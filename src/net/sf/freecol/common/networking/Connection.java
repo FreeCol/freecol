@@ -532,9 +532,15 @@ public class Connection implements Closeable {
      * @exception FreeColException if there is trouble with the response.
      */
     public Element handle(Element request) throws FreeColException {
-        return this.messageHandler.handle(this, request);
+        try {
+            return this.messageHandler.handle(this, request);
+        } catch (Exception ex) {
+            System.err.println("FAILEEE " + this.toString());
+            logger.log(Level.WARNING, "Handler failure in " + this.toString(),
+                       ex);
+        }
+        return null;
     }
-
 
     /**
      * Send a disconnect message.

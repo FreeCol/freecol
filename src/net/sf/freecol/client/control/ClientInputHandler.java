@@ -128,7 +128,8 @@ public abstract class ClientInputHandler extends FreeColClientHolder
                 logger.log(Level.FINEST, "Client ok: " + tag
                     + " to " + ((reply == null) ? "null" : reply.getTagName()));
             } catch (Exception ex) {
-                logger.log(Level.WARNING, "Client fail: " + tag, ex);
+                logger.log(Level.WARNING, "Client on " + connection.toString()
+                    + " failed for: " + tag, ex);
                 connection.reconnect();
             }
         }

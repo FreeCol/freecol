@@ -91,13 +91,22 @@ public class DOMMessage {
     /** The actual message data. */
     protected Document document;
 
-
+    /**
+     * Internal root constructor.
+     *
+     * @param The main tag.
+     */
+    private DOMMessage(String tag) {
+        this.document = createNewDocument();
+        Element root = this.document.createElement(tag);
+        this.document.appendChild(root);
+    }
+        
     /**
      * Constructs a new DOMMessage with data from the given InputStream. The
      * constructor to use if this is an INCOMING message.
      *
-     * @param inputStream The {@code InputStream} to get the XML-data
-     *            from.
+     * @param inputStream The {@code InputStream} to get the XML-data from.
      * @exception IOException if thrown by the {@code InputStream}.
      * @exception SAXException if thrown during parsing.
      */
@@ -113,16 +122,31 @@ public class DOMMessage {
      * @param attributes Attribute,value pairs.
      */
     public DOMMessage(String tag, String... attributes) {
-        this.document = createNewDocument();
-        Element root = this.document.createElement(tag);
-        this.document.appendChild(root);
+        this(tag);
+        
         String[] all = attributes;
         for (int i = 0; i < all.length; i += 2) {
-            if (all[i+1] != null) root.setAttribute(all[i], all[i+1]);
+            if (all[i+1] != null) this.setAttribute(all[i], all[i+1]);
+        }
+    }
+    
+    /**
+     * Create a DOMMessage with given tag and attributes.
+     *
+     * @param tag The main tag.
+     * @param attributes A {@code NamedNodeMap} of attributes.
+     */
+    private DOMMessage(String tag, NamedNodeMap map) {
+        this(tag);
+
+        final int n = map.getLength();
+        for (int i = 0; i < n; i++) {
+            Node node = map.item(i);
+            this.setAttribute(node.getNodeName(), node.getNodeValue());
         }
     }
 
-
+    
     /**
      * Create a DOMMessage from an element.
      *
@@ -136,16 +160,21 @@ public class DOMMessage {
         tag = "net.sf.freecol.common.networking."
             + tag.substring(0, 1).toUpperCase() + tag.substring(1)
             + "Message";
-        Class[] types = { Game.class, Element.class };
-        Object[] params = { game, element };
         DOMMessage message;
-        try {
-            message = (DOMMessage)Introspector.instantiate(tag, types, params);
-        } catch (Introspector.IntrospectorException ex) {
-            logger.log(Level.WARNING, "Instantiation fail for message type:"
-                + tag, ex);
-            message = null;
-        }
+        Class<?> tagClass = Introspector.getClassByName(tag);
+        if (tagClass == null) {
+            message = new DOMMessage(tag, element.getAttributes());
+        } else {
+            Class[] types = { Game.class, Element.class };
+            Object[] params = { game, element };
+            try {
+                message = (DOMMessage)Introspector.instantiate(tag,
+                    types, params);
+            } catch (Introspector.IntrospectorException ex) {
+                logger.log(Level.WARNING, "Instantiation fail for:" + tag, ex);
+                message = null;
+            }
+        }            
         return message;
     }
 
