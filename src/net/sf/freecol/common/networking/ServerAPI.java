@@ -407,7 +407,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean continuePlaying() {
-        return send(new DOMMessage("continuePlaying"));
+        return send(new TrivialMessage("continuePlaying"));
     }
 
     /**
@@ -546,7 +546,7 @@ public abstract class ServerAPI {
      */
     public boolean endTurn(Game game) {
         return askHandling(game,
-                           new DOMMessage("endTurn"));
+                           new TrivialMessage("endTurn"));
     }
 
     /**
@@ -557,7 +557,7 @@ public abstract class ServerAPI {
      */
     public boolean enterRevengeMode(Game game) {
         return askHandling(game,
-                           new DOMMessage("enterRevengeMode"));
+                           new TrivialMessage("enterRevengeMode"));
     }
 
     /**
@@ -700,7 +700,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean logout() {
-        return sendAndWait(new DOMMessage("logout",
+        return sendAndWait(new TrivialMessage("logout",
                 "reason", "User has quit the client."));
     }
 
@@ -901,7 +901,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean requestLaunch() {
-        return send(new DOMMessage("requestLaunch"));
+        return send(new TrivialMessage("requestLaunch"));
     }
 
     /**
@@ -912,7 +912,7 @@ public abstract class ServerAPI {
      */
     public boolean retire(Game game) {
         return askHandling(game,
-                           new DOMMessage("retire"));
+                           new TrivialMessage("retire"));
     }
 
     /**
@@ -949,7 +949,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setAvailable(Nation nation, NationState state) {
-        return askHandling(null, new DOMMessage("setAvailable",
+        return askHandling(null, new TrivialMessage("setAvailable",
                 "nation", nation.getId(),
                 "state", state.toString()));
     }
@@ -976,7 +976,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setColor(Nation nation, Color color) {
-        return askHandling(null, new DOMMessage("setColor",
+        return askHandling(null, new TrivialMessage("setColor",
                 "nation", nation.getId(),
                 "color", Integer.toString(color.getRGB())));
     }
@@ -1026,7 +1026,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setNation(Nation nation) {
-        return askHandling(null, new DOMMessage("setNation",
+        return askHandling(null, new TrivialMessage("setNation",
                 "value", nation.getId()));
     }
 
@@ -1038,7 +1038,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setNationType(NationType nationType) {
-        return askHandling(null, new DOMMessage("setNationType",
+        return askHandling(null, new TrivialMessage("setNationType",
                 "value", nationType.getId()));
     }
 
@@ -1050,7 +1050,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setReady(boolean ready) {
-        return send(new DOMMessage("ready",
+        return send(new TrivialMessage("ready",
                 "value", Boolean.toString(ready)));
     }
 
@@ -1072,7 +1072,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean startSkipping() {
-        return send(new DOMMessage("endTurn"));
+        return send(new TrivialMessage("endTurn"));
     }
 
     /**

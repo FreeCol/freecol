@@ -97,9 +97,7 @@ public class DOMMessage {
      * @param The main tag.
      */
     private DOMMessage(String tag) {
-        this.document = createNewDocument();
-        Element root = this.document.createElement(tag);
-        this.document.appendChild(root);
+        this.document = createDocument(tag);
     }
         
     /**
@@ -146,6 +144,72 @@ public class DOMMessage {
         }
     }
 
+    /**
+     * Create a new document with a root element with a given tag name.
+     *
+     * @param tag The root element name.
+     * @return The new document.
+     */
+    public static Document createDocument(String tag) {
+        Document document = createNewDocument();
+        Element root = document.createElement(tag);
+        document.appendChild(root);
+        return document;
+    }
+
+    /**
+     * Create a new document with a root element with a given tag name.
+     *
+     * @param tag The root element name.
+     * @return The root element of the document.
+     */
+    public static Element createElement(String tag) {
+        return createDocument(tag).getDocumentElement();
+    }
+
+    /**
+     * Create a new document with a root element with a given tag name
+     * and attributes.
+     *
+     * @param tag The root element name.
+     * @param map A {@code Map} of attributes.
+     * @return The new document.
+     */
+    public static Document createDocument(String tag, Map<String,String> map) {
+        Document document = createDocument(tag);
+        Element root = document.getDocumentElement();
+        forEachMapEntry(map, e -> root.setAttribute(e.getKey(), e.getValue()));
+        return document;
+    }
+    
+    /**
+     * Create a new document with a root element with a given tag name
+     * and attributes.
+     *
+     * @param tag The root element name.
+     * @param map A {@code Map} of attributes.
+     * @return The root element of the document.
+     */
+    public static Element createElement(String tag, Map<String,String> map) {
+        return createDocument(tag, map).getDocumentElement();
+    }
+
+    /**
+     * Utility to extract the attributes of an element into a map.
+     *
+     * @param element The {@code Element} to extract from.
+     * @return A {@code Map} of the attributes.
+     */
+    public static Map<String,String> getAttributeMap(Element element) {
+        Map<String, String> map = new HashMap<>();
+        NamedNodeMap nnm = element.getAttributes();
+        final int n = nnm.getLength();
+        for (int i = 0; i < n; i++) {
+            Node node = nnm.item(i);
+            map.put(node.getNodeName(), node.getNodeValue());
+        }
+        return map;
+    }
     
     /**
      * Create a DOMMessage from an element.

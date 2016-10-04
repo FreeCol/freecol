@@ -115,7 +115,7 @@ public class ServerListMessage extends DOMMessage {
      * @return A new {@code DOMMessage}.
      */
     private static DOMMessage serverInfoToMessage(ServerInfo si) {
-        return new DOMMessage(si.getTagName(),
+        return new TrivialMessage(si.getTagName(),
             NAME_TAG, si.getName(),
             ADDRESS_TAG, si.getAddress(),
             PORT_TAG, Integer.toString(si.getPort()),

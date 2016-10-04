@@ -548,7 +548,7 @@ public class Connection implements Closeable {
      * @exception IOException if failed to send the message.
      */
     public void disconnect() throws IOException {
-        this.send(new DOMMessage(DISCONNECT_TAG));
+        this.send(new TrivialMessage(DISCONNECT_TAG));
     }
 
     /**
@@ -556,7 +556,7 @@ public class Connection implements Closeable {
      */
     public void reconnect() {
         try {
-            this.send(new DOMMessage(RECONNECT_TAG));
+            this.send(new TrivialMessage(RECONNECT_TAG));
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Reconnect failed for " + this.name,
                 ioe);

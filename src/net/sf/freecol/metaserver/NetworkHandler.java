@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerListMessage;
+import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 
 import org.w3c.dom.Element;
@@ -112,10 +112,10 @@ public final class NetworkHandler implements MessageHandler {
         try {
             metaRegister.addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
         } catch (IOException e) {
-            return new DOMMessage("noRouteToServer").toXMLElement();
+            return new TrivialMessage("noRouteToServer").toXMLElement();
         }
 
-        return new DOMMessage("ok").toXMLElement();
+        return new TrivialMessage("ok").toXMLElement();
     }
 
 

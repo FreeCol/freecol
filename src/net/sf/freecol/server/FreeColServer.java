@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -604,7 +605,7 @@ public final class FreeColServer {
 
         setGameState(FreeColServer.GameState.IN_GAME);
         updateMetaServer();
-        sendToAll(new DOMMessage("startGame"), null);
+        sendToAll(new TrivialMessage("startGame"), null);
         getServer().setMessageHandlerToAllConnections(getInGameInputHandler());
     }
 
@@ -660,7 +661,7 @@ public final class FreeColServer {
         int nPlayers = getNumberOfLivingHumanPlayers();
         boolean started = gameState != GameState.STARTING_GAME;
         try {
-            Element reply = mc.ask(new DOMMessage(tag,
+            Element reply = mc.ask(new TrivialMessage(tag,
                     "name", addr,
                     "port", Integer.toString(port),
                     "slotsAvailable", Integer.toString(getSlotsAvailable()),
@@ -712,7 +713,7 @@ public final class FreeColServer {
                 FreeCol.META_SERVER_PORT,
                 null, FreeCol.SERVER_THREAD);
         ) {
-            mc.send(new DOMMessage("remove",
+            mc.send(new TrivialMessage("remove",
                     "port", Integer.toString(mc.getSocket().getPort())));
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Network error leaving meta-server: "

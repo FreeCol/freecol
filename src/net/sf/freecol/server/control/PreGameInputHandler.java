@@ -35,8 +35,8 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
 import net.sf.freecol.server.FreeColServer;
@@ -123,7 +123,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
 
         player.setConnected(false);
         getGame().removePlayer(player);
-        freeColServer.sendToAll(new DOMMessage("logout",
+        freeColServer.sendToAll(new TrivialMessage("logout",
                 "reason", "User has logged out.",
                 "player", player.getId()),
             connection);
@@ -145,7 +145,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
         if (player != null) {
             boolean ready = Boolean.parseBoolean(element.getAttribute("value"));
             player.setReady(ready);
-            freeColServer.sendToAll(new DOMMessage("playerReady",
+            freeColServer.sendToAll(new TrivialMessage("playerReady",
                     "player", player.getId(),
                     "value", Boolean.toString(ready)),
                 player.getConnection());
@@ -222,7 +222,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
             NationState state = Enum.valueOf(NationState.class,
                                              element.getAttribute("state"));
             getGame().getNationOptions().setNationState(nation, state);
-            freeColServer.sendToAll(new DOMMessage("setAvailable",
+            freeColServer.sendToAll(new TrivialMessage("setAvailable",
                     "nation", nation.getId(),
                     "state", state.toString()),
                 player.getConnection());
@@ -258,7 +258,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
                     .toXMLElement();
             }
             nation.setColor(color);
-            freeColServer.sendToAll(new DOMMessage("updateColor",
+            freeColServer.sendToAll(new TrivialMessage("updateColor",
                     "nation", nation.getId(),
                     "color", Integer.toString(color.getRGB())),
                 player.getConnection());
@@ -285,7 +285,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
             if (getGame().getNationOptions().getNations().get(nation)
                 == NationState.AVAILABLE) {
                 player.setNation(nation);
-                freeColServer.sendToAll(new DOMMessage("updateNation",
+                freeColServer.sendToAll(new TrivialMessage("updateNation",
                         "player", player.getId(),
                         "value", nation.getId()),
                     player.getConnection());
@@ -337,7 +337,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
             }
             if (ok) {
                 player.changeNationType(nationType);
-                freeColServer.sendToAll(new DOMMessage("updateNationType",
+                freeColServer.sendToAll(new TrivialMessage("updateNationType",
                         "player", player.getId(),
                         "value", nationType.getId()),
                     player.getConnection());
