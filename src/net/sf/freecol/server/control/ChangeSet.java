@@ -1378,11 +1378,9 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement(name);
-            for (int i = 0; i < attributes.length; i += 2) {
-                element.setAttribute(attributes[i], attributes[i+1]);
-            }
-            return element;
+            return new TrivialMessage(this.name)
+                .setAttributes(this.attributes)
+                .attachToDocument(doc);
         }
 
         /**
