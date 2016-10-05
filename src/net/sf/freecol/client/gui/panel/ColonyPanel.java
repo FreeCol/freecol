@@ -95,11 +95,26 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * This is a panel for the Colony display.  It shows the units that
  * are working in the colony, the buildings and much more.
- *
+ * <p>
  * Beware that in debug mode, this might be a server-side version of
- * the colony which is why we need to call
- * getColony().getSpecification() to get the spec that corresponds to
- * the good types in this colony.
+ * the colony which is why we need to call getColony().getSpecification()
+ * to get the spec that corresponds to the good types in this colony.
+ * <p>
+ * Panel Layout:
+ * <p style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;">
+ * |--------------------------------------------------------|
+ * | nameBox           |         netProductionPanel         |
+ * |--------------------------------------------------------|
+ * | tilesPanel        | buildingsPanel                     |
+ * |-------------------|                                    |
+ * | populationPanel   |                                    |
+ * |-------------------|                                    |
+ * | constructionPanel |                                    |
+ * |--------------------------------------------------------|
+ * | inPortPanel     | cargoPanel      | outsideColonyPanel |
+ * |--------------------------------------------------------|
+ * |                      warehousePanel                    |
+ * |--------------------------------------------------------|
  */
 public final class ColonyPanel extends PortPanel
     implements ActionListener, PropertyChangeListener {
@@ -1578,7 +1593,7 @@ public final class ColonyPanel extends PortPanel
                         goodsLabel.setTransferHandler(defaultTransferHandler);
                         goodsLabel.addMouseListener(pressListener);
                     }
-                    add(goodsLabel, false);
+                    add(goodsLabel, "alignx center");
                 }
             }
             ColonyPanel.this.updateProduction();
