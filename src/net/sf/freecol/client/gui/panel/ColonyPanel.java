@@ -1279,7 +1279,9 @@ public final class ColonyPanel extends PortPanel
 
         @Override
         public JToolTip createToolTip() {
-            return new RebelToolTip(getFreeColClient(), getColony());
+            JToolTip toolTip = new RebelToolTip(getFreeColClient(), getColony());
+            toolTip.setPreferredSize(new Dimension(400, 185));
+            return toolTip;
         }
 
 

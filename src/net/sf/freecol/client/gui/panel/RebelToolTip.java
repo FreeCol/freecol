@@ -60,7 +60,7 @@ public class RebelToolTip extends JToolTip {
         final Turn turn = colony.getGame().getTurn();
         StringTemplate t;
 
-        setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
+        setLayout(new MigLayout("fill, wrap 3", "[][right][right]", ""));
         // TODO: Calculate this from the size of the components
 
         add(Utility.localizedLabel(StringTemplate
@@ -98,13 +98,13 @@ public class RebelToolTip extends JToolTip {
                 && colony.getSoL() >= 100;
         final int liberty = colony.getLiberty();
         final int modulo = liberty % Colony.LIBERTY_PER_REBEL;
-        final int progressWidth = 393;
+        final int progressWidth = 400;
         FreeColProgressBar progress
                 = new FreeColProgressBar(null, 0,
                 Colony.LIBERTY_PER_REBEL, modulo,
                 ((capped) ? 0 : libertyProduction));
         progress.setPreferredSize(new Dimension(progressWidth, 20));
-        add(progress, "span 3");
+        add(progress, "span 3, alignx center");
 
         double turnsNext = -1.0;
         double turns100 = -1.0;
