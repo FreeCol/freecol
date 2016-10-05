@@ -227,7 +227,7 @@ public class DOMMessage {
         DOMMessage message;
         Class<?> tagClass = Introspector.getClassByName(tag);
         if (tagClass == null) {
-            message = new DOMMessage(tag, element.getAttributes());
+            message = new TrivialMessage(tag, getAttributeMap(element));
         } else {
             Class[] types = { Game.class, Element.class };
             Object[] params = { game, element };

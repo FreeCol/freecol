@@ -65,10 +65,19 @@ public class TrivialMessage extends DOMMessage {
     public TrivialMessage(String type, String... attributes) {
         this(type);
 
-        String[] all = attributes;
-        for (int i = 0; i < all.length; i += 2) {
-            if (all[i+1] != null) this.setAttribute(all[i], all[i+1]);
-        }
+        setAttributes(attributes);
+    }
+
+    /**
+     * Create a new {@code TrivialMessage} of a given type and attributes.
+     *
+     * @param type The message type.
+     * @param attributes A map of key,value pairs.
+     */
+    public TrivialMessage(String type, Map<String, String> attributes) {
+        this(type);
+
+        setAttributes(attributes);
     }
 
     /**
@@ -103,6 +112,7 @@ public class TrivialMessage extends DOMMessage {
      * @param key The {@code key} to look up.
      * @return The value found.
      */
+    @Override
     public String getAttribute(String key) {
         return this.attributes.get(key);
     }
@@ -112,7 +122,9 @@ public class TrivialMessage extends DOMMessage {
      *
      * @param key The {@code key} to look up.
      * @param value The value to set.
+     * @return This message.
      */
+    @Override
     public void setAttribute(String key, String value) {
         if (value != null) this.attributes.put(key, value);
     }
@@ -143,7 +155,33 @@ public class TrivialMessage extends DOMMessage {
         return (value == null) ? null : Integer.parseInt(getAttribute(key));
     }
 
+    /**
+     * Set the attributes in an array.
+     *
+     * @param attributes An array of key,value pairs.
+     * @return This message.
+     */
+    public TrivialMessage setAttributes(String[] attributes) {
+        if (attributes != null) {
+            for (int i = 0; i < attributes.length-1; i += 2) {
+                this.setAttribute(attributes[i], attributes[i+1]);
+            }
+        }
+        return this;
+    }
 
+    /**
+     * Set the attributes in a map.
+     *
+     * @param attributes A map of key,value pairs.
+     * @return This message.
+     */
+    public TrivialMessage setAttributes(Map<String, String> attributes) {
+        if (attributes != null) this.attributes.putAll(attributes);
+        return this;
+    }
+
+    
     /**
      * Handle a "trivial"-message.
      *
