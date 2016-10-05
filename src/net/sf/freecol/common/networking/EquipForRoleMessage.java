@@ -32,21 +32,12 @@ import org.w3c.dom.Element;
 /**
  * The message sent to equip a unit for a particular role.
  */
-public class EquipForRoleMessage extends DOMMessage {
+public class EquipForRoleMessage extends TrivialMessage {
 
     public static final String TAG = "equipForRole";
     private static final String COUNT_TAG = "count";
     private static final String ROLE_TAG = "role";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit to equip. */
-    private final String unitId;
-
-    /** The Role identifier. */
-    private final String roleId;
-
-    /** The role count. */
-    private final String roleCount;
 
 
     /**
@@ -58,11 +49,8 @@ public class EquipForRoleMessage extends DOMMessage {
      * @param roleCount The role count.
      */
     public EquipForRoleMessage(Unit unit, Role role, int roleCount) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.roleId = role.getId();
-        this.roleCount = String.valueOf(roleCount);
+        super(TAG, UNIT_TAG, unit.getId(), ROLE_TAG, role.getId(),
+              COUNT_TAG, String.valueOf(roleCount));
     }
 
     /**
@@ -72,11 +60,9 @@ public class EquipForRoleMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public EquipForRoleMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.roleId = getStringAttribute(element, ROLE_TAG);
-        this.roleCount = getStringAttribute(element, COUNT_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              ROLE_TAG, getStringAttribute(element, ROLE_TAG),
+              COUNT_TAG, getStringAttribute(element, COUNT_TAG));
     }
 
 
@@ -93,10 +79,13 @@ public class EquipForRoleMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = server.getGame();
+        final String unitId = getAttribute(UNIT_TAG);
+        final String roleId = getAttribute(ROLE_TAG);
+        final String countString = getAttribute(COUNT_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -104,31 +93,30 @@ public class EquipForRoleMessage extends DOMMessage {
         if (unit.isInEurope()) {
             ; // Always OK
         } else if (!unit.hasTile()) {
-            return serverPlayer.clientError("Unit is not on the map: "
-                + this.unitId)
+            return serverPlayer.clientError("Unit is not on the map: " + unitId)
                 .build(serverPlayer);
         } else if (unit.getSettlement() == null) {
             return serverPlayer.clientError("Unit is not in a settlement: "
-                + this.unitId)
+                + unitId)
                 .build(serverPlayer);
         }
 
-        Role role = game.getSpecification().getRole(this.roleId);
+        Role role = game.getSpecification().getRole(roleId);
         if (role == null) {
-            return serverPlayer.clientError("Not a role: " + this.roleId)
+            return serverPlayer.clientError("Not a role: " + roleId)
                 .build(serverPlayer);
         }
         int count;
         try {
-            count = Integer.parseInt(this.roleCount);
+            count = Integer.parseInt(countString);
         } catch (NumberFormatException nfe) {
             return serverPlayer.clientError("Role count is not an integer: " +
-                this.roleCount)
+                countString)
                 .build(serverPlayer);
         }
         if (count < 0 || count > role.getMaximumCount()) {
             return serverPlayer.clientError("Invalid role count: "
-                + this.roleCount)
+                + countString)
                 .build(serverPlayer);
         }
 
@@ -136,19 +124,6 @@ public class EquipForRoleMessage extends DOMMessage {
         ChangeSet cs = server.getInGameController()
             .equipForRole(serverPlayer, unit, role, count);
         return (cs == null) ? null : cs.build(serverPlayer);
-    }
-
-    /**
-     * Convert this EquipForRoleMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            ROLE_TAG, this.roleId,
-            COUNT_TAG, this.roleCount).toXMLElement();
     }
 
     /**

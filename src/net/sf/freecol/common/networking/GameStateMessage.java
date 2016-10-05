@@ -29,22 +29,17 @@ import org.w3c.dom.Element;
 /**
  * The message sent to check the game state.
  */
-public class GameStateMessage extends DOMMessage {
+public class GameStateMessage extends TrivialMessage {
 
     public static final String TAG = "gameState";
     private static final String STATE_TAG = "state";
-
-    /** The string value of the game state. */
-    public String state;
 
 
     /**
      * Create a new {@code GameStateMessage}.
      */
     public GameStateMessage() {
-        super(getTagName());
-
-        this.state = null;
+        super(TAG);
     }
 
     /**
@@ -55,16 +50,14 @@ public class GameStateMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public GameStateMessage(Game game, Element element) {
-        this();
-
-        this.state = getStringAttribute(element, STATE_TAG);
+        super(TAG, STATE_TAG, getStringAttribute(element, STATE_TAG));
     }
 
 
     // Public interface
 
     public GameState getGameState() {
-        return Enum.valueOf(GameState.class, this.state);
+        return Enum.valueOf(GameState.class, getAttribute(STATE_TAG));
     }
 
 
@@ -77,20 +70,8 @@ public class GameStateMessage extends DOMMessage {
      *     with the result of the query.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        this.state = server.getGameState().toString();
+        setAttribute(STATE_TAG, server.getGameState().toString());
         return this.toXMLElement();
-    }
-
-
-    /**
-     * Convert this GameStateMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            STATE_TAG, this.state).toXMLElement();
     }
 
     /**

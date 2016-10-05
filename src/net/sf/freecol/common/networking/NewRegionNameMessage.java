@@ -33,25 +33,13 @@ import org.w3c.dom.Element;
 /**
  * The message sent when naming a new region.
  */
-public class NewRegionNameMessage extends DOMMessage {
+public class NewRegionNameMessage extends TrivialMessage {
 
     public static final String TAG = "newRegionName";
     private static final String NEW_REGION_NAME_TAG = "newRegionName";
     private static final String REGION_TAG = "region";
     private static final String TILE_TAG = "tile";
     private static final String UNIT_TAG = "unit";
-
-    /** The object identifier of the region being discovered. */
-    private final String regionId;
-
-    /** The tile where the region is discovered. */
-    private final String tileId;
-
-    /** The unit making the discovery. */
-    private final String unitId;
-
-    /** The new name. */
-    private final String newRegionName;
 
 
     /**
@@ -65,12 +53,8 @@ public class NewRegionNameMessage extends DOMMessage {
      */
     public NewRegionNameMessage(Region region, Tile tile, Unit unit,
                                 String newRegionName) {
-        super(getTagName());
-
-        this.regionId = region.getId();
-        this.tileId = tile.getId();
-        this.unitId = unit.getId();
-        this.newRegionName = newRegionName;
+        super(TAG, REGION_TAG, region.getId(), TILE_TAG, tile.getId(),
+              UNIT_TAG, unit.getId(), NEW_REGION_NAME_TAG, newRegionName);
     }
 
     /**
@@ -81,12 +65,10 @@ public class NewRegionNameMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NewRegionNameMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.regionId = getStringAttribute(element, REGION_TAG);
-        this.tileId = getStringAttribute(element, TILE_TAG);
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.newRegionName = getStringAttribute(element, NEW_REGION_NAME_TAG);
+        super(TAG, REGION_TAG, getStringAttribute(element, REGION_TAG),
+              TILE_TAG, getStringAttribute(element, TILE_TAG),
+              UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              NEW_REGION_NAME_TAG, getStringAttribute(element, NEW_REGION_NAME_TAG));
     }
 
 
@@ -99,7 +81,7 @@ public class NewRegionNameMessage extends DOMMessage {
      * @return The region of this message.
      */
     public Region getRegion(Game game) {
-        return game.getFreeColGameObject(regionId, Region.class);
+        return game.getFreeColGameObject(getAttribute(REGION_TAG), Region.class);
     }
 
     /**
@@ -109,7 +91,7 @@ public class NewRegionNameMessage extends DOMMessage {
      * @return The tile of this message.
      */
     public Tile getTile(Game game) {
-        return game.getFreeColGameObject(tileId, Tile.class);
+        return game.getFreeColGameObject(getAttribute(TILE_TAG), Tile.class);
     }
 
     /**
@@ -119,7 +101,7 @@ public class NewRegionNameMessage extends DOMMessage {
      * @return The {@code Unit} of this message.
      */
     public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(unitId, Unit.class);
+        return player.getOurFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
     }
 
     /**
@@ -128,7 +110,7 @@ public class NewRegionNameMessage extends DOMMessage {
      * @return The new region name of this message.
      */
     public String getNewRegionName() {
-        return newRegionName;
+        return getAttribute(NEW_REGION_NAME_TAG);
     }
 
 
@@ -148,7 +130,7 @@ public class NewRegionNameMessage extends DOMMessage {
 
         Tile tile = getTile(game);
         if (!serverPlayer.hasExplored(tile)) {
-            return serverPlayer.clientError("Can not claim discovery in unexplored tile: " + tileId)
+            return serverPlayer.clientError("Can not claim discovery in unexplored tile: " + getAttribute(TILE_TAG))
                 .build(serverPlayer);
         }
 
@@ -163,33 +145,20 @@ public class NewRegionNameMessage extends DOMMessage {
         Region region = tile.getDiscoverableRegion();
         if (region == null) {
             return serverPlayer.clientError("No discoverable region in: "
-                + tileId)
+                + tile.getId())
                 .build(serverPlayer);
         }
-        if (!region.getId().equals(this.regionId)) {
+        String regionId = getAttribute(REGION_TAG);
+        if (!region.getId().equals(regionId)) {
             return serverPlayer.clientError("Region mismatch, "
-                + region.getId() + " != " + this.regionId)
+                + region.getId() + " != " + regionId)
                 .build(serverPlayer);
         }
         
         // Do the discovery
         return server.getInGameController()
-            .setNewRegionName(serverPlayer, unit, region, this.newRegionName)
+            .setNewRegionName(serverPlayer, unit, region, getNewRegionName())
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this NewRegionNameMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            REGION_TAG, this.regionId,
-            TILE_TAG, this.tileId,
-            UNIT_TAG, this.unitId,
-            NEW_REGION_NAME_TAG, this.newRegionName).toXMLElement();
     }
 
     /**

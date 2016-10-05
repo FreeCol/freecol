@@ -32,17 +32,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when naming a new land.
  */
-public class NewLandNameMessage extends DOMMessage {
+public class NewLandNameMessage extends TrivialMessage {
 
     public static final String TAG = "newLandName";
     private static final String NEW_LAND_NAME_TAG = "newLandName";
     private static final String UNIT_TAG = "unit";
-
-    /** The unit that has come ashore. */
-    private final String unitId;
-
-    /** The name to use. */
-    private final String newLandName;
 
 
     /**
@@ -53,10 +47,7 @@ public class NewLandNameMessage extends DOMMessage {
      * @param newLandName The new land name.
      */
     public NewLandNameMessage(Unit unit, String newLandName) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.newLandName = newLandName;
+        super(TAG, UNIT_TAG, unit.getId(), NEW_LAND_NAME_TAG, newLandName);
     }
 
     /**
@@ -67,10 +58,8 @@ public class NewLandNameMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NewLandNameMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.newLandName = getStringAttribute(element, NEW_LAND_NAME_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              NEW_LAND_NAME_TAG, getStringAttribute(element, NEW_LAND_NAME_TAG));
     }
 
 
@@ -83,7 +72,7 @@ public class NewLandNameMessage extends DOMMessage {
      * @return The {@code Unit} of this message.
      */
     public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(unitId, Unit.class);
+        return player.getOurFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
     }
 
     /**
@@ -92,7 +81,7 @@ public class NewLandNameMessage extends DOMMessage {
      * @return The new land name of this message.
      */
     public String getNewLandName() {
-        return newLandName;
+        return getAttribute(NEW_LAND_NAME_TAG);
     }
 
 
@@ -120,35 +109,24 @@ public class NewLandNameMessage extends DOMMessage {
         Tile tile = unit.getTile();
         if (tile == null) {
             return serverPlayer.clientError("Unit is not on the map: "
-                + this.unitId)
+                + unit.getId())
                 .build(serverPlayer);
         } else if (!tile.isLand()) {
             return serverPlayer.clientError("Unit is not in the new world: "
-                + this.unitId)
+                + unit.getId())
                 .build(serverPlayer);
         }
 
-        if (this.newLandName == null || this.newLandName.isEmpty()) {
+        String newLandName = getNewLandName();
+        if (newLandName == null || newLandName.isEmpty()) {
             return serverPlayer.clientError("Empty new land name")
                 .build(serverPlayer);
         }
 
         // Set name.
         return server.getInGameController()
-            .setNewLandName(serverPlayer, unit, this.newLandName)
+            .setNewLandName(serverPlayer, unit, newLandName)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this NewLandNameMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            NEW_LAND_NAME_TAG, this.newLandName).toXMLElement();
     }
 
     /**

@@ -31,13 +31,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when paying for a building.
  */
-public class PayForBuildingMessage extends DOMMessage {
+public class PayForBuildingMessage extends TrivialMessage {
 
     public static final String TAG = "payForBuilding";
     private static final String COLONY_TAG = "colony";
-
-    /** The identifier of the colony that is building. */
-    private final String colonyId;
 
 
     /**
@@ -47,9 +44,7 @@ public class PayForBuildingMessage extends DOMMessage {
      * @param colony The {@code Colony} that is building.
      */
     public PayForBuildingMessage(Colony colony) {
-        super(getTagName());
-
-        this.colonyId = colony.getId();
+        super(TAG, COLONY_TAG, colony.getId());
     }
 
     /**
@@ -60,9 +55,7 @@ public class PayForBuildingMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public PayForBuildingMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.colonyId = getStringAttribute(element, COLONY_TAG);
+        super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
     }
 
 
@@ -79,11 +72,11 @@ public class PayForBuildingMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-
+        final String colonyId = getAttribute(COLONY_TAG);
+        
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(this.colonyId,
-                                                    Colony.class);
+            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -93,17 +86,6 @@ public class PayForBuildingMessage extends DOMMessage {
         return server.getInGameController()
             .payForBuilding(serverPlayer, colony)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this PayForBuildingMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            COLONY_TAG, this.colonyId).toXMLElement();
     }
 
     /**

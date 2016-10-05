@@ -33,21 +33,12 @@ import org.w3c.dom.Element;
 /**
  * The message sent when unloading goods.
  */
-public class UnloadGoodsMessage extends DOMMessage {
+public class UnloadGoodsMessage extends TrivialMessage {
 
     public static final String TAG = "unloadGoods";
     private static final String AMOUNT_TAG = "amount";
     private static final String CARRIER_TAG = "carrier";
     private static final String TYPE_TAG = "type";
-
-    /** The identifier of the type of goods to unload.  */
-    private final String goodsTypeId;
-
-    /** The amount of goods to unload. */
-    private final String amountString;
-
-    /** The identifier of the carrier to unload to goods from. */
-    private final String carrierId;
 
 
     /**
@@ -58,11 +49,9 @@ public class UnloadGoodsMessage extends DOMMessage {
      * @param carrier The {@code Unit} carrying the goods.
      */
     public UnloadGoodsMessage(GoodsType goodsType, int amount, Unit carrier) {
-        super(getTagName());
-
-        this.goodsTypeId = goodsType.getId();
-        this.amountString = Integer.toString(amount);
-        this.carrierId = carrier.getId();
+        super(TAG, TYPE_TAG, goodsType.getId(),
+              AMOUNT_TAG, String.valueOf(amount),
+              CARRIER_TAG, carrier.getId());
     }
 
     /**
@@ -73,11 +62,9 @@ public class UnloadGoodsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UnloadGoodsMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.goodsTypeId = getStringAttribute(element, TYPE_TAG);
-        this.amountString = getStringAttribute(element, AMOUNT_TAG);
-        this.carrierId = getStringAttribute(element, CARRIER_TAG);
+        super(TAG, TYPE_TAG, getStringAttribute(element, TYPE_TAG),
+              AMOUNT_TAG, getStringAttribute(element, AMOUNT_TAG),
+              CARRIER_TAG, getStringAttribute(element, CARRIER_TAG));
     }
 
 
@@ -94,38 +81,39 @@ public class UnloadGoodsMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Specification spec = server.getSpecification();
-
+        final String typeId = getAttribute(TYPE_TAG);
+        final String amountString = getAttribute(AMOUNT_TAG);
+        final String carrierId = getAttribute(CARRIER_TAG);
+        
         Unit carrier;
         try {
-            carrier = player.getOurFreeColGameObject(this.carrierId, Unit.class);
+            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!carrier.canCarryGoods()) {
-            return serverPlayer.clientError("Not a goods carrier: "
-                + this.carrierId)
+            return serverPlayer.clientError("Not a goods carrier: " + carrierId)
                 .build(serverPlayer);
         }
         // Do not check location, carriers can dump goods anywhere
 
-        GoodsType type = spec.getGoodsType(this.goodsTypeId);
+        GoodsType type = spec.getGoodsType(typeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a goods type: "
-                + this.goodsTypeId)
+            return serverPlayer.clientError("Not a goods type: " + typeId)
                 .build(serverPlayer);
         }
 
         int amount;
         try {
-            amount = Integer.parseInt(this.amountString);
+            amount = Integer.parseInt(amountString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad amount: " + this.amountString)
+            return serverPlayer.clientError("Bad amount: " + amountString)
                 .build(serverPlayer);
         }
         if (amount <= 0) {
             return serverPlayer.clientError("Amount must be positive: "
-                + this.amountString)
+                + amountString)
                 .build(serverPlayer);
         }
         int present = carrier.getGoodsCount(type);
@@ -139,19 +127,6 @@ public class UnloadGoodsMessage extends DOMMessage {
         return server.getInGameController()
             .unloadGoods(serverPlayer, type, amount, carrier)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this UnloadGoodsMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            TYPE_TAG, this.goodsTypeId,
-            AMOUNT_TAG, this.amountString,
-            CARRIER_TAG, this.carrierId).toXMLElement();
     }
 
     /**

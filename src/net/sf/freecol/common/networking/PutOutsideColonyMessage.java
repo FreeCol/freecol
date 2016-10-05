@@ -31,13 +31,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when putting a unit outside a colony.
  */
-public class PutOutsideColonyMessage extends DOMMessage {
+public class PutOutsideColonyMessage extends TrivialMessage {
 
     public static final String TAG = "putOutsideColony";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit to be put out. */
-    private final String unitId;
 
 
     /**
@@ -47,9 +44,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
      * @param unit The {@code Unit} to put outside.
      */
     public PutOutsideColonyMessage(Unit unit) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
+        super(TAG, UNIT_TAG, unit.getId());
     }
 
     /**
@@ -60,9 +55,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public PutOutsideColonyMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
 
@@ -78,21 +71,20 @@ public class PutOutsideColonyMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.hasTile()) {
-            return serverPlayer.clientError("Unit is not on the map: "
-                + this.unitId)
+            return serverPlayer.clientError("Unit is not on the map: " + unitId)
                 .build(serverPlayer);
         } else if (unit.getColony() == null) {
-            return serverPlayer.clientError("Unit is not in a colony: "
-                + this.unitId)
+            return serverPlayer.clientError("Unit is not in a colony: " + unitId)
                 .build(serverPlayer);
         }
 
@@ -100,17 +92,6 @@ public class PutOutsideColonyMessage extends DOMMessage {
         return server.getInGameController()
             .putOutsideColony(serverPlayer, unit)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this PutOutsideColonyMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

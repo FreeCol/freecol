@@ -41,12 +41,6 @@ public class MoveMessage extends DOMMessage {
     private static final String DIRECTION_TAG = "direction";
     private static final String UNIT_TAG = "unit";
 
-    /** The identifier of the object to be moved. */
-    private final String unitId;
-
-    /** The direction to move. */
-    private final String directionString;
-
 
     /**
      * Create a new {@code MoveMessage} for the supplied unit and
@@ -56,10 +50,8 @@ public class MoveMessage extends DOMMessage {
      * @param direction The {@code Direction} to move in.
      */
     public MoveMessage(Unit unit, Direction direction) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.directionString = String.valueOf(direction);
+        super(TAG, UNIT_TAG, unit.getId(),
+              DIRECTION_TAG, String.valueOf(direction));
     }
 
     /**
@@ -70,10 +62,8 @@ public class MoveMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public MoveMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.directionString = getStringAttribute(element, DIRECTION_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
     }
 
 
@@ -89,10 +79,12 @@ public class MoveMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
+        final String directionString = getAttribute(DIRECTION_TAG);
 
         ServerUnit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, ServerUnit.class);
+            unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -100,7 +92,7 @@ public class MoveMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(this.directionString);
+            tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -108,7 +100,7 @@ public class MoveMessage extends DOMMessage {
 
         MoveType moveType = unit.getMoveType(tile);
         if (!moveType.isProgress()) {
-            return serverPlayer.clientError("Illegal move for: " + this.unitId
+            return serverPlayer.clientError("Illegal move for: " + unitId
                 + " type: " + moveType
                 + " from: " + unit.getLocation().getId()
                 + " to: " + tile.getId())
@@ -119,18 +111,6 @@ public class MoveMessage extends DOMMessage {
         return server.getInGameController()
             .move(serverPlayer, unit, tile)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this MoveMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**

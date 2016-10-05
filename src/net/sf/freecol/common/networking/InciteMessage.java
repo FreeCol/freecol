@@ -33,25 +33,13 @@ import org.w3c.dom.Element;
 /**
  * The message sent when inciting a native settlement.
  */
-public class InciteMessage extends DOMMessage {
+public class InciteMessage extends TrivialMessage {
 
     public static final String TAG = "incite";
     private static final String ENEMY_TAG = "enemy";
     private static final String GOLD_TAG = "gold";
     private static final String SETTLEMENT_TAG = "settlement";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit inciting. */
-    private final String unitId;
-
-    /** The identifier for the settlement. */
-    private final String settlementId;
-
-    /** The identifier of the enemy to incite against. */
-    private final String enemyId;
-
-    /** The amount of gold in the bribe. */
-    private final String goldString;
 
 
     /**
@@ -66,12 +54,8 @@ public class InciteMessage extends DOMMessage {
      */
     public InciteMessage(Unit unit, IndianSettlement is, Player enemy,
                          int gold) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.settlementId = is.getId();
-        this.enemyId = enemy.getId();
-        this.goldString = Integer.toString(gold);
+        super(TAG, UNIT_TAG, unit.getId(), SETTLEMENT_TAG, is.getId(),
+              ENEMY_TAG, enemy.getId(), GOLD_TAG, String.valueOf(gold));
     }
 
     /**
@@ -82,32 +66,30 @@ public class InciteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public InciteMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
-        this.enemyId = getStringAttribute(element, ENEMY_TAG);
-        this.goldString = getStringAttribute(element, GOLD_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              SETTLEMENT_TAG, getStringAttribute(element, SETTLEMENT_TAG),
+              ENEMY_TAG, getStringAttribute(element, ENEMY_TAG),
+              GOLD_TAG, getStringAttribute(element, GOLD_TAG));
     }
 
 
     // Public interface
 
     public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(this.unitId, Unit.class);
+        return player.getOurFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
     }
 
     public IndianSettlement getSettlement(Unit unit) {
-        return unit.getAdjacentSettlement(this.settlementId,
+        return unit.getAdjacentSettlement(getAttribute(SETTLEMENT_TAG),
                                           IndianSettlement.class);
     }
 
     public Player getEnemy(Game game) {
-        return game.getFreeColGameObject(this.enemyId, Player.class);
+        return game.getFreeColGameObject(getAttribute(ENEMY_TAG), Player.class);
     }
 
     public int getGold() {
-        return Integer.parseInt(this.goldString);
+        return getIntegerAttribute(GOLD_TAG);
     }
 
 
@@ -124,7 +106,7 @@ public class InciteMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = server.getGame();
-
+        
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
@@ -144,7 +126,8 @@ public class InciteMessage extends DOMMessage {
         MoveType type;
         ServerPlayer enemy = (ServerPlayer)getEnemy(game);
         if (enemy == null) {
-            return serverPlayer.clientError("Not a player: " + this.enemyId)
+            return serverPlayer.clientError("Not a player: "
+                + getAttribute(ENEMY_TAG))
                 .build(serverPlayer);
         } else if (enemy == player) {
             return serverPlayer.clientError("Inciting against oneself!")
@@ -159,11 +142,9 @@ public class InciteMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        int gold;
-        try {
-            gold = getGold();
-        } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad gold: " + this.goldString)
+        int gold = getGold();
+        if (gold < 0) {
+            return serverPlayer.clientError("Bad gold: " + getAttribute(GOLD_TAG))
                 .build(serverPlayer);
         }
 
@@ -171,20 +152,6 @@ public class InciteMessage extends DOMMessage {
         return server.getInGameController()
             .incite(serverPlayer, unit, is, enemy, gold)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this InciteMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            SETTLEMENT_TAG, this.settlementId,
-            ENEMY_TAG, this.enemyId,
-            GOLD_TAG, this.goldString).toXMLElement();
     }
 
     /**

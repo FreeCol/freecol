@@ -31,17 +31,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests setting a unit destination.
  */
-public class SetDestinationMessage extends DOMMessage {
+public class SetDestinationMessage extends TrivialMessage {
 
     public static final String TAG = "setDestination";
     private static final String DESTINATION_TAG = "destination";
     private static final String UNIT_TAG = "unit";
-
-    /** The object identifier of the unit whose destination is to be set. */
-    private final String unitId;
-
-    /** The object identifier of the unit destination or null. */
-    private final String destinationId;
 
 
     /**
@@ -52,11 +46,8 @@ public class SetDestinationMessage extends DOMMessage {
      * @param destination The destination to set (may be null)
      */
     public SetDestinationMessage(Unit unit, Location destination) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.destinationId = (destination == null) ? null
-            : destination.getId();
+        super(TAG, UNIT_TAG, unit.getId(),
+              DESTINATION_TAG, ((destination == null) ? null : destination.getId()));
     }
 
     /**
@@ -66,10 +57,8 @@ public class SetDestinationMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetDestinationMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.destinationId = getStringAttribute(element, DESTINATION_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              DESTINATION_TAG, getStringAttribute(element, DESTINATION_TAG));
     }
 
 
@@ -84,36 +73,25 @@ public class SetDestinationMessage extends DOMMessage {
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = serverPlayer.getGame();
+        final String unitId = getAttribute(UNIT_TAG);
+        final String destinationId = getAttribute(DESTINATION_TAG);
 
         Unit unit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(this.unitId,
-                                                        Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         // destination == null is OK.
-        Location destination = (this.destinationId == null) ? null
-            : game.findFreeColLocation(this.destinationId);
+        Location destination = (destinationId == null) ? null
+            : game.findFreeColLocation(destinationId);
 
         // Set destination
         return server.getInGameController()
             .setDestination(serverPlayer, unit, destination)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this SetDestinationMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            DESTINATION_TAG, this.destinationId).toXMLElement();
     }
 
     /**

@@ -32,19 +32,13 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a native delivers a gift to a Colony.
  */
-public class NativeGiftMessage extends DOMMessage {
+public class NativeGiftMessage extends TrivialMessage {
 
     public static final String TAG = "nativeGift";
     private static final String COLONY_TAG = "colony";
     private static final String UNIT_TAG = "unit";
 
-    /** The object identifier of the unit that is nativeing the gift. */
-    private final String unitId;
-
-    /** The object identifier of the colony the gift is going to. */
-    private final String colonyId;
-
-
+    
     /**
      * Create a new {@code NativeGiftMessage}.
      *
@@ -52,10 +46,7 @@ public class NativeGiftMessage extends DOMMessage {
      * @param colony The {@code Colony} that is trading.
      */
     public NativeGiftMessage(Unit unit, Colony colony) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.colonyId = colony.getId();
+        super(TAG, UNIT_TAG, unit.getId(), COLONY_TAG, colony.getId());
     }
 
     /**
@@ -66,10 +57,8 @@ public class NativeGiftMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NativeGiftMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.colonyId = getStringAttribute(element, COLONY_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              COLONY_TAG, getStringAttribute(element, COLONY_TAG));
     }
 
 
@@ -85,10 +74,12 @@ public class NativeGiftMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
+        final String colonyId = getAttribute(COLONY_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -96,7 +87,7 @@ public class NativeGiftMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = unit.getAdjacentSettlement(this.colonyId, Colony.class);
+            colony = unit.getAdjacentSettlement(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -106,18 +97,6 @@ public class NativeGiftMessage extends DOMMessage {
         return server.getInGameController()
             .nativeGift(serverPlayer, unit, colony)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this NativeGiftMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            COLONY_TAG, this.colonyId,
-            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

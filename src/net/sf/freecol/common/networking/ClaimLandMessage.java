@@ -35,23 +35,14 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests claiming land.
  */
-public class ClaimLandMessage extends DOMMessage {
+public class ClaimLandMessage extends TrivialMessage {
 
     public static final String TAG = "claimLand";
     private static final String CLAIMANT_TAG = "claimant";
     private static final String PRICE_TAG = "price";
     private static final String TILE_TAG = "tile";
 
-    /** The tile to claim. */
-    private final String tileId;
-
-    /** The unit or settlement claiming the land. */
-    private final String claimantId;
-
-    /** The price to pay for the tile. */
-    private final String priceString;
-
-
+    
     /**
      * Create a new {@code ClaimLandMessage}.
      *
@@ -61,11 +52,8 @@ public class ClaimLandMessage extends DOMMessage {
      * @param price The price to pay for the tile, negative if stealing.
      */
     public ClaimLandMessage(Tile tile, FreeColGameObject claimant, int price) {
-        super(getTagName());
-
-        this.tileId = tile.getId();
-        this.claimantId = claimant.getId();
-        this.priceString = Integer.toString(price);
+        super(TAG, TILE_TAG, tile.getId(), CLAIMANT_TAG, claimant.getId(),
+              PRICE_TAG, String.valueOf(price));
     }
 
     /**
@@ -75,11 +63,9 @@ public class ClaimLandMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ClaimLandMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.tileId = getStringAttribute(element, TILE_TAG);
-        this.claimantId = getStringAttribute(element, CLAIMANT_TAG);
-        this.priceString = getStringAttribute(element, PRICE_TAG);
+        super(TAG, TILE_TAG, getStringAttribute(element, TILE_TAG),
+              CLAIMANT_TAG, getStringAttribute(element, CLAIMANT_TAG),
+              PRICE_TAG, getStringAttribute(element, PRICE_TAG));
     }
 
 
@@ -96,46 +82,48 @@ public class ClaimLandMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = server.getGame();
+        final String tileId = getAttribute(TILE_TAG);
+        final String claimantId = getAttribute(CLAIMANT_TAG);
+        final String priceString = getAttribute(PRICE_TAG);
 
-        Tile tile = game.getFreeColGameObject(this.tileId, Tile.class);
+        Tile tile = game.getFreeColGameObject(tileId, Tile.class);
         if (tile == null) {
-            return serverPlayer.clientError("Not a file: " + this.tileId)
+            return serverPlayer.clientError("Not a file: " + tileId)
                 .build(serverPlayer);
         }
 
         Unit unit = null;
         try {
-            unit = player.getOurFreeColGameObject(this.claimantId, Unit.class);
+            unit = player.getOurFreeColGameObject(claimantId, Unit.class);
         } catch (IllegalStateException e) {} // Expected to fail sometimes...
         Settlement settlement = null;
         try {
-            settlement = player.getOurFreeColGameObject(this.claimantId,
+            settlement = player.getOurFreeColGameObject(claimantId,
                                                         Settlement.class);
         } catch (IllegalStateException e) {} // ...as is this one...
         if (unit != null) {
             if (unit.getTile() != tile) {
-                return serverPlayer.clientError("Unit not at tile: "
-                    + this.tileId)
+                return serverPlayer.clientError("Unit not at tile: " + tileId)
                     .build(serverPlayer);
             }
         } else if (settlement != null) {
             if (settlement.getOwner().isEuropean()
                 && !settlement.getTile().isAdjacent(tile)) {
                 return serverPlayer.clientError("Settlement can not claim tile: "
-                    + this.tileId)
+                    + tileId)
                     .build(serverPlayer);
             }
         } else { // ...but not both of them.
             return serverPlayer.clientError("Not a unit or settlement: "
-                + this.claimantId)
+                + claimantId)
                 .build(serverPlayer);
         }
 
         int price;
         try {
-            price = Integer.parseInt(this.priceString);
+            price = Integer.parseInt(priceString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad price: " + this.priceString)
+            return serverPlayer.clientError("Bad price: " + priceString)
                 .build(serverPlayer);
         }
 
@@ -195,19 +183,6 @@ public class ClaimLandMessage extends DOMMessage {
         return server.getInGameController()
             .claimLand(serverPlayer, tile, settlement, price)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this ClaimLandMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            TILE_TAG, this.tileId,
-            CLAIMANT_TAG, this.claimantId,
-            PRICE_TAG, this.priceString).toXMLElement();
     }
 
     /**

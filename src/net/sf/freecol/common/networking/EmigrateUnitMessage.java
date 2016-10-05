@@ -33,13 +33,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a unit is to emigrate.
  */
-public class EmigrateUnitMessage extends DOMMessage {
+public class EmigrateUnitMessage extends TrivialMessage {
 
     public static final String TAG = "emigrateUnit";
     private static final String SLOT_TAG = "slot";
-
-    /** The slot from which to select the unit. */
-    private final String slotString;
 
 
     /**
@@ -48,9 +45,7 @@ public class EmigrateUnitMessage extends DOMMessage {
      * @param slot The slot to select the migrant from.
      */
     public EmigrateUnitMessage(int slot) {
-        super(getTagName());
-
-        this.slotString = Integer.toString(slot);
+        super(TAG, SLOT_TAG, String.valueOf(slot));
     }
 
     /**
@@ -60,9 +55,7 @@ public class EmigrateUnitMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public EmigrateUnitMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.slotString = getStringAttribute(element, SLOT_TAG);
+        super(TAG, SLOT_TAG, getStringAttribute(element, SLOT_TAG));
     }
 
 
@@ -78,6 +71,7 @@ public class EmigrateUnitMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String slotString = getAttribute(SLOT_TAG);
 
         Europe europe = player.getEurope();
         if (europe == null) {
@@ -86,9 +80,9 @@ public class EmigrateUnitMessage extends DOMMessage {
         }
         int slot;
         try {
-            slot = Integer.parseInt(this.slotString);
+            slot = Integer.parseInt(slotString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad slot: " + this.slotString)
+            return serverPlayer.clientError("Bad slot: " + slotString)
                 .build(serverPlayer);
         }
         if (!MigrationType.validMigrantSlot(slot)) {
@@ -125,17 +119,6 @@ public class EmigrateUnitMessage extends DOMMessage {
         return server.getInGameController()
             .emigrate(serverPlayer, slot, type)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this EmigrateUnitMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            SLOT_TAG, this.slotString).toXMLElement();
     }
 
     /**

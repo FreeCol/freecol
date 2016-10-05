@@ -34,17 +34,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when attacking.
  */
-public class AttackMessage extends DOMMessage {
+public class AttackMessage extends TrivialMessage {
 
     public static final String TAG = "attack";
     private static final String DIRECTION_TAG = "direction";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the attacker. */
-    private final String unitId;
-
-    /** The direction to attack. */
-    private final String directionString;
 
 
     /**
@@ -55,10 +49,8 @@ public class AttackMessage extends DOMMessage {
      * @param direction The {@code Direction} to attack in.
      */
     public AttackMessage(Unit unit, Direction direction) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.directionString = String.valueOf(direction);
+        super(TAG, UNIT_TAG, unit.getId(),
+              DIRECTION_TAG, String.valueOf(direction));
     }
 
     /**
@@ -69,10 +61,8 @@ public class AttackMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AttackMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.directionString = getStringAttribute(element, DIRECTION_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
     }
 
 
@@ -88,10 +78,12 @@ public class AttackMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-        
+        final String unitId = getAttribute(UNIT_TAG);
+        final String directionString = getAttribute(DIRECTION_TAG);
+
         Unit unit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -99,7 +91,7 @@ public class AttackMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(this.directionString);
+            tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -112,7 +104,7 @@ public class AttackMessage extends DOMMessage {
             ; // OK
         } else {
             return serverPlayer.clientError("Illegal attack move for: "
-                + this.unitId
+                + unitId
                 + " type: " + moveType
                 + " from: " + unit.getLocation().getId()
                 + " to: " + tile.getId())
@@ -131,18 +123,6 @@ public class AttackMessage extends DOMMessage {
         return server.getInGameController()
             .combat(serverPlayer, unit, defender, null)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this AttackMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**

@@ -31,13 +31,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when paying tax arrears.
  */
-public class PayArrearsMessage extends DOMMessage {
+public class PayArrearsMessage extends TrivialMessage {
 
     public static final String TAG = "payArrears";
     private static final String GOODS_TYPE_TAG = "goodsType";
-
-    /** The identifier of the GoodsType to pay arrears for. */
-    private final String goodsTypeId;
 
 
     /**
@@ -47,9 +44,7 @@ public class PayArrearsMessage extends DOMMessage {
      * @param type The {@code GoodsType} to pay arrears for.
      */
     public PayArrearsMessage(GoodsType type) {
-        super(getTagName());
-
-        this.goodsTypeId = type.getId();
+        super(TAG, GOODS_TYPE_TAG, type.getId());
     }
 
     /**
@@ -60,9 +55,7 @@ public class PayArrearsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public PayArrearsMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.goodsTypeId = getStringAttribute(element, GOODS_TYPE_TAG);
+        super(TAG, GOODS_TYPE_TAG, getStringAttribute(element, GOODS_TYPE_TAG));
     }
 
 
@@ -80,23 +73,12 @@ public class PayArrearsMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         GoodsType goodsType = server.getSpecification()
-            .getGoodsType(this.goodsTypeId);
+            .getGoodsType(getAttribute(GOODS_TYPE_TAG));
 
         // Proceed to pay.
         return server.getInGameController()
             .payArrears(serverPlayer, goodsType)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this PayArrearsMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            GOODS_TYPE_TAG, this.goodsTypeId).toXMLElement();
     }
 
     /**

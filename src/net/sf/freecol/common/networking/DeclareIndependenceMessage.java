@@ -31,17 +31,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a player declares independence.
  */
-public class DeclareIndependenceMessage extends DOMMessage {
+public class DeclareIndependenceMessage extends TrivialMessage {
 
     public static final String TAG = "declareIndependence";
     private static final String COUNTRY_NAME_TAG = "countryName";
     private static final String NATION_NAME_TAG = "nationName";
-
-    /** The new name for the rebelling nation. */
-    private final String nationName;
-
-    /** The new name for the rebelling country */
-    private final String countryName;
 
 
     /**
@@ -52,10 +46,7 @@ public class DeclareIndependenceMessage extends DOMMessage {
      * @param countryName The new name for the rebelling country.
      */
     public DeclareIndependenceMessage(String nationName, String countryName) {
-        super(getTagName());
-
-        this.nationName = nationName;
-        this.countryName = countryName;
+        super(TAG, NATION_NAME_TAG, nationName, COUNTRY_NAME_TAG, countryName);
     }
 
     /**
@@ -67,7 +58,7 @@ public class DeclareIndependenceMessage extends DOMMessage {
      */
     public DeclareIndependenceMessage(Game game, Element element) {
         this(getStringAttribute(element, NATION_NAME_TAG),
-            getStringAttribute(element, COUNTRY_NAME_TAG));
+             getStringAttribute(element, COUNTRY_NAME_TAG));
     }
 
 
@@ -84,15 +75,19 @@ public class DeclareIndependenceMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-
-        if (this.nationName == null || this.nationName.isEmpty()) {
+        final String nationName = getAttribute(NATION_NAME_TAG);
+        final String countryName = getAttribute(COUNTRY_NAME_TAG);
+        
+        if (nationName == null || nationName.isEmpty()) {
             return serverPlayer.clientError("Empty nation name.")
                 .build(serverPlayer);
         }
-        if (this.countryName == null || this.countryName.isEmpty()) {
+
+        if (countryName == null || countryName.isEmpty()) {
             return serverPlayer.clientError("Empty country name.")
                 .build(serverPlayer);
         }
+
         StringTemplate problem = player.checkDeclareIndependence();
         if (problem != null) {
             return serverPlayer.clientError("Declaration blocked")
@@ -103,18 +98,6 @@ public class DeclareIndependenceMessage extends DOMMessage {
         return server.getInGameController()
             .declareIndependence(serverPlayer, nationName, countryName)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this DeclareIndependenceMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            NATION_NAME_TAG, this.nationName,
-            COUNTRY_NAME_TAG, this.countryName).toXMLElement();
     }
 
     /**

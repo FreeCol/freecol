@@ -30,21 +30,12 @@ import org.w3c.dom.Element;
 /**
  * The message that contains a chat string.
  */
-public class ChatMessage extends DOMMessage {
+public class ChatMessage extends TrivialMessage {
 
     public static final String TAG = "chat";
     private static final String MESSAGE_TAG = "message";
     private static final String PRIVATE_TAG = "private";
     private static final String SENDER_TAG = "sender";
-
-    /** The object identifier of the sender player. */
-    private String sender;
-
-    /** The text of the message. */
-    private final String message;
-
-    /** Whether this is a private message or not. */
-    private final boolean privateChat;
 
 
     /**
@@ -56,11 +47,8 @@ public class ChatMessage extends DOMMessage {
      * @param privateChat Whether this message is private.
      */
     public ChatMessage(Player player, String message, boolean privateChat) {
-        super(getTagName());
-
-        this.sender = player.getId();
-        this.message = message;
-        this.privateChat = privateChat;
+        super(TAG, SENDER_TAG, player.getId(), MESSAGE_TAG, message,
+              PRIVATE_TAG, String.valueOf(privateChat));
     }
 
     /**
@@ -72,11 +60,9 @@ public class ChatMessage extends DOMMessage {
      * @throws IllegalStateException if there is problem with the senderID.
      */
     public ChatMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.sender = getStringAttribute(element, SENDER_TAG);
-        this.message = getStringAttribute(element, MESSAGE_TAG);
-        this.privateChat = getBooleanAttribute(element, PRIVATE_TAG, false);
+        super(TAG, SENDER_TAG, getStringAttribute(element, SENDER_TAG),
+              MESSAGE_TAG, getStringAttribute(element, MESSAGE_TAG),
+              PRIVATE_TAG, getStringAttribute(element, PRIVATE_TAG));
     }
 
 
@@ -89,7 +75,7 @@ public class ChatMessage extends DOMMessage {
      * @return The player that sent this ChatMessage.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(this.sender, Player.class);
+        return game.getFreeColGameObject(getAttribute(SENDER_TAG), Player.class);
     }
 
     /**
@@ -98,7 +84,7 @@ public class ChatMessage extends DOMMessage {
      * @return The text of this ChatMessage.
      */
     public String getMessage() {
-        return this.message;
+        return getAttribute(MESSAGE_TAG);
     }
 
     /**
@@ -107,7 +93,7 @@ public class ChatMessage extends DOMMessage {
      * @return True if this ChatMessage is private.
      */
     public boolean isPrivate() {
-        return this.privateChat;
+        return getBooleanAttribute(PRIVATE_TAG);
     }
 
 
@@ -123,24 +109,11 @@ public class ChatMessage extends DOMMessage {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         /* Do not trust the client-supplied sender name */
-        this.sender = serverPlayer.getId();
+        setAttribute(SENDER_TAG, serverPlayer.getId());
 
-        server.getInGameController().chat(serverPlayer, this.message,
-                                          this.privateChat);
+        server.getInGameController()
+            .chat(serverPlayer, getMessage(), isPrivate());
         return null;
-    }
-
-    /**
-     * Convert this ChatMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            SENDER_TAG, this.sender,
-            MESSAGE_TAG, this.message,
-            PRIVATE_TAG, String.valueOf(this.privateChat)).toXMLElement();
     }
 
     /**

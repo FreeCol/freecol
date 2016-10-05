@@ -34,21 +34,12 @@ import org.w3c.dom.Element;
 /**
  * The message sent when speaking to a chief.
  */
-public class ScoutSpeakToChiefMessage extends DOMMessage {
+public class ScoutSpeakToChiefMessage extends TrivialMessage {
 
     public static final String TAG = "scoutSpeakToChief";
     private static final String RESULT_TAG = "result";
     private static final String SETTLEMENT_TAG = "settlement";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit that is speaking. */
-    private final String unitId;
-
-    /** The identifier of the settlement to talk to. */
-    private final String settlementId;
-
-    /** The result of speaking to the chief. */
-    private final String result;
 
 
     /**
@@ -63,11 +54,8 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      */
     public ScoutSpeakToChiefMessage(Unit unit, IndianSettlement is,
                                     String result) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.settlementId = is.getId();
-        this.result = result;
+        super(TAG, UNIT_TAG, unit.getId(), SETTLEMENT_TAG, is.getId(),
+              RESULT_TAG, result);
     }
 
     /**
@@ -78,27 +66,26 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ScoutSpeakToChiefMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
-        this.result = getStringAttribute(element, RESULT_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              SETTLEMENT_TAG, getStringAttribute(element, SETTLEMENT_TAG),
+              RESULT_TAG, getStringAttribute(element, RESULT_TAG));
     }
 
 
     // Public interface
 
     public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(this.unitId, Unit.class);
+        return game.getFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
     }
 
     public IndianSettlement getSettlement(Game game) {
-        return game.getFreeColGameObject(this.settlementId,
+        return game.getFreeColGameObject(getAttribute(SETTLEMENT_TAG),
                                          IndianSettlement.class);
     }
 
     public String getResult() {
-        return (this.result == null) ? "" : this.result;
+        String result = getAttribute(RESULT_TAG);
+        return (result == null) ? "" : result;
     }
 
     
@@ -114,23 +101,25 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
+        final String settlementId = getAttribute(SETTLEMENT_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
             return serverPlayer.clientError("Unit lacks ability to speak to chief: "
-                + this.unitId)
+                + unitId)
                 .build(serverPlayer);
         }
 
         IndianSettlement is;
         try {
-            is = unit.getAdjacentSettlement(this.settlementId,
+            is = unit.getAdjacentSettlement(settlementId,
                                             IndianSettlement.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
@@ -148,19 +137,6 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
         return server.getInGameController()
             .scoutSpeakToChief(serverPlayer, unit, is)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this ScoutSpeakToChiefMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            SETTLEMENT_TAG, this.settlementId,
-            RESULT_TAG, this.result).toXMLElement();
     }
 
     /**

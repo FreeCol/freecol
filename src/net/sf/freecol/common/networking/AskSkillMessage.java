@@ -35,17 +35,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when asking for the skill taught at a settlement.
  */
-public class AskSkillMessage extends DOMMessage {
+public class AskSkillMessage extends TrivialMessage {
 
     public static final String TAG = "askSkill";
     private static final String DIRECTION_TAG = "direction";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit that is asking. */
-    private final String unitId;
-
-    /** The direction the unit is asking in. */
-    private final String directionString;
 
 
     /**
@@ -56,10 +50,8 @@ public class AskSkillMessage extends DOMMessage {
      * @param direction The {@code Direction} the unit is looking.
      */
     public AskSkillMessage(Unit unit, Direction direction) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.directionString = String.valueOf(direction);
+        super(TAG, UNIT_TAG, unit.getId(),
+              DIRECTION_TAG, String.valueOf(direction));
     }
 
     /**
@@ -70,10 +62,8 @@ public class AskSkillMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AskSkillMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.directionString = getStringAttribute(element, DIRECTION_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
     }
 
 
@@ -90,10 +80,12 @@ public class AskSkillMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
+        final String directionString = getAttribute(DIRECTION_TAG);
 
         Unit unit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -101,7 +93,7 @@ public class AskSkillMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(this.directionString);
+            tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -125,18 +117,6 @@ public class AskSkillMessage extends DOMMessage {
         return server.getInGameController()
             .askLearnSkill(serverPlayer, unit, is)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this AskSkillMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**

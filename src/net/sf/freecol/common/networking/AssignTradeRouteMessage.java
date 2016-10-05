@@ -32,17 +32,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when assigning a trade route to a unit.
  */
-public class AssignTradeRouteMessage extends DOMMessage {
+public class AssignTradeRouteMessage extends TrivialMessage {
 
     public static final String TAG = "assignTradeRoute";
     private static final String TRADE_ROUTE_TAG = "tradeRoute";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit. */
-    private final String unitId;
-
-    /** The identifier of the trade route. */
-    private final String tradeRouteId;
 
 
     /**
@@ -53,10 +47,8 @@ public class AssignTradeRouteMessage extends DOMMessage {
      * @param tradeRoute The {@code TradeRoute} to assign.
      */
     public AssignTradeRouteMessage(Unit unit, TradeRoute tradeRoute) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.tradeRouteId = (tradeRoute == null) ? null : tradeRoute.getId();
+        super(TAG, UNIT_TAG, unit.getId(),
+              TRADE_ROUTE_TAG, ((tradeRoute == null) ? null : tradeRoute.getId()));
     }
 
     /**
@@ -67,10 +59,8 @@ public class AssignTradeRouteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AssignTradeRouteMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.tradeRouteId = getStringAttribute(element, TRADE_ROUTE_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              TRADE_ROUTE_TAG, getStringAttribute(element, TRADE_ROUTE_TAG));
     }
 
 
@@ -86,6 +76,8 @@ public class AssignTradeRouteMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
+        final String tradeRouteId = getAttribute(TRADE_ROUTE_TAG);
 
         Unit unit;
         try {
@@ -112,18 +104,6 @@ public class AssignTradeRouteMessage extends DOMMessage {
         return server.getInGameController()
             .assignTradeRoute(serverPlayer, unit, tradeRoute)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this AssignTradeRouteMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "tradeRoute", tradeRouteId).toXMLElement();
     }
 
     /**

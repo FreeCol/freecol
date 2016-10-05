@@ -32,13 +32,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when disembarking.
  */
-public class DisembarkMessage extends DOMMessage {
+public class DisembarkMessage extends TrivialMessage {
 
     public static final String TAG = "disembark";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the object disembarking. */
-    private final String unitId;
 
 
     /**
@@ -48,9 +45,7 @@ public class DisembarkMessage extends DOMMessage {
      * @param unit The {@code Unit} that is disembarking.
      */
     public DisembarkMessage(Unit unit) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
+        super(TAG, UNIT_TAG, unit.getId());
     }
 
     /**
@@ -61,9 +56,7 @@ public class DisembarkMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DisembarkMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
 
@@ -79,10 +72,11 @@ public class DisembarkMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
 
         ServerUnit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, ServerUnit.class);
+            unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -92,17 +86,6 @@ public class DisembarkMessage extends DOMMessage {
         return server.getInGameController()
             .disembarkUnit(serverPlayer, unit)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this DisembarkMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

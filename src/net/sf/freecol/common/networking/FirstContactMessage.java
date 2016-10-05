@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when making first contact between players.
  */
-public class FirstContactMessage extends DOMMessage {
+public class FirstContactMessage extends TrivialMessage {
 
     public static final String TAG = "firstContact";
     private static final String CAMPS_TAG = "camps";
@@ -39,24 +39,6 @@ public class FirstContactMessage extends DOMMessage {
     private static final String PLAYER_TAG = "player";
     private static final String RESULT_TAG = "result";
     private static final String TILE_TAG = "tile";
-
-    /** The identifier for the player making contact. */
-    private final String playerId;
-
-    /** The identifier for the player being contacted. */
-    private final String otherId;
-
-    /**
-     * The identifier for a tile to offer the contacting player if this is a
-     * first landing and the contacted player is a friendly native.
-     */
-    private final String tileId;
-
-    /** The number of settlements the contacted player has, if native. */
-    private final String settlementCount;
-
-    /** The result of the contact. */
-    private String result;
 
 
     /**
@@ -67,14 +49,10 @@ public class FirstContactMessage extends DOMMessage {
      * @param tile An optional {@code Tile} to offer.
      */
     public FirstContactMessage(Player player, Player other, Tile tile) {
-        super(getTagName());
-
-        this.playerId = player.getId();
-        this.otherId = other.getId();
-        this.tileId = (tile == null) ? null : tile.getId();
-        this.settlementCount = (other.isEuropean()) ? null
-            : Integer.toString(other.getSettlementCount());
-        this.result = null;
+        super(TAG, PLAYER_TAG, player.getId(), OTHER_TAG, other.getId(),
+              TILE_TAG, (tile == null) ? null : tile.getId(),
+              CAMPS_TAG, ((other.isEuropean()) ? null
+                  : String.valueOf(other.getSettlementCount())));
     }
 
     /**
@@ -85,43 +63,38 @@ public class FirstContactMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public FirstContactMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.playerId = getStringAttribute(element, PLAYER_TAG);
-        this.otherId = getStringAttribute(element, OTHER_TAG);
-        this.tileId = getStringAttribute(element, TILE_TAG);
-        this.settlementCount = getStringAttribute(element, CAMPS_TAG);
-        this.result = getStringAttribute(element, RESULT_TAG);
+        super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG),
+              OTHER_TAG, getStringAttribute(element, OTHER_TAG),
+              TILE_TAG, getStringAttribute(element, TILE_TAG),
+              CAMPS_TAG, getStringAttribute(element, CAMPS_TAG),
+              RESULT_TAG, getStringAttribute(element, RESULT_TAG));
     }
 
 
     // Public interface
 
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(playerId, Player.class);
+        return game.getFreeColGameObject(getAttribute(PLAYER_TAG), Player.class);
     }
 
     public Player getOtherPlayer(Game game) {
-        return game.getFreeColGameObject(otherId, Player.class);
+        return game.getFreeColGameObject(getAttribute(OTHER_TAG), Player.class);
     }
 
     public Tile getTile(Game game) {
-        return game.getFreeColGameObject(tileId, Tile.class);
+        return game.getFreeColGameObject(getAttribute(TILE_TAG), Tile.class);
     }
 
     public int getSettlementCount() {
-        try {
-            return Integer.parseInt(settlementCount);
-        } catch (NumberFormatException nfe) {}
-        return -1;
+        return getIntegerAttribute(CAMPS_TAG);
     }
             
     public boolean getResult() {
-        return Boolean.parseBoolean(result);
+        return getBooleanAttribute(RESULT_TAG);
     }
 
     public FirstContactMessage setResult(boolean result) {
-        this.result = String.valueOf(result);
+        setAttribute(RESULT_TAG, String.valueOf(result));
         return this;
     }
 
@@ -137,22 +110,23 @@ public class FirstContactMessage extends DOMMessage {
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = serverPlayer.getGame();
+        final String playerId = getAttribute(PLAYER_TAG);
+        final String otherId = getAttribute(OTHER_TAG);
 
         Player first = getPlayer(game);
         if (first == null) {
-            return serverPlayer.clientError("Invalid player: " + this.playerId)
+            return serverPlayer.clientError("Invalid player: " + playerId)
                 .build(serverPlayer);
-        } else if (serverPlayer.getId().equals(this.playerId)) {
+        } else if (serverPlayer.getId().equals(playerId)) {
             ; // OK
         } else {
-            return serverPlayer.clientError("Not our player: " + this.playerId)
+            return serverPlayer.clientError("Not our player: " + playerId)
                 .build(serverPlayer);
         }
 
         ServerPlayer otherPlayer = (ServerPlayer)getOtherPlayer(game);
         if (otherPlayer == null) {
-            return serverPlayer.clientError("Invalid other player: "
-                + this.otherId)
+            return serverPlayer.clientError("Invalid other player: " + otherId)
                 .build(serverPlayer);
         } else if (otherPlayer == serverPlayer) {
             return serverPlayer.clientError("First contact with self!?!")
@@ -164,21 +138,6 @@ public class FirstContactMessage extends DOMMessage {
             .nativeFirstContact(serverPlayer, otherPlayer,
                                 getTile(game), getResult())
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this FirstContactMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            PLAYER_TAG, this.playerId,
-            OTHER_TAG, this.otherId,
-            TILE_TAG, this.tileId,
-            CAMPS_TAG, this.settlementCount,
-            RESULT_TAG, this.result).toXMLElement();
     }
 
     /**

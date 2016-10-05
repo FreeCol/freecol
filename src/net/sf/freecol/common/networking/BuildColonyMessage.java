@@ -32,17 +32,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests building of a colony.
  */
-public class BuildColonyMessage extends DOMMessage {
+public class BuildColonyMessage extends TrivialMessage {
 
     public static final String TAG = "buildColony";
     private static final String NAME_TAG = "name";
     private static final String UNIT_TAG = "unit";
-
-    /** The name of the new colony. */
-    private final String colonyName;
-
-    /** The unit that is building the colony. */
-    private final String unitId;
 
 
     /**
@@ -53,10 +47,7 @@ public class BuildColonyMessage extends DOMMessage {
      * @param builder The {@code Unit} to do the building.
      */
     public BuildColonyMessage(String colonyName, Unit builder) {
-        super(getTagName());
-
-        this.colonyName = colonyName;
-        this.unitId = builder.getId();
+        super(TAG, NAME_TAG, colonyName, UNIT_TAG, builder.getId());
     }
 
     /**
@@ -66,10 +57,8 @@ public class BuildColonyMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public BuildColonyMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.colonyName = getStringAttribute(element, NAME_TAG);
-        this.unitId = getStringAttribute(element, UNIT_TAG);
+        super(TAG, NAME_TAG, getStringAttribute(element, NAME_TAG),
+              UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
 
@@ -87,28 +76,30 @@ public class BuildColonyMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = server.getGame();
+        final String colonyName = getAttribute(NAME_TAG);
+        final String unitId = getAttribute(UNIT_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.canBuildColony()) {
-            return serverPlayer.clientError("Unit " + this.unitId
+            return serverPlayer.clientError("Unit " + unitId
                 + " can not build colony.")
                 .build(serverPlayer);
         }
 
-        if (this.colonyName == null) {
+        if (colonyName == null) {
             return serverPlayer.clientError("Null colony name")
                 .build(serverPlayer);
-        } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(this.colonyName)) {
+        } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
             ; // ok
-        } else if (game.getSettlementByName(this.colonyName) != null) {
+        } else if (game.getSettlementByName(colonyName) != null) {
             return serverPlayer.clientError("Non-unique colony name "
-                + this.colonyName)
+                + colonyName)
                 .build(serverPlayer);
         }
 
@@ -123,18 +114,6 @@ public class BuildColonyMessage extends DOMMessage {
         return server.getInGameController()
             .buildSettlement(serverPlayer, unit, colonyName)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this BuildColonyMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            NAME_TAG, this.colonyName,
-            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to resolve natives making demands of a colony.
  */
-public class IndianDemandMessage extends DOMMessage {
+public class IndianDemandMessage extends TrivialMessage {
 
     public static final String TAG = "indianDemand";
     private static final String AMOUNT_TAG = "amount";
@@ -41,21 +41,6 @@ public class IndianDemandMessage extends DOMMessage {
     private static final String RESULT_TAG = "result";
     private static final String TYPE_TAG = "type";
     private static final String UNIT_TAG = "unit";
-    
-    /** The identifier of the unit that is demanding. */
-    private final String unitId;
-
-    /** The identifier of the colony being demanded of. */
-    private final String colonyId;
-
-    /** The type of goods being demanded, null implies gold. */
-    private final String typeId;
-
-    /** The amount of goods being demanded. */
-    private final String amount;
-
-    /** The result of this demand: null implies not decided yet. */
-    private String result;
 
 
     /**
@@ -69,13 +54,9 @@ public class IndianDemandMessage extends DOMMessage {
      */
     public IndianDemandMessage(Unit unit, Colony colony,
                                GoodsType type, int amount) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.colonyId = colony.getId();
-        this.typeId = (type == null) ? null : type.getId();
-        this.amount = Integer.toString(amount);
-        this.result = null;
+        super(TAG, UNIT_TAG, unit.getId(), COLONY_TAG, colony.getId(),
+              TYPE_TAG, (type == null) ? null : type.getId(),
+              AMOUNT_TAG, String.valueOf(amount));
     }
 
     /**
@@ -86,13 +67,11 @@ public class IndianDemandMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public IndianDemandMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.colonyId = getStringAttribute(element, COLONY_TAG);
-        this.typeId = getStringAttribute(element, TYPE_TAG);
-        this.amount = getStringAttribute(element, AMOUNT_TAG);
-        this.result = getStringAttribute(element, RESULT_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              COLONY_TAG, getStringAttribute(element, COLONY_TAG),
+              TYPE_TAG, getStringAttribute(element, TYPE_TAG),
+              AMOUNT_TAG, getStringAttribute(element, AMOUNT_TAG),
+              RESULT_TAG, getStringAttribute(element, RESULT_TAG));
     }
 
 
@@ -105,7 +84,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @return The {@code Unit} found.
      */
     public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(unitId, Unit.class);
+        return game.getFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
     }
 
     /**
@@ -115,7 +94,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @return The {@code Colony} found.
      */
     public Colony getColony(Game game) {
-        return game.getFreeColGameObject(colonyId, Colony.class);
+        return game.getFreeColGameObject(getAttribute(COLONY_TAG), Colony.class);
     }
 
     /**
@@ -125,6 +104,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @return The {@code GoodsType} found.
      */
     public GoodsType getType(Game game) {
+        String typeId = getAttribute(TYPE_TAG);
         return (typeId == null) ? null
             : game.getSpecification().getGoodsType(typeId);
     }
@@ -136,10 +116,7 @@ public class IndianDemandMessage extends DOMMessage {
      *     none or invalid.
      */
     public int getAmount() {
-        try {
-            return Integer.parseInt(amount);
-        } catch (NumberFormatException nfe) {}
-        return -1;
+        return getIntegerAttribute(AMOUNT_TAG);
     }
 
     /**
@@ -148,7 +125,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @return The result of this demand.
      */
     public Boolean getResult() {
-        return (result == null) ? null : Boolean.parseBoolean(result);
+        return getBooleanAttribute(RESULT_TAG);
     }
 
     /**
@@ -157,7 +134,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @param result The new result of this demand.
      */
     public void setResult(boolean result) {
-        this.result = Boolean.toString(result);
+        setAttribute(RESULT_TAG, String.valueOf(result));
     }
 
 
@@ -174,21 +151,24 @@ public class IndianDemandMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = player.getGame();
-
+        final String unitId = getAttribute(UNIT_TAG);
+        final String colonyId = getAttribute(COLONY_TAG);
+        final Boolean result = getResult();
+        
         Unit unit;
         try {
             if (result == null) { // Initial demand
-                unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+                unit = player.getOurFreeColGameObject(unitId, Unit.class);
                 if (unit.getMovesLeft() <= 0) {
                     return serverPlayer.clientError("Unit has no moves left: "
-                        + this.unitId)
+                        + unitId)
                         .build(serverPlayer);
                 }
             } else { // Reply from colony
                 unit = game.getFreeColGameObject(unitId, Unit.class);
                 if (unit == null) {
                     return serverPlayer.clientError("Not a unit: "
-                        + this.unitId)
+                        + unitId)
                         .build(serverPlayer);
                 }
             }
@@ -199,37 +179,22 @@ public class IndianDemandMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = unit.getAdjacentSettlement(this.colonyId, Colony.class);
+            colony = unit.getAdjacentSettlement(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
-        if (getAmount() <= 0) {
-            return serverPlayer.clientError("Bad amount: " + this.amount)
+        int amount = getAmount();
+        if (amount <= 0) {
+            return serverPlayer.clientError("Bad amount: " + amount)
                 .build(serverPlayer);
         }
 
         // Proceed to demand.
         return server.getInGameController()
-            .indianDemand(serverPlayer, unit, colony,
-                          getType(game), getAmount())
+            .indianDemand(serverPlayer, unit, colony, getType(game), amount)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this IndianDemandMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            COLONY_TAG, this.colonyId,
-            AMOUNT_TAG, this.amount,
-            TYPE_TAG, this.typeId,
-            RESULT_TAG, this.result).toXMLElement();
     }
 
     /**

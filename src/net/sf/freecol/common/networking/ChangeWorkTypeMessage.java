@@ -33,17 +33,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when changing the work type of a unit.
  */
-public class ChangeWorkTypeMessage extends DOMMessage {
+public class ChangeWorkTypeMessage extends TrivialMessage {
 
     public static final String TAG = "changeWorkType";
     private static final String UNIT_TAG = "unit";
     private static final String WORK_TYPE_TAG = "workType";
-
-    /** The identifier of the unit that is working. */
-    private final String unitId;
-
-    /** The goods type to produce. */
-    private final String workTypeId;
 
 
     /**
@@ -54,10 +48,7 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      * @param workType The {@code GoodsType} to produce.
      */
     public ChangeWorkTypeMessage(Unit unit, GoodsType workType) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.workTypeId = workType.getId();
+        super(TAG, UNIT_TAG, unit.getId(), WORK_TYPE_TAG, workType.getId());
     }
 
     /**
@@ -68,10 +59,8 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ChangeWorkTypeMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.workTypeId = getStringAttribute(element, WORK_TYPE_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              WORK_TYPE_TAG, getStringAttribute(element, WORK_TYPE_TAG));
     }
 
 
@@ -88,24 +77,26 @@ public class ChangeWorkTypeMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Specification spec = server.getSpecification();
+        final String unitId = getAttribute(UNIT_TAG);
+        final String workTypeId = getAttribute(WORK_TYPE_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.hasTile()) {
             return serverPlayer.clientError("Unit is not on the map: "
-                + this.unitId)
+                + unitId)
                 .build(serverPlayer);
         }
 
-        GoodsType type = spec.getGoodsType(this.workTypeId);
+        GoodsType type = spec.getGoodsType(workTypeId);
         if (type == null) {
             return serverPlayer.clientError("Not a goods type: "
-                + this.workTypeId)
+                + workTypeId)
                 .build(serverPlayer);
         }
 
@@ -113,18 +104,6 @@ public class ChangeWorkTypeMessage extends DOMMessage {
         return server.getInGameController()
             .changeWorkType(serverPlayer, unit, type)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this ChangeWorkTypeMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            WORK_TYPE_TAG, this.workTypeId).toXMLElement();
     }
 
     /**

@@ -31,17 +31,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when assigning a teacher.
  */
-public class AssignTeacherMessage extends DOMMessage {
+public class AssignTeacherMessage extends TrivialMessage {
 
     public static final String TAG = "assignTeacher";
     private static final String STUDENT_TAG = "student";
     private static final String TEACHER_TAG = "teacher";
-
-    /** The identifier of the student. */
-    private final String studentId;
-
-    /** The identifier of the teacher. */
-    private final String teacherId;
 
 
     /**
@@ -52,10 +46,7 @@ public class AssignTeacherMessage extends DOMMessage {
      * @param teacher The teacher {@code Unit}.
      */
     public AssignTeacherMessage(Unit student, Unit teacher) {
-        super(getTagName());
-
-        this.studentId = student.getId();
-        this.teacherId = teacher.getId();
+        super(TAG, STUDENT_TAG, student.getId(), TEACHER_TAG, teacher.getId());
     }
 
     /**
@@ -66,10 +57,8 @@ public class AssignTeacherMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AssignTeacherMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.studentId = getStringAttribute(element, STUDENT_TAG);
-        this.teacherId = getStringAttribute(element, TEACHER_TAG);
+        super(TAG, STUDENT_TAG, getStringAttribute(element, STUDENT_TAG),
+              TEACHER_TAG, getStringAttribute(element, TEACHER_TAG));
     }
 
 
@@ -85,10 +74,12 @@ public class AssignTeacherMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String studentId = getAttribute(STUDENT_TAG);
+        final String teacherId = getAttribute(TEACHER_TAG);
 
         Unit student;
         try {
-            student = player.getOurFreeColGameObject(this.studentId, Unit.class);
+            student = player.getOurFreeColGameObject(studentId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -96,7 +87,7 @@ public class AssignTeacherMessage extends DOMMessage {
 
         Unit teacher;
         try {
-            teacher = player.getOurFreeColGameObject(this.teacherId, Unit.class);
+            teacher = player.getOurFreeColGameObject(teacherId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -104,27 +95,27 @@ public class AssignTeacherMessage extends DOMMessage {
 
         if (student.getColony() == null) {
             return serverPlayer.clientError("Student not in colony: "
-                + this.studentId)
+                + studentId)
                 .build(serverPlayer);
         } else if (!student.isInColony()) {
             return serverPlayer.clientError("Student not working colony: "
-                + this.studentId)
+                + studentId)
                 .build(serverPlayer);
         } else if (teacher.getColony() == null) {
             return serverPlayer.clientError("Teacher not in colony: "
-                + this.teacherId)
+                + teacherId)
                 .build(serverPlayer);
         } else if (!teacher.getColony().canTrain(teacher)) {
             return serverPlayer.clientError("Teacher can not teach: "
-                + this.teacherId)
+                + teacherId)
                 .build(serverPlayer);
         } else if (student.getColony() != teacher.getColony()) {
             return serverPlayer.clientError("Student and teacher not in same colony: "
-                + this.studentId)
+                + studentId)
                 .build(serverPlayer);
         } else if (!student.canBeStudent(teacher)) {
             return serverPlayer.clientError("Student can not be taught by teacher: "
-                + this.studentId)
+                + studentId)
                 .build(serverPlayer);
         }
 
@@ -132,18 +123,6 @@ public class AssignTeacherMessage extends DOMMessage {
         return server.getInGameController()
             .assignTeacher(serverPlayer, student, teacher)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this AssignTeacherMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            STUDENT_TAG, this.studentId,
-            TEACHER_TAG, this.teacherId).toXMLElement();
     }
 
     /**

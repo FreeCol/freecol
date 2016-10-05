@@ -32,17 +32,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when moving a unit across the high seas.
  */
-public class MoveToMessage extends DOMMessage {
+public class MoveToMessage extends TrivialMessage {
 
     public static final String TAG = "moveTo";
     private static final String DESTINATION_TAG = "destination";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the object to be moved. */
-    private final String unitId;
-
-    /** The identifier of the destination to be moved to. */
-    private final String destinationId;
 
 
     /**
@@ -53,10 +47,8 @@ public class MoveToMessage extends DOMMessage {
      * @param destination The {@code Location} to move to.
      */
     public MoveToMessage(Unit unit, Location destination) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.destinationId = destination.getId();
+        super(TAG, UNIT_TAG, unit.getId(),
+              DESTINATION_TAG, destination.getId());
     }
 
     /**
@@ -67,10 +59,8 @@ public class MoveToMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public MoveToMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.destinationId = getStringAttribute(element, DESTINATION_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              DESTINATION_TAG, getStringAttribute(element, DESTINATION_TAG));
     }
 
 
@@ -87,19 +77,21 @@ public class MoveToMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = player.getGame();
+        final String unitId = getAttribute(UNIT_TAG);
+        final String destinationId = getAttribute(DESTINATION_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
-        Location destination = game.findFreeColLocation(this.destinationId);
+        Location destination = game.findFreeColLocation(destinationId);
         if (destination == null) {
             return serverPlayer.clientError("Not a location: "
-                + this.destinationId)
+                + destinationId)
                 .build(serverPlayer);
         }
 
@@ -107,18 +99,6 @@ public class MoveToMessage extends DOMMessage {
         return server.getInGameController()
             .moveTo(serverPlayer, unit, destination)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this MoveToMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            DESTINATION_TAG, this.destinationId).toXMLElement();
     }
 
     /**

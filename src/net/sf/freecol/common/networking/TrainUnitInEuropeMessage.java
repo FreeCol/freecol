@@ -31,13 +31,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when training a unit in Europe.
  */
-public class TrainUnitInEuropeMessage extends DOMMessage {
+public class TrainUnitInEuropeMessage extends TrivialMessage {
 
     public static final String TAG = "trainUnitInEurope";
     private static final String UNIT_TYPE_TAG = "unitType";
-
-    /** The identifier of the unit type. */
-    private final String typeId;
 
 
     /**
@@ -47,9 +44,7 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
      * @param type The {@code UnitType} to train.
      */
     public TrainUnitInEuropeMessage(UnitType type) {
-        super(getTagName());
-
-        this.typeId = type.getId();
+        super(TAG, UNIT_TYPE_TAG, type.getId());
     }
 
     /**
@@ -60,9 +55,7 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public TrainUnitInEuropeMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.typeId = getStringAttribute(element, UNIT_TYPE_TAG);
+        super(TAG, UNIT_TYPE_TAG, getStringAttribute(element, UNIT_TYPE_TAG));
     }
 
 
@@ -79,10 +72,11 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-
-        UnitType type = server.getSpecification().getUnitType(this.typeId);
+        final String typeId = getAttribute(UNIT_TYPE_TAG);
+        
+        UnitType type = server.getSpecification().getUnitType(typeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a unit type: " + this.typeId)
+            return serverPlayer.clientError("Not a unit type: " + typeId)
                 .build(serverPlayer);
         }
 
@@ -90,17 +84,6 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
         return server.getInGameController()
             .trainUnitInEurope(serverPlayer, type)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this TrainUnitInEuropeMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TYPE_TAG, typeId).toXMLElement();
     }
 
     /**

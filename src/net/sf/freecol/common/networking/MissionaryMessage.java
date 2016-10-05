@@ -36,21 +36,12 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a missionary establishes/denounces a mission.
  */
-public class MissionaryMessage extends DOMMessage {
+public class MissionaryMessage extends TrivialMessage {
 
     public static final String TAG = "missionary";
     private static final String DENOUNCE_TAG = "denounce";
     private static final String DIRECTION_TAG = "direction";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the missionary. */
-    private final String unitId;
-
-    /** The direction to the settlement. */
-    private final String directionString;
-
-    /** Is this a denunciation? */
-    private final boolean denounce;
 
 
     /**
@@ -63,11 +54,9 @@ public class MissionaryMessage extends DOMMessage {
      */
     public MissionaryMessage(Unit unit, Direction direction,
                              boolean denounce) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.directionString = String.valueOf(direction);
-        this.denounce = denounce;
+        super(TAG, UNIT_TAG, unit.getId(),
+              DIRECTION_TAG, String.valueOf(direction),
+              DENOUNCE_TAG, String.valueOf(denounce));
     }
 
     /**
@@ -78,11 +67,9 @@ public class MissionaryMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public MissionaryMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.directionString = getStringAttribute(element, DIRECTION_TAG);
-        this.denounce = getBooleanAttribute(element, DENOUNCE_TAG, false);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG),
+              DENOUNCE_TAG, getStringAttribute(element, DENOUNCE_TAG));
     }
 
 
@@ -98,10 +85,12 @@ public class MissionaryMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
+        final String directionString = getAttribute(DIRECTION_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -109,7 +98,7 @@ public class MissionaryMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(this.directionString);
+            tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -123,7 +112,8 @@ public class MissionaryMessage extends DOMMessage {
         }
 
         Unit missionary = is.getMissionary();
-        if (this.denounce) {
+        boolean denounce = getBooleanAttribute(DENOUNCE_TAG);
+        if (denounce) {
             if (missionary == null) {
                 return serverPlayer.clientError("Denouncing an empty mission at: "
                     + is.getId())
@@ -134,7 +124,7 @@ public class MissionaryMessage extends DOMMessage {
                     .build(serverPlayer);
             } else if (!unit.hasAbility(Ability.DENOUNCE_HERESY)) {
                 return serverPlayer.clientError("Unit lacks denouncement ability: "
-                    + this.unitId)
+                    + unitId)
                     .build(serverPlayer);
             }
         } else {
@@ -144,7 +134,7 @@ public class MissionaryMessage extends DOMMessage {
                     .build(serverPlayer);
             } else if (!unit.hasAbility(Ability.ESTABLISH_MISSION)) {
                 return serverPlayer.clientError("Unit lacks establish mission ability: "
-                    + this.unitId)
+                    + unitId)
                     .build(serverPlayer);
             }
         }
@@ -157,25 +147,12 @@ public class MissionaryMessage extends DOMMessage {
         }
 
         // Valid, proceed to denounce/establish.
-        return ((this.denounce)
+        return ((denounce)
             ? server.getInGameController()
                 .denounceMission(serverPlayer, unit, is)
             : server.getInGameController()
                 .establishMission(serverPlayer, unit, is))
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this MissionaryMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            DIRECTION_TAG, this.directionString,
-            DENOUNCE_TAG, Boolean.toString(this.denounce)).toXMLElement();
     }
 
     /**

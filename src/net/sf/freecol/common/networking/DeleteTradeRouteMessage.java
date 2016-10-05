@@ -31,13 +31,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when deleting a trade route.
  */
-public class DeleteTradeRouteMessage extends DOMMessage {
+public class DeleteTradeRouteMessage extends TrivialMessage {
 
     public static final String TAG = "deleteTradeRoute";
     private static final String TRADE_ROUTE_TAG = "tradeRoute";
-
-    /** The identifier of the trade route. */
-    private final String tradeRouteId;
 
 
     /**
@@ -47,9 +44,7 @@ public class DeleteTradeRouteMessage extends DOMMessage {
      * @param tradeRoute The {@code TradeRoute} to delete.
      */
     public DeleteTradeRouteMessage(TradeRoute tradeRoute) {
-        super(getTagName());
-
-        this.tradeRouteId = tradeRoute.getId();
+        super(TAG, TRADE_ROUTE_TAG, tradeRoute.getId());
     }
 
     /**
@@ -60,9 +55,7 @@ public class DeleteTradeRouteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DeleteTradeRouteMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.tradeRouteId = getStringAttribute(element, TRADE_ROUTE_TAG);
+        super(TAG, TRADE_ROUTE_TAG, getStringAttribute(element, TRADE_ROUTE_TAG));
     }
 
 
@@ -78,7 +71,8 @@ public class DeleteTradeRouteMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-
+        final String tradeRouteId = getAttribute(TRADE_ROUTE_TAG);
+        
         TradeRoute tradeRoute;
         try {
             tradeRoute = serverPlayer.getOurFreeColGameObject(tradeRouteId, 
@@ -92,17 +86,6 @@ public class DeleteTradeRouteMessage extends DOMMessage {
         return server.getInGameController()
             .deleteTradeRoute(serverPlayer, tradeRoute)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this DeleteTradeRouteMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            "tradeRoute", tradeRouteId).toXMLElement();
     }
 
     /**

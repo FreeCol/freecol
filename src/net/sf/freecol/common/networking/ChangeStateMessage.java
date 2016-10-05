@@ -32,17 +32,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when changing a unit state.
  */
-public class ChangeStateMessage extends DOMMessage {
+public class ChangeStateMessage extends TrivialMessage {
 
     public static final String TAG = "changeState";
     private static final String STATE_TAG = "state";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit to change. */
-    private final String unitId;
-
-    /** The state as a string. */
-    private final String stateString;
 
 
     /**
@@ -53,10 +47,7 @@ public class ChangeStateMessage extends DOMMessage {
      * @param state The new state.
      */
     public ChangeStateMessage(Unit unit, UnitState state) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.stateString = String.valueOf(state);
+        super(TAG, UNIT_TAG, unit.getId(), STATE_TAG, String.valueOf(state));
     }
 
     /**
@@ -67,10 +58,8 @@ public class ChangeStateMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ChangeStateMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.stateString = getStringAttribute(element, STATE_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              STATE_TAG, getStringAttribute(element, STATE_TAG));
     }
 
 
@@ -86,10 +75,12 @@ public class ChangeStateMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
+        final String stateString = getAttribute(STATE_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -98,15 +89,15 @@ public class ChangeStateMessage extends DOMMessage {
 
         UnitState state;
         try {
-            state = Enum.valueOf(UnitState.class, this.stateString);
+            state = Enum.valueOf(UnitState.class, stateString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.checkSetState(state)) {
-            return serverPlayer.clientError("Unit " + this.unitId
+            return serverPlayer.clientError("Unit " + unitId
                 + " can not change state: " + unit.getState().toString()
-                + " -> " + this.stateString)
+                + " -> " + stateString)
                 .build(serverPlayer);
         }
 
@@ -114,18 +105,6 @@ public class ChangeStateMessage extends DOMMessage {
         return server.getInGameController()
             .changeState(serverPlayer, unit, state)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this ChangeStateMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            STATE_TAG, this.stateString).toXMLElement();
     }
 
     /**

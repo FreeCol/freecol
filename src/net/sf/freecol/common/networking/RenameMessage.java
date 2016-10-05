@@ -32,17 +32,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when renaming a FreeColGameObject.
  */
-public class RenameMessage extends DOMMessage {
+public class RenameMessage extends TrivialMessage {
 
     public static final String TAG = "rename";
     private static final String NAMEABLE_TAG = "nameable";
     private static final String NAME_TAG = "name";
-
-    /** The identifier of the object to be renamed. */
-    private final String id;
-
-    /** The new name. */
-    private final String newName;
 
 
     /**
@@ -53,10 +47,7 @@ public class RenameMessage extends DOMMessage {
      * @param newName The new name for the object.
      */
     public RenameMessage(FreeColGameObject object, String newName) {
-        super(getTagName());
-
-        this.id = object.getId();
-        this.newName = newName;
+        super(TAG, NAMEABLE_TAG, object.getId(), NAME_TAG, newName);
     }
 
     /**
@@ -67,10 +58,8 @@ public class RenameMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public RenameMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.id = getStringAttribute(element, NAMEABLE_TAG);
-        this.newName = getStringAttribute(element, NAME_TAG);
+        super(TAG, NAMEABLE_TAG, getStringAttribute(element, NAMEABLE_TAG),
+              NAME_TAG, getStringAttribute(element, NAME_TAG));
     }
 
 
@@ -87,35 +76,24 @@ public class RenameMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-
+        final String nameableId = getAttribute(NAMEABLE_TAG);
+        
         FreeColGameObject fcgo;
         try {
-            fcgo = player.getOurFreeColGameObject(this.id, FreeColGameObject.class);
+            fcgo = player.getOurFreeColGameObject(nameableId, FreeColGameObject.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!(fcgo instanceof Nameable)) {
-            return serverPlayer.clientError("Not a nameable: " + this.id)
+            return serverPlayer.clientError("Not a nameable: " + nameableId)
                 .build(serverPlayer);
         }
 
         // Proceed to rename.
         return server.getInGameController()
-            .renameObject(serverPlayer, (Nameable)fcgo, this.newName)
+            .renameObject(serverPlayer, (Nameable)fcgo, getAttribute(NAME_TAG))
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this RenameMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            NAMEABLE_TAG, this.id,
-            NAME_TAG, this.newName).toXMLElement();
     }
 
     /**

@@ -31,13 +31,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests abandoning of a colony.
  */
-public class AbandonColonyMessage extends DOMMessage {
+public class AbandonColonyMessage extends TrivialMessage {
 
     public static final String TAG = "abandonColony";
     private static final String COLONY_TAG = "colony";
-
-    /** The identifier of the colony to abandon. */
-    private final String colonyId;
 
 
     /**
@@ -47,9 +44,7 @@ public class AbandonColonyMessage extends DOMMessage {
      * @param colony The {@code Colony} to abandon.
      */
     public AbandonColonyMessage(Colony colony) {
-        super(getTagName());
-
-        this.colonyId = colony.getId();
+        super(TAG, COLONY_TAG, colony.getId());
     }
 
     /**
@@ -59,9 +54,7 @@ public class AbandonColonyMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AbandonColonyMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.colonyId = getStringAttribute(element, COLONY_TAG);
+        super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
     }
 
 
@@ -78,17 +71,18 @@ public class AbandonColonyMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String colonyId = getAttribute(COLONY_TAG);
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (colony.getUnitCount() != 0) {
             return serverPlayer.clientError("Attempt to abandon colony "
-                + this.colonyId + " with non-zero unit count "
+                + colonyId + " with non-zero unit count "
                 + Integer.toString(colony.getUnitCount()))
                 .build(serverPlayer);
         }
@@ -98,17 +92,6 @@ public class AbandonColonyMessage extends DOMMessage {
         return server.getInGameController()
             .abandonSettlement(serverPlayer, colony)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this AbandonColonyMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            COLONY_TAG, this.colonyId).toXMLElement();
     }
 
     /**

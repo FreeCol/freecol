@@ -31,13 +31,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when clearing a unit speciality.
  */
-public class ClearSpecialityMessage extends DOMMessage {
+public class ClearSpecialityMessage extends TrivialMessage {
 
     public static final String TAG = "clearSpeciality";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit to be cleared. */
-    private final String unitId;
 
 
     /**
@@ -47,9 +44,7 @@ public class ClearSpecialityMessage extends DOMMessage {
      * @param unit The {@code Unit} to clear.
      */
     public ClearSpecialityMessage(Unit unit) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
+        super(TAG, UNIT_TAG, unit.getId());
     }
 
     /**
@@ -60,9 +55,7 @@ public class ClearSpecialityMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ClearSpecialityMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
 
@@ -78,10 +71,11 @@ public class ClearSpecialityMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -91,17 +85,6 @@ public class ClearSpecialityMessage extends DOMMessage {
         return server.getInGameController()
             .clearSpeciality(serverPlayer, unit)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this ClearSpecialityMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

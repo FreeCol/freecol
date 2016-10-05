@@ -31,13 +31,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when cashing in a treasure train.
  */
-public class CashInTreasureTrainMessage extends DOMMessage {
+public class CashInTreasureTrainMessage extends TrivialMessage {
 
     public static final String TAG = "cashInTreasureTrain";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the treasure train unit. */
-    private final String unitId;
 
 
     /**
@@ -47,9 +44,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      * @param unit The {@code Unit} to cash in.
      */
     public CashInTreasureTrainMessage(Unit unit) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
+        super(TAG, UNIT_TAG, unit.getId());
     }
 
     /**
@@ -60,9 +55,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public CashInTreasureTrainMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
 
@@ -78,21 +71,23 @@ public class CashInTreasureTrainMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
+
         if (!unit.canCarryTreasure()) {
             return serverPlayer.clientError("Can not cash in unit "
-                + this.unitId + ", can not carry treasure.")
+                + unitId + ", can not carry treasure.")
                 .build(serverPlayer);
         } else if (!unit.canCashInTreasureTrain()) {
             return serverPlayer.clientError("Can not cash in unit "
-                + this.unitId + ", unsuitable location.")
+                + unitId + ", unsuitable location.")
                 .build(serverPlayer);
         }
 
@@ -100,17 +95,6 @@ public class CashInTreasureTrainMessage extends DOMMessage {
         return server.getInGameController()
             .cashInTreasureTrain(serverPlayer, unit)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this CashInTreasureTrainMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

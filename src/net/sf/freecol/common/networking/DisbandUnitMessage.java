@@ -31,13 +31,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when disbanding a unit.
  */
-public class DisbandUnitMessage extends DOMMessage {
+public class DisbandUnitMessage extends TrivialMessage {
 
     public static final String TAG = "disbandUnit";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit to be disbanded. */
-    private final String unitId;
 
 
     /**
@@ -47,9 +44,7 @@ public class DisbandUnitMessage extends DOMMessage {
      * @param unit The {@code Unit} to clear.
      */
     public DisbandUnitMessage(Unit unit) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
+        super(TAG, UNIT_TAG, unit.getId());
     }
 
     /**
@@ -60,9 +55,7 @@ public class DisbandUnitMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DisbandUnitMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
 
@@ -78,10 +71,11 @@ public class DisbandUnitMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -91,17 +85,6 @@ public class DisbandUnitMessage extends DOMMessage {
         return server.getInGameController()
             .disbandUnit(serverPlayer, unit)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this DisbandUnitMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

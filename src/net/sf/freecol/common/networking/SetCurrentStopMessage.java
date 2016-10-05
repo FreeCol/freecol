@@ -32,17 +32,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent updating a unit's current stop.
  */
-public class SetCurrentStopMessage extends DOMMessage {
+public class SetCurrentStopMessage extends TrivialMessage {
 
     public static final String TAG = "setCurrentStop";
     private static final String INDEX_TAG = "index";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit whose stop is to be set. */
-    private final String unitId;
-
-    /** The index of the new stop. */
-    private final String index;
 
 
     /**
@@ -53,10 +47,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      * @param index The stop index.
      */
     public SetCurrentStopMessage(Unit unit, int index) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.index = String.valueOf(index);
+        super(TAG, UNIT_TAG, unit.getId(), INDEX_TAG, String.valueOf(index));
     }
 
     /**
@@ -67,10 +58,8 @@ public class SetCurrentStopMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetCurrentStopMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.index = getStringAttribute(element, INDEX_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              INDEX_TAG, getStringAttribute(element, INDEX_TAG));
     }
 
 
@@ -84,33 +73,32 @@ public class SetCurrentStopMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
+        final String indexString = getAttribute(INDEX_TAG);
 
         ServerUnit serverUnit;
         try {
-            serverUnit = serverPlayer.getOurFreeColGameObject(this.unitId,
-                ServerUnit.class);
+            serverUnit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         TradeRoute tr = serverUnit.getTradeRoute();
         if (tr == null) {
-            return serverPlayer.clientError("Unit has no trade route: "
-                + this.unitId)
+            return serverPlayer.clientError("Unit has no trade route: " + unitId)
                 .build(serverPlayer);
         }
 
         int count;
         try {
-            count = Integer.parseInt(this.index);
+            count = Integer.parseInt(indexString);
         } catch (NumberFormatException nfe) {
             return serverPlayer.clientError("Stop index is not an integer: " +
-                this.index)
+                indexString)
                 .build(serverPlayer);
         }
         if (count < 0 || count > tr.getStops().size()) {
-            return serverPlayer.clientError("Invalid stop index: "
-                + this.index)
+            return serverPlayer.clientError("Invalid stop index: " + indexString)
                 .build(serverPlayer);
         }
 
@@ -118,18 +106,6 @@ public class SetCurrentStopMessage extends DOMMessage {
         return server.getInGameController()
             .setCurrentStop(serverPlayer, serverUnit, count)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this SetCurrentStopMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            INDEX_TAG, this.index).toXMLElement();
     }
 
     /**

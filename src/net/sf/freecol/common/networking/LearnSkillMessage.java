@@ -35,17 +35,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent when learning for the skill taught at a settlement.
  */
-public class LearnSkillMessage extends DOMMessage {
+public class LearnSkillMessage extends TrivialMessage {
 
     public static final String TAG = "learnSkill";
     private static final String DIRECTION_TAG = "direction";
     private static final String UNIT_TAG = "unit";
-
-    /** The identifier of the unit that is learning. */
-    private final String unitId;
-
-    /** The direction the unit is learning in. */
-    private final String directionString;
 
 
     /**
@@ -56,10 +50,8 @@ public class LearnSkillMessage extends DOMMessage {
      * @param direction The {@code Direction} the unit is looking.
      */
     public LearnSkillMessage(Unit unit, Direction direction) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.directionString = String.valueOf(direction);
+        super(TAG, UNIT_TAG, unit.getId(),
+              DIRECTION_TAG, String.valueOf(direction));
     }
 
     /**
@@ -70,10 +62,8 @@ public class LearnSkillMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public LearnSkillMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.directionString = getStringAttribute(element, DIRECTION_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
     }
 
 
@@ -89,10 +79,12 @@ public class LearnSkillMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final String unitId = getAttribute(UNIT_TAG);
+        final String directionString = getAttribute(DIRECTION_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -100,7 +92,7 @@ public class LearnSkillMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(this.directionString);
+            tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -128,18 +120,6 @@ public class LearnSkillMessage extends DOMMessage {
         return server.getInGameController()
             .learnFromIndianSettlement(serverPlayer, unit, is)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this LearnSkillMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**

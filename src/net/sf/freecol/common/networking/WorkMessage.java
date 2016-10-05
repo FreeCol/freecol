@@ -32,17 +32,11 @@ import org.w3c.dom.Element;
 /**
  * The message sent to handle changes in work location.
  */
-public class WorkMessage extends DOMMessage {
+public class WorkMessage extends TrivialMessage {
 
     public static final String TAG = "work";
     private static final String UNIT_TAG = "unit";
     private static final String WORK_LOCATION_TAG = "workLocation";
-
-    /** The identifier of the unit. */
-    private final String unitId;
-
-    /** The identifier of the work location.  */
-    private final String workLocationId;
 
 
     /**
@@ -53,10 +47,8 @@ public class WorkMessage extends DOMMessage {
      * @param workLocation The {@code WorkLocation} to change to.
      */
     public WorkMessage(Unit unit, WorkLocation workLocation) {
-        super(getTagName());
-
-        this.unitId = unit.getId();
-        this.workLocationId = workLocation.getId();
+        super(TAG, UNIT_TAG, unit.getId(),
+              WORK_LOCATION_TAG, workLocation.getId());
     }
 
     /**
@@ -66,10 +58,8 @@ public class WorkMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public WorkMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.workLocationId = getStringAttribute(element, WORK_LOCATION_TAG);
+        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
+              WORK_LOCATION_TAG, getStringAttribute(element, WORK_LOCATION_TAG));
     }
 
 
@@ -86,38 +76,36 @@ public class WorkMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = server.getGame();
+        final String unitId = getAttribute(UNIT_TAG);
+        final String workLocationId = getAttribute(WORK_LOCATION_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         if (!unit.hasTile()) {
-            return serverPlayer.clientError("Unit is not on the map: "
-                + this.unitId)
+            return serverPlayer.clientError("Unit is not on the map: " + unitId)
                 .build(serverPlayer);
         }
 
         Colony colony = unit.getTile().getColony();
         if (colony == null) {
-            return serverPlayer.clientError("Unit is not at a colony: "
-                + this.unitId)
+            return serverPlayer.clientError("Unit is not at a colony: " + unitId)
                 .build(serverPlayer);
         }
 
         WorkLocation workLocation = game
-            .getFreeColGameObject(this.workLocationId, WorkLocation.class);
+            .getFreeColGameObject(workLocationId, WorkLocation.class);
         if (workLocation == null) {
-            return serverPlayer.clientError("Not a work location: "
-                + this.workLocationId)
+            return serverPlayer.clientError("Not a work location: " + workLocationId)
                 .build(serverPlayer);
         } else if (workLocation.getColony() != colony) {
             return serverPlayer.clientError("Work location is not in colony"
-                + colony.getId() + " where the unit is: "
-                + this.workLocationId)
+                + colony.getId() + " where the unit is: " + workLocationId)
                 .build(serverPlayer);
         } else if (!workLocation.canAdd(unit)) {
             return serverPlayer.clientError("Can not add " + unit
@@ -130,18 +118,6 @@ public class WorkMessage extends DOMMessage {
         return server.getInGameController()
             .work(serverPlayer, unit, workLocation)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this WorkMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            UNIT_TAG, unitId,
-            WORK_LOCATION_TAG, workLocationId).toXMLElement();
     }
 
     /**
