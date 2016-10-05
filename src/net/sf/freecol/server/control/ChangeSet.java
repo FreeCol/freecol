@@ -1730,13 +1730,13 @@ public class ChangeSet {
     /**
      * Helper function to add a spying change to a ChangeSet.
      *
-     * @param see The visibility of this change.
      * @param unit The {@code Unit} that is spying.
      * @param settlement The {@code Settlement} to spy on.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addSpy(See see, Unit unit, Settlement settlement) {
-        changes.add(new SpyChange(see, unit, settlement));
+    public ChangeSet addSpy(Unit unit, Settlement settlement) {
+        changes.add(new SpyChange(See.only((ServerPlayer)unit.getOwner()),
+                                  unit, settlement));
         return this;
     }
 
