@@ -230,7 +230,7 @@ public final class AIInGameInputHandler implements MessageHandler {
 
         ChooseFoundingFatherMessage message
             = new ChooseFoundingFatherMessage(game, element);
-        FoundingFather ff = aiPlayer.selectFoundingFather(message.getFathers());
+        FoundingFather ff = aiPlayer.selectFoundingFather(message.getFathers(game));
         logger.finest(aiPlayer.getId() + " chose founding father: " + ff);
         if (ff != null) message.setFather(ff);
         return message.toXMLElement();

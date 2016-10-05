@@ -2761,7 +2761,8 @@ public final class InGameController extends FreeColClientHolder {
      * @param ffs A list of {@code FoundingFather}s to choose from.
      */
     public void chooseFoundingFather(List<FoundingFather> ffs) {
-        if (ffs == null) return;
+        if (ffs == null || ffs.isEmpty()) return;
+       
         getGUI().showChooseFoundingFatherDialog(ffs,
             (FoundingFather ff) -> chooseFoundingFather(ffs, ff));
     }

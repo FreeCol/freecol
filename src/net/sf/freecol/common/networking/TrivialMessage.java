@@ -109,10 +109,10 @@ public class TrivialMessage extends DOMMessage {
     }
     
     /**
-     * Is an attribute present?
+     * Check if an attribute is present.
      *
      * @param key The {@code key} to look up.
-     * @return True if the attribute is present.
+     * @return True if key is present.
      */
     @Override
     public boolean hasAttribute(String key) {

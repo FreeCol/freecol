@@ -57,11 +57,11 @@ public final class ChooseFoundingFatherDialog
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param possibleFoundingFathers The Founding Fathers which can
-     *     be selected. The length of the array is the same as the
-     *     number of {@code FoundingFather} categories and the
-     *     values identifies a {@code FoundingFather} to be
-     *     picked in each of those categories.
+     * @param possibleFoundingFathers The {@code FoundingFather}s
+     *     which can be selected. The length of the array is the same
+     *     as the number of {@code FoundingFather} categories and the
+     *     values identifies a {@code FoundingFather} to be picked in
+     *     each of those categories.
      */
     public ChooseFoundingFatherDialog(FreeColClient freeColClient, JFrame frame,
             List<FoundingFather> possibleFoundingFathers) {

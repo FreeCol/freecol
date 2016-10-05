@@ -40,19 +40,13 @@ import org.w3c.dom.Element;
 /**
  * The message sent to choose a founding father.
  */
-public class ChooseFoundingFatherMessage extends DOMMessage {
+public class ChooseFoundingFatherMessage extends TrivialMessage {
 
     public static final String TAG = "chooseFoundingFather";
     private static final String FOUNDING_FATHER_TAG = "foundingFather";
-    private static final List<String> fatherKeys
-        = Collections.<String>unmodifiableList(transform(FoundingFatherType.values(),
-                alwaysTrue(), ft -> ft.toString()));
-
-    /** The fathers to offer. */
-    private final List<FoundingFather> fathers;
-
-    /** The selected father. */
-    private String foundingFatherId;
+    private static final List<String> fatherKeys = Collections.<String>
+        unmodifiableList(transform(FoundingFatherType.values(),
+                                   alwaysTrue(), FoundingFatherType::getKey));
 
 
     /**
@@ -64,11 +58,9 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     public ChooseFoundingFatherMessage(List<FoundingFather> fathers,
                                        FoundingFather ff) {
-        super(getTagName());
+        super(TAG, FOUNDING_FATHER_TAG, (ff == null) ? null : ff.getId());
 
-        this.fathers = new ArrayList<>();
-        this.fathers.addAll(fathers);
-        setFather(ff);
+        setFatherAttributes(fathers);
     }
 
     /**
@@ -79,14 +71,24 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ChooseFoundingFatherMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG, FOUNDING_FATHER_TAG, getStringAttribute(element, FOUNDING_FATHER_TAG));
 
         final Specification spec = game.getSpecification();
-        List<String> found = transform(fatherKeys, alwaysTrue(),
-                                       k -> element.getAttribute(k));
-        this.fathers = transform(found, id -> id != null && !id.isEmpty(),
-                                 id -> spec.getFoundingFather(id));
-        this.foundingFatherId = getStringAttribute(element, FOUNDING_FATHER_TAG);
+        setFatherAttributes(transform(fatherKeys,
+                k -> element.hasAttribute(k),
+                k -> spec.getFoundingFather(getStringAttribute(element, k))));
+    }
+
+
+    /**
+     * Set the attributes arising from a list of founding fathers.
+     *
+     * @param fathers A list of {@code FoundingFather}.
+     */
+    private void setFatherAttributes(List<FoundingFather> fathers) {
+        setAttributes(transform(fathers, alwaysTrue(), Function.identity(),
+                Collectors.toMap(ff -> ff.getType().getKey(),
+                                 FoundingFather::getId)));
     }
 
 
@@ -99,8 +101,9 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @return The chosen {@code FoundingFather}, or null if none set.
      */
     public final FoundingFather getFather(Game game) {
-        return (this.foundingFatherId == null) ? null
-            : game.getSpecification().getFoundingFather(this.foundingFatherId);
+        String id = getAttribute(FOUNDING_FATHER_TAG);
+        return (id == null) ? null
+            : game.getSpecification().getFoundingFather(id);
     }
 
     /**
@@ -110,7 +113,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @return This message.
      */
     public final ChooseFoundingFatherMessage setFather(FoundingFather ff) {
-        this.foundingFatherId = (ff == null) ? null : ff.getId();
+        setAttribute(FOUNDING_FATHER_TAG, (ff == null) ? null : ff.getId());
         return this;
     }
 
@@ -119,8 +122,10 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      *
      * @return The offered {@code FoundingFather}s.
      */
-    public final List<FoundingFather> getFathers() {
-        return this.fathers;
+    public final List<FoundingFather> getFathers(Game game) {
+        final Specification spec = game.getSpecification();
+        return transform(fatherKeys, tid -> hasAttribute(tid),
+                         tid -> spec.getFoundingFather(getAttribute(tid)));
     }
 
 
@@ -156,22 +161,6 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
 
         serverPlayer.updateCurrentFather(ff);
         return null;
-    }
-
-    /**
-     * Convert this ChooseFoundingFatherMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-                              FOUNDING_FATHER_TAG, this.foundingFatherId)
-            .setAttributes(transform(getFathers(), alwaysTrue(),
-                                     Function.identity(),
-                                     Collectors.toMap(f -> f.getType().toString(),
-                                                      f -> f.getId())))
-            .toXMLElement();
     }
 
     /**

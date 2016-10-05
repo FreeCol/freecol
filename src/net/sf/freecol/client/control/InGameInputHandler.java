@@ -482,11 +482,12 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.  The choice is returned asynchronously.
      */
     private Element chooseFoundingFather(Element element) {
+        final Game game = getGame();
         final ChooseFoundingFatherMessage message
-            = new ChooseFoundingFatherMessage(getGame(), element);
-        final List<FoundingFather> ffs = message.getFathers();
+            = new ChooseFoundingFatherMessage(game, element);
 
-        invokeLater(() -> igc().chooseFoundingFather(ffs));
+        invokeLater(() ->
+            igc().chooseFoundingFather(message.getFathers(game)));
         return null;
     }
 
