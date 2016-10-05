@@ -180,12 +180,11 @@ public final class Server extends Thread {
      *     to send to.
      */
     public void sendToAll(DOMMessage message, Connection exceptConnection) {
-        Element element = message.toXMLElement();
         for (Connection conn : transform(connections.values(),
                                          c -> c != exceptConnection)) {
             if (conn.isAlive()) {
                 try {
-                    conn.sendAndWait(element);
+                    conn.sendAndWait(message);
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Unable to send to: " + conn, e);
                 }
