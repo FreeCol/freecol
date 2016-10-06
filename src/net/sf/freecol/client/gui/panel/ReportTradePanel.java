@@ -238,7 +238,7 @@ public final class ReportTradePanel extends ReportPanel {
         return result;
     }
 
-    protected Border createBorder() {
+    private Border createBorder() {
         return new EmptyBorder(0, 20, 20, 20);
     }
 }

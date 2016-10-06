@@ -257,7 +257,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
     }
 
-    public class TileTypeTransform extends MapTransform {
+    public final class TileTypeTransform extends MapTransform {
         private final TileType tileType;
 
         private TileTypeTransform(TileType tileType) {
@@ -275,7 +275,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
     }
 
-    private class RiverTransform extends MapTransform {
+    private final class RiverTransform extends MapTransform {
         private final int magnitude;
 
         private RiverTransform(int magnitude) {

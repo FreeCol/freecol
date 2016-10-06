@@ -1561,7 +1561,7 @@ public final class ColonyPanel extends PortPanel
         /**
          * Add the property change listeners to this panel.
          */
-        protected void addPropertyChangeListeners() {
+        private void addPropertyChangeListeners() {
             final Colony colony = getColony();
             if (colony != null) {
                 colony.getGoodsContainer().addPropertyChangeListener(this);
@@ -1571,7 +1571,7 @@ public final class ColonyPanel extends PortPanel
         /**
          * Remove the property change listeners from this panel.
          */
-        protected void removePropertyChangeListeners() {
+        private void removePropertyChangeListeners() {
             final Colony colony = getColony();
             if (colony != null) {
                 colony.getGoodsContainer().removePropertyChangeListener(this);
@@ -2080,13 +2080,13 @@ public final class ColonyPanel extends PortPanel
                 removeAll();
             }
 
-            protected void addPropertyChangeListeners() {
+            private void addPropertyChangeListeners() {
                 if (this.colonyTile != null) {
                     this.colonyTile.addPropertyChangeListener(this);
                 }
             }
 
-            protected void removePropertyChangeListeners() {
+            private void removePropertyChangeListeners() {
                 if (this.colonyTile != null) {
                     this.colonyTile.removePropertyChangeListener(this);
                 }
