@@ -128,7 +128,7 @@ public final class CompactLabourReport extends ReportPanel {
             */
 
             if (colony.canTrain(unitData.getUnitType())) {
-                text = text + "*";
+                text += "*";
             }
         }
 
