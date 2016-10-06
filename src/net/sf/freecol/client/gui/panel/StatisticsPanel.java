@@ -59,7 +59,7 @@ public final class StatisticsPanel extends FreeColPanel {
         private static final int NAME_COLUMN = 0, VALUE_COLUMN = 1;
         private final String[] columnNames = { "name", "value" };
 
-        private Object data[][] = null;
+        private Object[][] data = null;
 
 
         /**
