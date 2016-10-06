@@ -35,25 +35,13 @@ import org.w3c.dom.Element;
 /**
  * The message sent when loading goods.
  */
-public class LoadGoodsMessage extends DOMMessage {
+public class LoadGoodsMessage extends TrivialMessage {
 
     public static final String TAG = "loadGoods";
     private static final String AMOUNT_TAG = "amount";
     private static final String CARRIER_TAG = "carrier";
     private static final String LOCATION_TAG = "location";
     private static final String TYPE_TAG = "type";
-
-    /** The identifier for the location of the goods. */
-    private final String locationId;
-    
-    /** The identifier of the type of goods to load. */
-    private final String goodsTypeId;
-
-    /** The amount of goods to load. */
-    private final String amountString;
-
-    /** The identifier of the carrier to load to goods onto. */
-    private final String carrierId;
 
 
     /**
@@ -66,12 +54,10 @@ public class LoadGoodsMessage extends DOMMessage {
      */
     public LoadGoodsMessage(Location loc, GoodsType type, int amount,
                             Unit carrier) {
-        super(getTagName());
-
-        this.locationId = loc.getId();
-        this.goodsTypeId = type.getId();
-        this.amountString = Integer.toString(amount);
-        this.carrierId = carrier.getId();
+        super(TAG, LOCATION_TAG, loc.getId(),
+              TYPE_TAG, type.getId(),
+              AMOUNT_TAG, String.valueOf(amount),
+              CARRIER_TAG, carrier.getId());
     }
 
     /**
@@ -82,12 +68,10 @@ public class LoadGoodsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public LoadGoodsMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.locationId = getStringAttribute(element, LOCATION_TAG);
-        this.goodsTypeId = getStringAttribute(element, TYPE_TAG);
-        this.amountString = getStringAttribute(element, AMOUNT_TAG);
-        this.carrierId = getStringAttribute(element, CARRIER_TAG);
+        super(TAG, LOCATION_TAG, getStringAttribute(element, LOCATION_TAG),
+              TYPE_TAG, getStringAttribute(element, TYPE_TAG),
+              AMOUNT_TAG, getStringAttribute(element, AMOUNT_TAG),
+              CARRIER_TAG, getStringAttribute(element, CARRIER_TAG));
     }
 
 
@@ -103,50 +87,50 @@ public class LoadGoodsMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = player.getGame();
         final Specification spec = server.getSpecification();
+        final String locationId = getAttribute(LOCATION_TAG);
+        final String typeId = getAttribute(TYPE_TAG);
+        final String carrierId = getAttribute(CARRIER_TAG);
+        final String amountString = getAttribute(AMOUNT_TAG);
 
-        FreeColGameObject fcgo = player.getGame()
-            .getFreeColGameObject(this.locationId);
+        FreeColGameObject fcgo = game.getFreeColGameObject(locationId);
         if (!(fcgo instanceof Location)) {
-            return serverPlayer.clientError("Not a location: "
-                + this.locationId)
+            return serverPlayer.clientError("Not a location: " + locationId)
                 .build(serverPlayer);
         }
 
         Unit carrier;
         try {
-            carrier = player.getOurFreeColGameObject(this.carrierId, Unit.class);
+            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!carrier.canCarryGoods()) {
-            return serverPlayer.clientError("Not a goods carrier: "
-                + this.carrierId)
+            return serverPlayer.clientError("Not a goods carrier: " + carrierId)
                 .build(serverPlayer);
         } else if (carrier.getTradeLocation() == null) {
-            return serverPlayer.clientError("Not at a trade location: "
-                + this.carrierId)
+            return serverPlayer.clientError("Not at a trade location: " + carrierId)
                 .build(serverPlayer);
         }
 
-        GoodsType type = spec.getGoodsType(this.goodsTypeId);
+        GoodsType type = spec.getGoodsType(typeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a goods type: "
-                + this.goodsTypeId)
+            return serverPlayer.clientError("Not a goods type: " + typeId)
                 .build(serverPlayer);
         }
 
         int amount;
         try {
-            amount = Integer.parseInt(this.amountString);
+            amount = Integer.parseInt(amountString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad amount: " + this.amountString)
+            return serverPlayer.clientError("Bad amount: " + amountString)
                 .build(serverPlayer);
         }
         if (amount <= 0) {
             return serverPlayer.clientError("Amount must be positive: "
-                + this.amountString)
+                + amountString)
                 .build(serverPlayer);
         }
 
@@ -154,20 +138,6 @@ public class LoadGoodsMessage extends DOMMessage {
         return server.getInGameController()
             .loadGoods(serverPlayer, (Location)fcgo, type, amount, carrier)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this LoadGoodsMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            LOCATION_TAG, this.locationId,
-            TYPE_TAG, this.goodsTypeId,
-            AMOUNT_TAG, this.amountString,
-            CARRIER_TAG, this.carrierId).toXMLElement();
     }
 
     /**
