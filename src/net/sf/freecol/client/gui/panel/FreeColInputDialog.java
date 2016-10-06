@@ -111,5 +111,5 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      *
      * @return The value of the input field/s.
      */
-    abstract protected T getInputValue();
+    protected abstract T getInputValue();
 }

@@ -780,7 +780,7 @@ public final class ColonyPanel extends PortPanel
      *
      * @return The {@code Colony}.
      */
-    public synchronized final Colony getColony() {
+    public final synchronized Colony getColony() {
         return colony;
     }
 
