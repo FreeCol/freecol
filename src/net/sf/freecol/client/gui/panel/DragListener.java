@@ -25,12 +25,13 @@ import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
+import javax.swing.JPopupMenu.Separator;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.OSUtils;
 
 
 /**
@@ -42,6 +43,32 @@ import net.sf.freecol.common.model.Unit;
 public final class DragListener extends MouseAdapter {
 
     private static final Logger logger = Logger.getLogger(DragListener.class.getName());
+
+    /**
+     * The maximum numbers of pixels of the user's screen height
+     *      before triggering the small flag
+     */
+    private static final int maxWindowHeight = 768;
+
+    /**
+     * The user's screen height.
+     */
+    private static final int windowHeight = (int) Math.floor(Toolkit.getDefaultToolkit().getScreenSize().getHeight());
+
+    /**
+     * The user's operating system.
+     */
+    private static final String operatingSystem = OSUtils.GetOperatingSystem();
+
+    /**
+     * Whether the user's operating system is Microsoft Windows
+     */
+    private final boolean windows = operatingSystem.startsWith("Windows");
+
+    /**
+     * Whether the user's screen height is smaller than the maximum height allowed
+     */
+    private static final boolean small = windowHeight < maxWindowHeight;
 
     private final FreeColPanel parentPanel;
 
@@ -70,38 +97,36 @@ public final class DragListener extends MouseAdapter {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        JComponent comp = (JComponent)e.getSource();
+        JComponent comp = (JComponent) e.getSource();
         // Does not work on some platforms:
         // if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
 
         if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
             if (!parentPanel.isEditable()) { // No panel when not editable
                 logger.warning("Button3 disabled on non-editable panel: "
-                    + parentPanel);
+                        + parentPanel);
                 return;
             }
-            QuickActionMenu menu
-                = new QuickActionMenu(freeColClient, parentPanel)
-                .addMenuItems(comp);
-            int lastIdx = menu.getComponentCount() - 1;
-            if (lastIdx >= 0
-                && menu.getComponent(lastIdx) instanceof JPopupMenu.Separator)
+            final QuickActionMenu menu
+                    = new QuickActionMenu(freeColClient, parentPanel)
+                    .addMenuItems(comp);
+            final int lastIdx = menu.getComponentCount() - 1;
+            if ((lastIdx >= 0)
+                    && (menu.getComponent(lastIdx) instanceof Separator))
                 menu.remove(lastIdx);
             if (menu.getComponentCount() <= 0) return;
 
-            final SwingGUI gui = (SwingGUI)freeColClient.getGUI();
-            boolean windows = System.getProperty("os.name").startsWith("Windows");
-            boolean small = Toolkit.getDefaultToolkit()
-                .getScreenSize().getHeight() < 768;
-            if (gui.isWindowed() && windows) {
-                // Work-around: JRE on Windows is unable to
-                // display popup menus that extend beyond the canvas.
-                menu.show(gui.getCanvas(), menu.getLocation().x, 0);
-            } else if (!gui.isWindowed() && small) {
-                // Move popup up when in full screen mode and when
-                // the screen size is too small to fit.  Similar
-                // to above workaround, but targeted for users
-                // with smaller screens such as netbooks.
+            final SwingGUI gui = (SwingGUI) freeColClient.getGUI();
+            /*
+            FIXME: Cleanup implementation
+            Work-arounds:
+            This moves the popup up when in full screen mode
+            and when the screen size is too small to fit. JRE
+            on Windows is unable to display popup menus that
+            extend beyond the canvas. Targeted for users with
+            smaller screens such as netbooks.
+            */
+            if ((gui.isWindowed() && windows) || (!gui.isWindowed() && small)) {
                 menu.show(gui.getCanvas(), menu.getLocation().x, 0);
             } else {
                 menu.show(comp, e.getX(), e.getY());
@@ -109,7 +134,7 @@ public final class DragListener extends MouseAdapter {
 
         } else {
             if (comp instanceof AbstractGoodsLabel) {
-                AbstractGoodsLabel label = (AbstractGoodsLabel)comp;
+                AbstractGoodsLabel label = (AbstractGoodsLabel) comp;
                 if (e.isShiftDown()) {
                     label.setPartialChosen(true);
                 } else if (e.isControlDown()) {
@@ -119,16 +144,16 @@ public final class DragListener extends MouseAdapter {
                     label.setDefaultAmount();
                 }
             } else if (comp instanceof UnitLabel) {
-                UnitLabel label = (UnitLabel)comp;
-                Unit u = label.getUnit();
+                final UnitLabel label = (UnitLabel) comp;
+                final Unit u = label.getUnit();
                 if (u.isCarrier()
-                    && !u.isAtSea()
-                    && parentPanel instanceof PortPanel) {
-                    ((PortPanel)parentPanel).setSelectedUnitLabel(label);
+                        && !u.isAtSea()
+                        && parentPanel instanceof PortPanel) {
+                    ((PortPanel) parentPanel).setSelectedUnitLabel(label);
                 }
             }
 
-            TransferHandler handler = comp.getTransferHandler();
+            final TransferHandler handler = comp.getTransferHandler();
             if (handler != null) {
                 handler.exportAsDrag(comp, e, TransferHandler.COPY);
             }
