@@ -434,7 +434,7 @@ public class Messages {
      * If .name is present, also look for a description.
      *
      * @param named The {@code Named} to look up.
-     * @return A 2-element array of name and description found.
+     * @return A 2-member array of name and description found.
      */
     public static String[] getBestNameAndDescription(Named named) {
         return getBestNameAndDescription(named.getNameKey());
@@ -447,7 +447,7 @@ public class Messages {
      * If .name is present, also look for a description.
      *
      * @param id The identifier to look up.
-     * @return A 2-element array of name and description found.
+     * @return A 2-member array of name and description found.
      */
     public static String[] getBestNameAndDescription(String id) {
         if (id != null && id.endsWith(NAME_SUFFIX)) { // Temporary hack

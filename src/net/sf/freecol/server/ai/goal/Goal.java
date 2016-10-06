@@ -546,7 +546,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Returns the tag name of the object.
      *
      * @return "aiGoal"
      */

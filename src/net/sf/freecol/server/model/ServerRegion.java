@@ -177,7 +177,7 @@ public class ServerRegion extends Region {
     /**
      * Get the center of the regions bounds.
      *
-     * @return An two element array [x,y] of the center coordinate.
+     * @return An two member array [x,y] of the center coordinate.
      */
     public int[] getCenter() {
         return new int[] { bounds.x + bounds.width/2,

@@ -4439,7 +4439,7 @@ outer:  for (Effect effect : effects) {
     }
 
     /**
-     * Gets the tag name of the root element representing this object.
+     * Gets the tag name of the object.
      *
      * @return "serverPlayer"
      */

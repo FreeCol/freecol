@@ -241,7 +241,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     // We do not need to write the abstractType attribute, as once
     // the spec is read, all cases of abstractType==true are removed.
     private static final String ABSTRACT_TAG = "abstract";
-    // Denotes deletion of a child element.
+    // Denotes deletion of a child.
     protected static final String DELETE_TAG = "delete";
     // Denotes that this type extends another.
     public static final String EXTENDS_TAG = "extends";
@@ -301,7 +301,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
                 xr.closeTag(Ability.getTagName());
 
             } else {
-                Ability ability = new Ability(xr, spec); // Closes the element
+                Ability ability = new Ability(xr, spec); // Closes
                 if (ability.getSource() == null) ability.setSource(this);
                 addAbility(ability);
                 spec.addAbility(ability);
@@ -313,7 +313,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
                 xr.closeTag(Modifier.getTagName());
 
             } else {
-                Modifier modifier = new Modifier(xr, spec);// Closes the element
+                Modifier modifier = new Modifier(xr, spec); // Closes
                 if (modifier.getSource() == null) modifier.setSource(this);
                 addModifier(modifier);
                 spec.addModifier(modifier);

@@ -254,7 +254,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Returns the tag name of the object.
      *
      * @return "serverBuilding"
      */

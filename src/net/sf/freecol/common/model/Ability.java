@@ -581,7 +581,7 @@ public final class Ability extends Feature {
     public String getXMLTagName() { return getTagName(); }
 
     /**
-     * Gets the XML tag name for this element.
+     * Gets the tag name for the object.
      *
      * @return "ability".
      */

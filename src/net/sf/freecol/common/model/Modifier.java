@@ -679,7 +679,7 @@ public class Modifier extends Feature {
     public String getXMLTagName() { return getTagName(); }
 
     /**
-     * Gets the XML tag name for this element.
+     * Gets the XML tag name for the object.
      *
      * @return "modifier".
      */

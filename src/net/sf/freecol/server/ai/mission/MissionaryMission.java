@@ -75,8 +75,7 @@ public class MissionaryMission extends Mission {
     }
 
     /**
-     * Creates a new {@code MissionaryMission} and reads
-     * the given element.
+     * Creates a new {@code MissionaryMission} from a reader.
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The {@code AIUnit} this mission is created for.
@@ -448,7 +447,7 @@ public class MissionaryMission extends Mission {
     public String getXMLTagName() { return getTagName(); }
 
     /**
-     * Gets the tag name of the root element representing this object.
+     * Gets the tag name of the object.
      *
      * @return "missionaryMission".
      */

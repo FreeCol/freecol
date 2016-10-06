@@ -82,7 +82,7 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Creates a new {@code AIMain} and reads the given element.
+     * Creates a new {@code AIMain} from a reader.
      *
      * @param freeColServer The main controller object for the
      *     server.
@@ -659,7 +659,7 @@ public class AIMain extends FreeColObject
     public String getXMLTagName() { return getTagName(); }
 
     /**
-     * Gets the tag name of the root element representing this object.
+     * Gets the tag name of the object.
      *
      * @return "aiMain"
      */

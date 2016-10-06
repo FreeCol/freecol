@@ -303,7 +303,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Returns the tag name of the object.
      *
      * @return "serverEurope"
      */

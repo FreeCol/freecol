@@ -519,7 +519,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     public String getXMLTagName() { return getTagName(); }
 
     /**
-     * Gets the tag name of the root element representing this object.
+     * Gets the tag name of the object.
      *
      * @return "diplomaticTrade".
      */

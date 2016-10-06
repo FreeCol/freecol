@@ -143,7 +143,7 @@ public class Effect extends FreeColSpecObjectType {
     public String getXMLTagName() { return getTagName(); }
 
     /**
-     * Gets the XML tag name for this element.
+     * Gets the tag name for the object.
      *
      * @return "effect".
      */

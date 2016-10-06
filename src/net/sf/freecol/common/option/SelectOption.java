@@ -105,7 +105,7 @@ public class SelectOption extends IntegerOption {
     }
 
     /**
-     * Gets the tag name of the item element.
+     * Gets the tag name of the contained object.
      *
      * Should be overridden by subclasses to ensure read/writeChildren work.
      *
@@ -238,7 +238,7 @@ public class SelectOption extends IntegerOption {
     public String getXMLTagName() { return getTagName(); }
 
     /**
-     * Gets the tag name of the root element representing this object.
+     * Gets the tag name of the object.
      *
      * @return "selectOption".
      */

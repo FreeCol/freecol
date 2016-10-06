@@ -420,7 +420,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     /**
      * Gets the production chain of the goods type, beginning with a
      * raw material that can not be produced from any other.  The last
-     * element of the production chain is the goods type itself.
+     * member of the production chain is the goods type itself.
      *
      * Note that this does not really handle goods that are stored as
      * something else as is the case for grain etc.
@@ -695,7 +695,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     public String getXMLTagName() { return getTagName(); }
 
     /**
-     * Gets the tag name of the root element representing this object.
+     * Gets the tag name of the object.
      *
      * @return "goods-type".
      */

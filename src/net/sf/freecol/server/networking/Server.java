@@ -90,8 +90,8 @@ public final class Server extends Thread {
      * @param port The TCP port to use for the public socket.
      * @throws IOException if the public socket cannot be created.
      */
-    public Server(FreeColServer freeColServer, String host,
-                  int port) throws IOException {
+    public Server(FreeColServer freeColServer, String host, int port)
+        throws IOException {
         super(FreeCol.SERVER_THREAD + "Server");
 
         this.freeColServer = freeColServer;

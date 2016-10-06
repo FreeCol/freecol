@@ -89,7 +89,7 @@ public class RangeOption extends SelectOption {
     }
 
     /**
-     * Gets the tag name of the item element
+     * Gets the tag name of the contained object.
      *
      * @return "rangeValue".
      */
@@ -108,7 +108,7 @@ public class RangeOption extends SelectOption {
     public String getXMLTagName() { return getTagName(); }
 
     /**
-     * Gets the tag name of the root element representing this object.
+     * Gets the tag name of the object.
      *
      * @return "rangeOption".
      */

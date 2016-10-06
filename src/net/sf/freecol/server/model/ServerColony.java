@@ -881,7 +881,7 @@ public class ServerColony extends Colony implements ServerModelObject {
     }
 
     /**
-     * Gets the tag name of the root element representing this object.
+     * Gets the tag name of the object.
      *
      * @return "serverColony"
      */

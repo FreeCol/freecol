@@ -172,7 +172,7 @@ public final class Specification {
     };
 
 
-    /** A map from specification element to a reader for that element. */
+    /** A map from specification object group identifier to a reader for it. */
     private final Map<String, ChildReader> readerMap = new HashMap<>();
 
     /* Containers filled from readers in the readerMap. */
@@ -2908,7 +2908,6 @@ public final class Specification {
      *      to the stream.
      */
     protected void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Start element
         xw.writeStartElement(getTagName());
 
         // Add attributes
@@ -2945,9 +2944,7 @@ public final class Specification {
         }
         xw.writeEndElement();
 
-        // End element
         xw.writeEndElement();
-
     }
 
     private <T extends FreeColObject> void writeSection(FreeColXMLWriter xw,
@@ -3041,7 +3038,7 @@ public final class Specification {
     }
 
     /**
-     * Gets the tag name of the root element representing this object.
+     * Gets the tag name of the object.
      *
      * @return "freecol-specification".
      */
