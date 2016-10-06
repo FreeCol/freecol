@@ -274,7 +274,7 @@ public class LoginMessage extends DOMMessage {
 
         connection.setMessageHandler(mh);
         server.getServer().addConnection(connection);
-        server.updateMetaServer();
+        server.updateMetaServer(false);
         return new LoginMessage(this.userName, this.version, player.isAdmin(),
                                 !starting, server.getSinglePlayer(),
                                 isCurrentPlayer, game).toXMLElement();

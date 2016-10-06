@@ -127,7 +127,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
                 "reason", "User has logged out.",
                 "player", player.getId()),
             connection);
-        freeColServer.updateMetaServer();
+        freeColServer.updateMetaServer(false);
         return null;
     }
 

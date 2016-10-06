@@ -602,7 +602,7 @@ public final class InGameInputHandler extends ServerInputHandler {
             cs = getFreeColServer().getInGameController()
                 .endTurn(serverPlayer);
         }
-        getFreeColServer().updateMetaServer();
+        getFreeColServer().updateMetaServer(false);
         return (cs == null) ? null : cs.build(serverPlayer);
     }
 }

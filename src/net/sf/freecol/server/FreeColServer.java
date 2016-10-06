@@ -90,8 +90,6 @@ import net.sf.freecol.server.model.Session;
 import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The main control class for the FreeCol server.  This class both
@@ -604,7 +602,7 @@ public final class FreeColServer {
         }
 
         setGameState(FreeColServer.GameState.IN_GAME);
-        updateMetaServer();
+        updateMetaServer(false);
         sendToAll(new TrivialMessage("startGame"), null);
         getServer().setMessageHandlerToAllConnections(getInGameInputHandler());
     }
@@ -622,27 +620,16 @@ public final class FreeColServer {
     /**
      * Sends information about this server to the meta-server.
      *
-     * Publically visible version, that is called in game.
-     *
-     * @return True if the MetaServer was updated.
-     */
-    public boolean updateMetaServer() {
-        return updateMetaServer(false);
-    }
-
-    /**
-     * Sends information about this server to the meta-server.
-     *
      * This is the master routine with private `firstTime' access
      * when called from the constructors.
      *
      * @param firstTime Must be true when called for the first time.
      * @return True if the MetaServer was updated.
      */
-    private boolean updateMetaServer(boolean firstTime) {
+    public boolean updateMetaServer(boolean firstTime) {
         if (!this.publicServer) return false;
 
-        Connection mc;
+        Connection mc = null;
         try {
             mc = new Connection(FreeCol.META_SERVER_ADDRESS,
                                 FreeCol.META_SERVER_PORT, null,
@@ -654,14 +641,14 @@ public final class FreeColServer {
             return false;
         }
 
-        String tag = (firstTime) ? "register" : "update";
-        int port = mc.getSocket().getPort();
-        String addr = (name != null) ? name
-            : (mc.getSocket().getLocalAddress().getHostAddress() + ":" + port);
-        int nPlayers = getNumberOfLivingHumanPlayers();
-        boolean started = gameState != GameState.STARTING_GAME;
         try {
-            Element reply = mc.ask(new TrivialMessage(tag,
+            String tag = (firstTime) ? "register" : "update";
+            int port = mc.getSocket().getPort();
+            String addr = (name != null) ? name
+                : (mc.getSocket().getLocalAddress().getHostAddress() + ":" + port);
+            int nPlayers = getNumberOfLivingHumanPlayers();
+            boolean started = gameState != GameState.STARTING_GAME;
+            DOMMessage reply = mc.ask((Game)null, new TrivialMessage(tag,
                     "name", addr,
                     "port", Integer.toString(port),
                     "slotsAvailable", Integer.toString(getSlotsAvailable()),
@@ -669,16 +656,10 @@ public final class FreeColServer {
                     "isGameStarted", Boolean.toString(started),
                     "version", FreeCol.getVersion(),
                     "gameState", Integer.toString(getGameState().ordinal())));
-            if (reply != null
-                && "noRouteToServer".equals(reply.getTagName())) {
+            if (reply != null && reply.isType("noRouteToServer")) {
                 this.publicServer = false;
                 return false;
             }
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Network error with meta-server:" + addr,
-                ioe);
-            this.publicServer = false;
-            return false;
         } finally {
             mc.close();
         }
@@ -692,7 +673,7 @@ public final class FreeColServer {
             t.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
-                        if (!updateMetaServer()) cancel();
+                        if (!updateMetaServer(false)) cancel();
                     }
                 }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
         }
