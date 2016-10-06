@@ -1277,6 +1277,12 @@ public final class ColonyPanel extends PortPanel
             repaint();
         }
 
+        /**
+         * Generates the {@code JToolTip} with the colony's
+         * detailed population information.
+         *
+         * @return The JToolTip created.
+         */
         @Override
         public JToolTip createToolTip() {
             JToolTip toolTip = new RebelToolTip(getFreeColClient(), getColony());
