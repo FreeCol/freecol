@@ -28,6 +28,8 @@ import java.util.stream.Stream;
 import javax.swing.filechooser.FileSystemView;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.util.*;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -177,7 +179,7 @@ public class FreeColDirectories {
      * @return True if Mac OS X appears to be present.
      */
     public static boolean onMacOSX() {
-        return "Mac OS X".equals(System.getProperty("os.name"));
+        return "Mac OS X".equals(OSUtils.GetOperatingSystem());
     }
 
     /**
@@ -195,7 +197,7 @@ public class FreeColDirectories {
      * @return True if Windows appears to be present.
      */
     public static boolean onWindows() {
-        return System.getProperty("os.name").startsWith("Windows");
+        return OSUtils.GetOperatingSystem().startsWith("Windows");
     }
 
     /**

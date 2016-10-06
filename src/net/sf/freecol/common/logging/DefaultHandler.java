@@ -30,6 +30,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.util.OSUtils;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -105,7 +106,7 @@ public final class DefaultHandler extends Handler {
                 .append("\nJava WM version: ")
                 .append(System.getProperty("java.vm.version"))
                 .append("\n\nOS name: ")
-                .append(System.getProperty("os.name"))
+                .append(OSUtils.GetOperatingSystem())
                 .append("\nOS architecture: ")
                 .append(System.getProperty("os.arch"))
                 .append("\nOS version: ")
