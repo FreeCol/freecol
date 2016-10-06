@@ -19,7 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
