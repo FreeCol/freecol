@@ -1435,7 +1435,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // are the modifiers
                 forEach(flatten(bankruptcy.getEffects(),
                                 e -> e.getObject().getModifiers()),
-                    m -> cs.addFeatureChange(this, this, m, false));
+                    m -> cs.addModifier(this, this, m, false));
                 cs.addMessage(See.only(this),
                     new ModelMessage(MessageType.GOVERNMENT_EFFICIENCY,
                                      "model.player.disaster.bankruptcy.stop",
@@ -1547,9 +1547,9 @@ outer:  for (Effect effect : effects) {
                             Modifier timedModifier = Modifier
                                 .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
                             modifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
-                            cs.addFeatureChange(this, this, timedModifier, true);
+                            cs.addModifier(this, this, timedModifier, true);
                         } else {
-                            cs.addFeatureChange(this, this, modifier, true);
+                            cs.addModifier(this, this, modifier, true);
                         }
                     });
             } else {
@@ -1644,9 +1644,9 @@ outer:  for (Effect effect : effects) {
                                     Modifier timedModifier = Modifier
                                         .makeTimedModifier(m.getId(), m, getGame().getTurn());
                                     timedModifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
-                                    cs.addFeatureChange(this, colony, timedModifier, true);
+                                    cs.addModifier(this, colony, timedModifier, true);
                                 } else {
-                                    cs.addFeatureChange(this, colony, m, true);
+                                    cs.addModifier(this, colony, m, true);
                                 }
                             });
                         colonyDirty |= first(effect.getModifiers()) != null;
@@ -3995,7 +3995,7 @@ outer:  for (Effect effect : effects) {
             market.setArrears(goodsType, arrears);
 
             Modifier tpm = makeTeaPartyModifier();
-            cs.addFeatureChange(this, colony, tpm, true);
+            cs.addModifier(this, colony, tpm, true);
             cs.add(See.only(this), colony.getGoodsContainer());
             cs.add(See.only(this), market.getMarketData(goodsType));
             

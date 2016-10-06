@@ -1550,17 +1550,19 @@ public class ChangeSet {
     }
 
     /**
-     * Helper function to add an Ability to a FreeColGameObject, or remove it.
+     * Helper function to add or remove an Ability to a FreeColGameObject.
      *
-     * @param serverPlayer a {@code ServerPlayer} value
-     * @param object a {@code FreeColGameObject} value
-     * @param ability an {@code Ability} value
-     * @param add a {@code boolean} value
-     * @return a {@code ChangeSet} value
+     * @param serverPlayer The owning {@code ServerPlayer}.
+     * @param object The {@code FreeColGameObject} to add to.
+     * @param ability The {@code Ability} to add/remove.
+     * @param add If true, add the ability.
+     * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addFeatureChange(ServerPlayer serverPlayer, FreeColGameObject object,
-                                      Ability ability, boolean add) {
-        changes.add(new FeatureChange(See.only(serverPlayer), object, ability, add));
+    public ChangeSet addAbility(ServerPlayer serverPlayer,
+                                FreeColGameObject object, Ability ability,
+                                boolean add) {
+        changes.add(new FeatureChange(See.only(serverPlayer),
+                                      object, ability, add));
         if (add) {
             object.addAbility(ability);
         } else {
@@ -1570,17 +1572,19 @@ public class ChangeSet {
     }
 
     /**
-     * Helper function to add a Modifier to a FreeColGameObject, or remove it.
+     * Helper function to add or remove a Modifier to a FreeColGameObject.
      *
-     * @param serverPlayer a {@code ServerPlayer} value
-     * @param object a {@code FreeColGameObject} value
-     * @param modifier a {@code Modifier} value
-     * @param add a {@code boolean} value
-     * @return a {@code ChangeSet} value
+     * @param serverPlayer The owning {@code ServerPlayer}.
+     * @param object The {@code FreeColGameObject} to add to.
+     * @param modifier The {@code Modifier} to add/remove.
+     * @param add If true, add the modifier.
+     * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addFeatureChange(ServerPlayer serverPlayer, FreeColGameObject object,
-                                      Modifier modifier, boolean add) {
-        changes.add(new FeatureChange(See.only(serverPlayer), object, modifier, add));
+    public ChangeSet addModifier(ServerPlayer serverPlayer,
+                                 FreeColGameObject object, Modifier modifier,
+                                 boolean add) {
+        changes.add(new FeatureChange(See.only(serverPlayer),
+                                      object, modifier, add));
         if (add) {
             object.addModifier(modifier);
         } else {
