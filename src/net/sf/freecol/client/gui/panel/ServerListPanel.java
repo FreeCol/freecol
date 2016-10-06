@@ -29,14 +29,12 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.common.i18n.Messages;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.ServerInfo;
 
@@ -197,102 +195,5 @@ public final class ServerListPanel extends FreeColPanel {
         } catch (NumberFormatException nfe) {
             logger.warning("Invalid ActionEvent, not a number: " + command);
         }
-    }
-}
-
-class ServerListTableModel extends AbstractTableModel {
-
-    private static final String[] columnNames = {
-        Messages.message("name"),
-        Messages.message("host"),
-        Messages.message("port"),
-        Messages.message("serverListPanel.players"),
-        Messages.message("serverListPanel.gameState"),
-    };
-
-    private List<ServerInfo> items;
-
-
-    public ServerListTableModel(List<ServerInfo> items) {
-        this.items = items;
-    }
-
-    /**
-     * Sets the items that should be contained by this model.
-     * 
-     * @param items The {@code ArrayList} containing the items.
-     */
-    public void setItems(List<ServerInfo> items) {
-        this.items = items;
-    }
-
-    /**
-     * Gets the given item.
-     * 
-     * @param row The row-number identifying a {@code ServerInfo}-line.
-     * @return The {@code ServerInfo}.
-     */
-    public ServerInfo getItem(int row) {
-        return items.get(row);
-    }
-
-    /**
-     * Returns the amount of columns in this statesTable.
-     * 
-     * @return The amount of columns in this statesTable.
-     */
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    /**
-     * Returns the name of the specified column.
-     * 
-     * @return The name of the specified column.
-     */
-    @Override
-    public String getColumnName(int column) {
-        return columnNames[column];
-    }
-
-    /**
-     * Returns the amount of rows in this statesTable.
-     * 
-     * @return The amount of rows in this statesTable.
-     */
-    @Override
-    public int getRowCount() {
-        return items.size();
-    }
-
-    /**
-     * Returns the value at the requested location.
-     * 
-     * @param row The requested row.
-     * @param column The requested column.
-     * @return The value at the requested location.
-     */
-    @Override
-    public Object getValueAt(int row, int column) {
-        if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
-            ServerInfo si = items.get(row);
-            switch (column) {
-            case 0:
-                return si.getName();
-            case 1:
-                return si.getAddress();
-            case 2:
-                return Integer.toString(si.getPort());
-            case 3:
-                return Integer.toString(si.getCurrentlyPlaying()) + "/"
-                        + Integer.toString(si.getCurrentlyPlaying() + si.getSlotsAvailable());
-            case 4:
-                return Messages.message("serverListPanel.gameState." + Integer.toString(si.getGameState()));
-            default:
-                return null;
-            }
-        }
-        return null;
     }
 }
