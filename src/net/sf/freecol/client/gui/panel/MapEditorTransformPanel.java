@@ -231,6 +231,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
          * Applies this transformation to the given tile.
          * @param t The {@code Tile} to be transformed,
          */
+        @Override
         public abstract void transform(Tile t);
 
         /**

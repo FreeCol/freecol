@@ -61,9 +61,9 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * @param okKey The key displayed on the "ok"-button.
      * @param cancelKey The key displayed on the optional "cancel"-button.
      */
-    public FreeColInputDialog(final FreeColClient freeColClient, JFrame frame,
-            boolean modal, Object obj, ImageIcon icon,
-            String okKey, String cancelKey) {
+    protected FreeColInputDialog(final FreeColClient freeColClient, JFrame frame,
+                                 boolean modal, Object obj, ImageIcon icon,
+                                 String okKey, String cancelKey) {
         this(freeColClient, frame);
 
         initializeInputDialog(frame, modal, obj, icon, okKey, cancelKey);

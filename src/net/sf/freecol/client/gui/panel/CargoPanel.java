@@ -176,6 +176,7 @@ public class CargoPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean accepts(Unit unit) {
         return carrier.canAdd(unit);
     }
@@ -183,6 +184,7 @@ public class CargoPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean accepts(Goods goods) {
         return carrier.canAdd(goods);
     }
@@ -192,6 +194,7 @@ public class CargoPanel extends FreeColPanel
      *
      * {@inheritDoc}
      */
+    @Override
     public Component add(Component comp, boolean editState) {
         if (carrier == null) {
             return null;
@@ -207,6 +210,7 @@ public class CargoPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public int suggested(GoodsType type) {
         return carrier.getLoadableAmount(type);
     }

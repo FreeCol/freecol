@@ -38,7 +38,7 @@ public abstract class InPortPanel extends UnitPanel {
      * @param name An optional name for the panel.
      * @param editable Is this panel editable?
      */
-    public InPortPanel(PortPanel portPanel, String name, boolean editable) {
+    protected InPortPanel(PortPanel portPanel, String name, boolean editable) {
         super(portPanel, name, editable);
     }
 

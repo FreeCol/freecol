@@ -81,9 +81,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      *     this dialog with.
      * @param optionGroupId The identifier for the overall option group.
      */
-    public OptionsDialog(FreeColClient freeColClient, JFrame frame,
-                         boolean editable, OptionGroup group, String headerKey,
-                         String defaultFileName, String optionGroupId) {
+    protected OptionsDialog(FreeColClient freeColClient, JFrame frame,
+                            boolean editable, OptionGroup group, String headerKey,
+                            String defaultFileName, String optionGroupId) {
         super(freeColClient, frame);
 
         this.editable = editable;

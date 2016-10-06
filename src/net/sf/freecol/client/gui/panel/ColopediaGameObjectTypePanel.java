@@ -76,9 +76,9 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
      * @param colopediaPanel The parent {@code ColopediaPanel}.
      * @param id The panel type identifier.
      */
-    public ColopediaGameObjectTypePanel(FreeColClient freeColClient,
-                                        ColopediaPanel colopediaPanel,
-                                        String id) {
+    protected ColopediaGameObjectTypePanel(FreeColClient freeColClient,
+                                           ColopediaPanel colopediaPanel,
+                                           String id) {
         super(freeColClient);
 
         this.colopediaPanel = colopediaPanel;

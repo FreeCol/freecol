@@ -142,6 +142,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Unit unit) {
             return unit.isNaval() && !unit.isDamaged();
         }
@@ -149,6 +150,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Goods goods) {
             return false;
         }
@@ -156,6 +158,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof UnitLabel)) {
@@ -208,6 +211,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int suggested(GoodsType type) { return -1; } // N/A
     }
 
@@ -240,6 +244,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Unit unit) {
             return !unit.isNaval();
         }
@@ -247,6 +252,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Goods goods) {
             return false;
         }
@@ -254,6 +260,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component add(Component comp, boolean editState) {
             Component c = add(comp);
             update();
@@ -263,6 +270,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int suggested(GoodsType type) { return -1; } // N/A
 
 
@@ -382,6 +390,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Unit unit) {
             return false;
         }
@@ -389,6 +398,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Goods goods) {
             return true;
         }
@@ -396,6 +406,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
@@ -435,6 +446,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int suggested(GoodsType type) {
             return -1; // No good choice
         }

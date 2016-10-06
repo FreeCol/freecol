@@ -83,8 +83,8 @@ public abstract class ReportUnitPanel extends ReportPanel {
      * @param key the report name key
      * @param showColonies Whether to show colonies with no selected units.
      */
-    public ReportUnitPanel(FreeColClient freeColClient, String key,
-                           boolean showColonies) {
+    protected ReportUnitPanel(FreeColClient freeColClient, String key,
+                              boolean showColonies) {
         super(freeColClient, key);
 
         this.showColonies = showColonies;
