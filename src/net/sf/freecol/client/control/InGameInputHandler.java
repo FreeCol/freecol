@@ -228,28 +228,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Select a child element with the given object identifier from a
-     * parent element.
-     *
-     * @param parent The parent {@code Element}.
-     * @param key The key to search for.
-     * @return An {@code Element} with matching key,
-     *     or null if none found.
-     */
-    private static Element selectElement(Element parent, String key) {
-        NodeList nodes = parent.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element e = (Element)nodes.item(i);
-            if (key.equals(DOMMessage.readId(e))) return e;
-        }
-        return null;
-    }
-
-    /**
      * Sometimes units appear which the client does not know about,
      * and are passed in as the children of the parent element.
-     * Worse, if their location is a Unit, that unit has to be passed in too.
-     * Pull a unit out of the children by id.
+     * Worse, if their location is a Unit, that unit has to be passed
+     * in too.  Pull a unit out of the children by id.
      *
      * @param game The {@code Game} to add the unit to.
      * @param element The {@code Element} to find a unit in.
@@ -258,10 +240,18 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private static Unit selectUnitFromElement(Game game, Element element,
                                               String id) {
-        Element e = selectElement(element, id);
+        NodeList nodes = element.getChildNodes();
+        Element found = null;
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = (Element)nodes.item(i);
+            if (id.equals(DOMMessage.readId(e))) {
+                found = e;
+                break;
+            }
+        }
         Unit u = null;
-        if (e != null) {
-            u = new Unit(game, e);
+        if (found != null) {
+            u = new Unit(game, found);
             if (u.getLocation() == null) {
                 throw new RuntimeException("Null location: " + u);
             }
