@@ -37,16 +37,10 @@ import org.w3c.dom.Element;
 /**
  * The message sent when setting the build queue.
  */
-public class SetBuildQueueMessage extends DOMMessage {
+public class SetBuildQueueMessage extends TrivialMessage {
 
     public static final String TAG = "setBuildQueue";
     private static final String COLONY_TAG = "colony";
-
-    /** The identifier of the colony containing the queue. */
-    private final String colonyId;
-
-    /** The items in the build queue. */
-    private final String[] queue;
 
 
     /**
@@ -57,11 +51,9 @@ public class SetBuildQueueMessage extends DOMMessage {
      * @param queue A list of {@code BuildableType}s to build.
      */
     public SetBuildQueueMessage(Colony colony, List<BuildableType> queue) {
-        super(getTagName());
+        super(TAG, COLONY_TAG, colony.getId());
 
-        this.colonyId = colony.getId();
-        this.queue = transform(queue, alwaysTrue(), BuildableType::getId)
-            .toArray(new String[0]);
+        setArrayAttributes(transform(queue, alwaysTrue(), BuildableType::getId));
     }
 
     /**
@@ -72,25 +64,34 @@ public class SetBuildQueueMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetBuildQueueMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.colonyId = getStringAttribute(element, COLONY_TAG);
-        this.queue = getArrayAttributes(element).toArray(new String[0]);
+        super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
+        setArrayAttributes(getArrayAttributes(element));
     }
 
 
     // Public interface
 
+    /**
+     * Get the colony that is building.
+     *
+     * @param player The {@code Player} that owns the colony.
+     * @return The colony.
+     */
     public Colony getColony(Player player) {
-        return player.getOurFreeColGameObject(this.colonyId, Colony.class);
+        return player.getOurFreeColGameObject(getAttribute(COLONY_TAG),
+                                              Colony.class);
     }
 
+    /**
+     * Get the list of buildables defined by the array attributes.
+     *
+     * @param spec A {@code Specification} to use to make the buildable.
+     * @return A list of {@code BuildableType}s.
+     */
     public List<BuildableType> getQueue(Specification spec) {
-        List<BuildableType> ret = new ArrayList<>();
-        for (int i = 0; i < this.queue.length; i++) {
-            ret.add(i, spec.getType(this.queue[i], BuildableType.class));
-        }
-        return ret;
+        return transform(getArrayAttributes(), alwaysTrue(),
+                         id -> spec.getType(id, BuildableType.class),
+                         toListNoNulls());
     }
 
     
@@ -118,10 +119,6 @@ public class SetBuildQueueMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        if (queue == null) {
-            return serverPlayer.clientError("Empty queue")
-                .build(serverPlayer);
-        }
         List<BuildableType> buildQueue;
         try {
             buildQueue = getQueue(spec);
@@ -134,18 +131,6 @@ public class SetBuildQueueMessage extends DOMMessage {
         return server.getInGameController()
             .setBuildQueue(serverPlayer, colony, buildQueue)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this SetBuildQueueMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            COLONY_TAG, this.colonyId)
-            .setArrayAttributes(this.queue).toXMLElement();
     }
 
     /**
