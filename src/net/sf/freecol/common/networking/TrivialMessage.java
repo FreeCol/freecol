@@ -19,9 +19,12 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -106,6 +109,17 @@ public class TrivialMessage extends DOMMessage {
     }
     
     /**
+     * Is an attribute present?
+     *
+     * @param key The {@code key} to look up.
+     * @return True if the attribute is present.
+     */
+    @Override
+    public boolean hasAttribute(String key) {
+        return this.attributes.containsKey(key);
+    }
+
+    /**
      * Get an attribute value.
      *
      * @param key The {@code key} to look up.
@@ -155,7 +169,7 @@ public class TrivialMessage extends DOMMessage {
     }
 
     /**
-     * Set the attributes in an array.
+     * Set the attribute pairs in an array.
      *
      * @param attributes An array of key,value pairs.
      * @return This message.
@@ -180,23 +194,46 @@ public class TrivialMessage extends DOMMessage {
         return this;
     }
 
-    
     /**
-     * Handle a "trivial"-message.
+     * Get a list of array attributes.
      *
-     * Should never be called in practice!
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
-     *
-     * @return Null.
+     * @param attributes A list of attribute values.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        return null;
+    public List<String> getArrayAttributes() {
+        List<String> ret = new ArrayList<>();
+        int n;
+        try {
+            n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG);
+        } catch (NumberFormatException nfe) {
+            n = 0;
+        }
+        for (int i = 0; i < n; i++) {
+            String key = FreeColObject.arrayKey(i);
+            if (!hasAttribute(key)) break;
+            ret.add(getAttribute(key));
+        }
+        return ret;
     }
 
+    /**
+     * Set a list of attributes as an array.
+     *
+     * @param attributes A list of attribute values.
+     */
+    public TrivialMessage setArrayAttributes(List<String> attributes) {
+        if (attributes != null) {
+            int i = 0;
+            for (String a : attributes) {
+                String key = FreeColObject.arrayKey(i);
+                i++;
+                setAttribute(key, a);
+            }
+            setAttribute(FreeColObject.ARRAY_SIZE_TAG, String.valueOf(i));
+        }
+        return this;
+    }
+
+    
     /**
      * {@inheritDoc}
      */
