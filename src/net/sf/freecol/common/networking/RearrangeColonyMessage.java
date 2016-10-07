@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests rearrangeing of a colony.
  */
-public class RearrangeColonyMessage extends DOMMessage {
+public class RearrangeColonyMessage extends TrivialMessage {
 
     public static final String TAG = "rearrangeColony";
     private static final String COLONY_TAG = "colony";
@@ -95,31 +95,67 @@ public class RearrangeColonyMessage extends DOMMessage {
             return this;
         }
 
-        public String unitKey(int i) {
+        public static String unitKey(int i) {
             return FreeColObject.arrayKey(i) + "unit";
         }
 
-        public String locKey(int i) {
+        public static String locKey(int i) {
             return FreeColObject.arrayKey(i) + "loc";
         }
 
-        public String workKey(int i) {
+        public static String workKey(int i) {
             return FreeColObject.arrayKey(i) + "work";
         }
 
-        public String roleKey(int i) {
+        public static String roleKey(int i) {
             return FreeColObject.arrayKey(i) + "role";
         }
 
-        public String roleCountKey(int i) {
+        public static String roleCountKey(int i) {
             return FreeColObject.arrayKey(i) + "count";
         }
 
-        @Override
-        public String toString() {
-            return "[Arrangement " + unit.getId() + " at " + loc.getId()
-                + " " + role.getRoleSuffix() + "." + roleCount
-                + ((work == null) ? "" : " work " + work.getId()) + "]";
+        /**
+         * Create new arrangements for a given list of worker units on the
+         * basis of a scratch colony configuration.
+         *
+         * @param colony The original {@code Colony}.
+         * @param workers A list of worker {@code Unit}s to arrange.
+         * @param scratch The scratch {@code Colony}.
+         * @return A list of {@code Arrangement}s.
+         */
+        public static List<Arrangement> getArrangements(Colony colony,
+                                                        List<Unit> workers,
+                                                        Colony scratch) {
+            List<Arrangement> ret = new ArrayList<>();
+            for (Unit u : workers) {
+                Unit su = scratch.getCorresponding(u);
+                if (u.getLocation().getId().equals(su.getLocation().getId())
+                    && u.getWorkType() == su.getWorkType()
+                    && u.getRole() == su.getRole()
+                    && u.getRoleCount() == su.getRoleCount()) continue;
+                ret.add(new Arrangement(u,
+                        (Location)colony.getCorresponding((FreeColObject)su.getLocation()),
+                        su.getWorkType(), su.getRole(), su.getRoleCount()));
+            }
+            return ret;
+        }
+
+        /**
+         * Create new arrangements from an element.
+         *
+         * @param game The {@code Game} to create arrangements in.
+         * @param element The {@code Element} to read from.
+         * @return A list of {@code Arrangement}s found.
+         */
+        public static List<Arrangement> readArrangements(Game game,
+                                                         Element element) {
+            List<Arrangement> ret = new ArrayList<>();
+            int n = getIntegerAttribute(element, FreeColObject.ARRAY_SIZE_TAG, 0);
+            for (int i = 0; i < n; i++) {
+                ret.add(new Arrangement().readFromElement(game, element, i));
+            }
+            return ret;
         }
 
         // Interface Comparable<Arrangement>
@@ -132,13 +168,19 @@ public class RearrangeColonyMessage extends DOMMessage {
             if (cmp == 0) cmp = this.roleCount - other.roleCount;
             return cmp;
         }
+
+        // Override Object
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "[Arrangement " + unit.getId() + " at " + loc.getId()
+                + " " + role.getRoleSuffix() + "." + roleCount
+                + ((work == null) ? "" : " work " + work.getId()) + "]";
+        }
     }
-
-    /** The id of the colony requesting the rearrangement. */
-    private final String colonyId;
-
-    /** A list of arrangements to make. */
-    private final List<Arrangement> arrangements = new ArrayList<>();
 
 
     /**
@@ -151,20 +193,9 @@ public class RearrangeColonyMessage extends DOMMessage {
      */
     public RearrangeColonyMessage(Colony colony, List<Unit> workers,
                                   Colony scratch) {
-        super(getTagName());
+        super(TAG, COLONY_TAG, colony.getId());
 
-        this.colonyId = colony.getId();
-        this.arrangements.clear();
-        for (Unit u : workers) {
-            Unit su = scratch.getCorresponding(u);
-            if (u.getLocation().getId().equals(su.getLocation().getId())
-                && u.getWorkType() == su.getWorkType()
-                && u.getRole() == su.getRole()
-                && u.getRoleCount() == su.getRoleCount()) continue;
-            addChange(u,
-                (Location)colony.getCorresponding((FreeColObject)su.getLocation()),
-                su.getWorkType(), su.getRole(), su.getRoleCount());
-        }
+        setArrangementAttributes(Arrangement.getArrangements(colony, workers, scratch));
     }
 
     /**
@@ -175,45 +206,58 @@ public class RearrangeColonyMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public RearrangeColonyMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
 
-        this.colonyId = getStringAttribute(element, COLONY_TAG);
-        int n;
-        try {
-            n = Integer.parseInt(element.getAttribute(FreeColObject.ARRAY_SIZE_TAG));
-        } catch (NumberFormatException nfe) {
-            n = 0;
+        setArrangementAttributes(Arrangement.readArrangements(game, element));
+    }
+
+
+    /**
+     * Set the attributes consequent to a list of arrangements.
+     *
+     * @param arrangements The list of {@code Arrangement}.
+     */
+    private void setArrangementAttributes(List<Arrangement> arrangements) {
+        int i = 0;
+        for (Arrangement a : arrangements) {
+            setAttribute(a.unitKey(i), a.unit.getId());
+            setAttribute(a.locKey(i), a.loc.getId());
+            if (a.work != null) {
+                setAttribute(a.workKey(i), a.work.getId());
+            }
+            setAttribute(a.roleKey(i), a.role.toString());
+            setAttribute(a.roleCountKey(i), String.valueOf(a.roleCount));
+            i++;
         }
-        this.arrangements.clear();
-        for (int i = 0; i < n; i++) {
-            this.arrangements.add(new Arrangement().readFromElement(game, element, i));
-        }
+        setAttribute(FreeColObject.ARRAY_SIZE_TAG, String.valueOf(i));
     }
 
 
     // Public interface
 
     /**
-     * Are there no changes present?
+     * Get arrangements from the attributes.
      *
-     * @return True if no changes have been added.
+     * @param game The {@code Game} to create arrangements in.
+     * @return A list of {@code Arrangement}s.
      */
-    public boolean isEmpty() {
-        return this.arrangements.isEmpty();
-    }
-
-    /**
-     * Add a change to this message.
-     *
-     * @param unit The {@code Unit} that is to change.
-     * @param loc The destination {@code Location} for the unit.
-     * @param work The {@code GoodsType} to produce (may be null).
-     * @param role The unit {@code Role}.
-     * @param roleCount The role count.
-     */
-    public void addChange(Unit unit, Location loc, GoodsType work,
-                          Role role, int roleCount) {
-        this.arrangements.add(new Arrangement(unit, loc, work, role, roleCount));
+    public List<Arrangement> getArrangements(Game game) {
+        List<Arrangement> ret = new ArrayList<>();
+        int n;
+        try {
+            n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG);
+        } catch (NumberFormatException nfe) {
+            n = 0;
+        }
+        for (int i = 0; i < n; i++) {
+            ret.add(new Arrangement(game,
+                                    getAttribute(Arrangement.unitKey(i)),
+                                    getAttribute(Arrangement.locKey(i)),
+                                    getAttribute(Arrangement.workKey(i)),
+                                    getAttribute(Arrangement.roleKey(i)),
+                                    getAttribute(Arrangement.roleCountKey(i))));
+        }
+        return ret;
     }
 
     
@@ -229,16 +273,18 @@ public class RearrangeColonyMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-
+        final String colonyId = getAttribute(COLONY_TAG);
+        final List<Arrangement> arrangements = getArrangements(player.getGame());
+        
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
-        if (isEmpty()) {
+        if (arrangements.isEmpty()) {
             return serverPlayer.clientError("Empty rearrangement list.")
                 .build(serverPlayer);
         }
@@ -264,32 +310,8 @@ public class RearrangeColonyMessage extends DOMMessage {
 
         // Rearrange can proceed.
         return server.getInGameController()
-            .rearrangeColony(serverPlayer, colony, this.arrangements)
+            .rearrangeColony(serverPlayer, colony, arrangements)
             .build(serverPlayer);
-    }
-
-    /**
-     * Convert this RearrangeColonyMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            COLONY_TAG, this.colonyId,
-            FreeColObject.ARRAY_SIZE_TAG, Integer.toString(arrangements.size()));
-        int i = 0;
-        for (Arrangement uc : arrangements) {
-            result.setAttribute(uc.unitKey(i), uc.unit.getId());
-            result.setAttribute(uc.locKey(i), uc.loc.getId());
-            if (uc.work != null) {
-                result.setAttribute(uc.workKey(i), uc.work.getId());
-            }
-            result.setAttribute(uc.roleKey(i), uc.role.toString());
-            result.setAttribute(uc.roleCountKey(i), String.valueOf(uc.roleCount));
-            i++;
-        }
-        return result.toXMLElement();
     }
 
     /**
