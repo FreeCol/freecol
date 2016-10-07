@@ -17,8 +17,9 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.panel;
+package net.sf.freecol.client.gui.panel.label;
 
+import net.sf.freecol.client.gui.panel.CargoPanel;
 import net.sf.freecol.common.model.Unit;
 
 import java.awt.Component;

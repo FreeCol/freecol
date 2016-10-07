@@ -28,6 +28,7 @@ import javax.swing.TransferHandler;
 import java.util.List;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.panel.label.UnitLabel;
 import net.sf.freecol.common.model.Unit;
 
 

@@ -26,6 +26,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.panel.label.CargoLabel;
+import net.sf.freecol.client.gui.panel.label.GoodsLabel;
+import net.sf.freecol.client.gui.panel.label.UnitLabel;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;

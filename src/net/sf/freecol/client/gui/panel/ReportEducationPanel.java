@@ -27,6 +27,7 @@ import java.util.function.Function;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.panel.label.UnitLabel;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.StringTemplate;

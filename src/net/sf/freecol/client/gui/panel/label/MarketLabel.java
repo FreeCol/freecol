@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.panel;
+package net.sf.freecol.client.gui.panel.label;
 
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
@@ -25,6 +25,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.panel.CargoPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;

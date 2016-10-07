@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.panel;
+package net.sf.freecol.client.gui.panel.label;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -27,6 +27,8 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.panel.CargoPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;

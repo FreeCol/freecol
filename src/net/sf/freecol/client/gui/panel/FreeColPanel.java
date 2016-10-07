@@ -174,7 +174,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The client {@code InGameController}.
      */
-    protected InGameController igc() {
+    public InGameController igc() {
         return freeColClient.getInGameController();
     }
 
