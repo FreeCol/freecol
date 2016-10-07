@@ -96,23 +96,23 @@ public class RearrangeColonyMessage extends DOMMessage {
         }
 
         public String unitKey(int i) {
-            return "x" + i + "unit";
+            return FreeColObject.arrayKey(i) + "unit";
         }
 
         public String locKey(int i) {
-            return "x" + i + "loc";
+            return FreeColObject.arrayKey(i) + "loc";
         }
 
         public String workKey(int i) {
-            return "x" + i + "work";
+            return FreeColObject.arrayKey(i) + "work";
         }
 
         public String roleKey(int i) {
-            return "x" + i + "role";
+            return FreeColObject.arrayKey(i) + "role";
         }
 
         public String roleCountKey(int i) {
-            return "x" + i + "count";
+            return FreeColObject.arrayKey(i) + "count";
         }
 
         @Override

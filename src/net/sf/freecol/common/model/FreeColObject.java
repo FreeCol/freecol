@@ -1209,7 +1209,19 @@ public abstract class FreeColObject
         xr.closeTag(tag);
     }
 
+    /**
+     * Make the standard array key.
+     *
+     * @param i The array index.
+     * @return The array key.
+     */
+    public static String arrayKey(int i) {
+        return "x" + String.valueOf(i);
+    }
 
+
+    // Override Object
+        
     /**
      * {@inheritDoc}
      */

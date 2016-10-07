@@ -632,7 +632,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
         List<T> list = new ArrayList<>(length);
         for (int x = 0; x < length; x++) {
             try {
-                final String value = getAttribute("x" + x, (String)null);
+                final String value = getAttribute(FreeColObject.arrayKey(x),
+                                                  (String)null);
                 T object = null;
                 if (value != null) {
                     Constructor<T> c = type.getConstructor(type);
@@ -672,7 +673,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
 
         List<T> list = new ArrayList<>(length);
         for (int x = 0; x < length; x++) {
-            T value = getType(spec, "x" + x, type, (T)null); 
+            T value = getType(spec, FreeColObject.arrayKey(x), type, (T)null); 
             if (value == null) logger.warning("Null list value(" + x + ")");
             list.add(value);
         }

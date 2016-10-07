@@ -322,10 +322,8 @@ public class DOMMessage {
     public DOMMessage setArrayAttributes(List<String> attributes) {
         if (!attributes.isEmpty()) {
             int i = 0;
-            String key;
             for (String a : attributes) {
-                key = "x" + Integer.toString(i);
-                setAttribute(key, a);
+                setAttribute(FreeColObject.arrayKey(i), a);
                 i++;
             }
         }
@@ -341,8 +339,7 @@ public class DOMMessage {
     public DOMMessage setArrayAttributes(String[] attributes) {
         if (attributes != null) {
             for (int i = 0; i < attributes.length; i++) {
-                String key = "x" + Integer.toString(i);
-                setAttribute(key, attributes[i]);
+                setAttribute(FreeColObject.arrayKey(i), attributes[i]);
             }
         }
         return this;
@@ -711,7 +708,7 @@ public class DOMMessage {
         String key;
         int i = 0;
         for (;;) {
-            key = "x" + Integer.toString(i);
+            key = FreeColObject.arrayKey(i);
             if (!element.hasAttribute(key)) break;
             result.add(element.getAttribute(key));
             i++;

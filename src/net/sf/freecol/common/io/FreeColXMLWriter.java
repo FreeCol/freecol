@@ -362,7 +362,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
 
         int i = 0;
         for (T t : members) {
-            writeAttribute("x" + i, t);
+            writeAttribute(FreeColObject.arrayKey(i), t);
             i++;
         }
 
