@@ -35,21 +35,16 @@ import org.w3c.dom.Element;
 /**
  * The message sent to discover the vacant players.
  */
-public class VacantPlayersMessage extends DOMMessage {
+public class VacantPlayersMessage extends TrivialMessage {
 
     public static final String TAG = "vacantPlayers";
     
-    /** The vacant players found. */
-    private final List<String> vacantPlayers = new ArrayList<>();
-
 
     /**
      * Create a new {@code VacantPlayersMessage}.
      */
     public VacantPlayersMessage() {
-        super(getTagName());
-
-        this.vacantPlayers.clear();
+        super(TAG);
     }
 
     /**
@@ -60,9 +55,9 @@ public class VacantPlayersMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public VacantPlayersMessage(Game game, Element element) {
-        this();
+        super(TAG);
 
-        this.vacantPlayers.addAll(getArrayAttributes(element));
+        setArrayAttributes(getArrayAttributes(element));
     }
 
 
@@ -74,7 +69,7 @@ public class VacantPlayersMessage extends DOMMessage {
      * @return A list of vacant code player identifiers.
      */
     public List<String> getVacantPlayers() {
-        return this.vacantPlayers;
+        return getArrayAttributes();
     }
 
 
@@ -94,22 +89,9 @@ public class VacantPlayersMessage extends DOMMessage {
 
         final Predicate<Player> vacantPred = p ->
             !p.isREF() && (p.isAI() || !((ServerPlayer)p).isConnected());
-        this.vacantPlayers.clear();
-        this.vacantPlayers.addAll(transform(game.getLiveEuropeanPlayers(),
-                                            vacantPred, Player::getNationId));
+        setArrayAttributes(transform(game.getLiveEuropeanPlayers(),
+                                     vacantPred, Player::getNationId));
         return this.toXMLElement();
-    }
-
-
-    /**
-     * Convert this VacantPlayersMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(getTagName())
-            .setArrayAttributes(this.vacantPlayers).toXMLElement();
     }
 
     /**
