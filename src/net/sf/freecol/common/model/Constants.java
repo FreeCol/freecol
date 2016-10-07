@@ -88,10 +88,4 @@ public interface Constants {
         HAGGLE,
         GIFT
     }
-
-    /** Trading failure types. */
-    public static final int NO_TRADE_GOODS = 0,
-                            NO_TRADE = -1,
-                            NO_TRADE_HAGGLE = -2,
-                            NO_TRADE_HOSTILE = -3;
 }

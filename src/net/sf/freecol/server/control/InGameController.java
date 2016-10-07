@@ -119,7 +119,6 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.REFAIPlayer;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -1291,69 +1290,6 @@ public final class InGameController extends Controller {
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see tile changes.
-        getGame().sendToOthers(serverPlayer, cs);
-        return cs;
-    }
-
-
-    /**
-     * Buy from a settlement.
-     *
-     * @param serverPlayer The {@code ServerPlayer} that is buying.
-     * @param unit The {@code Unit} that will carry the goods.
-     * @param is The {@code IndianSettlement} to buy from.
-     * @param goods The {@code Goods} to buy.
-     * @param amount How much gold to pay.
-     * @return A {@code ChangeSet} encapsulating this action.
-     */
-    public ChangeSet buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
-                                       IndianSettlement is,
-                                       Goods goods, int amount) {
-        ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, is, 0, cs);
-
-        NativeTradeSession session
-            = Session.lookup(NativeTradeSession.class, unit, is);
-        if (session == null) {
-            return serverPlayer.clientError("Trying to buy without opening a session");
-        }
-        NativeTrade nt = session.getNativeTrade();
-        if (!nt.getBuy()) {
-            return serverPlayer.clientError("Trying to buy in a session where buying is not allowed.");
-        }
-        if (!unit.hasSpaceLeft()) {
-            return serverPlayer.clientError("Unit is full, unable to buy.");
-        }
-
-        // Check that this is the agreement that was made
-        AIPlayer ai = getFreeColServer().getAIPlayer(is.getOwner());
-        int returnGold = ai.buyProposition(unit, is, goods, amount);
-        if (returnGold != amount) {
-            return serverPlayer.clientError("This was not the price we agreed upon! Cheater?");
-        }
-        if (!serverPlayer.checkGold(amount)) { // Check this is funded.
-            return serverPlayer.clientError("Insufficient gold to buy.");
-        }
-
-        // Valid, make the trade.
-        moveGoods(is, goods.getType(), goods.getAmount(), unit);
-        cs.add(See.perhaps(), unit);
-
-        Player settlementPlayer = is.getOwner();
-        Tile tile = is.getTile();
-        is.updateWantedGoods();
-        settlementPlayer.modifyGold(amount);
-        serverPlayer.modifyGold(-amount);
-        ((ServerIndianSettlement)is).csModifyAlarm(serverPlayer,
-            -amount / 50, true, cs);
-        tile.updateIndianSettlement(serverPlayer);
-        cs.add(See.only(serverPlayer), tile);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        nt.setBuy(true);
-        logger.finest(serverPlayer.getName() + " " + unit + " buys " + goods
-                      + " at " + is.getName() + " for " + amount);
-
-        // Others can see the unit capacity.
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }

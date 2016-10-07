@@ -94,12 +94,6 @@ public class NativeAIPlayer extends MissionAIPlayer {
     public static final int MAX_NUMBER_OF_DEMANDS = 1;
 
     /**
-     * Stores temporary information for sessions (trading with another
-     * player etc).
-     */
-    private final HashMap<String, Integer> sessionRegister = new HashMap<>();
-
-    /**
      * Debug helper to keep track of why/what the units are doing.
      * Do not serialize.
      */
@@ -736,7 +730,6 @@ public class NativeAIPlayer extends MissionAIPlayer {
         LogBuilder lb = new LogBuilder(1024);
         lb.add(player.getDebugName(), " in ", turn, "/", turn.getNumber());
 
-        sessionRegister.clear();
         clearAIUnits();
 
         determineStances(lb);
@@ -959,143 +952,6 @@ public class NativeAIPlayer extends MissionAIPlayer {
         default: // Invalid
             return NativeTradeAction.NAK_INVALID;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void registerSellGoods(Goods goods) {
-        String goldKey = "tradeGold#" + goods.getType().getId()
-            + "#" + goods.getAmount() + "#" + goods.getLocation().getId();
-        sessionRegister.put(goldKey, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int buyProposition(Unit unit, Settlement settlement,
-                              Goods goods, int gold) {
-        logger.finest("Entering method buyProposition");
-        Specification spec = getSpecification();
-        IndianSettlement is = (IndianSettlement) settlement;
-        Player buyer = unit.getOwner();
-        String goldKey = "tradeGold#" + goods.getType().getId()
-            + "#" + goods.getAmount() + "#" + settlement.getId();
-        String hagglingKey = "tradeHaggling#" + unit.getId();
-        int price;
-        Integer registered = sessionRegister.get(goldKey);
-        if (registered == null) {
-            price = is.getPriceToSell(goods);
-            switch (is.getAlarm(buyer).getLevel()) {
-            case HAPPY: case CONTENT:
-                break;
-            case DISPLEASED:
-                price *= 2;
-                break;
-            default:
-                return Constants.NO_TRADE_HOSTILE;
-            }
-            Set<Modifier> modifiers = new HashSet<>();
-            if (is.hasMissionary(buyer)
-                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                Unit u = is.getMissionary();
-                modifiers.addAll(u.getMissionaryTradeModifiers(false));
-            }
-            if (unit.isNaval()) {
-                modifiers.addAll(getShipTradePenalties(false));
-            }
-            price = (int)FeatureContainer.applyModifiers((float)price,
-                getGame().getTurn(), modifiers);
-            sessionRegister.put(goldKey, price);
-            return price;
-        }
-        price = registered;
-        if (price < 0 || price == gold) return price;
-        if (gold < (price * 9) / 10) {
-            logger.warning("Cheating attempt: sending offer too low");
-            sessionRegister.put(goldKey, -1);
-            return Constants.NO_TRADE;
-        }
-
-        int haggling = 1;
-        if (sessionRegister.containsKey(hagglingKey)) {
-            haggling = sessionRegister.get(hagglingKey);
-        }
-        if (randomInt(logger, "Haggle-buy", getAIRandom(), 3 + haggling) >= 3) {
-            sessionRegister.put(goldKey, -1);
-            return Constants.NO_TRADE_HAGGLE;
-        }
-        sessionRegister.put(goldKey, gold);
-        sessionRegister.put(hagglingKey, haggling + 1);
-        return gold;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int sellProposition(Unit unit, Settlement settlement,
-                               Goods goods, int gold) {
-        logger.finest("Entering method sellProposition");
-        Specification spec = getSpecification();
-        IndianSettlement is = (IndianSettlement) settlement;
-        Player seller = unit.getOwner();
-        String goldKey = "tradeGold#" + goods.getType().getId()
-            + "#" + goods.getAmount() + "#" + unit.getId()
-            + "#" + settlement.getId();
-        String hagglingKey = "tradeHaggling#" + unit.getId();
-        int price;
-        if (sessionRegister.containsKey(goldKey)) {
-            price = sessionRegister.get(goldKey);
-        } else {
-            price = is.getPriceToBuy(goods);
-            switch (is.getAlarm(seller).getLevel()) {
-            case HAPPY: case CONTENT:
-                break;
-            case DISPLEASED:
-                price /= 2;
-                break;
-            case ANGRY:
-                if (!goods.getType().getMilitary())
-                    return Constants.NO_TRADE_HOSTILE;
-                price /= 2;
-                break;
-            default:
-                return Constants.NO_TRADE_HOSTILE;
-            }
-            Set<Modifier> modifiers = new HashSet<>();
-            if (is.hasMissionary(seller)
-                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                Unit u = is.getMissionary();
-                modifiers.addAll(u.getMissionaryTradeModifiers(true));
-            }
-            if (unit.isNaval()) {
-                modifiers.addAll(getShipTradePenalties(true));
-            }
-            price = (int)FeatureContainer.applyModifiers((float)price,
-                getGame().getTurn(), modifiers);
-            if (price <= 0) return 0;
-            sessionRegister.put(goldKey, price);
-        }
-        if (gold < 0 || price == gold) return price;
-        if (gold > (price * 11) / 10) {
-            logger.warning("Cheating attempt: haggling request too high");
-            sessionRegister.put(goldKey, -1);
-            return Constants.NO_TRADE;
-        }
-        int haggling = 1;
-        if (sessionRegister.containsKey(hagglingKey)) {
-            haggling = sessionRegister.get(hagglingKey);
-        }
-        if (randomInt(logger, "Haggle-sell", getAIRandom(), 3 + haggling) >= 3) {
-            sessionRegister.put(goldKey, -1);
-            return Constants.NO_TRADE_HAGGLE;
-        }
-        sessionRegister.put(goldKey, gold);
-        sessionRegister.put(hagglingKey, haggling + 1);
-        return gold;
     }
 
 

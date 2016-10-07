@@ -194,13 +194,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     // Caches/internals.  Do not serialize.
 
     /**
-     * Stores temporary information for sessions (trading with another
-     * player etc).
-     */
-    private final java.util.Map<String, Integer> sessionRegister
-        = new HashMap<>();
-
-    /**
      * A cached map of Tile to best TileImprovementPlan.
      * Used to choose a tile improvement for a pioneer to work on.
      */
@@ -2254,7 +2247,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         if (getAIMain().getAIPlayer(player) != this) {
             throw new RuntimeException("EuropeanAIPlayer integrity fail");
         }
-        sessionRegister.clear();
         clearAIUnits();
         player.clearNationCache();
         badlyDefended.clear();
@@ -2568,88 +2560,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         return NativeTradeAction.NAK_INVALID;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void registerSellGoods(Goods goods) {
-        String goldKey = "tradeGold#" + goods.getType().getId()
-            + "#" + goods.getAmount() + "#" + goods.getLocation().getId();
-        sessionRegister.put(goldKey, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int buyProposition(Unit unit, Settlement settlement, Goods goods,
-                              int gold) {
-        logger.finest("Entering method buyProposition");
-        final Specification spec = getSpecification();
-        Player buyer = unit.getOwner();
-        IndianSettlement is = (IndianSettlement)settlement;
-        String goldKey = "tradeGold#" + goods.getType().getId()
-            + "#" + goods.getAmount() + "#" + settlement.getId();
-        String hagglingKey = "tradeHaggling#" + unit.getId();
-        Integer registered = sessionRegister.get(goldKey);
-        if (registered == null) {
-            int price = is.getPriceToSell(goods)
-                + getPlayer().getTension(buyer).getValue();
-            if (is.hasMissionary(buyer)
-                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                Unit u = is.getMissionary();
-                price = (int)FeatureContainer.applyModifiers(price,
-                    getGame().getTurn(), u.getMissionaryTradeModifiers(false));
-            }
-            sessionRegister.put(goldKey, price);
-            return price;
-        } else {
-            int price = registered;
-            if (price < 0 || price == gold) {
-                return price;
-            } else if (gold < (price * 9) / 10) {
-                logger.warning("Cheating attempt: sending a offer too low");
-                sessionRegister.put(goldKey, -1);
-                return Constants.NO_TRADE;
-            } else {
-                int haggling = 1;
-                if (sessionRegister.containsKey(hagglingKey)) {
-                    haggling = sessionRegister.get(hagglingKey);
-                }
-                if (randomInt(logger, "Buy gold", getAIRandom(),
-                              3 + haggling) <= 3) {
-                    sessionRegister.put(goldKey, gold);
-                    sessionRegister.put(hagglingKey, haggling + 1);
-                    return gold;
-                } else {
-                    sessionRegister.put(goldKey, -1);
-                    return Constants.NO_TRADE_HAGGLE;
-                }
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int sellProposition(Unit unit, Settlement settlement, Goods goods, 
-                               int gold) {
-        logger.finest("Entering method sellProposition");
-        Colony colony = (Colony) settlement;
-        Player otherPlayer = unit.getOwner();
-        // don't pay for more than fits in the warehouse
-        int amount = colony.getWarehouseCapacity()
-            - colony.getGoodsCount(goods.getType());
-        amount = Math.min(amount, goods.getAmount());
-        // get a good price
-        Tension.Level tensionLevel = getPlayer().getTension(otherPlayer).getLevel();
-        int percentage = (9 - tensionLevel.ordinal()) * 10;
-        // what we could get for the goods in Europe (minus taxes)
-        int netProfits = ((100 - getPlayer().getTax())
-                          * getPlayer().getMarket().getSalePrice(goods.getType(), amount)) / 100;
-        return (netProfits * percentage) / 100;
-    }
 
     /**
      * {@inheritDoc}

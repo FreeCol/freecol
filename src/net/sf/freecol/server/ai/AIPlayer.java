@@ -329,14 +329,6 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Called after another {@code Player} sends a
-     * {@code trade} message
-     *
-     * @param goods The goods which we are going to offer
-     */
-    public abstract void registerSellGoods(Goods goods);
-
-    /**
      * Handle a native trade request.
      *
      * @param action The {@code NativeTradeAction} to perform.
@@ -346,38 +338,6 @@ public abstract class AIPlayer extends AIObject {
     public abstract NativeTradeAction handleTrade(NativeTradeAction action,
                                                   NativeTrade nt);
     
-    /**
-     * Called when another {@code Player} proposes to buy.
-     *
-     * Deprecating, this is being replaced by handleTrade.
-     *
-     * @param unit The foreign {@code Unit} trying to trade.
-     * @param settlement The {@code Settlement} this player owns and
-     *            which the given {@code Unit} is trading.
-     * @param goods The goods the given {@code Unit} is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this {@code AIPlayer} suggests or
-     *     {@link net.sf.freecol.common.model.Constants#NO_TRADE}.
-     */
-    public abstract int buyProposition(Unit unit, Settlement settlement,
-                                       Goods goods, int gold);
-
-    /**
-     * Called when another {@code Player} proposes a sale.
-     *
-     * Deprecating, this is being replaced by handleTrade.
-     *
-     * @param unit The foreign {@code Unit} trying to trade.
-     * @param settlement The {@code Settlement} this player owns and
-     *            which the given {@code Unit} if trying to sell goods.
-     * @param goods The goods the given {@code Unit} is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this {@code AIPlayer} suggests or
-     *     {@link net.sf.freecol.common.model.Constants#NO_TRADE}.
-     */
-    public abstract int sellProposition(Unit unit, Settlement settlement,
-                                        Goods goods, int gold);
-
     /**
      * Decides to accept a tax raise or not.
      * Overridden by the European player.
