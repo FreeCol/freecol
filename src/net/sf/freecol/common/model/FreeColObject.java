@@ -851,18 +851,6 @@ public abstract class FreeColObject
     }
 
     /**
-     * Debugging tool, dump collection XML to System.err.
-     *
-     * @param <T> The collection member type.
-     * @param items The collection to dump.
-     */
-    public static <T extends FreeColObject> void dumpCollection(Collection<T> items) {
-        System.err.println("[Collection begin ");
-        for (T t : items) t.dumpObject();
-        System.err.println(" collection end]");
-    }
-
-    /**
      * Writes the object to the given file.
      *
      * @param file The {@code File} to write to.

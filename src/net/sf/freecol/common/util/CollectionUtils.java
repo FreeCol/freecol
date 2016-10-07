@@ -678,6 +678,70 @@ public class CollectionUtils {
     }
 
     /**
+     * Dump an array to {@code System.err}.
+     *
+     * @param header Optional informational string to print first.
+     * @param array The array to dump.
+     */
+    public static <T> void dump(String header, T[] array) {
+        dump_internal(header, Arrays.stream(array));
+    }
+
+    /**
+     * Dump a collection to {@code System.err}.
+     *
+     * @param header Optional informational string to print first.
+     * @param c The {@code Collection} to print.
+     */
+    public static void dump(String header, Collection<?> c) {
+        dump_internal(header, c.stream());
+    }
+
+    /**
+     * Dump a stream to {@code System.err}.
+     *
+     * @param header Optional informational string to print first.
+     * @param stream The {@code Stream} to print.
+     */
+    public static void dump(String header, Stream<?> stream) {
+        dump_internal(header, stream);
+    }
+
+    /**
+     * Implement dump().
+     *
+     * @param header Optional informational string to print first.
+     * @param stream The {@code Stream} to print.
+     */
+    private static void dump_internal(String header, Stream<?> stream) {
+        if (header != null) System.err.print(header);
+        System.err.print("[ ");                       
+        forEach(stream, (v) -> {
+                System.err.print(v);
+                System.err.print(' ');
+            });
+        System.err.println(']');
+    }
+
+    /**
+     * Dump a map to {@code System.err}.
+     *
+     * @param header Optional informational string to print first.
+     * @param map The {@code Map} to print.
+     */
+    public static void dump(String header, Map<?,?> map) {
+        if (header != null) System.err.print(header);
+        System.err.print("[ ");                       
+        forEachMapEntry(map, (e) -> {
+                System.err.print(e.getKey());
+                System.err.print(',');
+                System.err.print(e.getValue());
+                System.err.print(' ');
+            });
+        System.err.println(']');
+    }
+    
+    /**
      * Create a stream of files from a directory.
      *
      * @param dir The {@code File} that hopefully is a directory.
