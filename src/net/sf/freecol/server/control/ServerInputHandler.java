@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.server.FreeColServer;
@@ -45,8 +46,6 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(ServerInputHandler.class.getName());
-
-    private static final String LOGOUT_TAG = "logout";
 
     /**
      * The handler map provides named handlers for network
@@ -70,7 +69,7 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         register(Connection.DISCONNECT_TAG, (Connection conn, Element e) ->
             disconnect(conn, e));
 
-        register(LOGOUT_TAG, (Connection conn, Element e) ->
+        register(LogoutMessage.TAG, (Connection conn, Element e) ->
             logout(conn, e));
     }
 

@@ -39,6 +39,7 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LoginMessage;
+import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
@@ -71,7 +72,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> error(e));
         register(LoginMessage.TAG,
             (Connection c, Element e) -> login(e));
-        register("logout",
+        register(LogoutMessage.TAG,
             (Connection c, Element e) -> logout(e));
         register(MultipleMessage.TAG,
             (Connection c, Element e) -> multiple(c, e));
@@ -188,14 +189,10 @@ public final class PreGameInputHandler extends ClientInputHandler {
      */
     private Element logout(Element element) {
         final Game game = getGame();
+        final LogoutMessage message = new LogoutMessage(game, element);
 
-        String playerId = element.getAttribute("player");
-        String reason = element.getAttribute("reason");
-        if (reason != null && !reason.isEmpty()) {
-            logger.info("Client logging out: " + reason);
-        }
-
-        Player player = game.getFreeColGameObject(playerId, Player.class);
+        logger.info("Client logging out: " + message.getReason());
+        Player player = message.getPlayer(game);
         game.removePlayer(player);
         getGUI().refreshPlayersTable();
 

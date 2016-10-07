@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
@@ -123,10 +124,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
 
         player.setConnected(false);
         getGame().removePlayer(player);
-        freeColServer.sendToAll(new TrivialMessage("logout",
-                "reason", "User has logged out.",
-                "player", player.getId()),
-            connection);
+        LogoutMessage message = new LogoutMessage(player, "User has logged out");
+        freeColServer.sendToAll(message, connection);
         freeColServer.updateMetaServer(false);
         return null;
     }

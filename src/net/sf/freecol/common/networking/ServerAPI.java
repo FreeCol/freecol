@@ -695,11 +695,12 @@ public abstract class ServerAPI {
     /**
      * Server query-response for logging out.
      *
+     * @param player The {@code Player} that has logged out.
+     * @param reason The reason for logging out.
      * @return True if the server interaction succeeded.
      */
-    public boolean logout() {
-        return sendAndWait(new TrivialMessage("logout",
-                "reason", "User has quit the client."));
+    public boolean logout(Player player, String reason) {
+        return sendAndWait(new LogoutMessage(player, reason));
     }
 
     /**

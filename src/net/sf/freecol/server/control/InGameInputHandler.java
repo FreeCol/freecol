@@ -575,14 +575,10 @@ public final class InGameInputHandler extends ServerInputHandler {
                 .handle(freeColServer, connection));
     }
 
+    // Override ServerInputHandler
+
     /**
-     * Handles a "logout"-message.
-     * 
-     * @param connection The {@code Connection} the message was received
-     *            on.
-     * @param logoutElement The element (root element in a DOM-parsed XML tree)
-     *            that holds all the information.
-     * @return The reply.
+     * {@inheritDoc}
      */
     @Override
     protected Element logout(Connection connection, Element logoutElement) {

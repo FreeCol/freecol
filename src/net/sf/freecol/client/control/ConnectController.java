@@ -272,7 +272,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        if (fcc.isLoggedIn()) logout(true);
+        logout("Starting multiplayer");
 
         if (!unblockServer(port)) return false;
 
@@ -296,7 +296,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        if (fcc.isLoggedIn()) logout(true);
+        logout("Joining multiplayer");
 
         DOMMessage msg = ask(host, port, new GameStateMessage(),
             GameStateMessage.TAG, StringTemplate.template("client.noState"));
@@ -367,7 +367,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        if (fcc.isLoggedIn()) logout(true);
+        logout("Start single player");
 
         if (!unblockServer(FreeCol.getServerPort())) return false;
 
@@ -579,7 +579,7 @@ public final class ConnectController extends FreeColClientHolder {
         final int port = askServer().getPort();
 
         getGUI().removeInGameComponents();
-        logout(true);
+        logout("reconnect");
         StringTemplate err = login(FreeCol.getName(), host, port);
         if (err != null) {
             getGUI().showErrorMessage(err);
@@ -596,8 +596,9 @@ public final class ConnectController extends FreeColClientHolder {
      *     notified of the logout.  For example: if the server kicked us
      *     out then we don't need to confirm with a logout message.
      */
-    public void logout(boolean notifyServer) {
-        if (notifyServer) askServer().logout();
+    public void logout(String reason) {
+        final FreeColClient fcc = getFreeColClient();
+        if (fcc.isLoggedIn()) askServer().logout(fcc.getMyPlayer(), reason);
         try {
             askServer().disconnect();
         } catch (IOException ioe) {
@@ -610,32 +611,18 @@ public final class ConnectController extends FreeColClientHolder {
      * Quits the current game, optionally notifying and stopping the server.
      *
      * @param stopServer Whether to stop the server.
-     * @param notifyServer Whether or not the server should be
-     *     notified of the logout.  For example: if the server kicked us
-     *     out then we don't need to confirm with a logout message.
-     */
-    public void quitGame(boolean stopServer, boolean notifyServer) {
-        final FreeColServer server = getFreeColServer();
-        if (stopServer && server != null) {
-            server.getController().shutdown();
-            getFreeColClient().setFreeColServer(null);
-            finish();
-        } else {
-            if (getFreeColClient().isLoggedIn()) logout(notifyServer);
-        }
-    }
-
-    /**
-     * Quits the current game. If a server is running it will be
-     * stopped if stopServer is <i>true</i>.  The server and perhaps
-     * the clients (if a server is running through this client and
-     * stopServer is true) will be notified.
-     *
-     * @param stopServer Indicates whether or not a server that was
-     *     started through this client should be stopped.
      */
     public void quitGame(boolean stopServer) {
-        quitGame(stopServer, true);
+        if (stopServer) {
+            final FreeColServer server = getFreeColServer();
+            if (server != null) {
+                server.getController().shutdown();
+                getFreeColClient().setFreeColServer(null);
+            }
+            finish();
+        } else {
+            logout("User quit");
+        }
     }
 
     /**
