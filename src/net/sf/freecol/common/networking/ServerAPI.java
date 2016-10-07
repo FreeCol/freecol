@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
@@ -58,7 +57,6 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ErrorMessage;
-import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.option.OptionGroup;
 
 import org.w3c.dom.Element;

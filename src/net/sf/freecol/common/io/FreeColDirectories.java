@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 import javax.swing.filechooser.FileSystemView;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.util.*;
+import net.sf.freecol.common.util.OSUtils;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
 

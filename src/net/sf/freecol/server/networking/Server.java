@@ -34,8 +34,6 @@ import net.sf.freecol.common.networking.MessageHandler;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The networking server in which new clients can connect and methods

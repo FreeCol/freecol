@@ -22,7 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.*;
+import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 

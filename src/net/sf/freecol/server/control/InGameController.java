@@ -104,7 +104,6 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
-import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
