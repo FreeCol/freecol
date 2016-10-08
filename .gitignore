@@ -87,7 +87,6 @@ nbactions.xml
 ### Eclipse template
 
 .metadata
-bin/
 tmp/
 *.tmp
 *.bak
