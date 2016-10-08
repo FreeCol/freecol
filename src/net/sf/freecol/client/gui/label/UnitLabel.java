@@ -44,7 +44,7 @@ import net.sf.freecol.client.gui.panel.CargoPanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.InPortPanel;
-import net.sf.freecol.client.gui.panel.ReportPanel;
+import net.sf.freecol.client.gui.panel.report.ReportPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;

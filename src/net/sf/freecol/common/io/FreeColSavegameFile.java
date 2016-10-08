@@ -26,6 +26,8 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.dialog.*;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -44,7 +46,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * The name of a properties file that contains information about
      * the saved game, such as the size of the map, the date and time
      * it was started, and so on.  The map size is used in the
-     * {@link net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog},
+     * {@link MapGeneratorOptionsDialog},
      * for example.
      */
     public static final String SAVEGAME_PROPERTIES = "savegame.properties";
@@ -59,7 +61,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * The name of the image file that contains the map thumbnail,
      * i.e. a view of the game map as seen by the owner of the game
      * when saving. The thumbnail image is used by the {@link
-     * net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog}, in
+     * MapGeneratorOptionsDialog}, in
      * particular.
      */
     public static final String THUMBNAIL_FILE = "thumbnail.png";

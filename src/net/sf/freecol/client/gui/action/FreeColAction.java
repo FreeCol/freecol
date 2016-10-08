@@ -34,6 +34,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.dialog.*;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -345,7 +346,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Checks if this action should be enabled.
      *
-     * @return True if the {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog}
+     * @return True if the {@link ClientOptionsDialog}
      *     is not visible.
      */
     protected boolean shouldBeEnabled() {

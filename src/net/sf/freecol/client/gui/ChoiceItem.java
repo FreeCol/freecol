@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui;
 
 import javax.swing.ImageIcon;
 
+import net.sf.freecol.client.gui.dialog.*;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -30,7 +31,7 @@ import net.sf.freecol.common.util.Utils;
 
 /**
  * Can be used as a single choice for the
- * {@link net.sf.freecol.client.gui.panel.FreeColChoiceDialog}.
+ * {@link FreeColChoiceDialog}.
  */
 public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
 

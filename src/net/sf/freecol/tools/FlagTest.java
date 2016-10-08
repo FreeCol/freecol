@@ -35,13 +35,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 
-import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
-import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog.ColorButton;
-import net.sf.freecol.client.gui.panel.Flag;
-import net.sf.freecol.client.gui.panel.Flag.Background;
-import net.sf.freecol.client.gui.panel.Flag.Decoration;
-import net.sf.freecol.client.gui.panel.Flag.UnionPosition;
-import net.sf.freecol.client.gui.panel.Flag.UnionShape;
+import net.sf.freecol.client.gui.dialog.ConfirmDeclarationDialog;
+import net.sf.freecol.client.gui.dialog.ConfirmDeclarationDialog.ColorButton;
+import net.sf.freecol.client.gui.dialog.Flag;
+import net.sf.freecol.client.gui.dialog.Flag.Background;
+import net.sf.freecol.client.gui.dialog.Flag.Decoration;
+import net.sf.freecol.client.gui.dialog.Flag.UnionPosition;
+import net.sf.freecol.client.gui.dialog.Flag.UnionShape;
 
 
 public class FlagTest extends JFrame implements ActionListener, ItemListener {
