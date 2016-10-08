@@ -64,7 +64,9 @@ public class OSUtils {
      * Returns the browser for a given operating system
      *
      * @param url The URL to launch
-     * @return
+     * @return The String array with the browswer launch configurations
+     *
+     * @see #launchBrowser(String)
      */
     final private static String[] getBrowserExecString(String url) {
         final String os = getOperatingSystem();

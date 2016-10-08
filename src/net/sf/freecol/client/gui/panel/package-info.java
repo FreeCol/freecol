@@ -1,6 +1,6 @@
 /**
  * Contains the panel classes deriving from
- *      {@code MigPanel} or {@FreeColPanel}
+ *      {@code MigPanel} or {@code FreeColPanel}
  *
  * @since 0.2.1
  * @since 0.11.7 Broken into multiple sections'

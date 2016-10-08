@@ -347,8 +347,13 @@ public abstract class WorkLocation extends UnitLocation
                              better, goodsType, delta);
     }
 
+
     /**
      * Determines whether a {@code WorkLocation} is a good suggestion
+     *
+     * @param unitType The type of {@code Unit} to check.
+     * @param unit The Unit itself.
+     * @param goodsType The {@code GoodsType} to check.
      *
      * @return True or false, depending on whether the suggestion is valid.
      */

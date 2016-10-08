@@ -94,7 +94,7 @@ public class DOMMessage {
     /**
      * Internal root constructor.
      *
-     * @param The main tag.
+     * @param tag The main tag.
      */
     private DOMMessage(String tag) {
         this.document = createDocument(tag);
@@ -132,7 +132,7 @@ public class DOMMessage {
      * Create a DOMMessage with given tag and attributes.
      *
      * @param tag The main tag.
-     * @param attributes A {@code NamedNodeMap} of attributes.
+     * @param map A {@code NamedNodeMap} of attributes.
      */
     private DOMMessage(String tag, NamedNodeMap map) {
         this(tag);

@@ -434,7 +434,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
          * {@inheritDoc}
          *
          *
-         * @throw IllegalStateException if the method is run for an illegal location
+         * @throws IllegalStateException if the method is run for an illegal location
          */
         @Override
         public Component getListCellRendererComponent(JList<? extends TradeRouteStop> list,

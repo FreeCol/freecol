@@ -592,9 +592,7 @@ public final class ConnectController extends FreeColClientHolder {
     /**
      * Sends a logout message to the server.
      *
-     * @param notifyServer Whether or not the server should be
-     *     notified of the logout.  For example: if the server kicked us
-     *     out then we don't need to confirm with a logout message.
+     * @param reason The reason to logout from the server
      */
     public void logout(String reason) {
         final FreeColClient fcc = getFreeColClient();

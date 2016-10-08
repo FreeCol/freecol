@@ -680,6 +680,7 @@ public class CollectionUtils {
     /**
      * Dump an array to {@code System.err}.
      *
+     * @param <T> The collection to dump
      * @param header Optional informational string to print first.
      * @param array The array to dump.
      */

@@ -723,6 +723,10 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Get the value of attacking a {@code Settlement}
      *
+     * @param value The previously calculated input value from
+     *          {@link net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission
+     *                  #scoreSettlementPath(AIUnit, PathNode, Settlement)}
+     * @param unit The Unit doing the attacking.
      * @return The calculated value
      */
     public abstract int calculateSettlementValue(int value, Unit unit);

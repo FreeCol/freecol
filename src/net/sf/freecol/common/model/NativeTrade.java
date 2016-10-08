@@ -77,6 +77,7 @@ public class NativeTrade extends FreeColGameObject {
          * Create a new native trade action.
          *
          * @param closing If true this is an action that closes the session.
+         * @param fromEuropeans True if a European action.
          */
         NativeTradeAction(boolean closing, boolean fromEuropeans) {
             this.closing = closing;

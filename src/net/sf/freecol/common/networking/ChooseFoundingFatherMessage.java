@@ -120,6 +120,7 @@ public class ChooseFoundingFatherMessage extends TrivialMessage {
     /**
      * Get the list of offered fathers.
      *
+     * @param game The FreeCol game being played.
      * @return The offered {@code FoundingFather}s.
      */
     public final List<FoundingFather> getFathers(Game game) {

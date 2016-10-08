@@ -135,7 +135,6 @@ public class TrivialMessage extends DOMMessage {
      *
      * @param key The {@code key} to look up.
      * @param value The value to set.
-     * @return This message.
      */
     @Override
     public void setAttribute(String key, String value) {
@@ -197,7 +196,7 @@ public class TrivialMessage extends DOMMessage {
     /**
      * Get a list of array attributes.
      *
-     * @param attributes A list of attribute values.
+     * @return The list of array attributes.
      */
     public List<String> getArrayAttributes() {
         List<String> ret = new ArrayList<>();
