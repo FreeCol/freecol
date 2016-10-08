@@ -1081,19 +1081,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param settlement The {@code Settlement} to display.
      */
-    void showSettlement(Settlement settlement) {
-        if (settlement instanceof Colony) {
-            if (settlement.getOwner().equals(getMyPlayer())) {
-                showColonyPanel((Colony)settlement, null);
-            } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-                showForeignColony(settlement);
-            }
-        } else if (settlement instanceof IndianSettlement) {
-            showIndianSettlementPanel((IndianSettlement)settlement);
-        } else {
-            throw new IllegalStateException("Bogus settlement");
-        }
-    }
+    void showSettlement(Settlement settlement) {}
 
     protected void showForeignColony(Settlement settlement) {}
 

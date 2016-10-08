@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -1361,6 +1362,16 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         Tension tension = this.getAlarm(unit.getOwner());
         if (tension != null) value += tension.getValue() / 2;
         return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param canvas
+     * @param p
+     */
+    @Override
+    public void showSettlement(Canvas canvas, Player p) throws IllegalStateException {
+        canvas.showIndianSettlementPanel(this);
     }
 
 

@@ -29,9 +29,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Tile;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -727,6 +727,19 @@ public abstract class Settlement extends GoodsLocation
      */
     public abstract int calculateSettlementValue(int value, Unit unit);
 
+
+    /**
+     * Display the appropriate panel for a given {@code Settlement}
+     * TODO: Refactor so that the Settlement model doesn't know about Canvas
+     *
+     * @param canvas The instance of the FreeCol canvas to display.
+     * @param p The FreeCol Player, used to check ownership of a Colony.
+     * @throws IllegalStateException If a non-Colony or non-IndianSettlement
+     *                               attempts to call this method.
+     */
+    public void showSettlement(Canvas canvas, Player p) throws IllegalStateException {
+        throw new IllegalStateException("Bogus settlement");
+    }
 
     // Serialization
 

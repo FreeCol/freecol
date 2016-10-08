@@ -1106,6 +1106,15 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
+    void showSettlement(Settlement settlement) {
+        settlement.showSettlement(this.canvas, getMyPlayer());
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void showForeignColony(Settlement settlement) {
         canvas.showForeignColony(settlement);
     }

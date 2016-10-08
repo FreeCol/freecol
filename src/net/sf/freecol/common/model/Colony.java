@@ -37,6 +37,8 @@ import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -2720,6 +2722,20 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             value -= 200 * this.getStockade().getLevel();
         }
         return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param canvas
+     * @param p
+     */
+    @Override
+    public void showSettlement(Canvas canvas, Player p) throws IllegalStateException {
+        if (this.getOwner().equals(p)) {
+            canvas.showColonyPanel(this, null);
+        } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+            canvas.showForeignColony(this);
+        }
     }
 
 

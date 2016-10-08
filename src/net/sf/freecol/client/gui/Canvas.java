@@ -2046,7 +2046,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param settlement The {@code Settlement} with the colony
      */
-    void showForeignColony(Settlement settlement) {
+    public void showForeignColony(Settlement settlement) {
         if (settlement instanceof Colony) {
             Colony colony = freeColClient.getFreeColServer().getGame()
                 .getFreeColGameObject(settlement.getId(), Colony.class);
@@ -2084,7 +2084,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param is The {@code IndianSettlement} to display.
      */
-    void showIndianSettlementPanel(IndianSettlement is) {
+    public void showIndianSettlementPanel(IndianSettlement is) {
         IndianSettlementPanel panel
             = new IndianSettlementPanel(freeColClient, is);
         showFreeColPanel(panel, is.getTile(), true);
