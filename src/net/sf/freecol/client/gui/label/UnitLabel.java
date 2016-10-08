@@ -65,7 +65,7 @@ import static net.sf.freecol.common.util.StringUtils.lastPart;
  * This label holds Unit data in addition to the JLabel data, which makes it
  * ideal to use for drag and drop purposes.
  */
-public final class UnitLabel extends JLabel
+public final class UnitLabel extends FreeColLabel
     implements ActionListener, CargoLabel, Draggable {
 
     @SuppressWarnings("unused")

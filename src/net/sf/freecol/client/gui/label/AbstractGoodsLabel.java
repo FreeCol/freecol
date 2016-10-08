@@ -32,7 +32,7 @@ import net.sf.freecol.common.model.GoodsType;
 /**
  * This label represents AbstractGoods.
  */
-public class AbstractGoodsLabel extends JLabel {
+public class AbstractGoodsLabel extends FreeColLabel {
 
     private final AbstractGoods abstractGoods;
 

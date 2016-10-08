@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.label;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 
 /**
@@ -31,4 +32,28 @@ import javax.swing.JLabel;
  */
 public abstract class FreeColLabel extends JLabel {
 
+    /**
+     * Creates a {@code FreeColLabel} instance with
+     * no image and with an empty string for the title.
+     * <p>
+     * The label is centered vertically in its display area.
+     * <p>
+     * The label's contents, once set, will be displayed on the leading edge
+     * of the label's display area.
+     */
+    public FreeColLabel() {
+        super();
+    }
+
+
+    /**
+     * Creates a {@code FreeColLabel} instance with the
+     * specified image. The label is centered vertically
+     * and horizontally in its display area.
+     *
+     * @param image The image to be displayed by the label.
+     */
+    public FreeColLabel(Icon image) {
+        super();
+    }
 }
