@@ -27,7 +27,7 @@ import javax.swing.JToolTip;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.label.ProductionLabel;
+import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;

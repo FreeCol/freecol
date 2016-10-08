@@ -24,7 +24,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
-import net.sf.freecol.client.gui.panel.label.UnitLabel;
+import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.CollectionUtils.*;

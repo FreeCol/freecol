@@ -34,7 +34,7 @@ import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.label.GoodsLabel;
+import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;

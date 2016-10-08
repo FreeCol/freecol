@@ -21,7 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 
-import net.sf.freecol.client.gui.panel.label.UnitLabel;
+import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.common.model.Unit;
 
 

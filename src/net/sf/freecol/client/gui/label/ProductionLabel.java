@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.panel.label;
+package net.sf.freecol.client.gui.label;
 
 import java.awt.Color;
 import java.awt.Dimension;

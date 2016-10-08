@@ -17,14 +17,14 @@
  * along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.panel.label;
+package net.sf.freecol.client.gui.label;
 
 import javax.swing.JLabel;
 
 /**
  * A simple wrapper for {@code JLabel}
  *
- * All members of the net.sf.freecol.client.gui.panel.label
+ * All members of the net.sf.freecol.client.gui.label
  *      package extend this abstract class.
  *
  * @since 0.11.7
