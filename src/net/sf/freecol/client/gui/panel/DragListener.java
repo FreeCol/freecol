@@ -60,7 +60,7 @@ public final class DragListener extends MouseAdapter {
     /**
      * The user's operating system.
      */
-    private static final String operatingSystem = OSUtils.GetOperatingSystem();
+    private static final String operatingSystem = OSUtils.getOperatingSystem();
 
     /**
      * Whether the user's operating system is Microsoft Windows

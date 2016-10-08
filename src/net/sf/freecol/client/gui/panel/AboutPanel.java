@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -69,7 +67,7 @@ import net.sf.freecol.common.util.OSUtils;
  * | ---------------|
  * | okButton       |
  * | ---------------|
- * 
+ *
  */
 public final class AboutPanel extends FreeColPanel {
 
@@ -105,7 +103,7 @@ public final class AboutPanel extends FreeColPanel {
             getImageLibrary().getScaleFactor());
         Font fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, getImageLibrary().getScaleFactor());
-        
+
         // Version
         JLabel apVersion = Utility.localizedLabel("aboutPanel.version");
         apVersion.setFont(fontBold);
@@ -140,7 +138,7 @@ public final class AboutPanel extends FreeColPanel {
                                                     MANUAL_URL);
         apManualURL.addActionListener(this);
         add(apManualURL, "newline");
-        
+
         // License Disclaimer
         JTextArea apLegal = Utility.localizedTextArea("aboutPanel.legalDisclaimer");
         apLegal.setFont(fontNormal);
@@ -164,7 +162,7 @@ public final class AboutPanel extends FreeColPanel {
         final String url = ae.getActionCommand();
         if (SITE_URL.equals(url) || PROJECT_URL.equals(url)
             || MANUAL_URL.equals(url)) {
-            OSUtils.LaunchBrowser(url);
+            OSUtils.launchBrowser(url);
         }
         else {
             super.actionPerformed(ae);

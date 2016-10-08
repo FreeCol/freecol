@@ -179,7 +179,7 @@ public class FreeColDirectories {
      * @return True if Mac OS X appears to be present.
      */
     public static boolean onMacOSX() {
-        return "Mac OS X".equals(OSUtils.GetOperatingSystem());
+        return "Mac OS X".equals(OSUtils.getOperatingSystem());
     }
 
     /**
@@ -197,7 +197,7 @@ public class FreeColDirectories {
      * @return True if Windows appears to be present.
      */
     public static boolean onWindows() {
-        return OSUtils.GetOperatingSystem().startsWith("Windows");
+        return OSUtils.getOperatingSystem().startsWith("Windows");
     }
 
     /**

@@ -36,7 +36,7 @@ public class OSUtils {
      *
      * @param url The URL to launch
      */
-    final public static void LaunchBrowser(String url) {
+    final public static void launchBrowser(String url) {
 
         // Use Desktop Class first
         try {
@@ -48,7 +48,7 @@ public class OSUtils {
             logger.log(Level.FINEST, "Web browser failed to launch via Desktop Class.", e);
 
             // Use Runtime to launch browser
-            String[] browser = GetBrowserExecString(url);
+            String[] browser = getBrowserExecString(url);
             if (browser != null) {
                 try {
                     Runtime.getRuntime().exec(browser);
@@ -66,8 +66,8 @@ public class OSUtils {
      * @param url The URL to launch
      * @return
      */
-    final private static String[] GetBrowserExecString(String url) {
-        final String os = GetOperatingSystem();
+    final private static String[] getBrowserExecString(String url) {
+        final String os = getOperatingSystem();
         if (os == null) {
             // error, the operating system could not be determined
             return null;
@@ -93,8 +93,7 @@ public class OSUtils {
      *
      * @return os The string containing the Operating system
      */
-    final public static String GetOperatingSystem() {
-        String os = System.getProperty("os.name");
-        return os;
+    final public static String getOperatingSystem() {
+        return System.getProperty("os.name");
     }
 }

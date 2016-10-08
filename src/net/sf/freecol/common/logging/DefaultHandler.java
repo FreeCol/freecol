@@ -106,7 +106,7 @@ public final class DefaultHandler extends Handler {
                 .append("\nJava WM version: ")
                 .append(System.getProperty("java.vm.version"))
                 .append("\n\nOS name: ")
-                .append(OSUtils.GetOperatingSystem())
+                .append(OSUtils.getOperatingSystem())
                 .append("\nOS architecture: ")
                 .append(System.getProperty("os.arch"))
                 .append("\nOS version: ")
