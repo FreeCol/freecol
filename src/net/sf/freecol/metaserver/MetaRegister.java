@@ -22,6 +22,8 @@ package net.sf.freecol.metaserver;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,10 +39,23 @@ public final class MetaRegister {
 
     private static final Logger logger = Logger.getLogger(MetaRegister.class.getName());
 
+    /** Cleanup interval. */
+    private static final int REMOVE_DEAD_SERVERS_INTERVAL = 120000;
+
+    /** Removal interval. @see MetaRegister#removeServer */
+    private static final int REMOVE_OLDER_THAN = 90000;
+
     /** The current list of servers. */
     private final ArrayList<MetaItem> items = new ArrayList<>();
     
-    
+
+    /**
+     * Create a new MetaRegister.
+     */
+    public MetaRegister() {
+        startCleanupTimer();
+    }
+
     /**
      * Gets the server entry with the diven address and port.
      *
@@ -101,6 +116,23 @@ public final class MetaRegister {
         logger.info("Server updated:" + mi.toString());
     }
 
+    /**
+     * Start a timer to periodically clean up dead servers.
+     */
+    private void startCleanupTimer() {
+        Timer t = new Timer(true);
+        t.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    removeDeadServers();
+                } catch (Exception ex) {
+                    logger.log(Level.WARNING, "Could not remove servers.", ex);
+                }
+            }
+        }, REMOVE_DEAD_SERVERS_INTERVAL, REMOVE_DEAD_SERVERS_INTERVAL);
+    }
+
 
     // Public interface
 
@@ -158,7 +190,7 @@ public final class MetaRegister {
     public synchronized void removeDeadServers() {
         logger.info("Removing dead servers.");
 
-        long time = System.currentTimeMillis() - MetaServer.REMOVE_OLDER_THAN;
+        long time = System.currentTimeMillis() - REMOVE_OLDER_THAN;
         for (int i=0; i<items.size(); i++) {
             if (items.get(i).getLastUpdated() < time) {
                 logger.info("Removing: " + items.get(i));
@@ -179,7 +211,8 @@ public final class MetaRegister {
             items.remove(index);
             logger.info("Removing server:" + address + ":" + port);
         } else {
-            logger.info("Trying to remove non-existing server:" + address + ":" + port);
+            logger.warning("Trying to remove non-existing server:"
+                + address + ":" + port);
         }
     }
 

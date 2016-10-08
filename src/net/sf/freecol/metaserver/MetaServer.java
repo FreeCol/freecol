@@ -24,8 +24,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,10 +42,6 @@ import net.sf.freecol.common.networking.Connection;
 public final class MetaServer extends Thread {
 
     private static final Logger logger = Logger.getLogger(MetaServer.class.getName());
-
-    private static final int REMOVE_DEAD_SERVERS_INTERVAL = 120000;
-
-    public static final int REMOVE_OLDER_THAN = 90000;
 
     /** The public "well-known" socket to which clients may connect. */
     private final ServerSocket serverSocket;
@@ -105,18 +99,6 @@ public final class MetaServer extends Thread {
         final MetaRegister mr = new MetaRegister();
         networkHandler = new NetworkHandler(this, mr);
         serverSocket = new ServerSocket(port);
-
-        Timer t = new Timer(true);
-        t.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    mr.removeDeadServers();
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, "Could not remove servers.", ex);
-                }
-            }
-        }, REMOVE_DEAD_SERVERS_INTERVAL, REMOVE_DEAD_SERVERS_INTERVAL);
     }
 
     /**

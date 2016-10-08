@@ -53,7 +53,7 @@ public class ServerInfo {
      * @param port The port number in which clients may connect.
      * @param slotsAvailable Number of players that may conncet.
      * @param currentlyPlaying Number of players that are currently connected.
-     * @param isGameStarted <i>true</i> if the game has started.
+     * @param isGameStarted True if the game has started.
      * @param version The version of the server.
      * @param gameState The current state of the game.
      */
@@ -70,54 +70,56 @@ public class ServerInfo {
         this.gameState = gameState;
     }
 
+
     /**
-     * Returns the name of the server that is beeing represented 
+     * Get the name of the server that is beeing represented 
      * by this object.
      * 
-     * @return The name.
+     * @return The server name.
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
-     * Returns the IP-address.
+     * Get the IP address.
      *
-     * @return The IP-address of the server.
+     * @return The IP address of the server.
      */
     public String getAddress() {
-        return address;
+        return this.address;
     }
 
     /**
-     * Returns the port in which clients may connect.
+     * Get the TCP port in which clients may connect.
      *
-     * @return The port.
+     * @return The server port.
      */
     public int getPort() {
-        return port;
+        return this.port;
     }
 
     /**
-     * Returns the number of currently active (connected and not dead) players.
+     * Get the number of currently active (connected and not dead)
+     * players.
      *
-     * @return The number of players.
+     * @return The number of live players.
      */
     public int getCurrentlyPlaying() {
-        return currentlyPlaying;
+        return this.currentlyPlaying;
     }
 
     /**
-     * Returns the number of players that may connect.
+     * Get the number of players that may connect.
      *
      * @return The number of slots available on the server.
      */
     public int getSlotsAvailable() {
-        return slotsAvailable;
+        return this.slotsAvailable;
     }
 
     /**
-     * Get the game start state.
+     * Is the game started?
      *
      * @return True if the game is started.
      */
@@ -126,13 +128,13 @@ public class ServerInfo {
     }
     
     /**
-     * Returns the FreeCol version of the server.
+     * Get the FreeCol version of the server.
      *
      * @return The version.
      * @see net.sf.freecol.FreeCol#getVersion
      */
     public String getVersion() {
-        return version;
+        return this.version;
     }
 
     /**
@@ -142,7 +144,7 @@ public class ServerInfo {
      * @see net.sf.freecol.server.FreeColServer#getGameState
      */
     public int getGameState() {
-        return gameState;
+        return this.gameState;
     }
 
     /**
@@ -162,8 +164,9 @@ public class ServerInfo {
      */
     @Override
     public String toString() {
-        return name + "(" + address + ":" + port + ") " + currentlyPlaying 
-                + ", " + slotsAvailable + ", " + isGameStarted + ", " + version
-                + ", " + gameState;
+        return name + "(" + this.address + ":" + this.port + ") "
+            + this.currentlyPlaying + ", " + this.slotsAvailable
+            + ", " + this.isGameStarted + ", " + this.version
+            + ", " + this.gameState;
     }
 }

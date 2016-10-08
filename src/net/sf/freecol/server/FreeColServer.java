@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.function.Predicate;
@@ -68,6 +67,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.metaserver.MetaServerUtils;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -125,8 +125,6 @@ public final class FreeColServer {
     public static final String SAVED_GAME_TAG = "savedGame";
     public static final String SERVER_OBJECTS_TAG = "serverObjects";
     public static final String SINGLE_PLAYER_TAG = "singleplayer";
-
-    private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
     /**
      * The save game format used for saving games.
@@ -202,6 +200,9 @@ public final class FreeColServer {
 
     /** The game integrity state. */
     private int integrity = 1;
+
+    /** Meta-server update timer. */
+    private Timer metaServerUpdateTimer = null;
 
     
     /**
@@ -618,6 +619,19 @@ public final class FreeColServer {
     }
 
     /**
+     * Cancel public availablity through the meta-server.
+     *
+     * @return False.
+     */
+    private boolean cancelPublicServer() {
+        if (this.metaServerUpdateTimer != null) {
+            this.metaServerUpdateTimer.cancel();
+            this.metaServerUpdateTimer = null;
+        }
+        return this.publicServer = false;
+    }
+     
+    /**
      * Sends information about this server to the meta-server.
      *
      * This is the master routine with private `firstTime' access
@@ -629,17 +643,8 @@ public final class FreeColServer {
     public boolean updateMetaServer(boolean firstTime) {
         if (!this.publicServer) return false;
 
-        Connection mc = null;
-        try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS,
-                                FreeCol.META_SERVER_PORT, null,
-                                FreeCol.SERVER_THREAD);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not connect to meta-server: ",
-                FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT);
-            this.publicServer = false;
-            return false;
-        }
+        Connection mc = MetaServerUtils.getMetaServerConnection();
+        if (mc == null) return cancelPublicServer();
 
         try {
             String tag = (firstTime) ? "register" : "update";
@@ -657,53 +662,43 @@ public final class FreeColServer {
                     "version", FreeCol.getVersion(),
                     "gameState", Integer.toString(getGameState().ordinal())));
             if (reply != null && reply.isType("noRouteToServer")) {
-                this.publicServer = false;
-                return false;
+                return cancelPublicServer();
             }
         } finally {
             mc.close();
         }
         if (firstTime) {
-            // Starts the metaserver update thread.
-            //
-            // This update is really a "Hi! I am still here!"-message,
-            // since an additional update should be sent when a new
-            // player is added to/removed from this server etc.
-            Timer t = new Timer(true);
-            t.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (!updateMetaServer(false)) cancel();
-                    }
-                }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
+            // Start the metaserver update thread.
+            this.metaServerUpdateTimer = MetaServerUtils.startUpdateTimer(this);
         }
         return true;
     }
 
     /**
-     * Removes this server from the metaserver's list. The information is only
-     * sent if {@code public == true}.
+     * Removes this server from the meta-server.
      *
-     * @return True if the MetaServer was updated.
+     * Only relevant for public servers.
+     *
+     * @return True if the meta-server was updated.
      */
     public boolean removeFromMetaServer() {
         if (!this.publicServer) return false;
 
-        try (
-            Connection mc = new Connection(FreeCol.META_SERVER_ADDRESS,
-                FreeCol.META_SERVER_PORT,
-                null, FreeCol.SERVER_THREAD);
-        ) {
-            mc.send(new TrivialMessage("remove",
-                    "port", Integer.toString(mc.getSocket().getPort())));
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Network error leaving meta-server: "
-                + FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT,
-                ioe);
-            this.publicServer = false;
-            return false;
+        Connection mc = MetaServerUtils.getMetaServerConnection();
+        if (mc != null) {
+            try {
+                mc.send(new TrivialMessage("remove",
+                        "port", Integer.toString(mc.getSocket().getPort())));
+                return true;
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Network error leaving meta-server: "
+                    + FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT,
+                    ioe);
+            } finally {
+                mc.close();
+            }
         }
-        return true;
+        return cancelPublicServer();
     }
 
     /**
