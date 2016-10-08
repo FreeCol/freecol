@@ -26,7 +26,6 @@ import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.metaserver.MetaItem;
 import net.sf.freecol.metaserver.MetaRegister;
 import net.sf.freecol.server.FreeColServer;
 
@@ -93,19 +92,17 @@ public class ServerListMessage extends DOMMessage {
      * Convert an element to a server.
      *
      * @param e The {@code Element} to examine.
-     * @return A new {@code MetaItem} describing a server.
+     * @return A new {@code ServerInfo} describing a server.
      */     
-    private static MetaItem elementToServer(Element e) {
-        MetaItem mi = new MetaItem();
-        mi.update(getStringAttribute(e, NAME_TAG),
-            getStringAttribute(e, ADDRESS_TAG),
-            getIntegerAttribute(e, PORT_TAG, -1),
-            getIntegerAttribute(e, SLOTS_AVAILABLE_TAG, -1),
-            getIntegerAttribute(e, CURRENTLY_PLAYING_TAG, -1),
-            getBooleanAttribute(e, IS_GAME_STARTED_TAG, false),
-            getStringAttribute(e, VERSION_TAG),
-            getIntegerAttribute(e, GAME_STATE_TAG, -1));
-        return mi;
+    private static ServerInfo elementToServer(Element e) {
+        return new ServerInfo(getStringAttribute(e, NAME_TAG),
+                              getStringAttribute(e, ADDRESS_TAG),
+                              getIntegerAttribute(e, PORT_TAG, -1),
+                              getIntegerAttribute(e, SLOTS_AVAILABLE_TAG, -1),
+                              getIntegerAttribute(e, CURRENTLY_PLAYING_TAG, -1),
+                              getBooleanAttribute(e, IS_GAME_STARTED_TAG, false),
+                              getStringAttribute(e, VERSION_TAG),
+                              getIntegerAttribute(e, GAME_STATE_TAG, -1));
     }
 
     /**

@@ -38,15 +38,12 @@ public class ServerInfo {
     private String version;
     private int gameState;
 
+    /** Timestamp used by the meta-server. */
+    private long lastUpdated = -1L;
+    
 
     /**
-     * Empty constructor that can be used by subclasses.
-     */
-    protected ServerInfo() {}
-
-
-    /**
-     * Updates the object with the given information.
+     * Create a new server infomation holder.
      *
      * @param name The name of the server.
      * @param address The IP-address of the server.
@@ -57,17 +54,11 @@ public class ServerInfo {
      * @param version The version of the server.
      * @param gameState The current state of the game.
      */
-    public void update(String name, String address, int port,
-                       int slotsAvailable, int currentlyPlaying,
-                       boolean isGameStarted, String version, int gameState) {
-        this.name = name;
-        this.address = address;
-        this.port = port;
-        this.slotsAvailable = slotsAvailable;
-        this.currentlyPlaying = currentlyPlaying;
-        this.isGameStarted = isGameStarted;
-        this.version = version;
-        this.gameState = gameState;
+    public ServerInfo(String name, String address, int port,
+                      int slotsAvailable, int currentlyPlaying,
+                      boolean isGameStarted, String version, int gameState) {
+        this.update(name, address, port, slotsAvailable, currentlyPlaying,
+                    isGameStarted, version, gameState);
     }
 
 
@@ -148,6 +139,41 @@ public class ServerInfo {
     }
 
     /**
+     * Get the last update timestamp (may be negative if unset).
+     *
+     * @return The update timestamp.
+     */
+    public long getLastUpdated() {
+        return this.lastUpdated;
+    }
+    
+    /**
+     * Update this server.
+     *
+     * @param name The name of the server.
+     * @param address The IP-address of the server.
+     * @param port The port number in which clients may connect.
+     * @param slotsAvailable Number of players that may conncet.
+     * @param currentlyPlaying Number of players that are currently connected.
+     * @param isGameStarted True if the game has started.
+     * @param version The version of the server.
+     * @param gameState The current state of the game.
+     */
+    public void update(String name, String address, int port,
+                       int slotsAvailable, int currentlyPlaying,
+                       boolean isGameStarted, String version, int gameState) {
+        this.name = name;
+        this.address = address;
+        this.port = port;
+        this.slotsAvailable = slotsAvailable;
+        this.currentlyPlaying = currentlyPlaying;
+        this.isGameStarted = isGameStarted;
+        this.version = version;
+        this.gameState = gameState;
+        this.lastUpdated = System.currentTimeMillis();
+    }
+
+    /**
      * Gets the tag name of the object.
      *
      * @return "serverInfo".
@@ -164,9 +190,9 @@ public class ServerInfo {
      */
     @Override
     public String toString() {
-        return name + "(" + this.address + ":" + this.port + ") "
+        return name + " (" + this.address + ":" + this.port + ") "
             + this.currentlyPlaying + ", " + this.slotsAvailable
             + ", " + this.isGameStarted + ", " + this.version
-            + ", " + this.gameState;
+            + ", " + this.gameState + ", " + this.lastUpdated;
     }
 }
