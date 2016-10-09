@@ -69,7 +69,6 @@ import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -104,6 +103,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.Video;
+import net.sf.freecol.metaserver.ServerInfo;
 
 import static net.sf.freecol.common.util.StringUtils.lastPart;
 

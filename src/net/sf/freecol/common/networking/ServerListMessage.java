@@ -22,11 +22,10 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.metaserver.MetaRegister;
+import net.sf.freecol.metaserver.ServerInfo;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;

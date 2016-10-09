@@ -46,12 +46,12 @@ import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.metaserver.ServerInfo;
 
 
 /**

@@ -17,14 +17,12 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.common;
+package net.sf.freecol.metaserver;
 
 
 /**
- * Container class for information about a single server.  This
- * information is normally retrieved from a meta-server.
- * 
- * @see net.sf.freecol.metaserver
+ * Container class for information about a single server as retrieved
+ * from the meta-server.
  */
 public class ServerInfo {
 

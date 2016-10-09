@@ -36,7 +36,8 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.metaserver.ServerInfo;
+
 
 
 /**

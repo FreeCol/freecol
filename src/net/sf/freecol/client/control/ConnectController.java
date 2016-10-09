@@ -35,7 +35,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.LoadingSavegameInfo;
-import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColModFile;
@@ -52,6 +51,7 @@ import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.metaserver.ServerInfo;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
 
