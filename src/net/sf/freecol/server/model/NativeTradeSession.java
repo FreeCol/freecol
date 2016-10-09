@@ -67,8 +67,8 @@ public class NativeTradeSession extends Session {
      * {@inheritDoc}
      */
     @Override
-    public void complete(ChangeSet cs) {
-        super.complete(cs);
+    public boolean complete(ChangeSet cs) {
+        boolean ret = super.complete(cs);
 
         if (this.nt.hasNotTraded()) { // Reset the moves if nothing happened
             Unit unit = this.nt.getUnit();
@@ -77,6 +77,7 @@ public class NativeTradeSession extends Session {
                           "movesLeft");
         }
         this.nt.setDone();
+        return ret;
     }
 
 

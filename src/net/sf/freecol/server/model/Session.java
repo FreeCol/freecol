@@ -19,7 +19,9 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -38,8 +40,11 @@ public abstract class Session {
     /** A map of all active sessions. */
     private static final Map<String, Session> allSessions = new HashMap<>();
 
+    /** Lock for access to allSessions. */
+    private static final Object sessionLock = new Object();
+    
     /** Has this session been completed? */
-    private boolean completed;
+    private boolean completed = false;
 
 
     /**
@@ -49,26 +54,70 @@ public abstract class Session {
      * @param key A unique key to lookup this transaction with.
      */
     protected Session(String key) {
-        if (allSessions.get(key) != null) {
+        if (getSession(key) != null) {
             throw new IllegalArgumentException("Duplicate session: " + key);
         }
-        completed = false;
-        allSessions.put(key, this);
+        this.completed = false;
+        addSession(key, this);
         logger.finest("Created session: " + key);
     }
 
+
     /**
-     * All transaction types must implement a completion action.  The
-     * last thing they should do is call this to remove reference to
-     * this transaction.
+     * Add a new session.
+     *
+     * @param key The session key.
+     * @param session The associated {@code Session}.
+     */
+    private static void addSession(String key, Session session) {
+        synchronized (sessionLock) {
+            allSessions.put(key, session);
+        }
+    }
+
+    /**
+     * Get the session with a given key.
+     *
+     * @param key The session key.
+     * @return The {@code session} found.
+     */
+    private static Session getSession(String key) {
+        synchronized (sessionLock) {
+            return allSessions.get(key);
+        }
+    }
+    
+    /**
+     * Is this session complete?
+     *
+     * @return True if the session is complete.
+     */
+    public boolean isComplete() {
+        synchronized (this) {
+            return this.completed;
+        }
+    }
+    
+    /**
+     * All transaction types must implement a completion action.
+     *
+     * This is called by the controller at the end of turn to complete
+     * any sessions that have not yet completed, or if the controller
+     * gets the required response to complete the session.
      *
      * @param cs A {@code ChangeSet} to update with changes that
      *     occur when completing this session.
+     * @return True if the session was already complete.
      */
-    public void complete(ChangeSet cs) {
-        completed = true;
+    public boolean complete(ChangeSet cs) {
+        boolean ret;
+        synchronized (this) {
+            ret = this.completed;
+            this.completed = true;
+        }
+        return ret;
     }
-    
+
     /**
      * Make a transaction session key.
      *
@@ -105,17 +154,21 @@ public abstract class Session {
      * @param cs A {@code ChangeSet} to update.
      */
     public static void completeAll(ChangeSet cs) {
-        for (Session ts : transform(allSessions.values(), s -> !s.completed)) {
-            ts.complete(cs);
+        List<Session> sessions;
+        synchronized (sessionLock) {
+            sessions = transform(allSessions.values(), s -> !s.isComplete());
+            allSessions.clear();
         }
-        clearAll();
+        for (Session ts : sessions) ts.complete(cs);
     }
 
     /**
-     * Clear all transactions.
+     * Clear all sessions.
      */
     public static void clearAll() {
-        allSessions.clear();
+        synchronized (sessionLock) {
+            allSessions.clear();
+        }
     }
 
     /**
@@ -144,11 +197,13 @@ public abstract class Session {
      * @return A session of the specified type, or null if not found.
      */
     public static <T extends Session> T lookup(Class<T> type,
-        String s1, String s2) {
+                                               String s1, String s2) {
         String key = makeSessionKey(type, s1, s2);
-        Session ts = allSessions.get(key);
-        if (ts != null && ts.completed) {
-            allSessions.remove(key);
+        Session ts = getSession(key);
+        if (ts != null && ts.isComplete()) {
+            synchronized (sessionLock) {
+                allSessions.remove(key);
+            }
             ts = null;
         }
         return (ts == null) ? null : type.cast(ts);

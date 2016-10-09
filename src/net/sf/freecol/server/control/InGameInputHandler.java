@@ -311,14 +311,6 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new InciteMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(IndianDemandMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new IndianDemandMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
         register(JoinColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -539,6 +531,10 @@ public final class InGameInputHandler extends ServerInputHandler {
         register(FirstContactMessage.TAG,
             (Connection connection, Element element) ->
             new FirstContactMessage(getGame(), element)
+                .handle(freeColServer, connection));
+        register(IndianDemandMessage.TAG,
+            (Connection connection, Element element) ->
+            new IndianDemandMessage(getGame(), element)
                 .handle(freeColServer, connection));
         register(NationSummaryMessage.TAG,
             (Connection connection, Element element) ->

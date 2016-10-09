@@ -708,12 +708,14 @@ public class NativeAIPlayer extends MissionAIPlayer {
         final Player player = getPlayer();
         AIUnit aiu;
         IndianDemandMission mission;
-        if (unit.getOwner() == player // Its one of ours
-            && (aiu = getAIUnit(unit)) != null // and its valid and demanding
-            && (mission = aiu.getMission(IndianDemandMission.class)) != null
-            && accept != null) {
-            mission.setSucceeded(accept);
+        if (unit.getOwner() == player) { // Its one of ours
+            if ((aiu = getAIUnit(unit)) != null // and its valid and demanding
+                && (mission = aiu.getMission(IndianDemandMission.class)) != null
+                && accept != null) {
+                mission.setSucceeded(accept);
+            }
         }
+            
         return null;
     }
 

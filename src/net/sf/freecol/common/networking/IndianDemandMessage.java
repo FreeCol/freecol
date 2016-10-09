@@ -132,9 +132,11 @@ public class IndianDemandMessage extends TrivialMessage {
      * Client-side convenience function to set the result of this message.
      *
      * @param result The new result of this demand.
+     * @return This message.
      */
-    public void setResult(boolean result) {
+    public IndianDemandMessage setResult(boolean result) {
         setAttribute(RESULT_TAG, String.valueOf(result));
+        return this;
     }
 
 
@@ -142,26 +144,31 @@ public class IndianDemandMessage extends TrivialMessage {
      * Handle a "indianDemand"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
      * @param connection The {@code Connection} message was received on.
-     * @return An update containing the indianDemandd unit, or an
-     *     error {@code Element} on failure.
+     * @return An update containing the response, or an error
+     *     {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
+    public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = player.getGame();
+        final Game game = serverPlayer.getGame();
         final String unitId = getAttribute(UNIT_TAG);
         final String colonyId = getAttribute(COLONY_TAG);
         final Boolean result = getResult();
         
         Unit unit;
+        Colony colony;
         try {
-            if (result == null) { // Initial demand
-                unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            if (serverPlayer.isIndian()) { // Initial demand
+                unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
                 if (unit.getMovesLeft() <= 0) {
                     return serverPlayer.clientError("Unit has no moves left: "
                         + unitId)
+                        .build(serverPlayer);
+                }
+                colony = unit.getAdjacentSettlement(colonyId, Colony.class);
+                if (result != null) {
+                    return serverPlayer.clientError("Result in demand: "
+                        + serverPlayer.getId() + " " + result)
                         .build(serverPlayer);
                 }
             } else { // Reply from colony
@@ -171,15 +178,13 @@ public class IndianDemandMessage extends TrivialMessage {
                         + unitId)
                         .build(serverPlayer);
                 }
+                colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
+                if (result == null) {
+                    return serverPlayer.clientError("No result in demand response: "
+                        + serverPlayer.getId())
+                        .build(serverPlayer);
+                }
             }
-        } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
-        }
-
-        Colony colony;
-        try {
-            colony = unit.getAdjacentSettlement(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -191,9 +196,10 @@ public class IndianDemandMessage extends TrivialMessage {
                 .build(serverPlayer);
         }
 
-        // Proceed to demand.
+        // Proceed to demand or respond.
         return server.getInGameController()
-            .indianDemand(serverPlayer, unit, colony, getType(game), amount)
+            .indianDemand(serverPlayer, unit, colony, getType(game), amount,
+                          result)
             .build(serverPlayer);
     }
 }

@@ -93,7 +93,8 @@ public class MonarchSession extends Session {
     }
 
     @Override
-    public void complete(ChangeSet cs) {
+    public boolean complete(ChangeSet cs) {
+        boolean ret = super.complete(cs);
         switch (action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:
             serverPlayer.ignoreTax(tax, goods, cs);
@@ -104,7 +105,7 @@ public class MonarchSession extends Session {
         default:
             break;
         }
-        super.complete(cs);
+        return ret;
     }
 
     public MonarchAction getAction() {

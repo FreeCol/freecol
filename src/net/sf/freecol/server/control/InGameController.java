@@ -125,6 +125,7 @@ import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.DiplomacySession;
 import net.sf.freecol.server.model.LootSession;
 import net.sf.freecol.server.model.MonarchSession;
+import net.sf.freecol.server.model.NativeDemandSession;
 import net.sf.freecol.server.model.NativeTradeSession;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerEurope;
@@ -2773,54 +2774,37 @@ public final class InGameController extends Controller {
      * @param type The {@code GoodsType} being demanded, null
      *     implies gold.
      * @param amount The amount of goods/gold being demanded.
+     * @param result The demand result (null initially).
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet indianDemand(final ServerPlayer serverPlayer, Unit unit,
-                                  Colony colony, GoodsType type, int amount) {
+                                  Colony colony, GoodsType type, int amount,
+                                  Boolean result) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        ServerPlayer victim = (ServerPlayer) colony.getOwner();
-        int difficulty = spec.getInteger(GameOptions.NATIVE_DEMANDS);
+        final ServerPlayer victim = (ServerPlayer) colony.getOwner();
+        NativeDemandSession session = Session.lookup(NativeDemandSession.class,
+                                                     unit, colony);
         ChangeSet cs = new ChangeSet();
-
-        DOMMessage reply = askTimeout(victim,
-            new IndianDemandMessage(unit, colony, type, amount));
-        boolean result = (reply instanceof IndianDemandMessage)
-            ? ((IndianDemandMessage)reply).getResult()
-            : false;
-        logger.info(serverPlayer.getName() + " unit " + unit
-            + " demands " + amount + " " + ((type == null) ? "gold" : type)
-            + " from " + colony.getName() + " accepted: " + result);
-
-        IndianDemandMessage message = new IndianDemandMessage(unit, colony,
-                                                              type, amount);
-        message.setResult(result);
-        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL, message);
-        if (result) {
-            if (type == null) {
-                victim.modifyGold(-amount);
-                serverPlayer.modifyGold(amount);
-                cs.addPartial(See.only(victim), victim, "gold");
-                //cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-            } else {
-                GoodsContainer colonyContainer = colony.getGoodsContainer();
-                colonyContainer.saveState();
-                GoodsContainer unitContainer = unit.getGoodsContainer();
-                unitContainer.saveState();
-                moveGoods(colony, type, amount, unit);
-                cs.add(See.only(victim), colonyContainer);
-                //cs.add(See.only(serverPlayer), unitContainer);
+        if (serverPlayer.isIndian()) {
+            if (session != null) {
+                return serverPlayer.clientError("Repeated native demand: "
+                    + unit.getId() + "," + colony.getId());
             }
-            int tension = -(5 - difficulty) * 50;
-            ServerIndianSettlement sis = (ServerIndianSettlement)
-                unit.getHomeIndianSettlement();
-            if (sis == null) {
-                serverPlayer.csModifyTension(victim, tension, cs);
-            } else {
-                sis.csModifyAlarm(victim, tension, true, cs);
+            session = new NativeDemandSession(unit, colony, type, amount,
+                                              getTimeout());
+            cs.add(See.only(victim), ChangePriority.CHANGE_NORMAL,
+                   new IndianDemandMessage(unit, colony, type, amount));
+        } else {
+            if (session == null) {
+                return serverPlayer.clientError("Replying to missing demand: "
+                    + unit.getId() + "," + colony.getId());
             }
+            session.complete(result.booleanValue(), cs);
+            logger.info(serverPlayer.getName() + " unit " + unit
+                + " demands " + amount + " " + ((type == null) ? "gold" : type)
+                + " from " + colony.getName() + " accepted: " + result);
         }
-
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }

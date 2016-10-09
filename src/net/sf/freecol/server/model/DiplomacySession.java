@@ -65,10 +65,10 @@ public class DiplomacySession extends Session {
     }
 
     @Override
-    public void complete(ChangeSet cs) {
+    public boolean complete(ChangeSet cs) {
         unit.setMovesLeft(0);
         cs.add(See.only((ServerPlayer)unit.getOwner()), unit);
-        super.complete(cs);
+        return super.complete(cs);
     }
 
     public DiplomaticTrade getAgreement() {

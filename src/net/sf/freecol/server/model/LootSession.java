@@ -45,8 +45,8 @@ public class LootSession extends Session {
 
 
     @Override
-    public void complete(ChangeSet cs) {
-        super.complete(cs);
+    public boolean complete(ChangeSet cs) {
+        return super.complete(cs);
     }
 
     public List<Goods> getCapture() {

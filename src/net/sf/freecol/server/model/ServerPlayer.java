@@ -98,6 +98,7 @@ import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
+import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.util.LogBuilder;
@@ -4289,6 +4290,56 @@ outer:  for (Effect effect : effects) {
         }
         cs.add(See.only(newOwner), newOwner.exploreForUnit(unit));
         return true;
+    }
+
+
+    /**
+     * Accept the native demand at a players colony.
+     *
+     * @param demandPlayer The {@code ServerPlayer} that is demanding.
+     * @param unit The {@code Unit} that demanded.
+     * @param colony The {@code Colony} that was demanded of.
+     * @param type The {@code GoodsType} demanded, or null for gold.
+     * @param amount The amount demanded.
+     * @param result The result of the demand.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    public void csCompleteNativeDemand(ServerPlayer demandPlayer,
+                                       Unit unit, Colony colony,
+                                       GoodsType type, int amount,
+                                       boolean result, ChangeSet cs) {
+        // Always inform the demander of the result.
+        cs.add(See.only(demandPlayer), ChangePriority.CHANGE_NORMAL,
+                   new IndianDemandMessage(unit, colony, type, amount)
+                       .setResult(result));
+
+        if (result) {
+            if (type == null) {
+                this.modifyGold(-amount);
+                demandPlayer.modifyGold(amount);
+                cs.addPartial(See.only(this), this, "gold");
+                cs.addPartial(See.only(demandPlayer), demandPlayer, "gold");
+            } else {
+                GoodsContainer colonyContainer = colony.getGoodsContainer(),
+                    unitContainer = unit.getGoodsContainer();
+                GoodsContainer.moveGoods(colonyContainer, type, amount,
+                                         unitContainer);
+                cs.add(See.only(this), colonyContainer);
+                cs.add(See.only(demandPlayer), unitContainer);
+            }
+            
+            // FIXME: One day the AI should decide what it does with tension
+            int difficulty = getSpecification()
+                .getInteger(GameOptions.NATIVE_DEMANDS);
+            int tension = -(5 - difficulty) * 50;
+            ServerIndianSettlement sis = (ServerIndianSettlement)
+                unit.getHomeIndianSettlement();
+            if (sis == null) {
+                demandPlayer.csModifyTension(this, tension, cs);
+            } else {
+                sis.csModifyAlarm(this, tension, true, cs);
+            }
+        }
     }
 
 
