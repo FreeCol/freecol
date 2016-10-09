@@ -137,40 +137,26 @@ public final class MetaRegister {
     /**
      * Adds a new server with the given attributes.
      *
-     * @param name The name of the server.
-     * @param address The IP-address of the server.
-     * @param port The port number in which clients may connect.
-     * @param slotsAvailable Number of players that may conncet.
-     * @param currentlyPlaying Number of players that are currently connected.
-     * @param isGameStarted <i>true</i> if the game has started.
-     * @param version The version of the server.
-     * @param gameState The current state of the game.
+     * @param newSi The new {@code ServerInfo} to add.
      * @exception IOException if the connection fails.
      */
-    public synchronized void addServer(String name, String address, int port,
-                                       int slotsAvailable, int currentlyPlaying,
-                                       boolean isGameStarted, String version,
-                                       int gameState) throws IOException {
-        ServerInfo si = getServer(address, port);
+    public synchronized void addServer(ServerInfo newSi) {
+        ServerInfo si = getServer(newSi.getAddress(), newSi.getPort());
         if (si == null) { // Check connection before adding the server:
             try (
-                Connection mc = new Connection(address, port, null,
+                Connection mc = new Connection(newSi.getAddress(),
+                                               newSi.getPort(), null,
                                                FreeCol.METASERVER_THREAD);
             ) {
                 mc.disconnect();
             } catch (IOException ioe) {
                 logger.log(Level.WARNING, "Server rejected disconnect.", ioe);
-                throw ioe;
             }
-            si = new ServerInfo(name, address, port,
-                                slotsAvailable, currentlyPlaying,
-                                isGameStarted, version, gameState);
-            items.add(si);
-            logger.info("Server added:" + name
-                + " (" + address + ":" + port + ")");
+            items.add(newSi);
+            logger.info("Server added:" + newSi.getName()
+                + " (" + newSi.getAddress() + ":" + newSi.getPort() + ")");
         } else {
-            updateServer(si, name, address, port, slotsAvailable,
-                currentlyPlaying, isGameStarted, version, gameState);
+            si.update(newSi);
         }
     }
 
@@ -218,29 +204,14 @@ public final class MetaRegister {
     /**
      * Updates a server with the given attributes.
      *
-     * @param name The name of the server.
-     * @param address The IP-address of the server.
-     * @param port The port number in which clients may connect.
-     * @param slotsAvailable Number of players that may conncet.
-     * @param currentlyPlaying Number of players that are currently connected.
-     * @param isGameStarted <i>true</i> if the game has started.
-     * @param version The version of the server.
-     * @param gameState The current state of the game.
-     * @exception IOException if the server can not be contacted.
+     * @param newSi The new {@code ServerInfo}.
      */
-    public synchronized void updateServer(String name, String address,
-                                          int port, int slotsAvailable,
-                                          int currentlyPlaying,
-                                          boolean isGameStarted,
-                                          String version, int gameState)
-        throws IOException {
-        ServerInfo si = getServer(address, port);
+    public synchronized void updateServer(ServerInfo newSi) {
+        ServerInfo si = getServer(newSi.getAddress(), newSi.getPort());
         if (si == null) {
-            addServer(name, address, port, slotsAvailable, currentlyPlaying,
-                      isGameStarted, version, gameState);
+            addServer(newSi);
         } else {
-            updateServer(si, name, address, port, slotsAvailable,
-                         currentlyPlaying, isGameStarted, version, gameState);
+            si.update(newSi);
         }
     }
 }

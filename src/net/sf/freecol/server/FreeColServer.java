@@ -41,6 +41,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.FreeColSeed;
+import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
@@ -61,7 +62,10 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.RegisterServerMessage;
+import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
+import net.sf.freecol.common.networking.UpdateServerMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -646,29 +650,26 @@ public final class FreeColServer {
         Connection mc = MetaServerUtils.getMetaServerConnection();
         if (mc == null) return cancelPublicServer();
 
+        int port = mc.getSocket().getPort();
+        String address = mc.getHostAddress();
+        if (getName() == null) setName(address + ":" + port);
+        ServerInfo si = new ServerInfo(getName(), address, port,
+            getSlotsAvailable(), getNumberOfLivingHumanPlayers(),
+            gameState != GameState.STARTING_GAME, FreeCol.getVersion(),
+            getGameState().ordinal());
         try {
-            String tag = (firstTime) ? "register" : "update";
-            int port = mc.getSocket().getPort();
-            String addr = (name != null) ? name
-                : (mc.getSocket().getLocalAddress().getHostAddress() + ":" + port);
-            int nPlayers = getNumberOfLivingHumanPlayers();
-            boolean started = gameState != GameState.STARTING_GAME;
-            DOMMessage reply = mc.ask((Game)null, new TrivialMessage(tag,
-                    "name", addr,
-                    "port", Integer.toString(port),
-                    "slotsAvailable", Integer.toString(getSlotsAvailable()),
-                    "currentlyPlaying", Integer.toString(nPlayers),
-                    "isGameStarted", Boolean.toString(started),
-                    "version", FreeCol.getVersion(),
-                    "gameState", Integer.toString(getGameState().ordinal())));
-            if (reply != null && reply.isType("noRouteToServer")) {
+            DOMMessage reply = mc.ask((Game)null,
+                ((firstTime) ? new RegisterServerMessage(si)
+                    : new UpdateServerMessage(si)));
+            if (reply != null
+                && reply.isType(MetaServerUtils.NO_ROUTE_TO_SERVER)) {
+                logger.warning("Could not connect to meta-server.");
                 return cancelPublicServer();
             }
         } finally {
             mc.close();
         }
-        if (firstTime) {
-            // Start the metaserver update thread.
+        if (firstTime) { // Start the metaserver update thread
             this.metaServerUpdateTimer = MetaServerUtils.startUpdateTimer(this);
         }
         return true;
@@ -687,8 +688,7 @@ public final class FreeColServer {
         Connection mc = MetaServerUtils.getMetaServerConnection();
         if (mc != null) {
             try {
-                mc.send(new TrivialMessage("remove",
-                        "port", Integer.toString(mc.getSocket().getPort())));
+                mc.send(new RemoveServerMessage(mc));
                 return true;
             } catch (IOException ioe) {
                 logger.log(Level.WARNING, "Network error leaving meta-server: "

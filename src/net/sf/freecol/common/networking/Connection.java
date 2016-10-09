@@ -235,6 +235,15 @@ public class Connection implements Closeable {
     }
 
     /**
+     * Get the host address of this connection.
+     *
+     * @return The host address.
+     */
+    public String getHostAddress() {
+        return getSocket().getInetAddress().getHostAddress();
+    }
+    
+    /**
      * Sets the MessageHandler for this Connection.
      *
      * @param mh The new MessageHandler for this Connection.

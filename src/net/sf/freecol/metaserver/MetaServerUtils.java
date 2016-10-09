@@ -38,6 +38,9 @@ public class MetaServerUtils {
 
     private static final Logger logger = Logger.getLogger(MetaServerUtils.class.getName());
 
+    /** Error message type. */
+    public static final String NO_ROUTE_TO_SERVER = "noRouteToServer";
+    
     /** Client timer update interval. */
     private static final int UPDATE_INTERVAL = 60000;
 

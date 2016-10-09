@@ -24,34 +24,36 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.RegisterServerMessage;
+import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
-import net.sf.freecol.common.networking.UpdateMessage;
+import net.sf.freecol.common.networking.UpdateServerMessage;
 
 import org.w3c.dom.Element;
 
 
 /**
- * Handles all network messages being sent to the metaserver.
+ * Handle network messages sent to the meta-server.
  */
 public final class NetworkHandler implements MessageHandler {
     private static final Logger logger = Logger.getLogger(NetworkHandler.class.getName());
 
-
+    /** The encapsulated meta-server. */
     private final MetaServer metaServer;
+
+    /** The register of connected FreeColServers. */
     private final MetaRegister metaRegister;
 
 
 
     /**
-    * The constructor to use.
-    * 
-    * @param metaServer The {@code MetaServer} this
-    *       {@code NetworkHandler} has been created
-    *       for.
-    * @param metaRegister An object containing a list
-    *       of all the servers.
-    */
+     * The constructor to use.
+     * 
+     * @param metaServer The {@code MetaServer} this
+     *     {@code NetworkHandler} has been created for.
+     * @param metaRegister An object containing a list of all the servers.
+     */
     public NetworkHandler(MetaServer metaServer, MetaRegister metaRegister) {
         this.metaServer = metaServer;
         this.metaRegister = metaRegister;
@@ -59,11 +61,11 @@ public final class NetworkHandler implements MessageHandler {
 
     
     /**
-    * Handles a network message.
-    *
-    * @param connection The {@code Connection} the message came from.
-    * @param element The message to be processed.
-    */
+     * Handle a network message.
+     *
+     * @param connection The {@code Connection} the message came from.
+     * @param element The message to be processed.
+     */
     @Override
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;
@@ -72,16 +74,16 @@ public final class NetworkHandler implements MessageHandler {
         case Connection.DISCONNECT_TAG:
             reply = disconnect(connection, element);
             break;
-        case "register":
+        case RegisterServerMessage.TAG:
             reply = register(connection, element);
+            break;
+        case RemoveServerMessage.TAG:
+            reply = remove(connection, element);
             break;
         case ServerListMessage.TAG:
             reply = new ServerListMessage(metaRegister).toXMLElement();
             break;
-        case "remove":
-            reply = remove(connection, element);
-            break;
-        case UpdateMessage.TAG:
+        case UpdateServerMessage.TAG:
             reply = update(connection, element);
             break;
         default:
@@ -97,25 +99,16 @@ public final class NetworkHandler implements MessageHandler {
      * 
      * @param connection The connection the message was received on.
      * @param element The element containing the request.
-     * @return The reply: {@code null}.
+     * @return Null.
      */
     private Element register(Connection connection, Element element) {
-        String name = element.getAttribute("name");
-        String address = connection.getSocket().getInetAddress().getHostAddress();
-        int port = Integer.parseInt(element.getAttribute("port"));
-        int slotsAvailable = Integer.parseInt(element.getAttribute("slotsAvailable"));
-        int currentlyPlaying = Integer.parseInt(element.getAttribute("currentlyPlaying"));
-        boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted"));
-        String version = element.getAttribute("version");
-        int gameState = Integer.parseInt(element.getAttribute("gameState"));
+        final RegisterServerMessage message
+            = new RegisterServerMessage(null, element);
+        message.setAddress(connection.getHostAddress()); // Trust the connection
 
-        try {
-            metaRegister.addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
-        } catch (IOException e) {
-            return new TrivialMessage("noRouteToServer").toXMLElement();
-        }
+        metaRegister.addServer(message.getServerInfo());
 
-        return new TrivialMessage("ok").toXMLElement();
+        return null;
     }
 
 
@@ -124,21 +117,14 @@ public final class NetworkHandler implements MessageHandler {
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * @return The reply: {@code null}.
+     * @return Null.
      */
     private Element update(Connection connection, Element element) {
-        String name = element.getAttribute("name");
-        String address = connection.getSocket().getInetAddress().getHostAddress();
-        int port = Integer.parseInt(element.getAttribute("port"));
-        int slotsAvailable = Integer.parseInt(element.getAttribute("slotsAvailable"));
-        int currentlyPlaying = Integer.parseInt(element.getAttribute("currentlyPlaying"));
-        boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted"));
-        String version = element.getAttribute("version");
-        int gameState = Integer.parseInt(element.getAttribute("gameState"));
+        final UpdateServerMessage message
+            = new UpdateServerMessage(null, element);
+        message.setAddress(connection.getHostAddress());
 
-        try {
-            metaRegister.updateServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
-        } catch (IOException e) {}
+        metaRegister.updateServer(message.getServerInfo());
 
         return null;
     }
@@ -149,13 +135,14 @@ public final class NetworkHandler implements MessageHandler {
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * @return The reply: {@code null}.
+     * @return Null.
      */
     private Element remove(Connection connection, Element element) {
-        String address = connection.getSocket().getInetAddress().getHostAddress();
-        int port = Integer.parseInt(element.getAttribute("port"));
+        final RemoveServerMessage message
+            = new RemoveServerMessage(null, element);
+        message.setAddress(connection.getHostAddress());
 
-        metaRegister.removeServer(address, port);
+        metaRegister.removeServer(message.getAddress(), message.getPort());
 
         return null;
     }
@@ -166,11 +153,11 @@ public final class NetworkHandler implements MessageHandler {
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * @return The reply: {@code null}.
+     * @return Null.
      */
     private Element disconnect(Connection connection, Element element) {
-        connection.reallyClose();
         metaServer.removeConnection(connection);
+        connection.reallyClose();
         return null;
     }
 }

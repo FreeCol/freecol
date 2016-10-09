@@ -158,6 +158,7 @@ public class ServerInfo {
      * @param isGameStarted True if the game has started.
      * @param version The version of the server.
      * @param gameState The current state of the game.
+     * @param si The new {@code ServerInfo} to update with.
      */
     public void update(String name, String address, int port,
                        int slotsAvailable, int currentlyPlaying,
@@ -174,6 +175,18 @@ public class ServerInfo {
     }
 
     /**
+     * Update this server.
+     *
+     * @param si The new {@code ServerInfo} to update with.
+     */
+    public void update(ServerInfo si) {
+        update(si.getName(), si.getAddress(), si.getPort(),
+               si.getSlotsAvailable(), si.getCurrentlyPlaying(),
+               si.getIsGameStarted(), si.getVersion(), si.getGameState());
+    }
+
+
+   /**
      * Gets the tag name of the object.
      *
      * @return "serverInfo".
