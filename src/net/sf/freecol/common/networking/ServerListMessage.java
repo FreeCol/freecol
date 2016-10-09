@@ -38,14 +38,6 @@ import org.w3c.dom.Element;
 public class ServerListMessage extends DOMMessage {
 
     public static final String TAG = "serverList";
-    private static final String ADDRESS_TAG = "address";
-    private static final String CURRENTLY_PLAYING_TAG = "currentlyPlaying";
-    private static final String GAME_STATE_TAG = "gameState";
-    private static final String IS_GAME_STARTED_TAG = "isGameStarted";
-    private static final String NAME_TAG = "name";
-    private static final String PORT_TAG = "port";
-    private static final String SLOTS_AVAILABLE_TAG = "slotsAvailable";
-    private static final String VERSION_TAG = "version";
 
     /** The list of information about the available servers. */
     private List<ServerInfo> servers = new ArrayList<>();
@@ -56,22 +48,11 @@ public class ServerListMessage extends DOMMessage {
      * a request for servers.
      */
     public ServerListMessage() {
-        super(getTagName());
-    }
-
-    /**
-     * Create a new {@code ServerListMessage} from a
-     * {@code MetaRegister}.  Used to generate the reply.
-     *
-     * @param mr The {@code MetaRegister} to query for servers.
-     */
-    public ServerListMessage(MetaRegister mr) {
-        super(getTagName());
+        super(TAG);
 
         this.servers.clear();
-        this.servers.addAll(mr.getServers());
     }
-        
+
     /**
      * Create a new {@code ServerListMessage} from a
      * supplied element.  Used to read the reply.
@@ -80,47 +61,10 @@ public class ServerListMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ServerListMessage(Game game, Element element) {
-        super(getTagName());
+        this();
 
-        this.servers.clear();
         this.servers.addAll(mapChildren(element,
-                                        ServerListMessage::elementToServer));
-    }
-
-
-    /**
-     * Convert an element to a server.
-     *
-     * @param e The {@code Element} to examine.
-     * @return A new {@code ServerInfo} describing a server.
-     */     
-    private static ServerInfo elementToServer(Element e) {
-        return new ServerInfo(getStringAttribute(e, NAME_TAG),
-                              getStringAttribute(e, ADDRESS_TAG),
-                              getIntegerAttribute(e, PORT_TAG, -1),
-                              getIntegerAttribute(e, SLOTS_AVAILABLE_TAG, -1),
-                              getIntegerAttribute(e, CURRENTLY_PLAYING_TAG, -1),
-                              getBooleanAttribute(e, IS_GAME_STARTED_TAG, false),
-                              getStringAttribute(e, VERSION_TAG),
-                              getIntegerAttribute(e, GAME_STATE_TAG, -1));
-    }
-
-    /**
-     * Convert a ServerInfo record to a message.
-     *
-     * @param si The {@code ServerInfo} to convert.
-     * @return A new {@code DOMMessage}.
-     */
-    private static DOMMessage serverInfoToMessage(ServerInfo si) {
-        return new TrivialMessage(si.getTagName(),
-            NAME_TAG, si.getName(),
-            ADDRESS_TAG, si.getAddress(),
-            PORT_TAG, Integer.toString(si.getPort()),
-            SLOTS_AVAILABLE_TAG, Integer.toString(si.getSlotsAvailable()),
-            CURRENTLY_PLAYING_TAG, Integer.toString(si.getCurrentlyPlaying()),
-            IS_GAME_STARTED_TAG, Boolean.toString(si.getIsGameStarted()),
-            VERSION_TAG, si.getVersion(),
-            GAME_STATE_TAG, Integer.toString(si.getGameState()));
+                e -> new RegisterServerMessage(null, element).getServerInfo()));
     }
 
 
@@ -138,29 +82,13 @@ public class ServerListMessage extends DOMMessage {
     /**
      * Add information about a server.
      *
-     * @param <T> The {@code ServerInfo} type to add.
      * @param si The {@code ServerInfo} to add.
      */
-    public <T extends ServerInfo> void addServer(T si) {
+    public void addServer(ServerInfo si) {
         this.servers.add(si);
     }
 
     
-    /**
-     * Handle a "serverList"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
-     * @return Null.
-     */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        // Not needed, serverList messages are handled trivially in
-        // metaregister.NetworkHandler.
-        return null;
-    }
-
     /**
      * Convert this ServerListMessage to XML.
      *
@@ -170,7 +98,7 @@ public class ServerListMessage extends DOMMessage {
     public Element toXMLElement() {
         return new DOMMessage(getTagName())
             .addMessages(transform(this.servers, alwaysTrue(),
-                                   ServerListMessage::serverInfoToMessage))
+                                   si -> new RegisterServerMessage(si)))
             .toXMLElement();
     }
 

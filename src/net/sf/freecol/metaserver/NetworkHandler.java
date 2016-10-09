@@ -22,7 +22,9 @@ package net.sf.freecol.metaserver;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
@@ -68,7 +70,7 @@ public final class NetworkHandler implements MessageHandler {
      */
     @Override
     public synchronized Element handle(Connection connection, Element element) {
-        Element reply = null;
+        DOMMessage reply = null;
         final String tag = element.getTagName();
         switch (tag) {
         case Connection.DISCONNECT_TAG:
@@ -81,7 +83,7 @@ public final class NetworkHandler implements MessageHandler {
             reply = remove(connection, element);
             break;
         case ServerListMessage.TAG:
-            reply = new ServerListMessage(metaRegister).toXMLElement();
+            reply = serverList();
             break;
         case UpdateServerMessage.TAG:
             reply = update(connection, element);
@@ -90,7 +92,7 @@ public final class NetworkHandler implements MessageHandler {
             logger.warning("Unknown request: " + tag);
             break;
         }
-        return reply;
+        return (reply == null) ? null : reply.toXMLElement();
     }
 
     
@@ -101,7 +103,7 @@ public final class NetworkHandler implements MessageHandler {
      * @param element The element containing the request.
      * @return Null.
      */
-    private Element register(Connection connection, Element element) {
+    private DOMMessage register(Connection connection, Element element) {
         final RegisterServerMessage message
             = new RegisterServerMessage(null, element);
         message.setAddress(connection.getHostAddress()); // Trust the connection
@@ -113,13 +115,31 @@ public final class NetworkHandler implements MessageHandler {
 
 
     /**
+     * Handles a "serverList"-request.
+     *
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * @return A {@code ServerListMessage} with attached {@code ServerInfo}
+     *     for each current server known to the meta-register.
+     */
+    private DOMMessage serverList() {
+        final ServerListMessage message = new ServerListMessage();
+
+        for (ServerInfo si : metaRegister.getServers()) {
+            message.addServer(si);
+        }
+        return message;
+    }
+        
+
+    /**
      * Handles an "update"-request.
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
      * @return Null.
      */
-    private Element update(Connection connection, Element element) {
+    private DOMMessage update(Connection connection, Element element) {
         final UpdateServerMessage message
             = new UpdateServerMessage(null, element);
         message.setAddress(connection.getHostAddress());
@@ -137,7 +157,7 @@ public final class NetworkHandler implements MessageHandler {
      * @param element The element containing the request.
      * @return Null.
      */
-    private Element remove(Connection connection, Element element) {
+    private DOMMessage remove(Connection connection, Element element) {
         final RemoveServerMessage message
             = new RemoveServerMessage(null, element);
         message.setAddress(connection.getHostAddress());
@@ -155,9 +175,10 @@ public final class NetworkHandler implements MessageHandler {
      * @param element The element containing the request.
      * @return Null.
      */
-    private Element disconnect(Connection connection, Element element) {
+    private DOMMessage disconnect(Connection connection, Element element) {
         metaServer.removeConnection(connection);
         connection.reallyClose();
+
         return null;
     }
 }
