@@ -27,5 +27,5 @@ public interface Draggable {
      *
      * @return True if the object is on a carrier.
      */
-    public boolean isOnCarrier();
+    boolean isOnCarrier();
 }

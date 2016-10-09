@@ -36,9 +36,9 @@ public class AbstractGoodsLabel extends FreeColLabel {
 
     private final AbstractGoods abstractGoods;
 
-    private boolean partialChosen = false;
+    private boolean partialChosen;
 
-    private boolean fullChosen = false;
+    private boolean fullChosen;
 
 
     /**

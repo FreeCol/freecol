@@ -33,6 +33,8 @@ import javax.swing.ImageIcon;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.FontLibrary.FontSize;
+import net.sf.freecol.client.gui.FontLibrary.FontType;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -52,22 +54,22 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     private int maxIcons = 7;
 
     /** Whether to display positive integers with a "+" sign. */
-    private boolean drawPlus = false;
+    private boolean drawPlus;
 
     /** Whether the ProductionLabel should be centered. */
-    private boolean centered = true;
+    private final boolean centered = true;
 
     /** The compressed width of the ProductionLabel. */
     private int compressedWidth = -1;
 
     /** The goodsIcon for this type of production. */
-    private ImageIcon goodsIcon;
+    private final ImageIcon goodsIcon;
 
     /** The amount of goods that could be produced. */
     private int maximumProduction = -1;
 
     /** The smallest number to display above the goodsIcons. */
-    private int displayNumber;
+    private final int displayNumber;
 
     /**
      * The smallest number to display above the goodsIcons.
@@ -76,7 +78,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     private int stockNumber = -1;
 
     /** The image to display. */
-    private transient Image stringImage = null;
+    private transient Image stringImage;
 
 
     /**
@@ -112,7 +114,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     public ProductionLabel(FreeColClient freeColClient, AbstractGoods ag,
                            int maximumProduction, int stockNumber) {
         this(freeColClient,freeColClient.getGUI().getImageLibrary(), ag,
-            maximumProduction, stockNumber);
+             maximumProduction, stockNumber);
     }
 
     /**
@@ -143,11 +145,11 @@ public final class ProductionLabel extends AbstractGoodsLabel {
 
         if (getType() == null) {
             logger.warning("Bad production label (no type)\n"
-                + FreeColDebugger.stackTraceToString());
+                                   + FreeColDebugger.stackTraceToString());
         } else if (getAmount() == 0 && stockNumber < 0) {
             logger.warning("Bad production label: " + ag
-                + " stock=" + stockNumber
-                + "\n" + FreeColDebugger.stackTraceToString());
+                                   + " stock=" + stockNumber
+                                   + "\n" + FreeColDebugger.stackTraceToString());
         }
 
         this.maximumProduction = maximumProduction;
@@ -156,26 +158,26 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         // Horses stack poorly, only show one icon
         // TODO: make this highly specific hack more generic
         final GoodsType horses = freeColClient.getGame().getSpecification()
-            .getGoodsType("model.goods.horses");
+                                              .getGoodsType("model.goods.horses");
         this.maxIcons = (ag.getType() == horses) ? 1
-            : options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
+                                                 : options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         this.displayNumber = options
-            .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
+                .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
         this.goodsIcon = (ag.getType() == null) ? null
-            : new ImageIcon(lib.getIconImage(ag.getType()));
+                                                : new ImageIcon(lib.getIconImage(ag.getType()));
         this.compressedWidth = (this.goodsIcon == null) ? 0
-            : this.goodsIcon.getIconWidth() * 2;
+                                                        : this.goodsIcon.getIconWidth() * 2;
 
-        setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.TINY, Font.BOLD, lib.getScaleFactor()));
+        setFont(FontLibrary.createFont(FontType.SIMPLE,
+                                       FontSize.TINY, Font.BOLD, lib.getScaleFactor()));
         setForeground((getAmount() < 0) ? Color.RED : Color.WHITE);
         setToolTipText((getType() == null || getAmount() == 0) ? null
-            : Messages.message(getAbstractGoods().getLabel()));
+                                                               : Messages.message(getAbstractGoods().getLabel()));
 
         final int amount = getAmount();
         boolean showMax = amount > 0 && maximumProduction > amount;
         if (amount < 0 || amount >= displayNumber || amount > maxIcons
-            || stockNumber > 0 || showMax) {
+                || stockNumber > 0 || showMax) {
             String number = "";
             if (stockNumber >= 0) { // Show stored items in ReportColonyPanel
                 number = String.valueOf(stockNumber);
@@ -183,13 +185,15 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             }
             if (amount >= 0 && drawPlus) number += "+";
             number += String.valueOf(amount);
-            if (showMax) number += "/" + String.valueOf(maximumProduction);
-            
+            if (showMax) {
+                number += "/" + maximumProduction;
+            }
+
             BufferedImage dummy = new BufferedImage(1, 1,
-                BufferedImage.TYPE_INT_ARGB);
+                                                    BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = dummy.createGraphics();
             this.stringImage = lib.getStringImage(g, number,
-                getForeground(), getFont());
+                                                  getForeground(), getFont());
             g.dispose();
         } else {
             this.stringImage = null;
@@ -205,7 +209,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     @Override
     public void paintComponent(Graphics g) {
         int stringWidth = (this.stringImage == null) ? 0
-            : stringImage.getWidth(null);
+                                                     : stringImage.getWidth(null);
         int drawImageCount = Math.min(Math.abs(getAmount()), this.maxIcons);
         if (drawImageCount == 0) drawImageCount = 1;
         int iconWidth = this.goodsIcon.getIconWidth();
@@ -234,11 +238,11 @@ public final class ProductionLabel extends AbstractGoodsLabel {
 
         if (this.stringImage != null) {
             int textOffset = (width > stringWidth) ? (width - stringWidth)/2
-                : 0;
+                                                   : 0;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(this.stringImage, textOffset,
-                this.goodsIcon.getIconHeight()/2 - this.stringImage.getHeight(null)/2,
-                null);
+                        this.goodsIcon.getIconHeight()/2 - this.stringImage.getHeight(null)/2,
+                        null);
         }
     }
 
@@ -251,7 +255,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     @Override
     public Dimension getPreferredSize() {
         if (this.goodsIcon == null) return new Dimension(0, 0);
-       
+
         int drawImageCount = Math.max(1, Math.min(Math.abs(getAmount()),
                                                   this.maxIcons));
         int iconWidth = this.goodsIcon.getIconWidth();

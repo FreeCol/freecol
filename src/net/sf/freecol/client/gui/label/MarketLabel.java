@@ -1,20 +1,20 @@
 /**
- *  Copyright (C) 2002-2016   The FreeCol Team
+ * Copyright (C) 2002-2016   The FreeCol Team
  *
- *  This file is part of FreeCol.
+ * This file is part of FreeCol.
  *
- *  FreeCol is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ * FreeCol is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
  *
- *  FreeCol is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * FreeCol is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package net.sf.freecol.client.gui.label;
@@ -28,6 +28,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.CargoPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.debug.FreeColDebugger.DebugMode;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -41,14 +42,14 @@ import net.sf.freecol.common.model.Unit;
  * This label represents a cargo type on the European market.
  */
 public final class MarketLabel extends AbstractGoodsLabel
-    implements CargoLabel, Draggable, PropertyChangeListener {
+        implements CargoLabel, Draggable, PropertyChangeListener {
 
     /** The enclosing market. */
     private final Market market;
 
 
     /**
-     * Initializes this JLabel with the given goods type.
+     * Initializes this FreeColLabel with the given goods type.
      *
      * @param lib The {@code ImageLibrary} to display with.
      * @param type The {@code GoodsType} to represent.
@@ -64,18 +65,6 @@ public final class MarketLabel extends AbstractGoodsLabel
 
 
     /**
-     * Wrap the label with a border.
-     *
-     * @return This {@code MarketLabel}.
-     */
-    public MarketLabel addBorder() {
-        setBorder(Utility.TOPCELLBORDER);
-        setVerticalTextPosition(JLabel.BOTTOM);
-        setHorizontalTextPosition(JLabel.CENTER);
-        return this;
-    }
-
-    /**
      * Update this label.
      */
     public void update() {
@@ -88,13 +77,27 @@ public final class MarketLabel extends AbstractGoodsLabel
             toolTipText = Messages.message(type.getLabel());
             setEnabled(false);
         }
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+        if (FreeColDebugger.isInDebugMode(DebugMode.MENUS)) {
             toolTipText += " " + market.getAmountInMarket(type);
         }
         setToolTipText(toolTipText);
-        
+
         setText(market.getPaidForSale(type) + "/" + market.getCostToBuy(type));
     }
+
+
+    /**
+     * Wrap the label with a border.
+     *
+     * @return This {@code MarketLabel}.
+     */
+    public MarketLabel addBorder() {
+        setBorder(Utility.TOPCELLBORDER);
+        setVerticalTextPosition(JLabel.BOTTOM);
+        setHorizontalTextPosition(JLabel.CENTER);
+        return this;
+    }
+
 
     /**
      * Get this MarketLabel's market.
@@ -104,6 +107,7 @@ public final class MarketLabel extends AbstractGoodsLabel
     public Market getMarket() {
         return market;
     }
+
 
     /**
      * Sets the amount of the goods wrapped by this Label to
@@ -116,6 +120,7 @@ public final class MarketLabel extends AbstractGoodsLabel
 
 
     // Implement Draggable
+
 
     /**
      * Is this label on a carrier?  No, it is in a market!
@@ -130,6 +135,7 @@ public final class MarketLabel extends AbstractGoodsLabel
 
     // Interface PropertyChangeListener
 
+
     /**
      * {@inheritDoc}
      */
@@ -141,12 +147,13 @@ public final class MarketLabel extends AbstractGoodsLabel
 
     //Interface CargoLabel
 
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Component addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
-        MarketLabel label = (MarketLabel)comp;
+        MarketLabel label = (MarketLabel) comp;
         Player player = carrier.getOwner();
         if (!player.canTrade(label.getType())) {
             cargoPanel.igc().payArrears(label.getType());

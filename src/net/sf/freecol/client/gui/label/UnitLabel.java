@@ -32,6 +32,7 @@ import java.awt.event.ActionListener;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -58,6 +59,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 
+import static net.sf.freecol.common.model.Unit.*;
 import static net.sf.freecol.common.util.StringUtils.lastPart;
 
 
@@ -66,12 +68,14 @@ import static net.sf.freecol.common.util.StringUtils.lastPart;
  * ideal to use for drag and drop purposes.
  */
 public final class UnitLabel extends FreeColLabel
-    implements ActionListener, CargoLabel, Draggable {
+        implements ActionListener, CargoLabel, Draggable {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
-    public static enum UnitAction {
+    /**
+     * The different actions a {@code Unit} is allowed to take.
+     */
+    public enum UnitAction {
         ASSIGN,
         CLEAR_SPECIALITY,
         ACTIVATE_UNIT,
@@ -95,11 +99,11 @@ public final class UnitLabel extends FreeColLabel
 
     private boolean selected;
 
-    private boolean isSmall = false;
+    private boolean isSmall;
 
     private boolean ignoreLocation;
-    
-    private boolean useTileImageLibrary;
+
+    private final boolean useTileImageLibrary;
 
 
     /**
@@ -112,6 +116,7 @@ public final class UnitLabel extends FreeColLabel
         this(freeColClient, unit, false);
     }
 
+
     /**
      * Creates a JLabel to display a unit.
      *
@@ -122,6 +127,7 @@ public final class UnitLabel extends FreeColLabel
     public UnitLabel(FreeColClient freeColClient, Unit unit, boolean isSmall) {
         this(freeColClient, unit, isSmall, false);
     }
+
 
     /**
      * Creates a JLabel to display a unit.
@@ -174,6 +180,7 @@ public final class UnitLabel extends FreeColLabel
         return unit;
     }
 
+
     /**
      * Sets whether or not this unit should be selected.
      *
@@ -182,6 +189,7 @@ public final class UnitLabel extends FreeColLabel
     public void setSelected(boolean b) {
         selected = b;
     }
+
 
     /**
      * Sets whether or not this unit label should include production and state
@@ -194,18 +202,19 @@ public final class UnitLabel extends FreeColLabel
         ignoreLocation = b;
     }
 
+
     /**
      * Makes a smaller version.
      *
      * @param isSmall The image will be smaller if set to {@code true}.
      */
-    public void setSmall(boolean isSmall) {
+    public void setSmall(final boolean isSmall) {
         final ImageLibrary lib = useTileImageLibrary
-            ? gui.getTileImageLibrary()
-            : gui.getImageLibrary();
+                                 ? gui.getTileImageLibrary()
+                                 : gui.getImageLibrary();
         if (isSmall) {
-            ImageIcon imageIcon = new ImageIcon(lib.getSmallUnitImage(unit));
-            ImageIcon disabledImageIcon = new ImageIcon(lib.getSmallUnitImage(unit, true));
+            Icon imageIcon = new ImageIcon(lib.getSmallUnitImage(unit)); // Color image
+            Icon disabledImageIcon = new ImageIcon(lib.getSmallUnitImage(unit, true)); // Grayscale Image
             setPreferredSize(null);
 
             setIcon(imageIcon);
@@ -213,8 +222,8 @@ public final class UnitLabel extends FreeColLabel
             setBorder(Utility.blankBorder(0, 2, 0, 0));
             this.isSmall = true;
         } else {
-            ImageIcon imageIcon = new ImageIcon(lib.getUnitImage(unit));
-            ImageIcon disabledImageIcon = new ImageIcon(lib.getUnitImage(unit, true));
+            Icon imageIcon = new ImageIcon(lib.getUnitImage(unit)); // Color image
+            Icon disabledImageIcon = new ImageIcon(lib.getUnitImage(unit, true)); // Grayscale Image
             if (unit.getLocation() instanceof ColonyTile) {
                 Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
                 tileSize.width /= 2;
@@ -227,23 +236,12 @@ public final class UnitLabel extends FreeColLabel
             setIcon(imageIcon);
             setDisabledIcon(disabledImageIcon);
             setBorder((unit.getLocation() instanceof ColonyTile)
-                ? Utility.blankBorder(0, 15, 0, 15)
-                : Utility.blankBorder(0, 5, 0, 5));
+                      ? Utility.blankBorder(0, 15, 0, 15)
+                      : Utility.blankBorder(0, 5, 0, 5));
             this.isSmall = false;
         }
     }
 
-    /**
-     * Gets the description label.
-     *
-     * The description label is a tooltip with the unit name and description of
-     * the terrain its on if applicable *
-     *
-     * @return This UnitLabel's description label.
-     */
-    public String getDescriptionLabel() {
-        return getToolTipText();
-    }
 
     /**
      * Sets the description label.
@@ -257,6 +255,7 @@ public final class UnitLabel extends FreeColLabel
         setToolTipText(label);
     }
 
+
     /**
      * Paints this UnitLabel.
      *
@@ -266,13 +265,13 @@ public final class UnitLabel extends FreeColLabel
     public void paintComponent(Graphics g) {
         final Player player = freeColClient.getMyPlayer();
         final ImageLibrary lib = useTileImageLibrary
-            ? gui.getTileImageLibrary()
-            : gui.getImageLibrary();
+                                 ? gui.getTileImageLibrary()
+                                 : gui.getImageLibrary();
         if (ignoreLocation || selected
-            || (!unit.isCarrier() && unit.getState() != Unit.UnitState.SENTRY)) {
+                || (!unit.isCarrier() && unit.getState() != UnitState.SENTRY)) {
             setEnabled(true);
         } else if (unit.getOwner() != player
-            && unit.getColony() == null) {
+                && unit.getColony() == null) {
             setEnabled(true);
         } else {
             setEnabled(false);
@@ -287,17 +286,17 @@ public final class UnitLabel extends FreeColLabel
             GoodsType workType = unit.getWorkType();
             if (workType != null) {
                 int production = ((ColonyTile)unit.getLocation())
-                    .getTotalProductionOf(workType);
+                        .getTotalProductionOf(workType);
                 ProductionLabel pl = new ProductionLabel(freeColClient, lib,
-                    new AbstractGoods(workType, production));
+                                                         new AbstractGoods(workType, production));
                 g.translate(0, 10);
                 pl.paintComponent(g);
                 g.translate(0, -10);
             }
         } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
-                   getParent() instanceof InPortPanel ||
-                   getParent() instanceof EuropePanel.DocksPanel ||
-                   getParent().getParent() instanceof ReportPanel) {
+                getParent() instanceof InPortPanel ||
+                getParent() instanceof EuropePanel.DocksPanel ||
+                getParent().getParent() instanceof ReportPanel) {
             String text = Messages.message(unit.getOccupationLabel(player, false));
             g.drawImage(lib.getOccupationIndicatorChip((Graphics2D)g, unit, text), 0, 0, null);
 
@@ -306,7 +305,7 @@ public final class UnitLabel extends FreeColLabel
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
                 Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                    FontLibrary.FontSize.TINY, lib.getScaleFactor());
+                                                   FontLibrary.FontSize.TINY, lib.getScaleFactor());
                 Image repairImage1 = lib.getStringImage(g, underRepair1, Color.RED, font);
                 Image repairImage2 = lib.getStringImage(g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);
@@ -324,15 +323,17 @@ public final class UnitLabel extends FreeColLabel
         }
     }
 
+
     /**
      * Update the icon for this unit label.
      */
     public void updateIcon() {
-        setDescriptionLabel(unit.getDescription(Unit.UnitLabelType.FULL));
+        setDescriptionLabel(unit.getDescription(UnitLabelType.FULL));
         setSmall(isSmall);
         // repaint(0, 0, getWidth(), getHeight());
         // uc.refresh();
     }
+
 
     /**
      * Can a unit be equipped with a particular label.
@@ -342,20 +343,9 @@ public final class UnitLabel extends FreeColLabel
      */
     public boolean canUnitBeEquippedWith(JLabel data) {
         return getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)
-            && data instanceof AbstractGoodsLabel;
+                && data instanceof AbstractGoodsLabel;
     }
 
-    /**
-     * Gets a string corresponding to the UnitAction to work at a work
-     * location.
-     *
-     * @param wl The {@code WorkLocation} to use.
-     * @return The unit action as a string.
-     */
-    public static String getWorkLabel(WorkLocation wl) {
-        return "WORK_" + lastPart(wl.getClass().toString(), ".")
-            .toUpperCase(Locale.US);
-    }
 
     //Interface CargoLabel
 
@@ -409,66 +399,66 @@ public final class UnitLabel extends FreeColLabel
         GoodsType gt;
         switch (Enum.valueOf(UnitAction.class,
                              args[0].toUpperCase(Locale.US))) {
-        case ASSIGN:
-            igc.assignTeacher(unit,
-                              game.getFreeColGameObject(args[1], Unit.class));
-            break;
-        case WORK_COLONYTILE:
-            if (args.length < 3) break;
-            ColonyTile colonyTile
-                = game.getFreeColGameObject(args[1], ColonyTile.class);
-            if (args.length >= 4 && "!".equals(args[3])) {
-                // Claim tile if needed
-                if (!igc.claimTile(colonyTile.getWorkTile(),
-                                   unit.getColony())) break;
-            }
-            if (colonyTile != unit.getLocation()) igc.work(unit, colonyTile);
-            if ((gt = spec.getGoodsType(args[2])) != null
-                && unit.getWorkType() != gt) {
-                igc.changeWorkType(unit, gt);
-            }
-            break;
-        case WORK_BUILDING:
-            if (args.length < 3) break;
-            Building building
-                = game.getFreeColGameObject(args[1], Building.class);
-            if (building != unit.getLocation()) igc.work(unit, building);
-            if ((gt = spec.getGoodsType(args[2])) != null
-                && unit.getWorkType() != gt) {
-                igc.changeWorkType(unit, gt);
-            }
-            break;
-        case ACTIVATE_UNIT:
-            igc.changeState(unit, Unit.UnitState.ACTIVE);
-            gui.setActiveUnit(unit);
-            break;
-        case FORTIFY:
-            igc.changeState(unit, Unit.UnitState.FORTIFYING);
-            break;
-        case SENTRY:
-            igc.changeState(unit, Unit.UnitState.SENTRY);
-            break;
-        case COLOPEDIA:
-            gui.showColopediaPanel(unit.getType().getId());
-            break;
-        case LEAVE_TOWN:
-            igc.putOutsideColony(unit);
-            break;
-        case CLEAR_SPECIALITY:
-            igc.clearSpeciality(unit);
-            break;
-        case CLEAR_ORDERS:
-            igc.clearOrders(unit);
-            break;
-        case ASSIGN_TRADE_ROUTE:
-            gui.showTradeRoutePanel(unit);
-            break;
-        case LEAVE_SHIP:
-            igc.leaveShip(unit);
-            break;
-        case UNLOAD:
-            igc.unload(unit);
-            break;
+            case ASSIGN:
+                igc.assignTeacher(unit,
+                                  game.getFreeColGameObject(args[1], Unit.class));
+                break;
+            case WORK_COLONYTILE:
+                if (args.length < 3) break;
+                ColonyTile colonyTile
+                        = game.getFreeColGameObject(args[1], ColonyTile.class);
+                if (args.length >= 4 && "!".equals(args[3])) {
+                    // Claim tile if needed
+                    if (!igc.claimTile(colonyTile.getWorkTile(),
+                                       unit.getColony())) break;
+                }
+                if (colonyTile != unit.getLocation()) igc.work(unit, colonyTile);
+                if ((gt = spec.getGoodsType(args[2])) != null
+                        && unit.getWorkType() != gt) {
+                    igc.changeWorkType(unit, gt);
+                }
+                break;
+            case WORK_BUILDING:
+                if (args.length < 3) break;
+                Building building
+                        = game.getFreeColGameObject(args[1], Building.class);
+                if (building != unit.getLocation()) igc.work(unit, building);
+                if ((gt = spec.getGoodsType(args[2])) != null
+                        && unit.getWorkType() != gt) {
+                    igc.changeWorkType(unit, gt);
+                }
+                break;
+            case ACTIVATE_UNIT:
+                igc.changeState(unit, UnitState.ACTIVE);
+                gui.setActiveUnit(unit);
+                break;
+            case FORTIFY:
+                igc.changeState(unit, UnitState.FORTIFYING);
+                break;
+            case SENTRY:
+                igc.changeState(unit, UnitState.SENTRY);
+                break;
+            case COLOPEDIA:
+                gui.showColopediaPanel(unit.getType().getId());
+                break;
+            case LEAVE_TOWN:
+                igc.putOutsideColony(unit);
+                break;
+            case CLEAR_SPECIALITY:
+                igc.clearSpeciality(unit);
+                break;
+            case CLEAR_ORDERS:
+                igc.clearOrders(unit);
+                break;
+            case ASSIGN_TRADE_ROUTE:
+                gui.showTradeRoutePanel(unit);
+                break;
+            case LEAVE_SHIP:
+                igc.leaveShip(unit);
+                break;
+            case UNLOAD:
+                igc.unload(unit);
+                break;
         }
         updateIcon();
     }

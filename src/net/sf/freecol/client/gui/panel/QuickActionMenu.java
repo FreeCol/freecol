@@ -21,10 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.swing.Icon;
@@ -72,6 +69,7 @@ import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
 
 
 /**
@@ -104,7 +102,7 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
 
-    /**
+     /**
      * Add specific menu items for a given component.
      *
      * @param comp The specific {@code JComponent}.
@@ -127,6 +125,20 @@ public final class QuickActionMenu extends JPopupMenu {
         return this;
     }
 
+
+    /**
+     * Gets a string corresponding to the UnitAction to work at a work
+     * location.
+     *
+     * @param wl The {@code WorkLocation} to use.
+     * @return The unit action as a string.
+     */
+    private static String getWorkLabel(WorkLocation wl) {
+        return "WORK_" + lastPart(wl.getClass().toString(), ".")
+                .toUpperCase(Locale.US);
+    }
+
+
     /**
      * Prompt for an amount of goods to use.
      *
@@ -140,6 +152,7 @@ public final class QuickActionMenu extends JPopupMenu {
                                              ag.getAmount(), true);
         if (ret > 0) ag.setAmount(ret);
     }
+
 
     /**
      * Creates a popup menu for a Unit.
@@ -195,6 +208,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
     }
 
+
     private boolean addBoardItems(final UnitLabel unitLabel, Location loc) {
         final Unit tempUnit = unitLabel.getUnit();
         if (tempUnit.isCarrier()) return false;
@@ -219,6 +233,7 @@ public final class QuickActionMenu extends JPopupMenu {
         return added;
     }
 
+
     private boolean addLoadItems(final Goods goods, Location loc) {
         final InGameController igc = freeColClient.getInGameController();
 
@@ -242,6 +257,7 @@ public final class QuickActionMenu extends JPopupMenu {
         return added;
     }
 
+
     private boolean addCarrierItems(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
         if (!unit.isCarrier() || !unit.hasCargo()) return false;
@@ -264,6 +280,7 @@ public final class QuickActionMenu extends JPopupMenu {
         return true;
     }
 
+
     private List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
         final Comparator<JMenuItem> comp
             = Comparator.comparingInt((JMenuItem k) -> map.get(k))
@@ -271,6 +288,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 .thenComparing(JMenuItem::getText);
         return sort(map.keySet(), comp);
     }
+
 
     private JMenuItem makeProductionItem(GoodsType type, WorkLocation wl,
                                          int amount, UnitLabel unitLabel,
@@ -286,12 +304,13 @@ public final class QuickActionMenu extends JPopupMenu {
         }
         JMenuItem menuItem = Utility.localizedMenuItem(t,
             new ImageIcon(gui.getImageLibrary().getSmallIconImage(type)));
-        menuItem.setActionCommand(UnitLabel.getWorkLabel(wl)
+        menuItem.setActionCommand(getWorkLabel(wl)
             + "/" + wl.getId() + "/" + type.getId()
             + "/" + ((claim) ? "!" : ""));
         menuItem.addActionListener(unitLabel);
         return menuItem;
     }
+
 
     private boolean addWorkItems(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
@@ -385,6 +404,7 @@ public final class QuickActionMenu extends JPopupMenu {
         return !(owned.isEmpty() && unowned.isEmpty() && current == null);
     }
 
+
     private boolean addEducationItems(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
         final Specification spec = unit.getSpecification();
@@ -470,6 +490,7 @@ public final class QuickActionMenu extends JPopupMenu {
         return separatorNeeded;
     }
 
+
     private boolean addCommandItems(final UnitLabel unitLabel) {
         final Unit tempUnit = unitLabel.getUnit();
         final boolean isUnitAtSea = tempUnit.isAtSea();
@@ -553,6 +574,7 @@ public final class QuickActionMenu extends JPopupMenu {
         return true;
     }
 
+
     /**
      * Nasty hack to get menu item to change roles.
      *
@@ -617,6 +639,7 @@ public final class QuickActionMenu extends JPopupMenu {
             });
         return item;
     }
+
 
     /**
      * Add menu items for role manipulation for a unit.
@@ -758,6 +781,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
     }
 
+
     /**
      * Add an item to pay arrears on the given goods type.
      *
@@ -807,6 +831,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
     }
 
+
     private boolean addMarketItems(final AbstractGoods ag, Europe europe) {
         final InGameController igc = freeColClient.getInGameController();
         final Goods goods = new Goods(europe.getGame(), null,
@@ -831,6 +856,7 @@ public final class QuickActionMenu extends JPopupMenu {
         return added;
     }
 
+
     /**
      * Creates a menu for a tile.
      * 
@@ -842,6 +868,7 @@ public final class QuickActionMenu extends JPopupMenu {
             addTileItem(singleTilePanel.getColonyTile().getWorkTile());
         }
     }
+
 
     /**
      * Add a menu item for the tile a unit is working.
