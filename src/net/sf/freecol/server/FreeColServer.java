@@ -623,6 +623,27 @@ public final class FreeColServer {
     }
 
     /**
+     * Create a {@code ServerInfo} record for this server and connection.
+     *
+     * @param mc A {@code Connection} to the meta-server.
+     * @return A suitable record.
+     */
+    private ServerInfo getServerInfo(Connection mc) {
+        int port = mc.getSocket().getPort();
+        String address = mc.getHostAddress();
+        if (getName() == null) setName(address + ":" + port);
+        int slots = count(game.getLiveEuropeanPlayers(),
+            p -> !p.isREF() && ((ServerPlayer)p).isAI()
+                && !((ServerPlayer)p).isConnected());
+        int players = count(game.getLivePlayers(),
+            p -> !((ServerPlayer)p).isAI()
+                && ((ServerPlayer)p).isConnected());
+        return new ServerInfo(getName(), address, port, slots, players,
+                              gameState != GameState.STARTING_GAME,
+                              FreeCol.getVersion(), getGameState().ordinal());
+    }
+
+    /**
      * Cancel public availablity through the meta-server.
      *
      * @return False.
@@ -650,13 +671,7 @@ public final class FreeColServer {
         Connection mc = MetaServerUtils.getMetaServerConnection();
         if (mc == null) return cancelPublicServer();
 
-        int port = mc.getSocket().getPort();
-        String address = mc.getHostAddress();
-        if (getName() == null) setName(address + ":" + port);
-        ServerInfo si = new ServerInfo(getName(), address, port,
-            getSlotsAvailable(), getNumberOfLivingHumanPlayers(),
-            gameState != GameState.STARTING_GAME, FreeCol.getVersion(),
-            getGameState().ordinal());
+        ServerInfo si = getServerInfo(mc);
         try {
             DOMMessage reply = mc.ask((Game)null,
                 ((firstTime) ? new RegisterServerMessage(si)
@@ -699,30 +714,6 @@ public final class FreeColServer {
             }
         }
         return cancelPublicServer();
-    }
-
-    /**
-     * Gets the number of player that may connect.
-     *
-     * @return The number of available slots for human players.  This
-     *     number also includes european players currently controlled
-     *     by the AI.
-     */
-    public int getSlotsAvailable() {
-        return count(game.getLiveEuropeanPlayers(),
-                     p -> !p.isREF() && ((ServerPlayer)p).isAI()
-                         && !((ServerPlayer)p).isConnected());
-    }
-
-    /**
-     * Gets the number of human players in this game that is still playing.
-     *
-     * @return The number of living human players.
-     */
-    public int getNumberOfLivingHumanPlayers() {
-        return count(game.getLivePlayers(),
-                     p -> !((ServerPlayer)p).isAI()
-                         && ((ServerPlayer)p).isConnected());
     }
 
     /**

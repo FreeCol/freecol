@@ -51,6 +51,7 @@ import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.metaserver.MetaServerUtils;
 import net.sf.freecol.metaserver.ServerInfo;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
@@ -626,15 +627,22 @@ public final class ConnectController extends FreeColClientHolder {
     /**
      * Gets a list of servers from the meta server.
      *
+     * Note: synchronous comms.
+     *
      * @return A list of {@link ServerInfo} objects, or null on error.
      */
     public List<ServerInfo> getServerList() {
-        DOMMessage msg = ask(FreeCol.META_SERVER_ADDRESS,
-                             FreeCol.META_SERVER_PORT, new ServerListMessage(),
-                             ServerListMessage.TAG,
-                             StringTemplate.template("metaServer.communicationError"));
-        return (msg instanceof ServerListMessage)
-            ? ((ServerListMessage)msg).getServers()
-            : null;
+        Connection mc = MetaServerUtils.getMetaServerConnection();
+        if (mc == null) return null;
+
+        try {
+            DOMMessage message = mc.ask((Game)null, new ServerListMessage());
+            if (message instanceof ServerListMessage) {
+                return ((ServerListMessage)message).getServers();
+            }
+        } finally {
+            mc.close();
+        }
+        return null;
     }
 }
