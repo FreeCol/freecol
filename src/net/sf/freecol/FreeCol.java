@@ -114,21 +114,21 @@ public final class FreeCol {
     private static final String DIFFICULTY_DEFAULT = "model.difficulty.medium";
     private static final int    EUROPEANS_DEFAULT = 4;
     private static final int    EUROPEANS_MIN = 1;
+    public static final float   GUI_SCALE_DEFAULT = 1.0f;
+    private static final int    GUI_SCALE_MIN_PCT = 100;
+    private static final int    GUI_SCALE_MAX_PCT = 200;
+    public static final float   GUI_SCALE_MIN = GUI_SCALE_MIN_PCT / 100.0f;
+    public static final float   GUI_SCALE_MAX = GUI_SCALE_MAX_PCT / 100.0f;
+    private static final int    GUI_SCALE_STEP_PCT = 25;
+    public static final float   GUI_SCALE_STEP = GUI_SCALE_STEP_PCT / 100.0f;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
     private static final String JAVA_VERSION_MIN = "1.8";
     private static final int    MEMORY_MIN = 128; // Mbytes
     private static final int    PORT_DEFAULT = 3541;
     private static final String SPLASH_DEFAULT = "splash.jpg";
     private static final String TC_DEFAULT = "freecol";
-    public static final int     TIMEOUT_DEFAULT = 60; // 1 minute
-    public static final int     TIMEOUT_MIN = 10; // 10s
-    private static final int GUI_SCALE_MIN_PCT = 100;
-    private static final int GUI_SCALE_MAX_PCT = 200;
-    private static final int GUI_SCALE_STEP_PCT = 25;
-    public static final float GUI_SCALE_MIN = GUI_SCALE_MIN_PCT / 100.0f;
-    public static final float GUI_SCALE_MAX = GUI_SCALE_MAX_PCT / 100.0f;
-    public static final float GUI_SCALE_STEP = GUI_SCALE_STEP_PCT / 100.0f;
-    public static final float GUI_SCALE_DEFAULT = 1.0f;
+    public static final long    TIMEOUT_DEFAULT = 60L; // 1 minute
+    public static final long    TIMEOUT_MIN = 10L; // 10s
 
 
     // Cli values.  Often set to null so the default can be applied in
@@ -197,7 +197,7 @@ public final class FreeCol {
     private static String tc = null;
 
     /** The time out (seconds) for otherwise blocking commands. */
-    private static int timeout = -1;
+    private static long timeout = -1L;
 
     /**
      * The size of window to create, defaults to impossible dimensions
@@ -835,7 +835,7 @@ public final class FreeCol {
                 if (!setTimeout(arg)) { // Not fatal
                     gripe(StringTemplate.template("cli.error.timeout")
                         .addName("%string%", arg)
-                        .addName("%minimum%", Integer.toString(TIMEOUT_MIN)));
+                        .addName("%minimum%", Long.toString(TIMEOUT_MIN)));
                 }
             }
 
@@ -1226,9 +1226,9 @@ public final class FreeCol {
      * @param singlePlayer True if this is a single player game.
      * @return A suitable timeout value.
      */
-    public static int getTimeout(boolean singlePlayer) {
+    public static long getTimeout(boolean singlePlayer) {
         return (timeout >= TIMEOUT_MIN) ? timeout
-            : (singlePlayer) ? Integer.MAX_VALUE
+            : (singlePlayer) ? Long.MAX_VALUE
             : TIMEOUT_DEFAULT;
     }
 
@@ -1240,7 +1240,7 @@ public final class FreeCol {
      */
     public static boolean setTimeout(String timeout) {
         try {
-            int result = Integer.parseInt(timeout);
+            long result = Long.parseLong(timeout);
             if (result >= TIMEOUT_MIN) {
                 FreeCol.timeout = result;
                 return true;

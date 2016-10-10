@@ -174,7 +174,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param request The {@code DOMMessage} question.
      * @return The response to the question, or null if none.
      */
-    public DOMMessage askTimeout(final ServerPlayer serverPlayer, int timeout,
+    public DOMMessage askTimeout(final ServerPlayer serverPlayer, long timeout,
                                  final DOMMessage request) {
         Callable<DOMMessage> callable = () -> serverPlayer.ask(this, request);
         Future<DOMMessage> future = executor.submit(callable);

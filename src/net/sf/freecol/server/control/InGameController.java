@@ -166,6 +166,16 @@ public final class InGameController extends Controller {
 
 
     /**
+     * Get the timeout for this game.
+     *
+     * @return A timeout.
+     */
+    private long getTimeout() {
+        final boolean single = getFreeColServer().getSinglePlayer();
+        return FreeCol.getTimeout(single);
+    }
+        
+    /**
      * Asks a question of a player with a timeout.
      *
      * @param serverPlayer The {@code ServerPlayer} to ask.
@@ -174,9 +184,7 @@ public final class InGameController extends Controller {
      */
     private DOMMessage askTimeout(ServerPlayer serverPlayer,
                                   DOMMessage request) {
-        final boolean single = getFreeColServer().getSinglePlayer();
-        return getGame().askTimeout(serverPlayer, FreeCol.getTimeout(single),
-                                    request);
+        return getGame().askTimeout(serverPlayer, getTimeout(), request);
     }
 
 
