@@ -41,6 +41,8 @@ public class UnitWanderHostileMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(UnitWanderHostileMission.class.getName());
 
+    public static final String TAG = "unitWanderHostileMission";
+
     /** The tag for this mission. */
     private static final String tag = "AI hostile-wanderer";
 
@@ -191,19 +193,9 @@ public class UnitWanderHostileMission extends Mission {
 
     // Serialization
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "unitWanderHostileMission".
-     */
-    public static String getTagName() {
-        return "unitWanderHostileMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

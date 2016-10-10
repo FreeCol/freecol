@@ -40,6 +40,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public final class UnitType extends BuildableType implements Consumer {
 
+    public static final String TAG = "unit-type";
+
     /** Comparator for defence ability. */
     public static final Comparator<UnitType> defenceComparator
             = Comparator.comparingDouble(UnitType::getDefence);
@@ -929,7 +931,7 @@ public final class UnitType extends BuildableType implements Consumer {
             // @compat 0.11.6
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
             spec.setNeedUnitChangeTypes();
-            xr.closeTag(tag, Scope.getTagName());
+            xr.closeTag(tag, Scope.TAG);
             // end @compat 0.11.6
 
         } else {
@@ -940,23 +942,16 @@ public final class UnitType extends BuildableType implements Consumer {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String toString() {
-        return getId();
-    }
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "unit-type".
-     */
-    public static String getTagName() {
-        return "unit-type";
+    public String toString() {
+        return getId();
     }
 }

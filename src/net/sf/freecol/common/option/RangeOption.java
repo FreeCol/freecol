@@ -43,7 +43,8 @@ public class RangeOption extends SelectOption {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RangeOption.class.getName());
 
-
+    public static final String TAG = "rangeOption";
+    
     /**
      * Creates a new {@code RangeOption}.
      *
@@ -104,15 +105,5 @@ public class RangeOption extends SelectOption {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "rangeOption".
-     */
-    public static String getTagName() {
-        return "rangeOption";
-    }
+    public String getXMLTagName() { return TAG; }
 }

@@ -64,8 +64,10 @@ public class TransportMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(TransportMission.class.getName());
 
-    private static final String tag = "AI transport";
+    public static final String TAG = "transportMission";
 
+    private static final String tag = "AI transport";
+    
     private static enum CargoResult {
         TCONTINUE,  // Cargo should continue
         TDONE,      // Cargo completed successfully
@@ -1459,6 +1461,18 @@ public class TransportMission extends Mission {
         }
     }
 
+    /**
+     * More verbose version of toString().
+     *
+     * @return A summary of this mission including its transportables.
+     */
+    public String toFullString() {
+        LogBuilder lb = new LogBuilder(64);
+        lb.add(this);
+        for (Cargo cargo : tCopy()) lb.add("\n  ->", cargo);
+        return lb.toString();
+    }
+
 
     // Serialization
 
@@ -1526,7 +1540,7 @@ public class TransportMission extends Mission {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Cargo.getTagName().equals(tag)) {
+        if (Cargo.TAG.equals(tag)) {
             tAdd(new Cargo(getAIMain(), xr), -1);
 
         // @compat 0.10.5
@@ -1541,29 +1555,8 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * More verbose version of toString().
-     *
-     * @return A summary of this mission including its transportables.
-     */
-    public String toFullString() {
-        LogBuilder lb = new LogBuilder(64);
-        lb.add(this);
-        for (Cargo cargo : tCopy()) lb.add("\n  ->", cargo);
-        return lb.toString();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "transportMission".
-     */
-    public static String getTagName() {
-        return "transportMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

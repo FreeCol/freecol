@@ -298,19 +298,19 @@ public final class InGameInputHandler extends ClientInputHandler {
                     logger.warning("addObject with broken owner: " + owner);
                 } else {
                     final String tag = e.getTagName();
-                    if (FoundingFather.getTagName().equals(tag)) {
+                    if (FoundingFather.TAG.equals(tag)) {
                         FoundingFather father
                             = spec.getFoundingFather(DOMMessage.readId(e));
                         if (father != null) player.addFather(father);
                         player.invalidateCanSeeTiles();// Might be coronado?
                         
-                    } else if (HistoryEvent.getTagName().equals(tag)) {
+                    } else if (HistoryEvent.TAG.equals(tag)) {
                         player.addHistory(DOMMessage.readElement(game, e, HistoryEvent.class));
                         
-                    } else if (LastSale.getTagName().equals(tag)) {
+                    } else if (LastSale.TAG.equals(tag)) {
                         player.addLastSale(DOMMessage.readElement(game, e, LastSale.class));
                         
-                    } else if (ModelMessage.getTagName().equals(tag)) {
+                    } else if (ModelMessage.TAG.equals(tag)) {
                         player.addModelMessage(DOMMessage.readElement(game, e, ModelMessage.class));
                         
                     } else {
@@ -598,14 +598,14 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         DOMMessage.mapChildren(element, (e) -> {
                 final String tag = DOMMessage.getType(e);
-                if (Ability.getTagName().equals(tag)) {
+                if (Ability.TAG.equals(tag)) {
                     if (add) {
                         object.addAbility(new Ability(e, spec));
                     } else {
                         object.removeAbility(new Ability(e, spec));
                     }
                     
-                } else if (Modifier.getTagName().equals(tag)) {
+                } else if (Modifier.TAG.equals(tag)) {
                     if (add) {
                         object.addModifier(new Modifier(e, spec));
                     } else {

@@ -42,6 +42,8 @@ public class TileItemContainer extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(TileItemContainer.class.getName());
 
+    public static final String TAG = "tileItemContainer";
+
     /** The tile owner for which this is the container. */
     private Tile tile;
 
@@ -622,7 +624,7 @@ public class TileItemContainer extends FreeColGameObject {
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
-        if (LostCityRumour.getTagName().equals(tag)) {
+        if (LostCityRumour.TAG.equals(tag)) {
             LostCityRumour lcr = xr.readFreeColGameObject(game, LostCityRumour.class);
             if (lcr != null) {
                 // @compat 0.10.4
@@ -632,10 +634,10 @@ public class TileItemContainer extends FreeColGameObject {
                 addTileItem(lcr);
             }
 
-        } else if (Resource.getTagName().equals(tag)) {
+        } else if (Resource.TAG.equals(tag)) {
             addTileItem(xr.readFreeColGameObject(game, Resource.class));
 
-        } else if (TileImprovement.getTagName().equals(tag)
+        } else if (TileImprovement.TAG.equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
                    // end @compat 0.11.3
@@ -650,6 +652,14 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -657,20 +667,5 @@ public class TileItemContainer extends FreeColGameObject {
         for (TileItem item : getTileItems()) sb.append(' ').append(item);
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "tileItemContainer".
-     */
-    public static String getTagName() {
-        return "tileItemContainer";
     }
 }

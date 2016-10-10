@@ -65,6 +65,8 @@ public class Map extends FreeColGameObject implements Location {
 
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
+    public static final String TAG = "map";
+
     /**
      * Possible actions by the unit travelling along a path in consideration
      * of the next tile.
@@ -1335,6 +1337,9 @@ public class Map extends FreeColGameObject implements Location {
             openMap.put(dst.getId(), path);
             openMapQueue.offer(path);
         }
+
+
+        // Override Object
 
         /**
          * {@inheritDoc}
@@ -2623,10 +2628,10 @@ public class Map extends FreeColGameObject implements Location {
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
-        if (Region.getTagName().equals(tag)) {
+        if (Region.TAG.equals(tag)) {
             addRegion(xr.readFreeColGameObject(game, Region.class));
 
-        } else if (Tile.getTagName().equals(tag)) {
+        } else if (Tile.TAG.equals(tag)) {
             Tile t = xr.readFreeColGameObject(game, Tile.class);
             setTile(t, t.getX(), t.getY());
 
@@ -2650,15 +2655,5 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "map".
-     */
-    public static String getTagName() {
-        return "map";
-    }
+    public String getXMLTagName() { return TAG; }
 }

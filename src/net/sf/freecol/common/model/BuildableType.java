@@ -352,7 +352,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
             addRequiredGoods(new AbstractGoods(type, amount));
             xr.closeTag(REQUIRED_GOODS_TAG);
 
-        } else if (Limit.getTagName().equals(tag)) {
+        } else if (Limit.TAG.equals(tag)) {
             Limit limit = new Limit(xr, spec);
             if (limit.getLeftHandSide().getType() == null) {
                 limit.getLeftHandSide().setType(getId());
@@ -363,4 +363,6 @@ public abstract class BuildableType extends FreeColSpecObjectType {
             super.readChild(xr);
         }
     }
+
+    // getXMLTagName left to subclasses
 }

@@ -44,6 +44,7 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(PlayerExploredTile.class.getName());
 
+    public static final String TAG = "playerExploredTile";
 
     /** The owner of this view. */
     private Player player;
@@ -332,13 +333,13 @@ public class PlayerExploredTile extends FreeColGameObject {
             missionary = xr.readFreeColGameObject(game, Unit.class);
             xr.closeTag(MISSIONARY_TAG);
 
-        } else if (LostCityRumour.getTagName().equals(tag)) {
+        } else if (LostCityRumour.TAG.equals(tag)) {
             addTileItem(xr.readFreeColGameObject(game, LostCityRumour.class));
 
-        } else if (Resource.getTagName().equals(tag)) {
+        } else if (Resource.TAG.equals(tag)) {
             addTileItem(xr.readFreeColGameObject(game, Resource.class));
 
-        } else if (TileImprovement.getTagName().equals(tag)
+        } else if (TileImprovement.TAG.equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
                    // end @compat 0.11.3
@@ -353,15 +354,5 @@ public class PlayerExploredTile extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "playerExploredTile".
-     */
-    public static String getTagName() {
-        return "playerExploredTile";
-    }
+    public String getXMLTagName() { return TAG; }
 }

@@ -42,6 +42,8 @@ public class WorkInsideColonyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WorkInsideColonyMission.class.getName());
 
+    public static final String TAG = "workInsideColonyMission";
+
     /** The tag for this mission. */
     private static final String tag = "AI worker";
 
@@ -216,14 +218,5 @@ public class WorkInsideColonyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "workInsideColonyMission".
-     */
-    public static String getTagName() {
-        return "workInsideColonyMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

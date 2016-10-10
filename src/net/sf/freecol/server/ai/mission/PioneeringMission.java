@@ -59,6 +59,8 @@ public class PioneeringMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
+    public static final String TAG = "pioneeringMission";
+
     /** The tag for this mission. */
     private static final String tag = "AI pioneer";
 
@@ -767,7 +769,7 @@ public class PioneeringMission extends Mission {
             xw.writeAttribute(TARGET_TAG, target.getId());
 
             if (tileImprovementPlan != null) {
-                xw.writeAttribute(TileImprovementPlan.getTagName(),
+                xw.writeAttribute(TileImprovementPlan.TAG,
                                   tileImprovementPlan);
             }
         }
@@ -785,8 +787,8 @@ public class PioneeringMission extends Mission {
         // Do not use setTarget in serialization
         target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
 
-        tileImprovementPlan = (xr.hasAttribute(TileImprovementPlan.getTagName()))
-            ? xr.makeAIObject(aiMain, TileImprovementPlan.getTagName(),
+        tileImprovementPlan = (xr.hasAttribute(TileImprovementPlan.TAG))
+            ? xr.makeAIObject(aiMain, TileImprovementPlan.TAG,
                 TileImprovementPlan.class, (TileImprovementPlan)null, true)
             : null;
     }
@@ -795,14 +797,5 @@ public class PioneeringMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "pioneeringMission".
-     */
-    public static String getTagName() {
-        return "pioneeringMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

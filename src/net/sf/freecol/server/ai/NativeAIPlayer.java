@@ -959,9 +959,5 @@ public class NativeAIPlayer extends MissionAIPlayer {
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
+    // getXMLTagName not needed, uses parent
 }

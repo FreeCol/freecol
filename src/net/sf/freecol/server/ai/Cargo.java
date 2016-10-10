@@ -52,6 +52,8 @@ public class Cargo {
 
     private static final Logger logger = Logger.getLogger(Cargo.class.getName());
 
+    public static final String TAG = "cargo";
+
     /** Abandon cargo after three blockages. */
     private static final int MAX_TRY = 3;
 
@@ -623,31 +625,6 @@ public class Cargo {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        LogBuilder lb = new LogBuilder(64);
-        lb.add("[", transportable,
-            " ", getModeString(),
-            " ", getTurns(), "/", tries, " space=", spaceLeft,
-            ((wrapped == null) ? "" : " wrap"));
-        if (plan.twait != null && plan.cwait != null) {
-            lb.add(" ", plan.twait.toShortString(),
-                "/", plan.cwait.toShortString());
-        }
-        if (plan.cdst != null && plan.tdst != null) {
-            lb.add("->", plan.cdst.toShortString(),
-                "/", plan.tdst.toShortString());
-        }
-        lb.add(" ", plan.fallback, "]");
-        return lb.toString();
-    }            
-
-
     // Serialization
     // Cargo is not yet an AIObject or FreeColObject, but that may happen.
 
@@ -665,7 +642,7 @@ public class Cargo {
 
 
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getTagName());
+        xw.writeStartElement(TAG);
 
         xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG,
                           (AIObject)getTransportable());
@@ -709,9 +686,9 @@ public class Cargo {
         if (tid != null) {
             AIObject aio = aiMain.getAIObject(tid);
             if (aio == null) {
-                if (tid.startsWith(Unit.getTagName())) {
+                if (tid.startsWith(Unit.TAG)) {
                     tao = new AIUnit(aiMain, tid);
-                } else if (tid.startsWith(AIGoods.getTagName())) {
+                } else if (tid.startsWith(AIGoods.TAG)) {
                     tao = new AIGoods(aiMain, tid);
                 }
             } else {
@@ -749,15 +726,36 @@ public class Cargo {
 
         this.plan.fallback = xr.getAttribute(FALLBACK_TAG, false);
 
-        xr.closeTag(getTagName());
+        xr.closeTag(TAG);
     }
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "cargo"
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "cargo";
-    }
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("[", transportable,
+            " ", getModeString(),
+            " ", getTurns(), "/", tries, " space=", spaceLeft,
+            ((wrapped == null) ? "" : " wrap"));
+        if (plan.twait != null && plan.cwait != null) {
+            lb.add(" ", plan.twait.toShortString(),
+                "/", plan.cwait.toShortString());
+        }
+        if (plan.cdst != null && plan.tdst != null) {
+            lb.add("->", plan.cdst.toShortString(),
+                "/", plan.tdst.toShortString());
+        }
+        lb.add(" ", plan.fallback, "]");
+        return lb.toString();
+    }            
 }

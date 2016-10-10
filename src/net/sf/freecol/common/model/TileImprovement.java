@@ -44,6 +44,8 @@ public class TileImprovement extends TileItem implements Named {
 
     private static final Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
+    public static final String TAG = "tileImprovement";
+
     /** River magnitudes */
     public static final int NO_RIVER = 0;
     public static final int SMALL_RIVER = 1;
@@ -678,6 +680,14 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -688,20 +698,5 @@ public class TileImprovement extends TileItem implements Named {
         if (style != null) sb.append(' ').append(style.getString());
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "tileImprovement".
-     */
-    public static String getTagName() {
-        return "tileImprovement";
     }
 }

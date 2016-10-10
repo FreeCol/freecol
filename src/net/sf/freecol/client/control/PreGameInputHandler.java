@@ -241,7 +241,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final Game game = getGame();
 
         Element playerElement = (Element)element
-            .getElementsByTagName(Player.getTagName()).item(0);
+            .getElementsByTagName(Player.TAG).item(0);
         Player player = new Player(game, playerElement);
 
         game.removePlayer(player);

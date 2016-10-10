@@ -35,6 +35,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public class Event extends FreeColSpecObjectType {
 
+    public static final String TAG = "event";
+
     /** A restriction on the scope of the event. */
     private String value;
 
@@ -208,7 +210,7 @@ public class Event extends FreeColSpecObjectType {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (Limit.getTagName().equals(tag)) {
+        if (Limit.TAG.equals(tag)) {
             Limit limit = new Limit(xr, spec);
             // @compat 0.10.5
             if ("model.limit.independence.colonies".equals(limit.getId())) {
@@ -226,15 +228,5 @@ public class Event extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "event".
-     */
-    public static String getTagName() {
-        return "event";
-    }
+    public String getXMLTagName() { return TAG; }
 }

@@ -41,6 +41,8 @@ import static net.sf.freecol.common.util.StringUtils.*;
  */
 public class DiplomaticTrade extends FreeColGameObject {
 
+    public static final String TAG = "diplomaticTrade";
+
     /** A context for the trade. */
     public static enum TradeContext {
         CONTACT,    /** First contact between Europeans */
@@ -470,22 +472,22 @@ public class DiplomaticTrade extends FreeColGameObject {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (ColonyTradeItem.getTagName().equals(tag)) {
+        if (ColonyTradeItem.TAG.equals(tag)) {
             add(new ColonyTradeItem(getGame(), xr));
 
-        } else if (GoldTradeItem.getTagName().equals(tag)) {
+        } else if (GoldTradeItem.TAG.equals(tag)) {
             add(new GoldTradeItem(getGame(), xr));
 
-        } else if (GoodsTradeItem.getTagName().equals(tag)) {
+        } else if (GoodsTradeItem.TAG.equals(tag)) {
             add(new GoodsTradeItem(getGame(), xr));
 
-        } else if (InciteTradeItem.getTagName().equals(tag)) {
+        } else if (InciteTradeItem.TAG.equals(tag)) {
             add(new InciteTradeItem(getGame(), xr));
 
-        } else if (StanceTradeItem.getTagName().equals(tag)) {
+        } else if (StanceTradeItem.TAG.equals(tag)) {
             add(new StanceTradeItem(getGame(), xr));
 
-        } else if (UnitTradeItem.getTagName().equals(tag)) {
+        } else if (UnitTradeItem.TAG.equals(tag)) {
             add(new UnitTradeItem(getGame(), xr));
 
         } else {
@@ -493,6 +495,14 @@ public class DiplomaticTrade extends FreeColGameObject {
         }
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
@@ -510,20 +520,5 @@ public class DiplomaticTrade extends FreeColGameObject {
         for (TradeItem item : getTradeItems()) sb.append(' ').append(item);
         sb.append(" ]]");
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "diplomaticTrade".
-     */
-    public static String getTagName() {
-        return "diplomaticTrade";
     }
 }

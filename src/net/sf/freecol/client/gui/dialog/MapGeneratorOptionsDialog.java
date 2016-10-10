@@ -73,9 +73,9 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                                      boolean editable) {
         super(freeColClient, frame, editable,
               freeColClient.getGame().getMapGeneratorOptions(),
-              MapGeneratorOptions.getTagName(),
+              MapGeneratorOptions.TAG,
               FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME,
-              MapGeneratorOptions.getTagName());
+              MapGeneratorOptions.TAG);
 
         if (isEditable()) {
             loadDefaultOptions();

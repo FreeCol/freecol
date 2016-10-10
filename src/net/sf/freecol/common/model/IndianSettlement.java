@@ -48,6 +48,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
     private static final Logger logger = Logger.getLogger(IndianSettlement.class.getName());
 
+    public static final String TAG = "indianSettlement";
+
     /** The level of contact between a player and this settlement. */
     public static enum ContactLevel {
         UNCONTACTED,     // Nothing known other than location?
@@ -1660,26 +1662,19 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append(getName()).append(" at (").append(tile.getX())
             .append(',').append(tile.getY()).append(')');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "indianSettlement".
-     */
-    public static String getTagName() {
-        return "indianSettlement";
     }
 }

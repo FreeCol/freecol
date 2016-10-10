@@ -60,6 +60,8 @@ public abstract class AIPlayer extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
+    public static final String TAG = "aiPlayer";
+
     /** A comparator to sort AI units by location. */
     private static final Comparator<AIUnit> aiUnitLocationComparator
         = Comparator.comparing(AIUnit::getUnit, Unit.locComparator);
@@ -429,11 +431,7 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return the tag name.
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "aiPlayer";
-    }
+    public String getXMLTagName() { return TAG; }
 }

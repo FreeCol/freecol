@@ -226,52 +226,52 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
             logger.finest("Skipping action " + xr.readId());
             xr.nextTag();
 
-        } else if (AbstractUnitOption.getTagName().equals(tag)) {
+        } else if (AbstractUnitOption.TAG.equals(tag)) {
             option = new AbstractUnitOption(spec);
 
-        } else if (AudioMixerOption.getTagName().equals(tag)) {
+        } else if (AudioMixerOption.TAG.equals(tag)) {
             option = new AudioMixerOption(spec);
 
-        } else if (BooleanOption.getTagName().equals(tag)) {
+        } else if (BooleanOption.TAG.equals(tag)) {
             option = new BooleanOption(spec);
 
-        } else if (FileOption.getTagName().equals(tag)) {
+        } else if (FileOption.TAG.equals(tag)) {
             option = new FileOption(spec);
 
-        } else if (IntegerOption.getTagName().equals(tag)) {
+        } else if (IntegerOption.TAG.equals(tag)) {
             option = new IntegerOption(spec);
 
-        } else if (LanguageOption.getTagName().equals(tag)) {
+        } else if (LanguageOption.TAG.equals(tag)) {
             option = new LanguageOption(spec);
 
-        } else if (ModListOption.getTagName().equals(tag)) {
+        } else if (ModListOption.TAG.equals(tag)) {
             option = new ModListOption(spec);
 
-        } else if (ModOption.getTagName().equals(tag)) {
+        } else if (ModOption.TAG.equals(tag)) {
             option = new ModOption(spec);
 
-        } else if (OptionGroup.getTagName().equals(tag)) {
+        } else if (OptionGroup.TAG.equals(tag)) {
             option = new OptionGroup(spec);
 
-        } else if (PercentageOption.getTagName().equals(tag)) {
+        } else if (PercentageOption.TAG.equals(tag)) {
             option = new PercentageOption(spec);
 
-        } else if (RangeOption.getTagName().equals(tag)) {
+        } else if (RangeOption.TAG.equals(tag)) {
             option = new RangeOption(spec);
 
-        } else if (SelectOption.getTagName().equals(tag)) {
+        } else if (SelectOption.TAG.equals(tag)) {
             option = new SelectOption(spec);
 
-        } else if (StringOption.getTagName().equals(tag)) {
+        } else if (StringOption.TAG.equals(tag)) {
             option = new StringOption(spec);
 
-        } else if (UnitListOption.getTagName().equals(tag)) {
+        } else if (UnitListOption.TAG.equals(tag)) {
             option = new UnitListOption(spec);
 
-        } else if (UnitTypeOption.getTagName().equals(tag)) {
+        } else if (UnitTypeOption.TAG.equals(tag)) {
             option = new UnitTypeOption(spec);
 
-        } else if (TextOption.getTagName().equals(tag)) {
+        } else if (TextOption.TAG.equals(tag)) {
             option = new TextOption(spec);
 
         } else {

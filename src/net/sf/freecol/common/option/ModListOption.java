@@ -29,6 +29,8 @@ import net.sf.freecol.common.model.Specification;
  */
 public class ModListOption extends ListOption<FreeColModFile> {
 
+    public static final String TAG = "modListOption";
+
     /**
      * Creates a new {@code ModListOption}.
      *
@@ -69,15 +71,5 @@ public class ModListOption extends ListOption<FreeColModFile> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "modListOption".
-     */
-    public static String getTagName() {
-        return "modListOption";
-    }
+    public String getXMLTagName() { return TAG; }
 }

@@ -109,6 +109,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             return Double.compare(score, other.score);
         }
 
+
         // Override Object
 
         /**
@@ -913,4 +914,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
         return value;
     }
+
+
+    // Serialization
+    
+    // getXMLTagName not needed, uses parent
 }

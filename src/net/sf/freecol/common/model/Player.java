@@ -65,6 +65,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
+    public static final String TAG = "player";
+
     /**
      * Class object for use by {@link net.sf.freecol.client.ClientOptions}
      */
@@ -94,6 +96,11 @@ public class Player extends FreeColGameObject implements Nameable {
         // A_GOODS must be last, the spec is entitled to require checks on
         // as many goods types as it likes
 
+        // Override Object
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return super.toString().substring(2);
@@ -4255,36 +4262,36 @@ public class Player extends FreeColGameObject implements Nameable {
                         new Tension(xr.getAttribute(VALUE_TAG, 0)));
             xr.closeTag(TENSION_TAG);
         
-        } else if (Ability.getTagName().equals(tag)) {
+        } else if (Ability.TAG.equals(tag)) {
             Ability ability = new Ability(xr, spec);
             if (ability.isIndependent()) addAbility(ability);
 
-        } else if (Europe.getTagName().equals(tag)) {
+        } else if (Europe.TAG.equals(tag)) {
             europe = xr.readFreeColGameObject(game, Europe.class);
 
-        } else if (HighSeas.getTagName().equals(tag)) {
+        } else if (HighSeas.TAG.equals(tag)) {
             highSeas = xr.readFreeColGameObject(game, HighSeas.class);
 
-        } else if (HistoryEvent.getTagName().equals(tag)) {
+        } else if (HistoryEvent.TAG.equals(tag)) {
             addHistory(new HistoryEvent(xr));
 
-        } else if (LastSale.getTagName().equals(tag)) {
+        } else if (LastSale.TAG.equals(tag)) {
             addLastSale(new LastSale(xr));
 
-        } else if (Market.getTagName().equals(tag)) {
+        } else if (Market.TAG.equals(tag)) {
             market = xr.readFreeColGameObject(game, Market.class);
 
-        } else if (ModelMessage.getTagName().equals(tag)) {
+        } else if (ModelMessage.TAG.equals(tag)) {
             addModelMessage(new ModelMessage(xr));
 
-        } else if (Modifier.getTagName().equals(tag)) {
+        } else if (Modifier.TAG.equals(tag)) {
             Modifier modifier = new Modifier(xr, spec);
             if (modifier.isIndependent()) addModifier(modifier);
 
-        } else if (Monarch.getTagName().equals(tag)) {
+        } else if (Monarch.TAG.equals(tag)) {
             monarch = xr.readFreeColGameObject(game, Monarch.class);
 
-        } else if (TradeRoute.getTagName().equals(tag)) {
+        } else if (TradeRoute.TAG.equals(tag)) {
             addTradeRoute(xr.readFreeColGameObject(game, TradeRoute.class));
 
         } else {
@@ -4295,23 +4302,16 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String toString() {
-        return nationId;
-    }
+    public String getXMLTagName() { return TAG; }
 
+
+    // Override Object
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "player"
-     */
-    public static String getTagName() {
-        return "player";
+    public String toString() {
+        return nationId;
     }
 }

@@ -36,6 +36,8 @@ public class TextOption extends AbstractOption<String> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TextOption.class.getName());
 
+    public static final String TAG = "textOption";
+
     /** The value of this option. */
     private String value;
 
@@ -125,26 +127,20 @@ public class TextOption extends AbstractOption<String> {
      * {@inheritDoc}
      */
     @Override
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append('[').append(getId())
             .append(" value=").append(value);
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "textOption".
-     */
-    public static String getTagName() {
-        return "textOption";
     }
 }

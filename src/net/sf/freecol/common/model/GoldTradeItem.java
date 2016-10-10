@@ -30,6 +30,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  * A trade item consisting of just some gold.
  */
 public class GoldTradeItem extends TradeItem {
+
+    public static final String TAG = "goldTradeItem";
     
     /** The amount of gold to change hands. */
     private int gold;
@@ -113,30 +115,6 @@ public class GoldTradeItem extends TradeItem {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof GoldTradeItem) {
-            return this.gold == ((GoldTradeItem)other).gold
-                && super.equals(other);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        return 37 * hash + this.gold;
-    }
-
-
     // Serialization
 
     private static final String GOLD_TAG = "gold";
@@ -165,25 +143,39 @@ public class GoldTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append('[').append(getId()).append(' ').append(gold).append(']');
-        return sb.toString();
+    public boolean equals(Object other) {
+        if (other instanceof GoldTradeItem) {
+            return this.gold == ((GoldTradeItem)other).gold
+                && super.equals(other);
+        }
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + this.gold;
+    }
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "goldTradeItem".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "goldTradeItem";
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(16);
+        sb.append('[').append(getId()).append(' ').append(gold).append(']');
+        return sb.toString();
     }
 }

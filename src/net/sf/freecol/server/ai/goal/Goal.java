@@ -57,6 +57,8 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
     private static final Logger logger = Logger.getLogger(Goal.class.getName());
 
+    public static final String TAG = "aiGoal";
+
     private float relativeWeight;
     protected boolean needsPlanning;
     protected boolean isFinished;
@@ -543,15 +545,6 @@ public abstract class Goal extends AIObject implements GoalConstants {
             descr = parentGoal.getGoalDescription() + ">>";
         }
         return descr + getGoalDescription();
-    }
-
-    /**
-     * Returns the tag name of the object.
-     *
-     * @return "aiGoal"
-     */
-    public static String getTagName() {
-        return "aiGoal";
     }
 
 /* INTERFACE ******************************************************************/

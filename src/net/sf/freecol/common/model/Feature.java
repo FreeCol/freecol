@@ -463,7 +463,7 @@ public abstract class Feature extends FreeColSpecObject
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Scope.getTagName().equals(tag)) {
+        if (Scope.TAG.equals(tag)) {
             Scope scope = new Scope(xr);
             if (scope != null) addScope(scope);
 

@@ -41,6 +41,8 @@ public class WorkerWish extends Wish {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkerWish.class.getName());
 
+    public static final String TAG = "workerWish";
+
     /** The type of unit required. */
     private UnitType unitType;
 
@@ -78,7 +80,7 @@ public class WorkerWish extends Wish {
      */
     public WorkerWish(AIMain aiMain, Location destination, int value,
                       UnitType unitType, boolean expertNeeded) {
-        this(aiMain, getTagName() + ":" + aiMain.getNextId());
+        this(aiMain, TAG + ":" + aiMain.getNextId());
 
         if (destination == null) {
             throw new NullPointerException("destination == null");
@@ -162,33 +164,6 @@ public class WorkerWish extends Wish {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof WorkerWish) {
-            WorkerWish ow = (WorkerWish)other;
-            return super.equals(ow)
-                && Utils.equals(this.unitType, ow.unitType)
-                && this.expertNeeded == ow.expertNeeded;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.unitType);
-        return 37 * hash + ((this.expertNeeded) ? 1 : 0);
-    }
-
-
     // Serialization
 
     private static final String EXPERT_NEEDED_TAG = "expertNeeded";
@@ -244,6 +219,39 @@ public class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof WorkerWish) {
+            WorkerWish ow = (WorkerWish)other;
+            return super.equals(ow)
+                && Utils.equals(this.unitType, ow.unitType)
+                && this.expertNeeded == ow.expertNeeded;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.unitType);
+        return 37 * hash + ((this.expertNeeded) ? 1 : 0);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(64);
         lb.add("[", getId(),
@@ -251,20 +259,5 @@ public class WorkerWish extends Wish {
             ((expertNeeded) ? "/expert" : ""),
             " -> ", destination, " (", getValue(), ")]");
         return lb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "workerWish"
-     */
-    public static String getTagName() {
-        return "workerWish";
     }
 }

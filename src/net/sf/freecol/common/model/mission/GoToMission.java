@@ -33,6 +33,8 @@ import net.sf.freecol.common.model.Unit;
  */
 public class GoToMission extends AbstractMission {
 
+    public static final String TAG = "goToMission";
+
     /**
      * The number of turns this mission has been blocked.
      */
@@ -183,17 +185,5 @@ public class GoToMission extends AbstractMission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "goToMission"
-     */
-    public static String getTagName() {
-        return "goToMission";
-    }
-
-
-
+    public String getXMLTagName() { return TAG; }
 }

@@ -52,6 +52,8 @@ public class HighScore extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(HighScore.class.getName());
 
+    public static final String TAG = "highScore";
+
     /** A comparator by ascending AI object value. */
     public static final Comparator<? super HighScore> descendingScoreComparator
         = Comparator.comparingInt(HighScore::getScore).reversed();
@@ -392,7 +394,7 @@ public class HighScore extends FreeColObject {
 
             while (xr.moreTags()) {
                 final String tag = xr.getLocalName();
-                if (HighScore.getTagName().equals(tag)) {
+                if (HighScore.TAG.equals(tag)) {
                     scores.add(new HighScore(xr));
                 }
             }
@@ -580,15 +582,5 @@ public class HighScore extends FreeColObject {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "highScore".
-     */
-    public static String getTagName() {
-        return "highScore";
-    }
+    public String getXMLTagName() { return TAG; }
 }

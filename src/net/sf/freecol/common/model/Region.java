@@ -40,6 +40,8 @@ public class Region extends FreeColGameObject implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Region.class.getName());
 
+    public static final String TAG = "region";
+
     /** The keys for the valid predefined regions. */
     public static final List<String> predefinedRegionKeys
         = makeUnmodifiableList("model.region.arctic", "model.region.antarctic",
@@ -613,6 +615,14 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -623,20 +633,5 @@ public class Region extends FreeColGameObject implements Nameable {
         if (getDiscoverable()) sb.append('!');
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "region".
-     */
-    public static String getTagName() {
-        return "region";
     }
 }

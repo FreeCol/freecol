@@ -38,6 +38,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public final class GoodsType extends FreeColSpecObjectType {
 
+    public static final String TAG = "goods-type";
+
     private static final float DEFAULT_PRODUCTION_WEIGHT = 1.0f;
     private static final float DEFAULT_LOW_PRODUCTION_THRESHOLD = 0.0f;
     private static final float DEFAULT_ZERO_PRODUCTION_FACTOR = 1.0f;
@@ -691,15 +693,5 @@ public final class GoodsType extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "goods-type".
-     */
-    public static String getTagName() {
-        return "goods-type";
-    }
+    public String getXMLTagName() { return TAG; }
 }

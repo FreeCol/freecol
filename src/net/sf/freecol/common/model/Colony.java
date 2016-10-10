@@ -56,7 +56,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
+    public static final String TAG = "colony";
+
     public static final String REARRANGE_COLONY = "rearrangeColony";
+
     public static final int LIBERTY_PER_REBEL = 200;
 
     /** The number of turns of advanced warning of starvation. */
@@ -3038,13 +3041,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             if (ut != null) populationQueue.add(ut);
             xr.closeTag(POPULATION_QUEUE_TAG);
 
-        } else if (Building.getTagName().equals(tag)) {
+        } else if (Building.TAG.equals(tag)) {
             addBuilding(xr.readFreeColGameObject(game, Building.class));
 
-        } else if (ColonyTile.getTagName().equals(tag)) {
+        } else if (ColonyTile.TAG.equals(tag)) {
             addColonyTile(xr.readFreeColGameObject(game, ColonyTile.class));
 
-        } else if (ExportData.getTagName().equals(tag)) {
+        } else if (ExportData.TAG.equals(tag)) {
             ExportData data = new ExportData(xr);
             setExportData(data);
 
@@ -3056,23 +3059,16 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String toString() {
-        return getName();
-    }
+    public String getXMLTagName() { return TAG; }
 
+
+    // Override Object
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "colony".
-     */
-    public static String getTagName() {
-        return "colony";
+    public String toString() {
+        return getName();
     }
 }

@@ -41,6 +41,8 @@ import net.sf.freecol.common.util.RandomChoice;
  */
 public final class TileImprovementType extends FreeColSpecObjectType {
 
+    public static final String TAG = "tile-improvement-type";
+
     /** Is this improvement natural or man-made? */
     private boolean natural;
 
@@ -595,15 +597,5 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "tile-improvement-type".
-     */
-    public static String getTagName() {
-        return "tile-improvement-type";
-    }
+    public String getXMLTagName() { return TAG; }
 }

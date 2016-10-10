@@ -41,6 +41,8 @@ public class TradeRoute extends FreeColGameObject
 
     private static final Logger logger = Logger.getLogger(TradeRoute.class.getName());
 
+    public static final String TAG = "tradeRoute";
+
     /** The name of this trade route. */
     private String name;
 
@@ -388,7 +390,7 @@ public class TradeRoute extends FreeColGameObject
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (TradeRouteStop.getTagName().equals(tag)) {
+        if (TradeRouteStop.TAG.equals(tag)) {
             addStop(new TradeRouteStop(getGame(), xr));
             
         } else {
@@ -399,30 +401,23 @@ public class TradeRoute extends FreeColGameObject
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append('[').append(getXMLTagName())
+        sb.append('[').append(getId())
             .append(" \"").append(this.name).append('"');
         if (this.owner != null) sb.append(" owner=").append(this.owner.getId());
         sb.append(" silent=").append(Boolean.toString(this.silent));
         for (TradeRouteStop stop : getStops()) sb.append(' ').append(stop);
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "tradeRoute".
-     */
-    public static String getTagName() {
-        return "tradeRoute";
     }
 }

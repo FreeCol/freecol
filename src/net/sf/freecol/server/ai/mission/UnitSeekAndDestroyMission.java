@@ -51,6 +51,8 @@ public class UnitSeekAndDestroyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(UnitSeekAndDestroyMission.class.getName());
 
+    public static final String TAG = "unitSeekAndDestroyMission";
+
     /** The tag for this mission. */
     private static final String tag = "AI seek+destroyer";
 
@@ -553,14 +555,5 @@ public class UnitSeekAndDestroyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "unitSeekAndDestroyMission".
-     */
-    public static String getTagName() {
-        return "unitSeekAndDestroyMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

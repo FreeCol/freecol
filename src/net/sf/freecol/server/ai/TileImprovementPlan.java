@@ -45,6 +45,8 @@ public class TileImprovementPlan extends ValuedAIObject {
 
     private static final Logger logger = Logger.getLogger(TileImprovementPlan.class.getName());
 
+    public static final String TAG = "tileImprovementPlan";
+
     /** The type of improvement, from TileImprovementTypes. */
     private TileImprovementType type;
 
@@ -88,7 +90,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     public TileImprovementPlan(AIMain aiMain, Tile target,
                                TileImprovementType type, int value) {
-        super(aiMain, getTagName() + ":" + aiMain.getNextId());
+        super(aiMain, TAG + ":" + aiMain.getNextId());
 
         this.target = target;
         this.type = type;
@@ -283,35 +285,6 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof TileImprovementPlan) {
-            TileImprovementPlan op = (TileImprovementPlan)other;
-            return super.equals(op)
-                && Utils.equals(this.type, op.type)
-                && Utils.equals(this.target, op.target)
-                && Utils.equals(this.pioneer, op.pioneer);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.type);
-        hash = 37 * hash + Utils.hashCode(this.target);
-        return 37 * hash + Utils.hashCode(this.pioneer);
-    }
-
-
     // Serialization
 
     private static final String PIONEER_TAG = "pioneer";
@@ -324,7 +297,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     @Override
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        if (validate()) toXML(xw, getXMLTagName());
+        if (validate()) toXML(xw, TAG);
     }
 
     /**
@@ -379,6 +352,41 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof TileImprovementPlan) {
+            TileImprovementPlan op = (TileImprovementPlan)other;
+            return super.equals(op)
+                && Utils.equals(this.type, op.type)
+                && Utils.equals(this.target, op.target)
+                && Utils.equals(this.pioneer, op.pioneer);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.type);
+        hash = 37 * hash + Utils.hashCode(this.target);
+        return 37 * hash + Utils.hashCode(this.pioneer);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append('[').append(getId())
@@ -388,20 +396,5 @@ public class TileImprovementPlan extends ValuedAIObject {
             .append('/').append(getValue())
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "tileImprovementPlan"
-     */
-    public static String getTagName() {
-        return "tileImprovementPlan";
     }
 }

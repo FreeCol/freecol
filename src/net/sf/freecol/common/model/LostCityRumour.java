@@ -45,6 +45,8 @@ public class LostCityRumour extends TileItem {
 
     private static final Logger logger = Logger.getLogger(LostCityRumour.class.getName());
 
+    public static final String TAG = "lostCityRumour";
+
     // The bogus end of the world year.
     private static final int MAYAN_PROPHESY_YEAR = 2012;
 
@@ -430,15 +432,5 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "lostCityRumour".
-     */
-    public static String getTagName() {
-        return "lostCityRumour";
-    }
+    public String getXMLTagName() { return TAG; }
 }

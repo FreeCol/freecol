@@ -77,6 +77,8 @@ public class ClientOptions extends OptionGroup {
 
     private static final Logger logger = Logger.getLogger(ClientOptions.class.getName());
 
+    public static final String TAG = "clientOptions";
+
     //
     // Constants for each client option.
     // Keep these in sync with data/base/client-options.xml.
@@ -514,7 +516,7 @@ public class ClientOptions extends OptionGroup {
      * specification as it is needed before the specification is available.
      */
     public ClientOptions() {
-        super(getTagName());
+        super(TAG);
     }
 
 
@@ -773,12 +775,11 @@ public class ClientOptions extends OptionGroup {
         }
     }
 
+
+    // Serialization
+
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "clientOptions".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "clientOptions";
-    }
+    public String getXMLTagName() { return TAG; }
 }

@@ -42,6 +42,8 @@ public class GoodsWish extends Wish {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(GoodsWish.class.getName());
 
+    public static final String TAG = "goodsWish";
+
     /** The type of goods required. */
     private GoodsType goodsType;
 
@@ -77,7 +79,7 @@ public class GoodsWish extends Wish {
      */
     public GoodsWish(AIMain aiMain, Location destination, int value,
                      int amountRequested, GoodsType goodsType) {
-        this(aiMain, getTagName() + ":" + aiMain.getNextId());
+        this(aiMain, TAG + ":" + aiMain.getNextId());
 
         if (destination == null) {
             throw new NullPointerException("destination == null");
@@ -188,33 +190,6 @@ public class GoodsWish extends Wish {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof GoodsWish) {
-            GoodsWish og = (GoodsWish)other;
-            return super.equals(og)
-                && Utils.equals(this.goodsType, og.goodsType)
-                && this.amountRequested == og.amountRequested;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.goodsType);
-        return 37 * hash + this.amountRequested;
-    }
-
-
     // Serialization
 
     private static final String AMOUNT_REQUESTED_TAG = "amountRequested";
@@ -271,6 +246,39 @@ public class GoodsWish extends Wish {
      * {@inheritDoc}
      */
     @Override
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof GoodsWish) {
+            GoodsWish og = (GoodsWish)other;
+            return super.equals(og)
+                && Utils.equals(this.goodsType, og.goodsType)
+                && this.amountRequested == og.amountRequested;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.goodsType);
+        return 37 * hash + this.amountRequested;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(32);
         lb.add("[", getId(),
@@ -279,20 +287,5 @@ public class GoodsWish extends Wish {
             " -> ", destination,
             " (", getValue(), ")]");
         return lb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "goodsWish"
-     */
-    public static String getTagName() {
-        return "goodsWish";
     }
 }

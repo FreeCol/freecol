@@ -45,6 +45,8 @@ public class ColonyTile extends WorkLocation {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
+    public static final String TAG = "colonyTile";
+
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
     /** The maximum number of units a ColonyTile can hold. */
@@ -542,6 +544,14 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -550,20 +560,5 @@ public class ColonyTile extends WorkLocation {
             .append('/').append(getColony().getName())
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "colonyTile".
-     */
-    public static String getTagName() {
-        return "colonyTile";
     }
 }

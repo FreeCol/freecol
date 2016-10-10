@@ -32,10 +32,12 @@ import net.sf.freecol.common.util.Utils;
  */
 public class UnitTradeItem extends TradeItem {
     
+    public static final String TAG = "unitTradeItem";
+
     /** The unit to change hands. */
     private Unit unit;
 
-        
+
     /**
      * Creates a new {@code UnitTradeItem} instance.
      *
@@ -116,6 +118,37 @@ public class UnitTradeItem extends TradeItem {
     }
 
 
+    // Serialization
+
+    private static final String UNIT_TAG = "unit";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        xw.writeAttribute(UNIT_TAG, unit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
+        unit = xr.getAttribute(getGame(), UNIT_TAG, Unit.class, (Unit)null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
     // Override Object
 
     /**
@@ -139,22 +172,6 @@ public class UnitTradeItem extends TradeItem {
         return 37 * hash + Utils.hashCode(this.unit);
     }
 
-
-    // Serialization
-
-    private static final String UNIT_TAG = "unit";
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeAttributes(xw);
-
-        xw.writeAttribute(UNIT_TAG, unit);
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -164,30 +181,5 @@ public class UnitTradeItem extends TradeItem {
         sb.append('[').append(getId())
             .append(' ').append(unit.getId()).append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        super.readAttributes(xr);
-
-        unit = xr.getAttribute(getGame(), UNIT_TAG, Unit.class, (Unit)null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "unitTradeItem".
-     */
-    public static String getTagName() {
-        return "unitTradeItem";
     }
 }

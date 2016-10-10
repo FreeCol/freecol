@@ -54,6 +54,8 @@ public abstract class FreeColAction extends AbstractAction
     /** Protected to congregate the subclasses here. */
     protected static final Logger logger = Logger.getLogger(FreeColAction.class.getName());
 
+    public static final String TAG = "action";
+
     /**
      * A class used by Actions which have a mnemonic. Those Actions should
      * assign this listener to the JMenuItem they are a part of. This captures
@@ -65,7 +67,6 @@ public abstract class FreeColAction extends AbstractAction
     public class InnerMenuKeyListener implements MenuKeyListener {
 
         final int mnemonic;
-
 
         public InnerMenuKeyListener() {
             mnemonic = ((Integer) getValue(MNEMONIC_KEY));
@@ -379,7 +380,7 @@ public abstract class FreeColAction extends AbstractAction
      */
     @Override
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getTagName());
+        xw.writeStartElement(TAG);
 
         xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
 
@@ -400,8 +401,16 @@ public abstract class FreeColAction extends AbstractAction
         String acc = xr.getAttribute(ACCELERATOR_TAG, "");
         putValue(ACCELERATOR_KEY, (acc == null || acc.isEmpty()) ? null
             : KeyStroke.getKeyStroke(acc));
-        xr.closeTag(getTagName());
+        xr.closeTag(TAG);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
@@ -409,14 +418,5 @@ public abstract class FreeColAction extends AbstractAction
     @Override
     public String toString() {
         return getName();
-    }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "action".
-     */
-    public static String getTagName() {
-        return "action";
     }
 }

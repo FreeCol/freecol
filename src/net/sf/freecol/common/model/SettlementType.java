@@ -35,6 +35,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class SettlementType extends FreeColSpecObjectType {
 
+    public static final String TAG = "settlementType";
+
     /** Whether this SettlementType is a capital. */
     private boolean capital = false;
 
@@ -444,7 +446,7 @@ public class SettlementType extends FreeColSpecObjectType {
             this.gifts = new RandomRange(xr);
             xr.closeTag(GIFTS_TAG);
 
-        } else if (PlunderType.getTagName().equals(tag)) {
+        } else if (PlunderType.TAG.equals(tag)) {
             addPlunder(new PlunderType(xr, getSpecification()));
 
         } else {
@@ -455,15 +457,5 @@ public class SettlementType extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "settlementType".
-     */
-    public static String getTagName() {
-        return "settlementType";
-    }
+    public String getXMLTagName() { return TAG; }
 }

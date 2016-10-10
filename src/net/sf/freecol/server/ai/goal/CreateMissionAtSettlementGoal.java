@@ -51,6 +51,8 @@ public class CreateMissionAtSettlementGoal extends Goal {
 
     private static final Logger logger = Logger.getLogger(CreateMissionAtSettlementGoal.class.getName());
 
+    public static final String TAG = "createMissionAtSettlementGoal";
+
     //the settlement to build a mission at
     private final IndianSettlement target;
 
@@ -200,5 +202,5 @@ public class CreateMissionAtSettlementGoal extends Goal {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
+    public String getXMLTagName() { return TAG; }
 }

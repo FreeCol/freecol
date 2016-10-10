@@ -36,6 +36,8 @@ public class BooleanOption extends AbstractOption<Boolean> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(BooleanOption.class.getName());
 
+    public static final String TAG = "booleanOption";
+
     /** The value of this option. */
     private boolean value;
 
@@ -123,6 +125,14 @@ public class BooleanOption extends AbstractOption<Boolean> {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -130,20 +140,5 @@ public class BooleanOption extends AbstractOption<Boolean> {
             .append(" value=").append(value)
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "booleanOption".
-     */
-    public static String getTagName() {
-        return "booleanOption";
     }
 }

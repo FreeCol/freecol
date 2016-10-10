@@ -295,10 +295,10 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (Ability.getTagName().equals(tag)) {
+        if (Ability.TAG.equals(tag)) {
             if (xr.getAttribute(DELETE_TAG, false)) {
                 removeAbilities(xr.readId());
-                xr.closeTag(Ability.getTagName());
+                xr.closeTag(Ability.TAG);
 
             } else {
                 Ability ability = new Ability(xr, spec); // Closes
@@ -307,10 +307,10 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
                 spec.addAbility(ability);
             }
 
-        } else if (Modifier.getTagName().equals(tag)) {
+        } else if (Modifier.TAG.equals(tag)) {
             if (xr.getAttribute(DELETE_TAG, false)) {
                 removeModifiers(xr.readId());
-                xr.closeTag(Modifier.getTagName());
+                xr.closeTag(Modifier.TAG);
 
             } else {
                 Modifier modifier = new Modifier(xr, spec); // Closes
@@ -319,7 +319,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
                 spec.addModifier(modifier);
             }
 
-        } else if (Scope.getTagName().equals(tag)) {
+        } else if (Scope.TAG.equals(tag)) {
             Scope scope = new Scope(xr);
             if (scope != null) addScope(scope);
 
@@ -327,6 +327,11 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
             super.readChild(xr);
         }
     }
+
+    // getXMLTagName left to subclasses
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}

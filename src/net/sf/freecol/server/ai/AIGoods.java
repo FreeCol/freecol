@@ -49,6 +49,8 @@ public class AIGoods extends TransportableAIObject {
 
     private static final Logger logger = Logger.getLogger(AIGoods.class.getName());
 
+    public static final String TAG = "aiGoods";
+
     /** The underlying goods. */
     private Goods goods;
 
@@ -81,7 +83,7 @@ public class AIGoods extends TransportableAIObject {
      */
     public AIGoods(AIMain aiMain, Location location, GoodsType type,
                    int amount, Location destination) {
-        this(aiMain, getTagName() + ":" + aiMain.getNextId());
+        this(aiMain, TAG + ":" + aiMain.getNextId());
 
         this.goods = new Goods(aiMain.getGame(), location, type, amount);
         this.destination = destination;
@@ -380,33 +382,6 @@ public class AIGoods extends TransportableAIObject {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof AIGoods) {
-            AIGoods oa = (AIGoods)other;
-            return super.equals(oa)
-                && Utils.equals(this.goods, oa.goods)
-                && Utils.equals(this.destination, oa.destination);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.goods);
-        return 37 * hash + Utils.hashCode(this.destination);
-    }
-
-
     // Serialization
 
     private static final String DESTINATION_TAG = "destination";
@@ -463,7 +438,7 @@ public class AIGoods extends TransportableAIObject {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Goods.getTagName().equals(tag)) {
+        if (Goods.TAG.equals(tag)) {
             if (goods != null) {
                 goods.readFromXML(xr);
             } else {
@@ -479,6 +454,39 @@ public class AIGoods extends TransportableAIObject {
      * {@inheritDoc}
      */
     @Override
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof AIGoods) {
+            AIGoods oa = (AIGoods)other;
+            return super.equals(oa)
+                && Utils.equals(this.goods, oa.goods)
+                && Utils.equals(this.destination, oa.destination);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.goods);
+        return 37 * hash + Utils.hashCode(this.destination);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(64);
         lb.add("[", getId(), " ", goods);
@@ -488,20 +496,5 @@ public class AIGoods extends TransportableAIObject {
         if (transport != null) lb.add(" using ", transport.getUnit());
         lb.add("/", getTransportPriority(), "]");
         return lb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "aiGoods"
-     */
-    public static String getTagName() {
-        return "aiGoods";
     }
 }

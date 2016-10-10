@@ -143,5 +143,5 @@ public class GotoAdjacentGoal extends Goal {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
+    public String getXMLTagName() { return TAG; }
 }

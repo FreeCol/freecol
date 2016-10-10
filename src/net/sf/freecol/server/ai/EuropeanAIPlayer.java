@@ -2667,9 +2667,5 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
+    // getXMLTagName not needed, uses parent
 }

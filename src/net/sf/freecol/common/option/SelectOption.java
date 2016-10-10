@@ -48,6 +48,8 @@ public class SelectOption extends IntegerOption {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SelectOption.class.getName());
 
+    public static final String TAG = "selectOption";
+
     /** Use localized labels? */
     protected boolean localizedLabels = false;
 
@@ -132,7 +134,7 @@ public class SelectOption extends IntegerOption {
             }
             if (fallback == null) fallback = i;
         }
-        logger.warning(getTagName() + ".setValue invalid value: "
+        logger.warning(TAG + ".setValue invalid value: "
             + value + ", using fallback: " + fallback);
         super.setValue(fallback);
     }
@@ -221,6 +223,14 @@ public class SelectOption extends IntegerOption {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -229,20 +239,5 @@ public class SelectOption extends IntegerOption {
             .append(" localized=").append(localizedLabels)
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "selectOption".
-     */
-    public static String getTagName() {
-        return "selectOption";
     }
 }

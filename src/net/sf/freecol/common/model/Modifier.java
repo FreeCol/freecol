@@ -40,6 +40,7 @@ import org.w3c.dom.Element;
  */
 public class Modifier extends Feature {
 
+    public static final String TAG = "modifier";
     
     /**
      * Comparator to sort by ascending modifier index, then type, then
@@ -547,40 +548,6 @@ public class Modifier extends Feature {
     // end @compat 0.10.7
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) return true;
-        if (o instanceof Modifier) { 
-            Modifier m = (Modifier)o;
-            return Utils.equals(this.modifierType, m.modifierType)
-                && this.value == m.value
-                && this.increment == m.increment
-                && Utils.equals(this.incrementType, m.incrementType)
-                && this.modifierIndex == m.modifierIndex
-                && super.equals(o);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 31 * hash + Float.floatToIntBits(value);
-        hash = 31 * hash + Float.floatToIntBits(increment);
-        hash = 31 * hash + Utils.hashCode(modifierType);
-        hash = 31 * hash + Utils.hashCode(incrementType);
-        return 31 * hash + modifierIndex;
-    }
-
-
     // Serialization
 
     private static final String INCREMENT_TAG = "increment";
@@ -650,6 +617,45 @@ public class Modifier extends Feature {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o instanceof Modifier) { 
+            Modifier m = (Modifier)o;
+            return Utils.equals(this.modifierType, m.modifierType)
+                && this.value == m.value
+                && this.increment == m.increment
+                && Utils.equals(this.incrementType, m.incrementType)
+                && this.modifierIndex == m.modifierIndex
+                && super.equals(o);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + Float.floatToIntBits(value);
+        hash = 31 * hash + Float.floatToIntBits(increment);
+        hash = 31 * hash + Utils.hashCode(modifierType);
+        hash = 31 * hash + Utils.hashCode(incrementType);
+        return 31 * hash + modifierIndex;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -670,20 +676,5 @@ public class Modifier extends Feature {
         }
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the XML tag name for the object.
-     *
-     * @return "modifier".
-     */
-    public static String getTagName() {
-        return "modifier";
     }
 }

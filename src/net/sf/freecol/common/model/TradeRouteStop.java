@@ -38,6 +38,8 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
 
     private static final Logger logger = Logger.getLogger(TradeRouteStop.class.getName());
 
+    public static final String TAG = "tradeRouteStop";
+
     /** The trade location of the stop. */
     private Location location;
 
@@ -341,6 +343,13 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
@@ -348,29 +357,12 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append('[').append(getXMLTagName())
+        sb.append('[').append(getId())
             .append(' ').append(getLocation().getId());
         for (GoodsType goodsType : getCargo()) {
             sb.append(' ').append(goodsType);
         }
         sb.append(']');
         return sb.toString();            
-    }
-
-    /**
-     * Delegate to getTagName.
-     *
-     * @return What getTagName does.
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     * 
-     * @return "tradeRouteStop".
-     */
-    public static String getTagName() {
-        return "tradeRouteStop";
     }
 }

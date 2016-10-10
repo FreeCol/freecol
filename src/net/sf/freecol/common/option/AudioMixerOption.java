@@ -41,6 +41,8 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
 
     private static Logger logger = Logger.getLogger(AudioMixerOption.class.getName());
 
+    public static final String TAG = "audioMixerOption";
+
     /**
      * A wrapper for the mixer, including the Mixer.Info including a
      * potentially null value.
@@ -74,6 +76,12 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
             return getKey().compareTo(mw.getKey());
         }
 
+
+        // Override Object
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -83,11 +91,17 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
             return false;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int hashCode() {
             return getKey().hashCode();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return name;
@@ -232,14 +246,5 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "audioMixerOption".
-     */
-    public static String getTagName() {
-        return "audioMixerOption";
-    }
+    public String getXMLTagName() { return TAG; }
 }

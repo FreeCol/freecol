@@ -43,6 +43,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(GoodsContainer.class.getName());
 
+    public static final String TAG = "goodsContainer";
+
     /** The size of a standard `hold' of data. */
     public static final int CARGO_SIZE = 100;
 
@@ -524,7 +526,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
         for (GoodsType goodsType : sort(storage.keySet())) {
             
-            xw.writeStartElement(Goods.getTagName());
+            xw.writeStartElement(Goods.TAG);
 
             xw.writeAttribute(TYPE_TAG, goodsType);
 
@@ -584,7 +586,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
 
-            if (Goods.getTagName().equals(tag)) {
+            if (Goods.TAG.equals(tag)) {
                 GoodsType goodsType = xr.getType(spec, TYPE_TAG,
                     GoodsType.class, (GoodsType)null);
 
@@ -599,6 +601,14 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             xr.closeTag(tag);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
@@ -618,20 +628,5 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         sb.setLength(sb.length() - sep.length());
         sb.append("]]");
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "goodsContainer".
-     */
-    public static String getTagName() {
-        return "goodsContainer";
     }
 }

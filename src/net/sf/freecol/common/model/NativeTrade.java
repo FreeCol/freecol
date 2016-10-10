@@ -41,6 +41,8 @@ public class NativeTrade extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(NativeTrade.class.getName());
 
+    public static final String TAG = "nativeTrade";
+
     /** A template to use as a magic cookie for aborted trades. */
     private static final StringTemplate abortTrade
         = StringTemplate.template("");
@@ -425,7 +427,7 @@ public class NativeTrade extends FreeColGameObject {
         if (SETTLEMENT_TO_UNIT_TAG.equals(tag)) {
             while (xr.moreTags()) {
                 tag = xr.getLocalName();
-                if (NativeTradeItem.getTagName().equals(tag)) {
+                if (NativeTradeItem.TAG.equals(tag)) {
                     NativeTradeItem nti = new NativeTradeItem(game, xr);
                     if (nti != null) this.settlementToUnit.add(nti);
                 } else {
@@ -436,7 +438,7 @@ public class NativeTrade extends FreeColGameObject {
         } else if (UNIT_TO_SETTLEMENT_TAG.equals(tag)) {
             while (xr.moreTags()) {
                 tag = xr.getLocalName();
-                if (NativeTradeItem.getTagName().equals(tag)) {
+                if (NativeTradeItem.TAG.equals(tag)) {
                     NativeTradeItem nti = new NativeTradeItem(game, xr);
                     if (nti != null) this.unitToSettlement.add(nti);
                 } else {
@@ -444,7 +446,7 @@ public class NativeTrade extends FreeColGameObject {
                 }
             }
 
-        } else if (NativeTradeItem.getTagName().equals(tag)) {
+        } else if (NativeTradeItem.TAG.equals(tag)) {
             this.item = new NativeTradeItem(game, xr);
 
         } else {
@@ -455,11 +457,19 @@ public class NativeTrade extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         NativeTradeItem item = getItem();
-        sb.append('[').append(getTagName())
+        sb.append('[').append(TAG)
             .append(' ').append(getUnit().getId())
             .append(' ').append(getIndianSettlement().getId())
             .append(" buy=").append(getBuy())
@@ -476,20 +486,5 @@ public class NativeTrade extends FreeColGameObject {
             sb.append(' ').append(nti.toString());
         }
         return sb.append(" ]]").toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "nativeTrade".
-     */
-    public static String getTagName() {
-        return "nativeTrade";
     }
 }

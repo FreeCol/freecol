@@ -41,6 +41,8 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     private static final Logger logger = Logger.getLogger(UnitTypeOption.class
             .getName());
 
+    public static final String TAG = "unitTypeOption";
+    
     /**
      * FIXME: replace with Predicates.
      */
@@ -297,6 +299,14 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -306,20 +316,5 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
             .append(" selector=").append(selector)
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "unitTypeOption".
-     */
-    public static String getTagName() {
-        return "unitTypeOption";
     }
 }

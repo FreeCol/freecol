@@ -38,6 +38,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class ImprovementMission extends AbstractMission {
 
+    public static final String TAG = "improvementMission";
+
     /**
      * The improvement of this Mission.
      */
@@ -167,17 +169,5 @@ public class ImprovementMission extends AbstractMission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "improvementMission"
-     */
-    public static String getTagName() {
-        return "improvementMission";
-    }
-
-
-
+    public String getXMLTagName() { return TAG; }
 }

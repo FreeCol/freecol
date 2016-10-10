@@ -45,6 +45,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
     private static final Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
+    public static final String TAG = "optionGroup";
+
     /** The options in this group. */
     private final List<Option> options = new ArrayList<>();
 
@@ -745,6 +747,14 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -754,20 +764,5 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
         sb.append(" >]");
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "optionGroup".
-     */
-    public static String getTagName() {
-        return "optionGroup";
     }
 }

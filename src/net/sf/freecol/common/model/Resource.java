@@ -38,6 +38,8 @@ public class Resource extends TileItem {
 
     private static final Logger logger = Logger.getLogger(Resource.class.getName());
 
+    public static final String TAG = "resource";
+
     /** Some resources are unlimited. */
     private static final int UNLIMITED = -1;
 
@@ -315,24 +317,17 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String toString() {
-        return (quantity == UNLIMITED) ? getType().getId()
-            : Integer.toString(quantity) + " " + getType().getId();
-    }
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "resource".
-     */
-    public static String getTagName() {
-        return "resource";
+    public String toString() {
+        return (quantity == UNLIMITED) ? getType().getId()
+            : Integer.toString(quantity) + " " + getType().getId();
     }
 }

@@ -55,6 +55,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
+    public static final String TAG = "tile";
+
     /** Comparator to sort tiles by increasing distance from the edge. */
     public static final Comparator<Tile> edgeDistanceComparator
         = Comparator.comparingInt(Tile::getEdgeDistance);
@@ -2521,7 +2523,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     // Do not call toXML!  It will look for a cached tile,
                     // inside t which is already a cached copy!
                     try {
-                        t.internalToXML(xw, getTagName());
+                        t.internalToXML(xw, TAG);
                     } finally {
                         xw.setWriteScope(scope);
                     }
@@ -2648,7 +2650,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 FreeColXMLReader.ReadScope scope = xr.getReadScope();
                 xr.setReadScope(FreeColXMLReader.ReadScope.NOINTERN);
                 xr.nextTag();
-                xr.expectTag(Tile.getTagName());
+                xr.expectTag(Tile.TAG);
                 Tile tile = xr.readFreeColGameObject(game, Tile.class);
 
                 // Temporary workaround for BR#2618 on input
@@ -2684,14 +2686,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         // end @compat
 
-        } else if (Colony.getTagName().equals(tag)) {
+        } else if (Colony.TAG.equals(tag)) {
             settlement = xr.readFreeColGameObject(game, Colony.class);
 
-        } else if (IndianSettlement.getTagName().equals(tag)) {
+        } else if (IndianSettlement.TAG.equals(tag)) {
             settlement = xr.readFreeColGameObject(game, IndianSettlement.class);
 
         // @compat 0.10.7
-        } else if (PlayerExploredTile.getTagName().equals(tag)) {
+        } else if (PlayerExploredTile.TAG.equals(tag)) {
             // Only from a saved game.
             Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
                 Player.class, (Player)null, true);
@@ -2716,7 +2718,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             pet.fixCache();
         // end @compat 0.10.7
 
-        } else if (TileItemContainer.getTagName().equals(tag)
+        } else if (TileItemContainer.TAG.equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_ITEM_CONTAINER_TAG.equals(tag)
                    // end @compat 0.11.3
@@ -2742,6 +2744,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -2751,20 +2761,5 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             .append((!hasSettlement()) ? "" : " " + getSettlement().getName())
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "tile".
-     */
-    public static String getTagName() {
-        return "tile";
     }
 }

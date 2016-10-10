@@ -33,10 +33,12 @@ import net.sf.freecol.common.util.Utils;
  */
 public class StanceTradeItem extends TradeItem {
     
+    public static final String TAG = "stanceTradeItem";
+
     /** The stance between source and destination. */
     private Stance stance;
 
-        
+    
     /**
      * Creates a new {@code StanceTradeItem} instance.
      *
@@ -132,6 +134,37 @@ public class StanceTradeItem extends TradeItem {
     }
 
 
+    // Serialization
+
+    private static final String STANCE_TAG = "stance";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        xw.writeAttribute(STANCE_TAG, stance);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
+        stance = xr.getAttribute(STANCE_TAG, Stance.class, (Stance)null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
     // Override Object
 
     /**
@@ -155,22 +188,6 @@ public class StanceTradeItem extends TradeItem {
         return 37 * hash + Utils.hashCode(this.stance);
     }
 
-
-    // Serialization
-
-    private static final String STANCE_TAG = "stance";
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeAttributes(xw);
-
-        xw.writeAttribute(STANCE_TAG, stance);
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -180,30 +197,5 @@ public class StanceTradeItem extends TradeItem {
         sb.append('[').append(getId())
             .append(' ').append(stance).append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        super.readAttributes(xr);
-
-        stance = xr.getAttribute(STANCE_TAG, Stance.class, (Stance)null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "stanceTradeItem".
-     */
-    public static String getTagName() {
-        return "stanceTradeItem";
     }
 }

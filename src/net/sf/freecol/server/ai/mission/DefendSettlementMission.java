@@ -50,6 +50,8 @@ public class DefendSettlementMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
 
+    public static final String TAG = "defendSettlementMission";
+
     /** The tag for this mission. */
     private final String tag = "AI defender";
 
@@ -450,14 +452,5 @@ public class DefendSettlementMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "defendSettlementMission".
-     */
-    public static String getTagName() {
-        return "defendSettlementMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

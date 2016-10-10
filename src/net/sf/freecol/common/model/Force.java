@@ -41,6 +41,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class Force extends FreeColSpecObject {
 
+    public static final String TAG = "force";
+
     /** The number of land units in the REF. */
     private final List<AbstractUnit> landUnits = new ArrayList<>();
 
@@ -305,15 +307,5 @@ public class Force extends FreeColSpecObject {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "force".
-     */
-    public static String getTagName() {
-        return "force";
-    }
+    public String getXMLTagName() { return TAG; }
 }

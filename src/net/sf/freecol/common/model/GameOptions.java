@@ -27,6 +27,8 @@ package net.sf.freecol.common.model;
  */
 public class GameOptions {
 
+    public static final String TAG = "gameOptions";
+
     /** Map game option group. */
     public static final String GAMEOPTIONS_MAP
         = "gameOptions.map";
@@ -512,12 +514,10 @@ public class GameOptions {
         = "model.option.transportNavalUnitCheat";
 
 
+    // Serialization
+
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "gameOptions".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "gameOptions";
-    }
+    public String getXMLTagName() { return TAG; }
 }

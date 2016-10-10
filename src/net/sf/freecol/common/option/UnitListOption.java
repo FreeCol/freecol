@@ -29,6 +29,8 @@ import net.sf.freecol.common.model.Specification;
  */
 public class UnitListOption extends ListOption<AbstractUnit> {
 
+    public static final String TAG = "unitListOption";
+
     /**
      * Creates a new {@code UnitListOption}.
      *
@@ -64,15 +66,5 @@ public class UnitListOption extends ListOption<AbstractUnit> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "unitListOption".
-     */
-    public static String getTagName() {
-        return "unitListOption";
-    }
+    public String getXMLTagName() { return TAG; }
 }

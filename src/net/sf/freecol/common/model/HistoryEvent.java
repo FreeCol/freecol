@@ -34,6 +34,8 @@ import static net.sf.freecol.common.util.StringUtils.*;
  */
 public class HistoryEvent extends StringTemplate {
 
+    public static final String TAG = "historyEvent";
+
     public static enum HistoryEventType implements Named {
         DISCOVER_NEW_WORLD,
         DISCOVER_REGION,
@@ -202,37 +204,6 @@ public class HistoryEvent extends StringTemplate {
     }
 
 
-    // Interface Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof HistoryEvent) {
-            HistoryEvent h = (HistoryEvent)o;
-            return turn == h.turn && eventType == h.eventType
-                && Utils.equals(playerId, h.playerId)
-                && score == h.score;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 31 * hash + this.turn.hashCode();
-        hash = 31 * hash + this.eventType.ordinal();
-        if (this.playerId != null) hash = 31 * hash + this.playerId.hashCode();
-        hash = 31 * hash + this.score;
-        return hash;
-    }
-    
-
     // Serialization
 
     private static final String EVENT_TYPE_TAG = "eventType";
@@ -277,6 +248,42 @@ public class HistoryEvent extends StringTemplate {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof HistoryEvent) {
+            HistoryEvent h = (HistoryEvent)o;
+            return turn == h.turn && eventType == h.eventType
+                && Utils.equals(playerId, h.playerId)
+                && score == h.score;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + this.turn.hashCode();
+        hash = 31 * hash + this.eventType.ordinal();
+        if (this.playerId != null) hash = 31 * hash + this.playerId.hashCode();
+        hash = 31 * hash + this.score;
+        return hash;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -289,20 +296,5 @@ public class HistoryEvent extends StringTemplate {
         }
         sb.append(' ').append(super.toString()).append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "historyEvent".
-     */
-    public static String getTagName() {
-        return "historyEvent";
     }
 }

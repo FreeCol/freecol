@@ -33,10 +33,12 @@ import net.sf.freecol.common.util.Utils;
  */
 public class InciteTradeItem extends TradeItem {
     
+    public static final String TAG = "inciteTradeItem";
+
     /** The victim player. */
     private Player victim;
 
-
+    
     /**
      * Creates a new {@code InciteTradeItem} inincite.
      *
@@ -119,30 +121,6 @@ public class InciteTradeItem extends TradeItem {
     }
     
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof InciteTradeItem) {
-            return Utils.equals(this.victim, ((InciteTradeItem)other).victim)
-                && super.equals(other);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        return 37 * hash + Utils.hashCode(this.victim);
-    }
-
-
     // Serialization
 
     private static final String VICTIM_TAG = "victim";
@@ -172,26 +150,40 @@ public class InciteTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append('[').append(getId())
-            .append(' ').append(this.victim.getId()).append(']');
-        return sb.toString();
+    public boolean equals(Object other) {
+        if (other instanceof InciteTradeItem) {
+            return Utils.equals(this.victim, ((InciteTradeItem)other).victim)
+                && super.equals(other);
+        }
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + Utils.hashCode(this.victim);
+    }
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "inciteTradeItem".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "inciteTradeItem";
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(16);
+        sb.append('[').append(getId())
+            .append(' ').append(this.victim.getId()).append(']');
+        return sb.toString();
     }
 }

@@ -32,6 +32,8 @@ import net.sf.freecol.common.util.Utils;
  */
 public class ColonyTradeItem extends TradeItem {
 
+    public static final String TAG = "colonyTradeItem";
+
     /** The identifier of the colony to change hands. */
     private String colonyId;
 
@@ -124,32 +126,6 @@ public class ColonyTradeItem extends TradeItem {
     }
     
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof ColonyTradeItem) {
-            return Utils.equals(this.colonyId, ((ColonyTradeItem)other).colonyId)
-                && Utils.equals(this.colonyName, ((ColonyTradeItem)other).colonyName)
-                && super.equals(other);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.colonyId);
-        return 37 * hash + Utils.hashCode(this.colonyName);
-    }
-
-
     // Serialization
 
     private static final String COLONY_TAG = "colony";
@@ -183,26 +159,42 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append('[').append(getId())
-            .append(' ').append(colonyName).append(']');
-        return sb.toString();
+    public boolean equals(Object other) {
+        if (other instanceof ColonyTradeItem) {
+            return Utils.equals(this.colonyId, ((ColonyTradeItem)other).colonyId)
+                && Utils.equals(this.colonyName, ((ColonyTradeItem)other).colonyName)
+                && super.equals(other);
+        }
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.colonyId);
+        return 37 * hash + Utils.hashCode(this.colonyName);
+    }
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "colonyTradeItem".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "colonyTradeItem";
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(16);
+        sb.append('[').append(getId())
+            .append(' ').append(colonyName).append(']');
+        return sb.toString();
     }
 }

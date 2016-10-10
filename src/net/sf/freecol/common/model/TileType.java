@@ -38,6 +38,8 @@ import net.sf.freecol.common.util.RandomChoice;
 public final class TileType extends FreeColSpecObjectType
                             implements BaseProduction {
 
+    public static final String TAG = "tile-type";
+
     public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE };
 
     /**
@@ -612,12 +614,12 @@ public final class TileType extends FreeColSpecObjectType
                             xr.getAttribute(PROBABILITY_TAG, 100));
             xr.closeTag(RESOURCE_TAG);
 
-        } else if (Modifier.getTagName().equals(tag)) {
+        } else if (Modifier.TAG.equals(tag)) {
             // @compat 0.10.7
             // the tile type no longer contains the base production modifier
             String id = xr.getAttribute(ID_ATTRIBUTE_TAG, null);
             if (id.startsWith("model.goods.")) {
-                xr.closeTag(Modifier.getTagName());
+                xr.closeTag(Modifier.TAG);
             } else {
                 super.readChild(xr);
             }
@@ -630,15 +632,5 @@ public final class TileType extends FreeColSpecObjectType
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "tile-type".
-     */
-    public static String getTagName() {
-        return "tile-type";
-    }
+    public String getXMLTagName() { return TAG; }
 }

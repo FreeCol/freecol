@@ -33,6 +33,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public final class ResourceType extends FreeColSpecObjectType {
 
+    public static final String TAG = "resource-type";
+
     /** Maximum and minimum values for this resource type. */
     private int maxValue, minValue;
 
@@ -115,15 +117,5 @@ public final class ResourceType extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "resource-type".
-     */
-    public static String getTagName() {
-        return "resource-type";
-    }
+    public String getXMLTagName() { return TAG; }
 }

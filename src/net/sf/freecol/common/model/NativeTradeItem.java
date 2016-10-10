@@ -35,6 +35,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class NativeTradeItem extends GoodsTradeItem {
 
+    public static final String TAG = "nativeTradeItem";
+
     /** Magic number to denote that the price has not been initialized. */
     public static final int PRICE_UNSET = 0;
     
@@ -144,32 +146,6 @@ public class NativeTradeItem extends GoodsTradeItem {
     // Interface TradeItem
     // All provided by superclass
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof NativeTradeItem) {
-            return this.price == ((NativeTradeItem)other).price
-                && this.haggleCount == ((NativeTradeItem)other).haggleCount
-                && super.equals((NativeTradeItem)other);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + this.price;
-        return 37 * hash + this.haggleCount;
-    }
-
-
     // Serialization
 
     private static final String HAGGLE_COUNT_TAG = "haggleCount";
@@ -203,6 +179,37 @@ public class NativeTradeItem extends GoodsTradeItem {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof NativeTradeItem) {
+            return this.price == ((NativeTradeItem)other).price
+                && this.haggleCount == ((NativeTradeItem)other).haggleCount
+                && super.equals((NativeTradeItem)other);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + this.price;
+        return 37 * hash + this.haggleCount;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -212,20 +219,5 @@ public class NativeTradeItem extends GoodsTradeItem {
             .append(' ').append(price).append(' ').append(haggleCount)
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "nativeTradeItem".
-     */
-    public static String getTagName() {
-        return "nativeTradeItem";
     }
 }

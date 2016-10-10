@@ -36,6 +36,8 @@ import net.sf.freecol.common.model.Operand.OperandType;
  */
 public final class Limit extends FreeColSpecObjectType {
 
+    public static final String TAG = "limit";
+
     /** The basic operation used in evaluating this limit. */
     public static enum Operator {
         EQ, LT, GT, LE, GE
@@ -361,26 +363,19 @@ public final class Limit extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append(leftHandSide).append(' ').append(operator)
             .append(' ').append(rightHandSide);
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name for the object.
-     *
-     * @return "limit".
-     */
-    public static String getTagName() {
-        return "limit";
     }
 }

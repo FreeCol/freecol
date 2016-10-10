@@ -838,11 +838,11 @@ public abstract class Settlement extends GoodsLocation
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (Ability.getTagName().equals(tag)) {
+        if (Ability.TAG.equals(tag)) {
             Ability ability = new Ability(xr, spec);
             if (ability.isIndependent()) addAbility(ability);
 
-        } else if (Modifier.getTagName().equals(tag)) {
+        } else if (Modifier.TAG.equals(tag)) {
             Modifier modifier = new Modifier(xr, spec);
             if (modifier.isIndependent()) addModifier(modifier);
 
@@ -850,4 +850,6 @@ public abstract class Settlement extends GoodsLocation
             super.readChild(xr);
         }
     }
+
+    // getXMLTagName left to subclasses
 }

@@ -70,6 +70,8 @@ public final class Specification {
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
+    public static final String TAG = "freecol-specification";
+
     /** The difficulty levels option group is special. */
     public static final String DIFFICULTY_LEVELS = "difficultyLevels";
 
@@ -88,9 +90,7 @@ public final class Specification {
 
     /** The option groups to save. */
     private static final String[] coreOptionGroups = {
-        GameOptions.getTagName(),
-        MapGeneratorOptions.getTagName(),
-        DIFFICULTY_LEVELS
+        GameOptions.TAG, MapGeneratorOptions.TAG, DIFFICULTY_LEVELS
     };
 
 
@@ -117,15 +117,18 @@ public final class Specification {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
-            return getId();
-        }
+        public String getXMLTagName() { return "source"; }
+
+
+        // Override Object
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public String getXMLTagName() { return "source"; }
+        public String toString() {
+            return getId();
+        }
     };
 
     public static final Source AMBUSH_BONUS_SOURCE
@@ -660,11 +663,7 @@ public final class Specification {
      * Disable editing of some critical option groups.
      */
     public void disableEditing() {
-        for (String s : new String[] {
-                GameOptions.getTagName(),
-                MapGeneratorOptions.getTagName(),
-                DIFFICULTY_LEVELS
-            }) {
+        for (String s : coreOptionGroups) {
             OptionGroup og = allOptionGroups.get(s);
             if (og != null) og.setEditable(false);
         }
@@ -850,7 +849,7 @@ public final class Specification {
 
             boolean recursive = xr.getAttribute(RECURSIVE_TAG, true);
 
-            if (OptionGroup.getTagName().equals(tag)) {
+            if (OptionGroup.TAG.equals(tag)) {
                 String id = xr.readId();
                 OptionGroup group = allOptionGroups.get(id);
                 if (group == null) {
@@ -861,8 +860,7 @@ public final class Specification {
                 Specification.this.addOptionGroup(group, recursive);
 
             } else {
-                logger.warning(OptionGroup.getTagName()
-                    + " expected in OptionReader, not: " + tag);
+                logger.warning(OptionGroup.TAG + " expected in OptionReader, not: " + tag);
                 xr.nextTag();
             }
         }
@@ -1834,20 +1832,20 @@ public final class Specification {
     }
 
     public OptionGroup getGameOptions() {
-        return getOptionGroup(GameOptions.getTagName());
+        return getOptionGroup(GameOptions.TAG);
     }
 
     public void setGameOptions(OptionGroup go) {
-        allOptionGroups.put(GameOptions.getTagName(), go);
+        allOptionGroups.put(GameOptions.TAG, go);
         addOptionGroup(go, true);
     }
 
     public OptionGroup getMapGeneratorOptions() {
-        return getOptionGroup(MapGeneratorOptions.getTagName());
+        return getOptionGroup(MapGeneratorOptions.TAG);
     }
 
     public void setMapGeneratorOptions(OptionGroup mgo) {
-        allOptionGroups.put(MapGeneratorOptions.getTagName(), mgo);
+        allOptionGroups.put(MapGeneratorOptions.TAG, mgo);
         addOptionGroup(mgo, true);
     }
 
@@ -2908,7 +2906,7 @@ public final class Specification {
      *      to the stream.
      */
     protected void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getTagName());
+        xw.writeStartElement(TAG);
 
         // Add attributes
         xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
@@ -3038,11 +3036,7 @@ public final class Specification {
     }
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "freecol-specification".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "freecol-specification";
-    }
+    public String getXMLTagName() { return TAG; }
 }

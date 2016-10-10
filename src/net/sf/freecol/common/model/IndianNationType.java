@@ -39,6 +39,8 @@ import net.sf.freecol.common.util.RandomChoice;
  */
 public class IndianNationType extends NationType {
 
+    public static final String TAG = "indian-nation-type";
+
     /** Stores the ids of the skills taught by this Nation. */
     private List<RandomChoice<UnitType>> skills = null;
 
@@ -229,7 +231,7 @@ public class IndianNationType extends NationType {
         }
 
         for (String region : getRegionNames()) {
-            xw.writeStartElement(Region.getTagName());
+            xw.writeStartElement(Region.TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, region);
 
@@ -280,9 +282,9 @@ public class IndianNationType extends NationType {
                      xr.getAttribute(PROBABILITY_TAG, 0));
             xr.closeTag(SKILL_TAG);
 
-        } else if (Region.getTagName().equals(tag)) {
+        } else if (Region.TAG.equals(tag)) {
             addRegion(xr.readId());
-            xr.closeTag(Region.getTagName());
+            xr.closeTag(Region.TAG);
 
         } else {
             super.readChild(xr);
@@ -292,15 +294,5 @@ public class IndianNationType extends NationType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "indian-nation-type".
-     */
-    public static String getTagName() {
-        return "indian-nation-type";
-    }
+    public String getXMLTagName() { return TAG; }
 }

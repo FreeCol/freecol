@@ -73,8 +73,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(AIColony.class.getName());
 
-    private static final String LIST_ELEMENT = "ListElement";
+    public static final String TAG = "aiColony";
 
+    private static final String LIST_ELEMENT = "ListElement";
+    
     /**
      * Do not perform tile improvements that would leave less than
      * this amount of forested work locations available to the colony.
@@ -1390,20 +1392,20 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     // Serialization
 
     private static final String AI_GOODS_LIST_TAG
-        = AIGoods.getTagName() + LIST_ELEMENT;
+        = AIGoods.TAG + LIST_ELEMENT;
     private static final String GOODS_WISH_LIST_TAG
-        = GoodsWish.getTagName() + LIST_ELEMENT;
+        = GoodsWish.TAG + LIST_ELEMENT;
     private static final String TILE_IMPROVEMENT_PLAN_LIST_TAG
-        = TileImprovementPlan.getTagName() + LIST_ELEMENT;
+        = TileImprovementPlan.TAG + LIST_ELEMENT;
     private static final String WORKER_WISH_LIST_TAG
-        = WorkerWish.getTagName() + LIST_ELEMENT;
+        = WorkerWish.TAG + LIST_ELEMENT;
     // @compat 0.10.3
     private static final String OLD_GOODS_WISH_TAG
-        = GoodsWish.getTagName() + "Wish" + LIST_ELEMENT;
+        = GoodsWish.TAG + "Wish" + LIST_ELEMENT;
     private static final String OLD_TILE_IMPROVEMENT_PLAN_LIST_TAG
         = "tileimprovementplan" + LIST_ELEMENT;
     private static final String OLD_WORKER_WISH_TAG
-        = WorkerWish.getTagName() + "Wish" + LIST_ELEMENT;
+        = WorkerWish.TAG + "Wish" + LIST_ELEMENT;
     // end @compat
 
 
@@ -1526,14 +1528,5 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "aiColony"
-     */
-    public static String getTagName() {
-        return "aiColony";
-    }
+    public String getXMLTagName() { return TAG; }
 }

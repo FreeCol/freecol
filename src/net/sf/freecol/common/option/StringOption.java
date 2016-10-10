@@ -40,6 +40,8 @@ public class StringOption extends AbstractOption<String> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(StringOption.class.getName());
 
+    public static final String TAG = "stringOption";
+
     /** The value of this option. */
     private String value;
 
@@ -195,6 +197,14 @@ public class StringOption extends AbstractOption<String> {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -206,20 +216,5 @@ public class StringOption extends AbstractOption<String> {
         }
         sb.append("]]");
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "stringOption".
-     */
-    public static String getTagName() {
-        return "stringOption";
     }
 }

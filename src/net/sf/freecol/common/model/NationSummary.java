@@ -31,6 +31,8 @@ import net.sf.freecol.common.model.Stance;
  */
 public class NationSummary extends FreeColObject {
 
+    public static final String TAG = "nationSummary";
+
     /** The stance of the player toward the requesting player. */
     private Stance stance;
 
@@ -212,15 +214,5 @@ public class NationSummary extends FreeColObject {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "nationSummary"
-     */
-    public static String getTagName() {
-        return "nationSummary";
-    }
+    public String getXMLTagName() { return TAG; }
 }

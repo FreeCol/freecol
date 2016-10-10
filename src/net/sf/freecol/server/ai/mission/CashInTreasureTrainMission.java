@@ -53,6 +53,8 @@ public class CashInTreasureTrainMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(CashInTreasureTrainMission.class.getName());
 
+    public static final String TAG = "cashInTreasureTrainMission";
+
     /** The tag for this mission. */
     private static final String tag = "AI treasureTrain";
 
@@ -482,14 +484,5 @@ public class CashInTreasureTrainMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "cashInTreasureTrainMission".
-     */
-    public static String getTagName() {
-        return "cashInTreasureTrainMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

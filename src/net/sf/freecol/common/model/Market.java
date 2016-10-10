@@ -42,6 +42,8 @@ public final class Market extends FreeColGameObject implements Ownable {
 
     private static final Logger logger = Logger.getLogger(Market.class.getName());
 
+    public static final String TAG = "market";
+
     /**
      * European markets are bottomless.  Goods present never decrease
      * below this threshold.
@@ -550,7 +552,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (MarketData.getTagName().equals(tag)) {
+        if (MarketData.TAG.equals(tag)) {
             MarketData data = xr.readFreeColGameObject(getGame(), 
                                                        MarketData.class);
             putMarketData(data.getGoodsType(), data);
@@ -559,6 +561,14 @@ public final class Market extends FreeColGameObject implements Ownable {
             super.readChild(xr);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
@@ -573,20 +583,5 @@ public final class Market extends FreeColGameObject implements Ownable {
         }
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "market".
-     */
-    public static String getTagName() {
-        return "market";
     }
 }

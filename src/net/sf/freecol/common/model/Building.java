@@ -42,6 +42,8 @@ public class Building extends WorkLocation
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Building.class.getName());
 
+    public static final String TAG = "building";
+    
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
     /** The type of building. */
@@ -687,6 +689,14 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -696,20 +706,5 @@ public class Building extends WorkLocation
             .append('/').append(getColony().getName())
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "building".
-     */
-    public static String getTagName() {
-        return "building";
     }
 }

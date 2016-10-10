@@ -31,10 +31,12 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public class ExportData extends FreeColObject {
 
+    public static final String TAG = "exportData";
+
     private static final int HIGH_LEVEL_DEFAULT = 90;
     private static final int LOW_LEVEL_DEFAULT = 10;
     private static final int EXPORT_LEVEL_DEFAULT = 50;
-
+    
     /** The high water mark for the goods type. */
     private int highLevel = HIGH_LEVEL_DEFAULT;
 
@@ -240,15 +242,5 @@ public class ExportData extends FreeColObject {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "exportData".
-     */
-    public static String getTagName() {
-        return "exportData";
-    }
+    public String getXMLTagName() { return TAG; }
 }

@@ -38,6 +38,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public class Effect extends FreeColSpecObjectType {
 
+    public static final String TAG = "effect";
+
     public static final String DAMAGED_UNIT
         = "model.disaster.effect.damagedUnit";
     public static final String LOSS_OF_UNIT
@@ -126,6 +128,14 @@ public class Effect extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -134,20 +144,5 @@ public class Effect extends FreeColSpecObjectType {
         for (Scope scope : getScopeList()) sb.append(' ').append(scope);
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name for the object.
-     *
-     * @return "effect".
-     */
-    public static String getTagName() {
-        return "effect";
     }
 }

@@ -39,8 +39,10 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
     private static final Logger logger = Logger.getLogger(AbstractUnitOption.class.getName());
 
-    private static final TypeSelector DEFAULT_SELECTOR = TypeSelector.UNITS;
+    public static final String TAG = "unitOption";
 
+    private static final TypeSelector DEFAULT_SELECTOR = TypeSelector.UNITS;
+    
     /** The value of this option. */
     private AbstractUnit value = null;
 
@@ -263,25 +265,19 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(16);
-        sb.append('[').append(getId())
-            .append(' ').append(value).append(']');
-        return sb.toString();
-    }
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "unitOption".
-     */
-    public static String getTagName() {
-        return "unitOption";
+    public String toString() {
+        StringBuilder sb = new StringBuilder(16);
+        sb.append('[').append(getId())
+            .append(' ').append(value).append(']');
+        return sb.toString();
     }
 }

@@ -59,6 +59,8 @@ public class IndianDemandMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianDemandMission.class.getName());
 
+    public static final String TAG = "indianDemandMission";
+
     /** The minimum amount of goods to demand. */
     private static final int GOODS_DEMAND_MIN = 30;
     
@@ -485,14 +487,5 @@ public class IndianDemandMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "indianDemandMission".
-     */
-    public static String getTagName() {
-        return "indianDemandMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

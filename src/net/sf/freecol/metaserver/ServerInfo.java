@@ -26,10 +26,11 @@ package net.sf.freecol.metaserver;
  */
 public class ServerInfo {
 
+    public static final String TAG = "serverInfo";
+
     private String name;
     private String address;
     private int port;
-
     private int currentlyPlaying;
     private int slotsAvailable;
     private boolean isGameStarted;
@@ -181,16 +182,6 @@ public class ServerInfo {
         update(si.getName(), si.getAddress(), si.getPort(),
                si.getSlotsAvailable(), si.getCurrentlyPlaying(),
                si.getIsGameStarted(), si.getVersion(), si.getGameState());
-    }
-
-
-   /**
-     * Gets the tag name of the object.
-     *
-     * @return "serverInfo".
-     */
-    public static String getTagName() {
-        return "serverInfo";
     }
 
 

@@ -37,6 +37,8 @@ public class HighSeas extends UnitLocation {
 
     private static final Logger logger =  Logger.getLogger(HighSeas.class.getName());
 
+    public static final String TAG = "highSeas";
+
     /** The destinations this HighSeas object connects. */
     private final List<Location> destinations = new ArrayList<>();
 
@@ -227,23 +229,16 @@ public class HighSeas extends UnitLocation {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String toString() {
-        return getId();
-    }
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "highSeas"
-     */
-    public static String getTagName() {
-        return "highSeas";
+    public String toString() {
+        return getId();
     }
 }

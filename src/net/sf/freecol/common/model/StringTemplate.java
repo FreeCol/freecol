@@ -47,6 +47,8 @@ import net.sf.freecol.common.util.Utils;
 
 public class StringTemplate extends FreeColObject {
 
+    public static final String TAG = "stringTemplate";
+
     /**
      * The type of this StringTemplate, either NAME, a proper name
      * that must not be localized (e.g. "George Washington"), or KEY,
@@ -461,79 +463,6 @@ public class StringTemplate extends FreeColObject {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof StringTemplate) {
-            StringTemplate t = (StringTemplate)o;
-            if (!super.equals(o)
-                || this.templateType != t.templateType
-                || !Utils.equals(this.defaultId, t.defaultId)) return false;
-            switch (this.templateType) {
-            case TEMPLATE:
-                if ((this.keys == null) != (t.keys == null))
-                    return false;
-                if (this.keys != null) {
-                    if (this.keys.size() != t.keys.size()
-                        || this.keys.size() != this.replacements.size())
-                        return false;
-                    for (int i = 0; i < this.keys.size(); i++) {
-                        if (!this.keys.get(i)
-                            .equals(t.keys.get(i))) return false;
-                    }
-                }
-                // Fall through
-            case LABEL:
-                if ((this.replacements == null) != (t.replacements == null))
-                    return false;
-                if (this.replacements != null) {
-                    if (this.replacements.size() != t.replacements.size())
-                        return false;
-                    for (int i = 0; i < this.replacements.size(); i++) {
-                        if (!this.replacements.get(i)
-                            .equals(t.replacements.get(i))) return false;
-                    }
-                }
-                break;
-            default:
-                break;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 31 * hash + this.templateType.ordinal();
-        hash = 31 * hash + Utils.hashCode(this.defaultId);
-        switch (this.templateType) {
-        case TEMPLATE:
-            for (String key : getKeys()) {
-                hash = 31 * hash + Utils.hashCode(key);
-            }
-            // Fall through
-        case LABEL:
-            for (StringTemplate replacement : getReplacements()) {
-                hash = 31 * hash + Utils.hashCode(replacement);
-            }
-            break;
-        default:
-            break;
-        }
-        return hash;
-    }
-
-
     // Serialization
 
     private static final String DEFAULT_ID_TAG = "defaultId";
@@ -615,12 +544,90 @@ public class StringTemplate extends FreeColObject {
             addKey(xr.getAttribute(VALUE_TAG, (String)null));
             xr.closeTag(KEY_TAG);
 
-        } else if (StringTemplate.getTagName().equals(tag)) {
+        } else if (StringTemplate.TAG.equals(tag)) {
             addReplacement(new StringTemplate(xr));
         
         } else {
             super.readChild(xr);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof StringTemplate) {
+            StringTemplate t = (StringTemplate)o;
+            if (!super.equals(o)
+                || this.templateType != t.templateType
+                || !Utils.equals(this.defaultId, t.defaultId)) return false;
+            switch (this.templateType) {
+            case TEMPLATE:
+                if ((this.keys == null) != (t.keys == null))
+                    return false;
+                if (this.keys != null) {
+                    if (this.keys.size() != t.keys.size()
+                        || this.keys.size() != this.replacements.size())
+                        return false;
+                    for (int i = 0; i < this.keys.size(); i++) {
+                        if (!this.keys.get(i)
+                            .equals(t.keys.get(i))) return false;
+                    }
+                }
+                // Fall through
+            case LABEL:
+                if ((this.replacements == null) != (t.replacements == null))
+                    return false;
+                if (this.replacements != null) {
+                    if (this.replacements.size() != t.replacements.size())
+                        return false;
+                    for (int i = 0; i < this.replacements.size(); i++) {
+                        if (!this.replacements.get(i)
+                            .equals(t.replacements.get(i))) return false;
+                    }
+                }
+                break;
+            default:
+                break;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + this.templateType.ordinal();
+        hash = 31 * hash + Utils.hashCode(this.defaultId);
+        switch (this.templateType) {
+        case TEMPLATE:
+            for (String key : getKeys()) {
+                hash = 31 * hash + Utils.hashCode(key);
+            }
+            // Fall through
+        case LABEL:
+            for (StringTemplate replacement : getReplacements()) {
+                hash = 31 * hash + Utils.hashCode(replacement);
+            }
+            break;
+        default:
+            break;
+        }
+        return hash;
     }
 
     /**
@@ -666,20 +673,5 @@ public class StringTemplate extends FreeColObject {
             break;
         }
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "stringTemplate".
-     */
-    public static String getTagName() {
-        return "stringTemplate";
     }
 }

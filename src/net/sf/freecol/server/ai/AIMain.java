@@ -58,6 +58,8 @@ public class AIMain extends FreeColObject
 
     private static final Logger logger = Logger.getLogger(AIMain.class.getName());
 
+    public static final String TAG = "aiMain";
+
     /** The server that this AI is operating within. */
     private final FreeColServer freeColServer;
 
@@ -593,13 +595,13 @@ public class AIMain extends FreeColObject
                 new EuropeanAIPlayer(this, xr);
             // end @compat
 
-            } else if (AIColony.getTagName().equals(tag)) {
+            } else if (AIColony.TAG.equals(tag)) {
                 new AIColony(this, xr);
 
-            } else if (AIGoods.getTagName().equals(tag)) {
+            } else if (AIGoods.TAG.equals(tag)) {
                 new AIGoods(this, xr);
 
-            } else if (AIPlayer.getTagName().equals(tag)) {
+            } else if (AIPlayer.TAG.equals(tag)) {
                 Player p = getGame().getFreeColGameObject(oid, Player.class);
                 if (p != null) {
                     if (p.isIndian()) {
@@ -613,24 +615,24 @@ public class AIMain extends FreeColObject
                     }
                 }
 
-            } else if (AIUnit.getTagName().equals(tag)) {
+            } else if (AIUnit.TAG.equals(tag)) {
                 new AIUnit(this, xr);
 
-            } else if (GoodsWish.getTagName().equals(tag)
+            } else if (GoodsWish.TAG.equals(tag)
                 // @compat 0.10.3
                 || GOODS_WISH_TAG.equals(tag)
                 // end @compat
                        ) {
                 wish = new GoodsWish(this, xr);
 
-            } else if (TileImprovementPlan.getTagName().equals(tag)
+            } else if (TileImprovementPlan.TAG.equals(tag)
                 // @compat 0.10.3
                 || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
                 // end @compat
                        ) {
                 new TileImprovementPlan(this, xr);
 
-            } else if (WorkerWish.getTagName().equals(tag)) {
+            } else if (WorkerWish.TAG.equals(tag)) {
                 wish = new WorkerWish(this, xr);
             
             } else {
@@ -647,7 +649,7 @@ public class AIMain extends FreeColObject
                        + tag + ", id=" + oid, e);
             // We are hosed.  Try to resynchronize at the end of the tag
             // or aiMain.
-            final String mainTag = getTagName();
+            final String mainTag = TAG;
             while (xr.moreTags() || !(xr.atTag(tag) || xr.atTag(mainTag)));
         }
     }
@@ -655,15 +657,5 @@ public class AIMain extends FreeColObject
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "aiMain"
-     */
-    public static String getTagName() {
-        return "aiMain";
-    }
+    public String getXMLTagName() { return TAG; }
 }

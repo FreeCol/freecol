@@ -36,6 +36,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class UnitChangeType extends FreeColSpecObjectType {
 
+    public static final String TAG = "unit-change-type";
+
     /** Changes due to the unit being captured. */
     public static final String CAPTURE
         = "model.unitChange.capture";
@@ -134,6 +136,9 @@ public class UnitChangeType extends FreeColSpecObjectType {
         public boolean isAvailableTo(Player player) {
             return this.to.isAvailableTo(player);
         }
+
+
+        // Override Object
 
         /**
          * {@inheritDoc}
@@ -318,10 +323,18 @@ public class UnitChangeType extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append('[').append(getTagName()).append(' ').append(getSuffix())
+        sb.append('[').append(TAG).append(' ').append(getSuffix())
             .append(" ownerChange=").append(this.ownerChange);
         for (Map.Entry<UnitType, List<UnitChange>> entry
                  : this.changes.entrySet()) {
@@ -333,20 +346,5 @@ public class UnitChangeType extends FreeColSpecObjectType {
         }
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "unit-change-type".
-     */
-    public static final String getTagName() {
-        return "unit-change-type";
     }
 }

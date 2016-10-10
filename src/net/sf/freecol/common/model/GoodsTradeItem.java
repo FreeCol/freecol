@@ -32,10 +32,12 @@ import net.sf.freecol.common.util.Utils;
  */
 public class GoodsTradeItem extends TradeItem {
     
+    public static final String TAG = "goodsTradeItem";
+
     /** The goods to change hands. */
     protected Goods goods;
 
-
+    
     /**
      * Creates a new {@code GoodsTradeItem} instance.
      *
@@ -126,30 +128,6 @@ public class GoodsTradeItem extends TradeItem {
                 * (1.0 - player.getTax() / 100.0));
     }
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof GoodsTradeItem) {
-            return Utils.equals(this.goods, ((GoodsTradeItem)other).goods)
-                && super.equals(other);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        return 37 * hash + Utils.hashCode(this.goods);
-    }
-
-
     // Serialization
 
     /**
@@ -181,12 +159,41 @@ public class GoodsTradeItem extends TradeItem {
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
-        if (Goods.getTagName().equals(tag)) {
+        if (Goods.TAG.equals(tag)) {
             goods = new Goods(game, xr);
 
         } else {
             super.readChild(xr);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof GoodsTradeItem) {
+            return Utils.equals(this.goods, ((GoodsTradeItem)other).goods)
+                && super.equals(other);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + Utils.hashCode(this.goods);
     }
 
     /**
@@ -199,20 +206,5 @@ public class GoodsTradeItem extends TradeItem {
             .append(' ').append(goods.getAmount()).append(' ')
             .append(Messages.getName(goods)).append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "goodsTradeItem".
-     */
-    public static String getTagName() {
-        return "goodsTradeItem";
     }
 }

@@ -40,6 +40,8 @@ public class NationOptions extends FreeColSpecObject {
 
     private static final Logger logger = Logger.getLogger(NationOptions.class.getName());
 
+    public static final String TAG = "nationOptions";
+
     /** Type of national advantages for European players. */
     public static enum Advantages implements Named {
         NONE,
@@ -303,6 +305,14 @@ public class NationOptions extends FreeColSpecObject {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
@@ -312,20 +322,5 @@ public class NationOptions extends FreeColSpecObject {
             e -> sb.append(' ').append(e.getKey().getId())
                    .append(' ').append(e.getValue()).append('\n'));
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "nationOptions".
-     */
-    public static String getTagName() {
-        return "nationOptions";
     }
 }

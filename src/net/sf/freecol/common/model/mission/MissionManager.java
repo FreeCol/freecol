@@ -45,11 +45,11 @@ public class MissionManager {
 
     static {
         try {
-            missionMap.put(CompoundMission.getTagName(),
+            missionMap.put(CompoundMission.TAG,
                            CompoundMission.class.getConstructor(Game.class, FreeColXMLReader.class));
-            missionMap.put(GoToMission.getTagName(),
+            missionMap.put(GoToMission.TAG,
                            GoToMission.class.getConstructor(Game.class, FreeColXMLReader.class));
-            missionMap.put(ImprovementMission.getTagName(),
+            missionMap.put(ImprovementMission.TAG,
                            ImprovementMission.class.getConstructor(Game.class, FreeColXMLReader.class));
 
         } catch (NoSuchMethodException e) {

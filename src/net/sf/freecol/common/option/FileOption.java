@@ -36,6 +36,8 @@ public class FileOption extends AbstractOption<File> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FileOption.class.getName());
 
+    public static final String TAG = "fileOption";
+
     /** The value of this option. */
     private File value = null;
 
@@ -128,6 +130,14 @@ public class FileOption extends AbstractOption<File> {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -135,20 +145,5 @@ public class FileOption extends AbstractOption<File> {
             .append(" value=").append((value == null) ? "null":value.getName())
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "fileOption".
-     */
-    public static String getTagName() {
-        return "fileOption";
     }
 }

@@ -31,6 +31,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public final class LastSale extends FreeColObject {
 
+    public static final String TAG = "lastSale";
+
     /** When a sale was made. */
     private Turn when;
 
@@ -144,6 +146,14 @@ public final class LastSale extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -152,20 +162,5 @@ public final class LastSale extends FreeColObject {
             .append(" price=").append(price)
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "lastSale"
-     */
-    public static String getTagName() {
-        return "lastSale";
     }
 }

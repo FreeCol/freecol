@@ -50,6 +50,8 @@ public class PrivateerMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PrivateerMission.class.getName());
 
+    public static final String TAG = "privateerMission";
+
     /** The tag for this mission. */
     private static final String tag = "AI privateer";
 
@@ -474,14 +476,5 @@ public class PrivateerMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "privateerMission"
-     */
-    public static String getTagName() {
-        return "privateerMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

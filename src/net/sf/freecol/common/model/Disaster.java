@@ -36,6 +36,8 @@ import net.sf.freecol.common.util.RandomChoice;
  */
 public class Disaster extends FreeColSpecObjectType {
 
+    public static final String TAG = "disaster";
+
     /**
      * Bankruptcy occurs if upkeep is enabled and a player is unable
      * to pay for the maintenance of all buildings.
@@ -202,6 +204,14 @@ public class Disaster extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -211,20 +221,5 @@ public class Disaster extends FreeColSpecObjectType {
         }
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "disaster".
-     */
-    public static String getTagName() {
-        return "disaster";
     }
 }

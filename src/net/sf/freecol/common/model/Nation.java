@@ -40,6 +40,8 @@ import static net.sf.freecol.common.util.RandomUtils.*;
  */
 public class Nation extends FreeColSpecObjectType {
 
+    public static final String TAG = "nation";
+
     /** The unknown enemy id. */
     public static final String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
 
@@ -338,15 +340,5 @@ public class Nation extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "nation".
-     */
-    public static String getTagName() {
-        return "nation";
-    }
+    public String getXMLTagName() { return TAG; }
 }

@@ -33,6 +33,8 @@ import net.sf.freecol.common.util.Utils;
  */
 public class Scope extends FreeColObject {
 
+    public static final String TAG = "scope";
+
     /** 
      * The identifier of a {@code FreeColSpecObjectType}, or
      * {@code Option}.
@@ -230,74 +232,6 @@ public class Scope extends FreeColObject {
     // end @compat 0.10.7
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) return true;
-        if (o instanceof Scope) {
-            Scope otherScope = (Scope) o;
-            if (matchNegated != otherScope.matchNegated) {
-                return false;
-            }
-            if (matchesNull != otherScope.matchesNull) {
-                return false;
-            }
-            if (type == null) {
-                if (otherScope.getType() != type) {
-                    return false;
-                }
-            } else if (!type.equals(otherScope.getType())) {
-                return false;
-            }
-            if (abilityId == null) {
-                if (!Utils.equals(otherScope.getAbilityId(), abilityId)) {
-                    return false;
-                }
-            } else if (!abilityId.equals(otherScope.getAbilityId())) {
-                return false;
-            }
-            if (abilityValue != otherScope.getAbilityValue()) {
-                return false;
-            }
-            if (methodName == null) {
-                if (!Utils.equals(otherScope.getMethodName(), methodName)) {
-                    return false;
-                }
-            } else if (!methodName.equals(otherScope.getMethodName())) {
-                return false;
-            }
-            if (methodValue == null) {
-                if (!Utils.equals(otherScope.getMethodValue(), methodValue)) {
-                    return false;
-                }
-            } else if (!methodValue.equals(otherScope.getMethodValue())) {
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 31 * hash + (type == null ? 0 : type.hashCode());
-        hash = 31 * hash + (abilityId == null ? 0 : abilityId.hashCode());
-        hash = 31 * hash + (abilityValue ? 1 : 0);
-        hash = 31 * hash + (methodName == null ? 0 : methodName.hashCode());
-        hash = 31 * hash + (methodValue == null ? 0 : methodValue.hashCode());
-        hash = 31 * hash + (matchesNull ? 1 : 0);
-        return 31 * hash + (matchNegated ? 1 : 0);
-    }
-
-
     // Serialization
 
     private static final String ABILITY_ID_TAG = "ability-id";
@@ -390,6 +324,79 @@ public class Scope extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o instanceof Scope) {
+            Scope otherScope = (Scope) o;
+            if (matchNegated != otherScope.matchNegated) {
+                return false;
+            }
+            if (matchesNull != otherScope.matchesNull) {
+                return false;
+            }
+            if (type == null) {
+                if (otherScope.getType() != type) {
+                    return false;
+                }
+            } else if (!type.equals(otherScope.getType())) {
+                return false;
+            }
+            if (abilityId == null) {
+                if (!Utils.equals(otherScope.getAbilityId(), abilityId)) {
+                    return false;
+                }
+            } else if (!abilityId.equals(otherScope.getAbilityId())) {
+                return false;
+            }
+            if (abilityValue != otherScope.getAbilityValue()) {
+                return false;
+            }
+            if (methodName == null) {
+                if (!Utils.equals(otherScope.getMethodName(), methodName)) {
+                    return false;
+                }
+            } else if (!methodName.equals(otherScope.getMethodName())) {
+                return false;
+            }
+            if (methodValue == null) {
+                if (!Utils.equals(otherScope.getMethodValue(), methodValue)) {
+                    return false;
+                }
+            } else if (!methodValue.equals(otherScope.getMethodValue())) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + (type == null ? 0 : type.hashCode());
+        hash = 31 * hash + (abilityId == null ? 0 : abilityId.hashCode());
+        hash = 31 * hash + (abilityValue ? 1 : 0);
+        hash = 31 * hash + (methodName == null ? 0 : methodName.hashCode());
+        hash = 31 * hash + (methodValue == null ? 0 : methodValue.hashCode());
+        hash = 31 * hash + (matchesNull ? 1 : 0);
+        return 31 * hash + (matchNegated ? 1 : 0);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -404,20 +411,5 @@ public class Scope extends FreeColObject {
         if (matchNegated) sb.append(" match-negated");
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "scope".
-     */
-    public static String getTagName() {
-        return "scope";
     }
 }

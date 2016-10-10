@@ -45,6 +45,8 @@ public class EquipmentType extends BuildableType {
 
     public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];
 
+    public static final String TAG = "equipment-type";
+
     /** The maximum number of equipment items that can be combined. */
     private int maximumCount = 1;
 
@@ -191,47 +193,6 @@ public class EquipmentType extends BuildableType {
     }
 
     
-    
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int result = 1;
-        result = 37 * result
-            + ((compatibleEquipment == null) ? 0 : compatibleEquipment
-               .hashCode());
-        return 37 * result + ((getId() == null) ? 0 : getId().hashCode());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        EquipmentType other = (EquipmentType) obj;
-        if (compatibleEquipment == null) {
-            if (other.compatibleEquipment != null)
-                return false;
-        } else if (!compatibleEquipment.equals(other.compatibleEquipment))
-            return false;
-        if (getId() == null) {
-            if (other.getId() != null)
-                return false;
-        } else if (!getId().equals(other.getId()))
-            return false;
-        return true;
-    }
-
-
     // Serialization
 
     private static final String BY_INDIANS_TAG = "by-indians";
@@ -352,20 +313,49 @@ public class EquipmentType extends BuildableType {
             super.readChild(xr);
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        EquipmentType other = (EquipmentType) obj;
+        if (compatibleEquipment == null) {
+            if (other.compatibleEquipment != null)
+                return false;
+        } else if (!compatibleEquipment.equals(other.compatibleEquipment))
+            return false;
+        if (getId() == null) {
+            if (other.getId() != null)
+                return false;
+        } else if (!getId().equals(other.getId()))
+            return false;
+        return true;
+    }
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "equipment-type".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "equipment-type";
+    @Override
+    public int hashCode() {
+        int result = 1;
+        result = 37 * result
+            + ((compatibleEquipment == null) ? 0 : compatibleEquipment
+               .hashCode());
+        return 37 * result + ((getId() == null) ? 0 : getId().hashCode());
     }
 }

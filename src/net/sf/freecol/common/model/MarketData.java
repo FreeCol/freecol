@@ -35,6 +35,8 @@ public class MarketData extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(MarketData.class.getName());
 
+    public static final String TAG = "marketData";
+
     /** Inclusive lower bound on goods price. */
     public static final int MINIMUM_PRICE = 1;
 
@@ -457,6 +459,14 @@ public class MarketData extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
@@ -474,20 +484,5 @@ public class MarketData extends FreeColGameObject {
             .append(" traded=").append(traded)
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "marketData"
-     */
-    public static String getTagName() {
-        return "marketData";
     }
 }

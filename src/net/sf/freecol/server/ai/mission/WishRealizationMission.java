@@ -46,6 +46,8 @@ public class WishRealizationMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
+    public static final String TAG = "wishRealizationMission";
+
     /** The tag for this mission. */
     private static final String tag = "AI wisher";
 
@@ -261,14 +263,14 @@ public class WishRealizationMission extends Mission {
         final String wid = xr.getAttribute(WISH_TAG, (String)null);
         wish = xr.getAttribute(aiMain, WISH_TAG, Wish.class, (Wish)null);
         if (wish == null) {
-            if (wid.startsWith(GoodsWish.getTagName())
+            if (wid.startsWith(GoodsWish.TAG)
                 // @compat 0.10.3
                 || wid.startsWith(OLD_GOODS_WISH_TAG)
                 // end @compat
                 ) {
                 wish = new GoodsWish(aiMain, wid);
 
-            } else if (wid.startsWith(WorkerWish.getTagName())) {
+            } else if (wid.startsWith(WorkerWish.TAG)) {
                 wish = new WorkerWish(aiMain, wid);
 
             } else {
@@ -281,14 +283,5 @@ public class WishRealizationMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return The {@code String} "wishRealizationMission".
-     */
-    public static String getTagName() {
-        return "wishRealizationMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

@@ -36,6 +36,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class CompoundMission extends AbstractMission {
 
+    public static final String TAG = "compoundMission";
+    
     /**
      * The individual missions this CompoundMission wraps.
      */
@@ -208,5 +210,5 @@ public class CompoundMission extends AbstractMission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return "TODO!"; }
+    public String getXMLTagName() { return TAG; }
 }

@@ -40,6 +40,8 @@ import static net.sf.freecol.common.util.StringUtils.*;
  */
 public class Role extends BuildableType {
 
+    public static final String TAG = "role";
+
     /** Container for valid role changes. */
     public static class RoleChange {
 
@@ -535,19 +537,8 @@ public class Role extends BuildableType {
         }
     }
 
-
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "role"
-     */
-    public static String getTagName() {
-        return "role";
-    }
+    public String getXMLTagName() { return TAG; }
 }

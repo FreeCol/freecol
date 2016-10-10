@@ -41,6 +41,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public final class BuildingType extends BuildableType
         implements BaseProduction {
 
+    public static final String TAG = "building-type";
+
     /** The level of building. */
     private int level = 1;
 
@@ -639,15 +641,5 @@ public final class BuildingType extends BuildableType
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "building-type".
-     */
-    public static String getTagName() {
-        return "building-type";
-    }
+    public String getXMLTagName() { return TAG; }
 }

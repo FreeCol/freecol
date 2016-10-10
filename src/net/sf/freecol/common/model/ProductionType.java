@@ -40,6 +40,8 @@ import net.sf.freecol.common.util.Utils;
  */
 public class ProductionType extends FreeColSpecObject {
 
+    public static final String TAG = "production";
+
     /** Whether this production type applies only to colony center tiles. */
     private boolean unattended;
 
@@ -337,47 +339,6 @@ public class ProductionType extends FreeColSpecObject {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof ProductionType) {
-            ProductionType pt = (ProductionType)o;
-            return super.equals(o)
-                && this.unattended == pt.unattended
-                && Utils.equals(this.productionLevel, pt.productionLevel)
-                && listEquals(this.outputs, pt.outputs)
-                && listEquals(this.inputs, pt.inputs);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 31 * hash + ((this.unattended) ? 1 : 0);
-        hash = 31 * hash + Utils.hashCode(this.productionLevel);
-        if (this.outputs != null) {
-            for (AbstractGoods ag : this.outputs) {
-                hash = 31 * hash + Utils.hashCode(ag);
-            }
-        }
-        if (this.inputs != null) {
-            for (AbstractGoods ag : this.inputs) {
-                hash = 31 * hash + Utils.hashCode(ag);
-            }
-        }
-        return hash;
-    }
-
-
     // Serialization
 
     private static final String UNATTENDED_TAG = "unattended";
@@ -509,6 +470,52 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof ProductionType) {
+            ProductionType pt = (ProductionType)o;
+            return super.equals(o)
+                && this.unattended == pt.unattended
+                && Utils.equals(this.productionLevel, pt.productionLevel)
+                && listEquals(this.outputs, pt.outputs)
+                && listEquals(this.inputs, pt.inputs);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + ((this.unattended) ? 1 : 0);
+        hash = 31 * hash + Utils.hashCode(this.productionLevel);
+        if (this.outputs != null) {
+            for (AbstractGoods ag : this.outputs) {
+                hash = 31 * hash + Utils.hashCode(ag);
+            }
+        }
+        if (this.inputs != null) {
+            for (AbstractGoods ag : this.inputs) {
+                hash = 31 * hash + Utils.hashCode(ag);
+            }
+        }
+        return hash;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder(64);
@@ -537,20 +544,5 @@ public class ProductionType extends FreeColSpecObject {
         }
         result.append(']');
         return result.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "production".
-     */
-    public static String getTagName() {
-        return "production";
     }
 }

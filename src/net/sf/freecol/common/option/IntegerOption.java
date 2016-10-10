@@ -36,6 +36,8 @@ public class IntegerOption extends AbstractOption<Integer> {
 
     private static final Logger logger = Logger.getLogger(IntegerOption.class.getName());
 
+    public static final String TAG = "integerOption";
+
     /** The value of this option. */
     private int value;
 
@@ -206,6 +208,14 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -213,20 +223,5 @@ public class IntegerOption extends AbstractOption<Integer> {
             .append(" value=").append(value)
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "integerOption".
-     */
-    public static String getTagName() {
-        return "integerOption";
     }
 }

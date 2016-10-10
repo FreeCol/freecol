@@ -37,6 +37,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class EuropeanNationType extends NationType {
 
+    public static final String TAG = "european-nation-type";
+
     /** Whether this is an REF Nation. */
     private boolean ref = false;
 
@@ -265,15 +267,5 @@ public class EuropeanNationType extends NationType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "european-nation-type".
-     */
-    public static String getTagName() {
-        return "european-nation-type";
-    }
+    public String getXMLTagName() { return TAG; }
 }

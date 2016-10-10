@@ -39,6 +39,8 @@ public class IdleAtSettlementMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IdleAtSettlementMission.class.getName());
 
+    public static final String TAG = "idleAtSettlementMission";
+
     /** The tag for this mission. */
     private static final String tag = "AI idler";
 
@@ -184,19 +186,9 @@ public class IdleAtSettlementMission extends Mission {
 
     // Serialization
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "idleAtSettlementMission".
-     */
-    public static String getTagName() {
-        return "idleAtSettlementMission";
-    }
+    public String getXMLTagName() { return TAG; }
 }

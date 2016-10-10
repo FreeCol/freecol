@@ -37,9 +37,10 @@ import static net.sf.freecol.common.util.StringUtils.*;
  */
 public class ModelMessage extends StringTemplate {
 
+    public static final String TAG = "modelMessage";
+
     /** Constants describing the type of message. */
     public static enum MessageType implements Named {
-
         DEFAULT(""),
         WARNING("model.option.guiShowWarning"),
         SONS_OF_LIBERTY("model.option.guiShowSonsOfLiberty"),
@@ -372,34 +373,6 @@ public class ModelMessage extends StringTemplate {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof ModelMessage) {
-            ModelMessage m = (ModelMessage)o;
-            return sourceId.equals(m.sourceId)
-                && messageType == m.messageType
-                && super.equals(m);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + sourceId.hashCode();
-        return 37 * hash + messageType.ordinal();
-    }
-
-
     // Serialization
 
     private static final String DISPLAY_TAG = "display";
@@ -444,6 +417,39 @@ public class ModelMessage extends StringTemplate {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof ModelMessage) {
+            ModelMessage m = (ModelMessage)o;
+            return sourceId.equals(m.sourceId)
+                && messageType == m.messageType
+                && super.equals(m);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + sourceId.hashCode();
+        return 37 * hash + messageType.ordinal();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
@@ -454,20 +460,5 @@ public class ModelMessage extends StringTemplate {
             .append(", ").append(messageType)
             .append(" >");
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "modelMessage"
-     */
-    public static String getTagName() {
-        return "modelMessage";
     }
 }

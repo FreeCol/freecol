@@ -40,6 +40,8 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ModOption.class.getName());
 
+    public static final String TAG = "modOption";
+
     /** The value of this option. */
     private FreeColModFile value = null;
 
@@ -128,6 +130,27 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     }
 
 
+    // Serialization
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        if (value != null) {
+            xw.writeAttribute(VALUE_TAG, value.getId());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
     // Override Object
 
     /**
@@ -153,22 +176,6 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         return 31 * hash + Utils.hashCode(this.value);
     }
 
-
-    // Serialization
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeAttributes(xw);
-
-        if (value != null) {
-            xw.writeAttribute(VALUE_TAG, value.getId());
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -177,20 +184,5 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         StringBuilder sb = new StringBuilder(32);
         sb.append('[').append(getId()).append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "modOption".
-     */
-    public static String getTagName() {
-        return "modOption";
     }
 }

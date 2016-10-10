@@ -34,6 +34,8 @@ public class WorkLocationPlan extends AIObject {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkLocationPlan.class.getName());
 
+    public static final String TAG = "workLocationPlan";
+
     /** The work location the plan is for. */
     private WorkLocation workLocation;
 
@@ -107,6 +109,14 @@ public class WorkLocationPlan extends AIObject {
     // Serialization
     // WorkLocationPlans are not currently saved so this is a no-op.
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
@@ -119,20 +129,5 @@ public class WorkLocationPlan extends AIObject {
             .append(" at ").append(workLocation.getId())
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "workLocationPlan"
-     */
-    public static String getTagName() {
-        return "workLocationPlan";
     }
 }

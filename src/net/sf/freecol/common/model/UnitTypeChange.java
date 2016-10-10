@@ -34,6 +34,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class UnitTypeChange extends FreeColSpecObjectType {
 
+    public static final String TAG = "upgrade";
+
     public static enum ChangeType {
         EDUCATION,
         NATIVES,
@@ -271,6 +273,15 @@ public class UnitTypeChange extends FreeColSpecObjectType {
      * {@inheritDoc}
      */
     @Override
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append('[').append(newUnitType)
@@ -280,20 +291,5 @@ public class UnitTypeChange extends FreeColSpecObjectType {
                    .append('/').append(e.getValue()));
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "upgrade".
-     */
-    public static final String getTagName() {
-        return "upgrade";
     }
 }

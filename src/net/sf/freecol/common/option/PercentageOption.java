@@ -32,7 +32,9 @@ public class PercentageOption extends IntegerOption {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(PercentageOption.class.getName());
 
+    public static final String TAG = "percentageOption";
 
+    
     /**
      * Creates a new {@code PercentageOption}.
      *
@@ -48,6 +50,11 @@ public class PercentageOption extends IntegerOption {
 
     // Serialization
 
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
     /**
      * {@inheritDoc}
      */
@@ -57,20 +64,5 @@ public class PercentageOption extends IntegerOption {
         sb.append('[').append(getId())
             .append(' ').append(getValue()).append("%]");
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "percentageOption".
-     */
-    public static String getTagName() {
-        return "percentageOption";
     }
 }

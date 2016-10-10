@@ -48,6 +48,8 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     private static final Logger logger = Logger.getLogger(Monarch.class.getName());
 
+    public static final String TAG = "monarch";
+
     /** The minimum price for a monarch offer of mercenaries. */
     public static final int MONARCH_MINIMUM_PRICE = 200;
 
@@ -937,15 +939,5 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "monarch".
-     */
-    public static String getTagName() {
-        return "monarch";
-    }
+    public String getXMLTagName() { return TAG; }
 }

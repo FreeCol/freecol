@@ -34,6 +34,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class AbstractUnit extends FreeColObject {
 
+    public static final String TAG = "abstractUnit";
+
     /** The role identifier of this AbstractUnit. */
     private String roleId = Specification.DEFAULT_ROLE_ID;
 
@@ -249,26 +251,19 @@ public class AbstractUnit extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
         sb.append(number).append(' ').append(getId())
             .append(" (").append(roleId).append(')');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "abstractUnit".
-     */
-    public static String getTagName() {
-        return "abstractUnit";
     }
 }

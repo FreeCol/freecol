@@ -47,6 +47,8 @@ public class Europe extends UnitLocation
 
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
+    public static final String TAG = "europe";
+
     /** The initial recruit price. */
     private static final int RECRUIT_PRICE_INITIAL = 200;
 
@@ -623,10 +625,10 @@ public class Europe extends UnitLocation
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (Ability.getTagName().equals(tag)) {
+        if (Ability.TAG.equals(tag)) {
             addAbility(new Ability(xr, spec));
 
-        } else if (Modifier.getTagName().equals(tag)) {
+        } else if (Modifier.TAG.equals(tag)) {
             addModifier(new Modifier(xr, spec));
 
         } else if (RECRUIT_TAG.equals(tag)) {
@@ -659,23 +661,16 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String toString() {
-        return "Europe";
-    }
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "europe".
-     */
-    public static String getTagName() {
-        return "europe";
+    public String toString() {
+        return "Europe";
     }
 }

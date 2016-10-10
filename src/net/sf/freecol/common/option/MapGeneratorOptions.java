@@ -31,6 +31,7 @@ import net.sf.freecol.server.generator.MapGenerator;
  */
 public class MapGeneratorOptions {
 
+    public static final String TAG = "mapGeneratorOptions";
 
     /** Map generator options import group. */
     public static final String MAPGENERATOROPTIONS_IMPORT
@@ -142,13 +143,7 @@ public class MapGeneratorOptions {
                             TEMPERATURE_HOT       = 4;
 
 
+    // Serialization
 
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "mapGeneratorOptions".
-     */
-    public static String getTagName() {
-        return "mapGeneratorOptions";
-    }
+    public String getXMLTagName() { return TAG; }
 }

@@ -39,6 +39,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
     private static final Logger logger = Logger.getLogger(Goods.class.getName());
 
+    public static final String TAG = "goods";
+
     /** 
      * The game containing these goods.  It would be nice to make this
      * a FreeColGameObject, but then it could not extend AbstractGoods.
@@ -235,30 +237,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     }
     
     
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof Goods) {
-            Goods g = (Goods)o;
-            return this.location == g.location && super.equals(g);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        return 31 * hash + Utils.hashCode(this.location);
-    }
-
-
     // Serialization
 
     private static final String AMOUNT_TAG = "amount";
@@ -306,15 +284,29 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "goods".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "goods";
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Goods) {
+            Goods g = (Goods)o;
+            return this.location == g.location && super.equals(g);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 31 * hash + Utils.hashCode(this.location);
     }
 }

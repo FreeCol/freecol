@@ -79,6 +79,8 @@ public class AIUnit extends TransportableAIObject {
 
     private static final Logger logger = Logger.getLogger(AIUnit.class.getName());
 
+    public static final String TAG = "aiUnit";
+
     /** The Unit this AIObject contains AI-information for. */
     private Unit unit;
 
@@ -799,33 +801,6 @@ public class AIUnit extends TransportableAIObject {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof AIUnit) {
-            AIUnit oa = (AIUnit)other;
-            return super.equals(oa)
-                && Utils.equals(this.unit, oa.unit)
-                && Utils.equals(this.mission, oa.mission);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.unit);
-        return 37 * hash + Utils.hashCode(this.mission);
-    }
-
-
     // Serialization
 
     // @compat 0.10.3
@@ -885,60 +860,60 @@ public class AIUnit extends TransportableAIObject {
         final String tag = xr.getLocalName();
 
         mission = null;
-        if (BuildColonyMission.getTagName().equals(tag)) {
+        if (BuildColonyMission.TAG.equals(tag)) {
             mission = new BuildColonyMission(aiMain, this, xr);
 
-        } else if (CashInTreasureTrainMission.getTagName().equals(tag)) {
+        } else if (CashInTreasureTrainMission.TAG.equals(tag)) {
             mission = new CashInTreasureTrainMission(aiMain, this, xr);
 
-        } else if (DefendSettlementMission.getTagName().equals(tag)) {
+        } else if (DefendSettlementMission.TAG.equals(tag)) {
             mission = new DefendSettlementMission(aiMain, this, xr);
 
-        } else if (IdleAtSettlementMission.getTagName().equals(tag)
+        } else if (IdleAtSettlementMission.TAG.equals(tag)
             // @compat 0.10.5
             || IDLE_AT_COLONY_MISSION_TAG.equals(tag)
             // end @compat
                    ) {
             mission = new IdleAtSettlementMission(aiMain, this, xr);
 
-        } else if (IndianBringGiftMission.getTagName().equals(tag)) {
+        } else if (IndianBringGiftMission.TAG.equals(tag)) {
             mission = new IndianBringGiftMission(aiMain, this, xr);
 
-        } else if (IndianDemandMission.getTagName().equals(tag)) {
+        } else if (IndianDemandMission.TAG.equals(tag)) {
             mission = new IndianDemandMission(aiMain, this, xr);
 
-        } else if (MissionaryMission.getTagName().equals(tag)) {
+        } else if (MissionaryMission.TAG.equals(tag)) {
             mission = new MissionaryMission(aiMain, this, xr);
 
-        } else if (PioneeringMission.getTagName().equals(tag)
+        } else if (PioneeringMission.TAG.equals(tag)
             // @compat 0.10.3
             || TILE_IMPROVEMENT_PLAN_MISSION_TAG.equals(tag)
             // end @compat
                    ) {
             mission = new PioneeringMission(aiMain, this, xr);
 
-        } else if (PrivateerMission.getTagName().equals(tag)) {
+        } else if (PrivateerMission.TAG.equals(tag)) {
             mission = new PrivateerMission(aiMain, this, xr);
 
-        } else if (ScoutingMission.getTagName().equals(tag)) {
+        } else if (ScoutingMission.TAG.equals(tag)) {
             mission = new ScoutingMission(aiMain, this, xr);
 
-        } else if (TransportMission.getTagName().equals(tag)) {
+        } else if (TransportMission.TAG.equals(tag)) {
             mission = new TransportMission(aiMain, this, xr);
 
-        } else if (UnitSeekAndDestroyMission.getTagName().equals(tag)) {
+        } else if (UnitSeekAndDestroyMission.TAG.equals(tag)) {
             mission = new UnitSeekAndDestroyMission(aiMain, this, xr);
 
-        } else if (UnitWanderHostileMission.getTagName().equals(tag)) {
+        } else if (UnitWanderHostileMission.TAG.equals(tag)) {
             mission = new UnitWanderHostileMission(aiMain, this, xr);
 
-        } else if (UnitWanderMission.getTagName().equals(tag)) {
+        } else if (UnitWanderMission.TAG.equals(tag)) {
             mission = new UnitWanderMission(aiMain, this, xr);
 
-        } else if (WishRealizationMission.getTagName().equals(tag)) {
+        } else if (WishRealizationMission.TAG.equals(tag)) {
             mission = new WishRealizationMission(aiMain, this, xr);
 
-        } else if (WorkInsideColonyMission.getTagName().equals(tag)) {
+        } else if (WorkInsideColonyMission.TAG.equals(tag)) {
             mission = new WorkInsideColonyMission(aiMain, this, xr);
 
         } else {
@@ -950,22 +925,40 @@ public class AIUnit extends TransportableAIObject {
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
-        return (unit == null) ? "AIUnit-null" : unit.toString("AIUnit ");
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof AIUnit) {
+            AIUnit oa = (AIUnit)other;
+            return super.equals(oa)
+                && Utils.equals(this.unit, oa.unit)
+                && Utils.equals(this.mission, oa.mission);
+        }
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.unit);
+        return 37 * hash + Utils.hashCode(this.mission);
+    }
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "aiUnit"
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "aiUnit";
+    @Override
+    public String toString() {
+        return (unit == null) ? "AIUnit-null" : unit.toString("AIUnit ");
     }
 }

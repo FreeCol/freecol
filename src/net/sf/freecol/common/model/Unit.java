@@ -63,6 +63,8 @@ public class Unit extends GoodsLocation
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
+    public static final String TAG = "unit";
+
     /**
      * A large number of turns, denoting pathfinding failure.  Do not use
      * INFINITY as further calculation might use this.
@@ -4615,7 +4617,7 @@ public class Unit extends GoodsLocation
             }
         // end @compat 0.10.5
 
-        } else if (TileImprovement.getTagName().equals(tag)
+        } else if (TileImprovement.TAG.equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
                    // end @compat 0.11.3
@@ -4626,6 +4628,22 @@ public class Unit extends GoodsLocation
         } else {
             super.readChild(xr);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return toString("");
     }
 
     /**
@@ -4653,28 +4671,5 @@ public class Unit extends GoodsLocation
         }
         sb.append(']');
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return toString("");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "unit"
-     */
-    public static String getTagName() {
-        return "unit";
     }
 }

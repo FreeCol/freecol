@@ -40,6 +40,8 @@ import static net.sf.freecol.common.util.StringUtils.*;
  */
 public class FoundingFather extends FreeColSpecObjectType {
 
+    public static final String TAG = "founding-father";
+
     public static enum FoundingFatherType {
         TRADE,
         EXPLORATION,
@@ -348,7 +350,7 @@ public class FoundingFather extends FreeColSpecObjectType {
         } else if (UNIT_TAG.equals(tag)) {
             addUnit(new AbstractUnit(xr));
 
-        } else if (Event.getTagName().equals(tag)) {
+        } else if (Event.TAG.equals(tag)) {
             addEvent(new Event(xr, spec));
 
         } else {
@@ -359,15 +361,5 @@ public class FoundingFather extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "founding-father".
-     */
-    public static String getTagName() {
-        return "founding-father";
-    }
+    public String getXMLTagName() { return TAG; }
 }

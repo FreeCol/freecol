@@ -56,6 +56,8 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
+    public static final String TAG = "game";
+
     /** State for the FCGO iterator, out here because it has to be static. */
     private static enum FcgoState {
         INVALID,
@@ -1269,30 +1271,6 @@ public class Game extends FreeColGameObject {
     }
     
 
-    // Override Object
-    //
-    // Two games are not the same just because they have the same
-    // identifier, but to avoid having to check everything in the Game
-    // just insist on object equality for the equals() test, and
-    // accept the basic id-based hashCode().
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        return this == o;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Utils.hashCode(getId());
-    }
-
-
     // Serialization
     // Note: The order of the children is really sensitive.
     // Several fields can not be read without a specification, so it
@@ -1446,21 +1424,21 @@ public class Game extends FreeColGameObject {
             NameCache.addCityOfCibola(cibola);
             xr.closeTag(CIBOLA_TAG);
 
-        } else if (Map.getTagName().equals(tag)) {
+        } else if (Map.TAG.equals(tag)) {
             if (this.specification == null) {
                 throw new XMLStreamException("Tried to read " + tag
                     + " with null specification");
             }
             map = xr.readFreeColGameObject(game, Map.class);
 
-        } else if (NationOptions.getTagName().equals(tag)) {
+        } else if (NationOptions.TAG.equals(tag)) {
             if (this.specification == null) {
                 throw new XMLStreamException("Tried to read " + tag
                     + " with null specification");
             }
             nationOptions = new NationOptions(xr, specification);
 
-        } else if (Player.getTagName().equals(tag)) {
+        } else if (Player.TAG.equals(tag)) {
             if (this.specification == null) {
                 throw new XMLStreamException("Tried to read " + tag
                     + " with null specification");
@@ -1472,7 +1450,7 @@ public class Game extends FreeColGameObject {
                 players.add(player);
             }
 
-        } else if (Specification.getTagName().equals(tag)) {
+        } else if (Specification.TAG.equals(tag)) {
             logger.info(((specification == null) ? "Loading" : "Reloading")
                 + " specification.");
             this.specification = new Specification(xr);
@@ -1485,15 +1463,29 @@ public class Game extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+    //
+    // Two games are not the same just because they have the same
+    // identifier, but to avoid having to check everything in the Game
+    // just insist on object equality for the equals() test, and
+    // accept the basic id-based hashCode().
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "game".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "game";
+    @Override
+    public boolean equals(Object o) {
+        return this == o;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Utils.hashCode(getId());
     }
 }

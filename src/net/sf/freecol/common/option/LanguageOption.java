@@ -46,6 +46,8 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
     private static final Logger logger = Logger.getLogger(LanguageOption.class.getName());
 
+    public static final String TAG = "languageOption";
+
     /** Extra languages with alternate names. */
     private static final Map<String, String> languageNames
         = makeUnmodifiableMap(new String[] {
@@ -116,6 +118,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         public int compareTo(Language l) {
             return toString().compareTo(l.toString());
         }
+
 
         // Override Object
 
@@ -315,14 +318,5 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "languageOption".
-     */
-    public static String getTagName() {
-        return "languageOption";
-    }
+    public String getXMLTagName() { return TAG; }
 }

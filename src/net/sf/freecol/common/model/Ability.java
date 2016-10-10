@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
  */
 public final class Ability extends Feature {
 
+    public static final String TAG = "ability";
+
     /**
      * The ability to add the current tax as a bonus to the production
      * of bells.  Provided by the {@link FoundingFather} Thomas Paine.
@@ -511,32 +513,6 @@ public final class Ability extends Feature {
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof Ability) {
-            return this.value == ((Ability)o).value
-                && super.equals(o);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash += (value) ? 1 : 0;
-        return hash;
-    }
-
-
     // Serialization
 
 
@@ -563,6 +539,37 @@ public final class Ability extends Feature {
     /**
      * {@inheritDoc}
      */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof Ability) {
+            return this.value == ((Ability)o).value
+                && super.equals(o);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash += (value) ? 1 : 0;
+        return hash;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -572,20 +579,5 @@ public final class Ability extends Feature {
         }
         sb.append(" = ").append(value).append(" ]");
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name for the object.
-     *
-     * @return "ability".
-     */
-    public static String getTagName() {
-        return "ability";
     }
 }

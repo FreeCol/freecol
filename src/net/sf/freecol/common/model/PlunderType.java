@@ -31,10 +31,11 @@ import net.sf.freecol.common.model.RandomRange;
  */
 public class PlunderType extends FreeColSpecObjectType {
 
+    public static final String TAG = "plunder";
+
     /** The range of plunder amounts. */
     private RandomRange range;
-
-
+    
     /**
      * Creates a new plunder type.
      *
@@ -95,15 +96,5 @@ public class PlunderType extends FreeColSpecObjectType {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "plunder".
-     */
-    public static String getTagName() {
-        return "plunder";
-    }
+    public String getXMLTagName() { return TAG; }
 }

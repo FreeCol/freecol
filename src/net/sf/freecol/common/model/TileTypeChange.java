@@ -31,6 +31,8 @@ import net.sf.freecol.common.util.Utils;
  */
 public class TileTypeChange extends FreeColSpecObjectType {
 
+    public static final String TAG = "tile-type-change";
+
     /** The original tile type. */
     private TileType from;
 
@@ -128,31 +130,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
     // end @compat 0.10.4
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof TileTypeChange) {
-            return this.compareTo((TileTypeChange)other) == 0;
-        }
-        return super.equals(other);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.from);
-        hash = 37 * hash + Utils.hashCode(this.to);
-        return 37 * hash + Utils.hashCode(this.production);
-    }
-
-
     // Serialization
 
     private static final String FROM_TAG = "from";
@@ -238,18 +215,32 @@ public class TileTypeChange extends FreeColSpecObjectType {
     }
 
     /**
-     * Delegate to getTagName.
-     *
-     * @return What getTagName does.
+     * {@inheritDoc}
      */
-    public String getXMLTagName() { return getTagName(); }
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
 
     /**
-     * Gets the tag name of the object.
-     *
-     * @return "tile-type-change".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "tile-type-change";
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof TileTypeChange) {
+            return this.compareTo((TileTypeChange)other) == 0;
+        }
+        return super.equals(other);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.from);
+        hash = 37 * hash + Utils.hashCode(this.to);
+        return 37 * hash + Utils.hashCode(this.production);
     }
 }
