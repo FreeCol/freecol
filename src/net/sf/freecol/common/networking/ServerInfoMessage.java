@@ -21,7 +21,7 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.TrivialMessage;
+import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.metaserver.ServerInfo;
 
 import org.w3c.dom.Element;
@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 /**
  * The type of message that contains server information.
  */
-public abstract class ServerInfoMessage extends TrivialMessage {
+public abstract class ServerInfoMessage extends AttributeMessage {
 
     private static final String ADDRESS_TAG = "address";
     private static final String CURRENTLY_PLAYING_TAG = "currentlyPlaying";

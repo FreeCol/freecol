@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a native delivers a gift to a Colony.
  */
-public class NativeGiftMessage extends TrivialMessage {
+public class NativeGiftMessage extends AttributeMessage {
 
     public static final String TAG = "nativeGift";
     private static final String COLONY_TAG = "colony";

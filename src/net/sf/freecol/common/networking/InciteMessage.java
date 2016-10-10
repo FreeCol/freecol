@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when inciting a native settlement.
  */
-public class InciteMessage extends TrivialMessage {
+public class InciteMessage extends AttributeMessage {
 
     public static final String TAG = "incite";
     private static final String ENEMY_TAG = "enemy";

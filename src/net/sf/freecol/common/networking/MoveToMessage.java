@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when moving a unit across the high seas.
  */
-public class MoveToMessage extends TrivialMessage {
+public class MoveToMessage extends AttributeMessage {
 
     public static final String TAG = "moveTo";
     private static final String DESTINATION_TAG = "destination";

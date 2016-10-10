@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests abandoning of a colony.
  */
-public class AbandonColonyMessage extends TrivialMessage {
+public class AbandonColonyMessage extends AttributeMessage {
 
     public static final String TAG = "abandonColony";
     private static final String COLONY_TAG = "colony";

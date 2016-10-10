@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when disbanding a unit.
  */
-public class DisbandUnitMessage extends TrivialMessage {
+public class DisbandUnitMessage extends AttributeMessage {
 
     public static final String TAG = "disbandUnit";
     private static final String UNIT_TAG = "unit";

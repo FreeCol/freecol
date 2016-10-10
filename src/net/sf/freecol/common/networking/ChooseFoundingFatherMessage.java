@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to choose a founding father.
  */
-public class ChooseFoundingFatherMessage extends TrivialMessage {
+public class ChooseFoundingFatherMessage extends AttributeMessage {
 
     public static final String TAG = "chooseFoundingFather";
     private static final String FOUNDING_FATHER_TAG = "foundingFather";

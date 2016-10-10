@@ -255,7 +255,7 @@ public class LoginMessage extends DOMMessage {
 
             if (player.isAI()) {
                 player.setAI(false);
-                server.sendToAll(new TrivialMessage("setAI",
+                server.sendToAll(new AttributeMessage("setAI",
                         "player", player.getId(),
                         "ai", Boolean.toString(false)),
                     null);

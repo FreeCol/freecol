@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when naming a new region.
  */
-public class NewRegionNameMessage extends TrivialMessage {
+public class NewRegionNameMessage extends AttributeMessage {
 
     public static final String TAG = "newRegionName";
     private static final String NEW_REGION_NAME_TAG = "newRegionName";

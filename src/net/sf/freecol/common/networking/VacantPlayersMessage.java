@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to discover the vacant players.
  */
-public class VacantPlayersMessage extends TrivialMessage {
+public class VacantPlayersMessage extends AttributeMessage {
 
     public static final String TAG = "vacantPlayers";
     

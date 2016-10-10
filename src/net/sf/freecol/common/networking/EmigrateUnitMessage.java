@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a unit is to emigrate.
  */
-public class EmigrateUnitMessage extends TrivialMessage {
+public class EmigrateUnitMessage extends AttributeMessage {
 
     public static final String TAG = "emigrateUnit";
     private static final String SLOT_TAG = "slot";

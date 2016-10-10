@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when changing a unit state.
  */
-public class ChangeStateMessage extends TrivialMessage {
+public class ChangeStateMessage extends AttributeMessage {
 
     public static final String TAG = "changeState";
     private static final String STATE_TAG = "state";

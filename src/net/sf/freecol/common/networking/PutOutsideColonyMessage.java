@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when putting a unit outside a colony.
  */
-public class PutOutsideColonyMessage extends TrivialMessage {
+public class PutOutsideColonyMessage extends AttributeMessage {
 
     public static final String TAG = "putOutsideColony";
     private static final String UNIT_TAG = "unit";

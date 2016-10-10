@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when clearing a unit speciality.
  */
-public class ClearSpecialityMessage extends TrivialMessage {
+public class ClearSpecialityMessage extends AttributeMessage {
 
     public static final String TAG = "clearSpeciality";
     private static final String UNIT_TAG = "unit";

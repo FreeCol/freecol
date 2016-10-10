@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when scouting a native settlement.
  */
-public class ScoutIndianSettlementMessage extends TrivialMessage {
+public class ScoutIndianSettlementMessage extends AttributeMessage {
 
     public static final String TAG = "scoutIndianSettlement";
     private static final String DIRECTION_TAG = "direction";

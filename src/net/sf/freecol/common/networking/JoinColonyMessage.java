@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a unit joins a colony.
  */
-public class JoinColonyMessage extends TrivialMessage {
+public class JoinColonyMessage extends AttributeMessage {
 
     public static final String TAG = "joinColony";
     private static final String COLONY_TAG = "colony";

@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when embarking.
  */
-public class EmbarkMessage extends TrivialMessage {
+public class EmbarkMessage extends AttributeMessage {
 
     public static final String TAG = "embark";
     private static final String CARRIER_TAG = "carrier";

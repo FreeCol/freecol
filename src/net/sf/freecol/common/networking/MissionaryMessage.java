@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a missionary establishes/denounces a mission.
  */
-public class MissionaryMessage extends TrivialMessage {
+public class MissionaryMessage extends AttributeMessage {
 
     public static final String TAG = "missionary";
     private static final String DENOUNCE_TAG = "denounce";

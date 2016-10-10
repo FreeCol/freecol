@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests claiming land.
  */
-public class ClaimLandMessage extends TrivialMessage {
+public class ClaimLandMessage extends AttributeMessage {
 
     public static final String TAG = "claimLand";
     private static final String CLAIMANT_TAG = "claimant";

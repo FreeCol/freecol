@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when making first contact between players.
  */
-public class FirstContactMessage extends TrivialMessage {
+public class FirstContactMessage extends AttributeMessage {
 
     public static final String TAG = "firstContact";
     private static final String CAMPS_TAG = "camps";

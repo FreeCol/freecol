@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
+import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
@@ -144,7 +145,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
         if (player != null) {
             boolean ready = Boolean.parseBoolean(element.getAttribute("value"));
             player.setReady(ready);
-            freeColServer.sendToAll(new TrivialMessage("playerReady",
+            freeColServer.sendToAll(new AttributeMessage("playerReady",
                     "player", player.getId(),
                     "value", Boolean.toString(ready)),
                 player.getConnection());
@@ -221,7 +222,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
             NationState state = Enum.valueOf(NationState.class,
                                              element.getAttribute("state"));
             getGame().getNationOptions().setNationState(nation, state);
-            freeColServer.sendToAll(new TrivialMessage("setAvailable",
+            freeColServer.sendToAll(new AttributeMessage("setAvailable",
                     "nation", nation.getId(),
                     "state", state.toString()),
                 player.getConnection());
@@ -257,7 +258,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
                     .toXMLElement();
             }
             nation.setColor(color);
-            freeColServer.sendToAll(new TrivialMessage("updateColor",
+            freeColServer.sendToAll(new AttributeMessage("updateColor",
                     "nation", nation.getId(),
                     "color", Integer.toString(color.getRGB())),
                 player.getConnection());
@@ -284,7 +285,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
             if (getGame().getNationOptions().getNations().get(nation)
                 == NationState.AVAILABLE) {
                 player.setNation(nation);
-                freeColServer.sendToAll(new TrivialMessage("updateNation",
+                freeColServer.sendToAll(new AttributeMessage("updateNation",
                         "player", player.getId(),
                         "value", nation.getId()),
                     player.getConnection());
@@ -336,7 +337,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
             }
             if (ok) {
                 player.changeNationType(nationType);
-                freeColServer.sendToAll(new TrivialMessage("updateNationType",
+                freeColServer.sendToAll(new AttributeMessage("updateNationType",
                         "player", player.getId(),
                         "value", nationType.getId()),
                     player.getConnection());

@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when declining to investigate strange mounds.
  */
-public class DeclineMoundsMessage extends TrivialMessage {
+public class DeclineMoundsMessage extends AttributeMessage {
 
     public static final String TAG = "declineMounds";
     private static final String DIRECTION_TAG = "direction";

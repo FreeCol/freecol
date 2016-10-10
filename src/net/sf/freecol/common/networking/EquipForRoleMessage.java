@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to equip a unit for a particular role.
  */
-public class EquipForRoleMessage extends TrivialMessage {
+public class EquipForRoleMessage extends AttributeMessage {
 
     public static final String TAG = "equipForRole";
     private static final String COUNT_TAG = "count";

@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when logging out.
  */
-public class LogoutMessage extends TrivialMessage {
+public class LogoutMessage extends AttributeMessage {
 
     public static final String TAG = "logout";
     private static final String PLAYER_TAG = "player";

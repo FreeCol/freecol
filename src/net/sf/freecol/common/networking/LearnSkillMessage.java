@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when learning for the skill taught at a settlement.
  */
-public class LearnSkillMessage extends TrivialMessage {
+public class LearnSkillMessage extends AttributeMessage {
 
     public static final String TAG = "learnSkill";
     private static final String DIRECTION_TAG = "direction";

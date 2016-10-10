@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a player declares independence.
  */
-public class DeclareIndependenceMessage extends TrivialMessage {
+public class DeclareIndependenceMessage extends AttributeMessage {
 
     public static final String TAG = "declareIndependence";
     private static final String COUNTRY_NAME_TAG = "countryName";

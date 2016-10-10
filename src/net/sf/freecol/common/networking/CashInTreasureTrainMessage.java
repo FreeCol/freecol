@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when cashing in a treasure train.
  */
-public class CashInTreasureTrainMessage extends TrivialMessage {
+public class CashInTreasureTrainMessage extends AttributeMessage {
 
     public static final String TAG = "cashInTreasureTrain";
     private static final String UNIT_TAG = "unit";

@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when setting the build queue.
  */
-public class SetBuildQueueMessage extends TrivialMessage {
+public class SetBuildQueueMessage extends AttributeMessage {
 
     public static final String TAG = "setBuildQueue";
     private static final String COLONY_TAG = "colony";

@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when paying for a building.
  */
-public class PayForBuildingMessage extends TrivialMessage {
+public class PayForBuildingMessage extends AttributeMessage {
 
     public static final String TAG = "payForBuilding";
     private static final String COLONY_TAG = "colony";

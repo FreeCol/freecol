@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 /**
  * The message that contains a chat string.
  */
-public class ChatMessage extends TrivialMessage {
+public class ChatMessage extends AttributeMessage {
 
     public static final String TAG = "chat";
     private static final String MESSAGE_TAG = "message";

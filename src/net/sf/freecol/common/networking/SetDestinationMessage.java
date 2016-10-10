@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests setting a unit destination.
  */
-public class SetDestinationMessage extends TrivialMessage {
+public class SetDestinationMessage extends AttributeMessage {
 
     public static final String TAG = "setDestination";
     private static final String DESTINATION_TAG = "destination";

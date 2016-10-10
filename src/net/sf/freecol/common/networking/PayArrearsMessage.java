@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when paying tax arrears.
  */
-public class PayArrearsMessage extends TrivialMessage {
+public class PayArrearsMessage extends AttributeMessage {
 
     public static final String TAG = "payArrears";
     private static final String GOODS_TYPE_TAG = "goodsType";

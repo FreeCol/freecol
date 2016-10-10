@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when assigning a teacher.
  */
-public class AssignTeacherMessage extends TrivialMessage {
+public class AssignTeacherMessage extends AttributeMessage {
 
     public static final String TAG = "assignTeacher";
     private static final String STUDENT_TAG = "student";

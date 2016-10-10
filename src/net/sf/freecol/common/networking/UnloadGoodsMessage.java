@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when unloading goods.
  */
-public class UnloadGoodsMessage extends TrivialMessage {
+public class UnloadGoodsMessage extends AttributeMessage {
 
     public static final String TAG = "unloadGoods";
     private static final String AMOUNT_TAG = "amount";

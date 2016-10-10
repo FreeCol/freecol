@@ -946,7 +946,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setAvailable(Nation nation, NationState state) {
-        return askHandling(null, new TrivialMessage("setAvailable",
+        return askHandling(null, new AttributeMessage("setAvailable",
                 "nation", nation.getId(),
                 "state", state.toString()));
     }
@@ -973,7 +973,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setColor(Nation nation, Color color) {
-        return askHandling(null, new TrivialMessage("setColor",
+        return askHandling(null, new AttributeMessage("setColor",
                 "nation", nation.getId(),
                 "color", Integer.toString(color.getRGB())));
     }
@@ -1023,7 +1023,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setNation(Nation nation) {
-        return askHandling(null, new TrivialMessage("setNation",
+        return askHandling(null, new AttributeMessage("setNation",
                 "value", nation.getId()));
     }
 
@@ -1035,7 +1035,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setNationType(NationType nationType) {
-        return askHandling(null, new TrivialMessage("setNationType",
+        return askHandling(null, new AttributeMessage("setNationType",
                 "value", nationType.getId()));
     }
 
@@ -1047,7 +1047,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setReady(boolean ready) {
-        return send(new TrivialMessage("ready",
+        return send(new AttributeMessage("ready",
                 "value", Boolean.toString(ready)));
     }
 

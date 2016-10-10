@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to handle changes in work location.
  */
-public class WorkMessage extends TrivialMessage {
+public class WorkMessage extends AttributeMessage {
 
     public static final String TAG = "work";
     private static final String UNIT_TAG = "unit";

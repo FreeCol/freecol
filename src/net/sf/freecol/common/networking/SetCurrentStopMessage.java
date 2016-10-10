@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent updating a unit's current stop.
  */
-public class SetCurrentStopMessage extends TrivialMessage {
+public class SetCurrentStopMessage extends AttributeMessage {
 
     public static final String TAG = "setCurrentStop";
     private static final String INDEX_TAG = "index";

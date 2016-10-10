@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests building of a colony.
  */
-public class BuildColonyMessage extends TrivialMessage {
+public class BuildColonyMessage extends AttributeMessage {
 
     public static final String TAG = "buildColony";
     private static final String NAME_TAG = "name";

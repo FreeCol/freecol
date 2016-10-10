@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when speaking to a chief.
  */
-public class ScoutSpeakToChiefMessage extends TrivialMessage {
+public class ScoutSpeakToChiefMessage extends AttributeMessage {
 
     public static final String TAG = "scoutSpeakToChief";
     private static final String RESULT_TAG = "result";

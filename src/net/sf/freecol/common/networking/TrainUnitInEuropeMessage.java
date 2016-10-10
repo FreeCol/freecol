@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when training a unit in Europe.
  */
-public class TrainUnitInEuropeMessage extends TrivialMessage {
+public class TrainUnitInEuropeMessage extends AttributeMessage {
 
     public static final String TAG = "trainUnitInEurope";
     private static final String UNIT_TYPE_TAG = "unitType";

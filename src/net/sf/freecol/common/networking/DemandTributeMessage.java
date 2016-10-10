@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when demanding tribute from a native settlement.
  */
-public class DemandTributeMessage extends TrivialMessage {
+public class DemandTributeMessage extends AttributeMessage {
 
     public static final String TAG = "demandTribute";
     private static final String DIRECTION_TAG = "direction";

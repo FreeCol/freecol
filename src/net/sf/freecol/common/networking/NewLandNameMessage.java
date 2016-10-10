@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when naming a new land.
  */
-public class NewLandNameMessage extends TrivialMessage {
+public class NewLandNameMessage extends AttributeMessage {
 
     public static final String TAG = "newLandName";
     private static final String NEW_LAND_NAME_TAG = "newLandName";

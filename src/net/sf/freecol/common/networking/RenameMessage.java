@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when renaming a FreeColGameObject.
  */
-public class RenameMessage extends TrivialMessage {
+public class RenameMessage extends AttributeMessage {
 
     public static final String TAG = "rename";
     private static final String NAMEABLE_TAG = "nameable";

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when changing the work type of a unit.
  */
-public class ChangeWorkTypeMessage extends TrivialMessage {
+public class ChangeWorkTypeMessage extends AttributeMessage {
 
     public static final String TAG = "changeWorkType";
     private static final String UNIT_TAG = "unit";

@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to check the game state.
  */
-public class GameStateMessage extends TrivialMessage {
+public class GameStateMessage extends AttributeMessage {
 
     public static final String TAG = "gameState";
     private static final String STATE_TAG = "state";

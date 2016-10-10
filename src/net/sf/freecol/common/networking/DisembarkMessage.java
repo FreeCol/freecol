@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when disembarking.
  */
-public class DisembarkMessage extends TrivialMessage {
+public class DisembarkMessage extends AttributeMessage {
 
     public static final String TAG = "disembark";
     private static final String UNIT_TAG = "unit";

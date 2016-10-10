@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when assigning a trade route to a unit.
  */
-public class AssignTradeRouteMessage extends TrivialMessage {
+public class AssignTradeRouteMessage extends AttributeMessage {
 
     public static final String TAG = "assignTradeRoute";
     private static final String TRADE_ROUTE_TAG = "tradeRoute";

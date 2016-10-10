@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to resolve natives making demands of a colony.
  */
-public class IndianDemandMessage extends TrivialMessage {
+public class IndianDemandMessage extends AttributeMessage {
 
     public static final String TAG = "indianDemand";
     private static final String AMOUNT_TAG = "amount";

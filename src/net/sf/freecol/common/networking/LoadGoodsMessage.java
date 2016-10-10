@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when loading goods.
  */
-public class LoadGoodsMessage extends TrivialMessage {
+public class LoadGoodsMessage extends AttributeMessage {
 
     public static final String TAG = "loadGoods";
     private static final String AMOUNT_TAG = "amount";

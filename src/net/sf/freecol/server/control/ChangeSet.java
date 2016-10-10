@@ -49,7 +49,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
-import net.sf.freecol.common.networking.TrivialMessage;
+import net.sf.freecol.common.networking.AttributeMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -1301,10 +1301,10 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return new TrivialMessage("setStance",
-                                      "stance", stance.toString(),
-                                      "first", first.getId(),
-                                      "second", second.getId())
+            return new AttributeMessage("setStance",
+                                        "stance", stance.toString(),
+                                        "first", first.getId(),
+                                        "second", second.getId())
                 .attachToDocument(doc);
         }
 
@@ -1378,7 +1378,7 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return new TrivialMessage(this.name)
+            return new AttributeMessage(this.name)
                 .setAttributes(this.attributes)
                 .attachToDocument(doc);
         }

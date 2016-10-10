@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when deleting a trade route.
  */
-public class DeleteTradeRouteMessage extends TrivialMessage {
+public class DeleteTradeRouteMessage extends AttributeMessage {
 
     public static final String TAG = "deleteTradeRoute";
     private static final String TRADE_ROUTE_TAG = "tradeRoute";

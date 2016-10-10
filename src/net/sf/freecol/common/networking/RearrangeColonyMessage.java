@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests rearrangeing of a colony.
  */
-public class RearrangeColonyMessage extends TrivialMessage {
+public class RearrangeColonyMessage extends AttributeMessage {
 
     public static final String TAG = "rearrangeColony";
     private static final String COLONY_TAG = "colony";

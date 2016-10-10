@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when attacking.
  */
-public class AttackMessage extends TrivialMessage {
+public class AttackMessage extends AttributeMessage {
 
     public static final String TAG = "attack";
     private static final String DIRECTION_TAG = "direction";

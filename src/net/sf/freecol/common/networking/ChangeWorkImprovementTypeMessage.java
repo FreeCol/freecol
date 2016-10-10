@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when changing a work improvement type.
  */
-public class ChangeWorkImprovementTypeMessage extends TrivialMessage {
+public class ChangeWorkImprovementTypeMessage extends AttributeMessage {
 
     public static final String TAG = "changeWorkImprovementType";
     private static final String IMPROVEMENT_TYPE_TAG = "improvementType";
