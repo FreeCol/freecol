@@ -156,7 +156,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = firstContact(connection, element); break;
             case "fountainOfYouth":
                 reply = fountainOfYouth(connection, element); break;
-            case "indianDemand":
+            case IndianDemandMessage.TAG:
                 reply = indianDemand(connection, element); break;
             case "lootCargo":
                 reply = lootCargo(connection, element); break;
@@ -322,12 +322,12 @@ public final class AIInGameInputHandler implements MessageHandler {
         Colony colony = message.getColony(game);
         GoodsType type = message.getType(game);
         int amount = message.getAmount();
-        Boolean accept = message.getResult();
-        accept = aiPlayer.indianDemand(unit, colony, type, amount, accept);
-        if (accept == null) return null;
-        message.setResult(accept);
+        Boolean result = message.getResult();
+        result = aiPlayer.indianDemand(unit, colony, type, amount, result);
+        if (result == null) return null;
+        message.setResult(result);
         logger.finest("AI handling native demand by " + unit
-            + " at " + colony.getName() + " result: " + accept);
+            + " at " + colony.getName() + " result: " + result);
         return message.toXMLElement();
     }
 

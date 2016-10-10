@@ -150,7 +150,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> highScore(e));
         register(InciteMessage.TAG,
             (Connection c, Element e) -> incite(e));
-        register("indianDemand",
+        register(IndianDemandMessage.TAG,
             (Connection c, Element e) -> indianDemand(e));
         register("lootCargo",
             (Connection c, Element e) -> lootCargo(e));
