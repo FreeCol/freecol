@@ -313,13 +313,4 @@ public class RearrangeColonyMessage extends TrivialMessage {
             .rearrangeColony(serverPlayer, colony, arrangements)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "rearrangeColony".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

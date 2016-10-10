@@ -184,13 +184,4 @@ public class ClaimLandMessage extends TrivialMessage {
             .claimLand(serverPlayer, tile, settlement, price)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "claimLand".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

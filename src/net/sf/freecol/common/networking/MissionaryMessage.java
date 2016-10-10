@@ -154,13 +154,4 @@ public class MissionaryMessage extends TrivialMessage {
                 .establishMission(serverPlayer, unit, is))
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "missionary".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

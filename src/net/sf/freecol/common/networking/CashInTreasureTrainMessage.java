@@ -96,13 +96,4 @@ public class CashInTreasureTrainMessage extends TrivialMessage {
             .cashInTreasureTrain(serverPlayer, unit)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "cashInTreasureTrain".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

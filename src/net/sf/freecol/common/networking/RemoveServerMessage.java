@@ -56,14 +56,4 @@ public class RemoveServerMessage extends ServerInfoMessage {
                                Element element) {
         super(TAG, element);
     }
-
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "remove".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

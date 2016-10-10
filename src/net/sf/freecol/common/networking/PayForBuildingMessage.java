@@ -87,13 +87,4 @@ public class PayForBuildingMessage extends TrivialMessage {
             .payForBuilding(serverPlayer, colony)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "payForBuilding".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

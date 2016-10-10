@@ -128,13 +128,4 @@ public class UnloadGoodsMessage extends TrivialMessage {
             .unloadGoods(serverPlayer, type, amount, carrier)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "unloadGoods".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

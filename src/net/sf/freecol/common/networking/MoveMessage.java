@@ -112,13 +112,4 @@ public class MoveMessage extends DOMMessage {
             .move(serverPlayer, unit, tile)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "move".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

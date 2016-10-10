@@ -127,13 +127,4 @@ public class DemandTributeMessage extends TrivialMessage {
             .demandTribute(serverPlayer, unit, is)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "demandTribute".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

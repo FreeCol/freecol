@@ -105,13 +105,4 @@ public class AssignTradeRouteMessage extends TrivialMessage {
             .assignTradeRoute(serverPlayer, unit, tradeRoute)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "assignTradeRoute".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -86,13 +86,4 @@ public class DisbandUnitMessage extends TrivialMessage {
             .disbandUnit(serverPlayer, unit)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "disbandUnit".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -85,13 +85,4 @@ public class TrainUnitInEuropeMessage extends TrivialMessage {
             .trainUnitInEurope(serverPlayer, type)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "trainUnitInEurope".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

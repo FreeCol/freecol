@@ -106,13 +106,4 @@ public class ChangeStateMessage extends TrivialMessage {
             .changeState(serverPlayer, unit, state)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "changeState".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

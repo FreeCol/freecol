@@ -93,13 +93,4 @@ public class AbandonColonyMessage extends TrivialMessage {
             .abandonSettlement(serverPlayer, colony)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "abandonColony".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

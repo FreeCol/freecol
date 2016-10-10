@@ -46,7 +46,7 @@ public class AddPlayerMessage extends DOMMessage {
      * @param player The {@code Player}s to add.
      */
     public AddPlayerMessage(Player player) {
-        super(getTagName());
+        super(TAG);
 
         this.players.clear();
         if (player != null) this.players.add(player);
@@ -101,16 +101,7 @@ public class AddPlayerMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName())
+        return new DOMMessage(TAG)
             .add(this.players).toXMLElement();
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "addPlayer".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }

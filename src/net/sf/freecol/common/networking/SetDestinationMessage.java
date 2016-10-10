@@ -93,13 +93,4 @@ public class SetDestinationMessage extends TrivialMessage {
             .setDestination(serverPlayer, unit, destination)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "setDestination".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

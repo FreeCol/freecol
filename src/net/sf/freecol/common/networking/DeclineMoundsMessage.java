@@ -110,13 +110,4 @@ public class DeclineMoundsMessage extends TrivialMessage {
             .declineMounds(serverPlayer, tile)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "declineMounds".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

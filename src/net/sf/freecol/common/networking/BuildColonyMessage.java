@@ -115,13 +115,4 @@ public class BuildColonyMessage extends TrivialMessage {
             .buildSettlement(serverPlayer, unit, colonyName)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "buildColony".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

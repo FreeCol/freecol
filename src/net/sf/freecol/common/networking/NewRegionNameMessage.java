@@ -160,13 +160,4 @@ public class NewRegionNameMessage extends TrivialMessage {
             .setNewRegionName(serverPlayer, unit, region, getNewRegionName())
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "newRegionName".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -84,13 +84,4 @@ public class LogoutMessage extends TrivialMessage {
 
     // No single handle() method as logout handlers are present in all
     // controllers.
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "logout".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

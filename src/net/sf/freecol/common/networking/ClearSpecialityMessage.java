@@ -86,13 +86,4 @@ public class ClearSpecialityMessage extends TrivialMessage {
             .clearSpeciality(serverPlayer, unit)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "clearSpeciality".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

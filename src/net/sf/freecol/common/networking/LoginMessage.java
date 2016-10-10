@@ -83,7 +83,7 @@ public class LoginMessage extends DOMMessage {
     public LoginMessage(String userName, String version,
                         boolean admin, boolean startGame, boolean singlePlayer,
                         boolean currentPlayer, Game game) {
-        super(getTagName());
+        super(TAG);
 
         this.userName = userName;
         this.version = version;
@@ -112,15 +112,13 @@ public class LoginMessage extends DOMMessage {
      * @param e The {@code Element} to use to create the message.
      */
     public LoginMessage(Game game, Element e) {
-        super(getTagName());
-
-        this.userName = getStringAttribute(e, USER_NAME_TAG);
-        this.version = getStringAttribute(e, VERSION_TAG);
-        this.admin = getBooleanAttribute(e, ADMIN_TAG, false);
-        this.startGame = getBooleanAttribute(e, START_GAME_TAG, false);
-        this.singlePlayer = getBooleanAttribute(e, SINGLE_PLAYER_TAG, true);
-        this.currentPlayer = getBooleanAttribute(e, CURRENT_PLAYER_TAG, false);
-        this.game = getChild(game, e, 0, Game.class);
+        this(getStringAttribute(e, USER_NAME_TAG),
+             getStringAttribute(e, VERSION_TAG),
+             getBooleanAttribute(e, ADMIN_TAG, false),
+             getBooleanAttribute(e, START_GAME_TAG, false),
+             getBooleanAttribute(e, SINGLE_PLAYER_TAG, true),
+             getBooleanAttribute(e, CURRENT_PLAYER_TAG, false),
+             getChild(game, e, 0, Game.class));
     }
 
 
@@ -289,7 +287,7 @@ public class LoginMessage extends DOMMessage {
     public Element toXMLElement() {
         Player player = (this.game == null || this.userName == null) ? null
             : this.game.getPlayerByName(this.userName);
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             USER_NAME_TAG, this.userName,
             VERSION_TAG, this.version,
             ADMIN_TAG, Boolean.toString(this.admin),
@@ -298,14 +296,5 @@ public class LoginMessage extends DOMMessage {
             CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer))
             .add(this.game, player)
             .toXMLElement();
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "login".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }

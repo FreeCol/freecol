@@ -95,13 +95,4 @@ public class RenameMessage extends TrivialMessage {
             .renameObject(serverPlayer, (Nameable)fcgo, getAttribute(NAME_TAG))
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "rename".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

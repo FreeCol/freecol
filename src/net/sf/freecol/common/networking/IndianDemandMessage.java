@@ -196,13 +196,4 @@ public class IndianDemandMessage extends TrivialMessage {
             .indianDemand(serverPlayer, unit, colony, getType(game), amount)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "indianDemand".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

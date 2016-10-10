@@ -110,7 +110,7 @@ public final class InGameInputHandler extends ServerInputHandler {
 
         // Messages that are not specialized are trivial elements identified
         // by tag name only.
-        register(AbandonColonyMessage.getTagName(),
+        register(AbandonColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -118,7 +118,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new AbandonColonyMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(AskSkillMessage.getTagName(),
+        register(AskSkillMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -126,7 +126,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new AskSkillMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(AssignTeacherMessage.getTagName(),
+        register(AssignTeacherMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -134,7 +134,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new AssignTeacherMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(AssignTradeRouteMessage.getTagName(),
+        register(AssignTradeRouteMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -142,7 +142,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new AssignTradeRouteMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(AttackMessage.getTagName(),
+        register(AttackMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -150,7 +150,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new AttackMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(BuildColonyMessage.getTagName(),
+        register(BuildColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -158,7 +158,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new BuildColonyMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(CashInTreasureTrainMessage.getTagName(),
+        register(CashInTreasureTrainMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -166,7 +166,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new CashInTreasureTrainMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(ChangeStateMessage.getTagName(),
+        register(ChangeStateMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -174,7 +174,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ChangeStateMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(ChangeWorkImprovementTypeMessage.getTagName(),
+        register(ChangeWorkImprovementTypeMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -182,7 +182,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ChangeWorkImprovementTypeMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(ChangeWorkTypeMessage.getTagName(),
+        register(ChangeWorkTypeMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -190,7 +190,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ChangeWorkTypeMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(ChooseFoundingFatherMessage.getTagName(),
+        register(ChooseFoundingFatherMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -198,7 +198,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ChooseFoundingFatherMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(ClaimLandMessage.getTagName(),
+        register(ClaimLandMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -206,7 +206,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ClaimLandMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(ClearSpecialityMessage.getTagName(),
+        register(ClearSpecialityMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -214,7 +214,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ClearSpecialityMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(DeclareIndependenceMessage.getTagName(),
+        register(DeclareIndependenceMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -222,7 +222,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new DeclareIndependenceMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(DeclineMoundsMessage.getTagName(),
+        register(DeclineMoundsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -230,7 +230,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new DeclineMoundsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(DeliverGiftMessage.getTagName(),
+        register(DeliverGiftMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -238,7 +238,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new DeliverGiftMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(DeleteTradeRouteMessage.getTagName(),
+        register(DeleteTradeRouteMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -246,7 +246,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new DeleteTradeRouteMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(DemandTributeMessage.getTagName(),
+        register(DemandTributeMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -254,7 +254,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new DemandTributeMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(DisbandUnitMessage.getTagName(),
+        register(DisbandUnitMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -262,7 +262,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new DisbandUnitMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(DisembarkMessage.getTagName(),
+        register(DisembarkMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -270,7 +270,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new DisembarkMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(EmbarkMessage.getTagName(),
+        register(EmbarkMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -278,7 +278,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new EmbarkMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(EmigrateUnitMessage.getTagName(),
+        register(EmigrateUnitMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -295,7 +295,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                     .endTurn(freeColServer.getPlayer(connection))
                     .build(freeColServer.getPlayer(connection));
             }});
-        register(EquipForRoleMessage.getTagName(),
+        register(EquipForRoleMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -303,7 +303,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new EquipForRoleMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(InciteMessage.getTagName(),
+        register(InciteMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -311,7 +311,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new InciteMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(IndianDemandMessage.getTagName(),
+        register(IndianDemandMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -319,7 +319,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new IndianDemandMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(JoinColonyMessage.getTagName(),
+        register(JoinColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -327,7 +327,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new JoinColonyMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(LearnSkillMessage.getTagName(),
+        register(LearnSkillMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -335,7 +335,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new LearnSkillMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(LoadGoodsMessage.getTagName(),
+        register(LoadGoodsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -343,7 +343,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new LoadGoodsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(LootCargoMessage.getTagName(),
+        register(LootCargoMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -351,7 +351,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new LootCargoMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(MissionaryMessage.getTagName(),
+        register(MissionaryMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -359,7 +359,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new MissionaryMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(MonarchActionMessage.getTagName(),
+        register(MonarchActionMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -367,7 +367,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new MonarchActionMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(MoveMessage.getTagName(),
+        register(MoveMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -375,7 +375,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new MoveMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(MoveToMessage.getTagName(),
+        register(MoveToMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -383,7 +383,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new MoveToMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(MultipleMessage.getTagName(),
+        register(MultipleMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -391,7 +391,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new MultipleMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(NativeGiftMessage.getTagName(),
+        register(NativeGiftMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -399,7 +399,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new NativeGiftMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(NewLandNameMessage.getTagName(),
+        register(NewLandNameMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -407,7 +407,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new NewLandNameMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(NewRegionNameMessage.getTagName(),
+        register(NewRegionNameMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -415,7 +415,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new NewRegionNameMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(NewTradeRouteMessage.getTagName(),
+        register(NewTradeRouteMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -423,7 +423,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new NewTradeRouteMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(PayArrearsMessage.getTagName(),
+        register(PayArrearsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -431,7 +431,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new PayArrearsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(PayForBuildingMessage.getTagName(),
+        register(PayForBuildingMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -439,7 +439,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new PayForBuildingMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(PutOutsideColonyMessage.getTagName(),
+        register(PutOutsideColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -447,7 +447,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new PutOutsideColonyMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(RearrangeColonyMessage.getTagName(),
+        register(RearrangeColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -455,7 +455,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new RearrangeColonyMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(RenameMessage.getTagName(),
+        register(RenameMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -463,7 +463,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new RenameMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(ScoutIndianSettlementMessage.getTagName(),
+        register(ScoutIndianSettlementMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -471,7 +471,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ScoutIndianSettlementMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(ScoutSpeakToChiefMessage.getTagName(),
+        register(ScoutSpeakToChiefMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -479,7 +479,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ScoutSpeakToChiefMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(SetBuildQueueMessage.getTagName(),
+        register(SetBuildQueueMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -487,7 +487,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new SetBuildQueueMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(SetGoodsLevelsMessage.getTagName(),
+        register(SetGoodsLevelsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -495,7 +495,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new SetGoodsLevelsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(TrainUnitInEuropeMessage.getTagName(),
+        register(TrainUnitInEuropeMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -503,7 +503,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new TrainUnitInEuropeMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(UnloadGoodsMessage.getTagName(),
+        register(UnloadGoodsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -511,7 +511,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new UnloadGoodsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(WorkMessage.getTagName(),
+        register(WorkMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -527,7 +527,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                     .continuePlaying(freeColServer.getPlayer(connection));
                 return null;
             });
-        register(DiplomacyMessage.getTagName(),
+        register(DiplomacyMessage.TAG,
             (Connection connection, Element element) ->
             new DiplomacyMessage(getGame(), element)
                 .handle(freeColServer, connection));
@@ -536,19 +536,19 @@ public final class InGameInputHandler extends ServerInputHandler {
             freeColServer.getInGameController()
                .enterRevengeMode(freeColServer.getPlayer(connection))
                .build(freeColServer.getPlayer(connection)));
-        register(FirstContactMessage.getTagName(),
+        register(FirstContactMessage.TAG,
             (Connection connection, Element element) ->
             new FirstContactMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(NationSummaryMessage.getTagName(),
+        register(NationSummaryMessage.TAG,
             (Connection connection, Element element) ->
             new NationSummaryMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(HighScoreMessage.getTagName(),
+        register(HighScoreMessage.TAG,
             (Connection connection, Element element) ->
             new HighScoreMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(NativeTradeMessage.getTagName(),
+        register(NativeTradeMessage.TAG,
             (Connection connection, Element element) ->
             new NativeTradeMessage(getGame(), element)
                 .handle(freeColServer, connection));
@@ -557,19 +557,19 @@ public final class InGameInputHandler extends ServerInputHandler {
             freeColServer.getInGameController()
                 .retire(freeColServer.getPlayer(connection))
                 .build(freeColServer.getPlayer(connection)));
-        register(SetCurrentStopMessage.getTagName(),
+        register(SetCurrentStopMessage.TAG,
             (Connection connection, Element element) ->
             new SetCurrentStopMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(SetDestinationMessage.getTagName(),
+        register(SetDestinationMessage.TAG,
             (Connection connection, Element element) ->
             new SetDestinationMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(SpySettlementMessage.getTagName(),
+        register(SpySettlementMessage.TAG,
             (Connection connection, Element element) ->
             new SpySettlementMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(UpdateTradeRouteMessage.getTagName(),
+        register(UpdateTradeRouteMessage.TAG,
             (Connection connection, Element element) ->
             new UpdateTradeRouteMessage(getGame(), element)
                 .handle(freeColServer, connection));

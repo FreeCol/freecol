@@ -163,13 +163,4 @@ public class ChooseFoundingFatherMessage extends TrivialMessage {
         serverPlayer.updateCurrentFather(ff);
         return null;
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "chooseFoundingFather".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

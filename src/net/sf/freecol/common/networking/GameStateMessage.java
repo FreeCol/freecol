@@ -73,13 +73,4 @@ public class GameStateMessage extends TrivialMessage {
         setAttribute(STATE_TAG, server.getGameState().toString());
         return this.toXMLElement();
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "gameState".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -80,13 +80,4 @@ public class PayArrearsMessage extends TrivialMessage {
             .payArrears(serverPlayer, goodsType)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "payArrears".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -93,13 +93,4 @@ public class VacantPlayersMessage extends TrivialMessage {
                                      vacantPred, Player::getNationId));
         return this.toXMLElement();
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "vacantPlayers".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

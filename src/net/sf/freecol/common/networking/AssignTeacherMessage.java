@@ -124,13 +124,4 @@ public class AssignTeacherMessage extends TrivialMessage {
             .assignTeacher(serverPlayer, student, teacher)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "assignTeacher".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -123,13 +123,4 @@ public class ScoutIndianSettlementMessage extends TrivialMessage {
             .scoutIndianSettlement(serverPlayer, unit, is)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "scoutIndianSettlement".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

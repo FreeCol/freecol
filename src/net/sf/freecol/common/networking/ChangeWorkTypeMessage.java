@@ -105,14 +105,5 @@ public class ChangeWorkTypeMessage extends TrivialMessage {
             .changeWorkType(serverPlayer, unit, type)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "changeWorkType".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }
 

@@ -115,13 +115,4 @@ public class ChatMessage extends TrivialMessage {
             .chat(serverPlayer, getMessage(), isPrivate());
         return null;
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "chat".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

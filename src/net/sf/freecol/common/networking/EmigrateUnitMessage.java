@@ -120,13 +120,4 @@ public class EmigrateUnitMessage extends TrivialMessage {
             .emigrate(serverPlayer, slot, type)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "emigrateUnit".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

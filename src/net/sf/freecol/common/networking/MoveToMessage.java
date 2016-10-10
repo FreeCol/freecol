@@ -100,13 +100,4 @@ public class MoveToMessage extends TrivialMessage {
             .moveTo(serverPlayer, unit, destination)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "moveTo".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

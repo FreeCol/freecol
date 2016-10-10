@@ -87,13 +87,4 @@ public class DisembarkMessage extends TrivialMessage {
             .disembarkUnit(serverPlayer, unit)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "disembark".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

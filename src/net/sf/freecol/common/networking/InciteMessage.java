@@ -153,13 +153,4 @@ public class InciteMessage extends TrivialMessage {
             .incite(serverPlayer, unit, is, enemy, gold)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "incite".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

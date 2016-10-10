@@ -99,13 +99,4 @@ public class DeclareIndependenceMessage extends TrivialMessage {
             .declareIndependence(serverPlayer, nationName, countryName)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "declareIndependence".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

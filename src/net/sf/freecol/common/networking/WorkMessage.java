@@ -119,13 +119,4 @@ public class WorkMessage extends TrivialMessage {
             .work(serverPlayer, unit, workLocation)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "work".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

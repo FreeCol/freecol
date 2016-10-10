@@ -71,7 +71,7 @@ public class DiplomacyMessage extends DOMMessage {
      */
     public DiplomacyMessage(FreeColGameObject our, FreeColGameObject other,
                             DiplomaticTrade agreement) {
-        super(getTagName());
+        super(TAG);
 
         this.ourId = our.getId();
         this.otherId = other.getId();
@@ -124,7 +124,7 @@ public class DiplomacyMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DiplomacyMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.ourId = getStringAttribute(element, OUR_ID_TAG);
         this.otherId = getStringAttribute(element, OTHER_ID_TAG);
@@ -391,19 +391,10 @@ public class DiplomacyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             OUR_ID_TAG, this.ourId,
             OTHER_ID_TAG, this.otherId)
             .add(this.agreement)
             .add(this.extraUnit).toXMLElement();
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "diplomacy".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }

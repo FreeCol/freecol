@@ -52,7 +52,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      * @param data The new {@code ExportData}.
      */
     public SetGoodsLevelsMessage(Colony colony, ExportData data) {
-        super(getTagName());
+        super(TAG);
 
         this.colonyId = colony.getId();
         this.data = data;
@@ -66,7 +66,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetGoodsLevelsMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.colonyId = getStringAttribute(element, COLONY_TAG);
         this.data = getChild(game, element, 0, ExportData.class);
@@ -108,17 +108,8 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             COLONY_TAG, this.colonyId)
             .add(data).toXMLElement();
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "setGoodsLevels".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }

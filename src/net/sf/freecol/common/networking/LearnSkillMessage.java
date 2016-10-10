@@ -121,13 +121,4 @@ public class LearnSkillMessage extends TrivialMessage {
             .learnFromIndianSettlement(serverPlayer, unit, is)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "learnSkill".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -63,7 +63,7 @@ public class SpySettlementMessage extends DOMMessage {
      * @param settlement The {@code Settlement} the unit is looking at.
      */
     public SpySettlementMessage(Unit unit, Settlement settlement) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
@@ -78,7 +78,7 @@ public class SpySettlementMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SpySettlementMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
@@ -162,19 +162,10 @@ public class SpySettlementMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
                               UNIT_TAG, this.unitId,
                               SETTLEMENT_TAG, this.settlementId)
             .add(this.spyTile).toXMLElement();
         
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "spySettlement".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }

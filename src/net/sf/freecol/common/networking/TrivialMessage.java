@@ -248,13 +248,4 @@ public class TrivialMessage extends DOMMessage {
         return toXMLElement(); // Does not specialize
     }
      */
-    
-    /**
-     * The tag name of this object, which is not actually statically available.
-     *
-     * @return Fails!
-     */
-    public static String getTagName() {
-        return TRIVIAL_TAG;
-    }
 }

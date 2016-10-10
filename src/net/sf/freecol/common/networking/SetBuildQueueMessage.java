@@ -132,13 +132,4 @@ public class SetBuildQueueMessage extends TrivialMessage {
             .setBuildQueue(serverPlayer, colony, buildQueue)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "setBuildQueue".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -87,13 +87,4 @@ public class DeleteTradeRouteMessage extends TrivialMessage {
             .deleteTradeRoute(serverPlayer, tradeRoute)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "deleteTradeRoute".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

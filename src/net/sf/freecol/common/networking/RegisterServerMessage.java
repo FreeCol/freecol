@@ -52,14 +52,4 @@ public class RegisterServerMessage extends ServerInfoMessage {
                                  Element element) {
         super(TAG, element);
     }
-
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "register".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -52,14 +52,4 @@ public class UpdateServerMessage extends ServerInfoMessage {
                                Element element) {
         super(TAG, element);
     }
-
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "update".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

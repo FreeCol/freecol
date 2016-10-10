@@ -125,13 +125,4 @@ public class EquipForRoleMessage extends TrivialMessage {
             .equipForRole(serverPlayer, unit, role, count);
         return (cs == null) ? null : cs.build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "equipForRole".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

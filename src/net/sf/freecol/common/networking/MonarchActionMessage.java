@@ -66,7 +66,7 @@ public class MonarchActionMessage extends DOMMessage {
      */
     public MonarchActionMessage(MonarchAction action,
                                 StringTemplate template, String monarchKey) {
-        super(getTagName());
+        super(TAG);
 
         this.action = action;
         this.template = template;
@@ -83,7 +83,7 @@ public class MonarchActionMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public MonarchActionMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.action = getEnumAttribute(element, ACTION_TAG,
             MonarchAction.class, (MonarchAction)null);
@@ -194,20 +194,11 @@ public class MonarchActionMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             ACTION_TAG, this.action.toString(),
             MONARCH_TAG, this.monarchKey,
             TAX_TAG, this.tax,
             RESULT_TAG, this.resultString)
             .add(this.template).toXMLElement();
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "monarchAction".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }

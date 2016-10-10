@@ -143,13 +143,4 @@ public class EmbarkMessage extends TrivialMessage {
             .embarkUnit(serverPlayer, unit, carrier)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "embark".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

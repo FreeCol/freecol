@@ -51,7 +51,7 @@ public class HighScoreMessage extends DOMMessage {
      * @param key A message key for the final display.
      */
     public HighScoreMessage(String key) {
-        super(getTagName());
+        super(TAG);
 
         this.key = key;
     }
@@ -63,7 +63,7 @@ public class HighScoreMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public HighScoreMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.key = getStringAttribute(element, KEY_TAG);
         this.scores.clear();
@@ -111,16 +111,7 @@ public class HighScoreMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             KEY_TAG, this.key).add(this.scores).toXMLElement();
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "highScore".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }

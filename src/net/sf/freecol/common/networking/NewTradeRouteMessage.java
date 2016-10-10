@@ -44,7 +44,7 @@ public class NewTradeRouteMessage extends DOMMessage {
      * message identifier and message.
      */
     public NewTradeRouteMessage() {
-        super(getTagName());
+        super(TAG);
     }
 
     /**
@@ -55,7 +55,7 @@ public class NewTradeRouteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NewTradeRouteMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.tradeRoute = getChild(game, element, 0, true, TradeRoute.class);
     }
@@ -91,16 +91,7 @@ public class NewTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName())
+        return new DOMMessage(TAG)
             .add(this.tradeRoute).toXMLElement();
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "newTradeRoute".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }

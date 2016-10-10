@@ -124,13 +124,4 @@ public class AttackMessage extends TrivialMessage {
             .combat(serverPlayer, unit, defender, null)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "attack".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

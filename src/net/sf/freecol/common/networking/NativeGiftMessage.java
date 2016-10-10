@@ -98,13 +98,4 @@ public class NativeGiftMessage extends TrivialMessage {
             .nativeGift(serverPlayer, unit, colony)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "nativeGift".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

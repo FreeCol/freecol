@@ -139,13 +139,4 @@ public class FirstContactMessage extends TrivialMessage {
                                 getTile(game), getResult())
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "firstContact".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

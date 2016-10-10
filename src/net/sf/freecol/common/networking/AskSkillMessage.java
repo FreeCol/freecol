@@ -118,13 +118,4 @@ public class AskSkillMessage extends TrivialMessage {
             .askLearnSkill(serverPlayer, unit, is)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "askSkill".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

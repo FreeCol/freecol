@@ -107,13 +107,4 @@ public class SetCurrentStopMessage extends TrivialMessage {
             .setCurrentStop(serverPlayer, serverUnit, count)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "setCurrentStop".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

@@ -95,18 +95,9 @@ public class ServerListMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName())
+        return new DOMMessage(TAG)
             .addMessages(transform(this.servers, alwaysTrue(),
                                    si -> new RegisterServerMessage(si)))
             .toXMLElement();
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "serverList".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }

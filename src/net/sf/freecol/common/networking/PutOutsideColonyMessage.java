@@ -93,13 +93,4 @@ public class PutOutsideColonyMessage extends TrivialMessage {
             .putOutsideColony(serverPlayer, unit)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "putOutsideColony".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

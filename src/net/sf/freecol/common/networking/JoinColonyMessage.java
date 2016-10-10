@@ -99,13 +99,4 @@ public class JoinColonyMessage extends TrivialMessage {
             .joinColony(serverPlayer, unit, colony)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "joinColony".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

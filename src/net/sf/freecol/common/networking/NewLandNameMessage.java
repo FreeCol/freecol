@@ -128,13 +128,4 @@ public class NewLandNameMessage extends TrivialMessage {
             .setNewLandName(serverPlayer, unit, newLandName)
             .build(serverPlayer);
     }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "newLandName".
-     */
-    public static String getTagName() {
-        return TAG;
-    }
 }

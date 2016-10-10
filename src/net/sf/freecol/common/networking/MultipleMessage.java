@@ -47,7 +47,7 @@ public class MultipleMessage extends DOMMessage {
      * @param elements A list of sub-{@code Element}s.
      */
     public MultipleMessage(List<Element> elements) {
-        super(getTagName());
+        super(TAG);
 
         this.elements.clear();
         if (elements != null) this.elements.addAll(elements);
@@ -112,17 +112,8 @@ public class MultipleMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName());
+        DOMMessage result = new DOMMessage(TAG);
         for (Element e : this.elements) result.add(e);
         return result.toXMLElement();
-    }
-
-    /**
-     * The tag name of the root element representing this object.
-     *
-     * @return "multiple".
-     */
-    public static String getTagName() {
-        return TAG;
     }
 }
