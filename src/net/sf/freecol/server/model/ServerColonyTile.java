@@ -117,7 +117,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
                 if (resource != null) {
                     lb.add(" ", getId(), " exhausted resource ",
                            resource.getType().getSuffix());
-                    cs.addMessage(See.only(owner),
+                    cs.addMessage(owner,
                         new ModelMessage(ModelMessage.MessageType.WARNING,
                                          "model.colonyTile.resourceExhausted",
                                          colony)

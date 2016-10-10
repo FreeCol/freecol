@@ -150,7 +150,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
         } else {
             student.changeType(skill);//-vis: safe within colony
             StringTemplate newName = student.getLabel();
-            cs.addMessage(See.only(owner),
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
                                  "model.building.unitEducated",
                                  getColony(), this)
@@ -181,7 +181,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
         final ServerPlayer owner = (ServerPlayer)colony.getOwner();
         final Unit student = colony.findStudent(teacher);
         if (student == null) {
-            cs.addMessage(See.only(owner),
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.WARNING,
                                  "model.building.noStudent", colony, teacher)
                     .addStringTemplate("%teacher%", teacher.getLabel())
@@ -221,7 +221,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
         if (!canAutoProduce() && pi.getProduction().isEmpty()) {
             for (GoodsType gt : transform(getInputs(), alwaysTrue(),
                                           AbstractGoods::getType)) {
-                cs.addMessage(See.only((ServerPlayer)getOwner()),
+                cs.addMessage(getOwner(),
                     new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
                                      "model.building.notEnoughInput",
                                      this, gt)

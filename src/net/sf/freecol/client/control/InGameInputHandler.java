@@ -128,8 +128,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         register(Connection.DISCONNECT_TAG,
             (Connection c, Element e) -> disconnect(e));
-        register("addObject",
-            (Connection c, Element e) -> addObject(e));
         register(AddPlayerMessage.TAG,
             (Connection c, Element e) -> addPlayer(e));
         register("animateAttack",
@@ -289,46 +287,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
 
     // Individual message handlers
-
-    /**
-     * Add the objects which are the children of this Element.
-     *
-     * @param element The {@code Element} to process.
-     * @return Null.
-     */
-    private Element addObject(Element element) {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-        DOMMessage.mapChildren(element, (e) -> {
-                String owner = DOMMessage.getStringAttribute(e, "owner");
-                Player player = game.getFreeColGameObject(owner, Player.class);
-                if (player == null) {
-                    logger.warning("addObject with broken owner: " + owner);
-                } else {
-                    final String tag = e.getTagName();
-                    if (FoundingFather.TAG.equals(tag)) {
-                        FoundingFather father
-                            = spec.getFoundingFather(DOMMessage.readId(e));
-                        if (father != null) player.addFather(father);
-                        player.invalidateCanSeeTiles();// Might be coronado?
-                        
-                    } else if (HistoryEvent.TAG.equals(tag)) {
-                        player.addHistory(DOMMessage.readElement(game, e, HistoryEvent.class));
-                        
-                    } else if (LastSale.TAG.equals(tag)) {
-                        player.addLastSale(DOMMessage.readElement(game, e, LastSale.class));
-                        
-                    } else if (ModelMessage.TAG.equals(tag)) {
-                        player.addModelMessage(DOMMessage.readElement(game, e, ModelMessage.class));
-                        
-                    } else {
-                        logger.warning("addObject unrecognized: " + tag);
-                    }
-                }
-                return player;
-            });
-        return null;
-    }
 
     /**
      * Handle an "addPlayer"-message.
@@ -606,24 +564,79 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         DOMMessage.mapChildren(element, (e) -> {
                 final String tag = DOMMessage.getType(e);
-                if (Ability.TAG.equals(tag)) {
+                switch (tag) {
+                case Ability.TAG:
                     if (add) {
                         object.addAbility(new Ability(e, spec));
                     } else {
                         object.removeAbility(new Ability(e, spec));
                     }
-                    
-                } else if (Modifier.TAG.equals(tag)) {
+                    break;
+                case Modifier.TAG:
                     if (add) {
                         object.addModifier(new Modifier(e, spec));
                     } else {
                         object.removeModifier(new Modifier(e, spec));
                     }
+                    break;
+                case FoundingFather.TAG:
+                    FoundingFather ff;
+                    if (object instanceof Player && add
+                        && (ff = spec.getFoundingFather(DOMMessage.readId(e))) != null) {
+                        Player player = (Player)object;
+                        player.addFather(ff);
+                        player.invalidateCanSeeTiles(); // Might be coronado
+                    } else {
+                        logger.warning(tag + " feature change failure: "
+                            + object + "/" + add);
+                    }
+                    break;
+                case HistoryEvent.TAG:
+                    if (object instanceof Player && add) {
+                        Player player = (Player)object;
+                        player.addHistory(DOMMessage.readElement(game, e, HistoryEvent.class));
+                    } else {
+                        logger.warning(tag + " feature change failure: "
+                            + object + "/" + add);
+                    }
+                    break;
+                case LastSale.TAG:
+                    if (object instanceof Player && add) {
+                        Player player = (Player)object;
+                        player.addLastSale(DOMMessage.readElement(game, e, LastSale.class));
+                    } else {
+                        logger.warning(tag + " feature change failure: "
+                            + object + "/" + add);
+                    }
+                    break;
+                case ModelMessage.TAG:
+                    if (object instanceof Player && add) {
+                        Player player = (Player)object;
+                        player.addModelMessage(DOMMessage.readElement(game, e, ModelMessage.class));
+                    } else {
+                        logger.warning(tag + " feature change failure: "
+                            + object + "/" + add);
+                    }
+                    break;
+                case TradeRoute.TAG:
+                    if (object instanceof Player) {
+                        Player player = (Player)object;
+                        if (add) {
+                            player.addTradeRoute(DOMMessage.readElement(game, e, TradeRoute.class));
+                        } else {
+                            player.removeTradeRoute(DOMMessage.readElement(game, e, TradeRoute.class));
+                        }
+                    } else {
+                        logger.warning(tag + " feature change failure: "
+                            + object + "/" + add);
+                    }
+                    break;
                     
-                } else {
+                default:
                     logger.warning("featureChange unrecognized: " + tag);
+                    break;
                 }
-                return object;
+                return null;
             });
         return null;
     }

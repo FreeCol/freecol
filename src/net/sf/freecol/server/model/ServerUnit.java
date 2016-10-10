@@ -281,7 +281,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             if (!Messages.containsKey(messageId)) {
                 messageId = "model.unit.noMoreTools";
             }
-            cs.addMessage(See.only(owner),
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.WARNING,
                                  messageId, this)
                     .addStringTemplate("%unit%", getLabel())
@@ -341,7 +341,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         setHitPoints(getHitPoints() + 1);
         if (!isDamaged()) {
             Location loc = getLocation();
-            cs.addMessage(See.only(owner),
+            cs.addMessage(owner,
                 new ModelMessage(ModelMessage.MessageType.UNIT_REPAIRED,
                                  "model.unit.unitRepaired",
                                  this, (FreeColGameObject)loc)
@@ -421,7 +421,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         indianPlayer.csModifyTension(serverPlayer, 
             Tension.Level.HATEFUL.getLimit(), cs);//+til
         serverPlayer.csChangeStance(Stance.WAR, indianPlayer, true, cs);
-        cs.addMessage(See.only(serverPlayer),
+        cs.addMessage(serverPlayer,
             new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                              RumourType.BURIAL_GROUND.getDescriptionKey(),
                              serverPlayer, this)
@@ -515,13 +515,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
             csNativeBurialGround(cs);
             break;
         case EXPEDITION_VANISHES:
-            cs.addMessage(See.only(serverPlayer),
+            cs.addMessage(serverPlayer,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                  key, serverPlayer));
             result = false;
             break;
         case NOTHING:
-            cs.addMessage(See.only(serverPlayer),
+            cs.addMessage(serverPlayer,
                 lostCity.getNothingMessage(serverPlayer, mounds, random));
             break;
         case LEARN:
@@ -531,7 +531,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 random);
             changeType(uc.to);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
-            cs.addMessage(See.only(serverPlayer),
+            cs.addMessage(serverPlayer,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                  key, serverPlayer, this)
                     .addStringTemplate("%unit%", oldName)
@@ -544,7 +544,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.addPartial(See.only(serverPlayer), serverPlayer,
                           "gold", "score");
             if (mounds) key = rumour.getAlternateDescriptionKey("mounds");
-            cs.addMessage(See.only(serverPlayer),
+            cs.addMessage(serverPlayer,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                  key, serverPlayer, this)
                     .addAmount("%money%", chiefAmount));
@@ -557,7 +557,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                        foundTypes, random);
             newUnit = new ServerUnit(game, tile, serverPlayer,
                                      unitType);//-vis: safe, scout on tile
-            cs.addMessage(See.only(serverPlayer),
+            cs.addMessage(serverPlayer,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                  key, serverPlayer, newUnit));
             break;
@@ -571,7 +571,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 newUnit = new ServerUnit(game, tile, serverPlayer,
                                          unitType);//-vis: safe, scout on tile
                 newUnit.setTreasureAmount(treasureAmount);
-                cs.addMessage(See.only(serverPlayer),
+                cs.addMessage(serverPlayer,
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                      key, serverPlayer, newUnit)
                         .addName("%city%", cityName)
@@ -600,7 +600,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 newUnit.setTreasureAmount(ruinsAmount);
             }
             if (mounds) key = rumour.getAlternateDescriptionKey("mounds");
-            cs.addMessage(See.only(serverPlayer),
+            cs.addMessage(serverPlayer,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                  key, serverPlayer,
                                  ((newUnit != null) ? newUnit : this))
@@ -611,7 +611,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             if (europe == null) {
                 // FoY should now be disabled for non-colonial
                 // players, but leave this in for now as it is harmless.
-                cs.addMessage(See.only(serverPlayer),
+                cs.addMessage(serverPlayer,
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                      rumour.getAlternateDescriptionKey("noEurope"),
                                      serverPlayer, this));
@@ -626,7 +626,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                            ChangeSet.ChangePriority.CHANGE_LATE,
                            new FountainOfYouthMessage(dx));
                 }
-                cs.addMessage(See.only(serverPlayer),
+                cs.addMessage(serverPlayer,
                      new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                       key, serverPlayer, this));
                 cs.addAttribute(See.only(serverPlayer),
@@ -829,7 +829,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         cs.add(See.only(contactPlayer), is);
                         // First European contact with native settlement.
                         StringTemplate nation = is.getOwner().getNationLabel();
-                        cs.addMessage(See.only(contactPlayer),
+                        cs.addMessage(contactPlayer,
                             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                              "model.unit.nativeSettlementContact",
                                              this, is)
@@ -864,7 +864,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         Unit slowedBy = getSlowedBy(newTile, random);
         if (slowedBy != null) {
             StringTemplate enemy = slowedBy.getApparentOwnerName();
-            cs.addMessage(See.only(serverPlayer),
+            cs.addMessage(serverPlayer,
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "model.unit.slowed", this, slowedBy)
                     .addStringTemplate("%unit%",
@@ -910,7 +910,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             int attrition = getAttrition() + 1;
             setAttrition(attrition);
             if (attrition > getType().getMaximumAttrition()) {
-                cs.addMessage(See.only(owner),
+                cs.addMessage(owner,
                     new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                      "model.unit.attrition", this)
                         .addStringTemplate("%unit%", getLabel())
@@ -944,7 +944,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 < Math.min(getExperience(), maximumExperience)) {
                 StringTemplate oldName = getLabel();
                 changeType(learn);//-vis: safe within colony
-                cs.addMessage(See.only(owner),
+                cs.addMessage(owner,
                     new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
                                      "model.unit.experience", getColony(), this)
                         .addStringTemplate("%oldName%", oldName)
@@ -1018,7 +1018,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     lb.add(" arrives in Europe");
                     if (getTradeRoute() == null) {
                         setDestination(null);
-                        cs.addMessage(See.only(owner),
+                        cs.addMessage(owner,
                             new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                              "model.unit.arriveInEurope",
                                              europe, this)

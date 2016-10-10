@@ -432,7 +432,7 @@ public class ServerGame extends Game implements ServerModelObject {
 
         StringTemplate loser = weakAI.getNationLabel();
         StringTemplate winner = strongAI.getNationLabel();
-        cs.addMessage(See.all(),
+        cs.addGlobalMessage(this, null,
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              "model.game.spanishSuccession", strongAI)
                 .addStringTemplate("%loserNation%", loser)

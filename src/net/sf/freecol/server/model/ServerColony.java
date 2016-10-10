@@ -156,14 +156,14 @@ public class ServerColony extends Colony implements ServerModelObject {
         Unit unit = new ServerUnit(getGame(), getTile(), owner,
                                    type);//-vis: safe, within colony
         if (unit.hasAbility(Ability.BORN_IN_COLONY)) {
-            cs.addMessage(See.only((ServerPlayer) owner),
+            cs.addMessage(owner,
                           new ModelMessage(MessageType.UNIT_ADDED,
                                            "model.colony.newColonist",
                                            this, unit)
                               .addName("%colony%", getName()));
         } else {
             unit.setName(owner.getNameForUnit(type, random));
-            cs.addMessage(See.only((ServerPlayer) owner),
+            cs.addMessage(owner,
                           new ModelMessage(MessageType.UNIT_ADDED,
                                            "model.colony.unitReady",
                                            this, unit)
@@ -226,12 +226,11 @@ public class ServerColony extends Colony implements ServerModelObject {
                 ejectUnits(building, eject);//-til
                 if (!eject.isEmpty()) getTile().cacheUnseen(copied);//+til
             } else {
-                cs.addMessage(See.only((ServerPlayer)owner),
-                              getUnbuildableMessage(type));
+                cs.addMessage(owner, getUnbuildableMessage(type));
             }
         }
         if (success) {
-            cs.addMessage(See.only((ServerPlayer) owner),
+            cs.addMessage(owner,
                 new ModelMessage(MessageType.BUILDING_COMPLETED,
                                  "model.colony.buildingReady", this)
                     .addName("%colony%", getName())
@@ -274,7 +273,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                             && !gt.isStorable()
                             && getTotalProductionOf(gt) > 0))) {
                     // Production is idle
-                    cs.addMessage(See.only(owner),
+                    cs.addMessage(owner,
                         new ModelMessage(MessageType.WARNING,
                                          "model.colony.cannotBuild", this)
                             .addName("%colony%", getName()));
@@ -282,7 +281,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 return null;
                 
             case POPULATION_TOO_SMALL:
-                cs.addMessage(See.only(owner),
+                cs.addMessage(owner,
                     new ModelMessage(MessageType.WARNING,
                                      "model.colony.buildNeedPop",
                                      this)
@@ -293,7 +292,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 logger.warning("Unexpected build failure at " + getName()
                     + " for " + buildable
                     + ": " + getNoBuildReason(buildable, null));
-                cs.addMessage(See.only(owner),
+                cs.addMessage(owner,
                               getUnbuildableMessage(buildable));
                 break;
             }
@@ -320,7 +319,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         Tile copied = colonyTile.getTileToCache();
         if (!ejectUnits(ct, ct.getUnitList())) return;//-til
         colonyTile.cacheUnseen(copied);//+til
-        cs.addMessage(See.only(serverPlayer),
+        cs.addMessage(serverPlayer,
             new ModelMessage(MessageType.WARNING,
                              "model.colony.workersEvicted",
                              this, this)
@@ -481,7 +480,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             cs.addDisappear(newOwner, tile, brave);
             cs.add(See.only(newOwner), getTile());
             StringTemplate nation = oldOwner.getNationLabel();
-            cs.addMessage(See.only(newOwner),
+            cs.addMessage(newOwner,
                 new ModelMessage(MessageType.UNIT_ADDED,
                                 "model.colony.newConvert", brave)
                     .addStringTemplate("%nation%", nation)
@@ -582,7 +581,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     // Warn if about to fail, or if no useful progress
                     // towards completion is possible.
                     if (complete == -2 || complete == -1) {
-                        cs.addMessage(See.only(owner),
+                        cs.addMessage(owner,
                             new ModelMessage(MessageType.MISSING_GOODS,
                                              "model.colony.buildableNeedsGoods",
                                              this, build)
@@ -646,13 +645,13 @@ public class ServerColony extends Colony implements ServerModelObject {
                         cs.addRemove(See.only(owner), null,
                                      victim);//-vis: safe, all within colony
                         victim.dispose();
-                        cs.addMessage(See.only(owner),
+                        cs.addMessage(owner,
                             new ModelMessage(MessageType.UNIT_LOST,
                                              "model.colony.colonistStarved",
                                              this)
                                 .addName("%colony%", getName()));
                     } else { // Its dead, Jim.
-                        cs.addMessage(See.only(owner),
+                        cs.addMessage(owner,
                             new ModelMessage(MessageType.UNIT_LOST,
                                              "model.colony.colonyStarved",
                                              this)
@@ -663,7 +662,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 } else if (net < 0) {
                     int turns = stored / -net;
                     if (turns <= Colony.FAMINE_TURNS && !newUnitBorn) {
-                        cs.addMessage(See.only(owner),
+                        cs.addMessage(owner,
                             new ModelMessage(MessageType.WARNING,
                                              "model.colony.famineFeared",
                                              this)
@@ -732,7 +731,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
             if (lb2.grew()) {
                 lb2.shrink(", ");
-                cs.addMessage(See.only(owner),
+                cs.addMessage(owner,
                     new ModelMessage(MessageType.GOODS_MOVEMENT,
                                      "model.colony.customs.sale", this)
                         .addName("%colony%", getName())
@@ -757,7 +756,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
             if (amount < low && oldAmount >= low
                 && !(type == spec.getPrimaryFoodType() && newUnitBorn)) {
-                cs.addMessage(See.only(owner),
+                cs.addMessage(owner,
                     new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
                                      "model.colony.warehouseEmpty",
                                      this, type)
@@ -783,7 +782,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 messageId = "model.colony.warehouseFull";
             }
             if (messageId != null) {
-                cs.addMessage(See.only(owner),
+                cs.addMessage(owner,
                     new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
                                      messageId, this, type)
                         .addNamed("%goods%", type)
@@ -799,7 +798,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 && amount <= limit) {
                 int loss = amount + getNetProductionOf(type) - limit;
                 if (loss > 0) {
-                    cs.addMessage(See.only(owner),
+                    cs.addMessage(owner,
                         new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
                                          "model.colony.warehouseSoonFull",
                                          this, type)
@@ -833,7 +832,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                         && !g.isBreedable()
                         && getAdjustedNetProductionOf(g) > 0
                         && neededForBuildableType(g)))) {
-                cs.addMessage(See.only(owner),
+                cs.addMessage(owner,
                     new ModelMessage(MessageType.BUILDING_COMPLETED,
                         "model.colony.notBuildingAnything", this)
                         .addName("%colony%", getName()));
@@ -843,7 +842,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Update SoL.
         updateSoL();
         if (sonsOfLiberty / 10 != oldSonsOfLiberty / 10) {
-            cs.addMessage(See.only(owner),
+            cs.addMessage(owner,
                 new ModelMessage(MessageType.SONS_OF_LIBERTY,
                                  ((sonsOfLiberty > oldSonsOfLiberty)
                                      ? "model.colony.soLIncrease"
@@ -855,7 +854,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
             ModelMessage govMgtMessage = checkForGovMgtChangeMessage();
             if (govMgtMessage != null) {
-                cs.addMessage(See.only(owner), govMgtMessage);
+                cs.addMessage(owner, govMgtMessage);
             }
         }
         updateProductionBonus();

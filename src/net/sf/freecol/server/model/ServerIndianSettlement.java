@@ -429,14 +429,14 @@ public class ServerIndianSettlement extends IndianSettlement
         ServerPlayer missionaryOwner = (ServerPlayer)missionary.getOwner();
         if (destroy != null) {
             if (destroy) {
-                cs.addMessage(See.only(missionaryOwner),
+                cs.addMessage(missionaryOwner,
                     new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                      "model.indianSettlement.mission.destroyed",
                                      this)
                         .addStringTemplate("%settlement%",
                             getLocationLabelFor(missionaryOwner)));
             } else {
-                cs.addMessage(See.only(missionaryOwner),
+                cs.addMessage(missionaryOwner,
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                      "model.indianSettlement.mission.denounced",
                                      this)
@@ -491,7 +491,7 @@ public class ServerIndianSettlement extends IndianSettlement
         // Send a message to the enemy that tension has increased.
         String key = "model.player.alarmIncrease." + getAlarm(enemy).getKey();
         if (!Messages.containsKey(key)) return;
-        cs.addMessage(See.only((ServerPlayer)enemy),
+        cs.addMessage(enemy,
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              key, this)
                 .addStringTemplate("%nation%", getOwner().getNationLabel())

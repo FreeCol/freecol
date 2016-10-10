@@ -190,7 +190,6 @@ public final class AIInGameInputHandler implements MessageHandler {
             // Therefore most of these messages are useless.  This
             // may change one day.
             case Connection.DISCONNECT_TAG:                
-            case "addObject":
             case AddPlayerMessage.TAG:
             case "animateMove":
             case "animateAttack":

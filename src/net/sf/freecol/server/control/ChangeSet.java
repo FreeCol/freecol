@@ -1083,101 +1083,34 @@ public class ChangeSet {
     }
 
     /**
-     * Encapsulate an owned object change.
-     */
-    private static class OwnedChange extends Change {
-        private final FreeColObject fco;
-
-        /**
-         * Build a new OwnedChange.
-         *
-         * @param see The visibility of this change.
-         * @param fco The {@code FreeColObject} to update.
-         */
-        public OwnedChange(See see, FreeColObject fco) {
-            super(see);
-            this.fco = fco;
-        }
-
-        /**
-         * Gets the sort priority.
-         *
-         * @return "CHANGE_OWNER"
-         */
-        @Override
-        public int getPriority() {
-            return ChangePriority.CHANGE_OWNED.getPriority();
-        }
-
-        /**
-         * Specialize a OwnedChange into an "addObject" element for a
-         * particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return An "addObject" element.
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("addObject");
-            Element child = DOMMessage.toXMLElement(fco, doc, serverPlayer);
-            child.setAttribute("owner", serverPlayer.getId());
-            element.appendChild(child);
-            return element;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
-
-
-        // Override Object
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder(32);
-            sb.append('[').append(getClass().getName())
-                .append(' ').append(see)
-                .append(" #").append(getPriority())
-                .append(' ').append(fco.getId())
-                .append(']');
-            return sb.toString();
-        }
-    }
-
-    /**
      * Encapsulate a feature change.
      */
     private static class FeatureChange extends Change {
-        private final FreeColGameObject object;
-        private final Feature feature;
+
+        private final FreeColGameObject parent;
+        private final FreeColObject child;
         private final boolean add;
 
         /**
          * Build a new FeatureChange.
          *
          * @param see The visibility of this change.
-         * @param object The {@code FreeColGameObject} to update.
-         * @param feature a {@code Feature} value to add or remove.
-         * @param add a {@code boolean} value
+         * @param parent The {@code FreeColGameObject} to update.
+         * @param child The {@code FreeColObject} value to add or remove.
+         * @param add If true, add the child, if not, remove it.
          */
-        public FeatureChange(See see, FreeColGameObject object,
-                             Feature feature, boolean add) {
+        public FeatureChange(See see, FreeColGameObject parent,
+                             FreeColObject child, boolean add) {
             super(see);
-            this.object = object;
-            this.feature = feature;
+            this.parent = parent;
+            this.child = child;
             this.add = add;
         }
 
         /**
          * Gets the sort priority.
          *
-         * @return "CHANGE_OWNER"
+         * @return "CHANGE_OWNED"
          */
         @Override
         public int getPriority() {
@@ -1190,16 +1123,15 @@ public class ChangeSet {
          *
          * @param serverPlayer The {@code ServerPlayer} to update.
          * @param doc The owner {@code Document}.
-         * @return An "addObject" element.
+         * @return A "featureChange" element.
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("featureChange");
-            element.setAttribute("add", Boolean.toString(add));
-            element.setAttribute(FreeColObject.ID_ATTRIBUTE_TAG, object.getId());
-            Element child = DOMMessage.toXMLElement(feature, doc, (Player)null);
-            element.appendChild(child);
-            return element;
+            return new DOMMessage("featureChange",
+                                  FreeColObject.ID_ATTRIBUTE_TAG, this.parent.getId(),
+                                  "add", Boolean.toString(this.add))
+                .add(child)
+                .attachToDocument(doc);
         }
 
         /**
@@ -1220,10 +1152,10 @@ public class ChangeSet {
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(' ').append((add) ? "add" : "remove")
-                .append(' ').append(feature)
-                .append(' ').append((add) ? "to" : "from")
-                .append(' ').append(object.getId())
+                .append(' ').append((this.add) ? "add" : "remove")
+                .append(' ').append(this.child)
+                .append(' ').append((this.add) ? "to" : "from")
+                .append(' ').append(this.parent.getId())
                 .append(']');
             return sb.toString();
         }
@@ -1584,7 +1516,8 @@ public class ChangeSet {
      */
     public ChangeSet addFather(ServerPlayer serverPlayer,
                                FoundingFather father) {
-        changes.add(new OwnedChange(See.only(serverPlayer), father));
+        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
+                                      father, true));
         serverPlayer.addFather(father);
         return this;
     }
@@ -1642,9 +1575,25 @@ public class ChangeSet {
      * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addGlobalHistory(Game game, HistoryEvent history) {
-        changes.add(new OwnedChange(See.all(), history));
         for (Player p : game.getLiveEuropeanPlayerList()) {
-            p.addHistory(history);
+            addHistory((ServerPlayer)p, history);
+        }
+        return this;
+    }
+
+    /**
+     * Helper function to add a message to all the European players.
+     *
+     * @param game The {@code Game} to find players in.
+     * @param omit An optional {@code ServerPlayer} to omit.
+     * @param message The {@code ModelMessage} to add.
+     * @return The updated {@code ChangeSet}.
+     */
+    public ChangeSet addGlobalMessage(Game game, ServerPlayer omit,
+                                      ModelMessage message) {
+        for (Player p : game.getLiveEuropeanPlayerList()) {
+            if (p == (Player)omit) continue;
+            addMessage((ServerPlayer)p, message);
         }
         return this;
     }
@@ -1659,7 +1608,8 @@ public class ChangeSet {
      */
     public ChangeSet addHistory(ServerPlayer serverPlayer,
                                 HistoryEvent history) {
-        changes.add(new OwnedChange(See.only(serverPlayer), history));
+        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
+                                      history, true));
         serverPlayer.addHistory(history);
         return this;
     }
@@ -1667,12 +1617,14 @@ public class ChangeSet {
     /**
      * Helper function to add a message to a ChangeSet.
      *
-     * @param see The visibility of this change.
+     * @param player The {@code Player} to send the message to.
      * @param message The {@code ModelMessage} to add.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addMessage(See see, ModelMessage message) {
-        changes.add(new OwnedChange(see, message));
+    public ChangeSet addMessage(Player player, ModelMessage message) {
+        ServerPlayer serverPlayer = (ServerPlayer)player;
+        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
+                                      message, true));
         return this;
     }
 
@@ -1762,7 +1714,8 @@ public class ChangeSet {
                              GoodsType type, int price) {
         Game game = settlement.getGame();
         LastSale sale = new LastSale(settlement, type, game.getTurn(), price);
-        changes.add(new OwnedChange(See.only(serverPlayer), sale));
+        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
+                                      sale, true));
         serverPlayer.addLastSale(sale);
         return this;
     }
@@ -1805,7 +1758,8 @@ public class ChangeSet {
      */
     public ChangeSet addTradeRoute(ServerPlayer serverPlayer,
                                    TradeRoute tradeRoute) {
-        changes.add(new OwnedChange(See.only(serverPlayer), tradeRoute));
+        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
+                                      tradeRoute, true));
         return this;
     }
 
