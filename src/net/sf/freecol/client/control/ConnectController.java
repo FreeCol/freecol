@@ -201,7 +201,7 @@ public final class ConnectController extends FreeColClientHolder {
         fcc.setMapEditor(false);
  
         try {
-            askServer().disconnect();
+            askServer().disconnect("logging in");
         } catch (IOException ioe) {} // Ignore            
 
         // Establish the full connection here
@@ -599,7 +599,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         if (fcc.isLoggedIn()) askServer().logout(fcc.getMyPlayer(), reason);
         try {
-            askServer().disconnect();
+            askServer().disconnect("logout");
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Disconnection error", ioe);
         }

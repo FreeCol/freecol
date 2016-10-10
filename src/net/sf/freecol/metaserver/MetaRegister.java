@@ -147,7 +147,7 @@ public final class MetaRegister {
                                                newSi.getPort(), null,
                                                FreeCol.METASERVER_THREAD);
             ) {
-                mc.disconnect();
+                mc.disconnect("server replacement");
             } catch (IOException ioe) {
                 logger.log(Level.WARNING, "Server rejected disconnect.", ioe);
             }

@@ -95,11 +95,12 @@ public class UserServerAPI extends ServerAPI {
     /**
      * Disconnect the client connection..
      *
+     * @param reason The reason for the disconnection.
      * @exception IOException on failure to send the required messages.
      */
-    public void disconnect() throws IOException {
+    public void disconnect(String reason) throws IOException {
         if (this.clientConnection != null) {
-            this.clientConnection.disconnect();
+            this.clientConnection.disconnect(reason);
             reset();
         }
     }

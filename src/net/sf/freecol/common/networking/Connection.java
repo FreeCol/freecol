@@ -276,7 +276,7 @@ public class Connection implements Closeable {
     @Override
     public void close() {
         try {
-            disconnect();
+            disconnect("close");
         } catch (IOException ioe) {
             // Failure is expected if the other end has closed already
             logger.log(Level.FINE, "Disconnect failed for " + this.name, ioe);
@@ -554,10 +554,11 @@ public class Connection implements Closeable {
     /**
      * Send a disconnect message.
      *
+     * @param reason The reason for the disconnection.
      * @exception IOException if failed to send the message.
      */
-    public void disconnect() throws IOException {
-        this.send(new TrivialMessage(DISCONNECT_TAG));
+    public void disconnect(String reason) throws IOException {
+        this.send(new AttributeMessage(DISCONNECT_TAG, "reason", reason));
     }
 
     /**
