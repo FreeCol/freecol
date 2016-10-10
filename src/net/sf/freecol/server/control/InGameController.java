@@ -384,12 +384,11 @@ public final class InGameController extends Controller {
      */
     private void moveGoods(GoodsLocation src, GoodsType goodsType, int amount,
                            GoodsLocation dst) {
-        src.getGoodsContainer().saveState();
-        src.removeGoods(goodsType, amount);
-        if (dst != null) {
-            dst.getGoodsContainer().saveState();
-            dst.addGoods(goodsType, amount);
-        }
+        GoodsContainer srcContainer = (src == null) ? null
+            : src.getGoodsContainer();
+        GoodsContainer dstContainer = (dst == null) ? null
+            : dst.getGoodsContainer();
+        GoodsContainer.moveGoods(srcContainer, goodsType, amount, dstContainer);
     }
 
     /**

@@ -428,6 +428,28 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         return ret;
     }
 
+    /**
+     * Utility to move goods from one location to another.
+     *
+     * @param src The source {@code GoodsContainer}.
+     * @param goodsType The {@code GoodsType} to move.
+     * @param amount The amount of goods to move.
+     * @param dst The new {@code GoodsContainer}.
+     */
+    public static void moveGoods(GoodsContainer src,
+                                 GoodsType goodsType, int amount,
+                                 GoodsContainer dst) {
+        if (src != null) {
+            src.saveState();
+            src.removeGoods(goodsType, amount);
+        }
+        if (dst != null) {
+            dst.saveState();
+            dst.addGoods(goodsType, amount);
+        }
+    }
+
+    
     // Interface Ownable
 
     /**
