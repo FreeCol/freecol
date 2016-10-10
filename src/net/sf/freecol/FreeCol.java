@@ -129,6 +129,7 @@ public final class FreeCol {
     private static final String TC_DEFAULT = "freecol";
     public static final long    TIMEOUT_DEFAULT = 60L; // 1 minute
     public static final long    TIMEOUT_MIN = 10L; // 10s
+    public static final long    TIMEOUT_MAX = 3600000L; // 1000hours:-)
 
 
     // Cli values.  Often set to null so the default can be applied in
@@ -1228,7 +1229,7 @@ public final class FreeCol {
      */
     public static long getTimeout(boolean singlePlayer) {
         return (timeout >= TIMEOUT_MIN) ? timeout
-            : (singlePlayer) ? Long.MAX_VALUE
+            : (singlePlayer) ? TIMEOUT_MAX
             : TIMEOUT_DEFAULT;
     }
 
@@ -1241,7 +1242,7 @@ public final class FreeCol {
     public static boolean setTimeout(String timeout) {
         try {
             long result = Long.parseLong(timeout);
-            if (result >= TIMEOUT_MIN) {
+            if (TIMEOUT_MIN <= result && result <= TIMEOUT_MAX) {
                 FreeCol.timeout = result;
                 return true;
             }
