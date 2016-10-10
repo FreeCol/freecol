@@ -63,7 +63,6 @@ public class Connection implements Closeable {
     public static final String DISCONNECT_TAG = "disconnect";
     public static final String NETWORK_REPLY_ID_TAG = "networkReplyId";
     public static final String QUESTION_TAG = "question";
-    public static final String RECONNECT_TAG = "reconnect";
     public static final String REPLY_TAG = "reply";
     public static final String SEND_SUFFIX = "-send\n";
     public static final String REPLY_SUFFIX = "-reply\n";
@@ -566,7 +565,7 @@ public class Connection implements Closeable {
      */
     public void reconnect() {
         try {
-            this.send(new TrivialMessage(RECONNECT_TAG));
+            this.send(TrivialMessage.RECONNECT_MESSAGE);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Reconnect failed for " + this.name,
                 ioe);

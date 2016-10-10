@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NewTurnMessage;
+import net.sf.freecol.common.networking.TrivialMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.control.ChangeSet;
@@ -185,8 +186,8 @@ public class ServerGame extends Game implements ServerModelObject {
         } catch (TimeoutException te) {
             reply = null;
             sendTo(serverPlayer, new ChangeSet()
-                .addTrivial(See.only(serverPlayer), "closeMenus",
-                    ChangePriority.CHANGE_NORMAL));
+                .add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+                     TrivialMessage.CLOSE_MENUS_MESSAGE));
         } catch (InterruptedException | ExecutionException e) {
             reply = null;
             logger.log(Level.WARNING, "Exception completing future", e);

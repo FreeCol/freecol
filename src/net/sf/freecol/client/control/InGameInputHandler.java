@@ -77,6 +77,7 @@ import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
 import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.networking.SetStanceMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
+import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 
 import org.w3c.dom.Element;
@@ -139,7 +140,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> chat(e));
         register(ChooseFoundingFatherMessage.TAG,
             (Connection c, Element e) -> chooseFoundingFather(e));
-        register("closeMenus",
+        register(TrivialMessage.CLOSE_MENUS_TAG,
             (Connection c, Element e) -> closeMenus());
         register("diplomacy",
             (Connection c, Element e) -> diplomacy(e));
@@ -177,7 +178,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> newTurn(e));
         register("newTradeRoute",
             (Connection c, Element e) -> newTradeRoute(e));
-        register(Connection.RECONNECT_TAG,
+        register(TrivialMessage.RECONNECT_TAG,
             (Connection c, Element e) -> reconnect());
         register("remove",
             (Connection c, Element e) -> remove(e));
