@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.NewTurnMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.control.ChangeSet;
@@ -319,8 +320,8 @@ public class ServerGame extends Game implements ServerModelObject {
         Session.completeAll(cs);
         setTurn(getTurn().next());
         logger.finest("Turn is now " + getTurn() + duration);
-        cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
-                      "turn", Integer.toString(getTurn().getNumber()));
+        cs.add(See.all(), ChangePriority.CHANGE_NORMAL,
+               new NewTurnMessage(getTurn()));
     }
 
     /**

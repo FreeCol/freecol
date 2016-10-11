@@ -69,6 +69,7 @@ import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
+import net.sf.freecol.common.networking.NewTurnMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
@@ -168,7 +169,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> newLandName(e));
         register(NewRegionNameMessage.TAG,
             (Connection c, Element e) -> newRegionName(e));
-        register("newTurn",
+        register(NewTurnMessage.TAG,
             (Connection c, Element e) -> newTurn(e));
         register("newTradeRoute",
             (Connection c, Element e) -> newTradeRoute(e));
@@ -906,7 +907,9 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element newTurn(Element element) {
-        final int n = getIntegerAttribute(element, "turn");
+        final Game game = getGame();
+        final NewTurnMessage message = new NewTurnMessage(game, element);
+        int n = message.getTurnNumber();
         if (n < 0) {
             logger.warning("Invalid turn for newTurn");
             return null;

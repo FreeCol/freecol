@@ -54,6 +54,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NativeGiftMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
+import net.sf.freecol.common.networking.NewTurnMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
@@ -196,7 +197,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "gameEnded":
             case LogoutMessage.TAG:
             case NativeGiftMessage.TAG:
-            case "newTurn":
+            case NewTurnMessage.TAG:
             case "newTradeRoute":
             case "remove":
             case "removeGoods":
