@@ -47,6 +47,7 @@ import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
+import net.sf.freecol.common.networking.FountainOfYouthMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
@@ -155,7 +156,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = diplomacy(connection, element); break;
             case FirstContactMessage.TAG:
                 reply = firstContact(connection, element); break;
-            case "fountainOfYouth":
+            case FountainOfYouthMessage.TAG:
                 reply = fountainOfYouth(connection, element); break;
             case IndianDemandMessage.TAG:
                 reply = indianDemand(connection, element); break;
@@ -290,15 +291,12 @@ public final class AIInGameInputHandler implements MessageHandler {
     private Element fountainOfYouth(
         @SuppressWarnings("unused") Connection connection,
         Element element) {
+        final Game game = freeColServer.getGame();
+        final FountainOfYouthMessage message
+            = new FountainOfYouthMessage(game, element);
         final AIPlayer aiPlayer = getAIPlayer();
 
-        String migrants = element.getAttribute("migrants");
-        int n;
-        try {
-            n = Integer.parseInt(migrants);
-        } catch (NumberFormatException e) {
-            n = -1;
-        }
+        int n = message.getMigrants();
         for (int i = 0; i < n; i++) AIMessage.askEmigrate(aiPlayer, 0);
         return null;
     }

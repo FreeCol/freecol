@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.FountainOfYouthMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.util.LogBuilder;
@@ -621,9 +622,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 } else {
                     // Remember, and ask player to select
                     serverPlayer.setRemainingEmigrants(dx);
-                    cs.addTrivial(See.only(serverPlayer), "fountainOfYouth",
-                                  ChangeSet.ChangePriority.CHANGE_LATE,
-                                  "migrants", Integer.toString(dx));
+                    cs.add(See.only(serverPlayer),
+                           ChangeSet.ChangePriority.CHANGE_LATE,
+                           new FountainOfYouthMessage(dx));
                 }
                 cs.addMessage(See.only(serverPlayer),
                      new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,

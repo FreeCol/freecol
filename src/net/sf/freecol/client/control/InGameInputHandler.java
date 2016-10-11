@@ -57,6 +57,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
+import net.sf.freecol.common.networking.FountainOfYouthMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -142,7 +143,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> featureChange(e));
         register(FirstContactMessage.TAG,
             (Connection c, Element e) -> firstContact(e));
-        register("fountainOfYouth",
+        register(FountainOfYouthMessage.TAG,
             (Connection c, Element e) -> fountainOfYouth(e));
         register("gameEnded",
             (Connection c, Element e) -> gameEnded(e));
@@ -659,10 +660,13 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element fountainOfYouth(Element element) {
-        final int n = getIntegerAttribute(element, "migrants");
+        final Game game = getGame();
+        final FountainOfYouthMessage message
+            = new FountainOfYouthMessage(game, element);
+        
+        final int n = message.getMigrants();
         if (n <= 0) {
-            logger.warning("Invalid migrants attribute: "
-                + element.getAttribute("migrants"));
+            logger.warning("Invalid migrants attribute: " + n);
             return null;
         }
 
