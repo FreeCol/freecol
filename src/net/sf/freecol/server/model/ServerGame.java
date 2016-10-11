@@ -496,17 +496,4 @@ public class ServerGame extends Game implements ServerModelObject {
     public String getServerXMLElementTagName() {
         return "serverGame";
     }
-
-
-    // Interface Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        // ServerGame does not add any significant fields, so Game.equals
-        // suffices.
-        return super.equals(o);
-    }
 }
