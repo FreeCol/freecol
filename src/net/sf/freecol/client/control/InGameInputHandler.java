@@ -58,6 +58,7 @@ import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.FountainOfYouthMessage;
+import net.sf.freecol.common.networking.GameEndedMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -147,7 +148,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> firstContact(e));
         register(FountainOfYouthMessage.TAG,
             (Connection c, Element e) -> fountainOfYouth(e));
-        register("gameEnded",
+        register(GameEndedMessage.TAG,
             (Connection c, Element e) -> gameEnded(e));
         register(HighScoreMessage.TAG,
             (Connection c, Element e) -> highScore(e));
@@ -683,15 +684,16 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element gameEnded(Element element) {
+        final Game game = getGame();
+        final GameEndedMessage message = new GameEndedMessage(game, element);
+
         FreeColDebugger.finishDebugRun(getFreeColClient(), true);
-        final Player winner
-            = getGame().getFreeColGameObject(element.getAttribute("winner"),
-                                             Player.class);
+        final Player winner = message.getWinner(game);
         if (winner == null) {
             logger.warning("Invalid player for gameEnded");
             return null;
         }
-        final String highScore = element.getAttribute("highScore");
+        final String highScore = message.getScore();
 
         if (winner == getMyPlayer()) {
             invokeLater(() -> { igc().victory(highScore); });

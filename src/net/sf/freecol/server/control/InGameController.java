@@ -104,6 +104,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.GameEndedMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
@@ -2250,9 +2251,9 @@ public final class InGameController extends Controller {
     public ChangeSet endTurn(ServerPlayer serverPlayer) {
         final FreeColServer freeColServer = getFreeColServer();
         final ServerGame game = getGame();
-        final ServerPlayer winner = (ServerPlayer)game.checkForWinner();
-
+        ServerPlayer winner = (ServerPlayer)game.checkForWinner();
         ServerPlayer current = (ServerPlayer)game.getCurrentPlayer();
+
         if (serverPlayer != current) {
             throw new IllegalArgumentException("It is not "
                 + serverPlayer.getName() + "'s turn, it is "
@@ -2318,14 +2319,16 @@ public final class InGameController extends Controller {
             // AI-only simulations.
             boolean onlyAI = all(game.getConnectedPlayers(), Player::isAI);
             if (onlyAI) {
-                logger.info("No human player left.");
+                winner = first(sort(game.getConnectedPlayers(),
+                        Comparator.comparingInt(Player::getScore).reversed()));
+                logger.info("No human player left, winner is: " + winner);
                 if (debugOnlyAITurns > 0) { // Complete debug runs
                     FreeColDebugger.signalEndDebugRun();
                 }
                 game.setCurrentPlayer(null);
 
-                cs.addTrivial(See.all(), "gameEnded",
-                              ChangePriority.CHANGE_NORMAL);
+                cs.add(See.all(), ChangePriority.CHANGE_NORMAL,
+                       new GameEndedMessage(winner, false));
                 game.sendToOthers(serverPlayer, cs);
                 return cs;
             }
@@ -2337,10 +2340,8 @@ public final class InGameController extends Controller {
                 && !(freeColServer.getSinglePlayer() && winner.isAI())) {
                 boolean highScore = !winner.isAI()
                     && HighScore.newHighScore(winner);
-                cs.addTrivial(See.all(), "gameEnded",
-                              ChangePriority.CHANGE_NORMAL,
-                              "highScore", String.valueOf(highScore),
-                              "winner", winner.getId());
+                cs.add(See.all(), ChangePriority.CHANGE_NORMAL,
+                       new GameEndedMessage(winner, highScore));
             }
 
             // Do "new turn"-like actions that need to wait until right
