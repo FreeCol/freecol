@@ -63,6 +63,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
+import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -179,7 +180,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = newRegionName(connection, element); break;
             case SetAIMessage.TAG:
                 reply = setAI(connection, element); break;
-            case "setCurrentPlayer":
+            case SetCurrentPlayerMessage.TAG:
                 reply = setCurrentPlayer(connection, element); break;
                 
             // Since we're the server, we can see everything.
@@ -512,10 +513,10 @@ public final class AIInGameInputHandler implements MessageHandler {
         @SuppressWarnings("unused") Connection connection,
         final Element element) {
         final Game game = freeColServer.getGame();
+        final SetCurrentPlayerMessage message
+            = new SetCurrentPlayerMessage(game, element);
 
-        String str = element.getAttribute("player");
-        final Player currentPlayer = game.getFreeColGameObject(str, Player.class);
-
+        final Player currentPlayer = message.getPlayer(game);
         if (currentPlayer != null
             && serverPlayer.getId().equals(currentPlayer.getId())) {
             logger.finest("Starting new Thread for " + serverPlayer.getName());

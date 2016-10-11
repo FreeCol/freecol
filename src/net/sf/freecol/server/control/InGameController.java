@@ -113,6 +113,7 @@ import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.Arrangement;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
+import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -2362,9 +2363,8 @@ public final class InGameController extends Controller {
             }
             current.csStartTurn(random, cs);
 
-            cs.addTrivial(See.all(), "setCurrentPlayer",
-                          ChangePriority.CHANGE_LATE,
-                          "player", current.getId());
+            cs.add(See.all(), ChangePriority.CHANGE_LATE,
+                   new SetCurrentPlayerMessage(current));
             if (current.getPlayerType() == PlayerType.COLONIAL) {
                 Monarch monarch = current.getMonarch();
                 MonarchAction action = null;
@@ -2464,9 +2464,8 @@ public final class InGameController extends Controller {
 
         // Revenge begins
         game.setCurrentPlayer(serverPlayer);
-        cs.addTrivial(See.all(), "setCurrentPlayer",
-                      ChangePriority.CHANGE_LATE,
-                      "player", serverPlayer.getId());
+        cs.add(See.all(), ChangePriority.CHANGE_LATE,
+               new SetCurrentPlayerMessage(serverPlayer));
 
         // Others can tell something has happened to the player,
         // and possibly see the units.

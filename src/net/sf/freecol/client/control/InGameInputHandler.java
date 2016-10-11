@@ -73,6 +73,7 @@ import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.NewTurnMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
+import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 
@@ -182,7 +183,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> scoutSpeakToChief(e));
         register(SetAIMessage.TAG,
             (Connection c, Element e) -> setAI(e));
-        register("setCurrentPlayer",
+        register(SetCurrentPlayerMessage.TAG,
             (Connection c, Element e) -> setCurrentPlayer(e));
         register("setDead",
             (Connection c, Element e) -> setDead(e));
@@ -1005,9 +1006,11 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element setCurrentPlayer(Element element) {
-        final Player player
-            = getGame().getFreeColGameObject(element.getAttribute("player"),
-                                             Player.class);
+        final Game game = getGame();
+        final SetCurrentPlayerMessage message
+            = new SetCurrentPlayerMessage(game, element);
+
+        final Player player = message.getPlayer(game);
         if (player == null) {
             logger.warning("Invalid player for setCurrentPlayer");
             return null;
