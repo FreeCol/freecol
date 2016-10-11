@@ -312,65 +312,6 @@ public abstract class Feature extends FreeColSpecObject
     }
 
     
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) return true;
-        if (o instanceof Feature) {
-            Feature feature = (Feature)o;
-            if (!super.equals(o)
-                || this.source != feature.source
-                || this.duration != feature.duration
-                || this.temporary != feature.temporary)
-                return false;
-            if (firstTurn == null) {
-                if (feature.firstTurn != null) return false;
-            } else if (feature.firstTurn == null) {
-                return false;
-            } else if (firstTurn.getNumber() != feature.firstTurn.getNumber()) {
-                return false;
-            }
-            if (lastTurn == null) {
-                if (feature.lastTurn != null) return false;
-            } else if (feature.lastTurn == null) {
-                return false;
-            } else if (lastTurn.getNumber() != feature.lastTurn.getNumber()) {
-                return false;
-            }
-            List<Scope> tScopes = getScopeList();
-            List<Scope> fScopes = feature.getScopeList();
-            if (tScopes.size() != fScopes.size()
-                // Not very efficient, but we do not expect many scopes
-                || any(this.scopes, s -> !feature.scopes.contains(s))
-                || any(feature.scopes, s -> !this.scopes.contains(s)))
-                return false;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash += 31 * hash + Utils.hashCode(source);
-        hash += 31 * hash + ((firstTurn == null) ? 0 : firstTurn.getNumber());
-        hash += 31 * hash + ((lastTurn == null) ? 0 : lastTurn.getNumber());
-        hash += 31 * hash + duration;
-        hash += 31 * ((temporary) ? 1 : 0);
-        // FIXME: is this safe?  It is an easy way to ignore
-        // the order of scope elements.
-        hash += sum(getScopeList(), s -> Utils.hashCode(s));
-        return hash;
-    }
-
-
     // Serialization
 
     private static final String DURATION_TAG = "duration";
@@ -470,5 +411,66 @@ public abstract class Feature extends FreeColSpecObject
         } else {
             super.readChild(xr);
         }
+    }
+
+    // getXMLTagName left to subclasses
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o instanceof Feature) {
+            Feature feature = (Feature)o;
+            if (!super.equals(o)
+                || this.source != feature.source
+                || this.duration != feature.duration
+                || this.temporary != feature.temporary)
+                return false;
+            if (firstTurn == null) {
+                if (feature.firstTurn != null) return false;
+            } else if (feature.firstTurn == null) {
+                return false;
+            } else if (firstTurn.getNumber() != feature.firstTurn.getNumber()) {
+                return false;
+            }
+            if (lastTurn == null) {
+                if (feature.lastTurn != null) return false;
+            } else if (feature.lastTurn == null) {
+                return false;
+            } else if (lastTurn.getNumber() != feature.lastTurn.getNumber()) {
+                return false;
+            }
+            List<Scope> tScopes = getScopeList();
+            List<Scope> fScopes = feature.getScopeList();
+            if (tScopes.size() != fScopes.size()
+                // Not very efficient, but we do not expect many scopes
+                || any(this.scopes, s -> !feature.scopes.contains(s))
+                || any(feature.scopes, s -> !this.scopes.contains(s)))
+                return false;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash += 31 * hash + Utils.hashCode(source);
+        hash += 31 * hash + ((firstTurn == null) ? 0 : firstTurn.getNumber());
+        hash += 31 * hash + ((lastTurn == null) ? 0 : lastTurn.getNumber());
+        hash += 31 * hash + duration;
+        hash += 31 * ((temporary) ? 1 : 0);
+        // FIXME: is this safe?  It is an easy way to ignore
+        // the order of scope elements.
+        hash += sum(getScopeList(), s -> Utils.hashCode(s));
+        return hash;
     }
 }

@@ -100,6 +100,12 @@ public class Rule {
         return result;
     }
 
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         final String andString = " and ";

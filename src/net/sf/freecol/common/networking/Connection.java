@@ -573,6 +573,8 @@ public class Connection implements Closeable {
     }
 
 
+    // Override Object
+
     /**
      * {@inheritDoc}
      */

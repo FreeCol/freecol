@@ -97,6 +97,9 @@ public class ColonyPlan {
             return weight * support / difficulty;
         }
 
+
+        // Override Object
+
         /**
          * {@inheritDoc}
          */
@@ -1495,6 +1498,9 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         }
         return desc;
     }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}

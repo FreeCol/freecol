@@ -69,19 +69,22 @@ class ColopediaTreeItem {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return text;
-    }
-
-    /**
      * Returns the item's icon.
      *
      * @return the item's icon.
      */
     public ImageIcon getIcon() {
         return icon;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return text;
     }
 }

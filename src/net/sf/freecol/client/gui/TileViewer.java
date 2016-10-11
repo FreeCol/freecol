@@ -81,12 +81,14 @@ public final class TileViewer extends FreeColClientHolder {
             this.index = index;
         }
 
+
         // Implement Comparable<SortableImage>
 
         @Override
         public int compareTo(SortableImage other) {
             return other.index - this.index;
         }
+
 
         // Override Object
 

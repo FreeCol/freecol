@@ -80,6 +80,9 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                 .getLocationLabelFor(unit.getOwner()));
         }
 
+
+        // Override Object
+
         /**
          * {@inheritDoc}
          */

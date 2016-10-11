@@ -121,14 +121,6 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return text;
-    }
-
-    /**
      * Get any icon associated with this choice.
      *
      * @return An icon if present, or null if not found.
@@ -216,6 +208,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
             : this.text.compareTo(other.text);
     }
 
+
     // Override Object
 
     /**
@@ -245,5 +238,13 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
         hash = 31 * hash + ((this.optionCancel) ? 1 : 0);
         hash = 31 * hash + ((this.optionDefault) ? 1 : 0);
         return hash;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return text;
     }
 }

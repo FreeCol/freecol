@@ -231,32 +231,6 @@ public abstract class TradeItem extends FreeColGameObject {
     }
 
     
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof TradeItem) {
-            return Utils.equals(this.source, ((TradeItem)other).source)
-                && Utils.equals(this.destination, ((TradeItem)other).destination)
-                && super.equals(other);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(this.source);
-        return 37 * hash + Utils.hashCode(this.destination);
-    }
-
-
     // Serialization
 
     private static final String DESTINATION_TAG = "destination";
@@ -287,5 +261,33 @@ public abstract class TradeItem extends FreeColGameObject {
 
         this.destination = xr.getAttribute(getGame(), DESTINATION_TAG,
                                            Player.class, (Player)null);
+    }
+
+    // getXMLTagName left to subclasses
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof TradeItem) {
+            return Utils.equals(this.source, ((TradeItem)other).source)
+                && Utils.equals(this.destination, ((TradeItem)other).destination)
+                && super.equals(other);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.source);
+        return 37 * hash + Utils.hashCode(this.destination);
     }
 }

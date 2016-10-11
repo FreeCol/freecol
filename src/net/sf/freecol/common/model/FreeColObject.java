@@ -797,29 +797,6 @@ public abstract class FreeColObject
     }
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof FreeColObject) {
-            FreeColObject fco = (FreeColObject)o;
-            return Utils.equals(this.id, fco.id);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Utils.hashCode(this.id);
-    }
-
-
     // Serialization
 
     /** XML tag name for identifier attribute. */
@@ -1219,9 +1196,36 @@ public abstract class FreeColObject
         return "x" + String.valueOf(i);
     }
 
+    /**
+     * Get the serialization tag for this object.
+     *
+     * @return The tag.
+     */
+    public abstract String getXMLTagName();
+
 
     // Override Object
-        
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof FreeColObject) {
+            FreeColObject fco = (FreeColObject)o;
+            return Utils.equals(this.id, fco.id);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Utils.hashCode(this.id);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -1229,25 +1233,5 @@ public abstract class FreeColObject
     public String toString() {
         return getClass().getName() + ":" + getId();
         //+ " (super hashcode: " + Integer.toHexString(super.hashCode()) + ")"
-    }
-
-    /**
-     * Gets the tag name used to serialize this object, generally the
-     * class name starting with a lower case letter.
-     *
-     * @return The tag name for this object.
-     */
-    public abstract String getXMLTagName();
-        
-    /**
-     * Gets the tag name used to serialize this object, generally the
-     * class name starting with a lower case letter.  This method
-     * should be overridden by all subclasses that need to be
-     * serialized if instances are expected to be read.
-     *
-     * @return {@code null}.
-     */
-    public static String getTagName() {
-        return null;
     }
 }

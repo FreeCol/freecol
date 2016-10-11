@@ -289,34 +289,6 @@ public class Operand extends Scope {
     }
 
 
-    // Interface Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        return this == o
-            || (o instanceof Operand
-                && this.operandType == ((Operand)o).operandType
-                && this.scopeLevel == ((Operand)o).scopeLevel
-                && Utils.equals(this.value, ((Operand)o).value)
-                && super.equals(o));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 31 * hash + this.operandType.ordinal();
-        hash = 31 * hash + this.scopeLevel.ordinal();
-        hash = 31 * hash + this.value;
-        return hash;
-    }
-
-
     // Serialization
 
     private static final String OPERAND_TYPE_TAG = "operand-type";
@@ -372,6 +344,36 @@ public class Operand extends Scope {
         if (val != INFINITY) this.value = val;
     }
 
+    // getTagName apparently not needed, uses parents
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        return this == o
+            || (o instanceof Operand
+                && this.operandType == ((Operand)o).operandType
+                && this.scopeLevel == ((Operand)o).scopeLevel
+                && Utils.equals(this.value, ((Operand)o).value)
+                && super.equals(o));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + this.operandType.ordinal();
+        hash = 31 * hash + this.scopeLevel.ordinal();
+        hash = 31 * hash + this.value;
+        return hash;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -383,6 +385,4 @@ public class Operand extends Scope {
             .append(" scopeLevel=").append(this.scopeLevel);
         return super.toString().replaceFirst("^[^ ]*", sb.toString());
     }
-
-    // getTagName apparently not needed, uses parents.
 }

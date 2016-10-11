@@ -120,6 +120,9 @@ public class SimpleMapGenerator implements MapGenerator {
             return map.getTile(xy[0], xy[1]);
         }
 
+
+        // Override Object
+
         /**
          * {@inheritDoc}
          */

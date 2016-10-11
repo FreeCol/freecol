@@ -354,31 +354,6 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     public abstract String invalidReason();
 
 
-    // Override Object
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof TransportableAIObject) {
-            TransportableAIObject ot = (TransportableAIObject)other;
-            return super.equals(ot)
-                && Utils.equals(this.transport, ot.transport);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        return 37 * hash + Utils.hashCode(this.transport);
-    }
-
-
     // Serialization
 
     private static final String TRANSPORT_TAG = "transport";
@@ -412,5 +387,30 @@ public abstract class TransportableAIObject extends ValuedAIObject {
             ? xr.makeAIObject(aiMain, TRANSPORT_TAG,
                               AIUnit.class, (AIUnit)null, true)
             : null;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof TransportableAIObject) {
+            TransportableAIObject ot = (TransportableAIObject)other;
+            return super.equals(ot)
+                && Utils.equals(this.transport, ot.transport);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + Utils.hashCode(this.transport);
     }
 }

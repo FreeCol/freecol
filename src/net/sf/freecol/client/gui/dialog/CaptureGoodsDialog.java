@@ -82,6 +82,9 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
             return this.goods;
         }
 
+
+        // Override Object
+
         /**
          * {@inheritDoc}
          */

@@ -151,6 +151,8 @@ public class TileImprovementStyle {
     }
 
         
+    // Override Object
+
     /**
      * {@inheritDoc}
      */

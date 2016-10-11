@@ -1054,6 +1054,9 @@ public abstract class Mission extends AIObject {
         // attribute.  Missions do not have ids.
     }
 
+
+    // Override Object
+
     /**
      * {@inheritDoc}
      */

@@ -286,6 +286,31 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
 
+    // Serialization
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
+        if (xr.shouldIntern()) internId(getId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
+        this.initialized = true;
+        super.readFromXML(xr);
+    }
+
+    // getXMLTagName left to subclasses
+
+
     // Override Object
 
     /**
@@ -311,28 +336,5 @@ public abstract class FreeColGameObject extends FreeColObject {
     public int hashCode() {
         int hash = super.hashCode();
         return 31 * hash + Utils.hashCode(this.game);
-    }
-
-
-    // Serialization
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        super.readAttributes(xr);
-
-        if (xr.shouldIntern()) internId(getId());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-        this.initialized = true;
-        super.readFromXML(xr);
     }
 }

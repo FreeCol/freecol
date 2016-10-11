@@ -153,6 +153,9 @@ public final class DummyConnection extends Connection {
         return reply;
     }
 
+
+    // Override Object
+
     /**
      * {@inheritDoc}
      */

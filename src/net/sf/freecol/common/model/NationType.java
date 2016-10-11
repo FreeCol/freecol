@@ -278,4 +278,6 @@ public abstract class NationType extends FreeColSpecObjectType {
             super.readChild(xr);
         }
     }
+
+    // getXMLTagName left to subclasses
 }

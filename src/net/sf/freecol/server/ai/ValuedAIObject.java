@@ -100,6 +100,29 @@ public abstract class ValuedAIObject extends AIObject {
     }
 
 
+    // Serialization
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        xw.writeAttribute(VALUE_TAG, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
+        setValue(xr.getAttribute(VALUE_TAG, -1));
+    }
+
+
     // Override Object
 
     /**
@@ -122,28 +145,5 @@ public abstract class ValuedAIObject extends AIObject {
     public int hashCode() {
         int hash = super.hashCode();
         return 37 * hash + this.value;
-    }
-
-
-    // Serialization
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeAttributes(xw);
-
-        xw.writeAttribute(VALUE_TAG, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        super.readAttributes(xr);
-
-        setValue(xr.getAttribute(VALUE_TAG, -1));
     }
 }

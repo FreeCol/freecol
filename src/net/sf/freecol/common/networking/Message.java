@@ -224,19 +224,22 @@ public class Message {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return document.getDocumentElement().toString();
-    }
-
-    /**
      * Gets the current version of the FreeCol protocol.
      * 
      * @return The version of the FreeCol protocol.
      */
     public static String getFreeColProtocolVersion() {
         return FREECOL_PROTOCOL_VERSION;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return document.getDocumentElement().toString();
     }
 }

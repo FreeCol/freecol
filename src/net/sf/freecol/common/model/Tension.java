@@ -176,6 +176,7 @@ public class Tension implements Named {
         return Messages.nameKey("model." + getKey());
     }
     
+
     // Override Object
 
     /**

@@ -245,6 +245,13 @@ public class AbstractGoods extends FreeColObject implements Named {
         return getType().getNameKey();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() {
+        return null; // AbstractGoods are never serialized directly
+    }
+
 
     // Override Object
 
@@ -300,12 +307,5 @@ public class AbstractGoods extends FreeColObject implements Named {
     public static String toString(GoodsType goodsType, int amount) {
         return amount + " "
             + ((goodsType == null) ? "(null)" : goodsType.getSuffix());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getXMLTagName() {
-        return null; // AbstractGoods are never serialized directly
     }
 }

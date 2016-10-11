@@ -82,6 +82,7 @@ public class ForestMaker {
             this.y = y;
         }
 
+
         // Implement Comparable<ImageLocation>
 
         @Override
@@ -89,6 +90,7 @@ public class ForestMaker {
             int dy = other.y - this.y;
             return (dy == 0) ? other.x - this.x : dy;
         }
+
 
         // Override Object
 

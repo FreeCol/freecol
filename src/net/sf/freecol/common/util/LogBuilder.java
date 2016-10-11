@@ -207,10 +207,11 @@ public class LogBuilder {
         return s2.toString();
     }
 
+
+    // Override Object
+
     /**
-     * Get the buffer contents as a string.
-     *
-     * @return The buffer contents.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
