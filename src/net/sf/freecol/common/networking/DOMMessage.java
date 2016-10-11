@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Introspector;
 
 import org.w3c.dom.Document;
@@ -1015,24 +1016,29 @@ public class DOMMessage {
 
         try {
             if (fields == null) {
-                fco.toXML(xw);
+                try {
+                    fco.toXML(xw);
+                } catch (XMLStreamException xse) {
+                    throw new RuntimeException("toXML failed on " + fco, xse);
+                }
             } else {
-                fco.toXMLPartial(xw, fields);
+                try {
+                    fco.toXMLPartial(xw, fields);
+                } catch (XMLStreamException xse) {
+                    throw new RuntimeException("toXML[" + join(",", fields)
+                        + "] failed on " + fco, xse);
+                }
             }
-            xw.close();
-
             DocumentBuilderFactory factory
                 = DocumentBuilderFactory.newInstance();
             Document tempDocument = null;
-            try {
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));
-                return (Element)document.importNode(tempDocument.getDocumentElement(), true);
-            } catch (IOException|ParserConfigurationException|SAXException ex) {
-                throw new RuntimeException("Parse fail", ex);
-            }
-        } catch (XMLStreamException e) {
-            throw new IllegalStateException("Error writing stream", e);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));
+            return (Element)document.importNode(tempDocument.getDocumentElement(), true);
+        } catch (IOException|ParserConfigurationException|SAXException ex) {
+            throw new RuntimeException("Parse fail at " + fco, ex);
+        } finally {
+            xw.close();
         }
     }
 
