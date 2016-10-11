@@ -65,6 +65,7 @@ import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
 import net.sf.freecol.common.networking.SetDeadMessage;
+import net.sf.freecol.common.networking.SetStanceMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -206,7 +207,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "removeGoods":
             case ScoutSpeakToChiefMessage.TAG:
             case SetDeadMessage.TAG:
-            case "setStance":
+            case SetStanceMessage.TAG:
             case "startGame":
             case UpdateMessage.TAG:
                 break;

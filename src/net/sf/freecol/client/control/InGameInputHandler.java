@@ -75,6 +75,7 @@ import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
 import net.sf.freecol.common.networking.SetDeadMessage;
+import net.sf.freecol.common.networking.SetStanceMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 
@@ -188,7 +189,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> setCurrentPlayer(e));
         register(SetDeadMessage.TAG,
             (Connection c, Element e) -> setDead(e));
-        register("setStance",
+        register(SetStanceMessage.TAG,
             (Connection c, Element e) -> setStance(e));
         register(SpySettlementMessage.TAG,
             (Connection c, Element e) -> spySettlement(e));
@@ -1049,16 +1050,15 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private Element setStance(Element element) {
         final Game game = getGame();
-        final Stance stance = Enum.valueOf(Stance.class,
-                                           element.getAttribute("stance"));
-        final Player p1 = game
-            .getFreeColGameObject(element.getAttribute("first"), Player.class);
+        final SetStanceMessage message = new SetStanceMessage(game, element);
+
+        final Stance stance = message.getStance();
+        final Player p1 = message.getFirstPlayer(game);
         if (p1 == null) {
             logger.warning("Invalid player1 for setStance");
             return null;
         }
-        final Player p2 = game
-            .getFreeColGameObject(element.getAttribute("second"),Player.class);
+        final Player p2 = message.getSecondPlayer(game);
         if (p2 == null) {
             logger.warning("Invalid player2 for setStance");
             return null;

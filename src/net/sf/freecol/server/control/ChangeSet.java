@@ -50,6 +50,7 @@ import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.SetDeadMessage;
+import net.sf.freecol.common.networking.SetStanceMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -1338,10 +1339,7 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return new AttributeMessage("setStance",
-                                        "stance", stance.toString(),
-                                        "first", first.getId(),
-                                        "second", second.getId())
+            return new SetStanceMessage(stance, first, second)
                 .attachToDocument(doc);
         }
 
