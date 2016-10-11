@@ -183,7 +183,7 @@
              basedir="${freecol.build.dir}"
              manifest="${basedir}/src/MANIFEST.MF"
              includes="net/**, splash.jpg"
-             excludes="**/metaserver/**"/>
+             excludes="**/metaserver/MetaServer.java"/>
     </target>
 
     <!-- Compiles the metaserver and creates a JAR-file. -->
