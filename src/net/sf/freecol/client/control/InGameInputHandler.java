@@ -128,9 +128,9 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> animateAttack(e));
         register("animateMove",
             (Connection c, Element e) -> animateMove(e));
-        register("chat",
+        register(ChatMessage.TAG,
             (Connection c, Element e) -> chat(e));
-        register("chooseFoundingFather",
+        register(ChooseFoundingFatherMessage.TAG,
             (Connection c, Element e) -> chooseFoundingFather(e));
         register("closeMenus",
             (Connection c, Element e) -> closeMenus());
@@ -140,7 +140,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> error(e));
         register("featureChange",
             (Connection c, Element e) -> featureChange(e));
-        register("firstContact",
+        register(FirstContactMessage.TAG,
             (Connection c, Element e) -> firstContact(e));
         register("fountainOfYouth",
             (Connection c, Element e) -> fountainOfYouth(e));
@@ -162,9 +162,9 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> nationSummary(e));
         register(NativeTradeMessage.TAG,
             (Connection c, Element e) -> nativeTrade(e));
-        register("newLandName",
+        register(NewLandNameMessage.TAG,
             (Connection c, Element e) -> newLandName(e));
-        register("newRegionName",
+        register(NewRegionNameMessage.TAG,
             (Connection c, Element e) -> newRegionName(e));
         register("newTurn",
             (Connection c, Element e) -> newTurn(e));

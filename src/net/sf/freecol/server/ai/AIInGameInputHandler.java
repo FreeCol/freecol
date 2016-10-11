@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.AssignTradeRouteMessage;
+import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
@@ -148,11 +149,11 @@ public final class AIInGameInputHandler implements MessageHandler {
             switch (tag) {
             case Connection.RECONNECT_TAG:
                 logger.warning("Reconnect on illegal operation, refer to any previous error message."); break;
-            case "chooseFoundingFather":
+            case ChooseFoundingFatherMessage.TAG:
                 reply = chooseFoundingFather(connection, element); break;
             case "diplomacy":
                 reply = diplomacy(connection, element); break;
-            case "firstContact":
+            case FirstContactMessage.TAG:
                 reply = firstContact(connection, element); break;
             case "fountainOfYouth":
                 reply = fountainOfYouth(connection, element); break;
@@ -168,9 +169,9 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = nationSummary(connection, element); break;
             case NativeTradeMessage.TAG:
                 reply = nativeTrade(connection, element); break;
-            case "newLandName":
+            case NewLandNameMessage.TAG:
                 reply = newLandName(connection, element); break;
-            case "newRegionName":
+            case NewRegionNameMessage.TAG:
                 reply = newRegionName(connection, element); break;
             case "setCurrentPlayer":
                 reply = setCurrentPlayer(connection, element); break;
@@ -184,7 +185,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "animateMove":
             case "animateAttack":
             case AssignTradeRouteMessage.TAG:
-            case "chat":
+            case ChatMessage.TAG:
             case DeleteTradeRouteMessage.TAG:
             case ErrorMessage.TAG:
             case "featureChange":
