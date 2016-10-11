@@ -60,6 +60,7 @@ import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
+import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -174,6 +175,8 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = newLandName(connection, element); break;
             case NewRegionNameMessage.TAG:
                 reply = newRegionName(connection, element); break;
+            case SetAIMessage.TAG:
+                reply = setAI(connection, element); break;
             case "setCurrentPlayer":
                 reply = setCurrentPlayer(connection, element); break;
                 
@@ -198,7 +201,6 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "remove":
             case "removeGoods":
             case ScoutSpeakToChiefMessage.TAG:
-            case "setAI":
             case "setDead":
             case "setStance":
             case "startGame":
@@ -475,6 +477,26 @@ public final class AIInGameInputHandler implements MessageHandler {
         Element element) {
         return new NewRegionNameMessage(freeColServer.getGame(), element)
             .toXMLElement();
+    }
+
+    /**
+     * Handle a "setAI"-message.
+     *
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return Null.
+     */
+    private Element setAI(
+        @SuppressWarnings("unused") Connection connection,
+        Element element) {
+        final Game game = freeColServer.getGame();
+        final SetAIMessage message = new SetAIMessage(game, element);
+        
+        final Player p = message.getPlayer(game);
+        final boolean ai = message.getAI();
+        if (p != null) p.setAI(ai);
+
+        return null;
     }
 
     /**

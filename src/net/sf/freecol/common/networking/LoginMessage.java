@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.SetAIMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -255,10 +256,7 @@ public class LoginMessage extends DOMMessage {
 
             if (player.isAI()) {
                 player.setAI(false);
-                server.sendToAll(new AttributeMessage("setAI",
-                        "player", player.getId(),
-                        "ai", Boolean.toString(false)),
-                    null);
+                server.sendToAll(new SetAIMessage(player, false), connection);
             }
 
             // If this player is the first to reconnect, it is the

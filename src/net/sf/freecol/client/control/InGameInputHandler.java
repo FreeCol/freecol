@@ -70,6 +70,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
+import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 
@@ -177,7 +178,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> remove(e));
         register(ScoutSpeakToChiefMessage.TAG,
             (Connection c, Element e) -> scoutSpeakToChief(e));
-        register("setAI",
+        register(SetAIMessage.TAG,
             (Connection c, Element e) -> setAI(e));
         register("setCurrentPlayer",
             (Connection c, Element e) -> setCurrentPlayer(e));
@@ -983,9 +984,11 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private Element setAI(Element element) {
         final Game game = getGame();
-        Player p = game.getFreeColGameObject(element.getAttribute("player"),
-                                             Player.class);
-        p.setAI(Boolean.parseBoolean(element.getAttribute("ai")));
+        final SetAIMessage message = new SetAIMessage(game, element);
+        
+        final Player p = message.getPlayer(game);
+        final boolean ai = message.getAI();
+        if (p != null) p.setAI(ai);
 
         return null;
     }
