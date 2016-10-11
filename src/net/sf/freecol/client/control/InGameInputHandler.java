@@ -74,6 +74,7 @@ import net.sf.freecol.common.networking.NewTurnMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
+import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 
@@ -185,7 +186,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> setAI(e));
         register(SetCurrentPlayerMessage.TAG,
             (Connection c, Element e) -> setCurrentPlayer(e));
-        register("setDead",
+        register(SetDeadMessage.TAG,
             (Connection c, Element e) -> setDead(e));
         register("setStance",
             (Connection c, Element e) -> setStance(e));
@@ -1027,8 +1028,10 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element setDead(Element element) {
-        final Player player = getGame()
-            .getFreeColGameObject(element.getAttribute("player"),Player.class);
+        final Game game = getGame();
+        final SetDeadMessage message = new SetDeadMessage(game, element);
+        
+        final Player player = message.getPlayer(game);
         if (player == null) {
             logger.warning("Invalid player for setDead");
             return null;

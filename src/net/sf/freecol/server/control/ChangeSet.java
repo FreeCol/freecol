@@ -46,10 +46,11 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
+import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
-import net.sf.freecol.common.networking.AttributeMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -1553,8 +1554,8 @@ public class ChangeSet {
      * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addDead(ServerPlayer serverPlayer) {
-        addTrivial(See.all(), "setDead", ChangePriority.CHANGE_EARLY,
-                "player", serverPlayer.getId());
+        add(See.all(), ChangePriority.CHANGE_EARLY,
+            new SetDeadMessage(serverPlayer));
         return this;
     }
 
