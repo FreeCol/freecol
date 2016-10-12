@@ -381,11 +381,11 @@ public class Connection implements Closeable {
             throw new IOException("wait(ReceivingThread) for: " + tag);
         }
 
-        Element question = element.getOwnerDocument()
-            .createElement(QUESTION_TAG);
+        Element question = DOMMessage.createElement(QUESTION_TAG);
         question.setAttribute(NETWORK_REPLY_ID_TAG,
                               Integer.toString(networkReplyId));
-        question.appendChild(element);
+        question.appendChild(question.getOwnerDocument()
+                                     .importNode(element, true));
 
         NetworkReplyObject nro
             = this.receivingThread.waitForNetworkReply(networkReplyId);
@@ -544,7 +544,6 @@ public class Connection implements Closeable {
         try {
             return this.messageHandler.handle(this, request);
         } catch (Exception ex) {
-            System.err.println("FAILEEE " + this.toString());
             logger.log(Level.WARNING, "Handler failure in " + this.toString(),
                        ex);
         }
