@@ -80,7 +80,6 @@ import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SetGoodsLevelsMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
-import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UnloadGoodsMessage;
 import net.sf.freecol.common.networking.UpdateTradeRouteMessage;
 import net.sf.freecol.common.networking.WorkMessage;
@@ -109,6 +108,8 @@ public final class InGameInputHandler extends ServerInputHandler {
         // FIXME: move and simplify methods later, for now just delegate
         // FIXME: check that NRHs and CPNRHs are sensibly chosen
 
+        // Messages that are not specialized are trivial elements identified
+        // by tag name only.
         register(AbandonColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -285,7 +286,7 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new EmigrateUnitMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(TrivialMessage.END_TURN_TAG,
+        register("endTurn",
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -512,7 +513,7 @@ public final class InGameInputHandler extends ServerInputHandler {
             }});
 
         // NetworkRequestHandlers
-        register(TrivialMessage.CONTINUE_TAG,
+        register("continuePlaying",
             (Connection connection, Element element) -> {
                 freeColServer.getInGameController()
                     .continuePlaying(freeColServer.getPlayer(connection));
@@ -522,7 +523,7 @@ public final class InGameInputHandler extends ServerInputHandler {
             (Connection connection, Element element) ->
             new DiplomacyMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(TrivialMessage.ENTER_REVENGE_MODE_TAG,
+        register("enterRevengeMode",
             (Connection connection, Element element) ->
             freeColServer.getInGameController()
                .enterRevengeMode(freeColServer.getPlayer(connection))
@@ -547,7 +548,7 @@ public final class InGameInputHandler extends ServerInputHandler {
             (Connection connection, Element element) ->
             new NativeTradeMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(TrivialMessage.RETIRE_TAG,
+        register("retire",
             (Connection connection, Element element) ->
             freeColServer.getInGameController()
                 .retire(freeColServer.getPlayer(connection))

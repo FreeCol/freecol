@@ -71,7 +71,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
         register("ready",
             (Connection connection, Element element) ->
             ready(connection, element));
-        register(TrivialMessage.REQUEST_LAUNCH_TAG,
+        register("requestLaunch",
             (Connection connection, Element element) -> {
                 Element reply = requestLaunch(connection, element);
                 if (reply != null) {

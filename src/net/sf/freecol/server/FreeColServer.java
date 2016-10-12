@@ -608,7 +608,7 @@ public final class FreeColServer {
 
         setGameState(FreeColServer.GameState.IN_GAME);
         updateMetaServer(false);
-        sendToAll(TrivialMessage.START_GAME_MESSAGE, null);
+        sendToAll(new TrivialMessage("startGame"), null);
         getServer().setMessageHandlerToAllConnections(getInGameInputHandler());
     }
 
