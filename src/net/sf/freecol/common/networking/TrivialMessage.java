@@ -72,7 +72,7 @@ public class TrivialMessage extends DOMMessage {
      *
      * @param type The message type.
      */
-    public TrivialMessage(String type) {
+    protected TrivialMessage(String type) {
         super(type);
 
         this.type = type;
