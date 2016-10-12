@@ -41,6 +41,7 @@ import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
+import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
@@ -82,7 +83,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> removePlayer(e));
         register("setAvailable",
             (Connection c, Element e) -> setAvailable(e));
-        register("startGame",
+        register(TrivialMessage.START_GAME_TAG,
             (Connection c, Element e) -> startGame(e));
         register("updateColor",
             (Connection c, Element e) -> updateColor(e));

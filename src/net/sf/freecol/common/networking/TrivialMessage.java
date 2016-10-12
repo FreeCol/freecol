@@ -34,6 +34,35 @@ public class TrivialMessage extends DOMMessage {
 
     private static final String TRIVIAL_TAG = "trivial";
 
+    /*
+     * True trivial messages have no distinguishing parts, so we might
+     * as well just use some explicit constants.
+     */
+    public static final String CLOSE_MENUS_TAG = "closeMenus";
+    public static final TrivialMessage CLOSE_MENUS_MESSAGE
+        = new TrivialMessage(CLOSE_MENUS_TAG);
+    public static final String CONTINUE_TAG = "continuePlaying";
+    public static final TrivialMessage CONTINUE_MESSAGE
+        = new TrivialMessage(CONTINUE_TAG);
+    public static final String END_TURN_TAG = "endTurn";
+    public static final TrivialMessage END_TURN_MESSAGE
+        = new TrivialMessage(END_TURN_TAG);
+    public static final String ENTER_REVENGE_MODE_TAG = "enterRevengeMode";
+    public static final TrivialMessage ENTER_REVENGE_MODE_MESSAGE
+        = new TrivialMessage(ENTER_REVENGE_MODE_TAG);
+    public static final String RECONNECT_TAG = "reconnect";
+    public static final TrivialMessage RECONNECT_MESSAGE
+        = new TrivialMessage(RECONNECT_TAG);
+    public static final String REQUEST_LAUNCH_TAG = "requestLaunch";
+    public static final TrivialMessage REQUEST_LAUNCH_MESSAGE
+        = new TrivialMessage(REQUEST_LAUNCH_TAG);
+    public static final String RETIRE_TAG = "retire";
+    public static final TrivialMessage RETIRE_MESSAGE
+        = new TrivialMessage(RETIRE_TAG);
+    public static final String START_GAME_TAG = "startGame";
+    public static final TrivialMessage START_GAME_MESSAGE
+        = new TrivialMessage(START_GAME_TAG);
+
     /** The actual message type. */
     private final String type;
 
@@ -56,7 +85,8 @@ public class TrivialMessage extends DOMMessage {
      * @param game The {@code Game} this message belongs to.
      * @param element The {@code Element} to use to create the message.
      */
-    public TrivialMessage(Game game, Element element) {
+    public TrivialMessage(@SuppressWarnings("unused") Game game,
+                          Element element) {
         this(element.getTagName());
     }
 

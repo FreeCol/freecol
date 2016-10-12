@@ -405,7 +405,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean continuePlaying() {
-        return send(new TrivialMessage("continuePlaying"));
+        return send(TrivialMessage.CONTINUE_MESSAGE);
     }
 
     /**
@@ -544,7 +544,7 @@ public abstract class ServerAPI {
      */
     public boolean endTurn(Game game) {
         return askHandling(game,
-                           new TrivialMessage("endTurn"));
+                           TrivialMessage.END_TURN_MESSAGE);
     }
 
     /**
@@ -555,7 +555,7 @@ public abstract class ServerAPI {
      */
     public boolean enterRevengeMode(Game game) {
         return askHandling(game,
-                           new TrivialMessage("enterRevengeMode"));
+                           TrivialMessage.ENTER_REVENGE_MODE_MESSAGE);
     }
 
     /**
@@ -898,7 +898,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean requestLaunch() {
-        return send(new TrivialMessage("requestLaunch"));
+        return send(TrivialMessage.REQUEST_LAUNCH_MESSAGE);
     }
 
     /**
@@ -909,7 +909,7 @@ public abstract class ServerAPI {
      */
     public boolean retire(Game game) {
         return askHandling(game,
-                           new TrivialMessage("retire"));
+                           TrivialMessage.RETIRE_MESSAGE);
     }
 
     /**
@@ -1069,7 +1069,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean startSkipping() {
-        return send(new TrivialMessage("endTurn"));
+        return send(TrivialMessage.END_TURN_MESSAGE);
     }
 
     /**

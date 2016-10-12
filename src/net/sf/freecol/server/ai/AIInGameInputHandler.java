@@ -66,6 +66,7 @@ import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
 import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.networking.SetStanceMessage;
+import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -154,7 +155,7 @@ public final class AIInGameInputHandler implements MessageHandler {
         Element reply = null;
         try {
             switch (tag) {
-            case Connection.RECONNECT_TAG:
+            case TrivialMessage.RECONNECT_TAG:
                 logger.warning("Reconnect on illegal operation, refer to any previous error message."); break;
             case ChooseFoundingFatherMessage.TAG:
                 reply = chooseFoundingFather(connection, element); break;
@@ -207,7 +208,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case ScoutSpeakToChiefMessage.TAG:
             case SetDeadMessage.TAG:
             case SetStanceMessage.TAG:
-            case "startGame":
+            case TrivialMessage.START_GAME_TAG:
             case UpdateMessage.TAG:
                 break;
             default:
