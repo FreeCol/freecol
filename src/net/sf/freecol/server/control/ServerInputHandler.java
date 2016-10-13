@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NetworkRequestHandler;
@@ -66,7 +67,7 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         register(ChatMessage.TAG, (Connection conn, Element e) ->
             new ChatMessage(getGame(), e).handle(freeColServer, conn));
 
-        register(Connection.DISCONNECT_TAG, (Connection conn, Element e) ->
+        register(DisconnectMessage.TAG, (Connection conn, Element e) ->
             disconnect(conn, e));
 
         register(LogoutMessage.TAG, (Connection conn, Element e) ->

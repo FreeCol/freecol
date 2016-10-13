@@ -60,7 +60,6 @@ public class Connection implements Closeable {
     public static final char END_OF_STREAM = '\n';
     public static final int BUFFER_SIZE = 1 << 14;
     
-    public static final String DISCONNECT_TAG = "disconnect";
     public static final String NETWORK_REPLY_ID_TAG = "networkReplyId";
     public static final String QUESTION_TAG = "question";
     public static final String REPLY_TAG = "reply";
@@ -556,7 +555,7 @@ public class Connection implements Closeable {
      * @exception IOException if failed to send the message.
      */
     public void disconnect(String reason) throws IOException {
-        this.send(new AttributeMessage(DISCONNECT_TAG, "reason", reason));
+        this.send(new DisconnectMessage(reason));
     }
 
     /**

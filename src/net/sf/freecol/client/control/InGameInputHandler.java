@@ -55,6 +55,7 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.FountainOfYouthMessage;
@@ -126,8 +127,6 @@ public final class InGameInputHandler extends ClientInputHandler {
     public InGameInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
 
-        register(Connection.DISCONNECT_TAG,
-            (Connection c, Element e) -> disconnect(e));
         register(AddPlayerMessage.TAG,
             (Connection c, Element e) -> addPlayer(e));
         register("animateAttack",
@@ -142,6 +141,8 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> closeMenus());
         register("diplomacy",
             (Connection c, Element e) -> diplomacy(e));
+        register(DisconnectMessage.TAG,
+            (Connection c, Element e) -> disconnect(e));
         register(ErrorMessage.TAG,
             (Connection c, Element e) -> error(e));
         register("featureChange",

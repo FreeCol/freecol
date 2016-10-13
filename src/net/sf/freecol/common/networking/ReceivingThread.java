@@ -248,8 +248,7 @@ final class ReceivingThread extends Thread {
         if (connection.getMessageHandler() != null) {
             try {
                 connection.getMessageHandler().handle(connection,
-                    new AttributeMessage(Connection.DISCONNECT_TAG,
-                        "reason", reason).toXMLElement());
+                    new DisconnectMessage(reason).toXMLElement());
             } catch (FreeColException e) {
                 logger.log(Level.WARNING, "Rx disconnect", e);
             }
@@ -283,7 +282,7 @@ final class ReceivingThread extends Thread {
                 replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
             } catch (XMLStreamException xse) {
                 // EOS can occur when the other end disconnects
-                tag = Connection.DISCONNECT_TAG;
+                tag = DisconnectMessage.TAG;
                 replyId = -1;
             }
 
@@ -293,7 +292,7 @@ final class ReceivingThread extends Thread {
             DOMMessage msg;
             switch (tag) {
 
-            case Connection.DISCONNECT_TAG:
+            case DisconnectMessage.TAG:
                 // Disconnect at once if needed.
                 askToStop();
                 return;

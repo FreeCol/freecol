@@ -45,6 +45,7 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.FountainOfYouthMessage;
@@ -189,13 +190,13 @@ public final class AIInGameInputHandler implements MessageHandler {
             // Since we're the server, we can see everything.
             // Therefore most of these messages are useless.  This
             // may change one day.
-            case Connection.DISCONNECT_TAG:                
             case AddPlayerMessage.TAG:
             case "animateMove":
             case "animateAttack":
             case AssignTradeRouteMessage.TAG:
             case ChatMessage.TAG:
             case DeleteTradeRouteMessage.TAG:
+            case DisconnectMessage.TAG:                
             case ErrorMessage.TAG:
             case "featureChange":
             case GameEndedMessage.TAG:
