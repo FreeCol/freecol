@@ -45,6 +45,7 @@ import net.sf.freecol.common.networking.ReadyMessage;
 import net.sf.freecol.common.networking.SetAvailableMessage;
 import net.sf.freecol.common.networking.SetColorMessage;
 import net.sf.freecol.common.networking.SetNationMessage;
+import net.sf.freecol.common.networking.SetNationTypeMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
@@ -99,8 +100,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> updateGameOptions(e));
         register(UpdateMapGeneratorOptionsMessage.TAG,
             (Connection c, Element e) -> updateMapGeneratorOptions(e));
-        register("updateNationType",
-            (Connection c, Element e) -> updateNationType(e));
     }
 
 
@@ -325,6 +324,28 @@ public final class PreGameInputHandler extends ClientInputHandler {
     }
 
     /**
+     * Handles a "setNationType"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
+     * @return Null.
+     */
+    private Element setNationType(Element element) {
+        final Game game = getGame();
+        final SetNationTypeMessage message
+            = new SetNationTypeMessage(game, element);
+
+        Player player = message.getPlayer(game);
+        NationType nationType = message.getValue(getSpecification());
+        if (player != null && nationType != null) {
+            player.changeNationType(nationType);
+            getGUI().refreshPlayersTable();
+        }
+
+        return null;
+    }
+
+    /**
      * Handles an "startGame"-message.
      *
      * Wait until map is received from server, sometimes this
@@ -416,27 +437,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
                                            "client")) {
             logger.warning("Map generator option update failed");
         }
-        return null;
-    }
-    
-    /**
-     * Handles an "updateNationType"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
-     * @return Null.
-     */
-    private Element updateNationType(Element element) {
-        final Game game = getGame();
-
-        Player player = game
-            .getFreeColGameObject(element.getAttribute("player"), Player.class);
-        NationType nationType = getSpecification()
-            .getNationType(element.getAttribute("value"));
-
-        player.changeNationType(nationType);
-        getGUI().refreshPlayersTable();
-
         return null;
     }
 }

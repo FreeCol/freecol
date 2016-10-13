@@ -42,6 +42,7 @@ import net.sf.freecol.common.networking.ReadyMessage;
 import net.sf.freecol.common.networking.SetAvailableMessage;
 import net.sf.freecol.common.networking.SetColorMessage;
 import net.sf.freecol.common.networking.SetNationMessage;
+import net.sf.freecol.common.networking.SetNationTypeMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
@@ -76,8 +77,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
 
         register(ReadyMessage.TAG,
             (Connection connection, Element element) ->
-            new ReadyMessage(game, element)
-                .handle(freeColServer, connection));
+                new ReadyMessage(game, element)
+                    .handle(freeColServer, connection));
         register(TrivialMessage.REQUEST_LAUNCH_TAG,
             (Connection connection, Element element) -> {
                 Element reply = requestLaunch(connection, element);
@@ -86,19 +87,20 @@ public final class PreGameInputHandler extends ServerInputHandler {
             });
         register(SetAvailableMessage.TAG,
             (Connection connection, Element element) ->
-            new SetAvailableMessage(game, element)
-                .handle(freeColServer, connection));
+                new SetAvailableMessage(game, element)
+                    .handle(freeColServer, connection));
         register(SetColorMessage.TAG,
             (Connection connection, Element element) ->
-            new SetColorMessage(game, element)
-                .handle(freeColServer, connection));
+                new SetColorMessage(game, element)
+                    .handle(freeColServer, connection));
         register(SetNationMessage.TAG,
             (Connection connection, Element element) ->
                 new SetNationMessage(game, element)
                     .handle(freeColServer, connection));
-        register("setNationType",
+        register(SetNationTypeMessage.TAG,
             (Connection connection, Element element) ->
-            setNationType(connection, element));
+                new SetNationTypeMessage(game, element)
+                    .handle(freeColServer, connection));
         register(UpdateGameOptionsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -186,57 +188,6 @@ public final class PreGameInputHandler extends ServerInputHandler {
             return new ErrorMessage(e).toXMLElement();
         }
 
-        return null;
-    }
-
-    /**
-     * Handles a "setNationType"-message from a client.
-     * 
-     * @param connection The {@code Connection} the message came from.
-     * @param element The {@code Element} containing the request.
-     * @return Null, or an error message on failure.
-     */
-    private Element setNationType(Connection connection, Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer player = freeColServer.getPlayer(connection);
-        final Specification spec = getGame().getSpecification();
-
-        if (player != null) {
-            NationType nationType = spec.getNationType(element.getAttribute("value"));
-            NationType fixedNationType = spec.getNation(player.getNationId())
-                .getType();
-            Advantages advantages = getGame().getNationOptions()
-                .getNationalAdvantages();
-            boolean ok;
-            switch (advantages) {
-            case SELECTABLE:
-                ok = true;
-                break;
-            case FIXED:
-                ok = nationType.equals(fixedNationType);
-                break;
-            case NONE:
-                ok = nationType == spec.getDefaultNationType();
-                break;
-            default:
-                ok = false;
-                break;
-            }
-            if (ok) {
-                player.changeNationType(nationType);
-                freeColServer.sendToAll(new AttributeMessage("updateNationType",
-                        "player", player.getId(),
-                        "value", nationType.getId()),
-                    player.getConnection());
-            } else {
-                return new ErrorMessage(StringTemplate
-                    .template("server.badNationType")
-                    .addName("%nationType%", String.valueOf(nationType)))
-                    .toXMLElement();
-            }
-        } else {
-            logger.warning("setNationType from unknown connection.");
-        }
         return null;
     }
 }
