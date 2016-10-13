@@ -41,7 +41,9 @@ public abstract class FreeColLabel extends JLabel {
      * The label's contents, once set, will be displayed on the leading edge
      * of the label's display area.
      */
-    public FreeColLabel() {}
+    public FreeColLabel() {
+        super("", null, LEADING);
+    }
 
 
     /**
@@ -51,5 +53,7 @@ public abstract class FreeColLabel extends JLabel {
      *
      * @param image The image to be displayed by the label.
      */
-    public FreeColLabel(Icon image) {}
+    public FreeColLabel(Icon image) {
+        super(null, image, CENTER);
+    }
 }
