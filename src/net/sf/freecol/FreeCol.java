@@ -222,6 +222,10 @@ public final class FreeCol {
         JarURLConnection juc;
         try {
             juc = getJarURLConnection(FreeCol.class);
+        } catch (ClassCastException cce) {
+            juc = null;
+            System.err.println("Unable to cast class properly: "
+                                       + cce.getMessage());
         } catch (IOException ioe) {
             juc = null;
             System.err.println("Unable to open class jar: "
@@ -348,7 +352,7 @@ public final class FreeCol {
      * @exception IOException if the connection fails to open.
      */
     private static JarURLConnection getJarURLConnection(Class c)
-        throws IOException {
+        throws IOException, ClassCastException {
         String resourceName = "/" + c.getName().replace('.', '/') + ".class";
         URL url = c.getResource(resourceName);
         return (JarURLConnection)url.openConnection();
