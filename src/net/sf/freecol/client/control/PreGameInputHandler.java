@@ -41,6 +41,7 @@ import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
+import net.sf.freecol.common.networking.SetColorMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
@@ -83,10 +84,10 @@ public final class PreGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> removePlayer(e));
         register("setAvailable",
             (Connection c, Element e) -> setAvailable(e));
+        register(SetColorMessage.TAG,
+            (Connection c, Element e) -> setColor(e));
         register(TrivialMessage.START_GAME_TAG,
             (Connection c, Element e) -> startGame(e));
-        register("updateColor",
-            (Connection c, Element e) -> updateColor(e));
         register(UpdateMessage.TAG,
             (Connection c, Element e) -> update(e));
         register(UpdateGameOptionsMessage.TAG,
@@ -268,6 +269,33 @@ public final class PreGameInputHandler extends ClientInputHandler {
     }
 
     /**
+     * Handles an "setColor"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
+     * @return Null.
+     */
+    private Element setColor(Element element) {
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        final SetColorMessage message = new SetColorMessage(game, element);
+            
+        Nation nation = message.getNation(spec);
+        if (nation != null) {
+            Color color = message.getColor();
+            if (color != null) {
+                nation.setColor(color);
+                getGUI().refreshPlayersTable();
+            } else {
+                logger.warning("Invalid color: " + message.toString());
+            }
+        } else {
+            logger.warning("Invalid nation: " + message.toString());
+        }
+        return null;
+    }
+
+    /**
      * Handles an "startGame"-message.
      *
      * Wait until map is received from server, sometimes this
@@ -320,37 +348,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 logger.warning("Game node expected: " + fcgo.getId());
             }
         }
-        return null;
-    }
-
-    /**
-     * Handles an "updateColor"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
-     * @return Null.
-     */
-    private Element updateColor(Element element) {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-
-        String str = element.getAttribute("nation");
-        Nation nation = spec.getNation(str);
-        if (nation == null) {
-            logger.warning("Invalid nation: " + str);
-            return null;
-        }
-        Color color;
-        try {
-            str = element.getAttribute("color");
-            int rgb = Integer.parseInt(str);
-            color = new Color(rgb);
-        } catch (NumberFormatException nfe) {
-            logger.warning("Invalid color: " + str);
-            return null;
-        }
-        nation.setColor(color);
-        getGUI().refreshPlayersTable();
         return null;
     }
 

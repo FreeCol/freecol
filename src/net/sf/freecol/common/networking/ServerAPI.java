@@ -973,9 +973,8 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setColor(Nation nation, Color color) {
-        return askHandling(null, new AttributeMessage("setColor",
-                "nation", nation.getId(),
-                "color", Integer.toString(color.getRGB())));
+        return askHandling(null,
+                           new SetColorMessage(nation, color));
     }
 
     /**

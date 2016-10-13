@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.control;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -38,6 +37,7 @@ import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
+import net.sf.freecol.common.networking.SetColorMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
@@ -67,7 +67,9 @@ public final class PreGameInputHandler extends ServerInputHandler {
      */
     public PreGameInputHandler(FreeColServer freeColServer) {
         super(freeColServer);
-        // FIXME: move and simplify methods later, for now just delegate
+
+        final Game game = getGame();
+        
         register("ready",
             (Connection connection, Element element) ->
             ready(connection, element));
@@ -79,9 +81,10 @@ public final class PreGameInputHandler extends ServerInputHandler {
                 }
                 return reply;
             });
-        register("setColor",
+        register(SetColorMessage.TAG,
             (Connection connection, Element element) ->
-            setColor(connection, element));
+            new SetColorMessage(game, element)
+                .handle(freeColServer, connection));
         register("setNation",
             (Connection connection, Element element) ->
             setNation(connection, element));
@@ -96,7 +99,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                return new UpdateGameOptionsMessage(getGame(), element)
+                return new UpdateGameOptionsMessage(game, element)
                     .handle(freeColServer, player, connection);
             }});
         register(UpdateMapGeneratorOptionsMessage.TAG,
@@ -104,7 +107,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                return new UpdateMapGeneratorOptionsMessage(getGame(), element)
+                return new UpdateMapGeneratorOptionsMessage(game, element)
                     .handle(freeColServer, player, connection);
             }});
     }
@@ -228,42 +231,6 @@ public final class PreGameInputHandler extends ServerInputHandler {
                 player.getConnection());
         } else {
             logger.warning("Available from unknown connection.");
-        }
-        return null;
-    }
-
-    /**
-     * Handles a "setColor"-message from a client.
-     * 
-     * @param connection The {@code Connection} the message came from.
-     * @param element The {@code Element} containing the request.
-     * @return Null, or an error message on failure.
-     */
-    private Element setColor(Connection connection, Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer player = freeColServer.getPlayer(connection);
-        final Specification spec = getGame().getSpecification();
-
-        if (player != null) {
-            Nation nation = spec.getNation(element.getAttribute("nation"));
-            String str = element.getAttribute("color");
-            Color color;
-            try {
-                int rgb = Integer.decode(str);
-                color = new Color(rgb);
-            } catch (NumberFormatException nfe) {
-                return new ErrorMessage(StringTemplate
-                    .template("server.badColor")
-                    .addName("%color%", str))
-                    .toXMLElement();
-            }
-            nation.setColor(color);
-            freeColServer.sendToAll(new AttributeMessage("updateColor",
-                    "nation", nation.getId(),
-                    "color", Integer.toString(color.getRGB())),
-                player.getConnection());
-        } else {
-            logger.warning("setColor from unknown connection.");
         }
         return null;
     }
