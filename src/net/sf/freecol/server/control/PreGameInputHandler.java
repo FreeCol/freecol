@@ -38,6 +38,7 @@ import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.ReadyMessage;
+import net.sf.freecol.common.networking.SetAvailableMessage;
 import net.sf.freecol.common.networking.SetColorMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
@@ -83,6 +84,10 @@ public final class PreGameInputHandler extends ServerInputHandler {
                 }
                 return reply;
             });
+        register(SetAvailableMessage.TAG,
+            (Connection connection, Element element) ->
+            new SetAvailableMessage(game, element)
+                .handle(freeColServer, connection));
         register(SetColorMessage.TAG,
             (Connection connection, Element element) ->
             new SetColorMessage(game, element)
@@ -93,9 +98,6 @@ public final class PreGameInputHandler extends ServerInputHandler {
         register("setNationType",
             (Connection connection, Element element) ->
             setNationType(connection, element));
-        register("setAvailable",
-            (Connection connection, Element element) ->
-            setAvailable(connection, element));
         register(UpdateGameOptionsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -196,17 +198,17 @@ public final class PreGameInputHandler extends ServerInputHandler {
     private Element setAvailable(Connection connection, Element element) {
         final FreeColServer freeColServer = getFreeColServer();
         final ServerPlayer player = freeColServer.getPlayer(connection);
-        final Specification spec = getGame().getSpecification();
-
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        final SetAvailableMessage message
+            = new SetAvailableMessage(game, element);
+        
         if (player != null) {
-            Nation nation = spec.getNation(element.getAttribute("nation"));
-            NationState state = Enum.valueOf(NationState.class,
-                                             element.getAttribute("state"));
+            Nation nation = message.getNation(spec);
+            NationState state = message.getNationState();
             getGame().getNationOptions().setNationState(nation, state);
-            freeColServer.sendToAll(new AttributeMessage("setAvailable",
-                    "nation", nation.getId(),
-                    "state", state.toString()),
-                player.getConnection());
+            freeColServer.sendToAll(new SetAvailableMessage(nation, state),
+                                    player.getConnection());
         } else {
             logger.warning("Available from unknown connection.");
         }

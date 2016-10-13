@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.AddPlayerMessage;
+import net.sf.freecol.common.networking.AttributeMessage.SetAvailableMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.ErrorMessage;
@@ -83,7 +84,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> ready(e));
         register("removePlayer",
             (Connection c, Element e) -> removePlayer(e));
-        register("setAvailable",
+        register(SetAvailableMessage.TAG,
             (Connection c, Element e) -> setAvailable(e));
         register(SetColorMessage.TAG,
             (Connection c, Element e) -> setColor(e));
@@ -263,10 +264,13 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element setAvailable(Element element) {
-        Nation nation = getSpecification().getNation(element.getAttribute("nation"));
-        NationState state = Enum.valueOf(NationState.class,
-                                         element.getAttribute("state"));
-        getGame().getNationOptions().setNationState(nation, state);
+        final Game game = getGame();
+        final Specification spec = getSpecification();
+        final SetAvailableMessage message
+            = new SetAvailableMessage(game, element);
+
+        game.getNationOptions().setNationState(message.getNation(spec),
+                                               message.getNationState());
         getGUI().refreshPlayersTable();
         return null;
     }

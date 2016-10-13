@@ -946,9 +946,8 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setAvailable(Nation nation, NationState state) {
-        return askHandling(null, new AttributeMessage("setAvailable",
-                "nation", nation.getId(),
-                "state", state.toString()));
+        return askHandling(null,
+                           new AttributeMessage.SetAvailableMessage(nation, state));
     }
 
     /**
