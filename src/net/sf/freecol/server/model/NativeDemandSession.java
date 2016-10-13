@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -64,26 +65,32 @@ public class NativeDemandSession extends TimedSession {
     }
 
 
+    private ServerPlayer getColonyOwner() {
+        return (ServerPlayer)this.colony.getOwner();
+    }
+
+    private ServerPlayer getUnitOwner() {
+        return (ServerPlayer)this.unit.getOwner();
+    }
+    
     /**
      * Get the game.
      *
-     * @return The {@code Game}.
+     * @return The {@code ServerGame}.
      */
-    private Game getGame() {
-        return this.unit.getGame();
+    private ServerGame getGame() {
+        return (ServerGame)this.unit.getGame();
     }
 
     /**
-     * Primitve level to finishing the session with the given result.
+     * Primitive level to finishing the session with the given result.
      *
      * @param result The result of the demand.
      * @param cs A {@code ChangeSet} to update.
      */
     private void completeInternal(boolean result, ChangeSet cs) {
-        final ServerPlayer demandPlayer
-            = (ServerPlayer)this.unit.getOwner();
-        final ServerPlayer colonyPlayer
-            = (ServerPlayer)this.colony.getOwner();
+        final ServerPlayer demandPlayer = getUnitOwner();
+        final ServerPlayer colonyPlayer = getColonyOwner();
         
         colonyPlayer.csCompleteNativeDemand(demandPlayer,
             this.unit, this.colony, this.type, this.amount, result, cs);
@@ -116,7 +123,10 @@ public class NativeDemandSession extends TimedSession {
         boolean ret = super.complete(cs);
         if (!ret) {
             completeInternal(result, cs);
-            ((ServerGame)getGame()).sendToAll(cs);
+            cs.add(See.only(getColonyOwner()),
+                   ChangeSet.ChangePriority.CHANGE_NORMAL,
+                   TrivialMessage.CLOSE_MENUS_MESSAGE);
+            getGame().sendToAll(cs);
         }
         return ret;
     }

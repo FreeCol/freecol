@@ -291,24 +291,14 @@ public class DiplomacyMessage extends DOMMessage {
 
         Player senderPlayer = this.agreement.getSender();
         Player recipientPlayer = this.agreement.getRecipient();
-        Player refPlayer = serverPlayer.getREFPlayer();
         if (senderPlayer == null) {
             return serverPlayer.clientError("Null sender in agreement.")
                 .build(serverPlayer);
         } else if (recipientPlayer == null) {
             return serverPlayer.clientError("Null recipient in agreement.")
                 .build(serverPlayer);
-        } else if (senderPlayer != (Player)serverPlayer) {
-            return serverPlayer.clientError("Sender is not our player: "
-                + senderPlayer.getId())
-                .build(serverPlayer);
-        } else if (recipientPlayer != otherPlayer) {
-            return serverPlayer.clientError("Recipient is not other player: "
-                + recipientPlayer.getId())
-                .build(serverPlayer);
-        } else if (senderPlayer == refPlayer || recipientPlayer == refPlayer) {
-            return serverPlayer.clientError("The REF does not negotiate: "
-                + refPlayer.getId())
+        } else if (senderPlayer.isREF() || recipientPlayer.isREF()) {
+            return serverPlayer.clientError("The REF does not negotiate")
                 .build(serverPlayer);
         }
 

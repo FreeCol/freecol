@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -4178,14 +4179,15 @@ outer:  for (Effect effect : effects) {
     public void csNativeFirstContact(ServerPlayer other, Tile tile,
                                      ChangeSet cs) {
         cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
-            new FirstContactMessage(this, other, tile));
+               new FirstContactMessage(this, other, tile));
         csChangeStance(Stance.PEACE, other, true, cs);
         if (tile != null) {
             // Establish a diplomacy session so that if the player
             // accepts the tile offer, we can verify that the offer
             // was made.
             new DiplomacySession(tile.getFirstUnit(),
-                                 tile.getOwningSettlement());
+                                 tile.getOwningSettlement(),
+                                 FreeCol.getTimeout(false));
         }
     }
 
@@ -4216,8 +4218,8 @@ outer:  for (Effect effect : effects) {
             DiplomaticTrade.TradeContext.CONTACT, this, other, null, 0);
         agreement.add(new StanceTradeItem(game, this, other, Stance.PEACE));
         DiplomacySession session = (settlement == null)
-            ? new DiplomacySession(unit, otherUnit)
-            : new DiplomacySession(unit, settlement);
+            ? new DiplomacySession(unit, otherUnit, FreeCol.getTimeout(false))
+            : new DiplomacySession(unit, settlement, FreeCol.getTimeout(false));
         session.setAgreement(agreement);
         cs.add(See.only(this), ChangePriority.CHANGE_LATE, (settlement == null)
             ? new DiplomacyMessage(unit, otherUnit, agreement)

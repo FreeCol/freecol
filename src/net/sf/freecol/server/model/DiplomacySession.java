@@ -22,8 +22,11 @@ package net.sf.freecol.server.model;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 
@@ -31,7 +34,7 @@ import net.sf.freecol.server.control.ChangeSet.See;
 /**
  * A type of session to handle diplomacy.
  */
-public class DiplomacySession extends Session {
+public class DiplomacySession extends TimedSession {
 
     private static final Logger logger = Logger.getLogger(DiplomacySession.class.getName());
 
@@ -48,31 +51,43 @@ public class DiplomacySession extends Session {
     private final Unit otherUnit;
 
 
-    public DiplomacySession(Unit unit, Settlement settlement) {
-        super(makeSessionKey(DiplomacySession.class, unit, settlement));
+    /**
+     * Start a new diplomacy session with our unit and another player
+     * settlement.
+     *
+     * @param unit The {@code Unit} that is initiating diplomacy.
+     * @param settlement The {@code Settlement} that is contacted.
+     * @param timeout The amount of time to wait for a response.
+     */
+    public DiplomacySession(Unit unit, Settlement settlement, long timeout) {
+        super(makeSessionKey(DiplomacySession.class, unit, settlement),
+              timeout);
+
         this.agreement = null;
         this.unit = unit;
         this.settlement = settlement;
         this.otherUnit = null;
     }
 
-    public DiplomacySession(Unit unit, Unit otherUnit) {
-        super(makeSessionKey(DiplomacySession.class, unit, otherUnit));
+    /**
+     * Start a new diplomacy session with our unit and another player unit.
+     *
+     * @param unit The {@code Unit} that is initiating diplomacy.
+     * @param otherUnit The other {@code Unit} that is contacted.
+     * @param timeout The amount of time to wait for a response.
+     */
+    public DiplomacySession(Unit unit, Unit otherUnit, long timeout) {
+        super(makeSessionKey(DiplomacySession.class, unit, otherUnit),
+              timeout);
         this.agreement = null;
         this.unit = unit;
         this.settlement = null;
         this.otherUnit = otherUnit;
     }
 
-    @Override
-    public boolean complete(ChangeSet cs) {
-        unit.setMovesLeft(0);
-        cs.add(See.only((ServerPlayer)unit.getOwner()), unit);
-        return super.complete(cs);
-    }
 
     public DiplomaticTrade getAgreement() {
-        return agreement;
+        return this.agreement;
     }
 
     public void setAgreement(DiplomaticTrade agreement) {
@@ -80,14 +95,101 @@ public class DiplomacySession extends Session {
     }
     
     public Unit getUnit() {
-        return unit;
+        return this.unit;
     }
 
     public Settlement getSettlement() {
-        return settlement;
+        return this.settlement;
     }
 
     public Unit getOtherUnit() {
-        return otherUnit;
+        return this.otherUnit;
+    }
+
+    private ServerPlayer getOwner() {
+        return (ServerPlayer)this.unit.getOwner();
+    }
+
+    private ServerGame getGame() {
+        return (ServerGame)this.unit.getGame();
+    }
+
+    private DiplomacyMessage getMessage() {
+        return (this.otherUnit == null)
+            ? new DiplomacyMessage(this.unit, this.settlement, this.agreement)
+            : new DiplomacyMessage(this.unit, this.otherUnit, this.agreement);
+    }
+    
+    /**
+     * Primitive level to finishing the session with the given result.
+     *
+     * @param result The result of the session.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    private void completeInternal(boolean result, ChangeSet cs) {
+        if (this.agreement != null) { // Agreement is null in first contact
+            if (result) {
+                result = getGame().csAcceptTrade(this.agreement, this.unit,
+                                                 this.settlement, cs);
+            }
+            this.agreement.setStatus((result) ? TradeStatus.ACCEPT_TRADE
+                                              : TradeStatus.REJECT_TRADE);
+            cs.add(See.only((ServerPlayer)this.agreement.getSender()),
+                   ChangeSet.ChangePriority.CHANGE_LATE, getMessage());
+            cs.add(See.only((ServerPlayer)this.agreement.getRecipient()),
+                   ChangeSet.ChangePriority.CHANGE_LATE, getMessage());
+        }
+        this.unit.setMovesLeft(0);
+        cs.add(See.only(getOwner()), this.unit);
+    }
+
+    /**
+     * Explicit completion of the session with a given result.
+     *
+     * Called from the controller when the player returns a definite response.
+     *
+     * @param result Whether to accept or reject the demand.
+     * @param cs A {@code ChangeSet} to update.
+     * @return Whether the session was already complete.
+     */
+    public boolean complete(boolean result, ChangeSet cs) {
+        boolean ret = super.complete(cs);
+        if (!ret) {
+            completeInternal(result, cs);
+        }
+        return ret;
+    }
+
+
+    // Implement TimedSession
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean complete(boolean result) {
+        ChangeSet cs = new ChangeSet();
+        boolean ret = complete(false, cs);
+        if (!ret) { // Withdraw offer
+            cs.add(See.only((ServerPlayer)this.agreement.getSender()),
+                ChangeSet.ChangePriority.CHANGE_NORMAL,
+                TrivialMessage.CLOSE_MENUS_MESSAGE);
+            cs.add(See.only((ServerPlayer)this.agreement.getRecipient()),
+                ChangeSet.ChangePriority.CHANGE_NORMAL,
+                TrivialMessage.CLOSE_MENUS_MESSAGE);
+        }
+        getGame().sendToAll(cs);
+        return ret;
+    }
+
+
+    // Override Session
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean complete(ChangeSet cs) {
+        return complete(false, cs);
     }
 }

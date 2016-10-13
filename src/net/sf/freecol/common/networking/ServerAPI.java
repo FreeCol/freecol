@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -485,15 +486,17 @@ public abstract class ServerAPI {
     /**
      * Handler server query-response for diplomatic messages.
      *
-     * @param ourUnit Our {@code Unit} conducting the diplomacy.
-     * @param otherColony The other {@code Colony} to negotiate with.
+     * @param our Our object ({@code Unit} or {@code Colony})
+     *     conducting the diplomacy.
+     * @param other The other object ({@code Unit} or {@code Colony})
+     *     to negotiate with.
      * @param dt The {@code DiplomaticTrade} agreement to propose.
      * @return The resulting agreement or null if none present.
      */
-    public boolean diplomacy(Unit ourUnit, Colony otherColony, 
+    public boolean diplomacy(FreeColGameObject our, FreeColGameObject other, 
                              DiplomaticTrade dt) {
-        return askHandling(ourUnit.getGame(),
-                           new DiplomacyMessage(ourUnit, otherColony, dt));
+        // Has to be asynchronous
+        return send(new DiplomacyMessage(our, other, dt));
     }
 
     /**

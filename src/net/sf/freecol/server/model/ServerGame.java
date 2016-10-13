@@ -41,20 +41,28 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Limit;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SimpleCombatModel;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -460,6 +468,186 @@ public class ServerGame extends Game implements ServerModelObject {
         }
 
         return weakest;
+    }
+
+    /**
+     * Accept a diplomatic trade.  Handles the transfers of TradeItems.
+     *
+     * Note that first contact contexts may not necessarily have a settlement,
+     * but this is ok because first contact trade can only include stance
+     * and gold trade items.
+     *
+     * @param agreement The {@code DiplomacyTrade} agreement.
+     * @param unit The {@code Unit} that is trading.
+     * @param settlement The {@code Settlement} that is trading.
+     * @param cs A {@code ChangeSet} to update.
+     * @return True if the trade was completed successfully.
+     */
+    public boolean csAcceptTrade(DiplomaticTrade agreement, Unit unit,
+                                 Settlement settlement, ChangeSet cs) {
+        final ServerPlayer srcPlayer = (ServerPlayer)agreement.getSender();
+        final ServerPlayer dstPlayer = (ServerPlayer)agreement.getRecipient();
+        boolean visibilityChange = false;
+        
+        // Check trade carefully before committing.
+        boolean fail = false;
+        for (TradeItem tradeItem : agreement.getTradeItems()) {
+            final ServerPlayer source = (ServerPlayer)tradeItem.getSource();
+            final ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
+            if (!tradeItem.isValid()) {
+                logger.warning("Trade with invalid tradeItem: " + tradeItem);
+                fail = true;
+                continue;
+            }
+            if (source != srcPlayer && source != dstPlayer) {
+                logger.warning("Trade with invalid source: "
+                               + ((source == null) ? "null" : source.getId()));
+                fail = true;
+                continue;
+            }
+            if (dest != srcPlayer && dest != dstPlayer) {
+                logger.warning("Trade with invalid destination: "
+                               + ((dest == null) ? "null" : dest.getId()));
+                fail = true;
+                continue;
+            }
+
+            Colony colony = tradeItem.getColony(getGame());
+            if (colony != null && !source.owns(colony)) {
+                logger.warning("Trade with invalid source owner: " + colony);
+                fail = true;
+                continue;
+            }
+            int gold = tradeItem.getGold();
+            if (gold > 0 && !source.checkGold(gold)) {
+                logger.warning("Trade with invalid gold: " + gold);
+                fail = true;
+                continue;
+            }
+
+            Goods goods = tradeItem.getGoods();
+            if (goods != null) {
+                Location loc = goods.getLocation();
+                if (loc instanceof Ownable
+                    && !source.owns((Ownable)loc)) {
+                    logger.warning("Trade with invalid source owner: " + loc);
+                    fail = true;
+                } else if (!(loc instanceof GoodsLocation
+                        && loc.contains(goods))) {
+                    logger.warning("Trade of unavailable goods " + goods
+                        + " at " + loc);
+                    fail = true;
+                } else if (dest.owns(unit) && !unit.couldCarry(goods)) {
+                    logger.warning("Trade unit can not carry traded goods: "
+                        + goods);
+                    fail = true;
+                }
+            }
+
+            // Stance trade fail is harmless
+            Unit u = tradeItem.getUnit();
+            if (u != null) {
+                if (!source.owns(u)) {
+                    logger.warning("Trade with invalid source owner: " + u);
+                    fail = true;
+                    continue;
+                } else if (dest.owns(unit) && !unit.couldCarry(u)) {
+                    logger.warning("Trade unit can not carry traded unit: "
+                        + u);
+                    fail = true;
+                }
+            }
+        }
+        if (fail) return false;
+
+        for (TradeItem tradeItem : agreement.getTradeItems()) {
+            final ServerPlayer source = (ServerPlayer)tradeItem.getSource();
+            final ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
+            // Collect changes for updating.  Not very OO but
+            // TradeItem should not know about server internals.
+            // Take care to show items that change hands to the *old*
+            // owner too.
+            Stance stance = tradeItem.getStance();
+            if (stance != null
+                && !source.csChangeStance(stance, dest, true, cs)) {
+                logger.warning("Stance trade failure: " + stance);
+            }
+            Colony colony = tradeItem.getColony(getGame());
+            if (colony != null) {
+                ((ServerColony)colony).csChangeOwner(dest, false, cs);//-vis(both),-til
+                visibilityChange = true;
+            }
+            int gold = tradeItem.getGold();
+            if (gold > 0) {
+                source.modifyGold(-gold);
+                dest.modifyGold(gold);
+                cs.addPartial(See.only(source), source, "gold", "score");
+                cs.addPartial(See.only(dest), dest, "gold", "score");
+            }
+            Goods goods = tradeItem.getGoods();
+            if (goods != null && settlement != null) {
+                if (dest.owns(settlement)) {
+                    goods.setLocation(unit);
+                    GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), settlement);
+                    cs.add(See.only(source), unit);
+                    cs.add(See.only(dest), settlement.getGoodsContainer());
+                } else {
+                    goods.setLocation(settlement);
+                    GoodsLocation.moveGoods(settlement, goods.getType(), goods.getAmount(), unit);
+                    cs.add(See.only(dest), unit);
+                    cs.add(See.only(source), settlement.getGoodsContainer());
+                }
+            }
+            ServerPlayer victim = (ServerPlayer)tradeItem.getVictim();
+            if (victim != null) {
+                if (source.csChangeStance(Stance.WAR, victim, true, cs)) {
+                    // Have to add in an explicit stance change and
+                    // message because the player does not normally
+                    // have visibility of stance changes between other nations.
+                    cs.addStance(See.only(dest), source, Stance.WAR, victim);
+                    cs.addMessage(dest,
+                        new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                         Stance.WAR.getOtherStanceChangeKey(),
+                                         source)
+                            .addStringTemplate("%attacker%",
+                                source.getNationLabel())
+                            .addStringTemplate("%defender%",
+                                victim.getNationLabel()));
+                } else {
+                    logger.warning("Incite trade failure: " + victim);
+                }
+            }                
+            ServerUnit newUnit = (ServerUnit)tradeItem.getUnit();
+            if (newUnit != null && settlement != null) {
+                ServerPlayer former = (ServerPlayer)newUnit.getOwner();
+                Tile oldTile = newUnit.getTile();
+                Location newLoc;
+                if (unit.isOnCarrier()) {
+                    Unit carrier = unit.getCarrier();
+                    if (!carrier.couldCarry(newUnit)) {
+                        logger.warning("Can not add " + newUnit
+                            + " to " + carrier);
+                        continue;
+                    }
+                    newLoc = carrier;
+                } else if (dest == unit.getOwner()) {
+                    newLoc = unit.getTile();
+                } else {
+                    newLoc = settlement.getTile();
+                }
+                if (source.csChangeOwner(newUnit, dest, UnitChangeType.CAPTURE,
+                                         newLoc, cs)) {//-vis(both)
+                    newUnit.setMovesLeft(0);
+                    cs.add(See.perhaps().always(former), oldTile);
+                }
+                visibilityChange = true;
+            }
+        }
+        if (visibilityChange) {
+            srcPlayer.invalidateCanSeeTiles();//+vis(srcPlayer)
+            dstPlayer.invalidateCanSeeTiles();//+vis(dstPlayer)
+        }
+        return true;
     }
 
 

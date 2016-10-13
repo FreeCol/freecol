@@ -2966,12 +2966,9 @@ public final class InGameController extends FreeColClientHolder {
      * @param our Our {@code FreeColGameObject} that is negotiating.
      * @param other The other {@code FreeColGameObject}.
      * @param agreement The {@code DiplomaticTrade} agreement.
-     * @return A counter agreement, a rejected agreement, or null if
-     *     the original agreement was already decided.
      */
-    public DiplomaticTrade diplomacy(FreeColGameObject our,
-                                     FreeColGameObject other,
-                                     DiplomaticTrade agreement) {
+    public void diplomacy(FreeColGameObject our, FreeColGameObject other,
+                          DiplomaticTrade agreement) {
         final Player player = getMyPlayer();
         final Player otherPlayer = agreement.getOtherPlayer(player);
         StringTemplate t, nation = otherPlayer.getNationLabel();
@@ -3009,12 +3006,12 @@ public final class InGameController extends FreeColClientHolder {
             } else {
                 agreement = ourAgreement;
             }
-            return agreement;
+            askServer().diplomacy(our, other, agreement);
+            break;
         default:
             logger.warning("Bogus trade status: " + agreement.getStatus());
             break;
         }
-        return null;
     }
 
     /**

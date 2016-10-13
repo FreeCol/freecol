@@ -500,11 +500,10 @@ public final class InGameInputHandler extends ClientInputHandler {
             return null;
         }
 
-        invokeAndWait(() -> {
-                message.setAgreement(igc().diplomacy(our, other, agreement));
+        invokeLater(() -> {
+                igc().diplomacy(our, other, agreement);
             });
-        return (message.getAgreement() == null) ? null
-            : message.toXMLElement();
+        return null;
     }
 
     /**
