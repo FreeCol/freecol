@@ -1021,8 +1021,9 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setNation(Nation nation) {
-        return askHandling(null, new AttributeMessage("setNation",
-                "value", nation.getId()));
+        /* Passing a null player, the server fills it in. */
+        return askHandling(null,
+                           new SetNationMessage(null, nation));
     }
 
     /**

@@ -41,6 +41,7 @@ import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.ReadyMessage;
 import net.sf.freecol.common.networking.SetAvailableMessage;
 import net.sf.freecol.common.networking.SetColorMessage;
+import net.sf.freecol.common.networking.SetNationMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
@@ -91,9 +92,10 @@ public final class PreGameInputHandler extends ServerInputHandler {
             (Connection connection, Element element) ->
             new SetColorMessage(game, element)
                 .handle(freeColServer, connection));
-        register("setNation",
+        register(SetNationMessage.TAG,
             (Connection connection, Element element) ->
-            setNation(connection, element));
+                new SetNationMessage(game, element)
+                    .handle(freeColServer, connection));
         register("setNationType",
             (Connection connection, Element element) ->
             setNationType(connection, element));
@@ -183,40 +185,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
         } catch (FreeColException e) {
             return new ErrorMessage(e).toXMLElement();
         }
-        return null;
-    }
 
-    /**
-     * Handles a "setNation"-message from a client.
-     * 
-     * @param connection The {@code Connection} the message came from.
-     * @param element The {@code Element} containing the request.
-     * @return Null.
-     */
-    private Element setNation(Connection connection, Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer player = freeColServer.getPlayer(connection);
-        final Specification spec = getGame().getSpecification();
-
-        if (player != null) {
-            Nation nation = spec.getNation(element.getAttribute("value"));
-            if (getGame().getNationOptions().getNations().get(nation)
-                == NationState.AVAILABLE) {
-                player.setNation(nation);
-                freeColServer.sendToAll(new AttributeMessage("updateNation",
-                        "player", player.getId(),
-                        "value", nation.getId()),
-                    player.getConnection());
-            } else {
-                return new ErrorMessage(StringTemplate
-                    .template("server.badNation")
-                    .addName("%nation%", (nation == null) ? "null"
-                        : nation.getId()))
-                    .toXMLElement();
-            }
-        } else {
-            logger.warning("setNation from unknown connection.");
-        }
         return null;
     }
 
