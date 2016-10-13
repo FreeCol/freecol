@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.control;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -32,9 +33,9 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
-import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.ReadyMessage;
@@ -79,9 +80,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
         register(TrivialMessage.REQUEST_LAUNCH_TAG,
             (Connection connection, Element element) -> {
                 Element reply = requestLaunch(connection, element);
-                if (reply != null) {
-                    launching = false;
-                }
+                if (reply != null) launching = false;
                 return reply;
             });
         register(SetAvailableMessage.TAG,
@@ -183,34 +182,6 @@ public final class PreGameInputHandler extends ServerInputHandler {
             ((PreGameController)freeColServer.getController()).startGame();
         } catch (FreeColException e) {
             return new ErrorMessage(e).toXMLElement();
-        }
-
-        return null;
-    }
-
-    /**
-     * Handles a "setAvailable"-message from a client.
-     * 
-     * @param connection The {@code Connection} the message came from.
-     * @param element The {@code Element} containing the request.
-     * @return Null, or an error message on failure.
-     */
-    private Element setAvailable(Connection connection, Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer player = freeColServer.getPlayer(connection);
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-        final SetAvailableMessage message
-            = new SetAvailableMessage(game, element);
-        
-        if (player != null) {
-            Nation nation = message.getNation(spec);
-            NationState state = message.getNationState();
-            getGame().getNationOptions().setNationState(nation, state);
-            freeColServer.sendToAll(new SetAvailableMessage(nation, state),
-                                    player.getConnection());
-        } else {
-            logger.warning("Available from unknown connection.");
         }
         return null;
     }

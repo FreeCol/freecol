@@ -947,7 +947,7 @@ public abstract class ServerAPI {
      */
     public boolean setAvailable(Nation nation, NationState state) {
         return askHandling(null,
-                           new AttributeMessage.SetAvailableMessage(nation, state));
+                           new SetAvailableMessage(nation, state));
     }
 
     /**
