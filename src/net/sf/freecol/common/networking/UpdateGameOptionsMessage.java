@@ -81,16 +81,14 @@ public class UpdateGameOptionsMessage extends DOMMessage {
      *
      * @param freeColServer The {@code FreeColServer} handling
      *     the message.
-     * @param player The {@code Player} that sent the message.
      * @param connection The {@code Connection} message was received on.
      * @return Null (although other players are updated on success) or
      *     an error message if the options do not update.
      */
-    public Element handle(FreeColServer freeColServer, Player player,
-                          Connection connection) {
+    public Element handle(FreeColServer freeColServer, Connection connection) {
         final ServerPlayer serverPlayer = freeColServer.getPlayer(connection);
-        if (player == null || !player.isAdmin()) {
-            return serverPlayer.clientError("Not an admin: " + player)
+        if (serverPlayer == null || !serverPlayer.isAdmin()) {
+            return serverPlayer.clientError("Not an admin: " + serverPlayer)
                 .build(serverPlayer);
         }
         final Specification spec = freeColServer.getGame().getSpecification();

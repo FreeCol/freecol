@@ -33,9 +33,7 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.ReadyMessage;
@@ -80,11 +78,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
                 new ReadyMessage(game, element)
                     .handle(freeColServer, connection));
         register(TrivialMessage.REQUEST_LAUNCH_TAG,
-            (Connection connection, Element element) -> {
-                Element reply = requestLaunch(connection, element);
-                if (reply != null) launching = false;
-                return reply;
-            });
+            (Connection connection, Element element) ->
+                requestLaunch(connection, element));
         register(SetAvailableMessage.TAG,
             (Connection connection, Element element) ->
                 new SetAvailableMessage(game, element)
@@ -102,23 +97,27 @@ public final class PreGameInputHandler extends ServerInputHandler {
                 new SetNationTypeMessage(game, element)
                     .handle(freeColServer, connection));
         register(UpdateGameOptionsMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new UpdateGameOptionsMessage(game, element)
-                    .handle(freeColServer, player, connection);
-            }});
+            (Connection connection, Element element) ->
+                new UpdateGameOptionsMessage(game, element)
+                    .handle(freeColServer, connection));
         register(UpdateMapGeneratorOptionsMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new UpdateMapGeneratorOptionsMessage(game, element)
-                    .handle(freeColServer, player, connection);
-            }});
+            (Connection connection, Element element) ->
+                new UpdateMapGeneratorOptionsMessage(game, element)
+                    .handle(freeColServer, connection));
     }
-            
+
+    /**
+     * Set the launching state.
+     *
+     * @param launching The new launching state.
+     * @return The former launching state.
+     */
+    private synchronized boolean setLaunching(boolean launching) {
+        boolean old = this.launching;
+        this.launching = launching;
+        return old;
+    }
+
     /**
      * Handles a "logout"-message.
      * 
@@ -149,10 +148,11 @@ public final class PreGameInputHandler extends ServerInputHandler {
      * @return Null, or an error message on failure.
      */
     private Element requestLaunch(Connection connection,
-                                  @SuppressWarnings("unused") Element element) {
+                                  @SuppressWarnings("unused")Element element) {
         final FreeColServer freeColServer = getFreeColServer();
         final ServerPlayer player = freeColServer.getPlayer(connection);
-        final Specification spec = getGame().getSpecification();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
 
         // Check if launching player is an admin.
         if (!player.isAdmin()) {
@@ -160,15 +160,14 @@ public final class PreGameInputHandler extends ServerInputHandler {
                 .template("server.onlyAdminCanLaunch"))
                 .toXMLElement();
         }
-        if (launching) return null;
-        launching = true;
+        if (setLaunching(true)) return null;
 
         // Check that no two players have the same nation
-        final Game game = getGame();
         List<Nation> nations = new ArrayList<>();
         for (Player p : game.getLivePlayerList()) {
             final Nation nation = spec.getNation(p.getNationId());
             if (nations.contains(nation)) {
+                setLaunching(false);
                 return new ErrorMessage(StringTemplate
                     .template("server.invalidPlayerNations"))
                     .toXMLElement();
@@ -178,6 +177,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
 
         // Check if all players are ready.
         if (!game.allPlayersReadyToLaunch()) {
+            setLaunching(false);
             return new ErrorMessage(StringTemplate
                 .template("server.notAllReady"))
                 .toXMLElement();
