@@ -37,6 +37,7 @@ import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
+import net.sf.freecol.common.networking.ReadyMessage;
 import net.sf.freecol.common.networking.SetColorMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
@@ -69,10 +70,11 @@ public final class PreGameInputHandler extends ServerInputHandler {
         super(freeColServer);
 
         final Game game = getGame();
-        
-        register("ready",
+
+        register(ReadyMessage.TAG,
             (Connection connection, Element element) ->
-            ready(connection, element));
+            new ReadyMessage(game, element)
+                .handle(freeColServer, connection));
         register(TrivialMessage.REQUEST_LAUNCH_TAG,
             (Connection connection, Element element) -> {
                 Element reply = requestLaunch(connection, element);
@@ -131,30 +133,6 @@ public final class PreGameInputHandler extends ServerInputHandler {
         LogoutMessage message = new LogoutMessage(player, "User has logged out");
         freeColServer.sendToAll(message, connection);
         freeColServer.updateMetaServer(false);
-        return null;
-    }
-
-    /**
-     * Handles a "ready"-message from a client.
-     * 
-     * @param connection The {@code Connection} the message came from.
-     * @param element The {@code Element} containing the request.
-     * @return Null.
-     */
-    private Element ready(Connection connection, Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer player = freeColServer.getPlayer(connection);
-
-        if (player != null) {
-            boolean ready = Boolean.parseBoolean(element.getAttribute("value"));
-            player.setReady(ready);
-            freeColServer.sendToAll(new AttributeMessage("playerReady",
-                    "player", player.getId(),
-                    "value", Boolean.toString(ready)),
-                player.getConnection());
-        } else {
-            logger.warning("Ready from unknown connection.");
-        }
         return null;
     }
 

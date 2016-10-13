@@ -1046,8 +1046,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setReady(boolean ready) {
-        return send(new AttributeMessage("ready",
-                "value", Boolean.toString(ready)));
+        return send(new ReadyMessage(null, ready));
     }
 
     /**

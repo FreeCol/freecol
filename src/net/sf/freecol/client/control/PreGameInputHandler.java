@@ -41,6 +41,7 @@ import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
+import net.sf.freecol.common.networking.ReadyMessage;
 import net.sf.freecol.common.networking.SetColorMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
@@ -78,8 +79,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> logout(e));
         register(MultipleMessage.TAG,
             (Connection c, Element e) -> multiple(c, e));
-        register("playerReady",
-            (Connection c, Element e) -> playerReady(e));
+        register(ReadyMessage.TAG,
+            (Connection c, Element e) -> ready(e));
         register("removePlayer",
             (Connection c, Element e) -> removePlayer(e));
         register("setAvailable",
@@ -214,20 +215,22 @@ public final class PreGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handles a "playerReady"-message.
+     * Handles a "ready"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
      * @return Null.
      */
-    private Element playerReady(Element element) {
+    private Element ready(Element element) {
         final Game game = getGame();
+        final ReadyMessage message = new ReadyMessage(game, element);
 
-        Player player = game
-            .getFreeColGameObject(element.getAttribute("player"), Player.class);
-        boolean ready = Boolean.parseBoolean(element.getAttribute("value"));
-        player.setReady(ready);
-        getGUI().refreshPlayersTable();
+        Player player = message.getPlayer(game);
+        boolean ready = message.getValue();
+        if (player != null) {
+            player.setReady(ready);
+            getGUI().refreshPlayersTable();
+        }
 
         return null;
     }
@@ -348,6 +351,37 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 logger.warning("Game node expected: " + fcgo.getId());
             }
         }
+        return null;
+    }
+
+    /**
+     * Handles an "updateColor"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
+     * @return Null.
+     */
+    private Element updateColor(Element element) {
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+
+        String str = element.getAttribute("nation");
+        Nation nation = spec.getNation(str);
+        if (nation == null) {
+            logger.warning("Invalid nation: " + str);
+            return null;
+        }
+        Color color;
+        try {
+            str = element.getAttribute("color");
+            int rgb = Integer.parseInt(str);
+            color = new Color(rgb);
+        } catch (NumberFormatException nfe) {
+            logger.warning("Invalid color: " + str);
+            return null;
+        }
+        nation.setColor(color);
+        getGUI().refreshPlayersTable();
         return null;
     }
 
