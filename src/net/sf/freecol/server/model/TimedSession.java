@@ -53,7 +53,7 @@ public abstract class TimedSession extends Session {
                 public void run() {
                     complete(false);
                 }
-            }, timeout);
+            }, timeout * 1000 /* ms, scale to seconds */);
     }
 
 
