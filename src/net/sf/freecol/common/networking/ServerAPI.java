@@ -684,12 +684,13 @@ public abstract class ServerAPI {
      * Server query-response for logging in a player (pre-game).
      *
      * @param userName The user name.
+     * @param start Start the game immediately.
      * @param version The client version.
      * @return True if the server interaction succeeded.
      */
-    public boolean login(String userName, String version) {
+    public boolean login(String userName, boolean start, String version) {
         return askHandling(null,
-                           new LoginMessage(userName, version));
+                           new LoginMessage(userName, start, version));
     }
 
     /**

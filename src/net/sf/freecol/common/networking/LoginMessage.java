@@ -96,14 +96,14 @@ public class LoginMessage extends DOMMessage {
     }
 
     /**
-     * Create a new {@code LoginMessage} request with name and version
-     * only.
+     * Create a new simple {@code LoginMessage} request.
      *
      * @param userName The name of the user logging in.
+     * @param start Start the game at once.
      * @param version The version of FreeCol at the client.
      */
-    public LoginMessage(String userName, String version) {
-        this(userName, version, false, false, false, false, null);
+    public LoginMessage(String userName, boolean start, String version) {
+        this(userName, version, false, start, false, false, null);
     }
 
     /**

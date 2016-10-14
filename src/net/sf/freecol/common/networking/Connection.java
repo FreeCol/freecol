@@ -555,6 +555,7 @@ public class Connection implements Closeable {
      * @exception IOException if failed to send the message.
      */
     public void disconnect(String reason) throws IOException {
+        logger.info("Disconnect " + this + ": " + reason);
         this.send(new DisconnectMessage(reason));
     }
 

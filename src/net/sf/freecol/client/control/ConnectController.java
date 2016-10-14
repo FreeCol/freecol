@@ -191,12 +191,14 @@ public final class ConnectController extends FreeColClientHolder {
      * Public for the test suite.
      *
      * @param user The name of the player to use.
+     * @param start Start the game immediately.
      * @param host The name of the machine running the
      *            {@code FreeColServer}.
      * @param port The port to use when connecting to the host.
      * @return Null if the login succeeds, otherwise an error message template.
      */
-    public StringTemplate login(String user, String host, int port) {
+    public StringTemplate login(String user, boolean start,
+                                String host, int port) {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
  
@@ -223,7 +225,7 @@ public final class ConnectController extends FreeColClientHolder {
         // and return the game with the player inside.
         // The work is done in PGIH.login().
         Game game;
-        return (!askServer().login(user, FreeCol.getVersion()))
+        return (!askServer().login(user, start, FreeCol.getVersion()))
             ? StringTemplate.template("server.couldNotLogin")
             : ((game = getGame()) == null)
             ? StringTemplate.template("server.noSuchGame")
@@ -309,7 +311,7 @@ public final class ConnectController extends FreeColClientHolder {
         StringTemplate err;
         switch (state) {
         case STARTING_GAME:
-            if ((err = login(FreeCol.getName(), host, port)) != null) {
+            if ((err = login(FreeCol.getName(), false, host, port)) != null) {
                 getGUI().showErrorMessage(err);
                 return false;
             }
@@ -341,7 +343,7 @@ public final class ConnectController extends FreeColClientHolder {
                             .add("%nation%", Messages.nameKey(n))), n)));
             if (choice == null) return false; // User cancelled
 
-            if ((err = login(Messages.getRulerName(choice), host, port)) != null) {
+            if ((err = login(Messages.getRulerName(choice), false, host, port)) != null) {
                 getGUI().showErrorMessage(err);
                 return false;
             }
@@ -361,10 +363,10 @@ public final class ConnectController extends FreeColClientHolder {
      * FIXME: connect client/server directly (not using network-classes)
      *
      * @param spec The {@code Specification} for the game.
-     * @param skip Skip the start game panel.
+     * @param start Start the game at once.
      * @return True if the game starts successfully.
      */
-    public boolean startSinglePlayerGame(Specification spec, boolean skip) {
+    public boolean startSinglePlayerGame(Specification spec, boolean start) {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
@@ -385,7 +387,8 @@ public final class ConnectController extends FreeColClientHolder {
 
         fcc.setFreeColServer(freeColServer);
         fcc.setSinglePlayer(true);
-        StringTemplate err = login(FreeCol.getName(), freeColServer.getHost(),
+        StringTemplate err = login(FreeCol.getName(), start,
+                                   freeColServer.getHost(),
                                    freeColServer.getPort());
         if (err != null) {
             getGUI().showErrorMessage(err);
@@ -397,7 +400,7 @@ public final class ConnectController extends FreeColClientHolder {
             FreeColServer.removeAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX));
         }
         fcc.getPreGameController().setReady(true);
-        if (skip) {
+        if (start) {
             fcc.getPreGameController().requestLaunch();
         } else {
             getGUI().showStartGamePanel(getGame(), getMyPlayer(), true);
@@ -525,7 +528,7 @@ public final class ConnectController extends FreeColClientHolder {
                 // Server might have bounced to another port.
                 fcc.setSinglePlayer(singlePlayer);
                 igc().setGameConnected();
-                err = login(FreeCol.getName(), freeColServer.getHost(), 
+                err = login(FreeCol.getName(), true, freeColServer.getHost(), 
                             freeColServer.getPort());
                 if (err == null) {
                     SwingUtilities.invokeLater(() -> {
@@ -581,7 +584,7 @@ public final class ConnectController extends FreeColClientHolder {
 
         getGUI().removeInGameComponents();
         logout("reconnect");
-        StringTemplate err = login(FreeCol.getName(), host, port);
+        StringTemplate err = login(FreeCol.getName(), true, host, port);
         if (err != null) {
             getGUI().showErrorMessage(err);
             return false;
