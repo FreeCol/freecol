@@ -195,10 +195,10 @@ public final class ConnectController extends FreeColClientHolder {
      * @param host The name of the machine running the
      *            {@code FreeColServer}.
      * @param port The port to use when connecting to the host.
-     * @return Null if the login succeeds, otherwise an error message template.
+     * @return True if the login message was sent.
      */
-    public StringTemplate login(String user, boolean start,
-                                String host, int port) {
+    public boolean login(String user, boolean start,
+                         String host, int port) {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
  
@@ -218,21 +218,16 @@ public final class ConnectController extends FreeColClientHolder {
         } catch (Exception ex) {
             err = FreeCol.errorFromException(ex, "server.couldNotConnect");
         }
-        if (err != null) return err;
-        logger.info("Connected to " + host + ":" + port);
+        if (err == null) {
+            logger.info("Connected to " + host + ":" + port + " as " + user);
 
-        // Ask the server to log in a player with the given user name
-        // and return the game with the player inside.
-        // The work is done in PGIH.login().
-        Game game;
-        return (!askServer().login(user, start, FreeCol.getVersion()))
-            ? StringTemplate.template("server.couldNotLogin")
-            : ((game = getGame()) == null)
-            ? StringTemplate.template("server.noSuchGame")
-            : (getMyPlayer() == null)
-            ? StringTemplate.template("server.noSuchPlayer")
-                .addName("%player%", user)
-            : null;
+            // Ask the server to log in a player with the given user name.
+            // The work is done in PGIH.login().
+            if (askServer().login(user, start, FreeCol.getVersion())) return true;
+            err = StringTemplate.template("server.couldNotLogin");
+        }
+        getGUI().showErrorMessage(err);
+        return false;
     }
 
     //
@@ -311,11 +306,7 @@ public final class ConnectController extends FreeColClientHolder {
         StringTemplate err;
         switch (state) {
         case STARTING_GAME:
-            if ((err = login(FreeCol.getName(), false, host, port)) != null) {
-                getGUI().showErrorMessage(err);
-                return false;
-            }
-            fcc.setLoggedIn(true);
+            if (!login(FreeCol.getName(), false, host, port)) return false;
             getGUI().showStartGamePanel(getGame(), getMyPlayer(), false);
             break;
 
@@ -343,11 +334,7 @@ public final class ConnectController extends FreeColClientHolder {
                             .add("%nation%", Messages.nameKey(n))), n)));
             if (choice == null) return false; // User cancelled
 
-            if ((err = login(Messages.getRulerName(choice), false, host, port)) != null) {
-                getGUI().showErrorMessage(err);
-                return false;
-            }
-            fcc.setLoggedIn(true);
+            if (!login(Messages.getRulerName(choice), false, host, port)) return false;
             break;
 
         case ENDING_GAME: default:
@@ -387,13 +374,8 @@ public final class ConnectController extends FreeColClientHolder {
 
         fcc.setFreeColServer(freeColServer);
         fcc.setSinglePlayer(true);
-        StringTemplate err = login(FreeCol.getName(), start,
-                                   freeColServer.getHost(),
-                                   freeColServer.getPort());
-        if (err != null) {
-            getGUI().showErrorMessage(err);
-            return false;
-        }
+        if (!login(FreeCol.getName(), start, freeColServer.getHost(),
+                   freeColServer.getPort())) return false;
 
         final ClientOptions co = getClientOptions();
         if (co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
@@ -528,9 +510,8 @@ public final class ConnectController extends FreeColClientHolder {
                 // Server might have bounced to another port.
                 fcc.setSinglePlayer(singlePlayer);
                 igc().setGameConnected();
-                err = login(FreeCol.getName(), true, freeColServer.getHost(), 
-                            freeColServer.getPort());
-                if (err == null) {
+                if (login(FreeCol.getName(), true, freeColServer.getHost(), 
+                          freeColServer.getPort())) {
                     SwingUtilities.invokeLater(() -> {
                             ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
                             if (userMsg != null) {
@@ -540,7 +521,7 @@ public final class ConnectController extends FreeColClientHolder {
                         });
                     return; // Success!
                 }
-                logger.warning("Could not log in: " + Messages.message(err));
+                err = StringTemplate.template("server.couldNotLogin");
             } catch (FileNotFoundException fnfe) {
                 err = FreeCol.errorFromException(fnfe,
                     FreeCol.badFile("error.couldNotFind", theFile));
@@ -584,11 +565,7 @@ public final class ConnectController extends FreeColClientHolder {
 
         getGUI().removeInGameComponents();
         logout("reconnect");
-        StringTemplate err = login(FreeCol.getName(), true, host, port);
-        if (err != null) {
-            getGUI().showErrorMessage(err);
-            return false;
-        }
+        if (!login(FreeCol.getName(), true, host, port)) return false;
         igc().nextModelMessage();
         return true;
     }

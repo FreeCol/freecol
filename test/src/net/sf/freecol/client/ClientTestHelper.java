@@ -42,9 +42,8 @@ public class ClientTestHelper {
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);
-        StringTemplate err = connectController.login("test", true,
-            freeColServer.getHost(), freeColServer.getPort());
-        assertNull(err);
+        assertTrue(connectController.login("test", true,
+                freeColServer.getHost(), freeColServer.getPort()));
         client.getPreGameController().setReady(true);
         return client;
     }
