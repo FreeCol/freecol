@@ -141,11 +141,11 @@ public class LoginMessage extends DOMMessage {
         return this.startGame;
     }
 
-    public boolean isSinglePlayer() {
+    public boolean getSinglePlayer() {
         return this.singlePlayer;
     }
 
-    public boolean isCurrentPlayer() {
+    public boolean getCurrentPlayer() {
         return this.currentPlayer;
     }
 

@@ -27,6 +27,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
@@ -34,6 +35,7 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -161,26 +163,30 @@ public final class PreGameInputHandler extends ClientInputHandler {
     private Element login(Element element) {
         final FreeColClient fcc = getFreeColClient();
         final LoginMessage message = new LoginMessage(new Game(), element);
-        Game game = message.getGame();
-        fcc.setGame(game);
-
-        fcc.setSinglePlayer(message.isSinglePlayer());
-
         final String user = message.getUserName();
+        final boolean start = message.getStartGame();
+        final boolean single = message.getSinglePlayer();
+        final boolean current = message.getCurrentPlayer();
+        final Game game = message.getGame();
+        
         Player player = game.getPlayerByName(user);
         if (player == null) {
-            logger.warning("New game does not contain player: " + user);
+            StringTemplate err = StringTemplate
+                .template("server.noSuchPlayer")
+                .addName("%player%", user);
+            getGUI().showErrorMessage(err);
+            logger.warning(Messages.message(err));
             return null;
         }
+        fcc.setGame(game);
+        fcc.setSinglePlayer(single);
         fcc.setMyPlayer(player);
         fcc.addSpecificationActions(game.getSpecification());
+        fcc.setLoggedIn(true);
         logger.info("FreeColClient logged in as " + user
             + "/" + player.getId());
-
-        final boolean currentPlayer = message.isCurrentPlayer();
-        if (currentPlayer) game.setCurrentPlayer(player);
-
-        if (message.getStartGame()) fcc.getPreGameController().startGame();
+        if (current) game.setCurrentPlayer(player);
+        if (start) fcc.getPreGameController().startGame();
         return null;
     }
 

@@ -562,7 +562,8 @@ public final class ConnectController extends FreeColClientHolder {
     public boolean reconnect() {
         final String host = askServer().getHost();
         final int port = askServer().getPort();
-
+        logger.info("Reconnect " + FreeCol.getName()
+            + " to " + host + ":" + port + "/" + getFreeColClient().isLoggedIn());
         getGUI().removeInGameComponents();
         logout("reconnect");
         if (!login(FreeCol.getName(), true, host, port)) return false;
