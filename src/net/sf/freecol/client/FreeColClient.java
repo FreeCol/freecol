@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
 
@@ -857,5 +858,34 @@ public final class FreeColClient {
             ret = 1;
         }
         System.exit(ret);
+    }
+
+    /**
+     * Removes automatically created save games.
+     *
+     * Call this function to delete the automatically created save games from
+     * a previous game.
+     */
+    public void removeAutosaves() {
+        final ClientOptions co = getClientOptions();
+        if (!getMyPlayer().isAdmin()
+            || !co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) return;
+        final String prefix = co.getText(ClientOptions.AUTO_SAVE_PREFIX);
+        
+        File asd = FreeColDirectories.getAutosaveDirectory();
+        File[] files;
+        if (asd == null
+            || (files = asd.listFiles()) == null) return;
+        for (File autosaveFile : transform(files,
+                                           f -> f.getName().startsWith(prefix))) {
+            try {
+                if (!autosaveFile.delete()) {
+                    logger.warning("Failed to delete: " + autosaveFile.getPath());
+                }
+            } catch (SecurityException se) {
+                logger.log(Level.WARNING, "Failed to delete: "
+                    + autosaveFile.getPath());
+            }
+        }
     }
 }

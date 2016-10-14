@@ -684,7 +684,7 @@ public abstract class ServerAPI {
      * Server query-response for logging in a player (pre-game).
      *
      * @param userName The user name.
-     * @param start Start the game immediately.
+     * @param start Start the game at once.
      * @param version The client version.
      * @return True if the server interaction succeeded.
      */

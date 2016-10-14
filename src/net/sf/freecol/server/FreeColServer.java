@@ -1217,31 +1217,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Removes automatically created save games.
-     * Call this function to delete the automatically created save games from
-     * a previous game.
-     *
-     * @param prefix The prefix for the files to delete.
-     */
-    public static void removeAutosaves(final String prefix) {
-        File asd = FreeColDirectories.getAutosaveDirectory();
-        File[] files;
-        if (asd == null
-            || (files = asd.listFiles()) == null) return;
-        for (File autosaveFile : transform(files,
-                                           f -> f.getName().startsWith(prefix))) {
-            try {
-                if (!autosaveFile.delete()) {
-                    logger.warning("Failed to delete: " + autosaveFile.getPath());
-                }
-            } catch (SecurityException se) {
-                logger.log(Level.WARNING, "Failed to delete: "
-                    + autosaveFile.getPath());
-            }
-        }
-    }
-
-    /**
      * Reveals or hides the entire map for all players.
      * Debug menu helper.
      *

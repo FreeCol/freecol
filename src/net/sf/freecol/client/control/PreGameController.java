@@ -148,21 +148,29 @@ public final class PreGameController extends FreeColClientHolder {
      *     a debug run and should be skipping turns.
      */
     public boolean startGame() {
+        final FreeColClient fcc = getFreeColClient();
         final Player player = getMyPlayer();
         final GUI gui = getGUI();
+
+        // Clear the main display
         gui.closeMainPanel();
         gui.closeMenus();
         gui.closeStatusPanel();
-        // Stop the long introduction sound
+
+        // Stop the long introduction sound and play the player intro
         getSoundController().playSound(null);
         getSoundController().playSound("sound.intro." + player.getNationId());
 
         // Switch to InGame mode
-        getFreeColClient().setMessageHandler(getFreeColClient().getInGameInputHandler());
-        getFreeColClient().setInGame(true);
+        fcc.setMessageHandler(fcc.getInGameInputHandler());
+        fcc.setInGame(true);
         gui.initializeInGame();
 
-        Game game = getGame();
+        // Clean up autosaves
+        fcc.removeAutosaves();
+
+        // Sort out the unit initialization
+        final Game game = getGame();
         Tile entryTile = (player.getEntryLocation() == null) ? null
             : player.getEntryLocation().getTile();
         if (currentPlayerIsMyPlayer()) {
@@ -180,17 +188,18 @@ public final class PreGameController extends FreeColClientHolder {
         }
         gui.setupMouseListeners();
 
+        // Check for debug skipping
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && FreeColDebugger.getDebugRunTurns() > 0) {
-            getFreeColClient().skipTurns(FreeColDebugger.getDebugRunTurns());
+            fcc.skipTurns(FreeColDebugger.getDebugRunTurns());
             return false;
         }
 
-        if (getGame().getTurn().getNumber() == 1) {
-            // force view of tutorial message
+        // Tutorial message if needed
+        if (game.getTurn().getNumber() == 1) {
             player.addStartGameMessage();
-            igc().nextModelMessage();
         }
+        igc().nextModelMessage();
         return true;
     }
 
