@@ -3935,8 +3935,8 @@ public final class InGameController extends FreeColClientHolder {
                 if (nti == null) {
                     nti = getGUI().getChoice(unit.getTile(),
                         Messages.message("buyProposition.text"), is, "nothing",
-                        transform(nt.getSettlementToUnit(), alwaysTrue(),
-                                  goodsMapper));
+                        transform(nt.getSettlementToUnit(),
+                                  NativeTradeItem::priceIsValid, goodsMapper));
                     if (nti == null) break;
                     nt.setItem(nti);
                 }
@@ -3956,8 +3956,8 @@ public final class InGameController extends FreeColClientHolder {
                 if (nti == null) {
                     nti = getGUI().getChoice(unit.getTile(),
                         Messages.message("sellProposition.text"), is, "nothing",
-                        transform(nt.getUnitToSettlement(), alwaysTrue(),
-                                  goodsMapper));
+                        transform(nt.getUnitToSettlement(),
+                                  NativeTradeItem::priceIsValid, goodsMapper));
                     if (nti == null) break;
                     nt.setItem(nti);
                 }

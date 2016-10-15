@@ -191,7 +191,8 @@ public class NativeTrade extends FreeColGameObject {
     }
 
     public boolean canBuy() {
-        return getBuy() && !atWar() && this.unit.getSpaceLeft() > 0;
+        return getBuy() && !atWar() && this.unit.getSpaceLeft() > 0
+            && any(getSettlementToUnit(), NativeTradeItem::priceIsValid);
     }
     
     public void setBuy(boolean buy) {
@@ -203,7 +204,8 @@ public class NativeTrade extends FreeColGameObject {
     }
 
     public boolean canSell() {
-        return getSell() && !atWar() && this.unit.hasGoodsCargo();
+        return getSell() && !atWar()
+            && any(getUnitToSettlement(), NativeTradeItem::priceIsValid);
     }
     
     public void setSell(boolean sell) {

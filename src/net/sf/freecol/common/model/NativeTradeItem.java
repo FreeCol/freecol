@@ -98,6 +98,15 @@ public class NativeTradeItem extends GoodsTradeItem {
     }
 
     /**
+     * Is the price valid for trade.
+     *
+     * @return True if the price is positive.
+     */
+    public boolean priceIsValid() {
+        return this.price > 0;
+    }
+
+    /**
      * Get the price for this item.
      *
      * @return The current price.
