@@ -3916,6 +3916,11 @@ public final class InGameController extends FreeColClientHolder {
             return;
         }
 
+        // Col1 only displays at most 3 types of goods for sale.
+        // Maintain this for now but consider lifting in a future
+        // "enhanced trade" mode.
+        nt.limitSettlementToUnit(3);
+        
         final Function<NativeTradeItem, ChoiceItem<NativeTradeItem>>
             goodsMapper = i -> {
             String label = Messages.message(i.getGoods().getLabel(true));

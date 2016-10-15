@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -241,6 +242,14 @@ public class NativeTrade extends FreeColGameObject {
         this.count = -1;
     }
 
+    public NativeTradeItem getItem() {
+        return this.item;
+    }
+
+    public void setItem(NativeTradeItem nti) {
+        this.item = nti;
+    }
+
     public boolean hasNotTraded() {
         return getBuy() && getSell() && getGift();
     }
@@ -289,14 +298,16 @@ public class NativeTrade extends FreeColGameObject {
         }
     }
 
-    public NativeTradeItem getItem() {
-        return this.item;
+    public void limitSettlementToUnit(int n) {
+        List<NativeTradeItem> best = transform(this.settlementToUnit,
+            NativeTradeItem::priceIsValid, Function.identity(),
+            NativeTradeItem.descendingPriceComparator);
+        if (best.size() <= n) return;
+        for (NativeTradeItem nti : best.subList(n, best.size())) {
+            nti.setPrice(NativeTradeItem.PRICE_INVALID);
+        }
     }
-
-    public void setItem(NativeTradeItem nti) {
-        this.item = nti;
-    }
-
+            
     /**
      * Choose the next available upward haggling price.
      *
