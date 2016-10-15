@@ -41,7 +41,6 @@ import org.w3c.dom.Element;
 public class LoginMessage extends DOMMessage {
 
     public static final String TAG = "login";
-    private static final String ADMIN_TAG = "admin";
     private static final String CURRENT_PLAYER_TAG = "currentPlayer";
     private static final String SINGLE_PLAYER_TAG = "singlePlayer";
     private static final String START_GAME_TAG = "startGame";
@@ -53,9 +52,6 @@ public class LoginMessage extends DOMMessage {
 
     /** The client FreeCol version. */
     private final String version;
-
-    /** Is the player an admin. */
-    private final boolean admin;
 
     /** Whether to start the game. */
     private final boolean startGame;
@@ -75,20 +71,18 @@ public class LoginMessage extends DOMMessage {
      *
      * @param userName The name of the user logging in.
      * @param version The version of FreeCol at the client.
-     * @param admin Is the player an administrator?
      * @param startGame Whether to start the game.
      * @param singlePlayer True in single player games.
      * @param currentPlayer True if this player is the current player.
      * @param game The entire game.
      */
     public LoginMessage(String userName, String version,
-                        boolean admin, boolean startGame, boolean singlePlayer,
+                        boolean startGame, boolean singlePlayer,
                         boolean currentPlayer, Game game) {
         super(TAG);
 
         this.userName = userName;
         this.version = version;
-        this.admin = admin;
         this.startGame = startGame;
         this.singlePlayer = singlePlayer;
         this.currentPlayer = currentPlayer;
@@ -103,7 +97,7 @@ public class LoginMessage extends DOMMessage {
      * @param version The version of FreeCol at the client.
      */
     public LoginMessage(String userName, boolean start, String version) {
-        this(userName, version, false, start, false, false, null);
+        this(userName, version, start, false, false, null);
     }
 
     /**
@@ -115,7 +109,6 @@ public class LoginMessage extends DOMMessage {
     public LoginMessage(Game game, Element e) {
         this(getStringAttribute(e, USER_NAME_TAG),
              getStringAttribute(e, VERSION_TAG),
-             getBooleanAttribute(e, ADMIN_TAG, false),
              getBooleanAttribute(e, START_GAME_TAG, false),
              getBooleanAttribute(e, SINGLE_PLAYER_TAG, true),
              getBooleanAttribute(e, CURRENT_PLAYER_TAG, false),
@@ -131,10 +124,6 @@ public class LoginMessage extends DOMMessage {
 
     public String getVersion() {
         return this.version;
-    }
-
-    public boolean isAdmin() {
-        return this.admin;
     }
 
     public boolean getStartGame() {
@@ -271,9 +260,9 @@ public class LoginMessage extends DOMMessage {
         connection.setMessageHandler(mh);
         server.getServer().addConnection(connection);
         server.updateMetaServer(false);
-        return new LoginMessage(this.userName, this.version, player.isAdmin(),
-                                !starting, server.getSinglePlayer(),
-                                isCurrentPlayer, game).toXMLElement();
+        return new LoginMessage(this.userName, this.version, !starting,
+                                server.getSinglePlayer(), isCurrentPlayer,
+                                game).toXMLElement();
     }
 
     /**
@@ -288,7 +277,6 @@ public class LoginMessage extends DOMMessage {
         return new DOMMessage(TAG,
             USER_NAME_TAG, this.userName,
             VERSION_TAG, this.version,
-            ADMIN_TAG, Boolean.toString(this.admin),
             START_GAME_TAG, Boolean.toString(this.startGame),
             SINGLE_PLAYER_TAG, Boolean.toString(this.singlePlayer),
             CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer))

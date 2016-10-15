@@ -954,7 +954,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the player is an admin.
      */
     public boolean isAdmin() {
-        return admin;
+        return this.admin;
     }
 
     /**
