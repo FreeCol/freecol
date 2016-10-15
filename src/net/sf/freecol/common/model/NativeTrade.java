@@ -167,113 +167,252 @@ public class NativeTrade extends FreeColGameObject {
     }
 
 
+    /**
+     * Check if the trade participants are at war.
+     *
+     * @return True if the traders are at war.
+     */
     private boolean atWar() {
         return this.is.getOwner().atWarWith(this.unit.getOwner());
     }
 
+    /**
+     * Get a key for this transaction.
+     *
+     * @return A suitable key.
+     */
     public String getKey() {
         return getKey(this.unit, this.is);
     }
-    
+
+    /**
+     * Make a transaction key for a native trade.
+     *
+     * @param unit The {@code Unit} that is trading.
+     * @param is The {@code IndianSettlement} that is trading.
+     * @return A suitable key.
+     */
     public static String getKey(Unit unit, IndianSettlement is) {
         return unit.getId() + "-" + is.getId();
     }
-    
+
+    /**
+     * Get the unit that is trading.
+     *
+     * @return The {@code Unit} that started the trade.
+     */
     public Unit getUnit() {
         return this.unit;
     }
 
+    /**
+     * Get the settlement that is trading.
+     *
+     * @return The {@code IndianSettlement} that is traded with.
+     */
     public IndianSettlement getIndianSettlement() {
         return this.is;
     }
 
+    /**
+     * Is purchasing available in this transaction?
+     *
+     * @return True if no blocking purchase has been made.
+     */
     public boolean getBuy() {
         return this.buy;
     }
 
+    /**
+     * Can the unit owner buy more items in this session at present?
+     *
+     * @return True if not blocked, at peace, there are purchases to
+     *     be made and space available.
+     */
     public boolean canBuy() {
         return getBuy() && !atWar() && this.unit.getSpaceLeft() > 0
             && any(getSettlementToUnit(), NativeTradeItem::priceIsValid);
     }
-    
+
+    /**
+     * Set the purchase state.
+     *
+     * @param buy The new purchase state.
+     */
     public void setBuy(boolean buy) {
         this.buy = buy;
     }
 
+    /**
+     * Is selling available in this transaction?
+     *
+     * @return True if no blocking sale has been made.
+     */
     public boolean getSell() {
         return this.sell;
     }
 
+    /**
+     * Can the unit owner buy more items in this session at present?
+     *
+     * @return True if not blocked, at peace, and there are sales to be made.
+     */
     public boolean canSell() {
         return getSell() && !atWar()
             && any(getUnitToSettlement(), NativeTradeItem::priceIsValid);
     }
     
+    /**
+     * Set the sale state.
+     *
+     * @param sell The new sale state.
+     */
     public void setSell(boolean sell) {
         this.sell = sell;
     }
     
+    /**
+     * Is giving available in this transaction?
+     *
+     * @return True if no blocking gift has been made.
+     */
     public boolean getGift() {
         return this.gift;
     }
 
+    /**
+     * Can the unit owner give more items in this session at present?
+     *
+     * @return True if not blocked, and the unit has gifts to give.
+     */
     public boolean canGift() {
         return getGift() && this.unit.hasGoodsCargo();
     }
     
+    /**
+     * Set the gift state.
+     *
+     * @param gift The new gift state.
+     */
     public void setGift(boolean gift) {
         this.gift = gift;
     }
 
+    /**
+     * Have no trades been performed in this transaction?
+     *
+     * @return True if no blocking purchase, sale or gift has occurred.
+     */
+    public boolean hasNotTraded() {
+        return getBuy() && getSell() && getGift();
+    }
+
+    /**
+     * Get the transaction count.
+     *
+     * @return The transaction count.
+     */
     public int getCount() {
         return this.count;
     }
 
+    /**
+     * Set the transaction count.
+     *
+     * @param count The new transaction count.
+     */
     public void setCount(int count) {
         this.count = count;
     }
 
+    /**
+     * Is this transaction complete?
+     *
+     * @return True if the transaction is over.
+     */
     public boolean getDone() {
         return this.count < 0
             || (!canBuy() && !canSell() && !canGift());
     }
 
+    /**
+     * Set this transaction as complete.
+     */
     public void setDone() {
         this.count = -1;
     }
 
+    /**
+     * Get the item being traded.
+     *
+     * @return The current {@code NativeTradeItem}.
+     */
     public NativeTradeItem getItem() {
         return this.item;
     }
 
+    /**
+     * Set the item being traded.
+     *
+     * @param nti The new {@code NativeTradeItem}.
+     */
     public void setItem(NativeTradeItem nti) {
         this.item = nti;
     }
 
-    public boolean hasNotTraded() {
-        return getBuy() && getSell() && getGift();
-    }
-
+    /**
+     * Get the list of items the unit is able to offer the settlement.
+     *
+     * Note: some of these items might be currently invalid.
+     *
+     * @return A list of {@code NativeTradeItem}s the unit might sell.
+     */
     public List<NativeTradeItem> getUnitToSettlement() {
         return this.unitToSettlement;
     }
 
+    /**
+     * Get the list of items the settlement is able to offer the unit.
+     *
+     * Note: some of these items might be currently invalid.
+     *
+     * @return A list of {@code NativeTradeItem}s the unit might buy.
+     */
     public List<NativeTradeItem> getSettlementToUnit() {
         return this.settlementToUnit;
     }
 
+    /**
+     * Add an item to the unit list of items.
+     *
+     * @param nti The {@code NativeTradeItem} to add.
+     */
     public void addToUnit(NativeTradeItem nti) {
         this.unitToSettlement.add(nti);
     }
 
+    /**
+     * Remove an item from the unit list of items.
+     *
+     * @param nti The {@code NativeTradeItem} to remove.
+     */
     public void removeFromUnit(NativeTradeItem nti) {
         removeInPlace(this.unitToSettlement, nti.goodsMatcher());
     }
-    
+
+    /**
+     * Is another native trade compatible with this one?
+     *
+     * @return nt The other {@code NativeTrade}.
+     */
     public boolean isCompatible(final NativeTrade nt) {
         return this.getKey().equals(nt.getKey());
     }
 
+    /**
+     * Raw initialization of the unit and settlement list.
+     * Does not do pricing!
+     */
     public void initialize() {
         final Player unitPlayer = this.unit.getOwner();
         final Player settlementPlayer = this.is.getOwner();
@@ -288,6 +427,11 @@ public class NativeTrade extends FreeColGameObject {
         }
     }
 
+    /**
+     * Merge another compatible native trade into this one.
+     *
+     * @param nt The {@code NativeTrade} to merge.
+     */
     public void mergeFrom(final NativeTrade nt) {
         if (isCompatible(nt)) {
             this.unitToSettlement.clear();
@@ -298,6 +442,13 @@ public class NativeTrade extends FreeColGameObject {
         }
     }
 
+    /**
+     * Limit the number of items offered by the settlement.
+     *
+     * Used in the client to implement a Col1 restriction.
+     *
+     * @param n The number of items to offer.
+     */
     public void limitSettlementToUnit(int n) {
         List<NativeTradeItem> best = transform(this.settlementToUnit,
             NativeTradeItem::priceIsValid, Function.identity(),
