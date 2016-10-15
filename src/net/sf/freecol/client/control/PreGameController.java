@@ -69,18 +69,6 @@ public final class PreGameController extends FreeColClientHolder {
     }
 
     /**
-     * Sets this client to be (or not be) ready to start the game.
-     *
-     * @param ready Indicates whether or not this client is ready to
-     *     start the game.
-     */
-    public void setReady(boolean ready) {
-        getMyPlayer().setReady(ready);
-        
-        askServer().setReady(ready);
-    }
-
-    /**
      * Requests the game to be started.  This will only be successful
      * if all players are ready to start the game.
      */
@@ -142,6 +130,18 @@ public final class PreGameController extends FreeColClientHolder {
     }
 
     /**
+     * Sets this client to be (or not be) ready to start the game.
+     *
+     * @param ready Indicates whether or not this client is ready to
+     *     start the game.
+     */
+    public void setReady(boolean ready) {
+        getMyPlayer().setReady(ready);
+        
+        askServer().setReady(ready);
+    }
+
+    /**
      * Starts the game.
      *
      * @return True if the player should continue, false if we are in
@@ -156,6 +156,8 @@ public final class PreGameController extends FreeColClientHolder {
         // Stop the long introduction sound
         getSoundController().playSound(null);
         getSoundController().playSound("sound.intro." + player.getNationId());
+
+        // Switch to InGame mode
         getFreeColClient().setMessageHandler(getFreeColClient().getInGameInputHandler());
         getFreeColClient().setInGame(true);
         gui.initializeInGame();

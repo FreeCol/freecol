@@ -86,8 +86,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> multiple(c, e));
         register(ReadyMessage.TAG,
             (Connection c, Element e) -> ready(e));
-        register("removePlayer",
-            (Connection c, Element e) -> removePlayer(e));
         register(SetAvailableMessage.TAG,
             (Connection c, Element e) -> setAvailable(e));
         register(SetColorMessage.TAG,
@@ -238,26 +236,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             player.setReady(ready);
             getGUI().refreshPlayersTable();
         }
-
-        return null;
-    }
-
-    /**
-     * Handles a "removePlayer"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
-     * @return Null.
-     */
-    private Element removePlayer(Element element) {
-        final Game game = getGame();
-
-        Element playerElement = (Element)element
-            .getElementsByTagName(Player.TAG).item(0);
-        Player player = new Player(game, playerElement);
-
-        game.removePlayer(player);
-        getGUI().refreshPlayersTable();
 
         return null;
     }
