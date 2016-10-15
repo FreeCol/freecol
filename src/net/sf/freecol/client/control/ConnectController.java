@@ -142,8 +142,7 @@ public final class ConnectController extends FreeColClientHolder {
     }
 
     /**
-     * Ask the server a question, but do not make a persistent
-     * connection yet.
+     * Ask the server a question.
      *
      * Handle showing error messages on the GUI.  Only simple messages
      * will work here.
@@ -200,27 +199,19 @@ public final class ConnectController extends FreeColClientHolder {
     public boolean login(String user, boolean start, String host, int port) {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
- 
-        try {
-            askServer().disconnect("logging in");
-        } catch (IOException ioe) {} // Ignore            
+
+        // Clean up any old connections
+        if (askServer().isConnected()) {
+            try {
+                askServer().disconnect("logging in");
+            } catch (IOException ioe) {} // Ignore
+        }
 
         // Establish the full connection here
-        StringTemplate err = null;
-        String message = null;
-        try {
-            if (!askServer().connect(FreeCol.CLIENT_THREAD + user, host, port,
-                                     fcc.getPreGameInputHandler())) {
-                err = StringTemplate.template("server.couldNotConnect");
-            }
-        } catch (Exception ex) {
-            err = FreeCol.errorFromException(ex, "server.couldNotConnect");
-        }
+        StringTemplate err = fcc.connect(user, host, port);
         if (err == null) {
-            logger.info("Connected to " + host + ":" + port + " as " + user);
             // Ask the server to log in a player with the given user name.
             // Control transfers to PGIH.login().
-            logger.info("Connected to " + host + ":" + port);
             if (askServer().login(user, start, FreeCol.getVersion()))
                 return true;
             err = StringTemplate.template("server.couldNotLogin");
@@ -255,6 +246,10 @@ public final class ConnectController extends FreeColClientHolder {
     // where the inGame state is finally set to true, and the game
     // begins.
     //
+    // There is also a debug/fast-start shortcut which sends a true
+    // "startGame" flag in the login message to signal that we want to
+    // bypass the StartGamePanel.
+
 
     /**
      * Starts a multiplayer server and connects to it.

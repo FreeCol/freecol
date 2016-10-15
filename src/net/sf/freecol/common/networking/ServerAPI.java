@@ -94,6 +94,15 @@ public abstract class ServerAPI {
     // Internal message passing routines
 
     /**
+     * Convenience utility to check the connection.
+     *
+     * @return True if the server connection is open.
+     */
+    public boolean isConnected() {
+        return getConnection() != null;
+    }
+
+    /**
      * Sends a DOMMessage to the server.
      *
      * @param message The {@code DOMMessage} to send.

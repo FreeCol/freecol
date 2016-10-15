@@ -752,6 +752,33 @@ public final class FreeColClient {
     // Fundamental game start/stop/continue actions
 
     /**
+     * Establish the user connection.
+     *
+     * @param user The player name.
+     * @param host The host name to connect to.
+     * @param port The host port to connect to.
+     * @return Null on success, an {@code StringTemplate} error
+     *     message on failure.
+     */
+    public StringTemplate connect(String user, String host, int port) {
+        if (askServer().isConnected()) return null;
+
+        StringTemplate err = null;
+        try {
+            if (askServer().connect(FreeCol.CLIENT_THREAD + user, host, port,
+                                    getPreGameInputHandler())) {
+                logger.info("Connected to " + host + ":" + port
+                    + " as " + user);
+            } else {
+                err = StringTemplate.template("server.couldNotConnect");
+            }
+        } catch (Exception ex) {
+            err = FreeCol.errorFromException(ex, "server.couldNotConnect");
+        }
+        return err;
+    }
+
+    /**
      * If currently in a game, displays a quit dialog and if desired,
      * logs out of the current game.
      *
@@ -874,17 +901,16 @@ public final class FreeColClient {
         
         File asd = FreeColDirectories.getAutosaveDirectory();
         File[] files;
-        if (asd == null
-            || (files = asd.listFiles()) == null) return;
-        for (File autosaveFile : transform(files,
-                                           f -> f.getName().startsWith(prefix))) {
+        if (asd == null || (files = asd.listFiles()) == null) return;
+        for (File auto : transform(files,
+                                   f -> f.getName().startsWith(prefix))) {
             try {
-                if (!autosaveFile.delete()) {
-                    logger.warning("Failed to delete: " + autosaveFile.getPath());
+                if (!auto.delete()) {
+                    logger.warning("Failed to delete: " + auto.getPath());
                 }
             } catch (SecurityException se) {
-                logger.log(Level.WARNING, "Failed to delete: "
-                    + autosaveFile.getPath());
+                logger.log(Level.WARNING, "Deletion crash for "
+                    + auto.getPath(), se);
             }
         }
     }
