@@ -19,16 +19,20 @@
 
 package net.sf.freecol.common.model;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -344,6 +348,25 @@ public class Europe extends UnitLocation
     @Override
     public String toShortString() {
         return "Europe";
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getNameForLabel(Player player) {
+        return Messages.getName(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
+        Nation nation = this.getOwner().getNation();
+        return new ImageIcon(ImageLibrary.getMiscIconImage(nation,
+                                                           new Dimension(-1, cellHeight)));
     }
 
 

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,9 +28,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -563,6 +567,25 @@ public abstract class Settlement extends GoodsLocation
     @Override
     public final int getRank() {
         return Location.getRank(getTile());
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getNameForLabel(Player player) {
+        return Messages.message(this.getLocationLabelFor(player));
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
+        return new ImageIcon(ImageLibrary.getSettlementImage(this,
+                                                             new Dimension(64, -1)));
     }
 
 

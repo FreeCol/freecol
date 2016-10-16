@@ -50,7 +50,8 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -76,8 +77,8 @@ import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDecider;
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -124,24 +125,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
             final Player player = getMyPlayer();
             final ImageLibrary lib = getImageLibrary();
-            String name = "";
-            if (location instanceof Europe) {
-                Europe europe = (Europe)location;
-                Nation nation = europe.getOwner().getNation();
-                name = Messages.getName(europe);
-                this.icon = new ImageIcon(ImageLibrary.getMiscIconImage(nation,
-                    new Dimension(-1, CELL_HEIGHT)));
-            } else if (location instanceof Map) {
-                name = Messages.message(location.getLocationLabelFor(player));
-                this.icon = new ImageIcon(lib.getMiscImage(
-                    ImageLibrary.LOST_CITY_RUMOUR));
-            } else if (location instanceof Settlement) {
-                Settlement settlement = (Settlement) location;
-                name = Messages.message(settlement.getLocationLabelFor(player));
-                this.icon = new ImageIcon(ImageLibrary.getSettlementImage(
-                    settlement,
-                    new Dimension(64, -1)));
-            }
+            final String name = location.getNameForLabel(player);
+            this.icon = location.getLocationImage(CELL_HEIGHT, lib);
             StringTemplate template = StringTemplate
                 .template("selectDestinationDialog.destinationTurns")
                 .addName("%location%", name)

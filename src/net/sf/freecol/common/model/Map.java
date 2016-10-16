@@ -37,8 +37,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import javax.swing.ImageIcon;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
@@ -2477,6 +2480,23 @@ public class Map extends FreeColGameObject implements Location {
     @Override
     public String toShortString() {
         return "Map";
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getNameForLabel(Player player) {
+        return Messages.message(this.getLocationLabelFor(player));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
+        return new ImageIcon(library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
     }
 
 
