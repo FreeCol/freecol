@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Comparator;
 import java.util.function.Predicate;
 
 import javax.xml.stream.XMLStreamException;
@@ -37,9 +38,19 @@ public class NativeTradeItem extends GoodsTradeItem {
 
     public static final String TAG = "nativeTradeItem";
 
+    /** Compare the trade item price. */
+    public static final Comparator<NativeTradeItem> descendingPriceComparator
+        = Comparator.comparingInt(NativeTradeItem::getPrice).reversed()
+            .thenComparingInt(NativeTradeItem::getHaggleCount)
+            .thenComparing(nti -> nti.getGoods().getType(),
+                           GoodsType.goodsTypeComparator);
+
     /** Magic number to denote that the price has not been initialized. */
     public static final int PRICE_UNSET = 0;
-    
+
+    /** Magic number for price to denote an invalid item. */
+    public static final int PRICE_INVALID = -1;
+
     /** The current valuation by the natives. */
     private int price;
 
@@ -95,6 +106,15 @@ public class NativeTradeItem extends GoodsTradeItem {
      */
     public boolean priceIsSet() {
         return this.price != PRICE_UNSET;
+    }
+
+    /**
+     * Is the price valid for trade.
+     *
+     * @return True if the price is positive.
+     */
+    public boolean priceIsValid() {
+        return this.price > 0;
     }
 
     /**
@@ -171,7 +191,7 @@ public class NativeTradeItem extends GoodsTradeItem {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        this.price = xr.getAttribute(PRICE_TAG, -1);
+        this.price = xr.getAttribute(PRICE_TAG, PRICE_INVALID);
 
         this.haggleCount = xr.getAttribute(HAGGLE_COUNT_TAG, -1);
     }

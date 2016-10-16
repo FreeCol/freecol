@@ -160,6 +160,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
                 .template("server.onlyAdminCanLaunch"))
                 .toXMLElement();
         }
+        player.setReady(true);
         if (setLaunching(true)) return null;
 
         // Check that no two players have the same nation

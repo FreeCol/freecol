@@ -820,7 +820,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
             for (int h = nti.getHaggleCount(); h >= 0; h--) {
                 price = NativeTrade.haggleUp(price);
             }
-            if (price == NativeTradeItem.PRICE_UNSET) price = -1;
+            if (price <= NativeTradeItem.PRICE_UNSET) {
+                price = NativeTradeItem.PRICE_INVALID;
+            }
             nti.setPrice(price);
         }
 
@@ -839,7 +841,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
             for (int h = nti.getHaggleCount(); h >= 0; h--) {
                 price = NativeTrade.haggleDown(price);
             }
-            if (price == NativeTradeItem.PRICE_UNSET) price = -1;
+            if (price <= NativeTradeItem.PRICE_UNSET) {
+                price = NativeTradeItem.PRICE_INVALID;
+            }
             nti.setPrice(price);
         }
     }

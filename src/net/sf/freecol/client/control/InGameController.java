@@ -3916,6 +3916,11 @@ public final class InGameController extends FreeColClientHolder {
             return;
         }
 
+        // Col1 only displays at most 3 types of goods for sale.
+        // Maintain this for now but consider lifting in a future
+        // "enhanced trade" mode.
+        nt.limitSettlementToUnit(3);
+        
         final Function<NativeTradeItem, ChoiceItem<NativeTradeItem>>
             goodsMapper = i -> {
             String label = Messages.message(i.getGoods().getLabel(true));
@@ -3935,8 +3940,8 @@ public final class InGameController extends FreeColClientHolder {
                 if (nti == null) {
                     nti = getGUI().getChoice(unit.getTile(),
                         Messages.message("buyProposition.text"), is, "nothing",
-                        transform(nt.getSettlementToUnit(), alwaysTrue(),
-                                  goodsMapper));
+                        transform(nt.getSettlementToUnit(),
+                                  NativeTradeItem::priceIsValid, goodsMapper));
                     if (nti == null) break;
                     nt.setItem(nti);
                 }
@@ -3956,8 +3961,8 @@ public final class InGameController extends FreeColClientHolder {
                 if (nti == null) {
                     nti = getGUI().getChoice(unit.getTile(),
                         Messages.message("sellProposition.text"), is, "nothing",
-                        transform(nt.getUnitToSettlement(), alwaysTrue(),
-                                  goodsMapper));
+                        transform(nt.getUnitToSettlement(),
+                                  NativeTradeItem::priceIsValid, goodsMapper));
                     if (nti == null) break;
                     nt.setItem(nti);
                 }

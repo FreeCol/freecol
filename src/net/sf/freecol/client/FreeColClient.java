@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
 
@@ -751,6 +752,33 @@ public final class FreeColClient {
     // Fundamental game start/stop/continue actions
 
     /**
+     * Establish the user connection.
+     *
+     * @param user The player name.
+     * @param host The host name to connect to.
+     * @param port The host port to connect to.
+     * @return Null on success, an {@code StringTemplate} error
+     *     message on failure.
+     */
+    public StringTemplate connect(String user, String host, int port) {
+        if (askServer().isConnected()) return null;
+
+        StringTemplate err = null;
+        try {
+            if (askServer().connect(FreeCol.CLIENT_THREAD + user, host, port,
+                                    getPreGameInputHandler())) {
+                logger.info("Connected to " + host + ":" + port
+                    + " as " + user);
+            } else {
+                err = StringTemplate.template("server.couldNotConnect");
+            }
+        } catch (Exception ex) {
+            err = FreeCol.errorFromException(ex, "server.couldNotConnect");
+        }
+        return err;
+    }
+
+    /**
      * If currently in a game, displays a quit dialog and if desired,
      * logs out of the current game.
      *
@@ -857,5 +885,33 @@ public final class FreeColClient {
             ret = 1;
         }
         System.exit(ret);
+    }
+
+    /**
+     * Removes automatically created save games.
+     *
+     * Call this function to delete the automatically created save games from
+     * a previous game.
+     */
+    public void removeAutosaves() {
+        final ClientOptions co = getClientOptions();
+        if (!getMyPlayer().isAdmin()
+            || !co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) return;
+        final String prefix = co.getText(ClientOptions.AUTO_SAVE_PREFIX);
+        
+        File asd = FreeColDirectories.getAutosaveDirectory();
+        File[] files;
+        if (asd == null || (files = asd.listFiles()) == null) return;
+        for (File auto : transform(files,
+                                   f -> f.getName().startsWith(prefix))) {
+            try {
+                if (!auto.delete()) {
+                    logger.warning("Failed to delete: " + auto.getPath());
+                }
+            } catch (SecurityException se) {
+                logger.log(Level.WARNING, "Deletion crash for "
+                    + auto.getPath(), se);
+            }
+        }
     }
 }

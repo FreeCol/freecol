@@ -94,6 +94,15 @@ public abstract class ServerAPI {
     // Internal message passing routines
 
     /**
+     * Convenience utility to check the connection.
+     *
+     * @return True if the server connection is open.
+     */
+    public boolean isConnected() {
+        return getConnection() != null;
+    }
+
+    /**
      * Sends a DOMMessage to the server.
      *
      * @param message The {@code DOMMessage} to send.
@@ -684,7 +693,7 @@ public abstract class ServerAPI {
      * Server query-response for logging in a player (pre-game).
      *
      * @param userName The user name.
-     * @param start Start the game immediately.
+     * @param start Start the game at once.
      * @param version The client version.
      * @return True if the server interaction succeeded.
      */

@@ -184,7 +184,23 @@ public final class PreGameInputHandler extends ClientInputHandler {
         logger.info("FreeColClient logged in as " + user
             + "/" + player.getId());
         if (current) game.setCurrentPlayer(player);
-        if (start) fcc.getPreGameController().startGame();
+        if (fcc.isInGame()) {
+            fcc.getInGameController().nextModelMessage();
+        } else {
+            if (start) {
+                if (single) {
+                    fcc.getPreGameController().startGame();
+                } else {
+                    if (player.isAdmin()) {
+                        fcc.getPreGameController().setReady(true);
+                        fcc.getPreGameController().requestLaunch();
+                        fcc.getPreGameController().startGame();
+                    }
+                }
+            } else {
+                getGUI().showStartGamePanel(game, player, single);
+            }
+        }
         return null;
     }
 
