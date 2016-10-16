@@ -104,6 +104,7 @@ public class SoundTest extends FreeColTestCase {
         playSound("sound.attack.mounted");
         playSound("sound.attack.naval");
         playSound("sound.event.meet.model.nation.aztec");
+        playSound("sound.event.meet.model.nation.sioux");
         playSound("sound.event.illegalMove");
         playSound("sound.event.buildingComplete");
         playSound("sound.event.captureColony");
