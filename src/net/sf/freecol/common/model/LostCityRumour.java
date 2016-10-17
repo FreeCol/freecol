@@ -369,7 +369,7 @@ public class LostCityRumour extends TileItem {
      */
     @Override
     public Layer getLayer() {
-        return Layer.NATIVES;
+        return Layer.RUMOURS;
     }
 
 

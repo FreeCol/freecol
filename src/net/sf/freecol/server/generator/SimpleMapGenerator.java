@@ -198,24 +198,7 @@ public class SimpleMapGenerator implements MapGenerator {
     private void makeLostCityRumours(Map map, LogBuilder lb) {
         final boolean importRumours
             = mapOptions.getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
-        if (importGame != null && importRumours) {
-            Set<LostCityRumour> lcrs = new HashSet<>();
-            importGame.getMap().forEachTile(Tile::hasLostCityRumour, iTile -> {
-                    final LostCityRumour iLcr = iTile.getLostCityRumour();
-                    final Tile tile = map.getTile(iTile.getX(), iTile.getY());
-                    LostCityRumour lcr = new LostCityRumour(this.game, tile,
-                        iLcr.getType(), iLcr.getName());
-                    lcr.setLocation(tile);
-                    tile.addLostCityRumour(lcr);
-                    lcrs.add(lcr);
-                });
-            // If LCRs were imported then log and return, otherwise
-            // fall through and create them.
-            if (!lcrs.isEmpty()) {
-                lb.add("Imported ", lcrs.size(), " lost city rumours.\n");
-                return;
-            }
-        }
+        if (importGame != null && importRumours) return; // Should be done
 
         final int rumourNumber
             = mapOptions.getInteger(MapGeneratorOptions.RUMOUR_NUMBER);

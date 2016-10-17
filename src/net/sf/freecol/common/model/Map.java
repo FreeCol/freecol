@@ -84,11 +84,10 @@ public class Map extends FreeColGameObject implements Location {
 
     /**
      * The layers included in the map. The RIVERS layer includes all
-     * natural tile improvements that are not resources. The NATIVES
-     * layer includes Lost City Rumours as well as settlements.
+     * natural tile improvements that are not resources.
      */
     public static enum Layer {
-        NONE, LAND, TERRAIN, REGIONS, RIVERS, RESOURCES, NATIVES, ALL;
+        NONE, LAND, TERRAIN, REGIONS, RIVERS, RESOURCES, RUMOURS, NATIVES, ALL;
     };
 
     /** A position on the Map. */
@@ -2304,7 +2303,8 @@ public class Map extends FreeColGameObject implements Location {
         }
         setLayer((rivers && lostCityRumours && resources && nativeSettlements)
             ? Layer.ALL
-            : (nativeSettlements || lostCityRumours) ? Layer.NATIVES
+            : (nativeSettlements) ? Layer.NATIVES
+            : (lostCityRumours) ? Layer.RUMOURS
             : (resources) ? Layer.RESOURCES
             : (rivers) ? Layer.RIVERS
             : (regions) ? Layer.REGIONS

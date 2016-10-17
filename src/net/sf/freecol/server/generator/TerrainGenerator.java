@@ -854,10 +854,12 @@ public class TerrainGenerator {
     public Map createMap(LandMap landMap, LogBuilder lb) {
         final int width = landMap.getWidth();
         final int height = landMap.getHeight();
-        final boolean importTerrain = (importGame != null)
-            && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
         final boolean importBonuses = (importGame != null)
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
+        final boolean importRumours = (importGame != null)
+            && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
+        final boolean importTerrain = (importGame != null)
+            && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
 
         boolean mapHasLand = false;
         Map map = new Map(game, width, height);
@@ -913,9 +915,9 @@ public class TerrainGenerator {
                             = new TileItemContainer(game, t);
                         // TileItemContainer copies every natural item
                         // including Resource if importBonuses is true.
-                        // Rumors are not copied here.
                         container.copyFrom(importTile.getTileItemContainer(),
-                            (importBonuses) ? Map.Layer.RESOURCES
+                            (importRumours) ? Map.Layer.RUMOURS
+                            : (importBonuses) ? Map.Layer.RESOURCES
                             : Map.Layer.RIVERS);
                         t.setTileItemContainer(container);
                     }

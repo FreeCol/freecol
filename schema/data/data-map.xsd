@@ -52,6 +52,7 @@
       <xs:enumeration value="terrain"/>
       <xs:enumeration value="rivers"/>
       <xs:enumeration value="resources"/>
+      <xs:enumeration value="rumours"/>
       <xs:enumeration value="natives"/>
       <xs:enumeration value="all"/>
       <!-- @compat 0.10.x -->
