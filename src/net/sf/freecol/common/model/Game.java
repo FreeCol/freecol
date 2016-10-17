@@ -494,7 +494,7 @@ public class Game extends FreeColGameObject {
      * @return The game {@code UUID}.
      */
     public UUID getUUID () {
-       return uuid;
+       return this.uuid;
     }
 
     /**
@@ -1363,7 +1363,9 @@ public class Game extends FreeColGameObject {
                                               (String)null);
 
         String str = xr.getAttribute(UUID_TAG, (String)null);
-        if (str != null) {
+        if (str == null) {
+            this.uuid = UUID.randomUUID();
+        } else {
             try {
                 UUID u = UUID.fromString(str);
                 this.uuid = u;
