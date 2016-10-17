@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -53,6 +54,17 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
     }
 
     /**
+     * Internal constructor from element.
+     *
+     * @param element The {@code Element} to read from.
+     */
+    protected UpdateMapGeneratorOptionsMessage(Element element) {
+        this(new OptionGroup(MapGeneratorOptions.TAG));
+
+        readFromXMLElement(this.options, element);
+    }
+    
+    /**
      * Create a new {@code UpdateMapGeneratorOptionsMessage} from a
      * supplied element.
      *
@@ -60,7 +72,7 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateMapGeneratorOptionsMessage(Game game, Element element) {
-        this(getChild(game, element, 0, OptionGroup.class));
+        this(getChildElement(element, OptionGroup.TAG));
     }
 
 

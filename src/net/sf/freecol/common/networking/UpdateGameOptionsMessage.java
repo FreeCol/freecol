@@ -20,6 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
@@ -53,6 +54,17 @@ public class UpdateGameOptionsMessage extends DOMMessage {
     }
 
     /**
+     * Internal constructor from element.
+     *
+     * @param element The {@code Element} to read from.
+     */
+    protected UpdateGameOptionsMessage(Element element) {
+        this(new OptionGroup(GameOptions.TAG));
+
+        readFromXMLElement(this.options, element);
+    }
+    
+    /**
      * Create a new {@code UpdateGameOptionsMessage} from a
      * supplied element.
      *
@@ -60,7 +72,7 @@ public class UpdateGameOptionsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateGameOptionsMessage(Game game, Element element) {
-        this(getChild(game, element, 0, OptionGroup.class));
+        this(getChildElement(element, OptionGroup.TAG));
     }
 
 
