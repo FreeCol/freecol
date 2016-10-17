@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 

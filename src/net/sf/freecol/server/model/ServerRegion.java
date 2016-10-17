@@ -28,13 +28,13 @@ import java.awt.Rectangle;
 
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
+import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.common.util.LogBuilder;

@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.util.test.FreeColTestCase;
 

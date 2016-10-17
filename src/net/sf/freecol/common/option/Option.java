@@ -29,8 +29,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 
 /**
  * An option describes something which can be customized by the user.
- *
- * @see net.sf.freecol.common.model.GameOptions
  */
 public interface Option<T> extends Cloneable, ObjectWithId {
 

@@ -19,9 +19,9 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Operand.OperandType;
 import net.sf.freecol.common.model.Operand.ScopeLevel;
+import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerUnit;
