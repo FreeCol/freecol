@@ -910,11 +910,17 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         // Base price is purchase price plus delta.
         // - military goods at double value
         // - trade goods at +50%
+        // - add another point if the goods can not be produced
         int price = amount + Math.max(0, 11 * getPriceToBuy(type, amount) / 10);
         if (type.getMilitary()) {
             price = Math.max(price, amount * full * 2);
         } else if (type.isTradeGoods()) {
             price = Math.max(price, 150 * amount * full / 100);
+        } else {
+            GoodsType raw = type.getInputType();
+            if (raw != null && getMaximumProduction(raw) == 0) {
+                price += amount;
+            }
         }
         return price;
     }
