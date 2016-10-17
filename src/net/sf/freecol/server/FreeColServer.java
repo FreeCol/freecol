@@ -741,7 +741,11 @@ public final class FreeColServer {
     public void saveMapEditorGame(File file, BufferedImage image) 
         throws IOException {
         this.setAIMain(null);
+        // Mask out spec while saving map.
+        Specification spec = game.getSpecification();
+        game.setSpecification(null);
         saveGame(file, MAP_EDITOR_NAME, null, null, image);
+        game.setSpecification(spec);
     }
 
     /**

@@ -1326,7 +1326,12 @@ public class Game extends FreeColGameObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        specification.toXML(xw); // *Must be first*
+        if (specification != null) {
+            // Specification *must be first* if present.
+            // It is not necessarily present when reading maps, but an
+            // overriding spec is provided there so all should be well.
+            specification.toXML(xw);
+        }
 
         for (String cityName : NameCache.getCitiesOfCibola()) {
             // Preserve existing order
