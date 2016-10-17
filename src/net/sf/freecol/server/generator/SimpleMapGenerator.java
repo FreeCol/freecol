@@ -201,8 +201,10 @@ public class SimpleMapGenerator implements MapGenerator {
         if (importGame != null && importRumours) {
             Set<LostCityRumour> lcrs = new HashSet<>();
             importGame.getMap().forEachTile(Tile::hasLostCityRumour, iTile -> {
-                    final LostCityRumour lcr = iTile.getLostCityRumour();
+                    final LostCityRumour iLcr = iTile.getLostCityRumour();
                     final Tile tile = map.getTile(iTile.getX(), iTile.getY());
+                    LostCityRumour lcr = new LostCityRumour(this.game, tile,
+                        iLcr.getType(), iLcr.getName());
                     lcr.setLocation(tile);
                     tile.addLostCityRumour(lcr);
                     lcrs.add(lcr);
