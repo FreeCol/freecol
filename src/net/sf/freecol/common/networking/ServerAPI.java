@@ -710,7 +710,8 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean logout(Player player, String reason) {
-        return sendAndWait(new LogoutMessage(player, reason));
+        return askHandling(player.getGame(),
+                           new LogoutMessage(player, reason));
     }
 
     /**
