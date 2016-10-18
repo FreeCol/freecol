@@ -67,7 +67,6 @@ public final class MapEditorController extends FreeColClientHolder {
          * @param t The {@code Tile} to be transformed,
          */
         public abstract void transform(Tile t);
-
     }
 
     /**
@@ -84,6 +83,31 @@ public final class MapEditorController extends FreeColClientHolder {
      */
     public MapEditorController(FreeColClient freeColClient) {
         super(freeColClient);
+    }
+
+
+    /**
+     * Require all native nation players to be present in a game.
+     *
+     * @param game The {@code Game} to add native nations to.
+     */
+    private void requireNativeNations(Game game) {
+        final Specification spec = game.getSpecification();
+        for (Nation n : spec.getIndianNations()) {
+            Player p = game.getPlayerByNation(n);
+            if (p == null) {
+                p = new ServerPlayer(game, false, n, null, null);
+                game.addPlayer(p);
+            }
+        }
+    }
+
+    private void reloadMainPanel () {
+        SwingUtilities.invokeLater(() -> {
+                getGUI().closeMainPanel();
+                getGUI().showMainPanel(null);
+                getSoundController().playSound("sound.intro.general");
+            });
     }
 
 
@@ -113,7 +137,8 @@ public final class MapEditorController extends FreeColClientHolder {
             getGUI().changeViewMode(GUI.VIEW_TERRAIN_MODE);
             getGUI().startMapEditorGUI();
         } catch (IOException e) {
-            getGUI().showErrorMessage(StringTemplate.template("server.initialize"));
+            getGUI().showErrorMessage(StringTemplate
+                .template("server.initialize"));
             return;
         }
     }
@@ -131,8 +156,9 @@ public final class MapEditorController extends FreeColClientHolder {
         
     /**
      * Sets the currently chosen {@code MapTransform}.
+     *
      * @param mt The transform that should be applied to a
-     *      {@code Tile} that is clicked on the map.
+     *     {@code Tile} that is clicked on the map.
      */
     public void setMapTransform(IMapTransform mt) {
         currentMapTransform = mt;
@@ -141,8 +167,9 @@ public final class MapEditorController extends FreeColClientHolder {
 
     /**
      * Gets the current {@code MapTransform}.
+     *
      * @return The transform that should be applied to a
-     *      {@code Tile} that is clicked on the map.
+     *     {@code Tile} that is clicked on the map.
      */
     public IMapTransform getMapTransform() {
         return currentMapTransform;
@@ -237,22 +264,6 @@ public final class MapEditorController extends FreeColClientHolder {
     }
 
     /**
-     * Require all native nation players to be present in a game.
-     *
-     * @param game The {@code Game} to add native nations to.
-     */
-    public void requireNativeNations(Game game) {
-        final Specification spec = game.getSpecification();
-        for (Nation n : spec.getIndianNations()) {
-            Player p = game.getPlayerByNation(n);
-            if (p == null) {
-                p = new ServerPlayer(game, false, n, null, null);
-                game.addPlayer(p);
-            }
-        }
-    }
-
-    /**
      * Loads a game from the given file.
      *
      * @param file The {@code File}.
@@ -307,13 +318,5 @@ public final class MapEditorController extends FreeColClientHolder {
             }
         };
         getFreeColClient().setWork(loadGameJob);
-    }
-
-    private void reloadMainPanel () {
-        SwingUtilities.invokeLater(() -> {
-                getGUI().closeMainPanel();
-                getGUI().showMainPanel(null);
-                getSoundController().playSound("sound.intro.general");
-            });
     }
 }

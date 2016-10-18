@@ -110,7 +110,8 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
         try {
             if (e.getClickCount() > 1) {
-                canvas.convertToMapTile(e.getX(), e.getY());
+                Tile t = canvas.convertToMapTile(e.getX(), e.getY());
+                if (t != null) getGUI().showTilePanel(t);
             } else {
                 canvas.requestFocus();
             }
