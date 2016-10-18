@@ -159,6 +159,23 @@ public abstract class GoodsLocation extends UnitLocation {
             : goodsContainer.getCompactGoods();
     }
 
+    /**
+     * Move goods from one location to another.
+     *
+     * @param src The source {@code GoodsLocation}.
+     * @param goodsType The {@code GoodsType} to move.
+     * @param amount The amount of goods to move.
+     * @param dst The new {@code GoodsLocation}.
+     */
+    public static void moveGoods(GoodsLocation src, GoodsType goodsType,
+                                 int amount, GoodsLocation dst) {
+        GoodsContainer srcContainer = (src == null) ? null
+            : src.getGoodsContainer();
+        GoodsContainer dstContainer = (dst == null) ? null
+            : dst.getGoodsContainer();
+        GoodsContainer.moveGoods(srcContainer, goodsType, amount, dstContainer);
+    }
+
 
     // Interface Location (from UnitLocation)
     // Inheriting

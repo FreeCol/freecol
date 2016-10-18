@@ -387,23 +387,6 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Move goods from one location to another.
-     *
-     * @param src The source {@code GoodsLocation}.
-     * @param goodsType The {@code GoodsType} to move.
-     * @param amount The amount of goods to move.
-     * @param dst The new {@code GoodsLocation}.
-     */
-    private void moveGoods(GoodsLocation src, GoodsType goodsType, int amount,
-                           GoodsLocation dst) {
-        GoodsContainer srcContainer = (src == null) ? null
-            : src.getGoodsContainer();
-        GoodsContainer dstContainer = (dst == null) ? null
-            : dst.getGoodsContainer();
-        GoodsContainer.moveGoods(srcContainer, goodsType, amount, dstContainer);
-    }
-
-    /**
      * Buy goods from a native settlement.
      *
      * @param unit The {@code Unit} that is buying.
@@ -416,7 +399,7 @@ public final class InGameController extends Controller {
                        ServerIndianSettlement sis, ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
         csVisit(owner, sis, 0, cs);
-        moveGoods(sis, goods.getType(), goods.getAmount(), unit);
+        GoodsLocation.moveGoods(sis, goods.getType(), goods.getAmount(), unit);
         cs.add(See.perhaps(), unit);
         sis.getOwner().modifyGold(price);
         owner.modifyGold(-price);
@@ -443,7 +426,7 @@ public final class InGameController extends Controller {
                         ServerIndianSettlement sis, ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
         csVisit(owner, sis, 0, cs);
-        moveGoods(unit, goods.getType(), goods.getAmount(), sis);
+        GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), sis);
         cs.add(See.perhaps(), unit);
         sis.getOwner().modifyGold(-price);
         owner.modifyGold(price);
@@ -472,7 +455,7 @@ public final class InGameController extends Controller {
                         ServerIndianSettlement sis, ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
         csVisit(owner, sis, 0, cs);
-        moveGoods(unit, goods.getType(), goods.getAmount(), sis);
+        GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), sis);
         cs.add(See.perhaps(), unit);
         sis.csModifyAlarm(owner, -price/50, true, cs);
         sis.updateWantedGoods();
@@ -941,12 +924,12 @@ public final class InGameController extends Controller {
             if (goods != null && settlement != null) {
                 if (dest.owns(settlement)) {
                     goods.setLocation(unit);
-                    moveGoods(unit, goods.getType(), goods.getAmount(), settlement);
+                    GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), settlement);
                     cs.add(See.only(source), unit);
                     cs.add(See.only(dest), settlement.getGoodsContainer());
                 } else {
                     goods.setLocation(settlement);
-                    moveGoods(settlement, goods.getType(), goods.getAmount(), unit);
+                    GoodsLocation.moveGoods(settlement, goods.getType(), goods.getAmount(), unit);
                     cs.add(See.only(dest), unit);
                     cs.add(See.only(source), settlement.getGoodsContainer());
                 }
@@ -1899,7 +1882,7 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         Tile tile = settlement.getTile();
-        moveGoods(unit, goods.getType(), goods.getAmount(), settlement);
+        GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), settlement);
         cs.add(See.perhaps(), unit);
         if (settlement instanceof ServerIndianSettlement) {
             ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
@@ -2945,7 +2928,7 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-        moveGoods(gl, goodsType, amount, carrier);
+        GoodsLocation.moveGoods(gl, goodsType, amount, carrier);
         logger.finest(Messages.message(loc.getLocationLabel())
             + " loaded " + amount + " " + goodsType.getSuffix()
             + " onto " + carrier);
@@ -3218,7 +3201,7 @@ public final class InGameController extends Controller {
         final ServerPlayer otherPlayer = (ServerPlayer)colony.getOwner();
 
         ChangeSet cs = new ChangeSet();
-        moveGoods(unit, goods.getType(), goods.getAmount(), colony);
+        GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), colony);
         cs.add(See.perhaps(), unit);
 
         // Inform the receiver of the gift.
@@ -3798,7 +3781,7 @@ public final class InGameController extends Controller {
                 + " in Europe for " + (serverPlayer.getGold() - gold));
         } else {
             // Dumping goods in Europe
-            moveGoods(carrier, type, amount, null);
+            GoodsLocation.moveGoods(carrier, type, amount, null);
             logger.finest(carrier + " dumped " + amount
                 + " " + type.getSuffix() + " in Europe");
         }
@@ -4040,7 +4023,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         if (carrier.getSettlement() != null) {
             Settlement settlement = carrier.getSettlement();
-            moveGoods(carrier, goodsType, amount, settlement);
+            GoodsLocation.moveGoods(carrier, goodsType, amount, settlement);
             logger.finest(carrier
                 + " unloaded " + amount + " " + goodsType.getSuffix()
                 + " to " + settlement.getName());
@@ -4051,7 +4034,7 @@ public final class InGameController extends Controller {
                 cs.addPartial(See.only(serverPlayer), carrier, "movesLeft");
             }
         } else { // Dump of goods onto a tile
-            moveGoods(carrier, goodsType, amount, null);
+            GoodsLocation.moveGoods(carrier, goodsType, amount, null);
             logger.finest(carrier + " dumped " + amount
                 + " " + goodsType.getSuffix() + " to " + carrier.getLocation());
             cs.add(See.perhaps(), (FreeColGameObject)carrier.getLocation());
