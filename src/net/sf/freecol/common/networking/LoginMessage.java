@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.AddPlayerMessage;
@@ -193,7 +194,8 @@ public class LoginMessage extends DOMMessage {
                 }
             }
 
-            if (!game.canAddNewPlayer()) {
+            Nation nation = game.getVacantNation();
+            if (nation == null) {
                 return new ErrorMessage(StringTemplate
                     .template("server.maximumPlayers"))
                     .toXMLElement();
@@ -206,7 +208,7 @@ public class LoginMessage extends DOMMessage {
 
             // Create and add the new player:
             boolean admin = game.getLivePlayerList().isEmpty();
-            player = new ServerPlayer(game, admin, game.getVacantNation(),
+            player = new ServerPlayer(game, admin, nation,
                                       connection.getSocket(), connection);
             player.setName(userName);
             game.addPlayer(player);
