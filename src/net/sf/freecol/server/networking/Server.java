@@ -229,13 +229,12 @@ public final class Server extends Thread {
                 Socket clientSocket = null;
                 try {
                     clientSocket = serverSocket.accept();
-
-                    logger.info("Got client connection from "
-                        + clientSocket.getInetAddress()
-                        + ":" + clientSocket.getPort());
+                    String name = clientSocket.getInetAddress() + ":"
+                        + clientSocket.getPort();
+                    logger.info("Got client connection from " + name);
                     Connection connection = new Connection(clientSocket,
                         this.freeColServer.getUserConnectionHandler(),
-                        FreeCol.SERVER_THREAD);
+                        FreeCol.SERVER_THREAD + name);
                     addConnection(connection);
                 } catch (IOException|IllegalMonitorStateException e) {
                     if (this.running) {
