@@ -1232,9 +1232,10 @@ public final class FreeCol {
      * @return A suitable timeout value.
      */
     public static long getTimeout(boolean singlePlayer) {
-        return (timeout >= TIMEOUT_MIN) ? timeout
-            : (singlePlayer) ? TIMEOUT_MAX
-            : TIMEOUT_DEFAULT;
+        if (timeout < 0L) {
+            timeout = (singlePlayer) ? TIMEOUT_MAX : TIMEOUT_DEFAULT;
+        }
+        return timeout;
     }
 
     /**
