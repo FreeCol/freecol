@@ -1344,6 +1344,8 @@ public class GUI extends FreeColClientHolder {
 
     public void showStatusPanel(String message) {}
 
+    public void showTilePanel(Tile tile) {}
+
     public void showTilePopUpAtSelectedTile() {}
 
     public void showTradeRoutePanel(Unit unit) {}

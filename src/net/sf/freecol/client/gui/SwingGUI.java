@@ -1717,6 +1717,10 @@ public class SwingGUI extends GUI {
         canvas.showStatusPanel(message);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void showTilePanel(Tile tile) {
         canvas.showTilePanel(tile);
     }
