@@ -177,18 +177,6 @@ public final class InGameController extends Controller {
         return FreeCol.getTimeout(single);
     }
         
-    /**
-     * Asks a question of a player with a timeout.
-     *
-     * @param serverPlayer The {@code ServerPlayer} to ask.
-     * @param request The {@code DOMMessage} question.
-     * @return The response to the question, or null if none.
-     */
-    private DOMMessage askTimeout(ServerPlayer serverPlayer,
-                                  DOMMessage request) {
-        return getGame().askTimeout(serverPlayer, getTimeout(), request);
-    }
-
 
     // Debug support
 

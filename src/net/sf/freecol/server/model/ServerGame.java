@@ -86,9 +86,6 @@ public class ServerGame extends Game implements ServerModelObject {
     /** Timestamp of last move, if any.  Do not serialize. */
     private long lastTime = -1L;
 
-    /** An executor for askTimeout. */
-    private final ExecutorService executor = Executors.newCachedThreadPool();
-
 
     /**
      * Creates a new game model.
@@ -176,33 +173,6 @@ public class ServerGame extends Game implements ServerModelObject {
         serverPlayer.send(cs);
     }
 
-    /**
-     * Asks a question of a player with a timeout.
-     *
-     * @param serverPlayer The {@code ServerPlayer} to ask.
-     * @param timeout The timeout, in seconds.
-     * @param request The {@code DOMMessage} question.
-     * @return The response to the question, or null if none.
-     */
-    public DOMMessage askTimeout(final ServerPlayer serverPlayer, long timeout,
-                                 final DOMMessage request) {
-        Callable<DOMMessage> callable = () -> serverPlayer.ask(this, request);
-        Future<DOMMessage> future = executor.submit(callable);
-        DOMMessage reply;
-        try {
-            reply = future.get(timeout, TimeUnit.SECONDS);
-        } catch (TimeoutException te) {
-            reply = null;
-            sendTo(serverPlayer, new ChangeSet()
-                .add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-                     TrivialMessage.CLOSE_MENUS_MESSAGE));
-        } catch (InterruptedException | ExecutionException e) {
-            reply = null;
-            logger.log(Level.WARNING, "Exception completing future", e);
-        }
-        return reply;
-    }
-    
     /**
      * Makes a trivial server object in this game given a server object tag
      * and an identifier.
