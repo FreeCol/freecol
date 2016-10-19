@@ -495,8 +495,8 @@ public abstract class ServerAPI {
      */
     public boolean diplomacy(FreeColGameObject our, FreeColGameObject other, 
                              DiplomaticTrade dt) {
-        // Has to be asynchronous
-        return send(new DiplomacyMessage(our, other, dt));
+        return askHandling(our.getGame(),
+                           new DiplomacyMessage(our, other, dt));
     }
 
     /**
