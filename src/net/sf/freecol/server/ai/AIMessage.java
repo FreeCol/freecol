@@ -253,7 +253,7 @@ public class AIMessage {
     public static boolean askIndianDemand(AIUnit aiUnit, Colony colony,
                                           GoodsType type, int amount) {
         return aiUnit.getAIOwner().askServer()
-            .indianDemand(aiUnit.getUnit(), colony, type, amount);
+            .indianDemand(aiUnit.getUnit(), colony, type, amount, null);
     }
 
     /**

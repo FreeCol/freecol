@@ -3374,11 +3374,10 @@ public final class InGameController extends FreeColClientHolder {
      * @param colony The {@code Colony} demanded of.
      * @param type The {@code GoodsType} demanded (null means gold).
      * @param amount The amount of goods/gold demanded.
-     * @return Whether the demand was accepted or not.
      */
-    public boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType type, int amount) {
-        if (unit == null || colony == null) return false;
+    public void indianDemand(Unit unit, Colony colony,
+                             GoodsType type, int amount) {
+        if (unit == null || colony == null) return;
 
         final Player player = getMyPlayer();
         final int opt = getClientOptions()
@@ -3481,7 +3480,7 @@ public final class InGameController extends FreeColClientHolder {
             player.addModelMessage(m);
             displayModelMessages(false);
         }
-        return accepted;
+        askServer().indianDemand(unit, colony, type, amount, accepted);
     }
 
     /**

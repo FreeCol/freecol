@@ -816,9 +816,11 @@ public final class InGameInputHandler extends ClientInputHandler {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
 
-        invokeAndWait(() -> message.setResult(igc().indianDemand(unit, colony,
-                    message.getType(game), message.getAmount())));
-        return message.toXMLElement();
+        invokeLater(() -> {
+                igc().indianDemand(unit, colony, message.getType(game),
+                                   message.getAmount());
+            });
+        return null;
     }
 
     /**

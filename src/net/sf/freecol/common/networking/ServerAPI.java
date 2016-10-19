@@ -645,12 +645,15 @@ public abstract class ServerAPI {
      * @param colony The {@code Colony} to demand of.
      * @param type The {@code GoodsType} to demand.
      * @param amount The amount of goods to demand.
+     * @param result The result of the demand.
      * @return True if the server interaction succeeded.
      */
     public boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType type, int amount) {
-        return askHandling(unit.getGame(),
-                           new IndianDemandMessage(unit, colony, type, amount));
+                                GoodsType type, int amount, Boolean result) {
+        IndianDemandMessage message
+            = new IndianDemandMessage(unit, colony, type, amount);
+        if (result != null) message.setResult(result);
+        return askHandling(unit.getGame(), message);
     }
             
     /**
