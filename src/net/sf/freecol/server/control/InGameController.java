@@ -790,39 +790,6 @@ public final class InGameController extends Controller {
     }
 
 
-    // Diplomacy support
-
-    /**
-     * Process a European diplomacy session according to an agreement.
-     *
-     * @param serverPlayer The {@code ServerPlayer} in the session.
-     * @param session The {@code DiplomacySession} underway.
-     * @param agreement The {@code DiplomaticTrade} to consider.
-     * @param cs A {@code ChangeSet} to update.
-     */
-    private void csDiplomacySession(ServerPlayer serverPlayer,
-                                    DiplomacySession session,
-                                    DiplomaticTrade agreement, 
-                                    ChangeSet cs) {
-        agreement.incrementVersion();
-        TradeStatus status = agreement.getStatus();
-        switch (status) {
-        case PROPOSE_TRADE:
-            session.setAgreement(agreement);
-            ServerPlayer otherPlayer = session.getOtherPlayer(serverPlayer);
-            cs.add(See.only(otherPlayer), ChangePriority.CHANGE_LATE,
-                   session.getMessage(otherPlayer));
-            break;
-        case ACCEPT_TRADE:
-            session.complete(true, cs);
-            break;
-        case REJECT_TRADE: default:
-            session.complete(false, cs);
-            break;
-        }
-    }
-
-
     // Routines that follow implement the controller response to
     // messages.  The convention is to return a change set back to the
     // invoking message handler, but handle changes for other players
@@ -1835,7 +1802,7 @@ public final class InGameController extends Controller {
                         + " from " + ourUnit);
         }            
         ServerPlayer otherPlayer = (ServerPlayer)otherColony.getOwner();
-        csDiplomacySession(serverPlayer, session, agreement, cs);
+        serverPlayer.csDiplomacy(session, agreement, cs);
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }
@@ -1863,7 +1830,7 @@ public final class InGameController extends Controller {
                         + " from " + ourColony);
         }            
         ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
-        csDiplomacySession(serverPlayer, session, agreement, cs);
+        serverPlayer.csDiplomacy(session, agreement, cs);
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }
@@ -2352,8 +2319,9 @@ public final class InGameController extends Controller {
             + "compatible contact session: " + ds.getKey());
 
         ChangeSet cs = new ChangeSet();
-        if (compatible) {
-            csDiplomacySession(serverPlayer, ds, agreement, cs);
+        if (compatible) { // Update the other player
+            serverPlayer.csDiplomacy(ds, agreement, cs);
+            getGame().sendToOthers(serverPlayer, cs);
         }
         return cs;
     }

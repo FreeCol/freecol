@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Disaster;
 import net.sf.freecol.common.model.Effect;
 import net.sf.freecol.common.model.Europe;
@@ -4346,6 +4347,33 @@ outer:  for (Effect effect : effects) {
             } else {
                 sis.csModifyAlarm(this, tension, true, cs);
             }
+        }
+    }
+
+    /**
+     * Process European diplomacy according to an agreement.
+     *
+     * @param session The {@code DiplomacySession} underway.
+     * @param agreement The {@code DiplomaticTrade} to consider.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    public void csDiplomacy(DiplomacySession session,
+                            DiplomaticTrade agreement, ChangeSet cs) {
+        agreement.incrementVersion();
+        TradeStatus status = agreement.getStatus();
+        switch (status) {
+        case PROPOSE_TRADE:
+            session.setAgreement(agreement);
+            ServerPlayer otherPlayer = session.getOtherPlayer(this);
+            cs.add(See.only(otherPlayer), ChangePriority.CHANGE_LATE,
+                   session.getMessage(otherPlayer));
+            break;
+        case ACCEPT_TRADE:
+            session.complete(true, cs);
+            break;
+        case REJECT_TRADE: default:
+            session.complete(false, cs);
+            break;
         }
     }
 

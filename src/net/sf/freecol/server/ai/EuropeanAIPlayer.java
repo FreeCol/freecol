@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FeatureContainer;
@@ -2429,16 +2430,14 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     public TradeStatus acceptDiplomaticTrade(DiplomaticTrade agreement) {
         final Player player = getPlayer();
         final Player other = agreement.getOtherPlayer(player);
-        // final Market market = player.getMarket();
         final boolean franklin
             = other.hasAbility(Ability.ALWAYS_OFFERED_PEACE);
         final java.util.Map<TradeItem, Integer> scores = new HashMap<>();
         TradeItem peace = null;
-        // TradeItem cash = null;
+        TradeStatus result = null;
         LogBuilder lb = new LogBuilder(64);
         lb.add("Evaluate trade offer to ", player.getName(),
             " from ", other.getName());
-        TradeStatus result = null;
 
         int unacceptable = 0, value = 0;
         for (TradeItem item : agreement.getTradeItems()) {
@@ -2455,7 +2454,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     }
                     break;
                 case UNCONTACTED: case PEACE:
-                    if (agreement.getContext() == DiplomaticTrade.TradeContext.CONTACT) {
+                    if (agreement.getContext() == TradeContext.CONTACT) {
                         peace = item;
                         score = 0;
                     }

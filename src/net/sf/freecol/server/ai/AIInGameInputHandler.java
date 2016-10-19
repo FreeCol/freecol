@@ -273,8 +273,9 @@ public final class AIInGameInputHandler implements MessageHandler {
         sb.append(" -> ").append(agreement);
         logger.fine(sb.toString());
 
-        return new DiplomacyMessage(message.getOurFCGO(game),
-                                    message.getOtherFCGO(game), agreement)
+        // Note: transposing {our,other} here, the message is in sender sense
+        return new DiplomacyMessage(message.getOtherFCGO(game),
+                                    message.getOurFCGO(game), agreement)
             .toXMLElement();
     }
 

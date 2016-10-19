@@ -102,39 +102,79 @@ public class DiplomacySession extends TimedSession {
                               o1.getOwner(), o2.getOwner());
     }
                                                   
-    
+
+    /**
+     * Get the game this session is in.
+     *
+     * @return The enclosing {@code ServerGame}.
+     */
+    private ServerGame getGame() {
+        return (ServerGame)this.unit.getGame();
+    }
+
+    /**
+     * Get the session agreement.
+     *
+     * @return The {@code DiplomaticTrade} under negotiation.
+     */
     public DiplomaticTrade getAgreement() {
         return this.agreement;
     }
 
+    /**
+     * Set the session agreement.
+     *
+     * @param agreement The new {@code DiplomaticTrade} to negotiate.
+     */
     public void setAgreement(DiplomaticTrade agreement) {
         this.agreement = agreement;
     }
     
+    /**
+     * Get the initiating unit.
+     *
+     * @return The {@code Unit} that started the session.
+     */
     public Unit getUnit() {
         return this.unit;
     }
 
+    /**
+     * Get the settlement if any.
+     *
+     * @return The {@code Settlement} that is negotiating.
+     */
     public Settlement getSettlement() {
         return this.settlement;
     }
 
+    /**
+     * Get the other unit if any.
+     *
+     * @return The other {@code Unit} that is negotiating.
+     */
     public Unit getOtherUnit() {
         return this.otherUnit;
     }
 
+    /**
+     * Get the owner of the initiating unit.
+     *
+     * @return The {@code ServerPlayer} that owns the initiating unit.
+     */
     private ServerPlayer getOwner() {
         return (ServerPlayer)this.unit.getOwner();
     }
 
+    /**
+     * Get the owner of the other settlement or unit.
+     *
+     * @return The {@code ServerPlayer} that owns the other settlement or unit.
+     */
     private ServerPlayer getOtherPlayer() {
         return (ServerPlayer)((this.settlement != null)
             ? this.settlement.getOwner()
             : this.otherUnit.getOwner());
-    }
-
-    private ServerGame getGame() {
-        return (ServerGame)this.unit.getGame();
     }
 
     /**
@@ -165,13 +205,26 @@ public class DiplomacySession extends TimedSession {
                 : new DiplomacyMessage(this.unit, this.otherUnit, this.agreement));
     }
 
-    public boolean isCompatible(Ownable o1, Ownable o2) {
-System.err.println("CHECK COMPAT this=" + getKey() + " f1=" + o1 + " f2=" + o2 + " k=" + makeDiplomacySessionKey(o1, o2));
-        return makeDiplomacySessionKey(o1, o2).equals(getKey());
+    /**
+     * Was this session started by the given objects?
+     *
+     * @param fcgo1 The first {@code FreeColGameObject}.
+     * @param fcgo2 The second {@code FreeColGameObject}.
+     * @return True if the objects started this session.
+     */
+    public boolean isCompatible(FreeColGameObject fcgo1,
+                                FreeColGameObject fcgo2) {
+        return (fcgo1 == (FreeColGameObject)this.unit
+            && (fcgo2 == (FreeColGameObject)this.settlement
+                || fcgo2 == (FreeColGameObject)this.otherUnit))
+            || (fcgo2 == (FreeColGameObject)this.unit
+                && (fcgo1 == (FreeColGameObject)this.settlement
+                    || fcgo1 == (FreeColGameObject)this.otherUnit));
     }
     
     /**
-     * Find any contact session already underway between the given units.
+     * Find any contact session already underway between the owners of
+     * the given units.
      *
      * @param unit The first {@code Unit}.
      * @param other The second {@code Unit}.
@@ -182,14 +235,15 @@ System.err.println("CHECK COMPAT this=" + getKey() + " f1=" + o1 + " f2=" + o2 +
     }
 
     /**
-     * Find any contact session already underway between the given unit and
-     * settlement.
+     * Find any contact session already underway between the owners of a 
+     * given unit and settlement.
      *
      * @param unit The {@code Unit}.
      * @param settlement The {@code Settlement}.
      * @return Any {@code DiplomacySession} found.
      */
-    public static DiplomacySession findContactSession(Unit unit, Settlement settlement) {
+    public static DiplomacySession findContactSession(Unit unit,
+                                                      Settlement settlement) {
         return findContactSession(unit.getOwner(), settlement.getOwner());
     }
 
