@@ -890,8 +890,10 @@ public abstract class ServerAPI {
      */
     public boolean rearrangeColony(Colony colony, List<Unit> workers,
                                    Colony scratch) {
-        return askHandling(colony.getGame(),
-                           new RearrangeColonyMessage(colony, workers, scratch));
+        RearrangeColonyMessage message
+            = new RearrangeColonyMessage(colony, workers, scratch);
+        return (message.isEmpty()) ? true
+            : askHandling(colony.getGame(), message);
     }
 
     /**

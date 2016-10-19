@@ -236,6 +236,15 @@ public class RearrangeColonyMessage extends AttributeMessage {
     // Public interface
 
     /**
+     * Check if the are no arrangements present.
+     *
+     * @return True if there are no arrangements.
+     */
+    public boolean isEmpty() {
+        return getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG) == 0;
+    }
+
+    /**
      * Get arrangements from the attributes.
      *
      * @param game The {@code Game} to create arrangements in.
