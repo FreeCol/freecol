@@ -133,29 +133,32 @@ public class RebelToolTip extends JToolTip {
         final String na = Messages.message("notApplicable");
         add(Utility.localizedLabel("rebelToolTip.nextMember"));
         add(new JLabel((turnsNext < 0) ? na
-                : Integer.toString((int) Math.ceil(turnsNext))), "skip");
+                : String.valueOf((int)Math.ceil(turnsNext))), "skip");
 
         // Displays the number of turns until 50% of the population is Rebel
         // If the colony has passed 50%, then do not display notice.
         if (turns50 > 0) {
             add(Utility.localizedLabel("rebelToolTip.50percent"));
-            add(new JLabel(Integer.toString((int) Math.ceil(turns50))));
+            add(new JLabel(String.valueOf((int)Math.ceil(turns50))), "skip");
         }
 
         // DDisplays the number of turns until 100% of the population is Rebel
         // If the colony has passed 100%, then do not display notice.
         if (turns100 > 0) {
             add(Utility.localizedLabel("rebelToolTip.100percent"));
-            add(new JLabel(Integer.toString((int) Math.ceil(turns100))), "skip");
+            add(new JLabel(String.valueOf((int)Math.ceil(turns100))), "skip");
         }
 
         final int grow = colony.getPreferredSizeChange();
-        if (grow > 0) {
+        if (grow >= Colony.CHANGE_UPPER_BOUND) {
             add(Utility.localizedLabel("rebelToolTip.changeMore"));
-            add(new JLabel(Integer.toString(grow)), "skip");
+            add(Utility.localizedLabel("many"), "skip");
+        } else if (grow >= 0) {
+            add(Utility.localizedLabel("rebelToolTip.changeMore"));
+            add(new JLabel(String.valueOf(grow)), "skip");
         } else if (grow < 0) {
             add(Utility.localizedLabel("rebelToolTip.changeLess"));
-            add(new JLabel(Integer.toString(-grow)), "skip");
+            add(new JLabel(String.valueOf(-grow)), "skip");
         }
     }
 

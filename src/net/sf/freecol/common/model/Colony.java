@@ -62,6 +62,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public static final String REARRANGE_COLONY = "rearrangeColony";
 
     public static final int LIBERTY_PER_REBEL = 200;
+    public static final int CHANGE_UPPER_BOUND = 10;
 
     /** The number of turns of advanced warning of starvation. */
     public static final int FAMINE_TURNS = 3;
@@ -1281,8 +1282,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             return -i;
         } else {
             final Specification spec = getSpecification();
-            limit = spec.getInteger("model.option.badGovernmentLimit");
-            for (i = 1; i < limit; i++) {
+            limit = CHANGE_UPPER_BOUND;
+            for (i = 1; i <= limit; i++) {
                 if (governmentChange(pop + i) == -1) break;
             }
             return i - 1;
