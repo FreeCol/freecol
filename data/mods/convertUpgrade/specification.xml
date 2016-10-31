@@ -19,16 +19,9 @@
     *
   -->
 <freecol-specification id="convertUpgrade">
-  <founding-fathers>
-    <founding-father id="model.foundingFather.bartolomeDeLasCasas"
-                     preserve="true">
-      <ability id="model.ability.upgradeConvertsAtColony" value="true" />
-    </founding-father>
-  </founding-fathers>
-
   <unit-change-types>
     <unit-change-type id="model.unitChange.enterColony">
-      <scope methodName="canUpgradeOnEnterColony" methodValue="true"/>
+      <scope method-name="canUpgradeOnEnterColony" method-value="true"/>
       <unit-type-change from="model.unit.indianConvert"
                         to="model.unit.freeColonist" probability="100"/>
     </unit-change-type>
