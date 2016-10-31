@@ -244,6 +244,8 @@ public class Scope extends FreeColObject {
     // @compat 0.11.3
     private static final String OLD_MATCH_NEGATED_TAG = "matchNegated";
     private static final String OLD_MATCHES_NULL_TAG = "matchesNull";
+    private static final String OLD_METHOD_NAME_TAG = "methodName";
+    private static final String OLD_METHOD_VALUE_TAG = "methodValue";
     // end @compat 0.11.3
 
 
@@ -316,9 +318,19 @@ public class Scope extends FreeColObject {
 
         abilityValue = xr.getAttribute(ABILITY_VALUE_TAG, true);
 
-        methodName = xr.getAttribute(METHOD_NAME_TAG, (String)null);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_METHOD_NAME_TAG)) {
+            methodName = xr.getAttribute(OLD_METHOD_NAME_TAG, (String)null);
+        } else
+        // end @compat 0.11.3
+            methodName = xr.getAttribute(METHOD_NAME_TAG, (String)null);
 
-        methodValue = xr.getAttribute(METHOD_VALUE_TAG, (String)null);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_METHOD_VALUE_TAG)) {
+            methodValue = xr.getAttribute(OLD_METHOD_VALUE_TAG, (String)null);
+        } else
+        // end @compat 0.11.3
+            methodValue = xr.getAttribute(METHOD_VALUE_TAG, (String)null);
     }
 
     /**
