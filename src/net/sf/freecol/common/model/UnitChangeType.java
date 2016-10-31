@@ -334,7 +334,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append('[').append(TAG).append(' ').append(getSuffix())
+        sb.append('[').append(getId()).append(' ').append(getSuffix())
             .append(" ownerChange=").append(this.ownerChange);
         for (Map.Entry<UnitType, List<UnitChange>> entry
                  : this.changes.entrySet()) {
