@@ -407,6 +407,10 @@ public final class Ability extends Feature {
     public static final String UNDEAD
         = "model.ability.undead";
 
+    /** Upgrade converts to free colonist with Casas. */
+    public static final String UPGRADE_CONVERT
+        = "model.ability.upgradeConvert";
+    
 
     /** The ability value. */
     private boolean value = true;

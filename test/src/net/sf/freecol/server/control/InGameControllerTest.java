@@ -1844,30 +1844,6 @@ public class InGameControllerTest extends FreeColTestCase {
             || (colonistType == types[1] && statesmanType == types[0]));
     }
 
-    public void testAddFatherUpgrades() {
-        final Game game = ServerTestHelper.startServerGame(getTestMap());
-        final InGameController igc = ServerTestHelper.getInGameController();
-
-        Colony colony = getStandardColony(4);
-        colony.getUnitList().get(0).setType(colonistType);
-        colony.getUnitList().get(1).setType(colonistType);
-        colony.getUnitList().get(2).setType(colonistType);
-        colony.getUnitList().get(3).setType(indenturedServantType);
-
-        FoundingFather father = new FoundingFather("father", spec());
-        father.setType(FoundingFatherType.TRADE);
-        java.util.Map<UnitType, UnitType> upgrades = new HashMap<>();
-        upgrades.put(indenturedServantType, colonistType);
-        upgrades.put(colonistType, statesmanType);
-        father.setUpgrades(upgrades);
-        igc.addFoundingFather((ServerPlayer)colony.getOwner(), father);
-
-        assertEquals(statesmanType, colony.getUnitList().get(0).getType());
-        assertEquals(statesmanType, colony.getUnitList().get(1).getType());
-        assertEquals(statesmanType, colony.getUnitList().get(2).getType());
-        assertEquals(colonistType, colony.getUnitList().get(3).getType());
-    }
-
     public void testAddFatherBuildingEvent() {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
         final InGameController igc = ServerTestHelper.getInGameController();

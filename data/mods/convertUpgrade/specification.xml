@@ -21,7 +21,7 @@
 <freecol-specification id="convertUpgrade">
   <unit-change-types>
     <unit-change-type id="model.unitChange.enterColony">
-      <scope method-name="canUpgradeOnEnterColony" method-value="true"/>
+      <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
       <unit-type-change from="model.unit.indianConvert"
                         to="model.unit.freeColonist" probability="100"/>
     </unit-change-type>

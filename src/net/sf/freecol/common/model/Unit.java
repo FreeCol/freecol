@@ -1441,15 +1441,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Support for the convertUpgrade mod.
-     *
-     * @return True if the convert upgrade mod is enabled and Casas elected.
-     */
-    public boolean canUpgradeOnEnterColony() {
-        return getOwner().hasAbility("model.ability.upgradeConvertsAtColony");
-    }
-        
-    /**
      * Gets the nationality of this Unit.
      *
      * Nationality represents a Unit's personal allegiance to a

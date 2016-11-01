@@ -85,6 +85,8 @@ public class IndividualFatherTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType statesmanType
         = spec().getUnitType("model.unit.elderStatesman");
+    private static final UnitType nativeConvertType
+        = spec().getUnitType("model.unit.indianConvert");
 
 
     public void testBolivar() {
@@ -202,27 +204,13 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        java.util.Map<UnitType, UnitType> upgrades
-            = bartolomeDeLasCasas.getUpgrades();
-
-        assertFalse(upgrades.isEmpty());
-        forEachMapEntry(upgrades, e -> {
-                assertEquals(e.getKey(),
-                             spec().getUnitType(e.getKey().getId()));
-                assertEquals(e.getValue(),
-                             spec().getUnitType(e.getValue().getId()));
-            });
-
         Colony colony = getStandardColony(4);
         ServerPlayer player = (ServerPlayer)colony.getOwner();
         Unit unit = colony.getUnitList().get(0);
-
-        java.util.Map.Entry<UnitType, UnitType> entry
-            = first(upgrades.entrySet());
-        unit.setType(entry.getKey());
-
+        unit.setType(nativeConvertType);
+        
         player.csAddFoundingFather(bartolomeDeLasCasas, null, new ChangeSet());
-        assertEquals(unit.getType(), entry.getValue());
+        assertEquals(unit.getType(), colonistType);
     }
 
     public void testDeWitt() {

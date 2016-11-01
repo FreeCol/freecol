@@ -74,6 +74,10 @@ public class UnitChangeType extends FreeColSpecObjectType {
     public static final String EXPERIENCE
         = "model.unitChange.experience";
 
+    /** Change when a founding father is elected. */
+    public static final String FOUNDING_FATHER
+        = "model.unitChange.foundingFather";
+
     /** Changes at declaration of independence. */
     public static final String INDEPENDENCE
         = "model.unitChange.independence";

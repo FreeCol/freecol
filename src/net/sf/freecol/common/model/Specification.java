@@ -2379,6 +2379,16 @@ public final class Specification {
                 }
             }
         }
+
+        // <upgrade> element dropped from FoundingFather, replaced by an
+        // ability.  Only impacts Casas.
+        FoundingFather casas
+            = getFoundingFather("model.foundingFather.bartolomeDeLasCasas");
+        if (casas != null && !casas.hasAbility(Ability.UPGRADE_CONVERT)) {
+            Ability uc = new Ability(Ability.UPGRADE_CONVERT, casas, true);
+            addAbility(uc);
+            casas.addAbility(uc);
+        }
         // end @compat 0.11.6
     }
 

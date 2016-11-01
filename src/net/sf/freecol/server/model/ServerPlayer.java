@@ -1943,14 +1943,15 @@ outer:  for (Effect effect : effects) {
             europeDirty = true;
         }
 
-        java.util.Map<UnitType, UnitType> upgrades = father.getUpgrades();
-        if (upgrades != null) {
+        UnitChangeType uct
+            = spec.getUnitChangeType(UnitChangeType.FOUNDING_FATHER);
+        if (uct != null && uct.appliesTo(this)) {
             for (Unit u : getUnitList()) {
-                UnitType newType = upgrades.get(u.getType());
-                if (newType != null) {
-                    u.changeType(newType);//-vis(this)
+                for (UnitChange uc : uct.getUnitChanges(u.getType())) {
+                    u.changeType(uc.to);//-vis(this)
                     visibilityChange = true;
                     cs.add(See.perhaps(), u);
+                    break;
                 }
             }
         }

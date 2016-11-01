@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.113">
+<freecol-specification id="classic" version="0.114">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -1575,6 +1575,11 @@
       <unit-type-change from="model.unit.freeColonist"
                         to="model.unit.masterTobaccoPlanter" probability="4"/>
     </unit-change-type>
+    <unit-change-type id="model.unitChange.foundingFather">
+      <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      <unit-type-change from="model.unit.indianConvert"
+                        to="model.unit.freeColonist" probability="100"/>
+    </unit-change-type>
     <unit-change-type id="model.unitChange.independence">
       <unit-type-change from="model.unit.veteranSoldier"
                         to="model.unit.colonialRegular" probability="100"/>
@@ -2864,8 +2869,8 @@
     <founding-father id="model.foundingFather.bartolomeDeLasCasas"
                      type="religious"
                      weight1="0" weight2="5" weight3="10">
-      <upgrade from-id="model.unit.indianConvert"
-               to-id="model.unit.freeColonist"/>
+      <ability id="model.ability.upgradeConvert"
+               value="true"/>
     </founding-father>
   </founding-fathers>
 

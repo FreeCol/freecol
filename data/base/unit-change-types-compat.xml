@@ -188,6 +188,11 @@
       <unit-type-change from="model.unit.freeColonist"
                         to="model.unit.masterTobaccoPlanter" probability="4"/>
     </unit-change-type>
+    <unit-change-type id="model.unitChange.foundingFather">
+      <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      <unit-type-change from="model.unit.indianConvert"
+                        to="model.unit.freeColonist" probability="100"/>
+    </unit-change-type>
     <unit-change-type id="model.unitChange.independence">
       <unit-type-change from="model.unit.veteranSoldier"
                         to="model.unit.colonialRegular" probability="100"/>
