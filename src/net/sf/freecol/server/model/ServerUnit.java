@@ -20,7 +20,7 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -771,7 +771,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
 
             // Check for new contacts.
-            List<ServerPlayer> pending = new ArrayList<>();
+            Set<ServerPlayer> pending = new HashSet<>();
             for (Tile t : transform(newTile.getSurroundingTiles(1, 1),
                                     nt -> nt != null && nt.isLand())) {
                 settlement = t.getSettlement();
