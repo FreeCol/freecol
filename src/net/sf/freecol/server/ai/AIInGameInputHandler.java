@@ -195,6 +195,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "animateAttack":
             case AssignTradeRouteMessage.TAG:
             case ChatMessage.TAG:
+            case TrivialMessage.CLOSE_MENUS_TAG:
             case DeleteTradeRouteMessage.TAG:
             case DisconnectMessage.TAG:                
             case ErrorMessage.TAG:
