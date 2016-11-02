@@ -262,6 +262,10 @@ public final class AIInGameInputHandler implements MessageHandler {
         final DiplomacyMessage message = new DiplomacyMessage(game, element);
         final DiplomaticTrade agreement = message.getAgreement();
 
+        // Shortcut if no negotiation is required
+        if (agreement.getStatus() != DiplomaticTrade.TradeStatus.PROPOSE_TRADE)
+            return null;
+        
         StringBuilder sb = new StringBuilder(256);
         sb.append("AI Diplomacy: ").append(agreement);
         TradeStatus status = getAIPlayer().acceptDiplomaticTrade(agreement);
