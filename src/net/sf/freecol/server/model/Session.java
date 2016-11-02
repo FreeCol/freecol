@@ -38,11 +38,14 @@ public abstract class Session {
     private static final Logger logger = Logger.getLogger(Session.class.getName());
 
     /** A map of all active sessions. */
-    private static final Map<String, Session> allSessions = new HashMap<>();
+    protected static final Map<String, Session> allSessions = new HashMap<>();
 
     /** Lock for access to allSessions. */
     private static final Object sessionLock = new Object();
-    
+
+    /** The key to this session. */
+    private String key;
+
     /** Has this session been completed? */
     private boolean completed = false;
 
@@ -57,11 +60,21 @@ public abstract class Session {
         if (getSession(key) != null) {
             throw new IllegalArgumentException("Duplicate session: " + key);
         }
+        this.key = key;
         this.completed = false;
         addSession(key, this);
         logger.finest("Created session: " + key);
     }
 
+
+    /**
+     * Get the session key.
+     *
+     * @return The key for this session.
+     */
+    public String getKey() {
+        return this.key;
+    }
 
     /**
      * Add a new session.
