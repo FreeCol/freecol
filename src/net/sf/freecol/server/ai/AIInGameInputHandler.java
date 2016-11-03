@@ -56,6 +56,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NativeGiftMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
+import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.NewTurnMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
@@ -83,11 +84,11 @@ public final class AIInGameInputHandler implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
 
-    /** The player for whom I work. */
-    private final ServerPlayer serverPlayer;
-
     /** The server. */
     private final FreeColServer freeColServer;
+
+    /** The player for whom I work. */
+    private final ServerPlayer serverPlayer;
 
     /** The main AI object. */
     private final AIMain aiMain;
@@ -97,24 +98,25 @@ public final class AIInGameInputHandler implements MessageHandler {
      * The constructor to use.
      *
      * @param freeColServer The main server.
-     * @param me The AI {@code ServerPlayer} that is being
+     * @param serverPlayer The {@code ServerPlayer} that is being
      *     managed by this AIInGameInputHandler.
      * @param aiMain The main AI-object.
      */
-    public AIInGameInputHandler(FreeColServer freeColServer, ServerPlayer me,
+    public AIInGameInputHandler(FreeColServer freeColServer,
+                                ServerPlayer serverPlayer,
                                 AIMain aiMain) {
         if (freeColServer == null) {
             throw new NullPointerException("freeColServer == null");
-        } else if (me == null) {
-            throw new NullPointerException("me == null");
-        } else if (!me.isAI()) {
+        } else if (serverPlayer == null) {
+            throw new NullPointerException("serverPlayer == null");
+        } else if (!serverPlayer.isAI()) {
             throw new RuntimeException("Applying AIInGameInputHandler to a non-AI player!");
         } else if (aiMain == null) {
             throw new NullPointerException("aiMain == null");
         }
 
         this.freeColServer = freeColServer;
-        this.serverPlayer = me;
+        this.serverPlayer = serverPlayer;
         this.aiMain = aiMain;
     }
 
@@ -125,7 +127,7 @@ public final class AIInGameInputHandler implements MessageHandler {
      * @return The {@code AIPlayer}.
      */
     private AIPlayer getAIPlayer() {
-        return aiMain.getAIPlayer(serverPlayer);
+        return this.aiMain.getAIPlayer(this.serverPlayer);
     }
 
     /**
@@ -135,61 +137,92 @@ public final class AIInGameInputHandler implements MessageHandler {
      * @return The corresponding AI unit or null if not found.
      */
     private AIUnit getAIUnit(Unit unit) {
-        return aiMain.getAIUnit(unit);
+        return this.aiMain.getAIUnit(unit);
+    }
+
+    /**
+     * Get the game.
+     *
+     * @return The {@code Game} in the server.
+     */
+    private Game getGame() {
+        return this.freeColServer.getGame();
+    }
+
+    /**
+     * Get the enclosed player.
+     *
+     * @return This {@code ServerPlayer}.
+     */
+    private ServerPlayer getMyPlayer() {
+        return this.serverPlayer;
     }
 
 
     // Implement MessageHandler
 
     /**
-     * Deals with incoming messages that have just been received.
-     *
-     * @param connection The {@code Connection} the message was
-     *     received on.
-     * @param element The root element of the message.
-     * @return The reply.
+     * {@inheritDoc}
      */
     @Override
     public synchronized Element handle(Connection connection, Element element) {
         if (element == null) return null;
+
+        final Game game = getGame();
         final String tag = element.getTagName();
         Element reply = null;
         try {
             switch (tag) {
-            case TrivialMessage.RECONNECT_TAG:
-                logger.warning("Reconnect on illegal operation, refer to any previous error message."); break;
             case ChooseFoundingFatherMessage.TAG:
-                reply = chooseFoundingFather(connection, element); break;
+                reply = chooseFoundingFather(new ChooseFoundingFatherMessage(game, element));
+                break;
             case "diplomacy":
-                reply = diplomacy(connection, element); break;
+                reply = diplomacy(new DiplomacyMessage(game, element));
+                break;
             case FirstContactMessage.TAG:
-                reply = firstContact(connection, element); break;
+                reply = firstContact(new FirstContactMessage(game, element));
+                break;
             case FountainOfYouthMessage.TAG:
-                reply = fountainOfYouth(connection, element); break;
+                reply = fountainOfYouth(new FountainOfYouthMessage(game, element));
+                break;
             case IndianDemandMessage.TAG:
-                reply = indianDemand(connection, element); break;
+                reply = indianDemand(new IndianDemandMessage(game, element));
+                break;
             case "lootCargo":
-                reply = lootCargo(connection, element); break;
+                reply = lootCargo(new LootCargoMessage(game, element));
+                break;
             case "monarchAction":
-                reply = monarchAction(connection, element); break;
+                reply = monarchAction(new MonarchActionMessage(game, element));
+                break;
             case MultipleMessage.TAG:
-                reply = multiple(connection, element); break;
+                reply = multiple(connection, element);
+                break;
             case NationSummaryMessage.TAG:
-                reply = nationSummary(connection, element); break;
+                reply = nationSummary(new NationSummaryMessage(game, element));
+                break;
             case NativeTradeMessage.TAG:
-                reply = nativeTrade(connection, element); break;
+                reply = nativeTrade(new NativeTradeMessage(game, element));
+                break;
             case NewLandNameMessage.TAG:
-                reply = newLandName(connection, element); break;
+                reply = newLandName(new NewLandNameMessage(game, element));
+                break;
             case NewRegionNameMessage.TAG:
-                reply = newRegionName(connection, element); break;
+                reply = newRegionName(new NewRegionNameMessage(game, element));
+                break;
+            case TrivialMessage.RECONNECT_TAG:
+                logger.warning("Reconnect on illegal operation,"
+                    + " refer to any previous error message.");
+                break;
             case SetAIMessage.TAG:
-                reply = setAI(connection, element); break;
+                reply = setAI(new SetAIMessage(game, element));
+                break;
             case SetCurrentPlayerMessage.TAG:
-                reply = setCurrentPlayer(connection, element); break;
+                reply = setCurrentPlayer(new SetCurrentPlayerMessage(game, element));
+                break;
                 
             // Since we're the server, we can see everything.
-            // Therefore most of these messages are useless.  This
-            // may change one day.
+            // Therefore most of these messages are useless.
+            // This may change one day.
             case AddPlayerMessage.TAG:
             case "animateMove":
             case "animateAttack":
@@ -204,9 +237,8 @@ public final class AIInGameInputHandler implements MessageHandler {
             case LogoutMessage.TAG:
             case NativeGiftMessage.TAG:
             case NewTurnMessage.TAG:
-            case "newTradeRoute":
+            case NewTradeRouteMessage.TAG:
             case "remove":
-            case "removeGoods":
             case ScoutSpeakToChiefMessage.TAG:
             case SetDeadMessage.TAG:
             case SetStanceMessage.TAG:
@@ -218,7 +250,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 break;
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "AI input handler for " + serverPlayer
+            logger.log(Level.WARNING, "AI input handler for " + getMyPlayer()
                 + " caught error handling " + tag, e);
         }
         return reply;
@@ -230,42 +262,32 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Handles a "chooseFoundingFather"-message.
      * Only meaningful for AIPlayer types that implement selectFoundingFather.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code ChooseFoundingFatherMessage} to process.
      * @return An {@code Element} containing the response/s.
      */
-    private Element chooseFoundingFather(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final Game game = aiMain.getGame();
+    private Element chooseFoundingFather(ChooseFoundingFatherMessage message) {
         final AIPlayer aiPlayer = getAIPlayer();
+        final List<FoundingFather> fathers = message.getFathers(getGame());
 
-        ChooseFoundingFatherMessage message
-            = new ChooseFoundingFatherMessage(game, element);
-        FoundingFather ff = aiPlayer.selectFoundingFather(message.getFathers(game));
-        logger.finest(aiPlayer.getId() + " chose founding father: " + ff);
+        FoundingFather ff = aiPlayer.selectFoundingFather(fathers);
         if (ff != null) message.setFather(ff);
+        logger.finest(aiPlayer.getId() + " chose founding father: " + ff);
         return message.toXMLElement();
     }
 
     /**
      * Handles an "diplomacy"-message.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code DiplomacyMessage} to process.
      * @return An {@code Element} containing the response/s.
      */
-    private Element diplomacy(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final Game game = freeColServer.getGame();
-        final DiplomacyMessage message = new DiplomacyMessage(game, element);
+    private Element diplomacy(DiplomacyMessage message) {
+        final Game game = getGame();
         final DiplomaticTrade agreement = message.getAgreement();
 
         // Shortcut if no negotiation is required
         if (agreement.getStatus() != DiplomaticTrade.TradeStatus.PROPOSE_TRADE)
             return null;
-        
         StringBuilder sb = new StringBuilder(256);
         sb.append("AI Diplomacy: ").append(agreement);
         TradeStatus status = getAIPlayer().acceptDiplomaticTrade(agreement);
@@ -282,35 +304,24 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Replies to a first contact offer.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code FirstContactMessage} to process.
      * @return An {@code Element} containing the response/s.
      */
-    private Element firstContact(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final Game game = freeColServer.getGame();
-
-        return new FirstContactMessage(game, element).setResult(true)
-            .toXMLElement();
+    private Element firstContact(FirstContactMessage message) {
+        return message.setResult(true).toXMLElement();
     }
 
     /**
      * Replies to fountain of youth offer.
      *
-     * @param connection The {@code Connection} the element arrived on.
+     * @param message The {@code FountainOfYouthMessage} to process.
      * @param element The {@code Element} to process.
      * @return Null.
      */
-    private Element fountainOfYouth(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final Game game = freeColServer.getGame();
-        final FountainOfYouthMessage message
-            = new FountainOfYouthMessage(game, element);
+    private Element fountainOfYouth(FountainOfYouthMessage message) {
         final AIPlayer aiPlayer = getAIPlayer();
+        final int n = message.getMigrants();
 
-        int n = message.getMigrants();
         for (int i = 0; i < n; i++) AIMessage.askEmigrate(aiPlayer, 0);
         return null;
     }
@@ -318,25 +329,21 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handles an "indianDemand"-message.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code IndianDemandMessage} to process.
      * @return The original message with the acceptance state set if querying
      *     the colony player (result == null), or null if reporting the final
      *     result to the native player (result != null).
      */
-    private Element indianDemand(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final Game game = aiMain.getGame();
+    private Element indianDemand(IndianDemandMessage message) {
+        final Game game = getGame();
         final AIPlayer aiPlayer = getAIPlayer();
+        final Unit unit = message.getUnit(game);
+        final Colony colony = message.getColony(game);
+        final GoodsType type = message.getType(game);
+        final int amount = message.getAmount();
 
-        IndianDemandMessage message = new IndianDemandMessage(game, element);
-        Unit unit = message.getUnit(game);
-        Colony colony = message.getColony(game);
-        GoodsType type = message.getType(game);
-        int amount = message.getAmount();
-        Boolean result = message.getResult();
-        result = aiPlayer.indianDemand(unit, colony, type, amount, result);
+        Boolean result = aiPlayer.indianDemand(unit, colony, type, amount,
+                                               message.getResult());
         if (result == null) return null;
         message.setResult(result);
         logger.finest("AI handling native demand by " + unit
@@ -347,18 +354,14 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Replies to loot cargo offer.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code LootCargoMessage} to process.
      * @return Null.
      */
-    private Element lootCargo(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final Game game = freeColServer.getGame();
-        final Market market = serverPlayer.getMarket();
+    private Element lootCargo(LootCargoMessage message) {
+        final Game game = getGame();
+        final Market market = getMyPlayer().getMarket();
+        final Unit unit = message.getUnit(game);
 
-        LootCargoMessage message = new LootCargoMessage(game, element);
-        Unit unit = message.getUnit(game);
         List<Goods> goods = sort(message.getGoods(),
                                  market.getSalePriceComparator());
         List<Goods> loot = new ArrayList<>();
@@ -376,17 +379,12 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handles a "monarchAction"-message.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code MonarchActionMessage} to process.
      * @return An {@code Element} containing the response/s.
      */
-    private Element monarchAction(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final Game game = aiMain.getGame();
+    private Element monarchAction(MonarchActionMessage message) {
+        final MonarchAction action = message.getAction();
 
-        MonarchActionMessage message = new MonarchActionMessage(game, element);
-        MonarchAction action = message.getAction();
         boolean accept;
         switch (action) {
         case RAISE_TAX_WAR: case RAISE_TAX_ACT:
@@ -424,20 +422,15 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handle an incoming nation summary.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code NationSummaryMessage} to process.
      * @return Null.
      */
-    private Element nationSummary(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final Game game = aiMain.getGame();
+    private Element nationSummary(NationSummaryMessage message) {
         final AIPlayer aiPlayer = getAIPlayer();
+        final Player player = aiPlayer.getPlayer();
+        final Player other = message.getPlayer(getGame());
+        final NationSummary ns = message.getNationSummary();
 
-        NationSummaryMessage message = new NationSummaryMessage(game, element);
-        Player player = aiPlayer.getPlayer();
-        Player other = message.getPlayer(game);
-        NationSummary ns = message.getNationSummary();
         player.putNationSummary(other, ns);
         logger.info("Updated nation summary of " + other.getSuffix()
             + " for AI " + player.getSuffix());
@@ -447,91 +440,66 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handle a native trade message.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code NativeTradeMessage} to process.
      * @return An {@code Element} containing the response/s.
      */
-    private Element nativeTrade(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final NativeTradeMessage message
-            = new NativeTradeMessage(aiMain.getGame(), element);
+    private Element nativeTrade(NativeTradeMessage message) {
         final NativeTrade nt = message.getNativeTrade();
-        NativeTrade.NativeTradeAction action = message.getAction();
+        final NativeTrade.NativeTradeAction action = message.getAction();
 
-        action = getAIPlayer().handleTrade(action, nt);
-        return new NativeTradeMessage(action, nt).toXMLElement();
+        return new NativeTradeMessage(getAIPlayer().handleTrade(action, nt),
+                                      nt).toXMLElement();
     }
 
     /**
      * Replies to offer to name the new land.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code NewLandNameMessage} to process.
      * @return An {@code Element} containing the response/s.
      */
-    private Element newLandName(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        return new NewLandNameMessage(freeColServer.getGame(), element)
-            .toXMLElement();
+    private Element newLandName(NewLandNameMessage message) {
+        return message.toXMLElement();
     }
 
     /**
      * Replies to offer to name a new region name.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code NewRegionNameMessage} to process.
      * @return An {@code Element} containing the response/s.
      */
-    private Element newRegionName(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        return new NewRegionNameMessage(freeColServer.getGame(), element)
-            .toXMLElement();
+    private Element newRegionName(NewRegionNameMessage message) {
+        return message.toXMLElement();
     }
 
     /**
      * Handle a "setAI"-message.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code SetAIMessage} to process.
      * @return Null.
      */
-    private Element setAI(
-        @SuppressWarnings("unused") Connection connection,
-        Element element) {
-        final Game game = freeColServer.getGame();
-        final SetAIMessage message = new SetAIMessage(game, element);
-        
-        final Player p = message.getPlayer(game);
+    private Element setAI(SetAIMessage message) {
+        final Player p = message.getPlayer(getGame());
         final boolean ai = message.getAI();
-        if (p != null) p.setAI(ai);
 
+        if (p != null) p.setAI(ai);
         return null;
     }
 
     /**
      * Handles a "setCurrentPlayer"-message.
      *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
+     * @param message The {@code SetCurrentPlayerMessage} to process.
      * @return Null.
      */
-    private Element setCurrentPlayer(
-        @SuppressWarnings("unused") Connection connection,
-        final Element element) {
-        final Game game = freeColServer.getGame();
-        final SetCurrentPlayerMessage message
-            = new SetCurrentPlayerMessage(game, element);
+    private Element setCurrentPlayer(SetCurrentPlayerMessage message) {
+        final Player currentPlayer = message.getPlayer(getGame());
 
-        final Player currentPlayer = message.getPlayer(game);
         if (currentPlayer != null
-            && serverPlayer.getId().equals(currentPlayer.getId())) {
-            logger.finest("Starting new Thread for " + serverPlayer.getName());
-            String nam = FreeCol.SERVER_THREAD + "AIPlayer ("
-                + serverPlayer.getName() + ")";
-            new Thread(nam) {
+            && getMyPlayer().getId().equals(currentPlayer.getId())) {
+            String name = getMyPlayer().getName();
+            logger.finest("Starting new Thread for " + name);
+            name = FreeCol.SERVER_THREAD + "AIPlayer (" + name + ")";
+            new Thread(name) {
                 @Override
                 public void run() {
                     try {
