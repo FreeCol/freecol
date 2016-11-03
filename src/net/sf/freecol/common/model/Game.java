@@ -704,19 +704,12 @@ public class Game extends FreeColGameObject {
      * Adds the specified player to the game.
      *
      * @param player The {@code Player} to add.
-     * @return True if the player was added.
      */
-    public boolean addPlayer(Player player) {
-        if (player.isAI() || canAddNewPlayer()) {
-            players.add(player);
-            Nation nation = getSpecification().getNation(player.getNationId());
-            nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
-            if (currentPlayer == null) currentPlayer = player;
-            return true;
-        }
-        logger.warning("Game already full, but tried to add: "
-            + player.getName());
-        return false;
+    public void addPlayer(Player player) {
+        players.add(player);
+        Nation nation = getSpecification().getNation(player.getNationId());
+        nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
+        if (getCurrentPlayer() == null) setCurrentPlayer(player);
     }
 
     /**
