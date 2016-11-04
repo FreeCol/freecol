@@ -108,11 +108,7 @@ public class TrivialMessage extends DOMMessage {
 
 
     /**
-     * Server-side handler for this message.
-     *
-     * @param freeColServer The {@code FreeColServer} handling the request.
-     * @param serverPlayer The {@code ServerPlayer} that sent the request.
-     * @return A {@code ChangeSet} defining the response.
+     * {@inheritDoc}
      */
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,

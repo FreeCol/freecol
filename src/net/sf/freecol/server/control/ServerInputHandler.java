@@ -25,12 +25,16 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NetworkRequestHandler;
+import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
@@ -64,14 +68,15 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     public ServerInputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
 
-        register(ChatMessage.TAG, (Connection conn, Element e) ->
-            new ChatMessage(getGame(), e).handle(freeColServer, conn));
+        register(ChatMessage.TAG,
+            (Connection conn, Element e) -> handler(false, conn,
+                new ChatMessage(getGame(), e)));
 
-        register(DisconnectMessage.TAG, (Connection conn, Element e) ->
-            disconnect(conn, e));
+        register(DisconnectMessage.TAG,
+            (Connection conn, Element e) -> disconnect(conn, e));
 
-        register(LogoutMessage.TAG, (Connection conn, Element e) ->
-            logout(conn, e));
+        register(LogoutMessage.TAG,
+            (Connection conn, Element e) -> logout(conn, e));
     }
 
 
@@ -94,6 +99,28 @@ public abstract class ServerInputHandler extends FreeColServerHolder
      */
     protected final boolean unregister(String name, NetworkRequestHandler handler) {
         return this.handlerMap.remove(name, handler);
+    }
+
+    /**
+     * Wrapper for new message handling.
+     *
+     * @param current If true, insist the message is from the current player
+     *     in the game.
+     * @param connection The {@code Connection} the message arrived on.
+     * @param message The {@code DOMMessage} to handle.
+     * @return The resulting reply {@code Element}.
+     */
+    protected Element handler(boolean current, Connection connection,
+                              DOMMessage message) {
+        final FreeColServer freeColServer = getFreeColServer();
+        final ServerPlayer serverPlayer = freeColServer.getPlayer(connection);
+        final Game game = freeColServer.getGame();
+        ChangeSet cs = (current && (game == null || serverPlayer == null
+                || serverPlayer != game.getCurrentPlayer()))
+            ? serverPlayer.clientError("Received: " + message.getType()
+                + " out of turn from player: " + serverPlayer.getNation())
+            : message.serverHandler(freeColServer, serverPlayer);
+        return (cs == null) ? null : cs.build(serverPlayer);
     }
 
     /**
@@ -129,7 +156,7 @@ public abstract class ServerInputHandler extends FreeColServerHolder
      * @return The reply.
      */
     protected abstract Element logout(Connection connection, Element element);
-
+    
 
     // Implement MessageHandler
 

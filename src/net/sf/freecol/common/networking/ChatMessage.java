@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -97,22 +98,19 @@ public class ChatMessage extends AttributeMessage {
     }
 
 
-    /**
-     * Handle a "chat"-message.
-     *
-     * @param server The {@code FreeColServer} that handles the message.
-     * @param connection The {@code Connection} message was received on.
-     *
-     * @return Null.
-     */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    // Override DOMMessage
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer server,
+                                   ServerPlayer serverPlayer) {
         /* Do not trust the client-supplied sender name */
         setAttribute(SENDER_TAG, serverPlayer.getId());
 
         server.getInGameController()
             .chat(serverPlayer, getMessage(), isPrivate());
         return null;
-    }
+    }        
 }

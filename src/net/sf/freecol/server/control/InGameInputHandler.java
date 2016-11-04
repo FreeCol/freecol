@@ -309,28 +309,6 @@ public final class InGameInputHandler extends ServerInputHandler {
                 .handle(freeColServer, connection));
     }
 
-    /**
-     * Handle a new message.
-     *
-     * @param current If true, insist the message is from the current player
-     *     in the game.
-     * @param connection The {@code Connection} the message arrived on.
-     * @param message The {@code DOMMessage} to handle.
-     * @return The resulting reply {@code Element}.
-     */
-    private Element handler(boolean current, Connection connection,
-                            DOMMessage message) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer serverPlayer = freeColServer.getPlayer(connection);
-        final Game game = freeColServer.getGame();
-        ChangeSet cs = (current && (game == null || serverPlayer == null
-                || serverPlayer != game.getCurrentPlayer()))
-            ? serverPlayer.clientError("Received: " + message.getType()
-                + " out of turn from player: " + serverPlayer.getNation())
-            : message.serverHandler(freeColServer, serverPlayer);
-        return (cs == null) ? null : cs.build(serverPlayer);
-    }
-
 
     // Override ServerInputHandler
 
