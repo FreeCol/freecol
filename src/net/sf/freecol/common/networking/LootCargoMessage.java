@@ -117,13 +117,10 @@ public class LootCargoMessage extends DOMMessage {
      * Handle a "lootCargo"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An {@code Element} encapsulating the looting.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final Game game = server.getGame();
 
         Unit winner;

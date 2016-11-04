@@ -63,15 +63,11 @@ public class PayArrearsMessage extends AttributeMessage {
      * Handle a "payArrears"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
-     *
-     * @return An update containing the payArrearsd unit,
-     *         or an error {@code Element} on failure.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
+     * @return An update containing the paying unit, or an
+     *     error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         GoodsType goodsType = server.getSpecification()
             .getGoodsType(getAttribute(GOODS_TYPE_TAG));
 

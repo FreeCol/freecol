@@ -79,15 +79,12 @@ public class LoadGoodsMessage extends AttributeMessage {
      * Handle a "loadGoods"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An update containing the carrier, or an error
      *     {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = player.getGame();
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+        final Game game = serverPlayer.getGame();
         final Specification spec = server.getSpecification();
         final String locationId = getAttribute(LOCATION_TAG);
         final String typeId = getAttribute(TYPE_TAG);
@@ -102,7 +99,7 @@ public class LoadGoodsMessage extends AttributeMessage {
 
         Unit carrier;
         try {
-            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
+            carrier = serverPlayer.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

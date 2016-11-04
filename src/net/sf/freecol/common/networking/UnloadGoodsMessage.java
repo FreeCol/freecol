@@ -72,14 +72,11 @@ public class UnloadGoodsMessage extends AttributeMessage {
      * Handle a "unloadGoods"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An update containing the carrier, or an error
      *     {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final Specification spec = server.getSpecification();
         final String typeId = getAttribute(TYPE_TAG);
         final String amountString = getAttribute(AMOUNT_TAG);
@@ -87,7 +84,7 @@ public class UnloadGoodsMessage extends AttributeMessage {
         
         Unit carrier;
         try {
-            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
+            carrier = serverPlayer.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

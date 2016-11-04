@@ -274,20 +274,18 @@ public class RearrangeColonyMessage extends AttributeMessage {
      * Handle a "rearrangeColony"-message.
      *
      * @param server The {@code FreeColServer} handling the request.
-     * @param player The {@code Player} rearrangeing the colony.
-     * @param connection The {@code Connection} the message is from.
+     * @param serverPlayer The {@code ServerPlayer} rearranging the colony.
      * @return An update {@code Element} with the rearranged colony,
      *     or an error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String colonyId = getAttribute(COLONY_TAG);
-        final List<Arrangement> arrangements = getArrangements(player.getGame());
+        final Game game = serverPlayer.getGame();
+        final List<Arrangement> arrangements = getArrangements(game);
         
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

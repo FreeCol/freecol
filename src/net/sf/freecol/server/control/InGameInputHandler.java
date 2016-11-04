@@ -112,403 +112,345 @@ public final class InGameInputHandler extends ServerInputHandler {
         register(AbandonColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new AbandonColonyMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(AskSkillMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new AskSkillMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(AssignTeacherMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new AssignTeacherMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(AssignTradeRouteMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new AssignTradeRouteMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(AttackMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new AttackMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(BuildColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new BuildColonyMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(CashInTreasureTrainMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new CashInTreasureTrainMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(ChangeStateMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new ChangeStateMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(ChangeWorkImprovementTypeMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new ChangeWorkImprovementTypeMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(ChangeWorkTypeMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new ChangeWorkTypeMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(ChooseFoundingFatherMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new ChooseFoundingFatherMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(ClaimLandMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new ClaimLandMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(ClearSpecialityMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new ClearSpecialityMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(DeclareIndependenceMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new DeclareIndependenceMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(DeclineMoundsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new DeclineMoundsMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(DeliverGiftMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new DeliverGiftMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(DeleteTradeRouteMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new DeleteTradeRouteMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(DemandTributeMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new DemandTributeMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(DisbandUnitMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new DisbandUnitMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(DisembarkMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new DisembarkMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(EmbarkMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new EmbarkMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(EmigrateUnitMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new EmigrateUnitMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(TrivialMessage.END_TURN_TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return freeColServer.getInGameController()
-                    .endTurn(freeColServer.getPlayer(connection))
-                    .build(freeColServer.getPlayer(connection));
+            public Element handle(ServerPlayer serverPlayer, Element element) {
+                return freeColServer.getInGameController().endTurn(serverPlayer)
+                    .build(serverPlayer);
             }});
         register(EquipForRoleMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new EquipForRoleMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(InciteMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new InciteMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(JoinColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new JoinColonyMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(LearnSkillMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new LearnSkillMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(LoadGoodsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new LoadGoodsMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(LootCargoMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new LootCargoMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(MissionaryMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new MissionaryMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(MonarchActionMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new MonarchActionMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(MoveMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new MoveMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(MoveToMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new MoveToMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(MultipleMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new MultipleMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(NativeGiftMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new NativeGiftMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(NewLandNameMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new NewLandNameMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(NewRegionNameMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new NewRegionNameMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(NewTradeRouteMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new NewTradeRouteMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(PayArrearsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new PayArrearsMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(PayForBuildingMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new PayForBuildingMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(PutOutsideColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new PutOutsideColonyMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(RearrangeColonyMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new RearrangeColonyMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(RenameMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new RenameMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(ScoutIndianSettlementMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new ScoutIndianSettlementMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(ScoutSpeakToChiefMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new ScoutSpeakToChiefMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(SetBuildQueueMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new SetBuildQueueMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(SetGoodsLevelsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new SetGoodsLevelsMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(TrainUnitInEuropeMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new TrainUnitInEuropeMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(UnloadGoodsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new UnloadGoodsMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
         register(WorkMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
+            public Element handle(ServerPlayer serverPlayer, Element element) {
                 return new WorkMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
+                    .handle(freeColServer, serverPlayer);
             }});
 
         // NetworkRequestHandlers
@@ -534,6 +476,10 @@ public final class InGameInputHandler extends ServerInputHandler {
         register(IndianDemandMessage.TAG,
             (Connection connection, Element element) ->
             new IndianDemandMessage(getGame(), element)
+                .handle(freeColServer, connection));
+        register(MultipleMessage.TAG,
+            (Connection connection, Element element) ->
+            new MultipleMessage(getGame(), element)
                 .handle(freeColServer, connection));
         register(NationSummaryMessage.TAG,
             (Connection connection, Element element) ->

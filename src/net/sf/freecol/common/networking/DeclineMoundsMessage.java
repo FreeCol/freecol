@@ -70,20 +70,17 @@ public class DeclineMoundsMessage extends AttributeMessage {
      * Handle a "declineMounds"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} that sent the message.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} that sent the message.
      * @return An {@code Element} to update the originating
      *     player with the result of the demand.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

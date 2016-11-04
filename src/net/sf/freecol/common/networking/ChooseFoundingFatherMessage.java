@@ -135,15 +135,11 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      * The server does not need to handle this message type.
      *
      * @param server The {@code FreeColServer} handling the request.
-     * @param player The {@code Player} abandoning the colony.
-     * @param connection The {@code Connection} the message is from.
-     *
+     * @param serverPlayer The {@code ServerPlayer} abandoning the colony.
      * @return Null.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final Game game = server.getGame();
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
         final List<FoundingFather> offered = serverPlayer.getOfferedFathers();
         final FoundingFather ff = getFather(game);
 

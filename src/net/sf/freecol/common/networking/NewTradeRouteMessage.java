@@ -72,14 +72,10 @@ public class NewTradeRouteMessage extends DOMMessage {
      * Handle a "newTradeRoute"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An update setting the trade route.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         this.tradeRoute = serverPlayer.newTradeRoute();
         return this.toXMLElement();
     }

@@ -67,21 +67,18 @@ public class WorkMessage extends AttributeMessage {
      * Handle a "work"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An update encapsulating the work location change or an
      *     error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final Game game = server.getGame();
         final String unitId = getAttribute(UNIT_TAG);
         final String workLocationId = getAttribute(WORK_LOCATION_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

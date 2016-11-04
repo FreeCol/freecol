@@ -63,17 +63,14 @@ public class EmigrateUnitMessage extends AttributeMessage {
      * Handle a "emigrateUnit"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An {@code Element} encapsulating the change,
      *         or an error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String slotString = getAttribute(SLOT_TAG);
 
-        Europe europe = player.getEurope();
+        Europe europe = serverPlayer.getEurope();
         if (europe == null) {
             return serverPlayer.clientError("No Europe to migrate from.")
                 .build(serverPlayer);
@@ -98,18 +95,18 @@ public class EmigrateUnitMessage extends AttributeMessage {
                     .build(serverPlayer);
             }
             type = MigrationType.FOUNTAIN;
-        } else if (player.checkEmigrate()) {
+        } else if (serverPlayer.checkEmigrate()) {
             if (MigrationType.specificMigrantSlot(slot)
-                && !player.hasAbility(Ability.SELECT_RECRUIT)) {
+                && !serverPlayer.hasAbility(Ability.SELECT_RECRUIT)) {
                 return serverPlayer.clientError("selectRecruit ability absent.")
                     .build(serverPlayer);
             }
             type = MigrationType.NORMAL;
         } else {
-            if (!player.checkGold(europe.getRecruitPrice())) {
+            if (!serverPlayer.checkGold(europe.getRecruitPrice())) {
                 return serverPlayer.clientError("No migrants available at cost "
                     + europe.getRecruitPrice()
-                    + " for player with " + player.getGold() + " gold.")
+                    + " for player with " + serverPlayer.getGold() + " gold.")
                     .build(serverPlayer);
             }
             type = MigrationType.RECRUIT;

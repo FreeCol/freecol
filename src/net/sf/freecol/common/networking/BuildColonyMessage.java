@@ -66,22 +66,19 @@ public class BuildColonyMessage extends AttributeMessage {
      * Handle a "buildColony"-message.
      *
      * @param server The {@code FreeColServer} handling the request.
-     * @param player The {@code Player} building the colony.
-     * @param connection The {@code Connection} the message is from.
+     * @param serverPlayer The {@code ServerPlayer} building the colony.
      * @return An update {@code Element} defining the new colony
      *     and updating its surrounding tiles, or an error
      *     {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final Game game = server.getGame();
         final String colonyName = getAttribute(NAME_TAG);
         final String unitId = getAttribute(UNIT_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -104,9 +101,9 @@ public class BuildColonyMessage extends AttributeMessage {
         }
 
         Tile tile = unit.getTile();
-        if (!player.canClaimToFoundSettlement(tile)) {
+        if (!serverPlayer.canClaimToFoundSettlement(tile)) {
             return serverPlayer.clientError("Can not build colony on tile "
-                + tile + ": " + player.canClaimToFoundSettlementReason(tile))
+                + tile + ": " + serverPlayer.canClaimToFoundSettlementReason(tile))
                 .build(serverPlayer);
         }
 

@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
@@ -86,12 +87,10 @@ public class AddPlayerMessage extends DOMMessage {
      * Handle a "addPlayer"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return Null.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         // Only sent by the server to the clients.
         return null;
     }

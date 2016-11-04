@@ -63,15 +63,11 @@ public class TrainUnitInEuropeMessage extends AttributeMessage {
      * Handle a "trainUnitInEurope"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
-     *
-     * @return An update containing the trainUnitInEuroped unit,
-     *         or an error {@code Element} on failure.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
+     * @return An update containing the trained unit, or an
+     *     error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String typeId = getAttribute(UNIT_TYPE_TAG);
         
         UnitType type = server.getSpecification().getUnitType(typeId);

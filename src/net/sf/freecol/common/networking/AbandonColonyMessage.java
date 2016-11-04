@@ -62,20 +62,17 @@ public class AbandonColonyMessage extends AttributeMessage {
      * Handle a "abandonColony"-message.
      *
      * @param server The {@code FreeColServer} handling the request.
-     * @param player The {@code Player} abandoning the colony.
-     * @param connection The {@code Connection} the message is from.
+     * @param serverPlayer The {@code ServerPlayer} abandoning the colony.
      * @return An update {@code Element} defining the new colony
      *     and updating its surrounding tiles, or an error
      *     {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String colonyId = getAttribute(COLONY_TAG);
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

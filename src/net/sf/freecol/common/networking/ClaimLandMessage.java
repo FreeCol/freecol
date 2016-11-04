@@ -73,14 +73,11 @@ public class ClaimLandMessage extends AttributeMessage {
      * Handle a "claimLand"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} the message was from.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      *
      * @return An update, or error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final Game game = server.getGame();
         final String tileId = getAttribute(TILE_TAG);
         final String claimantId = getAttribute(CLAIMANT_TAG);
@@ -94,11 +91,11 @@ public class ClaimLandMessage extends AttributeMessage {
 
         Unit unit = null;
         try {
-            unit = player.getOurFreeColGameObject(claimantId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(claimantId, Unit.class);
         } catch (IllegalStateException e) {} // Expected to fail sometimes...
         Settlement settlement = null;
         try {
-            settlement = player.getOurFreeColGameObject(claimantId,
+            settlement = serverPlayer.getOurFreeColGameObject(claimantId,
                                                         Settlement.class);
         } catch (IllegalStateException e) {} // ...as is this one...
         if (unit != null) {
@@ -128,12 +125,12 @@ public class ClaimLandMessage extends AttributeMessage {
         }
 
         // Request is well formed, but there are more possibilities...
-        int value = player.getLandPrice(tile);
+        int value = serverPlayer.getLandPrice(tile);
         Player owner = tile.getOwner();
         Settlement ownerSettlement = tile.getOwningSettlement();
         if (owner == null) { // unclaimed, always free
             price = 0;
-        } else if (owner == player) { // capture vacant colony tiles only
+        } else if (owner == serverPlayer) { // capture vacant colony tiles only
             if (settlement != null && ownerSettlement != null
                 && tile.isInUse()) {
                 return serverPlayer.clientError("Can not claim tile "
@@ -151,7 +148,7 @@ public class ClaimLandMessage extends AttributeMessage {
                     .build(serverPlayer);
             }
         } else { // natives
-            NoClaimReason why = player.canClaimForSettlementReason(tile);
+            NoClaimReason why = serverPlayer.canClaimForSettlementReason(tile);
             switch (why) {
             case NONE:
                 break; // Succeed.
@@ -162,7 +159,7 @@ public class ClaimLandMessage extends AttributeMessage {
                             + tile.getId() + ": insufficient offer.")
                             .build(serverPlayer);
                     }
-                    if (!player.checkGold(price)) {
+                    if (!serverPlayer.checkGold(price)) {
                         return serverPlayer.clientError("Can not pay for tile: "
                             + tile.getId() + ": insufficient funds.")
                             .build(serverPlayer);

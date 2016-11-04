@@ -77,20 +77,17 @@ public class MissionaryMessage extends AttributeMessage {
      * Handle a "missionary"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An element containing the result of the mission
      *     operation, or an error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -118,7 +115,7 @@ public class MissionaryMessage extends AttributeMessage {
                 return serverPlayer.clientError("Denouncing an empty mission at: "
                     + is.getId())
                     .build(serverPlayer);
-            } else if (missionary.getOwner() == player) {
+            } else if (missionary.getOwner() == serverPlayer) {
                 return serverPlayer.clientError("Denouncing our own missionary at: "
                     + is.getId())
                     .build(serverPlayer);

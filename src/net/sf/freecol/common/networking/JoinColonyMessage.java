@@ -66,21 +66,18 @@ public class JoinColonyMessage extends AttributeMessage {
      * Handle a "joinColony"-message.
      *
      * @param server The {@code FreeColServer} handling the request.
-     * @param player The {@code Player} building the colony.
-     * @param connection The {@code Connection} the message is from.
+     * @param serverPlayer The {@code ServerPlayer} building the colony.
      * @return An update {@code Element} defining the new colony
      *     and updating its surrounding tiles, or an error
      *     {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String colonyId = getAttribute(COLONY_TAG);
         final String unitId = getAttribute(UNIT_TAG);
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -88,7 +85,7 @@ public class JoinColonyMessage extends AttributeMessage {
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

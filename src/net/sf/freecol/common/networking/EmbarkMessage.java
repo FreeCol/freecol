@@ -74,21 +74,18 @@ public class EmbarkMessage extends AttributeMessage {
      * Handle a "embark"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An update containing the embarked unit, or an error
      *     {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String carrierId = getAttribute(CARRIER_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 
         ServerUnit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -96,7 +93,7 @@ public class EmbarkMessage extends AttributeMessage {
 
         Unit carrier;
         try {
-            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
+            carrier = serverPlayer.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

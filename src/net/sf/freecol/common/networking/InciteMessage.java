@@ -97,14 +97,11 @@ public class InciteMessage extends AttributeMessage {
      * Handle a "incite"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An element containing the result of the incite, or an
      *     error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final Game game = server.getGame();
         
         Unit unit;
@@ -129,7 +126,7 @@ public class InciteMessage extends AttributeMessage {
             return serverPlayer.clientError("Not a player: "
                 + getAttribute(ENEMY_TAG))
                 .build(serverPlayer);
-        } else if (enemy == player) {
+        } else if (enemy == serverPlayer) {
             return serverPlayer.clientError("Inciting against oneself!")
                 .build(serverPlayer);
         } else if (!enemy.isEuropean()) {

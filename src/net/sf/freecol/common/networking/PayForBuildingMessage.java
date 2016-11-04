@@ -63,20 +63,16 @@ public class PayForBuildingMessage extends AttributeMessage {
      * Handle a "payForBuilding"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
-     *
-     * @return An update containing the payForBuildingd unit,
-     *         or an error {@code Element} on failure.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
+     * @return An update containing the paying unit, or an
+     *     error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String colonyId = getAttribute(COLONY_TAG);
         
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

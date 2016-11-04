@@ -71,15 +71,11 @@ public class AskSkillMessage extends AttributeMessage {
      * Handle a "askSkill"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
-     *
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An {@code Element} to update the originating player
      *         with the result of the query.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 

@@ -67,20 +67,16 @@ public class RenameMessage extends AttributeMessage {
      * Handle a "rename"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
-     *
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An update containing the renamed unit,
-     *         or an error {@code Element} on failure.
+     *     or an error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String nameableId = getAttribute(NAMEABLE_TAG);
         
         FreeColGameObject fcgo;
         try {
-            fcgo = player.getOurFreeColGameObject(nameableId, FreeColGameObject.class);
+            fcgo = serverPlayer.getOurFreeColGameObject(nameableId, FreeColGameObject.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

@@ -68,14 +68,11 @@ public class AssignTradeRouteMessage extends AttributeMessage {
      * Handle a "assignTradeRoute"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} that sent the message.
-     * @param connection The {@code Connection} message was received on.
+     * @param serverPlayer The {@code ServerPlayer} that sent the message.
      * @return An {@code Element} to update the originating
      *     player with the result of the demand.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String tradeRouteId = getAttribute(TRADE_ROUTE_TAG);
 

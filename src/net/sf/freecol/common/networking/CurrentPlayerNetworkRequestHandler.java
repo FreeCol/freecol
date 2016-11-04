@@ -61,6 +61,9 @@ public abstract class CurrentPlayerNetworkRequestHandler
             : player.equals(game.getCurrentPlayer());
     }
 
+
+    // Override NetworkRequestHandler
+
     /**
      * {@inheritDoc}
      */
@@ -73,17 +76,17 @@ public abstract class CurrentPlayerNetworkRequestHandler
                 + serverPlayer.getNation())
                 .build(serverPlayer);
         }
-        return handle(serverPlayer, conn, element);
+        return handle(serverPlayer, element);
     }
 
+    
     /**
      * Handle a request for the current player.
      * 
-     * @param player The requesting {@code Player}.
-     * @param conn The {@code Connection} the request originates from.
+     * @param player The requesting {@code ServerPlayer}.
      * @param element The {@code Element} with the request.
      * @return An answerering {@code Element}, which may be null.
      */
-    protected abstract Element handle(Player player, Connection conn,
+    protected abstract Element handle(ServerPlayer serverPlayer,
                                       Element element);
 }

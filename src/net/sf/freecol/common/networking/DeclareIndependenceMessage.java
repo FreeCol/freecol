@@ -66,15 +66,11 @@ public class DeclareIndependenceMessage extends AttributeMessage {
      * Handle a "declareIndependence"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} the message is from.
-     *
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An update {@code Element} describing the REF and the
-     *         rebel player, or an error {@code Element} on failure.
+     *     rebel player, or an error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String nationName = getAttribute(NATION_NAME_TAG);
         final String countryName = getAttribute(COUNTRY_NAME_TAG);
         
@@ -88,7 +84,7 @@ public class DeclareIndependenceMessage extends AttributeMessage {
                 .build(serverPlayer);
         }
 
-        StringTemplate problem = player.checkDeclareIndependence();
+        StringTemplate problem = serverPlayer.checkDeclareIndependence();
         if (problem != null) {
             return serverPlayer.clientError("Declaration blocked")
                 .build(serverPlayer);

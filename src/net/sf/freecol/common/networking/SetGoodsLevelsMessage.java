@@ -77,18 +77,13 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      * Handle a "setGoodsLevels"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} the message applies to.
-     * @param connection The {@code Connection} message was received on.
-     *
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
      * @return An update {@code Element} updating the colony.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(this.colonyId,
+            colony = serverPlayer.getOurFreeColGameObject(this.colonyId,
                                                     Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())

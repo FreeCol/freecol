@@ -63,14 +63,11 @@ public class DeleteTradeRouteMessage extends AttributeMessage {
      * Handle a "deleteTradeRoute"-message.
      *
      * @param server The {@code FreeColServer} handling the message.
-     * @param player The {@code Player} that sent the message.
-     * @param connection The {@code Connection} message was received on.
-     * @return An update containing the deleteTradeRouted unit, or an
+     * @param serverPlayer The {@code ServerPlayer} that sent the message.
+     * @return An update containing the deleted unit, or an
      *     error {@code Element} on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
         final String tradeRouteId = getAttribute(TRADE_ROUTE_TAG);
         
         TradeRoute tradeRoute;
