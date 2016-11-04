@@ -19,20 +19,27 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Ownable;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 
 
 /**
  * A type of session to handle diplomacy.
+ *
+ * Diplomacy may involve human players, so it *must* be a TimedSession.
  */
 public class DiplomacySession extends TimedSession {
 
@@ -60,8 +67,7 @@ public class DiplomacySession extends TimedSession {
      * @param timeout The amount of time to wait for a response.
      */
     public DiplomacySession(Unit unit, Settlement settlement, long timeout) {
-        super(makeSessionKey(DiplomacySession.class, unit, settlement),
-              timeout);
+        super(makeDiplomacySessionKey(unit, settlement), timeout);
 
         this.agreement = null;
         this.unit = unit;
@@ -77,15 +83,26 @@ public class DiplomacySession extends TimedSession {
      * @param timeout The amount of time to wait for a response.
      */
     public DiplomacySession(Unit unit, Unit otherUnit, long timeout) {
-        super(makeSessionKey(DiplomacySession.class, unit, otherUnit),
-              timeout);
+        super(makeDiplomacySessionKey(unit, otherUnit), timeout);
         this.agreement = null;
         this.unit = unit;
         this.settlement = null;
         this.otherUnit = otherUnit;
     }
 
-
+    /**
+     * Make a diplomacy session key for the given ownables.
+     *
+     * @param o1 The first {@code Ownable}.
+     * @param o2 The second {@code Ownable}.
+     * @return A diplomacy session key.
+     */
+    private static String makeDiplomacySessionKey(Ownable o1, Ownable o2) {
+        return makeSessionKey(DiplomacySession.class,
+                              o1.getOwner(), o2.getOwner());
+    }
+                                                  
+    
     public DiplomaticTrade getAgreement() {
         return this.agreement;
     }
@@ -110,16 +127,92 @@ public class DiplomacySession extends TimedSession {
         return (ServerPlayer)this.unit.getOwner();
     }
 
+    private ServerPlayer getOtherPlayer() {
+        return (ServerPlayer)((this.settlement != null)
+            ? this.settlement.getOwner()
+            : this.otherUnit.getOwner());
+    }
+
     private ServerGame getGame() {
         return (ServerGame)this.unit.getGame();
     }
 
-    private DiplomacyMessage getMessage() {
-        return (this.otherUnit == null)
-            ? new DiplomacyMessage(this.unit, this.settlement, this.agreement)
-            : new DiplomacyMessage(this.unit, this.otherUnit, this.agreement);
+    /**
+     * Utility to find the other player in this session from a given one.
+     *
+     * @param serverPlayer The {@code ServerPlayer} *not* to find.
+     * @return The other {@code ServerPlayer}.
+     */
+    public ServerPlayer getOtherPlayer(ServerPlayer serverPlayer) {
+        ServerPlayer other = getOwner();
+        return (other != serverPlayer) ? other : getOtherPlayer();
+    }
+        
+    /**
+     * Utility to create a message using the current session parameters and
+     * trade agreement, given a desired destination player.
+     *
+     * @param destination The {@code ServerPlayer} to send the message to.
+     * @return A new {@code DiplomacyMessage} for the destination player.
+     */
+    public DiplomacyMessage getMessage(ServerPlayer destination) {
+        return (destination.owns(this.unit))
+            ? ((this.otherUnit == null)
+                ? new DiplomacyMessage(this.settlement, this.unit, this.agreement)
+                : new DiplomacyMessage(this.otherUnit, this.unit, this.agreement))
+            : ((this.otherUnit == null)
+                ? new DiplomacyMessage(this.unit, this.settlement, this.agreement)
+                : new DiplomacyMessage(this.unit, this.otherUnit, this.agreement));
+    }
+
+    public boolean isCompatible(Ownable o1, Ownable o2) {
+System.err.println("CHECK COMPAT this=" + getKey() + " f1=" + o1 + " f2=" + o2 + " k=" + makeDiplomacySessionKey(o1, o2));
+        return makeDiplomacySessionKey(o1, o2).equals(getKey());
     }
     
+    /**
+     * Find any contact session already underway between the given units.
+     *
+     * @param unit The first {@code Unit}.
+     * @param other The second {@code Unit}.
+     * @return Any {@code DiplomacySession} found.
+     */
+    public static DiplomacySession findContactSession(Unit unit, Unit other) {
+        return findContactSession(unit.getOwner(), other.getOwner());
+    }
+
+    /**
+     * Find any contact session already underway between the given unit and
+     * settlement.
+     *
+     * @param unit The {@code Unit}.
+     * @param settlement The {@code Settlement}.
+     * @return Any {@code DiplomacySession} found.
+     */
+    public static DiplomacySession findContactSession(Unit unit, Settlement settlement) {
+        return findContactSession(unit.getOwner(), settlement.getOwner());
+    }
+
+    /**
+     * Find any contact session already underway between the given players.
+     *
+     * @param p1 The first {@code Player}.
+     * @param p2 The second {@code Player}.
+     * @return Any {@code DiplomacySession} found.
+     */
+    private static DiplomacySession findContactSession(Player p1, Player p2) {
+        final ServerPlayer s1 = (ServerPlayer)p1;
+        final ServerPlayer s2 = (ServerPlayer)p2;
+        final Predicate<Session> pred = s -> (s instanceof DiplomacySession)
+            && (((DiplomacySession)s).getAgreement().getContext()
+                == DiplomaticTrade.TradeContext.CONTACT)
+            && ((((DiplomacySession)s).getOwner() == s1
+                    && ((DiplomacySession)s).getOtherPlayer() == s2)
+                || (((DiplomacySession)s).getOwner() == s2
+                    && ((DiplomacySession)s).getOtherPlayer() == s1));
+        return (DiplomacySession)find(allSessions.values(), pred);
+    }
+
     /**
      * Primitive level to finishing the session with the given result.
      *
@@ -127,6 +220,7 @@ public class DiplomacySession extends TimedSession {
      * @param cs A {@code ChangeSet} to update.
      */
     private void completeInternal(boolean result, ChangeSet cs) {
+        logger.info("Completing diplomacy session: " + this);
         if (this.agreement != null) { // Agreement is null in first contact
             if (result) {
                 result = getGame().csAcceptTrade(this.agreement, this.unit,
@@ -134,10 +228,12 @@ public class DiplomacySession extends TimedSession {
             }
             this.agreement.setStatus((result) ? TradeStatus.ACCEPT_TRADE
                                               : TradeStatus.REJECT_TRADE);
-            cs.add(See.only((ServerPlayer)this.agreement.getSender()),
-                   ChangeSet.ChangePriority.CHANGE_LATE, getMessage());
-            cs.add(See.only((ServerPlayer)this.agreement.getRecipient()),
-                   ChangeSet.ChangePriority.CHANGE_LATE, getMessage());
+            ServerPlayer sp = (ServerPlayer)this.agreement.getSender();
+            cs.add(See.only(sp), ChangeSet.ChangePriority.CHANGE_LATE,
+                   getMessage(sp));
+            sp = (ServerPlayer)this.agreement.getRecipient();
+            cs.add(See.only(sp), ChangeSet.ChangePriority.CHANGE_LATE,
+                   getMessage(sp));
         }
         this.unit.setMovesLeft(0);
         cs.add(See.only(getOwner()), this.unit);

@@ -2440,49 +2440,53 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             " from ", other.getName());
         TradeStatus result = null;
 
-        int unacceptable = 0;
+        int unacceptable = 0, value = 0;
         for (TradeItem item : agreement.getTradeItems()) {
             if (item instanceof StanceTradeItem) {
                 getNationSummary(other); // Freshen the name summary cache
             }                    
-            int value = item.evaluateFor(player);
+            int score = item.evaluateFor(player);
             if (item instanceof StanceTradeItem) { // Handle some special cases
                 switch (item.getStance()) {
                 case ALLIANCE: case CEASE_FIRE:
                     if (franklin) {
                         peace = item;
-                        value = 0;
+                        score = 0;
                     }
                     break;
-                case PEACE:
+                case UNCONTACTED: case PEACE:
                     if (agreement.getContext() == DiplomaticTrade.TradeContext.CONTACT) {
                         peace = item;
-                        value = 0;
+                        score = 0;
                     }
                     break;
                 default:
                     break;
                 }
             }
-            if (value == Integer.MIN_VALUE) {
+            if (score == Integer.MIN_VALUE) {
                 unacceptable++;
             } else if (item.getSource() == player) {
-                value = -value;
+                score = -score;
             }
-            scores.put(item, value);
-            lb.add(", ", Messages.message(item.getLabel()), " = ", value);
+            scores.put(item, score);
+            lb.add(", ", Messages.message(item.getLabel()), " = ", score);
+            if (score != Integer.MIN_VALUE) value += score;
         }
         lb.add(".");
-        
-        // If too many items are unacceptable, reject
-        double ratio = (double)unacceptable
-            / (unacceptable + agreement.getTradeItems().size());
-        if (ratio > 0.5 - 0.5 * agreement.getVersion()) {
-            result = rejectAgreement(peace, agreement);
-            lb.add("  Too many (", unacceptable, ") unacceptable.");
-        }
 
-        int value = 0;
+        if (unacceptable == 0 && value >= 0) { // Accept if all good
+            result = TradeStatus.ACCEPT_TRADE;
+            lb.add("  All accepted at ", value, ".");
+        } else { // If too many items are unacceptable, reject
+            double ratio = (double)unacceptable
+                / (unacceptable + agreement.getTradeItems().size());
+            if (ratio > 0.5 - 0.5 * agreement.getVersion()) {
+                result = rejectAgreement(peace, agreement);
+                lb.add("  Too many (", unacceptable, ") unacceptable.");
+            }
+        }
+       
         if (result == null) {
             // Dump the unacceptable offers, sum the rest
             for (Entry<TradeItem, Integer> entry : scores.entrySet()) {
@@ -2491,38 +2495,28 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     lb.add("  Dropped invalid ", entry.getKey(), ".");
                 } else {
                     value += entry.getValue();
-                    lb.add("  Added valid ", entry.getKey(), ", total = ", value,
-                           ".");
+                    lb.add("  Added valid ", entry.getKey(),
+                           ", total = ", value, ".");
                 }
             }
-            // If the result is non-negative,
-            // accept/propose-without-unacceptable
-            if (value >= 0) {
-                result = (agreement.getContext()
-                    == DiplomaticTrade.TradeContext.CONTACT
-                    && agreement.getVersion() == 0) ? TradeStatus.PROPOSE_TRADE
-                    : (unacceptable == 0) ? TradeStatus.ACCEPT_TRADE
-                    : (agreement.isEmpty()) ? TradeStatus.REJECT_TRADE
-                    : TradeStatus.PROPOSE_TRADE;
-            }
-            lb.add("  Total = ", value, ".");
+            // If nothing is left then fail, 
+            if (agreement.isEmpty()) result = rejectAgreement(peace, agreement);
         }
 
-        if (result == null) { // Give up?
-            if (randomInt(logger, "Enough diplomacy?", getAIRandom(),
-                          1 + agreement.getVersion()) > 5) {
-                result = rejectAgreement(peace, agreement);
-                lb.add("  Ran out of patience at ", agreement.getVersion(), ".");
-            }
+        // Give up?
+        if (randomInt(logger, "Enough diplomacy?", getAIRandom(),
+                      1 + agreement.getVersion()) > 5) {
+            result = rejectAgreement(peace, agreement);
+            lb.add("  Ran out of patience at ", agreement.getVersion(), ".");
         }
 
         if (result == null) {
-            // Dump the negative offers until the sum is positive.
+            // Dump the negative offers until the sum is non-negative.
             // Return a proposal with items we like/can accept, or reject
             // if none are left.
             for (Entry<TradeItem, Integer> e
                      : mapEntriesByValue(scores, ascendingIntegerComparator)) {
-                if (value > 0) break;
+                if (value >= 0) break;
                 TradeItem item = e.getKey();
                 value -= e.getValue();
                 if (value >= 50 && item instanceof GoldTradeItem) {
@@ -2531,12 +2525,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     gti.setGold(gti.getGold() - value / 2);
                     value /= 2;
                     lb.add("  Reducing gold item to ", gti.getGold(), ".");
-                    break;
+                } else {
+                    agreement.remove(item);
+                    lb.add("  Dropped ", item, ", value now = ", value, ".");
                 }
-                agreement.remove(item);
-                lb.add("  Dropped ", item, ", value now = ", value, ".");
             }
-            if (value > 0 && !agreement.isEmpty()) {
+            if (value >= 0 && !agreement.isEmpty()) {
                 result = TradeStatus.PROPOSE_TRADE;
                 lb.add("  Pruned until acceptable at ", value, ".");
             } else {

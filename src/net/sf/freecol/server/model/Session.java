@@ -134,6 +134,8 @@ public abstract class Session {
     /**
      * Make a transaction session key.
      *
+     * Note: sort the keys to make session key independent of argument order.
+     *
      * @param type An identifier for the type of transaction.
      * @param o1 A string to uniquely identify the transaction.
      * @param o2 Another string to uniquely identify the transaction.
@@ -141,7 +143,9 @@ public abstract class Session {
      */
     protected static String makeSessionKey(Class type,
                                            String o1, String o2) {
-        return type + "-" + o1 + "-" + o2;
+        return (o1.compareTo(o2) < 0)
+            ? type + "-" + o1 + "-" + o2
+            : type + "-" + o2 + "-" + o1;
     }
 
     /**

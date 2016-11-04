@@ -488,13 +488,14 @@ public final class InGameInputHandler extends ClientInputHandler {
             = new DiplomacyMessage(getGame(), element);
         final DiplomaticTrade agreement = message.getAgreement();
 
-        final FreeColGameObject our = message.getOurFCGO(game);
+        // Note incoming message will have ownership transposed as it
+        // is their proposal.
+        final FreeColGameObject our = message.getOtherFCGO(game);
         if (our == null) {
             logger.warning("Our FCGO omitted from diplomacy message.");
             return null;
         }
-
-        final FreeColGameObject other = message.getOtherFCGO(game);
+        final FreeColGameObject other = message.getOurFCGO(game);
         if (other == null) {
             logger.warning("Other FCGO omitted from diplomacy message.");
             return null;

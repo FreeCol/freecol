@@ -4211,20 +4211,24 @@ outer:  for (Effect effect : effects) {
         } else if (otherUnit != null) {
             other = (ServerPlayer)otherUnit.getOwner();
         } else {
-            throw new IllegalArgumentException("Non-null settlement or "
-                    + "otherUnit required.");
+            throw new RuntimeException("Non-null settlement or "
+                    + "other unit required.");
         }
-        
+
+        // Initial agreement goes first to this player
         DiplomaticTrade agreement = new DiplomaticTrade(game,
-            DiplomaticTrade.TradeContext.CONTACT, this, other, null, 0);
-        agreement.add(new StanceTradeItem(game, this, other, Stance.PEACE));
+            DiplomaticTrade.TradeContext.CONTACT, other, this, null, 0);
+        agreement.add(new StanceTradeItem(game, other, this, Stance.PEACE));
         DiplomacySession session = (settlement == null)
             ? new DiplomacySession(unit, otherUnit, FreeCol.getTimeout(false))
             : new DiplomacySession(unit, settlement, FreeCol.getTimeout(false));
         session.setAgreement(agreement);
-        cs.add(See.only(this), ChangePriority.CHANGE_LATE, (settlement == null)
-            ? new DiplomacyMessage(unit, otherUnit, agreement)
-            : new DiplomacyMessage(unit, (Colony)settlement, agreement));
+        cs.add(See.only(this), ChangePriority.CHANGE_LATE,
+               session.getMessage(this));
+        unit.setMovesLeft(0);
+        cs.addPartial(See.only(this), unit, "movesLeft");
+        logger.info("New European contact for " + unit
+            + ", with session: " + session.getKey());
     }
 
     /**

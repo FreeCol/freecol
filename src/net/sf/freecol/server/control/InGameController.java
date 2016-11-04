@@ -796,26 +796,22 @@ public final class InGameController extends Controller {
      * Process a European diplomacy session according to an agreement.
      *
      * @param serverPlayer The {@code ServerPlayer} in the session.
-     * @param otherPlayer The other {@code ServerPlayer} in the session.
-     * @param agreement The {@code DiplomaticTrade} to consider.
      * @param session The {@code DiplomacySession} underway.
-     * @param message A {@code DiplomacyMessage} to send.
-     * @param cs A {@code ChangeSet} to contain the trade changes
-     *     if accepted.
+     * @param agreement The {@code DiplomaticTrade} to consider.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csDiplomacySession(ServerPlayer serverPlayer,
-                                    ServerPlayer otherPlayer,
-                                    DiplomaticTrade agreement, 
                                     DiplomacySession session,
-                                    DiplomacyMessage message,
+                                    DiplomaticTrade agreement, 
                                     ChangeSet cs) {
         agreement.incrementVersion();
         TradeStatus status = agreement.getStatus();
         switch (status) {
         case PROPOSE_TRADE:
             session.setAgreement(agreement);
+            ServerPlayer otherPlayer = session.getOtherPlayer(serverPlayer);
             cs.add(See.only(otherPlayer), ChangePriority.CHANGE_LATE,
-                   message); // Forward to other end
+                   session.getMessage(otherPlayer));
             break;
         case ACCEPT_TRADE:
             session.complete(true, cs);
@@ -1833,10 +1829,13 @@ public final class InGameController extends Controller {
                     + " with " + agreement);
             }
             session = new DiplomacySession(ourUnit, otherColony, getTimeout());
-        }
+            logger.info("New diplomacy session: " + session);
+        } else {
+            logger.info("Continuing diplomacy session: " + session
+                        + " from " + ourUnit);
+        }            
         ServerPlayer otherPlayer = (ServerPlayer)otherColony.getOwner();
-        csDiplomacySession(serverPlayer, otherPlayer, agreement, session,
-            new DiplomacyMessage(otherColony, ourUnit, agreement), cs);
+        csDiplomacySession(serverPlayer, session, agreement, cs);
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }
@@ -1859,10 +1858,12 @@ public final class InGameController extends Controller {
             return serverPlayer.clientError("Mission cu-diplomacy session for "
                 + otherUnit.getId() + "/" + ourColony.getId()
                 + " with " + agreement);
-        }
+        } else {
+            logger.info("Continuing diplomacy session: " + session
+                        + " from " + ourColony);
+        }            
         ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
-        csDiplomacySession(serverPlayer, otherPlayer, agreement, session,
-            new DiplomacyMessage(otherUnit, ourColony, agreement), cs);
+        csDiplomacySession(serverPlayer, session, agreement, cs);
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }
@@ -2317,94 +2318,45 @@ public final class InGameController extends Controller {
      * Handle first contact between European players.
      *
      * @param serverPlayer The {@code ServerPlayer} making contact.
-     * @param ourUnit Our {@code Unit}.
-     * @param otherUnit The other {@code unit}.
+     * @param ourUnit The {@code Unit} making contact (may be null).
+     * @param ourColony The {@code Colony} making contact (may be null).
+     * @param otherUnit The other {@code Unit} making contact (may be null).
+     * @param otherColony The other {@code Colony} making contact (may be null).
      * @param agreement The {@code DiplomaticTrade} to consider.
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet europeanFirstContact(ServerPlayer serverPlayer,
-                                          Unit ourUnit, Unit otherUnit,
+                                          Unit ourUnit, Colony ourColony,
+                                          Unit otherUnit, Colony otherColony,
                                           DiplomaticTrade agreement) {
+        String err = "Missing contact diplomacy session for ";
+        DiplomacySession ds;
+        boolean compatible = false;
+        if (ourColony != null) {
+            ds = DiplomacySession.findContactSession(otherUnit, ourColony);
+            if (ds == null) return serverPlayer.clientError(err
+                + ourColony.getId() + " and " + otherUnit.getId());
+            compatible = ds.isCompatible(ourColony, otherUnit);
+        } else if (otherUnit != null) {
+            ds = DiplomacySession.findContactSession(ourUnit, otherUnit);
+            if (ds == null) return serverPlayer.clientError(err
+                + ourUnit.getId() + " and " + otherUnit.getId());
+            compatible = ds.isCompatible(ourUnit, otherUnit);
+        } else {
+            ds = DiplomacySession.findContactSession(ourUnit, otherColony);
+            if (ds == null) return serverPlayer.clientError(err
+                + ourUnit.getId() + " and " + otherColony.getId());
+            compatible = ds.isCompatible(ourUnit, otherColony);
+        }
+        logger.info("Continuing " + ((compatible) ? "" : "in")
+            + "compatible contact session: " + ds.getKey());
+
         ChangeSet cs = new ChangeSet();
-        DiplomacySession session = Session.lookup(DiplomacySession.class, 
-                                                  ourUnit, otherUnit);
-        if (session == null) {
-            session = Session.lookup(DiplomacySession.class,
-                                     otherUnit, ourUnit);
+        if (compatible) {
+            csDiplomacySession(serverPlayer, ds, agreement, cs);
         }
-        if (session == null) {
-            if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
-                return serverPlayer.clientError("Missing uu1-diplomacy session for "
-                    + ourUnit.getId() + "," + otherUnit.getId()
-                    + " with " + agreement);
-            }
-            session = new DiplomacySession(ourUnit, otherUnit, getTimeout());
-            ourUnit.setMovesLeft(0);
-            cs.addPartial(See.only(serverPlayer), ourUnit, "movesLeft");
-        }
-        ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
-        csDiplomacySession(serverPlayer, otherPlayer, agreement, session,
-            new DiplomacyMessage(otherUnit, ourUnit, agreement), cs);
         return cs;
     }
-
-    /**
-     * Handle first contact between European players.
-     *
-     * @param serverPlayer The {@code ServerPlayer} making contact.
-     * @param ourUnit Our {@code Unit}.
-     * @param otherColony The other {@code Colony}.
-     * @param agreement The {@code DiplomaticTrade} to consider.
-     * @return A {@code ChangeSet} encapsulating this action.
-     */
-    public ChangeSet europeanFirstContact(ServerPlayer serverPlayer,
-                                          Unit ourUnit, Colony otherColony,
-                                          DiplomaticTrade agreement) {
-        ChangeSet cs = new ChangeSet();
-        DiplomacySession session = Session.lookup(DiplomacySession.class,
-                                                  ourUnit, otherColony);
-        if (session == null) {
-            if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
-                return serverPlayer.clientError("Missing uc1-diplomacy session for "
-                    + ourUnit.getId() + "," + otherColony.getId()
-                    + " with " + agreement);
-            }
-            session = new DiplomacySession(ourUnit, otherColony, getTimeout());
-            ourUnit.setMovesLeft(0);
-            cs.addPartial(See.only(serverPlayer), ourUnit, "movesLeft");
-        }
-        ServerPlayer otherPlayer = (ServerPlayer)otherColony.getOwner();
-        csDiplomacySession(serverPlayer, otherPlayer, agreement, session,
-            new DiplomacyMessage(otherColony, ourUnit, agreement), cs);
-        return cs;
-    }
-
-    /**
-     * Handle first contact between European players.
-     *
-     * @param serverPlayer The {@code ServerPlayer} making contact.
-     * @param ourColony Our {@code Colony}.
-     * @param otherUnit The other {@code Unit}.
-     * @param agreement The {@code DiplomaticTrade} to consider.
-     * @return A {@code ChangeSet} encapsulating this action.
-     */
-    public ChangeSet europeanFirstContact(ServerPlayer serverPlayer,
-                                          Colony ourColony, Unit otherUnit,
-                                          DiplomaticTrade agreement) {
-        ChangeSet cs = new ChangeSet();
-        DiplomacySession session = Session.lookup(DiplomacySession.class,
-                                                  otherUnit, ourColony);
-        if (session == null) {
-            return serverPlayer.clientError("Missing cu1-diplomacy session for "
-                + ourColony.getId() + "," + otherUnit.getId()
-                + " with " + agreement);
-        }
-        ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
-        csDiplomacySession(serverPlayer, otherPlayer, agreement, session,
-            new DiplomacyMessage(otherUnit, ourColony, agreement), cs);
-        return cs;
-    }
-
 
     /**
      * Gets the list of high scores.
