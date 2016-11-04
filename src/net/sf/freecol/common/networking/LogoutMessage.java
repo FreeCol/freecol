@@ -91,19 +91,34 @@ public class LogoutMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         if (serverPlayer == null) return null;
-        logger.info("Logout by " + serverPlayer.getName());
+        logger.info("Handling logout by " + serverPlayer.getName());
 
-        /*
-         * FIXME: Setting the player dead directly should be a server
-         * option, but for now - allow the player to reconnect:
-         */
         ChangeSet cs = null;
+
+        // FIXME: Setting the player dead directly should be a server
+        // option, but for now allow the player to reconnect.
         serverPlayer.setConnected(false);
-        if (freeColServer.getGame().getCurrentPlayer() == serverPlayer
-            && !freeColServer.getSinglePlayer()) {
-            cs = freeColServer.getInGameController().endTurn(serverPlayer);
+
+        switch (freeColServer.getGameState()) {
+        case STARTING_GAME:
+            LogoutMessage message
+                = new LogoutMessage(serverPlayer, "User has logged out");
+            freeColServer.sendToAll(message, serverPlayer);
+            break;
+        case IN_GAME:
+            Game game = freeColServer.getGame();
+            if (game.getCurrentPlayer() == serverPlayer
+                && !freeColServer.getSinglePlayer()) {
+                cs = freeColServer.getInGameController().endTurn(serverPlayer);
+            }
+            break;
+        case ENDING_GAME:
+            break;
         }
+
+        // Withdraw from the metaserver
         freeColServer.updateMetaServer(false);
+
         return cs;
     }
 }

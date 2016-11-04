@@ -604,7 +604,7 @@ public final class FreeColServer {
 
         setGameState(FreeColServer.GameState.IN_GAME);
         updateMetaServer(false);
-        sendToAll(TrivialMessage.START_GAME_MESSAGE, null);
+        sendToAll(TrivialMessage.START_GAME_MESSAGE, (Connection)null);
         getServer().setMessageHandlerToAllConnections(getInGameInputHandler());
     }
 
@@ -612,10 +612,21 @@ public final class FreeColServer {
      * Send a message to all connections.
      *
      * @param msg The {@code DOMMessage} to send.
-     * @param conn An option {@code Connection} to omit.
+     * @param conn An optional {@code Connection} to omit.
      */
     public void sendToAll(DOMMessage msg, Connection conn) {
         getServer().sendToAll(msg, conn);
+    }
+
+    /**
+     * Send a message to all connections.
+     *
+     * @param msg The {@code DOMMessage} to send.
+     * @param serverPlayer An optional {@code ServerPlayer} to omit.
+     */
+    public void sendToAll(DOMMessage msg, ServerPlayer serverPlayer) {
+        sendToAll(msg,
+            (serverPlayer == null) ? null : serverPlayer.getConnection());
     }
 
     /**

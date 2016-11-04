@@ -119,28 +119,6 @@ public final class PreGameInputHandler extends ServerInputHandler {
     }
 
     /**
-     * Handles a "logout"-message.
-     * 
-     * @param connection The {@code Connection} the message came from.
-     * @param element The {@code Element} containing the request.
-     * @return A logout reply message.
-     */
-    @Override
-    protected Element logout(Connection connection,
-                             @SuppressWarnings("unused") Element element) {
-        logger.info("Logout from: " + connection);
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer player = freeColServer.getPlayer(connection);
-
-        player.setConnected(false);
-        getGame().removePlayer(player);
-        LogoutMessage message = new LogoutMessage(player, "User has logged out");
-        freeColServer.sendToAll(message, connection);
-        freeColServer.updateMetaServer(false);
-        return null;
-    }
-
-    /**
      * Handles a "requestLaunch"-message from a client.
      * 
      * @param connection The {@code Connection} the message came from.

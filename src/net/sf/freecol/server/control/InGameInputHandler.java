@@ -308,16 +308,4 @@ public final class InGameInputHandler extends ServerInputHandler {
             new MultipleMessage(getGame(), element)
                 .handle(freeColServer, connection));
     }
-
-
-    // Override ServerInputHandler
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Element logout(Connection connection, Element element) {
-        return handler(false, connection,
-                       new LogoutMessage(getGame(), element));
-    }
 }

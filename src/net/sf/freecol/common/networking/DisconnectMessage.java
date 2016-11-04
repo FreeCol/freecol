@@ -22,7 +22,9 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.networking.Server;
 
 import org.w3c.dom.Element;
 
@@ -67,5 +69,24 @@ public class DisconnectMessage extends AttributeMessage {
         return getAttribute(REASON_TAG);
     }
 
-    // No single handle() method, disconnection response varies.
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        if (serverPlayer == null) return null;
+
+        ChangeSet cs = new LogoutMessage(serverPlayer, "disconnect")
+            .serverHandler(freeColServer, serverPlayer);
+
+        Connection c = serverPlayer.getConnection();
+        if (c != null) c.reallyClose();
+
+        Server server = freeColServer.getServer();
+        if (server != null) server.removeConnection(c);
+
+        return cs;
+    }
 }

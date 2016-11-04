@@ -73,10 +73,12 @@ public abstract class ServerInputHandler extends FreeColServerHolder
                 new ChatMessage(getGame(), e)));
 
         register(DisconnectMessage.TAG,
-            (Connection conn, Element e) -> disconnect(conn, e));
+            (Connection conn, Element e) -> handler(false, conn,
+                new DisconnectMessage(getGame(), e)));
 
         register(LogoutMessage.TAG,
-            (Connection conn, Element e) -> logout(conn, e));
+            (Connection conn, Element e) -> handler(false, conn,
+                new LogoutMessage(getGame(), e)));
     }
 
 
@@ -123,40 +125,6 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         return (cs == null) ? null : cs.build(serverPlayer);
     }
 
-    /**
-     * Handle a "disconnect"-message.
-     * 
-     * @param connection The {@code Connection} the message was received
-     *     on.
-     * @param element The {@code Element} (root element in a
-     *     DOM-parsed XML tree) that holds all the information.
-     * @return Null.
-     */
-    protected Element disconnect(Connection connection, Element element) {
-        // The player should be logged out by now, but just in case:
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        logger.info("Disconnecting player "
-            + ((player == null) ? "null" : player.getName()));
-        if (player != null && player.isConnected()) {
-            logout(connection, null);
-        }
-        connection.reallyClose();
-        Server server = getFreeColServer().getServer();
-        if (server != null) server.removeConnection(connection);
-        return null;
-    }
-    
-    /**
-     * Handle a "logout"-message.
-     * 
-     * @param connection The {@code Connection} the message was received
-     *     on.
-     * @param element The {@code Element} (root element in a
-     *     DOM-parsed XML tree) that holds all the information.
-     * @return The reply.
-     */
-    protected abstract Element logout(Connection connection, Element element);
-    
 
     // Implement MessageHandler
 
@@ -166,20 +134,22 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     public final Element handle(Connection connection, Element element) {
         if (element == null) return null;
         final String tag = element.getTagName();
-        NetworkRequestHandler handler = handlerMap.get(tag);
+        final NetworkRequestHandler handler = handlerMap.get(tag);
+        Element ret = null;
+
         if (handler == null) {
             // Should we return an error here? The old handler returned null.
             logger.warning("No handler installed for " + tag);
         } else {
             try {
-                logger.log(Level.FINEST, "Handling " + tag);
-                return handler.handle(connection, element);
+                ret = handler.handle(connection, element);
+                logger.log(Level.FINEST, "Handling " + tag + " ok");
             } catch (Exception e) {
                 // FIXME: should we really catch Exception? The old code did.
-                logger.log(Level.WARNING, "Handler failure for " + tag, e);
+                logger.log(Level.WARNING, "Handling " + tag + " failed", e);
                 connection.reconnect();
             }
         }
-        return null;
+        return ret;
     }
 }
