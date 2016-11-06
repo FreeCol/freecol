@@ -359,18 +359,17 @@ public class Connection implements Closeable {
             this.out.write(sw.toString().getBytes("UTF-8"));
             this.out.flush();
         }
-        log(element, true);
     }
 
     /**
      * Low level routine to sends a message and return the reply.
      *
      * @param element The question for the other peer.
-     * @return The reply from the other peer.
+     * @return The reply {@code DOMMessage} from the other peer.
      * @exception IOException if an error occur while sending the message.
      * @see #sendInternal(Element)
      */
-    private Element askInternal(Element element) throws IOException {
+    private DOMMessage askInternal(Element element) throws IOException {
         if (element == null) return null;
         final String tag = element.getTagName();
         int networkReplyId = this.receivingThread.getNextNetworkReplyId();
@@ -388,13 +387,12 @@ public class Connection implements Closeable {
         NetworkReplyObject nro
             = this.receivingThread.waitForNetworkReply(networkReplyId);
         sendInternal(question);
+        log(question, true);
 
         // Wait for response
         DOMMessage response = (DOMMessage)nro.getResponse();
-        Element reply = (response == null) ? null : response.toXMLElement();
-        log(reply, false);
-
-        return (reply == null) ? null : (Element)reply.getFirstChild();
+        log((response == null) ? null : response.toXMLElement(), false);
+        return response;
     }
 
 
@@ -421,6 +419,7 @@ public class Connection implements Closeable {
      */
     public void send(Element element) throws IOException {
         sendInternal(element);
+        log(element, true);
         logger.fine("Send: " + element.getTagName());
     }
 
@@ -449,10 +448,11 @@ public class Connection implements Closeable {
      * @see #sendAndWait(Element)
      */
     public Element ask(Element element) throws IOException {
-        Element reply = askInternal(element);
+        DOMMessage reply = askInternal(element);
         logger.fine("Ask: " + element.getTagName()
-            + ", reply: " + ((reply == null) ? "null" : reply.getTagName()));
-        return reply;
+            + ", reply: " + ((reply == null) ? "null" : reply.getType()));
+        return (reply == null) ? null
+            : (Element)reply.toXMLElement().getFirstChild();
     }
 
     /**
