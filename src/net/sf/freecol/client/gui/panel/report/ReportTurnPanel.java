@@ -75,7 +75,8 @@ public final class ReportTurnPanel extends ReportPanel {
     private final Hashtable<String, List<JComponent>> textPanesByMessage
         = new Hashtable<>();
     /** The messages to display. */
-    private List<ModelMessage> messages;
+    private final List<ModelMessage> messages = new ArrayList<>();
+
 
     /**
      * Creates the turn report.
@@ -88,7 +89,6 @@ public final class ReportTurnPanel extends ReportPanel {
         super(freeColClient, "reportTurnAction");
 
         // Display Panel
-        reportPanel.removeAll();
         reportPanel.setLayout(new MigLayout("wrap 4", "[center][550!]:push[][]", ""));
         setMessages(messages);
     }
@@ -100,8 +100,10 @@ public final class ReportTurnPanel extends ReportPanel {
      * @param messages The {@code ModelMessages} to display in the report.
      */
     public void setMessages(List<ModelMessage> messages) {
-        this.messages = messages;
-        if (messages != null) displayMessages();
+        reportPanel.removeAll();
+        this.messages.clear();
+        if (messages != null) this.messages.addAll(messages);
+        displayMessages();
     }
         
     private void displayMessages() {
