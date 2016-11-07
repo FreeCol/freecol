@@ -146,7 +146,7 @@ public final class InGameController extends Controller {
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
     /** The server random number source. */
-    private final Random random;
+    private Random random;
 
     /** Debug helpers, do not serialize. */
     private int debugOnlyAITurns = 0;
@@ -158,15 +158,23 @@ public final class InGameController extends Controller {
      * The constructor to use.
      *
      * @param freeColServer The main server object.
-     * @param random The pseudo-random number source to use.
      */
-    public InGameController(FreeColServer freeColServer, Random random) {
+    public InGameController(FreeColServer freeColServer) {
         super(freeColServer);
 
-        this.random = random;
+        this.random = null;
     }
 
 
+    /**
+     * Set the PRNG.
+     *
+     * @param random The new {@code Random} to use in this controller.
+     */
+    public void setRandom(Random random) {
+        this.random = random;
+    }
+    
     /**
      * Get the timeout for this game.
      *

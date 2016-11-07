@@ -52,9 +52,9 @@ public class FreeColServerHolder {
     }
 
     /**
-     * Returns the Game.
+     * Get the game the server is operating.
      *
-     * @return a {@code Game} value
+     * @return The current {@code ServerGame}.
      */
     protected ServerGame getGame() {
         return freeColServer.getGame();

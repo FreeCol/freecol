@@ -62,6 +62,11 @@ public final class ServerTestHelper {
         return server.getInGameController();
     }
 
+    public static void setRandom(Random newRandom) {
+        random = newRandom;
+    }
+
+
     public static void stopServer() {
         if (server != null) {
             Controller c = server.getController();
@@ -200,9 +205,5 @@ public final class ServerTestHelper {
     public static void stopServerGame() {
         stopServer();
         FreeColTestCase.setGame(null);
-    }
-
-    public static void setRandom(Random newRandom) {
-        random = newRandom;
     }
 }

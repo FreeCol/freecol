@@ -208,6 +208,23 @@ public final class FreeColServer {
     /** Meta-server update timer. */
     private Timer metaServerUpdateTimer = null;
 
+
+    /**
+     * Base constructor common to the following new-game and
+     * saved-game constructors.
+     *
+     * @param name An optional name for the server.
+     * @param port The TCP port to use for the public socket.
+     */
+    private FreeColServer(String name, int port) throws IOException {
+        this.name = name;
+        this.server = serverStart(port); // Throws IOException
+        this.userConnectionHandler = new UserConnectionHandler(this);
+        this.preGameController = new PreGameController(this);
+        this.preGameInputHandler = new PreGameInputHandler(this);
+        this.inGameInputHandler = new InGameInputHandler(this);
+        this.inGameController = new InGameController(this);
+    }
     
     /**
      * Starts a new server, with a new game.
@@ -222,25 +239,16 @@ public final class FreeColServer {
     public FreeColServer(boolean publicServer, boolean singlePlayer,
                          Specification specification, int port, String name)
         throws IOException {
+        this(name, port);
+
         this.publicServer = publicServer;
         this.singlePlayer = singlePlayer;
-        this.name = name;
-
-        this.server = serverStart(port); // Throws IOException
-
-        this.userConnectionHandler = new UserConnectionHandler(this);
-        this.preGameController = new PreGameController(this);
-        this.preGameInputHandler = new PreGameInputHandler(this);
-        this.inGameInputHandler = new InGameInputHandler(this);
-
         this.random = new Random(FreeColSeed.getFreeColSeed(true));
         this.game = new ServerGame(specification);
         this.game.setNationOptions(new NationOptions(specification));
         this.game.randomize(random);
-        
-        this.inGameController = new InGameController(this, random);
-        this.mapGenerator = new SimpleMapGenerator(game, random);
-
+        this.inGameController.setRandom(random);
+        this.mapGenerator = new SimpleMapGenerator(this.game, random);
         this.publicServer = updateMetaServer(true);
     }
 
@@ -262,16 +270,7 @@ public final class FreeColServer {
     public FreeColServer(final FreeColSavegameFile savegame, 
                          Specification specification, int port, String name)
         throws FreeColException, IOException, XMLStreamException {
-        // publicServer will be read from the saved game
-        // singlePlayer will be read from the saved game
-        this.name = name;
-
-        this.server = serverStart(port); // Throws IOException
-
-        this.userConnectionHandler = new UserConnectionHandler(this);
-        this.preGameController = new PreGameController(this);
-        this.preGameInputHandler = new PreGameInputHandler(this);
-        this.inGameInputHandler = new InGameInputHandler(this);
+        this(name, port);
 
         this.game = loadGame(savegame, specification, server);
         // NationOptions will be read from the saved game.
@@ -283,12 +282,53 @@ public final class FreeColServer {
         if (seed != FreeColSeed.DEFAULT_SEED) {
             this.random = new Random(seed);
         }
-        this.inGameController = new InGameController(this, random);
+        this.inGameController.setRandom(random);
         this.mapGenerator = null;
-
         this.publicServer = updateMetaServer(true);
     }
 
+
+    /**
+     * Start a Server at port.
+     *
+     * If the port is specified, just try once.
+     *
+     * If the port is unspecified (negative), try multiple times.
+     *
+     * @param firstPort The port to start trying to connect at.
+     * @return A started {@code Server}.
+     * @exception IOException on failure to open the port.
+     */
+    private Server serverStart(int firstPort) throws IOException {
+        String host = (this.publicServer) ? "0.0.0.0"
+            : InetAddress.getLoopbackAddress().getHostAddress();
+        int port, tries;
+        if (firstPort < 0) {
+            port = FreeCol.getServerPort();
+            tries = 10;
+        } else {
+            port = firstPort;
+            tries = 1;
+        }
+        logger.finest("serverStart(" + firstPort + ") => " + port
+            + " x " + tries);
+        for (int i = tries; i > 0; i--) {
+            try {
+                server = new Server(this, host, port);
+                server.start();
+                break;
+            } catch (BindException be) {
+                if (i == 1) {
+                    throw new IOException("Bind exception starting server at: "
+                        + host + ":" + port, be);
+                }
+            } catch (IOException ie) {
+                if (i == 1) throw ie;
+            }
+            port++;
+        }
+        return server;
+    }
 
     /**
      * Is the user playing in single player mode?
@@ -362,59 +402,6 @@ public final class FreeColServer {
         return (this.server == null) ? -1 : this.server.getPort();
     }
 
-
-    /**
-     * Start a Server at port.
-     *
-     * If the port is specified, just try once.
-     *
-     * If the port is unspecified (negative), try multiple times.
-     *
-     * @param firstPort The port to start trying to connect at.
-     * @return A started {@code Server}.
-     * @exception IOException on failure to open the port.
-     */
-    private Server serverStart(int firstPort) throws IOException {
-        String host = (this.publicServer) ? "0.0.0.0"
-            : InetAddress.getLoopbackAddress().getHostAddress();
-        int port, tries;
-        if (firstPort < 0) {
-            port = FreeCol.getServerPort();
-            tries = 10;
-        } else {
-            port = firstPort;
-            tries = 1;
-        }
-        logger.finest("serverStart(" + firstPort + ") => " + port
-            + " x " + tries);
-        for (int i = tries; i > 0; i--) {
-            try {
-                server = new Server(this, host, port);
-                server.start();
-                break;
-            } catch (BindException be) {
-                if (i == 1) {
-                    throw new IOException("Bind exception starting server at: "
-                        + host + ":" + port, be);
-                }
-            } catch (IOException ie) {
-                if (i == 1) throw ie;
-            }
-            port++;
-        }
-        return server;
-    }
-
-
-    /**
-     * Gets the specification from the game run by this server.
-     *
-     * @return The specification from the game.
-     */
-    public Specification getSpecification() {
-        return game.getSpecification();
-    }
-
     /**
      * Gets the {@code UserConnectionHandler}.
      *
@@ -482,6 +469,15 @@ public final class FreeColServer {
      */
     public void setGame(ServerGame game) {
         this.game = game;
+    }
+
+    /**
+     * Gets the specification from the game run by this server.
+     *
+     * @return The specification from the game.
+     */
+    public Specification getSpecification() {
+        return game.getSpecification();
     }
 
     /**
