@@ -68,6 +68,6 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
         return game.getFreeColGameObject(getAttribute(PLAYER_TAG), Player.class);
     }
 
-    // No server handle() method required.
+    // No server handler required.
     // This message is only sent to clients.
 }

@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -60,25 +61,20 @@ public class TrainUnitInEuropeMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "trainUnitInEurope"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the trained unit, or an
-     *     error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String typeId = getAttribute(UNIT_TYPE_TAG);
         
-        UnitType type = server.getSpecification().getUnitType(typeId);
+        UnitType type = freeColServer.getSpecification().getUnitType(typeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a unit type: " + typeId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a unit type: " + typeId);
         }
 
         // Proceed to train a unit.
-        return server.getInGameController()
-            .trainUnitInEurope(serverPlayer, type)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .trainUnitInEurope(serverPlayer, type);
     }
 }

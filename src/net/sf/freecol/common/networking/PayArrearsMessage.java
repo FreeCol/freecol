@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -60,20 +61,16 @@ public class PayArrearsMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "payArrears"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the paying unit, or an
-     *     error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        GoodsType goodsType = server.getSpecification()
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final GoodsType goodsType = freeColServer.getSpecification()
             .getGoodsType(getAttribute(GOODS_TYPE_TAG));
 
         // Proceed to pay.
-        return server.getInGameController()
-            .payArrears(serverPlayer, goodsType)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .payArrears(serverPlayer, goodsType);
     }
 }

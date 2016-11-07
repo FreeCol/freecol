@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -63,36 +64,29 @@ public class DeclareIndependenceMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "declareIndependence"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update {@code Element} describing the REF and the
-     *     rebel player, or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String nationName = getAttribute(NATION_NAME_TAG);
         final String countryName = getAttribute(COUNTRY_NAME_TAG);
         
         if (nationName == null || nationName.isEmpty()) {
-            return serverPlayer.clientError("Empty nation name.")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Empty nation name.");
         }
 
         if (countryName == null || countryName.isEmpty()) {
-            return serverPlayer.clientError("Empty country name.")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Empty country name.");
         }
 
         StringTemplate problem = serverPlayer.checkDeclareIndependence();
         if (problem != null) {
-            return serverPlayer.clientError("Declaration blocked")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Declaration blocked");
         }
 
         // Declare.
-        return server.getInGameController()
-            .declareIndependence(serverPlayer, nationName, countryName)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .declareIndependence(serverPlayer, nationName, countryName);
     }
 }

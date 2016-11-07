@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -68,14 +69,11 @@ public class AskSkillMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "askSkill"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An {@code Element} to update the originating player
-     *         with the result of the query.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 
@@ -83,35 +81,30 @@ public class AskSkillMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
             return serverPlayer.clientError("There is no native settlement at: "
-                + tile.getId())
-                .build(serverPlayer);
+                + tile.getId());
         }
 
         MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
             return serverPlayer.clientError("Unable to enter " + is.getName()
-                + ": " + type.whyIllegal())
-                .build(serverPlayer);
+                + ": " + type.whyIllegal());
         }
 
         // Update the skill
-        return server.getInGameController()
-            .askLearnSkill(serverPlayer, unit, is)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .askLearnSkill(serverPlayer, unit, is);
     }
 }

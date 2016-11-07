@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -115,46 +116,39 @@ public class NewRegionNameMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "newRegionName"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update setting the new region name, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = server.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
 
         Tile tile = getTile(game);
         if (!serverPlayer.hasExplored(tile)) {
-            return serverPlayer.clientError("Can not claim discovery in unexplored tile: " + getAttribute(TILE_TAG))
-                .build(serverPlayer);
+            return serverPlayer.clientError("Can not claim discovery in unexplored tile: "
+                + getAttribute(TILE_TAG));
         }
 
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Region region = tile.getDiscoverableRegion();
         if (region == null) {
             return serverPlayer.clientError("No discoverable region in: "
-                + tile.getId())
-                .build(serverPlayer);
+                + tile.getId());
         }
         String regionId = getAttribute(REGION_TAG);
         if (!region.getId().equals(regionId)) {
             return serverPlayer.clientError("Region mismatch, "
-                + region.getId() + " != " + regionId)
-                .build(serverPlayer);
+                + region.getId() + " != " + regionId);
         }
         
         // Do the discovery
-        return server.getInGameController()
-            .setNewRegionName(serverPlayer, unit, region, getNewRegionName())
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .setNewRegionName(serverPlayer, unit, region, getNewRegionName());
     }
 }

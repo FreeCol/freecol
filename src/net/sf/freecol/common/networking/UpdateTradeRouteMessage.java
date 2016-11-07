@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -65,18 +66,13 @@ public class UpdateTradeRouteMessage extends DOMMessage {
 
 
     /**
-     * Handle a "updateTradeRoute"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} message was received on.
-     * @return Null, or an error message on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-
-        return server.getInGameController()
-            .updateTradeRoute(serverPlayer, this.tradeRoute)
-            .build(serverPlayer);
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return freeColServer.getInGameController()
+            .updateTradeRoute(serverPlayer, this.tradeRoute);
     }
 
     /**

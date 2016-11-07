@@ -83,17 +83,8 @@ public class UpdateMessage extends DOMMessage {
     }
 
     
-    /**
-     * Handle a "update"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return Null.
-     */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        // Only sent by the server to the clients.
-        return null;
-    }
+    // No server handler required.
+    // This message is only sent to the client.
 
     /**
      * {@inheritDoc}

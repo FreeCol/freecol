@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -105,17 +106,13 @@ public class HighScoreMessage extends DOMMessage {
 
     
     /**
-     * Handle a "highScore"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} message was received on.
-     * @return An update containing the high scores.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        return server.getInGameController()
-            .getHighScores(serverPlayer, this.key)
-            .build(serverPlayer);
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return freeColServer.getInGameController()
+            .getHighScores(serverPlayer, this.key);
     }
 
     /**

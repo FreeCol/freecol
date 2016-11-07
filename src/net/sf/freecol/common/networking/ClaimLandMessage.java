@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -70,23 +71,19 @@ public class ClaimLandMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "claimLand"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     *
-     * @return An update, or error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = server.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final String tileId = getAttribute(TILE_TAG);
         final String claimantId = getAttribute(CLAIMANT_TAG);
         final String priceString = getAttribute(PRICE_TAG);
 
         Tile tile = game.getFreeColGameObject(tileId, Tile.class);
         if (tile == null) {
-            return serverPlayer.clientError("Not a file: " + tileId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a file: " + tileId);
         }
 
         Unit unit = null;
@@ -100,28 +97,24 @@ public class ClaimLandMessage extends AttributeMessage {
         } catch (IllegalStateException e) {} // ...as is this one...
         if (unit != null) {
             if (unit.getTile() != tile) {
-                return serverPlayer.clientError("Unit not at tile: " + tileId)
-                    .build(serverPlayer);
+                return serverPlayer.clientError("Unit not at tile: " + tileId);
             }
         } else if (settlement != null) {
             if (settlement.getOwner().isEuropean()
                 && !settlement.getTile().isAdjacent(tile)) {
                 return serverPlayer.clientError("Settlement can not claim tile: "
-                    + tileId)
-                    .build(serverPlayer);
+                    + tileId);
             }
         } else { // ...but not both of them.
             return serverPlayer.clientError("Not a unit or settlement: "
-                + claimantId)
-                .build(serverPlayer);
+                + claimantId);
         }
 
         int price;
         try {
             price = Integer.parseInt(priceString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad price: " + priceString)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Bad price: " + priceString);
         }
 
         // Request is well formed, but there are more possibilities...
@@ -134,8 +127,7 @@ public class ClaimLandMessage extends AttributeMessage {
             if (settlement != null && ownerSettlement != null
                 && tile.isInUse()) {
                 return serverPlayer.clientError("Can not claim tile "
-                    + tile.getId() + ": already owned.")
-                    .build(serverPlayer);
+                    + tile.getId() + ": already owned.");
             }
             price = 0;
         } else if (owner.isEuropean()) {
@@ -144,8 +136,7 @@ public class ClaimLandMessage extends AttributeMessage {
                 price = 0;
             } else { // must fail
                 return serverPlayer.clientError("Can not claim tile " 
-                    + tile.getId() + ": European owners will not sell.")
-                    .build(serverPlayer);
+                    + tile.getId() + ": European owners will not sell.");
             }
         } else { // natives
             NoClaimReason why = serverPlayer.canClaimForSettlementReason(tile);
@@ -156,29 +147,25 @@ public class ClaimLandMessage extends AttributeMessage {
                 if (price >= 0) {
                     if (price < value) {
                         return serverPlayer.clientError("Can not claim tile "
-                            + tile.getId() + ": insufficient offer.")
-                            .build(serverPlayer);
+                            + tile.getId() + ": insufficient offer.");
                     }
                     if (!serverPlayer.checkGold(price)) {
                         return serverPlayer.clientError("Can not pay for tile: "
-                            + tile.getId() + ": insufficient funds.")
-                            .build(serverPlayer);
+                            + tile.getId() + ": insufficient funds.");
                     }
                     // Succeed, sufficient offer
                 } // else succeed, stealing
                 break;
             default: // Fail
                 return serverPlayer.clientError("Can not claim tile "
-                    + tile.getId() + ": " + why)
-                    .build(serverPlayer);
+                    + tile.getId() + ": " + why);
             }
         }
 
         // Proceed to claim.  Note, does not require unit, it is only
         // required for permission checking above.  Settlement is required
         // to set owning settlement.
-        return server.getInGameController()
-            .claimLand(serverPlayer, tile, settlement, price)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .claimLand(serverPlayer, tile, settlement, price);
     }
 }

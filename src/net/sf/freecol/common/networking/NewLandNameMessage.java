@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -86,42 +87,34 @@ public class NewLandNameMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "newLandName"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update setting the new land name, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Tile tile = unit.getTile();
         if (tile == null) {
             return serverPlayer.clientError("Unit is not on the map: "
-                + unit.getId())
-                .build(serverPlayer);
+                + unit.getId());
         } else if (!tile.isLand()) {
             return serverPlayer.clientError("Unit is not in the new world: "
-                + unit.getId())
-                .build(serverPlayer);
+                + unit.getId());
         }
 
         String newLandName = getNewLandName();
         if (newLandName == null || newLandName.isEmpty()) {
-            return serverPlayer.clientError("Empty new land name")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Empty new land name");
         }
 
         // Set name.
-        return server.getInGameController()
-            .setNewLandName(serverPlayer, unit, newLandName)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .setNewLandName(serverPlayer, unit, newLandName);
     }
 }

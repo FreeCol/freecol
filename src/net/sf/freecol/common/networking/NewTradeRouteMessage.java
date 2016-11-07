@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -55,7 +56,7 @@ public class NewTradeRouteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NewTradeRouteMessage(Game game, Element element) {
-        super(TAG);
+        this();
 
         this.tradeRoute = getChild(game, element, 0, true, TradeRoute.class);
     }
@@ -63,6 +64,11 @@ public class NewTradeRouteMessage extends DOMMessage {
 
     // Public interface
 
+    /**
+     * Get the new trade route.
+     *
+     * @return The {@code TradeRoute} attached to this message.
+     */
     public TradeRoute getTradeRoute() {
         return this.tradeRoute;
     }
@@ -79,18 +85,14 @@ public class NewTradeRouteMessage extends DOMMessage {
     }
 
 
-
     /**
-     * Handle a "newTradeRoute"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update setting the trade route.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        return server.getInGameController()
-            .newTradeRoute(serverPlayer)
-            .build(serverPlayer);
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return freeColServer.getInGameController()
+            .newTradeRoute(serverPlayer);
     }
 
     /**

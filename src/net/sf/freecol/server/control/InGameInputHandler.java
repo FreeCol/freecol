@@ -21,6 +21,7 @@ package net.sf.freecol.server.control;
 
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
@@ -45,6 +46,7 @@ import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
@@ -55,6 +57,7 @@ import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.LoadGoodsMessage;
+import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -100,421 +103,234 @@ public final class InGameInputHandler extends ServerInputHandler {
 
 
     /**
-     * The constructor to use.
+     * Create a new server in-game input handler.
+     *
+     * Note: all the handler lamdbas call getGame() because it is not
+     * necessarily available when the constructor is called.
      * 
      * @param freeColServer The main server object.
      */
     public InGameInputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
-        // FIXME: move and simplify methods later, for now just delegate
-        // FIXME: check that NRHs and CPNRHs are sensibly chosen
 
         register(AbandonColonyMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new AbandonColonyMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new AbandonColonyMessage(getGame(), e)));
         register(AskSkillMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new AskSkillMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new AskSkillMessage(getGame(), e)));
         register(AssignTeacherMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new AssignTeacherMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new AssignTeacherMessage(getGame(), e)));
         register(AssignTradeRouteMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new AssignTradeRouteMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new AssignTradeRouteMessage(getGame(), e)));
         register(AttackMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new AttackMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new AttackMessage(getGame(), e)));
         register(BuildColonyMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new BuildColonyMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new BuildColonyMessage(getGame(), e)));
         register(CashInTreasureTrainMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new CashInTreasureTrainMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new CashInTreasureTrainMessage(getGame(), e)));
         register(ChangeStateMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new ChangeStateMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new ChangeStateMessage(getGame(), e)));
         register(ChangeWorkImprovementTypeMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new ChangeWorkImprovementTypeMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new ChangeWorkImprovementTypeMessage(getGame(), e)));
         register(ChangeWorkTypeMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new ChangeWorkTypeMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new ChangeWorkTypeMessage(getGame(), e)));
         register(ChooseFoundingFatherMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new ChooseFoundingFatherMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new ChooseFoundingFatherMessage(getGame(), e)));
         register(ClaimLandMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new ClaimLandMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
+            (Connection conn, Element e) -> handler(true, conn,
+                new ClaimLandMessage(getGame(), e)));
         register(ClearSpecialityMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new ClearSpecialityMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(DeclareIndependenceMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new DeclareIndependenceMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(DeclineMoundsMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new DeclineMoundsMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(DeliverGiftMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new DeliverGiftMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(DeleteTradeRouteMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new DeleteTradeRouteMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(DemandTributeMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new DemandTributeMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(DisbandUnitMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new DisbandUnitMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(DisembarkMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new DisembarkMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(EmbarkMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new EmbarkMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(EmigrateUnitMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new EmigrateUnitMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(TrivialMessage.END_TURN_TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return freeColServer.getInGameController().endTurn(serverPlayer)
-                    .build(serverPlayer);
-            }});
-        register(EquipForRoleMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new EquipForRoleMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(InciteMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new InciteMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(JoinColonyMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new JoinColonyMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(LearnSkillMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new LearnSkillMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(LoadGoodsMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new LoadGoodsMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(LootCargoMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new LootCargoMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(MissionaryMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new MissionaryMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(MonarchActionMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new MonarchActionMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(MoveMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new MoveMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(MoveToMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new MoveToMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(NativeGiftMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new NativeGiftMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(NewLandNameMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new NewLandNameMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(NewRegionNameMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new NewRegionNameMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(NewTradeRouteMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new NewTradeRouteMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(PayArrearsMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new PayArrearsMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(PayForBuildingMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new PayForBuildingMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(PutOutsideColonyMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new PutOutsideColonyMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(RearrangeColonyMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new RearrangeColonyMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(RenameMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new RenameMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(ScoutIndianSettlementMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new ScoutIndianSettlementMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(ScoutSpeakToChiefMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new ScoutSpeakToChiefMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(SetBuildQueueMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new SetBuildQueueMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(SetGoodsLevelsMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new SetGoodsLevelsMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(TrainUnitInEuropeMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new TrainUnitInEuropeMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(UnloadGoodsMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new UnloadGoodsMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-        register(WorkMessage.TAG,
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(ServerPlayer serverPlayer, Element element) {
-                return new WorkMessage(getGame(), element)
-                    .handle(freeColServer, serverPlayer);
-            }});
-
-        // NetworkRequestHandlers
+            (Connection conn, Element e) -> handler(true, conn,
+                new ClearSpecialityMessage(getGame(), e)));
         register(TrivialMessage.CONTINUE_TAG,
-            (Connection connection, Element element) -> {
-                freeColServer.getInGameController()
-                    .continuePlaying(freeColServer.getPlayer(connection));
-                return null;
-            });
+            (Connection conn, Element e) -> handler(false, conn,
+                TrivialMessage.CONTINUE_MESSAGE));
+        register(DeclareIndependenceMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new DeclareIndependenceMessage(getGame(), e)));
+        register(DeclineMoundsMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new DeclineMoundsMessage(getGame(), e)));
+        register(DeliverGiftMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new DeliverGiftMessage(getGame(), e)));
+        register(DeleteTradeRouteMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new DeleteTradeRouteMessage(getGame(), e)));
+        register(DemandTributeMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new DemandTributeMessage(getGame(), e)));
         register(DiplomacyMessage.TAG,
-            (Connection connection, Element element) ->
-            new DiplomacyMessage(getGame(), element)
-                .handle(freeColServer, connection));
+            (Connection conn, Element e) -> handler(false, conn,
+                new DiplomacyMessage(getGame(), e)));
+        register(DisbandUnitMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new DisbandUnitMessage(getGame(), e)));
+        register(DisembarkMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new DisembarkMessage(getGame(), e)));
+        register(EmbarkMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new EmbarkMessage(getGame(), e)));
+        register(EmigrateUnitMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new EmigrateUnitMessage(getGame(), e)));
+        register(TrivialMessage.END_TURN_TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                TrivialMessage.END_TURN_MESSAGE));
         register(TrivialMessage.ENTER_REVENGE_MODE_TAG,
-            (Connection connection, Element element) ->
-            freeColServer.getInGameController()
-               .enterRevengeMode(freeColServer.getPlayer(connection))
-               .build(freeColServer.getPlayer(connection)));
+            (Connection conn, Element e) -> handler(false, conn,
+                TrivialMessage.ENTER_REVENGE_MODE_MESSAGE));
+        register(EquipForRoleMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new EquipForRoleMessage(getGame(), e)));
         register(FirstContactMessage.TAG,
-            (Connection connection, Element element) ->
-            new FirstContactMessage(getGame(), element)
-                .handle(freeColServer, connection));
+            (Connection conn, Element e) -> handler(false, conn,
+                new FirstContactMessage(getGame(), e)));
+        register(InciteMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new InciteMessage(getGame(), e)));
         register(IndianDemandMessage.TAG,
-            (Connection connection, Element element) ->
-            new IndianDemandMessage(getGame(), element)
-                .handle(freeColServer, connection));
+            (Connection conn, Element e) -> handler(false, conn,
+                new IndianDemandMessage(getGame(), e)));
+        register(HighScoreMessage.TAG,
+            (Connection conn, Element e) -> handler(false, conn,
+                new HighScoreMessage(getGame(), e)));
+        register(JoinColonyMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new JoinColonyMessage(getGame(), e)));
+        register(LearnSkillMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new LearnSkillMessage(getGame(), e)));
+        register(LoadGoodsMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new LoadGoodsMessage(getGame(), e)));
+        register(LootCargoMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new LootCargoMessage(getGame(), e)));
+        register(MissionaryMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new MissionaryMessage(getGame(), e)));
+        register(MonarchActionMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new MonarchActionMessage(getGame(), e)));
+        register(MoveMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new MoveMessage(getGame(), e)));
+        register(MoveToMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new MoveToMessage(getGame(), e)));
+        //register(MultipleMessage.TAG,
+        //    (Connection conn, Element e) -> handler(false, conn,
+        //        new MultipleMessage(getGame(), e)));
+        register(NationSummaryMessage.TAG,
+            (Connection conn, Element e) -> handler(false, conn,
+                new NationSummaryMessage(getGame(), e)));
+        register(NativeGiftMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new NativeGiftMessage(getGame(), e)));
+        register(NativeTradeMessage.TAG,
+            (Connection conn, Element e) -> handler(false, conn,
+                new NativeTradeMessage(getGame(), e)));
+        register(NewLandNameMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new NewLandNameMessage(getGame(), e)));
+        register(NewRegionNameMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new NewRegionNameMessage(getGame(), e)));
+        register(NewTradeRouteMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new NewTradeRouteMessage(getGame(), e)));
+        register(PayArrearsMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new PayArrearsMessage(getGame(), e)));
+        register(PayForBuildingMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new PayForBuildingMessage(getGame(), e)));
+        register(PutOutsideColonyMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new PutOutsideColonyMessage(getGame(), e)));
+        register(RearrangeColonyMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new RearrangeColonyMessage(getGame(), e)));
+        register(RenameMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new RenameMessage(getGame(), e)));
+        register(TrivialMessage.RETIRE_TAG,
+            (Connection conn, Element e) -> handler(false, conn,
+                TrivialMessage.RETIRE_MESSAGE));
+        register(ScoutIndianSettlementMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new ScoutIndianSettlementMessage(getGame(), e)));
+        register(ScoutSpeakToChiefMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new ScoutSpeakToChiefMessage(getGame(), e)));
+        register(SetBuildQueueMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new SetBuildQueueMessage(getGame(), e)));
+        register(SetCurrentStopMessage.TAG,
+            (Connection conn, Element e) -> handler(false, conn,
+                new SetCurrentStopMessage(getGame(), e)));
+        register(SetDestinationMessage.TAG,
+            (Connection conn, Element e) -> handler(false, conn,
+                new SetDestinationMessage(getGame(), e)));
+        register(SetGoodsLevelsMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new SetGoodsLevelsMessage(getGame(), e)));
+        register(SpySettlementMessage.TAG,
+            (Connection conn, Element e) -> handler(false, conn,
+                new SpySettlementMessage(getGame(), e)));
+        register(TrainUnitInEuropeMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new TrainUnitInEuropeMessage(getGame(), e)));
+        register(UnloadGoodsMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new UnloadGoodsMessage(getGame(), e)));
+        register(UpdateTradeRouteMessage.TAG,
+            (Connection conn, Element e) -> handler(false, conn,
+                new UpdateTradeRouteMessage(getGame(), e)));
+        register(WorkMessage.TAG,
+            (Connection conn, Element e) -> handler(true, conn,
+                new WorkMessage(getGame(), e)));
+
         register(MultipleMessage.TAG,
             (Connection connection, Element element) ->
             new MultipleMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(NationSummaryMessage.TAG,
-            (Connection connection, Element element) ->
-            new NationSummaryMessage(getGame(), element)
-                .handle(freeColServer, connection));
-        register(HighScoreMessage.TAG,
-            (Connection connection, Element element) ->
-            new HighScoreMessage(getGame(), element)
-                .handle(freeColServer, connection));
-        register(NativeTradeMessage.TAG,
-            (Connection connection, Element element) ->
-            new NativeTradeMessage(getGame(), element)
-                .handle(freeColServer, connection));
-        register(TrivialMessage.RETIRE_TAG,
-            (Connection connection, Element element) ->
-            freeColServer.getInGameController()
-                .retire(freeColServer.getPlayer(connection))
-                .build(freeColServer.getPlayer(connection)));
-        register(SetCurrentStopMessage.TAG,
-            (Connection connection, Element element) ->
-            new SetCurrentStopMessage(getGame(), element)
-                .handle(freeColServer, connection));
-        register(SetDestinationMessage.TAG,
-            (Connection connection, Element element) ->
-            new SetDestinationMessage(getGame(), element)
-                .handle(freeColServer, connection));
-        register(SpySettlementMessage.TAG,
-            (Connection connection, Element element) ->
-            new SpySettlementMessage(getGame(), element)
-                .handle(freeColServer, connection));
-        register(UpdateTradeRouteMessage.TAG,
-            (Connection connection, Element element) ->
-            new UpdateTradeRouteMessage(getGame(), element)
-                .handle(freeColServer, connection));
     }
+
+    /**
+     * Handle a new message.
+     *
+     * @param current If true, insist the message is from the current player
+     *     in the game.
+     * @param connection The {@code Connection} the message arrived on.
+     * @param message The {@code DOMMessage} to handle.
+     * @return The resulting reply {@code Element}.
+     */
+    private Element handler(boolean current, Connection connection,
+                            DOMMessage message) {
+        final FreeColServer freeColServer = getFreeColServer();
+        final ServerPlayer serverPlayer = freeColServer.getPlayer(connection);
+        final Game game = freeColServer.getGame();
+        ChangeSet cs = (current && (game == null || serverPlayer == null
+                || serverPlayer != game.getCurrentPlayer()))
+            ? serverPlayer.clientError("Received: " + message.getType()
+                + " out of turn from player: " + serverPlayer.getNation())
+            : message.serverHandler(freeColServer, serverPlayer);
+        return (cs == null) ? null : cs.build(serverPlayer);
+    }
+
 
     // Override ServerInputHandler
 
@@ -522,24 +338,8 @@ public final class InGameInputHandler extends ServerInputHandler {
      * {@inheritDoc}
      */
     @Override
-    protected Element logout(Connection connection, Element logoutElement) {
-        ServerPlayer serverPlayer = getFreeColServer().getPlayer(connection);
-        if (serverPlayer == null) return null;
-        logger.info("Logout by: " + connection
-            + " (" + serverPlayer.getName() + ") ");
-
-        /*
-         * FIXME: Setting the player dead directly should be a server
-         * option, but for now - allow the player to reconnect:
-         */
-        ChangeSet cs = null;
-        serverPlayer.setConnected(false);
-        if (getFreeColServer().getGame().getCurrentPlayer() == serverPlayer
-                && !getFreeColServer().getSinglePlayer()) {
-            cs = getFreeColServer().getInGameController()
-                .endTurn(serverPlayer);
-        }
-        getFreeColServer().updateMetaServer(false);
-        return (cs == null) ? null : cs.build(serverPlayer);
+    protected Element logout(Connection connection, Element element) {
+        return handler(false, connection,
+                       new LogoutMessage(getGame(), element));
     }
 }

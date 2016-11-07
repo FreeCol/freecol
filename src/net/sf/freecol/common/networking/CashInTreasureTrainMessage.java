@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -60,37 +61,30 @@ public class CashInTreasureTrainMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "cashInTreasureTrain"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update resulting from cashing in the treasure train,
-     *     or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
 
         Unit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         if (!unit.canCarryTreasure()) {
             return serverPlayer.clientError("Can not cash in unit "
-                + unitId + ", can not carry treasure.")
-                .build(serverPlayer);
+                + unitId + ", can not carry treasure.");
         } else if (!unit.canCashInTreasureTrain()) {
             return serverPlayer.clientError("Can not cash in unit "
-                + unitId + ", unsuitable location.")
-                .build(serverPlayer);
+                + unitId + ", unsuitable location.");
         }
 
         // Cash in
-        return server.getInGameController()
-            .cashInTreasureTrain(serverPlayer, unit)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .cashInTreasureTrain(serverPlayer, unit);
     }
 }

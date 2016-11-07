@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -67,14 +68,11 @@ public class AttackMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "attack"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update encapsulating the attack or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 
@@ -82,16 +80,14 @@ public class AttackMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         MoveType moveType = unit.getMoveType(tile);
@@ -104,21 +100,18 @@ public class AttackMessage extends AttributeMessage {
                 + unitId
                 + " type: " + moveType
                 + " from: " + unit.getLocation().getId()
-                + " to: " + tile.getId())
-                .build(serverPlayer);
+                + " to: " + tile.getId());
         }
 
         Unit defender = tile.getDefendingUnit(unit);
         if (defender == null) {
             return serverPlayer.clientError("Could not find defender"
                 + " in tile: " + tile.getId()
-                + " from: " + unit.getLocation().getId())
-                .build(serverPlayer);
+                + " from: " + unit.getLocation().getId());
         }
 
         // Proceed to attack.
-        return server.getInGameController()
-            .combat(serverPlayer, unit, defender, null)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .combat(serverPlayer, unit, defender, null);
     }
 }

@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -99,45 +100,36 @@ public class NativeTradeMessage extends DOMMessage {
 
     
     /**
-     * Handle a "nativeTrade"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} message was received on.
-     * @return A reply encapsulating the possibilities for this
-     *     trade, or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final NativeTrade nt = getNativeTrade();
         if (nt == null) {
-            return serverPlayer.clientError("Null native trade")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Null native trade");
         }
         
         final Unit unit = nt.getUnit();
         if (unit == null) {
-            return serverPlayer.clientError("Null unit").build(serverPlayer);
+            return serverPlayer.clientError("Null unit");
         }
         if (!unit.hasTile()) {
             return serverPlayer.clientError("Unit not on the map: "
-                + unit.getId()).build(serverPlayer);
+                + unit.getId());
         }
 
         final IndianSettlement is = nt.getIndianSettlement();
         if (is == null) {
-            return serverPlayer.clientError("Null settlement")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Null settlement");
         }
 
         if (!unit.getTile().isAdjacent(is.getTile())) {
-            return serverPlayer.clientError("Unit not adjacent to settlement")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Unit not adjacent to settlement");
         }
 
-        return server.getInGameController()
-            .nativeTrade(serverPlayer, getAction(), nt)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .nativeTrade(serverPlayer, getAction(), nt);
     }
 
     /**

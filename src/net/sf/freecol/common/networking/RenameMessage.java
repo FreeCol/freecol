@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -64,31 +65,25 @@ public class RenameMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "rename"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the renamed unit,
-     *     or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String nameableId = getAttribute(NAMEABLE_TAG);
         
         FreeColGameObject fcgo;
         try {
             fcgo = serverPlayer.getOurFreeColGameObject(nameableId, FreeColGameObject.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (!(fcgo instanceof Nameable)) {
-            return serverPlayer.clientError("Not a nameable: " + nameableId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a nameable: " + nameableId);
         }
 
         // Proceed to rename.
-        return server.getInGameController()
-            .renameObject(serverPlayer, (Nameable)fcgo, getAttribute(NAME_TAG))
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .renameObject(serverPlayer, (Nameable)fcgo, getAttribute(NAME_TAG));
     }
 }

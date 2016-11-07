@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -96,36 +97,30 @@ public class SetBuildQueueMessage extends AttributeMessage {
 
     
     /**
-     * Handle a "setBuildQueue"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the new queue
-     *         or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = server.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final Specification spec = game.getSpecification();
 
         Colony colony;
         try {
             colony = getColony(serverPlayer);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         List<BuildableType> buildQueue;
         try {
             buildQueue = getQueue(spec);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         // Proceed to set the build queue.
-        return server.getInGameController()
-            .setBuildQueue(serverPlayer, colony, buildQueue)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .setBuildQueue(serverPlayer, colony, buildQueue);
     }
 }

@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -90,14 +91,11 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
 
     
     /**
-     * Handle a "scoutSpeakToChief"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An element containing the result of the scouting
-     *     action, or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String settlementId = getAttribute(SETTLEMENT_TAG);
 
@@ -105,13 +103,11 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (!unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
             return serverPlayer.clientError("Unit lacks ability to speak to chief: "
-                + unitId)
-                .build(serverPlayer);
+                + unitId);
         }
 
         IndianSettlement is;
@@ -119,20 +115,17 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
             is = unit.getAdjacentSettlement(settlementId,
                                             IndianSettlement.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
             return serverPlayer.clientError("Unable to enter "
-                + is.getName() + ": " + type.whyIllegal())
-                .build(serverPlayer);
+                + is.getName() + ": " + type.whyIllegal());
         }
 
         // Valid request, do the scouting.
-        return server.getInGameController()
-            .scoutSpeakToChief(serverPlayer, unit, is)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .scoutSpeakToChief(serverPlayer, unit, is);
     }
 }

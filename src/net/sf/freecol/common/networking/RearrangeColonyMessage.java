@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -271,14 +272,11 @@ public class RearrangeColonyMessage extends AttributeMessage {
 
     
     /**
-     * Handle a "rearrangeColony"-message.
-     *
-     * @param server The {@code FreeColServer} handling the request.
-     * @param serverPlayer The {@code ServerPlayer} rearranging the colony.
-     * @return An update {@code Element} with the rearranged colony,
-     *     or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String colonyId = getAttribute(COLONY_TAG);
         final Game game = serverPlayer.getGame();
         final List<Arrangement> arrangements = getArrangements(game);
@@ -287,37 +285,30 @@ public class RearrangeColonyMessage extends AttributeMessage {
         try {
             colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         if (arrangements.isEmpty()) {
-            return serverPlayer.clientError("Empty rearrangement list.")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Empty rearrangement list.");
         }
         int i = 0;
         for (Arrangement uc : arrangements) {
             if (uc.unit == null) {
-                return serverPlayer.clientError("Invalid unit " + i)
-                    .build(serverPlayer);
+                return serverPlayer.clientError("Invalid unit " + i);
             }
             if (uc.loc == null) {
-                return serverPlayer.clientError("Invalid location " + i)
-                    .build(serverPlayer);
+                return serverPlayer.clientError("Invalid location " + i);
             }
             if (uc.role == null) {
-                return serverPlayer.clientError("Invalid role " + i)
-                    .build(serverPlayer);
+                return serverPlayer.clientError("Invalid role " + i);
             }
             if (uc.roleCount < 0) {
-                return serverPlayer.clientError("Invalid role count " + i)
-                    .build(serverPlayer);
+                return serverPlayer.clientError("Invalid role count " + i);
             }
         }
 
         // Rearrange can proceed.
-        return server.getInGameController()
-            .rearrangeColony(serverPlayer, colony, arrangements)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .rearrangeColony(serverPlayer, colony, arrangements);
     }
 }

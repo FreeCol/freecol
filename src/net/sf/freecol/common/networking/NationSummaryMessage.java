@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -105,29 +106,22 @@ public class NationSummaryMessage extends DOMMessage {
     
     
     /**
-     * Handle a "nationSummary"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} message was received on.
-     *
-     * @return An update containing the nation summaries, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = serverPlayer.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
 
         Player player = getPlayer(game);
         if (player == null) {
-            return serverPlayer.clientError("Not a player: " + this.playerId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a player: " + this.playerId);
         } else if (player.isIndian() && !serverPlayer.hasContacted(player)) {
             return null;
         }
 
-        return server.getInGameController()
-            .nationSummary(serverPlayer, player)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .nationSummary(serverPlayer, player);
     }
 
     /**

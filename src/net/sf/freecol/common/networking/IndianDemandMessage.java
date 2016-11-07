@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -141,16 +142,12 @@ public class IndianDemandMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "indianDemand"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} message was received on.
-     * @return An update containing the response, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = serverPlayer.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final String unitId = getAttribute(UNIT_TAG);
         final String colonyId = getAttribute(COLONY_TAG);
         final Boolean result = getResult();
@@ -162,44 +159,37 @@ public class IndianDemandMessage extends AttributeMessage {
                 unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
                 if (unit.getMovesLeft() <= 0) {
                     return serverPlayer.clientError("Unit has no moves left: "
-                        + unitId)
-                        .build(serverPlayer);
+                        + unitId);
                 }
                 colony = unit.getAdjacentSettlement(colonyId, Colony.class);
                 if (result != null) {
                     return serverPlayer.clientError("Result in demand: "
-                        + serverPlayer.getId() + " " + result)
-                        .build(serverPlayer);
+                        + serverPlayer.getId() + " " + result);
                 }
             } else { // Reply from colony
                 unit = game.getFreeColGameObject(unitId, Unit.class);
                 if (unit == null) {
                     return serverPlayer.clientError("Not a unit: "
-                        + unitId)
-                        .build(serverPlayer);
+                        + unitId);
                 }
                 colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
                 if (result == null) {
                     return serverPlayer.clientError("No result in demand response: "
-                        + serverPlayer.getId())
-                        .build(serverPlayer);
+                        + serverPlayer.getId());
                 }
             }
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         int amount = getAmount();
         if (amount <= 0) {
-            return serverPlayer.clientError("Bad amount: " + amount)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Bad amount: " + amount);
         }
 
         // Proceed to demand or respond.
-        return server.getInGameController()
+        return freeColServer.getInGameController()
             .indianDemand(serverPlayer, unit, colony, getType(game), amount,
-                          result)
-            .build(serverPlayer);
+                          result);
     }
 }

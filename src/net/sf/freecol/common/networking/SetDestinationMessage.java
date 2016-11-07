@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -63,16 +64,12 @@ public class SetDestinationMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "setDestination"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} the message is from.
-     * @return An update containing the unit with the new destination,
-     *     or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = serverPlayer.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final String unitId = getAttribute(UNIT_TAG);
         final String destinationId = getAttribute(DESTINATION_TAG);
 
@@ -80,8 +77,7 @@ public class SetDestinationMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         // destination == null is OK.
@@ -89,8 +85,7 @@ public class SetDestinationMessage extends AttributeMessage {
             : game.findFreeColLocation(destinationId);
 
         // Set destination
-        return server.getInGameController()
-            .setDestination(serverPlayer, unit, destination)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .setDestination(serverPlayer, unit, destination);
     }
 }

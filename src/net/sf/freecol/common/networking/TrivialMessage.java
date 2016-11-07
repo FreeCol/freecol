@@ -23,6 +23,9 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
@@ -102,4 +105,39 @@ public class TrivialMessage extends DOMMessage {
     public String getType() {
         return this.type;
     }
+
+
+    /**
+     * Server-side handler for this message.
+     *
+     * @param freeColServer The {@code FreeColServer} handling the request.
+     * @param serverPlayer The {@code ServerPlayer} that sent the request.
+     * @return A {@code ChangeSet} defining the response.
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final InGameController igc = freeColServer.getInGameController();
+        switch (this.type) {
+        case CLOSE_MENUS_TAG:
+            return serverPlayer.clientError("Close menus in server?!?");
+        case CONTINUE_TAG:
+            return igc.continuePlaying(serverPlayer);
+        case END_TURN_TAG:
+            return igc.endTurn(serverPlayer);
+        case ENTER_REVENGE_MODE_TAG:
+            return igc.enterRevengeMode(serverPlayer);
+        case RECONNECT_TAG:
+            break;
+        case REQUEST_LAUNCH_TAG:
+            break;
+        case RETIRE_TAG:
+            return igc.retire(serverPlayer);
+        case START_GAME_TAG:
+            break;
+        default:
+            return super.serverHandler(freeColServer, serverPlayer);
+        }
+        return null;
+    }        
 }

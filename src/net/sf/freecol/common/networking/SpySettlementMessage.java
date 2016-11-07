@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -102,57 +103,44 @@ public class SpySettlementMessage extends DOMMessage {
 
 
     /**
-     * Handle a "spySettlement"-message.
-     *
-     * @param server The {@code FreeColServer} that is handling
-     *     the message.
-     * @param connection The {@code Connection} the message was
-     *     received on.
-     * @return An {@code Element} containing a representation of
-     *     the settlement being spied upon and any units at that
-     *     position, or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = serverPlayer.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
 
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (!unit.hasAbility(Ability.SPY_ON_COLONY)) {
             return serverPlayer.clientError("Unit lacks ability"
-                + " to spy on colony: " + this.unitId)
-                .build(serverPlayer);
+                + " to spy on colony: " + this.unitId);
         }
 
         Colony colony = getColony(game);
         if (colony == null) {
             return serverPlayer.clientError("Not a colony: "
-                + this.settlementId)
-                .build(serverPlayer);
+                + this.settlementId);
         }
         Tile tile = colony.getTile();
         if (!unit.getTile().isAdjacent(tile)) {
             return serverPlayer.clientError("Unit " + this.unitId
-                + " not adjacent to colony: " + this.settlementId)
-                .build(serverPlayer);
+                + " not adjacent to colony: " + this.settlementId);
         }
 
         MoveType type = unit.getMoveType(tile);
         if (type != MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
             return serverPlayer.clientError("Unable to enter at: "
-                + colony.getName() + ": " + type.whyIllegal())
-                .build(serverPlayer);
+                + colony.getName() + ": " + type.whyIllegal());
         }
 
         // Spy on the settlement
-        return server.getInGameController()
-            .spySettlement(serverPlayer, unit, colony)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .spySettlement(serverPlayer, unit, colony);
     }
 
     /**

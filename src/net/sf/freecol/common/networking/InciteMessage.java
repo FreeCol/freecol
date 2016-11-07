@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -94,60 +95,50 @@ public class InciteMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "incite"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An element containing the result of the incite, or an
-     *     error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = server.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         IndianSettlement is;
         try {
             is = getSettlement(unit);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         MoveType type;
         ServerPlayer enemy = (ServerPlayer)getEnemy(game);
         if (enemy == null) {
             return serverPlayer.clientError("Not a player: "
-                + getAttribute(ENEMY_TAG))
-                .build(serverPlayer);
+                + getAttribute(ENEMY_TAG));
         } else if (enemy == serverPlayer) {
-            return serverPlayer.clientError("Inciting against oneself!")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Inciting against oneself!");
         } else if (!enemy.isEuropean()) {
-            return serverPlayer.clientError("Inciting against non-European!")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Inciting against non-European!");
         } else if ((type = unit.getMoveType(is.getTile()))
             != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
             return serverPlayer.clientError("Unable to enter "
-                + is.getName() + ": " + type.whyIllegal())
-                .build(serverPlayer);
+                + is.getName() + ": " + type.whyIllegal());
         }
 
         int gold = getGold();
         if (gold < 0) {
-            return serverPlayer.clientError("Bad gold: " + getAttribute(GOLD_TAG))
-                .build(serverPlayer);
+            return serverPlayer.clientError("Bad gold: "
+                + getAttribute(GOLD_TAG));
         }
 
         // Valid, proceed to incite.
-        return server.getInGameController()
-            .incite(serverPlayer, unit, is, enemy, gold)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .incite(serverPlayer, unit, is, enemy, gold);
     }
 }

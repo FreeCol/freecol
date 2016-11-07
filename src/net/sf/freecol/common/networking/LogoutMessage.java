@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -82,6 +83,27 @@ public class LogoutMessage extends AttributeMessage {
         return getAttribute(REASON_TAG);
     }
 
-    // No single handle() method as logout handlers are present in all
-    // controllers.
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        if (serverPlayer == null) return null;
+        logger.info("Logout by " + serverPlayer.getName());
+
+        /*
+         * FIXME: Setting the player dead directly should be a server
+         * option, but for now - allow the player to reconnect:
+         */
+        ChangeSet cs = null;
+        serverPlayer.setConnected(false);
+        if (freeColServer.getGame().getCurrentPlayer() == serverPlayer
+            && !freeColServer.getSinglePlayer()) {
+            cs = freeColServer.getInGameController().endTurn(serverPlayer);
+        }
+        freeColServer.updateMetaServer(false);
+        return cs;
+    }
 }

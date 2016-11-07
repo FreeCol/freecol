@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -64,14 +65,11 @@ public class ChangeStateMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "changeState"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the changed unit, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String stateString = getAttribute(STATE_TAG);
 
@@ -79,8 +77,7 @@ public class ChangeStateMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         // Do not test if it is on the map, units in Europe can change state.
 
@@ -88,19 +85,16 @@ public class ChangeStateMessage extends AttributeMessage {
         try {
             state = Enum.valueOf(UnitState.class, stateString);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (!unit.checkSetState(state)) {
             return serverPlayer.clientError("Unit " + unitId
                 + " can not change state: " + unit.getState().toString()
-                + " -> " + stateString)
-                .build(serverPlayer);
+                + " -> " + stateString);
         }
 
         // Proceed to change.
-        return server.getInGameController()
-            .changeState(serverPlayer, unit, state)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .changeState(serverPlayer, unit, state);
     }
 }

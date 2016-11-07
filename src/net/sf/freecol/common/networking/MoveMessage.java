@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -68,31 +69,27 @@ public class MoveMessage extends DOMMessage {
 
 
     /**
-     * Handle a "move"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the moved unit, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 
         ServerUnit unit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId,
+                                                        ServerUnit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         MoveType moveType = unit.getMoveType(tile);
@@ -100,13 +97,11 @@ public class MoveMessage extends DOMMessage {
             return serverPlayer.clientError("Illegal move for: " + unitId
                 + " type: " + moveType
                 + " from: " + unit.getLocation().getId()
-                + " to: " + tile.getId())
-                .build(serverPlayer);
+                + " to: " + tile.getId());
         }
 
         // Proceed to move.
-        return server.getInGameController()
-            .move(serverPlayer, unit, tile)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .move(serverPlayer, unit, tile);
     }
 }

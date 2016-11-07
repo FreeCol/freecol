@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -131,29 +132,23 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "chooseFoundingFather"-message.
-     * The server does not need to handle this message type.
-     *
-     * @param server The {@code FreeColServer} handling the request.
-     * @param serverPlayer The {@code ServerPlayer} abandoning the colony.
-     * @return Null.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = server.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final List<FoundingFather> offered = serverPlayer.getOfferedFathers();
         final FoundingFather ff = getFather(game);
 
         if (!serverPlayer.canRecruitFoundingFather()) {
             return serverPlayer.clientError("Player can not recruit fathers: "
-                + serverPlayer.getId())
-                .build(serverPlayer);
+                + serverPlayer.getId());
         } else if (ff == null) {
-            return serverPlayer.clientError("No founding father selected")
-                .build(serverPlayer);
+            return serverPlayer.clientError("No founding father selected");
         } else if (!offered.contains(ff)) {
             return serverPlayer.clientError("Founding father not offered: "
-                + ff.getId())
-                .build(serverPlayer);
+                + ff.getId());
         }
 
         serverPlayer.updateCurrentFather(ff);

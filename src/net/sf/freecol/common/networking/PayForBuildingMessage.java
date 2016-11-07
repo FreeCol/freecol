@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -60,27 +61,22 @@ public class PayForBuildingMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "payForBuilding"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the paying unit, or an
-     *     error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String colonyId = getAttribute(COLONY_TAG);
         
         Colony colony;
         try {
             colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         // Proceed to pay.
-        return server.getInGameController()
-            .payForBuilding(serverPlayer, colony)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .payForBuilding(serverPlayer, colony);
     }
 }

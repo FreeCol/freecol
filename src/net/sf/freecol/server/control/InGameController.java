@@ -1316,8 +1316,9 @@ public final class InGameController extends Controller {
      * Continue playing after winning.
      *
      * @param serverPlayer The {@code ServerPlayer} that plays on.
+     * @return Null.
      */
-    public void continuePlaying(ServerPlayer serverPlayer) {
+    public ChangeSet continuePlaying(ServerPlayer serverPlayer) {
         final ServerGame game = getGame();
         if (!getFreeColServer().getSinglePlayer()) {
             logger.warning("Can not continue playing in multiplayer!");
@@ -1337,6 +1338,7 @@ public final class InGameController extends Controller {
                         + serverPlayer.getName()
                         + " has won, but is continuing to play.");
         }
+        return null;
     }
 
 

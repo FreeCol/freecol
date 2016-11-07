@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -63,14 +64,11 @@ public class AssignTeacherMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "assignTeacher"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the student-teacher assignment or
-     *     an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String studentId = getAttribute(STUDENT_TAG);
         final String teacherId = getAttribute(TEACHER_TAG);
 
@@ -78,47 +76,38 @@ public class AssignTeacherMessage extends AttributeMessage {
         try {
             student = serverPlayer.getOurFreeColGameObject(studentId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Unit teacher;
         try {
             teacher = serverPlayer.getOurFreeColGameObject(teacherId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         if (student.getColony() == null) {
             return serverPlayer.clientError("Student not in colony: "
-                + studentId)
-                .build(serverPlayer);
+                + studentId);
         } else if (!student.isInColony()) {
             return serverPlayer.clientError("Student not working colony: "
-                + studentId)
-                .build(serverPlayer);
+                + studentId);
         } else if (teacher.getColony() == null) {
             return serverPlayer.clientError("Teacher not in colony: "
-                + teacherId)
-                .build(serverPlayer);
+                + teacherId);
         } else if (!teacher.getColony().canTrain(teacher)) {
             return serverPlayer.clientError("Teacher can not teach: "
-                + teacherId)
-                .build(serverPlayer);
+                + teacherId);
         } else if (student.getColony() != teacher.getColony()) {
             return serverPlayer.clientError("Student and teacher not in same colony: "
-                + studentId)
-                .build(serverPlayer);
+                + studentId);
         } else if (!student.canBeStudent(teacher)) {
             return serverPlayer.clientError("Student can not be taught by teacher: "
-                + studentId)
-                .build(serverPlayer);
+                + studentId);
         }
 
         // Proceed to assign.
-        return server.getInGameController()
-            .assignTeacher(serverPlayer, student, teacher)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .assignTeacher(serverPlayer, student, teacher);
     }
 }

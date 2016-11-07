@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -60,14 +61,11 @@ public class DeleteTradeRouteMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "deleteTradeRoute"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} that sent the message.
-     * @return An update containing the deleted unit, or an
-     *     error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String tradeRouteId = getAttribute(TRADE_ROUTE_TAG);
         
         TradeRoute tradeRoute;
@@ -75,13 +73,11 @@ public class DeleteTradeRouteMessage extends AttributeMessage {
             tradeRoute = serverPlayer.getOurFreeColGameObject(tradeRouteId, 
                 TradeRoute.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         // Proceed to delete.
-        return server.getInGameController()
-            .deleteTradeRoute(serverPlayer, tradeRoute)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .deleteTradeRoute(serverPlayer, tradeRoute);
     }
 }

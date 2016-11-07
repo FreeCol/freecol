@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -61,27 +62,22 @@ public class DisembarkMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "disembark"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the disembarked unit, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
 
         ServerUnit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         // Do the disembark.
-        return server.getInGameController()
-            .disembarkUnit(serverPlayer, unit)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .disembarkUnit(serverPlayer, unit);
     }
 }

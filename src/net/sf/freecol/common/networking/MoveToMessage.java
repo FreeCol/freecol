@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -65,14 +66,11 @@ public class MoveToMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "moveTo"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the moved unit, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final Game game = serverPlayer.getGame();
         final String unitId = getAttribute(UNIT_TAG);
         final String destinationId = getAttribute(DESTINATION_TAG);
@@ -81,20 +79,17 @@ public class MoveToMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Location destination = game.findFreeColLocation(destinationId);
         if (destination == null) {
             return serverPlayer.clientError("Not a location: "
-                + destinationId)
-                .build(serverPlayer);
+                + destinationId);
         }
 
         // Proceed to move.
-        return server.getInGameController()
-            .moveTo(serverPlayer, unit, destination)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .moveTo(serverPlayer, unit, destination);
     }
 }

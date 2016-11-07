@@ -55,7 +55,10 @@ import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Introspector;
-
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.model.ServerPlayer;
+    
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -1042,7 +1045,19 @@ public class DOMMessage {
         }
     }
 
+    /**
+     * Server-side handler for this message.
+     *
+     * @param freeColServer The {@code FreeColServer} handling the request.
+     * @param serverPlayer The {@code ServerPlayer} that sent the request.
+     * @return A {@code ChangeSet} defining the response.
+     */
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return serverPlayer.clientError("Invalid message type: " + getType());
+    }
 
+    
     // Override Object
 
     /**

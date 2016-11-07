@@ -67,15 +67,12 @@ public class EquipForRoleMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "equipForRole"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update encapsulating the equipForRole location change
-     *     or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = server.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final String unitId = getAttribute(UNIT_TAG);
         final String roleId = getAttribute(ROLE_TAG);
         final String countString = getAttribute(COUNT_TAG);
@@ -84,42 +81,36 @@ public class EquipForRoleMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (unit.isInEurope()) {
             ; // Always OK
         } else if (!unit.hasTile()) {
-            return serverPlayer.clientError("Unit is not on the map: " + unitId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Unit is not on the map: "
+                + unitId);
         } else if (unit.getSettlement() == null) {
             return serverPlayer.clientError("Unit is not in a settlement: "
-                + unitId)
-                .build(serverPlayer);
+                + unitId);
         }
 
         Role role = game.getSpecification().getRole(roleId);
         if (role == null) {
-            return serverPlayer.clientError("Not a role: " + roleId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a role: " + roleId);
         }
         int count;
         try {
             count = Integer.parseInt(countString);
         } catch (NumberFormatException nfe) {
-            return serverPlayer.clientError("Role count is not an integer: " +
-                countString)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Role count is not an integer: "
+                + countString);
         }
         if (count < 0 || count > role.getMaximumCount()) {
             return serverPlayer.clientError("Invalid role count: "
-                + countString)
-                .build(serverPlayer);
+                + countString);
         }
 
         // Proceed to equip.
-        ChangeSet cs = server.getInGameController()
+        return freeColServer.getInGameController()
             .equipForRole(serverPlayer, unit, role, count);
-        return (cs == null) ? null : cs.build(serverPlayer);
     }
 }

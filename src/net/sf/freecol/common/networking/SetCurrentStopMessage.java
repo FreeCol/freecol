@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -64,15 +65,11 @@ public class SetCurrentStopMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "setCurrentStop"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} the message is from.
-     * @return An set containing the unit after updating its
-     *     current stop, or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String indexString = getAttribute(INDEX_TAG);
 
@@ -80,13 +77,12 @@ public class SetCurrentStopMessage extends AttributeMessage {
         try {
             serverUnit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         TradeRoute tr = serverUnit.getTradeRoute();
         if (tr == null) {
-            return serverPlayer.clientError("Unit has no trade route: " + unitId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Unit has no trade route: "
+                + unitId);
         }
 
         int count;
@@ -94,17 +90,15 @@ public class SetCurrentStopMessage extends AttributeMessage {
             count = Integer.parseInt(indexString);
         } catch (NumberFormatException nfe) {
             return serverPlayer.clientError("Stop index is not an integer: " +
-                indexString)
-                .build(serverPlayer);
+                indexString);
         }
         if (count < 0 || count > tr.getStops().size()) {
-            return serverPlayer.clientError("Invalid stop index: " + indexString)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Invalid stop index: "
+                + indexString);
         }
 
         // Valid, set.
-        return server.getInGameController()
-            .setCurrentStop(serverPlayer, serverUnit, count)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .setCurrentStop(serverPlayer, serverUnit, count);
     }
 }

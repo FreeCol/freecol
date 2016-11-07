@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -64,15 +65,12 @@ public class WorkMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "work"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update encapsulating the work location change or an
-     *     error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = server.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final String unitId = getAttribute(UNIT_TAG);
         final String workLocationId = getAttribute(WORK_LOCATION_TAG);
 
@@ -80,40 +78,36 @@ public class WorkMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         if (!unit.hasTile()) {
-            return serverPlayer.clientError("Unit is not on the map: " + unitId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Unit is not on the map: "
+                + unitId);
         }
 
         Colony colony = unit.getTile().getColony();
         if (colony == null) {
-            return serverPlayer.clientError("Unit is not at a colony: " + unitId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Unit is not at a colony: "
+                + unitId);
         }
 
         WorkLocation workLocation = game
             .getFreeColGameObject(workLocationId, WorkLocation.class);
         if (workLocation == null) {
-            return serverPlayer.clientError("Not a work location: " + workLocationId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a work location: "
+                + workLocationId);
         } else if (workLocation.getColony() != colony) {
             return serverPlayer.clientError("Work location is not in colony"
-                + colony.getId() + " where the unit is: " + workLocationId)
-                .build(serverPlayer);
+                + colony.getId() + " where the unit is: " + workLocationId);
         } else if (!workLocation.canAdd(unit)) {
             return serverPlayer.clientError("Can not add " + unit
                 + " to " + workLocation
-                + ": " + workLocation.getNoAddReason(unit))
-                .build(serverPlayer);
+                + ": " + workLocation.getNoAddReason(unit));
         }
 
         // Work.
-        return server.getInGameController()
-            .work(serverPlayer, unit, workLocation)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .work(serverPlayer, unit, workLocation);
     }
 }

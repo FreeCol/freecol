@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -69,14 +70,11 @@ public class DemandTributeMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "demandTribute"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} that sent the message.
-     * @return An {@code Element} to update the originating
-     *     player with the result of the demand.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 
@@ -84,44 +82,38 @@ public class DemandTributeMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (unit.isArmed()
             || unit.hasAbility(Ability.DEMAND_TRIBUTE)) {
             ; // ok
         } else {
             return serverPlayer.clientError("Unit is neither armed"
-                + " nor able to demand tribute: " + unitId)
-                .build(serverPlayer);
+                + " nor able to demand tribute: " + unitId);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
             return serverPlayer.clientError("There is native settlement at: "
-                + tile.getId())
-                .build(serverPlayer);
+                + tile.getId());
         }
 
         MoveType type = unit.getMoveType(tile);
         if (type != MoveType.ATTACK_SETTLEMENT
             && type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
             return serverPlayer.clientError("Unable to demand tribute at: "
-                + is.getName() + ": " + type.whyIllegal())
-                .build(serverPlayer);
+                + is.getName() + ": " + type.whyIllegal());
         }
 
         // Do the demand
-        return server.getInGameController()
-            .demandTribute(serverPlayer, unit, is)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .demandTribute(serverPlayer, unit, is);
     }
 }

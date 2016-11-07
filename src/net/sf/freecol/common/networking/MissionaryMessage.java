@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -74,14 +75,11 @@ public class MissionaryMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "missionary"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An element containing the result of the mission
-     *     operation, or an error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 
@@ -89,23 +87,20 @@ public class MissionaryMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
             return serverPlayer.clientError("There is no native settlement at: "
-                + tile.getId())
-                .build(serverPlayer);
+                + tile.getId());
         }
 
         Unit missionary = is.getMissionary();
@@ -113,42 +108,35 @@ public class MissionaryMessage extends AttributeMessage {
         if (denounce) {
             if (missionary == null) {
                 return serverPlayer.clientError("Denouncing an empty mission at: "
-                    + is.getId())
-                    .build(serverPlayer);
+                    + is.getId());
             } else if (missionary.getOwner() == serverPlayer) {
                 return serverPlayer.clientError("Denouncing our own missionary at: "
-                    + is.getId())
-                    .build(serverPlayer);
+                    + is.getId());
             } else if (!unit.hasAbility(Ability.DENOUNCE_HERESY)) {
                 return serverPlayer.clientError("Unit lacks denouncement ability: "
-                    + unitId)
-                    .build(serverPlayer);
+                    + unitId);
             }
         } else {
             if (missionary != null) {
                 return serverPlayer.clientError("Establishing extra mission at: "
-                    + is.getId())
-                    .build(serverPlayer);
+                    + is.getId());
             } else if (!unit.hasAbility(Ability.ESTABLISH_MISSION)) {
                 return serverPlayer.clientError("Unit lacks establish mission ability: "
-                    + unitId)
-                    .build(serverPlayer);
+                    + unitId);
             }
         }
 
         MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
             return serverPlayer.clientError("Unable to enter " + is.getName()
-                + ": " + type.whyIllegal())
-                .build(serverPlayer);
+                + ": " + type.whyIllegal());
         }
 
         // Valid, proceed to denounce/establish.
-        return ((denounce)
-            ? server.getInGameController()
+        return (denounce)
+            ? freeColServer.getInGameController()
                 .denounceMission(serverPlayer, unit, is)
-            : server.getInGameController()
-                .establishMission(serverPlayer, unit, is))
-            .build(serverPlayer);
+            : freeColServer.getInGameController()
+                .establishMission(serverPlayer, unit, is);
     }
 }

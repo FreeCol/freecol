@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -100,43 +101,34 @@ public class FirstContactMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "firstContact"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} message was received on.
-     * @return An update containing the firstContactd unit, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = serverPlayer.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final String playerId = getAttribute(PLAYER_TAG);
         final String otherId = getAttribute(OTHER_TAG);
 
         Player first = getPlayer(game);
         if (first == null) {
-            return serverPlayer.clientError("Invalid player: " + playerId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Invalid player: " + playerId);
         } else if (serverPlayer.getId().equals(playerId)) {
             ; // OK
         } else {
-            return serverPlayer.clientError("Not our player: " + playerId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not our player: " + playerId);
         }
 
         ServerPlayer otherPlayer = (ServerPlayer)getOtherPlayer(game);
         if (otherPlayer == null) {
-            return serverPlayer.clientError("Invalid other player: " + otherId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Invalid other player: " + otherId);
         } else if (otherPlayer == serverPlayer) {
-            return serverPlayer.clientError("First contact with self!?!")
-                .build(serverPlayer);
+            return serverPlayer.clientError("First contact with self!?!");
         }
 
         // Proceed to contact.
-        return server.getInGameController()
+        return freeColServer.getInGameController()
             .nativeFirstContact(serverPlayer, otherPlayer,
-                                getTile(game), getResult())
-            .build(serverPlayer);
+                                getTile(game), getResult());
     }
 }

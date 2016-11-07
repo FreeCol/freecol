@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -67,14 +68,11 @@ public class DeclineMoundsMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "declineMounds"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} that sent the message.
-     * @return An {@code Element} to update the originating
-     *     player with the result of the demand.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
 
@@ -82,29 +80,25 @@ public class DeclineMoundsMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         LostCityRumour rumour = tile.getLostCityRumour();
         if (rumour == null
             || rumour.getType() != LostCityRumour.RumourType.MOUNDS) {
             return serverPlayer.clientError("No mounds rumour on tile: "
-                + tile.getId())
-                .build(serverPlayer);
+                + tile.getId());
         }
 
         // Clear the mounds.
-        return server.getInGameController()
-            .declineMounds(serverPlayer, tile)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .declineMounds(serverPlayer, tile);
     }
 }

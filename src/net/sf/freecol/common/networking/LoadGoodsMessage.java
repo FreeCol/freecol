@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -76,16 +77,13 @@ public class LoadGoodsMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "loadGoods"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the carrier, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = serverPlayer.getGame();
-        final Specification spec = server.getSpecification();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
+        final Specification spec = freeColServer.getSpecification();
         final String locationId = getAttribute(LOCATION_TAG);
         final String typeId = getAttribute(TYPE_TAG);
         final String carrierId = getAttribute(CARRIER_TAG);
@@ -93,47 +91,41 @@ public class LoadGoodsMessage extends AttributeMessage {
 
         FreeColGameObject fcgo = game.getFreeColGameObject(locationId);
         if (!(fcgo instanceof Location)) {
-            return serverPlayer.clientError("Not a location: " + locationId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a location: " + locationId);
         }
 
         Unit carrier;
         try {
             carrier = serverPlayer.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (!carrier.canCarryGoods()) {
-            return serverPlayer.clientError("Not a goods carrier: " + carrierId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a goods carrier: "
+                + carrierId);
         } else if (carrier.getTradeLocation() == null) {
-            return serverPlayer.clientError("Not at a trade location: " + carrierId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not at a trade location: "
+                + carrierId);
         }
 
         GoodsType type = spec.getGoodsType(typeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a goods type: " + typeId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a goods type: " + typeId);
         }
 
         int amount;
         try {
             amount = Integer.parseInt(amountString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad amount: " + amountString)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Bad amount: " + amountString);
         }
         if (amount <= 0) {
             return serverPlayer.clientError("Amount must be positive: "
-                + amountString)
-                .build(serverPlayer);
+                + amountString);
         }
 
         // Load the goods
-        return server.getInGameController()
-            .loadGoods(serverPlayer, (Location)fcgo, type, amount, carrier)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .loadGoods(serverPlayer, (Location)fcgo, type, amount, carrier);
     }
 }

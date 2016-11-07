@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -74,26 +75,22 @@ public class SetGoodsLevelsMessage extends DOMMessage {
 
 
     /**
-     * Handle a "setGoodsLevels"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update {@code Element} updating the colony.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         Colony colony;
         try {
             colony = serverPlayer.getOurFreeColGameObject(this.colonyId,
-                                                    Colony.class);
+                                                          Colony.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         // Proceed to set.
-        return server.getInGameController()
-            .setGoodsLevels(serverPlayer, colony, this.data)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .setGoodsLevels(serverPlayer, colony, this.data);
     }
 
     /**

@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -63,16 +64,12 @@ public class BuildColonyMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "buildColony"-message.
-     *
-     * @param server The {@code FreeColServer} handling the request.
-     * @param serverPlayer The {@code ServerPlayer} building the colony.
-     * @return An update {@code Element} defining the new colony
-     *     and updating its surrounding tiles, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = server.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final String colonyName = getAttribute(NAME_TAG);
         final String unitId = getAttribute(UNIT_TAG);
 
@@ -80,36 +77,30 @@ public class BuildColonyMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (!unit.canBuildColony()) {
             return serverPlayer.clientError("Unit " + unitId
-                + " can not build colony.")
-                .build(serverPlayer);
+                + " can not build colony.");
         }
 
         if (colonyName == null) {
-            return serverPlayer.clientError("Null colony name")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Null colony name");
         } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
             ; // ok
         } else if (game.getSettlementByName(colonyName) != null) {
             return serverPlayer.clientError("Non-unique colony name "
-                + colonyName)
-                .build(serverPlayer);
+                + colonyName);
         }
 
         Tile tile = unit.getTile();
         if (!serverPlayer.canClaimToFoundSettlement(tile)) {
             return serverPlayer.clientError("Can not build colony on tile "
-                + tile + ": " + serverPlayer.canClaimToFoundSettlementReason(tile))
-                .build(serverPlayer);
+                + tile + ": " + serverPlayer.canClaimToFoundSettlementReason(tile));
         }
 
         // Build can proceed.
-        return server.getInGameController()
-            .buildSettlement(serverPlayer, unit, colonyName)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .buildSettlement(serverPlayer, unit, colonyName);
     }
 }

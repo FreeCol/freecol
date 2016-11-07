@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -119,20 +120,16 @@ public class DeliverGiftMessage extends DOMMessage {
 
 
     /**
-     * Handle a "deliverGift"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the unit and settlement, or an
-     *     error {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         Unit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         IndianSettlement is;
@@ -140,21 +137,18 @@ public class DeliverGiftMessage extends DOMMessage {
             is = unit.getAdjacentSettlement(this.settlementId,
                                             IndianSettlement.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         // Make sure we are trying to deliver something that is there
         if (this.goods.getLocation() != unit) {
             return serverPlayer.clientError("Gift " + this.goods.getId()
-                + " is not with unit " + this.unitId)
-                .build(serverPlayer);
+                + " is not with unit " + this.unitId);
         }
 
         // Proceed to deliver.
-        return server.getInGameController()
-            .deliverGiftToSettlement(serverPlayer, unit, is, goods)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .deliverGiftToSettlement(serverPlayer, unit, is, goods);
     }
 
     /**

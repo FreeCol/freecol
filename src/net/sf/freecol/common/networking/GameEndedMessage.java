@@ -83,6 +83,6 @@ public class GameEndedMessage extends AttributeMessage {
         return getAttribute(HIGH_SCORE_TAG);
     }
 
-    // No server handle() method required.
+    // No server handler method required.
     // This message is only sent to clients.
 }

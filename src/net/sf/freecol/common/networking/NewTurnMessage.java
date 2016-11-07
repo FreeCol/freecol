@@ -71,6 +71,6 @@ public class NewTurnMessage extends AttributeMessage {
     }
 
 
-    // No server handle() method required.
+    // No server handler method required.
     // This message is only sent to clients.
 }

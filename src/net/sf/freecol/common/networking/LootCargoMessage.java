@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -114,30 +115,26 @@ public class LootCargoMessage extends DOMMessage {
 
 
     /**
-     * Handle a "lootCargo"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An {@code Element} encapsulating the looting.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Game game = server.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
 
         Unit winner;
         try {
             winner = getUnit(game);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         // Do not check loserId, as it might have sunk.  It is enough
         // that the attacker knows it.  Similarly the server is better
         // placed to check the goods validity.
 
         // Try to loot.
-        return server.getInGameController()
-            .lootCargo(serverPlayer, winner, this.loserId, goods)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .lootCargo(serverPlayer, winner, this.loserId, goods);
     }
 
     /**

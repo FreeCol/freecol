@@ -186,21 +186,15 @@ public class DiplomacyMessage extends DOMMessage {
 
 
     /**
-     * Handle a "diplomacy"-message.
-     *
-     * @param server The {@code FreeColServer} that handles the message.
-     * @param connection The {@code Connection} the message is from.
-     * @return An {@code Element} describing the trade with
-     *     either "accept" or "reject" status, null on trade failure,
-     *     or an error {@code Element} on outright error.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = serverPlayer.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
 
         if (this.agreement == null) {
-            return serverPlayer.clientError("Null diplomatic agreement.")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Null diplomatic agreement");
         }
 
         Unit ourUnit = null;
@@ -225,7 +219,7 @@ public class DiplomacyMessage extends DOMMessage {
         } else {
             cs = serverPlayer.clientError("Our object is bogus: " + our);
         }
-        if (cs != null) return cs.build(serverPlayer);
+        if (cs != null) return cs;
         
         Unit otherUnit = null;
         Colony otherColony = null;
@@ -271,10 +265,9 @@ public class DiplomacyMessage extends DOMMessage {
         } else {
             cs = serverPlayer.clientError("Other object is bogus: " + other);
         }
-        if (cs != null) return cs.build(serverPlayer);
+        if (cs != null) return cs;
         if (ourUnit == null && otherUnit == null) {
-            return serverPlayer.clientError("Both units null")
-                .build(serverPlayer);
+            return serverPlayer.clientError("Both units null");
         }
 
         Player senderPlayer = this.agreement.getSender();
@@ -286,9 +279,9 @@ public class DiplomacyMessage extends DOMMessage {
         } else if (senderPlayer.isREF() || recipientPlayer.isREF()) {
             cs = serverPlayer.clientError("The REF does not negotiate");
         }
-        if (cs != null) return cs.build(serverPlayer);
+        if (cs != null) return cs;
 
-        final InGameController igc = server.getInGameController();
+        final InGameController igc = freeColServer.getInGameController();
         switch (this.agreement.getContext()) {
         case CONTACT:
             cs = igc.europeanFirstContact(serverPlayer, ourUnit, ourColony,
@@ -350,7 +343,7 @@ public class DiplomacyMessage extends DOMMessage {
         }
         if (cs == null) cs = serverPlayer.clientError("Invalid diplomacy for "
             + this.agreement.getContext());
-        return cs.build(serverPlayer);
+        return cs;
     }
 
     /**

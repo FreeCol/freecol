@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -65,15 +66,12 @@ public class ChangeWorkTypeMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "changeWorkType"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the changes, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        final Specification spec = server.getSpecification();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Specification spec = freeColServer.getSpecification();
         final String unitId = getAttribute(UNIT_TAG);
         final String workTypeId = getAttribute(WORK_TYPE_TAG);
 
@@ -81,26 +79,21 @@ public class ChangeWorkTypeMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (!unit.hasTile()) {
             return serverPlayer.clientError("Unit is not on the map: "
-                + unitId)
-                .build(serverPlayer);
+                + unitId);
         }
 
         GoodsType type = spec.getGoodsType(workTypeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a goods type: "
-                + workTypeId)
-                .build(serverPlayer);
+            return serverPlayer.clientError("Not a goods type: " + workTypeId);
         }
 
         // Proceed to changeWorkType.
-        return server.getInGameController()
-            .changeWorkType(serverPlayer, unit, type)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .changeWorkType(serverPlayer, unit, type);
     }
 }
 

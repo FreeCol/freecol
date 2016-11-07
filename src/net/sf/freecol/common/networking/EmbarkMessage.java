@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -71,14 +72,11 @@ public class EmbarkMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "embark"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the embarked unit, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String carrierId = getAttribute(CARRIER_TAG);
         final String directionString = getAttribute(DIRECTION_TAG);
@@ -87,16 +85,14 @@ public class EmbarkMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Unit carrier;
         try {
             carrier = serverPlayer.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Location sourceLocation = unit.getLocation();
@@ -109,35 +105,30 @@ public class EmbarkMessage extends AttributeMessage {
                     + " at " + sourceLocation.getId()
                     + " and carrier " + carrierId
                     + " at " + carrier.getLocation().getId()
-                    + " are not co-located.")
-                    .build(serverPlayer);
+                    + " are not co-located.");
             }
         } else {
             // Units have to be on the map and have moves left if a
             // move is involved.
             if (unit.getMovesLeft() <= 0) {
                 return serverPlayer.clientError("Unit has no moves left: "
-                    + unitId)
-                    .build(serverPlayer);
+                    + unitId);
             }
 
             Tile destinationTile = null;
             try {
                 destinationTile = unit.getNeighbourTile(directionString);
             } catch (Exception e) {
-                return serverPlayer.clientError(e.getMessage())
-                    .build(serverPlayer);
+                return serverPlayer.clientError(e.getMessage());
             }
             if (carrier.getTile() != destinationTile) {
                 return serverPlayer.clientError("Carrier: " + carrierId
-                    + " is not at destination tile: " + destinationTile)
-                    .build(serverPlayer);
+                    + " is not at destination tile: " + destinationTile);
             }
         }
 
         // Proceed to embark
-        return server.getInGameController()
-            .embarkUnit(serverPlayer, unit, carrier)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .embarkUnit(serverPlayer, unit, carrier);
     }
 }

@@ -67,6 +67,6 @@ public class FountainOfYouthMessage extends AttributeMessage {
         return getIntegerAttribute(MIGRANTS_TAG);
     }
 
-    // No server handle() method required.
+    // No server handler required.
     // This message is only sent to clients.
 }

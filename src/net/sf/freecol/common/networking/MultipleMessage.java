@@ -92,14 +92,10 @@ public class MultipleMessage extends DOMMessage {
 
 
     /**
-     * Handle a "multiple"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} message was received on.
-     * @return A collapsed resolution of the submessages.
+     * About to go away.
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        return applyHandler(server.getInGameInputHandler(), connection);
+    public Element handle(FreeColServer freeColServer, Connection connection) {
+        return applyHandler(freeColServer.getInGameInputHandler(), connection);
     }
 
 

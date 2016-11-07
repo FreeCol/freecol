@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -59,35 +60,28 @@ public class AbandonColonyMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "abandonColony"-message.
-     *
-     * @param server The {@code FreeColServer} handling the request.
-     * @param serverPlayer The {@code ServerPlayer} abandoning the colony.
-     * @return An update {@code Element} defining the new colony
-     *     and updating its surrounding tiles, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String colonyId = getAttribute(COLONY_TAG);
 
         Colony colony;
         try {
             colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
         if (colony.getUnitCount() != 0) {
             return serverPlayer.clientError("Attempt to abandon colony "
                 + colonyId + " with non-zero unit count "
-                + Integer.toString(colony.getUnitCount()))
-                .build(serverPlayer);
+                + Integer.toString(colony.getUnitCount()));
         }
 
         // Proceed to abandon
         // FIXME: Player.settlements is still being fixed on the client side.
-        return server.getInGameController()
-            .abandonSettlement(serverPlayer, colony)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .abandonSettlement(serverPlayer, colony);
     }
 }

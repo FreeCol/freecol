@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -169,17 +170,13 @@ public class MonarchActionMessage extends DOMMessage {
 
 
     /**
-     * Handles a "monarchAction"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An {@code Element} containing the response.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        // Try to resolve the action.
-        return server.getInGameController()
-            .monarchAction(serverPlayer, getAction(), getResult())
-            .build(serverPlayer);
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return freeColServer.getInGameController()
+            .monarchAction(serverPlayer, getAction(), getResult());
     }
 
     /**

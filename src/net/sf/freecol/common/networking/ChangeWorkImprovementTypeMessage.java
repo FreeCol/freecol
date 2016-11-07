@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -68,14 +69,11 @@ public class ChangeWorkImprovementTypeMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "changeWorkImprovementType"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return An update containing the changed unit, or an error
-     *     {@code Element} on failure.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         final String unitId = getAttribute(UNIT_TAG);
         final String improvementId = getAttribute(IMPROVEMENT_TYPE_TAG);
 
@@ -83,53 +81,44 @@ public class ChangeWorkImprovementTypeMessage extends AttributeMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
+            return serverPlayer.clientError(e.getMessage());
         }
 
         Tile tile = unit.getTile();
         if (tile == null) {
             return serverPlayer.clientError("Unit is not on the map: "
-                + unitId)
-                .build(serverPlayer);
+                + unitId);
         } else if (!unit.hasAbility(Ability.IMPROVE_TERRAIN)) {
             return serverPlayer.clientError("Unit can not improve tiles: "
-                + unitId)
-                .build(serverPlayer);
+                + unitId);
         }
 
-        TileImprovementType type = server.getSpecification()
+        TileImprovementType type = freeColServer.getSpecification()
             .getTileImprovementType(improvementId);
         TileImprovement improvement;
         if (type == null) {
             return serverPlayer.clientError("Not a tile improvement type: "
-                + improvementId)
-                .build(serverPlayer);
+                + improvementId);
         } else if (type.isNatural()) {
             return serverPlayer.clientError("ImprovementType must not be natural: "
-                + improvementId)
-                .build(serverPlayer);
+                + improvementId);
         } else if (!type.isTileTypeAllowed(tile.getType())) {
             return serverPlayer.clientError("ImprovementType not allowed on tile: "
-                + improvementId)
-                .build(serverPlayer);
+                + improvementId);
         } else if ((improvement = tile.getTileImprovement(type)) == null) {
             if (!type.isWorkerAllowed(unit)) {
                 return serverPlayer.clientError("Unit can not create improvement: "
-                    + improvementId)
-                    .build(serverPlayer);
+                    + improvementId);
             }
         } else { // Has improvement, check if worker can contribute to it
             if (!improvement.isWorkerAllowed(unit)) {
                 return serverPlayer.clientError("Unit can not work on improvement: "
-                    + improvementId)
-                    .build(serverPlayer);
+                    + improvementId);
             }
         }
 
         // Proceed to change.
-        return server.getInGameController()
-            .changeWorkImprovementType(serverPlayer, unit, type)
-            .build(serverPlayer);
+        return freeColServer.getInGameController()
+            .changeWorkImprovementType(serverPlayer, unit, type);
     }
 }
