@@ -1568,6 +1568,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         for (Player p : transform(getGame().getLiveEuropeanPlayers(player),
                                   x -> !x.isREF())) {
             NationSummary ns = getNationSummary(p);
+            if (ns == null) continue;
             if (p == player) {
                 navalStrength = ns.getNavalStrength();
             } else {
