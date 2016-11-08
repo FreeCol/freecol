@@ -3088,6 +3088,21 @@ public final class InGameController extends Controller {
 
 
     /**
+     * Create a new trade route for a player.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that needs a new route.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet newTradeRoute(ServerPlayer serverPlayer) {
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+            new NewTradeRouteMessage()
+                .setTradeRoute(serverPlayer.newTradeRoute()));
+        return cs;
+    }
+
+
+    /**
      * Pay arrears.
      *
      * @param serverPlayer The {@code ServerPlayer} that owns the unit.

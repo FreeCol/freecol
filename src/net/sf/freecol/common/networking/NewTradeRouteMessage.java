@@ -67,6 +67,18 @@ public class NewTradeRouteMessage extends DOMMessage {
         return this.tradeRoute;
     }
 
+    /**
+     * Set the new trade route.
+     *
+     * @param tradeRoute The {@code TradeRoute} to attach.
+     * @return This message.
+     */
+    public NewTradeRouteMessage setTradeRoute(TradeRoute tradeRoute) {
+        this.tradeRoute = tradeRoute;
+        return this;
+    }
+
+
 
     /**
      * Handle a "newTradeRoute"-message.
@@ -76,8 +88,9 @@ public class NewTradeRouteMessage extends DOMMessage {
      * @return An update setting the trade route.
      */
     public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        this.tradeRoute = serverPlayer.newTradeRoute();
-        return this.toXMLElement();
+        return server.getInGameController()
+            .newTradeRoute(serverPlayer)
+            .build(serverPlayer);
     }
 
     /**
