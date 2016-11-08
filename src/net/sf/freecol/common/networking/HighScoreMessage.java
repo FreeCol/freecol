@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
@@ -54,6 +55,7 @@ public class HighScoreMessage extends DOMMessage {
         super(TAG);
 
         this.key = key;
+        this.scores.clear();
     }
 
     /**
@@ -63,11 +65,9 @@ public class HighScoreMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public HighScoreMessage(Game game, Element element) {
-        super(TAG);
+        this(getStringAttribute(element, KEY_TAG));
 
-        this.key = getStringAttribute(element, KEY_TAG);
-        this.scores.clear();
-        this.scores.addAll(getChildren(game, element, HighScore.class));
+        setScores(getChildren(game, element, HighScore.class));
     }
 
 
@@ -91,6 +91,18 @@ public class HighScoreMessage extends DOMMessage {
         return this.scores;
     }
 
+    /**
+     * Set the scores for this message.
+     *
+     * @param scores A list of {@code HighScore}s to add.
+     * @return This message.
+     */
+    public HighScoreMessage setScores(List<HighScore> scores) {
+        this.scores.clear();
+        this.scores.addAll(scores);
+        return this;
+    }
+
     
     /**
      * Handle a "highScore"-message.
@@ -100,8 +112,10 @@ public class HighScoreMessage extends DOMMessage {
      * @return An update containing the high scores.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        this.scores.addAll(server.getInGameController().getHighScores());
-        return this.toXMLElement();
+        final ServerPlayer serverPlayer = server.getPlayer(connection);
+        return server.getInGameController()
+            .getHighScores(serverPlayer, this.key)
+            .build(serverPlayer);
     }
 
     /**

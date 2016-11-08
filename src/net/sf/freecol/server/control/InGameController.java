@@ -104,12 +104,14 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GameEndedMessage;
+import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
+import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.Arrangement;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
@@ -2334,13 +2336,20 @@ public final class InGameController extends Controller {
         return cs;
     }
 
+
     /**
      * Gets the list of high scores.
      *
-     * @return A list of {@code HighScore}.
+     * @param serverPlayer The {@code ServerPlayer} querying the scores.
+     * @param A key for the high score message.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
-    public List<HighScore> getHighScores() {
-        return HighScore.loadHighScores();
+    public ChangeSet getHighScores(ServerPlayer serverPlayer, String key) {
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+            new HighScoreMessage(key)
+                .setScores(HighScore.loadHighScores()));
+        return cs;
     }
 
 
