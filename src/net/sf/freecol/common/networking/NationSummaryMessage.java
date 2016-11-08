@@ -125,9 +125,9 @@ public class NationSummaryMessage extends DOMMessage {
             return null;
         }
 
-        // Proceed to get the summary.
-        setNationSummary(new NationSummary(player, serverPlayer));
-        return toXMLElement();
+        return server.getInGameController()
+            .nationSummary(serverPlayer, player)
+            .build(serverPlayer);
     }
 
     /**

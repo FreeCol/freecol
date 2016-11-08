@@ -2816,6 +2816,22 @@ public final class InGameController extends Controller {
 
 
     /**
+     * Get a nation summary.
+     *
+     * @param serverPlayer The {@code ServerPlayer} to make the summary for.
+     * @param player The {@code Player} to summarize.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet nationSummary(ServerPlayer serverPlayer, Player player) {
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+            new NationSummaryMessage(player)
+                .setNationSummary(new NationSummary(player, serverPlayer)));
+        return cs;
+    }
+
+
+    /**
      * Handle first contact between European and native player.
      *
      * Note that we check for a diplomacy session, but only bother in
