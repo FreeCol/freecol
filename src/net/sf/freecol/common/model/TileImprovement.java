@@ -379,6 +379,8 @@ public class TileImprovement extends TileItem implements Named {
      * @return The actual encoded connections found.
      */
     public String updateRiverConnections(String conns) {
+        // FIXME: Consider checking conns for incompatible length and content
+        //        to prevent more bugs.
         if (!isRiver()) return null;
         final Tile tile = getTile();
         int i = 0;
