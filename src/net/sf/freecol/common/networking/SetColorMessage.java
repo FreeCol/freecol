@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -91,15 +92,12 @@ public class SetColorMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "setColor"-message from a client.
-     * 
-     * @param server The {@code FreeColServer} that handles the message.
-     * @param connection The {@code Connection} the message is from.
-     * @return Null.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Specification spec = serverPlayer.getGame().getSpecification();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Specification spec = freeColServer.getGame().getSpecification();
         
         if (serverPlayer != null) {
             Nation nation = getNation(spec);
@@ -107,8 +105,8 @@ public class SetColorMessage extends AttributeMessage {
                 Color color = getColor();
                 if (color != null) {
                     nation.setColor(color);
-                    server.sendToAll(new SetColorMessage(nation, color),
-                                     connection);
+                    freeColServer.sendToAll(new SetColorMessage(nation, color),
+                                            serverPlayer);
                 } else {
                     logger.warning("Invalid color: " + this.toString());
                 }

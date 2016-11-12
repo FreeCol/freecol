@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -94,6 +95,15 @@ public class TrivialMessage extends DOMMessage {
     }
 
 
+    private InGameController igc(FreeColServer freeColServer) {
+        return freeColServer.getInGameController();
+    }
+
+    private PreGameController pgc(FreeColServer freeColServer) {
+        return freeColServer.getPreGameController();
+    }
+
+
     // Public interface
 
     /**
@@ -113,22 +123,21 @@ public class TrivialMessage extends DOMMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final InGameController igc = freeColServer.getInGameController();
         switch (this.type) {
         case CLOSE_MENUS_TAG:
             return serverPlayer.clientError("Close menus in server?!?");
         case CONTINUE_TAG:
-            return igc.continuePlaying(serverPlayer);
+            return igc(freeColServer).continuePlaying(serverPlayer);
         case END_TURN_TAG:
-            return igc.endTurn(serverPlayer);
+            return igc(freeColServer).endTurn(serverPlayer);
         case ENTER_REVENGE_MODE_TAG:
-            return igc.enterRevengeMode(serverPlayer);
-        case RECONNECT_TAG:
+            return igc(freeColServer).enterRevengeMode(serverPlayer);
+        case RECONNECT_TAG: // Only sent to client
             break;
         case REQUEST_LAUNCH_TAG:
-            break;
+            return pgc(freeColServer).requestLaunch(serverPlayer);
         case RETIRE_TAG:
-            return igc.retire(serverPlayer);
+            return igc(freeColServer).retire(serverPlayer);
         case START_GAME_TAG:
             break;
         default:

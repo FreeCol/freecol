@@ -74,12 +74,8 @@ public class SaveLoadTest extends FreeColTestCase {
             .getMapGeneratorOptions()
             .getOption(MapGeneratorOptions.IMPORT_FILE);
         importOption.setValue(file);
-        Controller c = server.getController();
-        assertNotNull(c);
-        assertTrue(c instanceof PreGameController);
-        PreGameController pgc = (PreGameController)c;
         try {
-            pgc.startGame();
+            server.startGame();
         } catch (FreeColException e) {
             fail(e.getMessage());
         }

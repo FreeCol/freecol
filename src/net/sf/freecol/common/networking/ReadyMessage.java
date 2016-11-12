@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -84,20 +85,16 @@ public class ReadyMessage extends AttributeMessage {
 
 
     /**
-     * Handles a "ready"-message from a client.
-     * 
-     * @param server The {@code FreeColServer} that handles the message.
-     * @param connection The {@code Connection} the message is from.
-     * @return Null.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
         if (serverPlayer != null) {
             boolean ready = getValue();
             serverPlayer.setReady(ready);
-            server.sendToAll(new ReadyMessage(serverPlayer, ready),
-                             connection);
+            freeColServer.sendToAll(new ReadyMessage(serverPlayer, ready),
+                                    serverPlayer);
         } else {
             logger.warning("Ready from unknown connection.");
         }

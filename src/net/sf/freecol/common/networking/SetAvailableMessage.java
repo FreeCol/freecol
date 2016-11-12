@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -86,25 +87,22 @@ public class SetAvailableMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "setAvailable"-message from a client.
-     * 
-     * @param server The {@code FreeColServer} that handles the message.
-     * @param connection The {@code Connection} the message is from.
-     * @return Null.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = serverPlayer.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final Specification spec = game.getSpecification();
         
         if (serverPlayer != null) {
             Nation nation = getNation(spec);
             NationState state = getNationState();
             game.getNationOptions().setNationState(nation, state);
-            server.sendToAll(new SetAvailableMessage(nation, state),
-                             connection);
+            freeColServer.sendToAll(new SetAvailableMessage(nation, state),
+                                    serverPlayer);
         } else {
-            logger.warning("setAvailable from unknown connection.");
+            logger.warning("setAvailable from unknown player.");
         }
         return null;
     }

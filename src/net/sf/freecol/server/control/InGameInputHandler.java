@@ -19,10 +19,6 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.logging.Logger;
-
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.AssignTeacherMessage;
@@ -99,14 +95,12 @@ import org.w3c.dom.Element;
  */
 public final class InGameInputHandler extends ServerInputHandler {
 
-    private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
-
 
     /**
      * Create a new server in-game input handler.
      *
-     * Note: all the handler lamdbas call getGame() because it is not
-     * necessarily available when the constructor is called.
+     * Note: all the handler lamdbas call getGame() because the game
+     * is not necessarily available when the constructor is called.
      * 
      * @param freeColServer The main server object.
      */
@@ -305,7 +299,7 @@ public final class InGameInputHandler extends ServerInputHandler {
 
         register(MultipleMessage.TAG,
             (Connection connection, Element element) ->
-            new MultipleMessage(getGame(), element)
-                .handle(freeColServer, connection));
+                new MultipleMessage(getGame(), element)
+                    .handle(freeColServer, connection));
     }
 }

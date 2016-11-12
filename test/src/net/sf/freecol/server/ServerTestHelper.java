@@ -132,12 +132,8 @@ public final class ServerTestHelper {
         FreeColServer serv = startServer(false, true);
 
         // generate a random map
-        Controller c = serv.getController();
-        assertNotNull(c);
-        assertTrue(c instanceof PreGameController);
-        PreGameController pgc = (PreGameController) c;
         try {
-            pgc.startGame();
+            serv.startGame();
         } catch (FreeColException e) {
             fail(e.getMessage());
         }
@@ -186,9 +182,8 @@ public final class ServerTestHelper {
         stopServerGame();
         FreeColServer serv = startServer(false, true, spec);
         serv.setMapGenerator(new MockMapGenerator(serv.getGame(), map));
-        PreGameController pgc = (PreGameController) serv.getController();
         try {
-            pgc.startGame();
+            serv.startGame();
         } catch (FreeColException e) {
             fail("Failed to start game: " + e.getMessage());
         }

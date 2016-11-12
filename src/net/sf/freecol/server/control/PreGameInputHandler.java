@@ -19,22 +19,7 @@
 
 package net.sf.freecol.server.control;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.NationOptions.Advantages;
-import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.model.NationType;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.ReadyMessage;
 import net.sf.freecol.common.networking.SetAvailableMessage;
@@ -51,122 +36,43 @@ import org.w3c.dom.Element;
 
 
 /**
- * Handles the network messages that arrives before the game starts.
+ * Handle messages that arrive before the game starts.
  * 
  * @see PreGameController
  */
 public final class PreGameInputHandler extends ServerInputHandler {
 
-    private static final Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
-
-    /** Is the game launching yet. */
-    private boolean launching = false;
-
-
     /**
-     * The constructor to use.
+     * Create the a new pre-game controller.
      * 
      * @param freeColServer The main server object.
      */
     public PreGameInputHandler(FreeColServer freeColServer) {
         super(freeColServer);
 
-        final Game game = getGame();
-
         register(ReadyMessage.TAG,
-            (Connection connection, Element element) ->
-                new ReadyMessage(game, element)
-                    .handle(freeColServer, connection));
+            (Connection conn, Element e) -> handler(false, conn,
+                new ReadyMessage(getGame(), e)));
         register(TrivialMessage.REQUEST_LAUNCH_TAG,
-            (Connection connection, Element element) ->
-                requestLaunch(connection, element));
+            (Connection conn, Element e) -> handler(false, conn,
+                TrivialMessage.REQUEST_LAUNCH_MESSAGE));
         register(SetAvailableMessage.TAG,
-            (Connection connection, Element element) ->
-                new SetAvailableMessage(game, element)
-                    .handle(freeColServer, connection));
+            (Connection conn, Element e) -> handler(false, conn,
+                new SetAvailableMessage(getGame(), e)));
         register(SetColorMessage.TAG,
-            (Connection connection, Element element) ->
-                new SetColorMessage(game, element)
-                    .handle(freeColServer, connection));
+            (Connection conn, Element e) -> handler(false, conn,
+                new SetColorMessage(getGame(), e)));
         register(SetNationMessage.TAG,
-            (Connection connection, Element element) ->
-                new SetNationMessage(game, element)
-                    .handle(freeColServer, connection));
+            (Connection conn, Element e) -> handler(false, conn,
+                new SetNationMessage(getGame(), e)));
         register(SetNationTypeMessage.TAG,
-            (Connection connection, Element element) ->
-                new SetNationTypeMessage(game, element)
-                    .handle(freeColServer, connection));
+            (Connection conn, Element e) -> handler(false, conn,
+                new SetNationTypeMessage(getGame(), e)));
         register(UpdateGameOptionsMessage.TAG,
-            (Connection connection, Element element) ->
-                new UpdateGameOptionsMessage(game, element)
-                    .handle(freeColServer, connection));
+            (Connection conn, Element e) -> handler(false, conn,
+                new UpdateGameOptionsMessage(getGame(), e)));
         register(UpdateMapGeneratorOptionsMessage.TAG,
-            (Connection connection, Element element) ->
-                new UpdateMapGeneratorOptionsMessage(game, element)
-                    .handle(freeColServer, connection));
-    }
-
-    /**
-     * Set the launching state.
-     *
-     * @param launching The new launching state.
-     * @return The former launching state.
-     */
-    private synchronized boolean setLaunching(boolean launching) {
-        boolean old = this.launching;
-        this.launching = launching;
-        return old;
-    }
-
-    /**
-     * Handles a "requestLaunch"-message from a client.
-     * 
-     * @param connection The {@code Connection} the message came from.
-     * @param element The {@code Element} containing the request.
-     * @return Null, or an error message on failure.
-     */
-    private Element requestLaunch(Connection connection,
-                                  @SuppressWarnings("unused")Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer player = freeColServer.getPlayer(connection);
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-
-        // Check if launching player is an admin.
-        if (!player.isAdmin()) {
-            return new ErrorMessage(StringTemplate
-                .template("server.onlyAdminCanLaunch"))
-                .toXMLElement();
-        }
-        player.setReady(true);
-        if (setLaunching(true)) return null;
-
-        // Check that no two players have the same nation
-        List<Nation> nations = new ArrayList<>();
-        for (Player p : game.getLivePlayerList()) {
-            final Nation nation = spec.getNation(p.getNationId());
-            if (nations.contains(nation)) {
-                setLaunching(false);
-                return new ErrorMessage(StringTemplate
-                    .template("server.invalidPlayerNations"))
-                    .toXMLElement();
-            }
-            nations.add(nation);
-        }
-
-        // Check if all players are ready.
-        if (!game.allPlayersReadyToLaunch()) {
-            setLaunching(false);
-            return new ErrorMessage(StringTemplate
-                .template("server.notAllReady"))
-                .toXMLElement();
-        }
-        try {
-            ((PreGameController)freeColServer.getController()).startGame();
-        } catch (FreeColException e) {
-            return new ErrorMessage(e).toXMLElement();
-        }
-
-        return null;
+            (Connection conn, Element e) -> handler(false, conn,
+                new UpdateMapGeneratorOptionsMessage(getGame(), e)));
     }
 }

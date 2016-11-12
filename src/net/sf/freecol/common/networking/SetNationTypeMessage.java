@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -87,20 +88,17 @@ public class SetNationTypeMessage extends AttributeMessage {
 
 
     /**
-     * Handles a "setNationType"-message from a client.
-     * 
-     * @param server The {@code FreeColServer} that handles the message.
-     * @param connection The {@code Connection} the message is from.
-     * @return Null or an error-message.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = serverPlayer.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final Specification spec = game.getSpecification();
 
         if (serverPlayer != null) {
-            NationType fixedNationType = spec.getNation(serverPlayer.getNationId())
-                .getType();
+            NationType fixedNationType
+                = spec.getNation(serverPlayer.getNationId()).getType();
             NationType nationType = getValue(spec);
             boolean ok;
             switch (game.getNationOptions().getNationalAdvantages()) {
@@ -120,13 +118,12 @@ public class SetNationTypeMessage extends AttributeMessage {
             }
             if (ok) {
                 serverPlayer.changeNationType(nationType);
-                server.sendToAll(new SetNationTypeMessage(serverPlayer, nationType),
-                                 connection);
+                freeColServer.sendToAll(new SetNationTypeMessage(serverPlayer, nationType),
+                                        serverPlayer);
             } else {
-                return new ErrorMessage(StringTemplate
+                return serverPlayer.clientError(StringTemplate
                     .template("server.badNationType")
-                    .addName("%nationType%", String.valueOf(nationType)))
-                    .toXMLElement();
+                    .addName("%nationType%", String.valueOf(nationType)));
             }
         } else {
             logger.warning("setNationType from unknown connection.");

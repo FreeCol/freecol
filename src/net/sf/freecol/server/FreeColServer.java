@@ -405,11 +405,11 @@ public final class FreeColServer {
     /**
      * Gets the {@code UserConnectionHandler}.
      *
-     * @return The {@code UserConnectionHandler} that is beeing used when
-     *         new client connect.
+     * @return The {@code UserConnectionHandler} that is used when a
+     *     new client connects.
      */
     public UserConnectionHandler getUserConnectionHandler() {
-        return userConnectionHandler;
+        return this.userConnectionHandler;
     }
 
     /**
@@ -418,11 +418,8 @@ public final class FreeColServer {
      * @return The {@code Controller}.
      */
     public Controller getController() {
-        if (getGameState() == GameState.IN_GAME) {
-            return inGameController;
-        } else {
-            return preGameController;
-        }
+        return (getGameState() == GameState.IN_GAME) ? this.inGameController
+            : this.preGameController;
     }
 
     /**
@@ -431,7 +428,16 @@ public final class FreeColServer {
      * @return The {@code PreGameInputHandler}.
      */
     public PreGameInputHandler getPreGameInputHandler() {
-        return preGameInputHandler;
+        return this.preGameInputHandler;
+    }
+
+    /**
+     * Gets the {@code PreGameController}.
+     *
+     * @return The {@code PreGameController}.
+     */
+    public PreGameController getPreGameController() {
+        return this.preGameController;
     }
 
     /**
@@ -440,7 +446,7 @@ public final class FreeColServer {
      * @return The {@code InGameInputHandler}.
      */
     public InGameInputHandler getInGameInputHandler() {
-        return inGameInputHandler;
+        return this.inGameInputHandler;
     }
 
     /**
@@ -449,17 +455,17 @@ public final class FreeColServer {
      * @return The controller from making a new turn etc.
      */
     public InGameController getInGameController() {
-        return inGameController;
+        return this.inGameController;
     }
 
     /**
      * Gets the {@code Game} that is being played.
      *
      * @return The {@code Game} which is the main class of the game-model
-     *         being used in this game.
+     *     being used in this game.
      */
     public ServerGame getGame() {
-        return game;
+        return this.game;
     }
 
     /**
@@ -477,7 +483,7 @@ public final class FreeColServer {
      * @return The specification from the game.
      */
     public Specification getSpecification() {
-        return game.getSpecification();
+        return this.game.getSpecification();
     }
 
     /**
@@ -578,7 +584,8 @@ public final class FreeColServer {
     /**
      * Start the game.
      *
-     * Called from PreGameController following a requestLaunch message.
+     * Called from PreGameController following a requestLaunch message, or
+     * from the test suite.
      *
      * <ol>
      *   <li>Creates the game.

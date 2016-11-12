@@ -358,6 +358,25 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Convenience function to create a client error message, log it,
      * and wrap it into a change set.
      *
+     * @param template An i18n template.
+     * @return A new {@code ChangeSet}.
+     */
+    public ChangeSet clientError(StringTemplate template) {
+        logger.warning(Messages.message(template));
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
+            Thread.dumpStack();
+        }
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.only(this), ChangeSet.ChangePriority.CHANGE_NORMAL,
+               new ErrorMessage(template));
+        return cs;
+    }
+
+
+    /**
+     * Convenience function to create a client error message, log it,
+     * and wrap it into a change set.
+     *
      * @param message The non-i18n message.
      * @return A new {@code ChangeSet}.
      */

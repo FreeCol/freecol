@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -88,15 +89,12 @@ public class SetNationMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "setNation"-message from a client.
-     * 
-     * @param server The {@code FreeColServer} that handles the message.
-     * @param connection The {@code Connection} the message is from.
-     * @return Null or an error-message.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = serverPlayer.getGame();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
         final Specification spec = game.getSpecification();
 
         if (serverPlayer != null) {
@@ -111,14 +109,13 @@ public class SetNationMessage extends AttributeMessage {
                 && game.getNationOptions().getNations().get(nation)
                     == NationState.AVAILABLE) {
                 serverPlayer.setNation(nation);
-                server.sendToAll(new SetNationMessage(serverPlayer, nation),
-                                 connection);
+                freeColServer.sendToAll(new SetNationMessage(serverPlayer, nation),
+                                        serverPlayer);
             } else {
-                return new ErrorMessage(StringTemplate
+                return serverPlayer.clientError(StringTemplate
                     .template("server.badNation")
                     .addName("%nation%", (nation == null) ? "null"
-                        : nation.getId()))
-                    .toXMLElement();
+                        : nation.getId()));
             }
         } else {
             logger.warning("setNation from unknown connection.");
