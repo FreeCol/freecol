@@ -19,19 +19,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.Field;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-
 import net.sf.freecol.common.model.Role;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 public class UnitTest extends FreeColTestCase {
