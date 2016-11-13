@@ -1213,10 +1213,9 @@ public final class InGameController extends Controller {
      * @param pri A privacy setting, currently a noop.
      */
     public void chat(ServerPlayer serverPlayer, String message, boolean pri) {
-        getGame().sendToOthers(serverPlayer, new ChangeSet()
-            .add(See.all().except(serverPlayer),
-                 ChangeSet.ChangePriority.CHANGE_NORMAL,
-                 new ChatMessage(serverPlayer, message, false)));
+        getGame().sendToOthers(serverPlayer,
+            ChangeSet.simpleChange(See.all().except(serverPlayer),
+                new ChatMessage(serverPlayer, message, false)));
     }
 
 
@@ -2347,11 +2346,8 @@ public final class InGameController extends Controller {
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet getHighScores(ServerPlayer serverPlayer, String key) {
-        ChangeSet cs = new ChangeSet();
-        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-            new HighScoreMessage(key)
-                .setScores(HighScore.loadHighScores()));
-        return cs;
+        return ChangeSet.simpleChange(serverPlayer,
+            new HighScoreMessage(key).setScores(HighScore.loadHighScores()));
     }
 
 
@@ -2825,11 +2821,9 @@ public final class InGameController extends Controller {
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet nationSummary(ServerPlayer serverPlayer, Player player) {
-        ChangeSet cs = new ChangeSet();
-        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+        return ChangeSet.simpleChange(serverPlayer,
             new NationSummaryMessage(player)
                 .setNationSummary(new NationSummary(player, serverPlayer)));
-        return cs;
     }
 
 
@@ -3112,11 +3106,9 @@ public final class InGameController extends Controller {
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet newTradeRoute(ServerPlayer serverPlayer) {
-        ChangeSet cs = new ChangeSet();
-        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+        return ChangeSet.simpleChange(serverPlayer,
             new NewTradeRouteMessage()
                 .setTradeRoute(serverPlayer.newTradeRoute()));
-        return cs;
     }
 
 

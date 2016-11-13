@@ -40,14 +40,16 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Stance;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.networking.SetStanceMessage;
@@ -1898,6 +1900,99 @@ public class ChangeSet {
         return result;
     }
 
+
+    // Convenience functions to create change sets
+    
+    /**
+     * Convenience function to create an i18n client error message and
+     * wrap it into a change set.
+     *
+     * @param serverPlayer An optional {@code ServerPlayer} to restrict
+     *     visibility to.
+     * @param template An i18n template.
+     * @return A new {@code ChangeSet}.
+     */
+    public static ChangeSet clientError(ServerPlayer serverPlayer,
+                                        StringTemplate template) {
+        See see = (serverPlayer == null) ? See.all() : See.only(serverPlayer);
+        return clientError(see, template);
+    }
+
+    /**
+     * Convenience function to create an i18n client error message and
+     * wrap it into a change set.
+     *
+     * @param see The message visibility.
+     * @param template An i18n template.
+     * @return A new {@code ChangeSet}.
+     */
+    public static ChangeSet clientError(See see, StringTemplate template) {
+        ChangeSet cs = new ChangeSet();
+        if (see == null) see = See.all();
+        cs.add(see, ChangeSet.ChangePriority.CHANGE_NORMAL,
+               new ErrorMessage(template));
+        return cs;
+    }
+
+    /**
+     * Convenience function to create a non-i18n client error message
+     * and wrap it into a change set.
+     *
+     * @param serverPlayer An optional {@code ServerPlayer} to restrict
+     *     visibility to.
+     * @param message The message.
+     * @return A new {@code ChangeSet}.
+     */
+    public static ChangeSet clientError(ServerPlayer serverPlayer,
+                                        String message) {
+        See see = (serverPlayer == null) ? See.all() : See.only(serverPlayer);
+        return clientError(see, message);
+    }
+
+    /**
+     * Convenience function to create a non-i18n client error message
+     * and wrap it into a change set.
+     *
+     * @param see The message visibility.
+     * @param message A non-i18n message.
+     * @return A new {@code ChangeSet}.
+     */
+    public static ChangeSet clientError(See see, String message) {
+        ChangeSet cs = new ChangeSet();
+        if (see == null) see = See.all();
+        cs.add(see, ChangeSet.ChangePriority.CHANGE_NORMAL,
+               new ErrorMessage(message));
+        return cs;
+    }
+
+    /**
+     * Convenience function to create a change set containing a message.
+     *
+     * @param serverPlayer An optional {@code ServerPlayer} to restrict
+     *     visibility to.
+     * @param message The message to wrap.
+     * @return A new {@code ChangeSet}.
+     */
+    public static ChangeSet simpleChange(ServerPlayer serverPlayer,
+                                         DOMMessage message) {
+        See see = (serverPlayer == null) ? See.all() : See.only(serverPlayer);
+        return simpleChange(see, message);
+    }
+
+    /**
+     * Convenience function to create a change set containing a message.
+     *
+     * @param see The message visibility.
+     * @param message The message to wrap.
+     * @return A new {@code ChangeSet}.
+     */
+    public static ChangeSet simpleChange(See see, DOMMessage message) {
+        ChangeSet cs = new ChangeSet();
+        cs.add((see == null) ? See.all() : see, ChangePriority.CHANGE_NORMAL,
+               message);
+        return cs;
+    }
+    
 
     // Override Object
 

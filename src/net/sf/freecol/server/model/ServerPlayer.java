@@ -355,8 +355,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Convenience function to create a client error message, log it,
-     * and wrap it into a change set.
+     * Convenience function to create a client error message for this
+     * player, log it, and wrap it into a change set.
      *
      * @param template An i18n template.
      * @return A new {@code ChangeSet}.
@@ -366,10 +366,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
             Thread.dumpStack();
         }
-        ChangeSet cs = new ChangeSet();
-        cs.add(See.only(this), ChangeSet.ChangePriority.CHANGE_NORMAL,
-               new ErrorMessage(template));
-        return cs;
+        return ChangeSet.clientError(See.only(this), template);
     }
 
 
@@ -385,10 +382,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
             Thread.dumpStack();
         }
-        ChangeSet cs = new ChangeSet();
-        cs.add(See.only(this), ChangeSet.ChangePriority.CHANGE_NORMAL,
-               new ErrorMessage(message));
-        return cs;
+        return ChangeSet.clientError(See.only(this), message);
     }
 
     /**
