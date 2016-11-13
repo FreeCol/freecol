@@ -63,21 +63,13 @@ public abstract class FreeColGameObject extends FreeColObject {
 
 
     /**
-     * Creates a new {@code FreeColGameObject}.
-     *
-     * Automatically assign an object identifier and register this
-     * object at the specified {@code Game}.
+     * Create and initialize a new {@code FreeColGameObject}.
      *
      * @param game The enclosing {@code Game}.
      */
     public FreeColGameObject(Game game) {
-        if (game != null) {
-            setGame(game); // Set game before calling internId
-            internId(getXMLTagName() + ":" + game.getNextId());
-        }
-        this.initialized = getId() != null;
-        this.disposed = false;
-    }
+        initialize(game);
+    }        
 
     /**
      * Creates a new {@code FreeColGameObject}.
@@ -96,6 +88,20 @@ public abstract class FreeColGameObject extends FreeColObject {
         this.disposed = false;
     }
 
+    /**
+     * Initialize and register this object in a given game.
+     *
+     * @param game The {@code Game} to attach this object to.
+     */
+    public void initialize(Game game) {
+        if (game != null) {
+            setGame(game); // Set game before calling internId
+            internId(getXMLTagName() + ":" + game.getNextId());
+        }
+        this.initialized = getId() != null;
+        this.disposed = false;
+    }
+        
 
     /**
      * Instantiate an uninitialized FreeColGameObject within a game.

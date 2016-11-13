@@ -208,8 +208,8 @@ public class LoginMessage extends DOMMessage {
 
             // Create and add the new player:
             boolean admin = game.getLivePlayerList().isEmpty();
-            player = new ServerPlayer(game, admin, nation,
-                                      connection.getSocket(), connection);
+            player = new ServerPlayer(game, admin, nation);
+            player.setConnection(connection); //connection.getSocket()
             player.setName(userName);
             game.addPlayer(player);
 

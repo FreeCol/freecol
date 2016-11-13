@@ -20,7 +20,6 @@
 package net.sf.freecol.server.model;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -115,10 +114,8 @@ import org.w3c.dom.Element;
 
 
 /**
- * A {@code Player} with additional (server specific) information.
- *
- * That is: pointers to this player's
- * {@link Connection} and {@link Socket}
+ * A {@code Player} with additional (server specific) information, notably
+ * this player's {@link Connection}.
  */
 public class ServerPlayer extends Player implements ServerModelObject {
 
@@ -153,9 +150,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     // Do not serialize anything below.
 
-    /** The network socket to the player's client. */
-    private Socket socket;
-
     /** The connection for this player. */
     private Connection connection;
 
@@ -188,16 +182,29 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param game The {@code Game} this object belongs to.
      * @param admin Whether the player is the game administrator or not.
      * @param nation The nation of the {@code Player}.
-     * @param socket The socket to the player's client.
-     * @param connection The {@code Connection} for the socket.
      */
-    public ServerPlayer(Game game, boolean admin, Nation nation,
-                        Socket socket, Connection connection) {
+    public ServerPlayer(Game game, boolean admin, Nation nation) {
         super(game);
 
-        if (nation == null) throw new IllegalArgumentException("Null nation");
-        final Specification spec = getSpecification();
+        this.connection = null;
 
+        initialize(game, admin, nation);
+    }
+
+    /**
+     * Complete initialization for this server player.
+     *
+     * Used above and for the stub players created at login.
+     *
+     * @param game The {@code Game} this object belongs to.
+     * @param admin Whether the player is the game administrator or not.
+     * @param nation The nation for this player.
+     */
+    public void initialize(Game game, boolean admin, Nation nation) {
+        if (nation == null) throw new RuntimeException("Null nation");
+
+        this.initialize(game); // Attach to game
+        
         this.name = nation.getRulerName();
         this.admin = admin;
         this.nationId = nation.getId();
@@ -235,6 +242,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     // argue that some level of religious unrest might
                     // contribute to the fact there is an expedition to
                     // the new world underway.
+                    final Specification spec = game.getSpecification();
                     this.immigration = spec.getInteger(GameOptions.PLAYER_IMMIGRATION_BONUS);
                 }
                 this.gold = 0;
@@ -243,14 +251,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 this.gold = Player.GOLD_NOT_ACCOUNTED;
             }
         } else {
-            throw new IllegalArgumentException("Bogus nation: " + nation);
+            throw new RuntimeException("Bogus nation: " + nation);
         }
         this.market = new Market(getGame(), this);
         this.liberty = 0;
         this.currentFather = null;
-
-        this.socket = socket;
-        this.setConnection(connection);
     }
 
 
@@ -275,14 +280,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void setConnected(boolean connected) {
         this.connected = connected;
-    }
-
-    /**
-     * Gets the socket of this player.
-     * @return The {@code Socket}.
-     */
-    public Socket getSocket() {
-        return this.socket;
     }
 
     /**

@@ -2124,7 +2124,7 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerPlayer swedish = null;
         for (Nation n : game.getSpecification().getNations()) {
             if (n.getId().equals("model.nation.swedish")) {
-                swedish = new ServerPlayer(game, false, n, null, null);
+                swedish = new ServerPlayer(game, false, n);
                 swedish.setAI(true);
                 game.addPlayer(swedish);
                 break;

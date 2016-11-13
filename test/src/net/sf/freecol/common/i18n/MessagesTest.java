@@ -404,8 +404,7 @@ public class MessagesTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer)game
             .getPlayerByNationId("model.nation.dutch");
         Nation refNation = dutch.getNation().getREFNation();
-        ServerPlayer dutchREF = new ServerPlayer(game, false, refNation, 
-                                                 null, null);
+        ServerPlayer dutchREF = new ServerPlayer(game, false, refNation);
         ServerPlayer sioux = (ServerPlayer)game
             .getPlayerByNationId("model.nation.sioux");
         Unit unit;

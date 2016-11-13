@@ -135,7 +135,7 @@ public class FreeColMapLoader implements MapLoader {
                                     Player player = game.getPlayerByNationId(nationId);
                                     if (player == null) {
                                         Nation nation = game.getSpecification().getNation(nationId);
-                                        player = new ServerPlayer(game, false, nation, null, null);
+                                        player = new ServerPlayer(game, false, nation);
                                         game.addPlayer(player);
                                     }
                                     tile.setOwner(player);

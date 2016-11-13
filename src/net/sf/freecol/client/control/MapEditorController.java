@@ -96,7 +96,7 @@ public final class MapEditorController extends FreeColClientHolder {
         for (Nation n : spec.getIndianNations()) {
             Player p = game.getPlayerByNation(n);
             if (p == null) {
-                p = new ServerPlayer(game, false, n, null, null);
+                p = new ServerPlayer(game, false, n);
                 game.addPlayer(p);
             }
         }

@@ -242,7 +242,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     lb.add("Native nation ", iPlayer.getNationId(),
                         " not found in spec.\n");
                 } else {
-                    indian = new ServerPlayer(game, false, nation, null, null);
+                    indian = new ServerPlayer(game, false, nation);
                     lb.add("Imported new native nation ",
                         iPlayer.getNationId(), ": ", indian.getId(), "\n");
                     game.addPlayer(indian);

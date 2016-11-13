@@ -171,7 +171,7 @@ public class FreeColTestCase extends TestCase {
         specification.applyDifficultyLevel("model.difficulty.medium");
         for (Nation n : specification.getNations()) {
             if (n.isUnknownEnemy()) continue;
-            Player p = new ServerPlayer(game, false, n, null, null);
+            Player p = new ServerPlayer(game, false, n);
             boolean ai = !n.getType().isEuropean() || n.getType().isREF();
             p.setAI(ai);
             if (ai || game.canAddNewPlayer()) game.addPlayer(p);
