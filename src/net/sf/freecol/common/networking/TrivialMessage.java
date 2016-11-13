@@ -124,25 +124,20 @@ public class TrivialMessage extends DOMMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         switch (this.type) {
-        case CLOSE_MENUS_TAG:
-            return serverPlayer.clientError("Close menus in server?!?");
         case CONTINUE_TAG:
             return igc(freeColServer).continuePlaying(serverPlayer);
         case END_TURN_TAG:
             return igc(freeColServer).endTurn(serverPlayer);
         case ENTER_REVENGE_MODE_TAG:
             return igc(freeColServer).enterRevengeMode(serverPlayer);
-        case RECONNECT_TAG: // Only sent to client
-            break;
         case REQUEST_LAUNCH_TAG:
             return pgc(freeColServer).requestLaunch(serverPlayer);
         case RETIRE_TAG:
             return igc(freeColServer).retire(serverPlayer);
-        case START_GAME_TAG:
-            break;
+        // Only sent to client
+        case CLOSE_MENUS_TAG: case RECONNECT_TAG: case START_GAME_TAG:
         default:
             return super.serverHandler(freeColServer, serverPlayer);
         }
-        return null;
     }        
 }

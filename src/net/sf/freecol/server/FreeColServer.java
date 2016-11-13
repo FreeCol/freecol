@@ -590,7 +590,8 @@ public final class FreeColServer {
      * <ol>
      *   <li>Creates the game.
      *   <li>Sends updated game information to the clients.
-     *   <li>Changes the game state to {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}.
+     *   <li>Changes the game state to
+     *         {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}.
      *   <li>Sends the "startGame"-message to the clients.
      * </ol>
      *
@@ -611,7 +612,7 @@ public final class FreeColServer {
 
         setGameState(FreeColServer.GameState.IN_GAME);
         updateMetaServer(false);
-        sendToAll(TrivialMessage.START_GAME_MESSAGE, (Connection)null);
+        sendToAll(TrivialMessage.START_GAME_MESSAGE, (ServerPlayer)null);
         getServer().setMessageHandlerToAllConnections(getInGameInputHandler());
     }
 

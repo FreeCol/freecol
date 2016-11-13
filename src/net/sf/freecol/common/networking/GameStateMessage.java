@@ -21,7 +21,9 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.FreeColServer.GameState;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
@@ -43,6 +45,15 @@ public class GameStateMessage extends AttributeMessage {
     }
 
     /**
+     * Create a new {@code GameStateMessage} with a given state.
+     */
+    public GameStateMessage(GameState gameState) {
+        super(TAG);
+
+        setAttribute(STATE_TAG, gameState.toString());
+    }
+
+    /**
      * Create a new {@code GameStateMessage} from a
      * supplied element.
      *
@@ -50,7 +61,8 @@ public class GameStateMessage extends AttributeMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public GameStateMessage(Game game, Element element) {
-        super(TAG, STATE_TAG, getStringAttribute(element, STATE_TAG));
+        this(getEnumAttribute(element, STATE_TAG,
+                              GameState.class, (GameState)null));
     }
 
 
@@ -62,15 +74,13 @@ public class GameStateMessage extends AttributeMessage {
 
 
     /**
-     * Handle a "gameState"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} message was received on.
-     * @return An {@code Element} to update the originating player
-     *     with the result of the query.
+     * {@inheritDoc}
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        setAttribute(STATE_TAG, server.getGameState().toString());
-        return this.toXMLElement();
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+        @SuppressWarnings("unused") ServerPlayer serverPlayer) {
+        // Called from UserConnectionHandler, without serverPlayer being defined
+        return ChangeSet.simpleChange((ServerPlayer)null,
+            new GameStateMessage(freeColServer.getGameState()));
     }
 }

@@ -177,6 +177,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Special constructor to make a simple stub player with only the
+     * connection information valid.  Needed when a new player logs in.
+     *
+     * @param connection The initial {@code Connection}.
+     */
+    public ServerPlayer(Connection connection) {
+        super(null);
+
+        setConnection(connection);
+    }
+
+    /**
      * Creates a new ServerPlayer.
      *
      * @param game The {@code Game} this object belongs to.
@@ -186,8 +198,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public ServerPlayer(Game game, boolean admin, Nation nation) {
         super(game);
 
-        this.connection = null;
-
+        setConnection(null);
         initialize(game, admin, nation);
     }
 

@@ -27,13 +27,14 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
 
 /**
- * The message sent to discover the vacant players.
+ * The message sent to discover vacant players in a game.
  */
 public class VacantPlayersMessage extends AttributeMessage {
 
@@ -72,25 +73,31 @@ public class VacantPlayersMessage extends AttributeMessage {
         return getArrayAttributes();
     }
 
-
-    // Implement MessageHandler
-
     /**
-     * Handle a "vacantPlayers"-message.
+     * Set the vacant players in this message from a given game.
      *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param connection The {@code Connection} message was received on.
-     *
-     * @return An {@code Element} to update the originating player
-     *     with the result of the query.
+     * @param game The {@code Game} to find players in.
+     * @return This message.
      */
-    public Element handle(FreeColServer server, Connection connection) {
-        final Game game = server.getGame();
-
+    public VacantPlayersMessage setVacantPlayers(Game game) {
+        if (game == null) return this;
         final Predicate<Player> vacantPred = p ->
             !p.isREF() && (p.isAI() || !((ServerPlayer)p).isConnected());
         setArrayAttributes(transform(game.getLiveEuropeanPlayers(),
                                      vacantPred, Player::getNationId));
-        return this.toXMLElement();
+        return this;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+        @SuppressWarnings("unused") ServerPlayer serverPlayer) {
+        // Called from UserConnectionHandler, without serverPlayer being defined
+        return ChangeSet.simpleChange((ServerPlayer)null,
+            new VacantPlayersMessage()
+                .setVacantPlayers(freeColServer.getGame()));
     }
 }

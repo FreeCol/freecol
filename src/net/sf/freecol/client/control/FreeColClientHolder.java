@@ -152,11 +152,20 @@ public class FreeColClientHolder {
     }
 
     /**
-     * Get the in game controller.
+     * Get the in-game controller.
      *
      * @return The {@code InGameController} for the client.
      */
     protected InGameController igc() {
         return this.freeColClient.getInGameController();
+    }
+
+    /**
+     * Get the pre-game controller.
+     *
+     * @return The {@code PreGameController} for the client.
+     */
+    protected PreGameController pgc() {
+        return this.freeColClient.getPreGameController();
     }
 }

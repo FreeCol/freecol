@@ -185,16 +185,16 @@ public final class PreGameInputHandler extends ClientInputHandler {
             + "/" + player.getId());
         if (current) game.setCurrentPlayer(player);
         if (fcc.isInGame()) {
-            fcc.getInGameController().nextModelMessage();
+            igc().nextModelMessage();
         } else {
             if (start) {
                 if (single) {
-                    fcc.getPreGameController().startGame();
+                    pgc().startGame();
                 } else {
                     if (player.isAdmin()) {
-                        fcc.getPreGameController().setReady(true);
-                        fcc.getPreGameController().requestLaunch();
-                        fcc.getPreGameController().startGame();
+                        pgc().setReady(true);
+                        pgc().requestLaunch();
+                        pgc().startGame();
                     }
                 }
             } else {
@@ -360,8 +360,9 @@ public final class PreGameInputHandler extends ClientInputHandler {
         new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
                 @Override
                 public void run() {
+                    Game game;
                     for (;;) {
-                        Game game = getGame();
+                        game = getGame();
                         if (game != null && game.getMap() != null) break;
                         try {
                             Thread.sleep(200);
@@ -371,8 +372,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                     }
                     
                     SwingUtilities.invokeLater(() -> {
-                            getFreeColClient().getPreGameController()
-                                .startGame();
+                            pgc().startGame();
                         });
                 }
             }.start();
