@@ -135,8 +135,10 @@ public class IndianDemandMessage extends AttributeMessage {
      * @param result The new result of this demand.
      * @return This message.
      */
-    public IndianDemandMessage setResult(boolean result) {
-        setAttribute(RESULT_TAG, String.valueOf(result));
+    public IndianDemandMessage setResult(Boolean result) {
+        if (result != null) {
+            setAttribute(RESULT_TAG, String.valueOf(result));
+        }
         return this;
     }
 
