@@ -133,13 +133,16 @@ public abstract class ServerInputHandler extends FreeColServerHolder
      */
     public final Element handle(Connection connection, Element element) {
         if (element == null) return null;
+        final FreeColServer freeColServer = getFreeColServer();
         final String tag = element.getTagName();
         final NetworkRequestHandler handler = handlerMap.get(tag);
         Element ret = null;
 
         if (handler == null) {
             // Should we return an error here? The old handler returned null.
-            logger.warning("No handler installed for " + tag);
+            logger.warning("No "
+                + freeColServer.getGameState().toString().toLowerCase()
+                + " handler for " + tag);
         } else {
             try {
                 ret = handler.handle(connection, element);
