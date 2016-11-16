@@ -982,7 +982,16 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this {@code Player} is ready to start the game.
      */
     public boolean isReady() {
-        return ready;
+        return getReady() || isAI();
+    }
+
+    /**
+     * Get the readiness state.
+     *
+     * @return Get the {@code Player}s readiness state.
+     */
+    public boolean getReady() {
+        return this.ready;
     }
 
     /**
