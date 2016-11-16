@@ -159,14 +159,32 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element login(Element element) {
+        // The {@link LoginMessage} received here should have the game
+        // attached.  If we are joining a running game, there is
+        // little more needed to be done.  If we are restoring from
+        // saved, the game should include a map and a full complement
+        // of players, including ours.
+        //
+        // Otherwise we may still need to select a nation, and
+        // optionally change game or map options (using several
+        // possible messages).  {@link StartGamePanel} does this.
+        //
+        // When all the parameters are in place and all players are
+        // ready (trivially true in single player, needs checking in
+        // multiplayer) the client needs to send a requestLaunch
+        // message to ask the server to start the game.  That is
+        // either done here or by the start game panel.
+        //
+        // requestLaunch effectively transfers control to
+        // {@link FreeColServer#startGame}.
+        //
         final FreeColClient fcc = getFreeColClient();
         final LoginMessage message = new LoginMessage(new Game(), element);
         final String user = message.getUserName();
-        final boolean start = message.getStartGame();
         final boolean single = message.getSinglePlayer();
         final boolean current = message.getCurrentPlayer();
-        final Game game = message.getGame();
-        
+        final Game game = message.getGame(); // This is the real game!
+
         Player player = game.getPlayerByName(user);
         if (player == null) {
             StringTemplate err = StringTemplate
@@ -181,25 +199,20 @@ public final class PreGameInputHandler extends ClientInputHandler {
         fcc.setMyPlayer(player);
         fcc.addSpecificationActions(game.getSpecification());
         fcc.setLoggedIn(true);
-        logger.info("FreeColClient logged in as " + user
-            + "/" + player.getId());
         if (current) game.setCurrentPlayer(player);
-        if (fcc.isInGame()) {
+        logger.info("FreeColClient logged in to "
+            + ((fcc.isInGame()) ? "running"
+                : (game.allPlayersReadyToLaunch()) ? "ready" : "new")
+            + " " + ((single) ? "single" : "multi")
+            + "player game as " + user + "/" + player.getId());
+
+        if (fcc.isInGame()) { // Joining existing game, possibly reconnect
             igc().nextModelMessage();
-        } else {
-            if (start) {
-                if (single) {
-                    pgc().startGame();
-                } else {
-                    if (player.isAdmin()) {
-                        pgc().setReady(true);
-                        pgc().requestLaunch();
-                        pgc().startGame();
-                    }
-                }
-            } else {
-                getGUI().showStartGamePanel(game, player, single);
-            }
+        } else if (game.getMap() != null
+            && game.allPlayersReadyToLaunch()) { // Ready to launch!
+            pgc().requestLaunch();
+        } else { // More parameters need to be set, or players to become ready
+            getGUI().showStartGamePanel(game, player, single);
         }
         return null;
     }

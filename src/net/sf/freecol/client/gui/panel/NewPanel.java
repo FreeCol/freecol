@@ -530,7 +530,7 @@ public final class NewPanel extends FreeColPanel
             case SINGLE:
                 this.specification.prepare(getSelectedAdvantages(),
                                            this.difficulty);
-                if (cc.startSinglePlayerGame(this.specification, false)) return;
+                if (cc.startSinglePlayerGame(this.specification)) return;
                 break;
             case JOIN:
                 int joinPort = getSelectedPort(this.joinPortField);

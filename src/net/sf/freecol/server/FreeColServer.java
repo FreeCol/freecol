@@ -159,8 +159,8 @@ public final class FreeColServer {
      */
     public static final String DEFAULT_SPEC = "freecol";
 
-    /** Games are either starting, being played, or ending. */
-    public static enum GameState { PRE_GAME, LOAD_GAME, IN_GAME, END_GAME };
+    /** Games are either starting, ending or being played. */
+    public static enum GameState { PRE_GAME, LOAD_GAME, IN_GAME, END_GAME }
 
 
     // Serializable fundamentals
@@ -648,21 +648,32 @@ public final class FreeColServer {
      *   <li>Changes the game state to
      *         {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}.
      *   <li>Sends the "startGame"-message to the clients.
+     *   <li>Switches to using the in-game version of the input handler.
      * </ol>
      *
      * @exception FreeColException if there is a problem creating the game.
      */
     public void startGame() throws FreeColException {
+        logger.info("Starting game.");
         final Game game = buildGame();
 
-        // Inform the clients.
-        for (Player player : transform(game.getLivePlayers(), p -> !p.isAI())) {
-            ServerPlayer serverPlayer = (ServerPlayer)player;
-
-            serverPlayer.invalidateCanSeeTiles(); // Send clean copy of the game
-            ChangeSet cs = new ChangeSet();
-            cs.add(See.only(serverPlayer), game);
-            serverPlayer.send(cs);
+        switch (this.gameState) {
+        case PRE_GAME: // Send the updated game to the clients.
+            for (Player player : transform(game.getLivePlayers(),
+                                           p -> !p.isAI())) {
+                ServerPlayer serverPlayer = (ServerPlayer)player;
+                serverPlayer.invalidateCanSeeTiles();
+                ChangeSet cs = new ChangeSet();
+                cs.add(See.only(serverPlayer), game);
+                serverPlayer.send(cs);
+            }
+            break;
+        case LOAD_GAME: // Do nothing, game has been sent.
+            break;
+        default:
+            logger.warning("Invalid startGame when server state = "
+                + this.gameState);
+            return;
         }
 
         updateMetaServer(false);
@@ -1205,46 +1216,55 @@ public final class FreeColServer {
      * Builds a new game using the parameters that exist in the game
      * as it stands.
      *
-     * @return The updated game.
+     * @return The updated {@code Game}.
      * @exception FreeColException on map generation failure.
      */
     public Game buildGame() throws FreeColException {
         final ServerGame game = getGame();
         final Specification spec = game.getSpecification();
-        final AIMain aiMain = new AIMain(this);
+
+        // Establish AI main if missing
+        if (getAIMain() == null) {
+            AIMain aiMain = new AIMain(this);
+            setAIMain(aiMain);
+            game.setFreeColGameObjectListener(aiMain);
+        }
+
+        // Fill in missing available players
         final Predicate<Entry<Nation, NationState>> availablePred = e ->
             !e.getKey().isUnknownEnemy()
                 && e.getValue() != NationState.NOT_AVAILABLE
                 && game.getPlayerByNationId(e.getKey().getId()) == null;
-
-        setAIMain(aiMain);
-        game.setFreeColGameObjectListener(aiMain);
         game.updatePlayers(transform(game.getNationOptions().getNations().entrySet(),
                                      availablePred, e -> makeAIPlayer(e.getKey()),
                                      Player.playerComparator));
 
         // We need a fake unknown enemy player
-        establishUnknownEnemy(game);
+        if (game.getUnknownEnemy() == null) {
+            establishUnknownEnemy(game);
+        }
 
         // Create the map.
-        LogBuilder lb = new LogBuilder(256);
-        game.setMap(getMapGenerator().createMap(lb));
-        lb.log(logger, Level.FINER);
+        if (game.getMap() == null) {
+            LogBuilder lb = new LogBuilder(256);
+            game.setMap(getMapGenerator().createMap(lb));
+            lb.log(logger, Level.FINER);
         
-        // Initial stances and randomizations for all players.
-        spec.generateDynamicOptions();
-        Random random = getServerRandom();
-        for (Player player : game.getLivePlayerList()) {
-            ((ServerPlayer)player).randomizeGame(random);
-            if (player.isIndian()) {
-                // Indian players know about each other, but European colonial
-                // players do not.
-                final int alarm = (Tension.Level.HAPPY.getLimit()
-                    + Tension.Level.CONTENT.getLimit()) / 2;
-                for (Player other : game.getLiveNativePlayerList(player)) {
-                    player.setStance(other, Stance.PEACE);
-                    for (IndianSettlement is : player.getIndianSettlementList()) {
-                        is.setAlarm(other, new Tension(alarm));
+            // Initial stances and randomizations for all players.
+            spec.generateDynamicOptions();
+            Random random = getServerRandom();
+            for (Player player : game.getLivePlayerList()) {
+                ((ServerPlayer)player).randomizeGame(random);
+                if (player.isIndian()) {
+                    // Indian players know about each other, but European colonial
+                    // players do not.
+                    final int alarm = (Tension.Level.HAPPY.getLimit()
+                        + Tension.Level.CONTENT.getLimit()) / 2;
+                    for (Player other : game.getLiveNativePlayerList(player)) {
+                        player.setStance(other, Stance.PEACE);
+                        for (IndianSettlement is : player.getIndianSettlementList()) {
+                            is.setAlarm(other, new Tension(alarm));
+                        }
                     }
                 }
             }

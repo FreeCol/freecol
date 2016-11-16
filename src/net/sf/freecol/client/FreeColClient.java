@@ -297,7 +297,8 @@ public final class FreeColClient {
         //   - display the main panel and let the user choose what to
         //     do (which will often be to progress through the
         //     NewPanel to a call to the connect controller to start a game)
-        if (savedGame != null) {
+        //
+        if (savedGame != null) { // Restore from saved
             soundController.playSound("sound.intro.general");
             SwingUtilities.invokeLater(() -> {
                     if (!connectController.startSavedGame(savedGame, userMsg)) {
@@ -307,15 +308,15 @@ public final class FreeColClient {
         } else if (spec != null) { // Debug or fast start
             soundController.playSound("sound.intro.general");
             SwingUtilities.invokeLater(() -> {
-                    if (!connectController.startSinglePlayerGame(spec, true)) {
+                    if (!connectController.startSinglePlayerGame(spec)) {
                         gui.showMainPanel(userMsg);
                     }
                 });
-        } else if (showOpeningVideo) {
+        } else if (showOpeningVideo) { // Video first
             SwingUtilities.invokeLater(() -> {
                     gui.showOpeningVideo(userMsg);
                 });
-        } else {
+        } else { // Start main panel
             soundController.playSound("sound.intro.general");
             invokeMainPanel(userMsg).run();
         }

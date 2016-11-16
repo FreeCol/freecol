@@ -46,7 +46,6 @@ public class LoginMessage extends DOMMessage {
     public static final String TAG = "login";
     private static final String CURRENT_PLAYER_TAG = "currentPlayer";
     private static final String SINGLE_PLAYER_TAG = "singlePlayer";
-    private static final String START_GAME_TAG = "startGame";
     private static final String USER_NAME_TAG = "userName";
     private static final String VERSION_TAG = "version";
     
@@ -55,9 +54,6 @@ public class LoginMessage extends DOMMessage {
 
     /** The client FreeCol version. */
     private final String version;
-
-    /** Whether to start the game. */
-    private final boolean startGame;
 
     /** Is this a single player game. */
     private final boolean singlePlayer;
@@ -74,19 +70,16 @@ public class LoginMessage extends DOMMessage {
      *
      * @param userName The name of the user logging in.
      * @param version The version of FreeCol at the client.
-     * @param startGame Whether to start the game.
      * @param singlePlayer True in single player games.
      * @param currentPlayer True if this player is the current player.
      * @param game The entire game.
      */
-    public LoginMessage(String userName, String version,
-                        boolean startGame, boolean singlePlayer,
+    public LoginMessage(String userName, String version, boolean singlePlayer,
                         boolean currentPlayer, Game game) {
         super(TAG);
 
         this.userName = userName;
         this.version = version;
-        this.startGame = startGame;
         this.singlePlayer = singlePlayer;
         this.currentPlayer = currentPlayer;
         this.game = game;
@@ -96,11 +89,10 @@ public class LoginMessage extends DOMMessage {
      * Create a new simple {@code LoginMessage} request.
      *
      * @param userName The name of the user logging in.
-     * @param start Start the game at once.
      * @param version The version of FreeCol at the client.
      */
-    public LoginMessage(String userName, boolean start, String version) {
-        this(userName, version, start, false, false, null);
+    public LoginMessage(String userName, String version) {
+        this(userName, version, false, false, null);
     }
 
     /**
@@ -112,7 +104,6 @@ public class LoginMessage extends DOMMessage {
     public LoginMessage(Game game, Element e) {
         this(getStringAttribute(e, USER_NAME_TAG),
              getStringAttribute(e, VERSION_TAG),
-             getBooleanAttribute(e, START_GAME_TAG, false),
              getBooleanAttribute(e, SINGLE_PLAYER_TAG, true),
              getBooleanAttribute(e, CURRENT_PLAYER_TAG, false),
              getChild(game, e, 0, Game.class));
@@ -127,10 +118,6 @@ public class LoginMessage extends DOMMessage {
 
     public String getVersion() {
         return this.version;
-    }
-
-    public boolean getStartGame() {
-        return this.startGame;
     }
 
     public boolean getSinglePlayer() {
@@ -184,14 +171,16 @@ public class LoginMessage extends DOMMessage {
 
         Connection conn = serverPlayer.getConnection();
         Game game;
+        ServerPlayer present;
         boolean isCurrentPlayer = false;
 
         switch (freeColServer.getGameState()) {
-        case PRE_GAME: case LOAD_GAME:
+        case PRE_GAME:
             if ((game = freeColServer.waitForGame()) == null) {
                 return ChangeSet.clientError((ServerPlayer)null,
                     StringTemplate.template("server.timeOut"));
             }
+
             Nation nation = game.getVacantNation();
             if (nation == null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
@@ -221,20 +210,19 @@ public class LoginMessage extends DOMMessage {
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(serverPlayer,
-                new LoginMessage(this.userName, this.version, this.startGame,
+                new LoginMessage(this.userName, this.version,
                                  freeColServer.getSinglePlayer(),
                                  game.getCurrentPlayer() == serverPlayer,
                                  game));
 
-        case IN_GAME:
+        case LOAD_GAME:
             if (FreeColServer.MAP_EDITOR_NAME.equals(this.userName)) {
                 // Trying to start a map, see BR#2976 -> IR#217
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("error.mapEditorGame"));
             }
-            // Restoring from existing game.
-            game = freeColServer.getGame();
-            ServerPlayer present = getPlayerByName(game);
+            game = freeColServer.getGame(); // Restoring from existing game.
+            present = getPlayerByName(game);
             if (present == null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameNotPresent")
@@ -243,7 +231,13 @@ public class LoginMessage extends DOMMessage {
                         transform(game.getLiveEuropeanPlayers(),
                                   alwaysTrue(), Player::getName,
                             Collectors.joining(", "))));
-            } else if (present.isConnected() && !present.isAI()) {
+            } else if (present.isConnected()) {
+                // Another player already connected on the name
+                return ChangeSet.clientError((ServerPlayer)null, StringTemplate
+                    .template("server.userNameInUse")
+                    .addName("%name%", this.userName));
+            } else if (present.isAI()) {
+                // Should not connect to AI
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameInUse")
                     .addName("%name%", this.userName));
@@ -251,11 +245,6 @@ public class LoginMessage extends DOMMessage {
 
             present.setConnection(conn);
             present.setConnected(true);
-            if (present.isAI()) {
-                present.setAI(false);
-                freeColServer.sendToAll(new SetAIMessage(present, false),
-                                        present);
-            }
 
             // Ensure there is a current player.
             if (game.getCurrentPlayer() == null) game.setCurrentPlayer(present);
@@ -263,10 +252,49 @@ public class LoginMessage extends DOMMessage {
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(present,
-                new LoginMessage(this.userName, this.version, true,
+                new LoginMessage(this.userName, this.version,
                                  freeColServer.getSinglePlayer(),
                                  game.getCurrentPlayer() == present, game));
 
+        case IN_GAME:
+            game = freeColServer.getGame(); // Restoring from existing game.
+            present = getPlayerByName(game);
+            if (present == null) {
+                return ChangeSet.clientError((ServerPlayer)null, StringTemplate
+                    .template("server.userNameNotPresent")
+                    .addName("%name%", userName)
+                    .addName("%names%",
+                        transform(game.getLiveEuropeanPlayers(),
+                                  alwaysTrue(), Player::getName,
+                            Collectors.joining(", "))));
+            } else if (present.isConnected()) {
+                // Another player already connected on the name
+                return ChangeSet.clientError((ServerPlayer)null, StringTemplate
+                    .template("server.userNameInUse")
+                    .addName("%name%", this.userName));
+            }
+            // Allow to join as AI?
+            // else if (!present.isAI()) {
+            //    return ChangeSet.clientError((ServerPlayer)null, StringTemplate
+            //        .template("server.userNameInUse")
+            //        .addName("%name%", this.userName));
+            //if (present.isAI()) {
+            //    present.setAI(false);
+            //    freeColServer.sendToAll(new SetAIMessage(present, false),
+            //                            present);
+            //}
+            //}
+
+            present.setConnection(conn);
+            present.setConnected(true);
+
+            // Add the connection, send back the game
+            freeColServer.addPlayerConnection(conn);
+            return ChangeSet.simpleChange(present,
+                new LoginMessage(this.userName, this.version,
+                                 freeColServer.getSinglePlayer(),
+                                 game.getCurrentPlayer() == present, game));
+            
         case END_GAME: default:
             break;
         }
@@ -285,7 +313,6 @@ public class LoginMessage extends DOMMessage {
         return new DOMMessage(TAG,
             USER_NAME_TAG, this.userName,
             VERSION_TAG, this.version,
-            START_GAME_TAG, Boolean.toString(this.startGame),
             SINGLE_PLAYER_TAG, Boolean.toString(this.singlePlayer),
             CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer))
             .add(this.game, player)

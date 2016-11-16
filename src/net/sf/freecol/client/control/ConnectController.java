@@ -191,12 +191,11 @@ public final class ConnectController extends FreeColClientHolder {
      * Public for the test suite.
      *
      * @param user The name of the player to use.
-     * @param start Start the game at once.
      * @param host The name of the machine running the {@code FreeColServer}.
      * @param port The port to use when connecting to the host.
      * @return True if the login message was sent.
      */
-    public boolean login(String user, boolean start, String host, int port) {
+    public boolean login(String user, String host, int port) {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
@@ -211,9 +210,8 @@ public final class ConnectController extends FreeColClientHolder {
         StringTemplate err = fcc.connect(user, host, port);
         if (err == null) {
             // Ask the server to log in a player with the given user name.
-            // Control transfers to PGIH.login().
-            if (askServer().login(user, start, FreeCol.getVersion()))
-                return true;
+            // Control effectively transfers to PGIH.login().
+            if (askServer().login(user, FreeCol.getVersion())) return true;
             err = StringTemplate.template("server.couldNotLogin");
         }
         getGUI().showErrorMessage(err);
@@ -222,34 +220,16 @@ public final class ConnectController extends FreeColClientHolder {
 
     //
     // There are several ways to start a game.
-    // - multi-player
+    // - multi-player (can also be joined while in play)
     // - single player
     // - restore from saved game
+    // - shortcut debug/fast-start
     //
     // They all ultimately have to establish a connection to the server,
     // and get the game from there, which is done in {@link #login()}.
+    // Control then effectively transfers to the handler for the login
+    // message in {@link PreGameInputHandler}.
     //
-    // When restoring from saved we are mostly done at this point and
-    // the game will begin.  Otherwise we may still need to select a
-    // nation and change game or map options, which is done in the
-    // {@link StartGamePanel}.  The start game panel can then send a
-    // requestLaunch message which will tell the server to generate
-    // the game and map with the required parameters.  The updated
-    // game is sent to all clients with an "update" message.
-    //
-    // The server then tells the clients that the game is starting
-    // with a "startGame" message.  Except for saved games where it
-    // cheats and sets a "startGame" flag in the login response that
-    // short circuits this.  FIXME: which is awkward, tidy?
-    //
-    // "startGame" eventually ends up in FreeColServer.startGame,
-    // where the inGame state is finally set to true, and the game
-    // begins.
-    //
-    // There is also a debug/fast-start shortcut which sends a true
-    // "startGame" flag in the login message to signal that we want to
-    // bypass the StartGamePanel.
-
 
     /**
      * Starts a multiplayer server and connects to it.
@@ -271,10 +251,10 @@ public final class ConnectController extends FreeColClientHolder {
         FreeColServer freeColServer = startServer(publicServer, false,
                                                   specification, port);
         if (freeColServer == null) return false;
-
         fcc.setFreeColServer(freeColServer);
-        return joinMultiplayerGame(freeColServer.getHost(),
-                                   freeColServer.getPort());
+        fcc.setSinglePlayer(false);
+
+        return joinGame(freeColServer.getHost(), freeColServer.getPort());
     }
 
     /**
@@ -290,6 +270,17 @@ public final class ConnectController extends FreeColClientHolder {
 
         logout("Joining multiplayer");
 
+        return joinGame(host, port);
+    }
+
+    /**
+     * Join a game.
+     *
+     * @param host The name of the machine running the server.
+     * @param port The port to use when connecting to the host.
+     * @return True if the game starts successfully.
+     */
+    private boolean joinGame(String host, int port) {
         DOMMessage msg = ask(host, port, new GameStateMessage(),
             GameStateMessage.TAG, StringTemplate.template("client.noState"));
         GameState state = (msg instanceof GameStateMessage)
@@ -300,7 +291,7 @@ public final class ConnectController extends FreeColClientHolder {
         StringTemplate err;
         switch (state) {
         case PRE_GAME: case LOAD_GAME:
-            if (!login(FreeCol.getName(), false, host, port)) return false;
+            if (!login(FreeCol.getName(), host, port)) return false;
             break;
 
         case IN_GAME:
@@ -310,6 +301,8 @@ public final class ConnectController extends FreeColClientHolder {
                     .template("client.debugConnect"));
                 return false;
             }
+
+            // Find the players, choose one.
             msg = ask(host, port, new VacantPlayersMessage(),
                       VacantPlayersMessage.TAG,
                       StringTemplate.template("client.noPlayers"));
@@ -317,7 +310,6 @@ public final class ConnectController extends FreeColClientHolder {
                 ? ((VacantPlayersMessage)msg).getVacantPlayers()
                 : null;
             if (names == null || names.isEmpty()) return false;
-
             String choice = getGUI().getChoice(null,
                 Messages.message("client.choicePlayer"), "cancel",
                 transform(names, alwaysTrue(), n ->
@@ -326,8 +318,7 @@ public final class ConnectController extends FreeColClientHolder {
                             .add("%nation%", Messages.nameKey(n))), n)));
             if (choice == null) return false; // User cancelled
 
-            if (!login(Messages.getRulerName(choice), false, host, port))
-                return false;
+            if (!login(Messages.getRulerName(choice), host, port)) return false;
             break;
 
         case END_GAME: default:
@@ -343,10 +334,9 @@ public final class ConnectController extends FreeColClientHolder {
      * FIXME: connect client/server directly (not using network-classes)
      *
      * @param spec The {@code Specification} for the game.
-     * @param start Start the game at once.
      * @return True if the game starts successfully.
      */
-    public boolean startSinglePlayerGame(Specification spec, boolean start) {
+    public boolean startSinglePlayerGame(Specification spec) {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
@@ -362,13 +352,14 @@ public final class ConnectController extends FreeColClientHolder {
         List<FreeColModFile> mods = getClientOptions().getActiveMods();
         spec.loadMods(mods);
         Messages.loadActiveModMessageBundle(mods, FreeCol.getLocale());
+
         FreeColServer freeColServer = startServer(false, true, spec, -1);
         if (freeColServer == null) return false;
-
         fcc.setFreeColServer(freeColServer);
         fcc.setSinglePlayer(true);
-        return login(FreeCol.getName(), start,
-                     freeColServer.getHost(), freeColServer.getPort());
+
+        return login(FreeCol.getName(), freeColServer.getHost(),
+                     freeColServer.getPort());
     }
 
     /**
@@ -492,7 +483,7 @@ public final class ConnectController extends FreeColClientHolder {
                 // Server might have bounced to another port.
                 fcc.setSinglePlayer(singlePlayer);
                 igc().setGameConnected();
-                if (login(FreeCol.getName(), true, freeColServer.getHost(), 
+                if (login(FreeCol.getName(), freeColServer.getHost(), 
                           freeColServer.getPort())) {
                     SwingUtilities.invokeLater(() -> {
                             ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
@@ -548,7 +539,7 @@ public final class ConnectController extends FreeColClientHolder {
             + " to " + host + ":" + port);
         getGUI().removeInGameComponents();
         logout("reconnect");
-        return login(FreeCol.getName(), true, host, port);
+        return login(FreeCol.getName(), host, port);
     }
 
     /**
