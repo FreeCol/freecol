@@ -656,25 +656,27 @@ public final class Canvas extends JDesktopPane {
     private void addCentered(Component comp, Integer i) {
         comp.setLocation((getWidth() - comp.getWidth()) / 2,
                          (getHeight() - comp.getHeight()) / 2);
-
         this.add(comp, i);
     }
 
     /**
-     * Adds a component to this Canvas.  Removes the statusPanel if
-     * visible (and {@code comp != statusPanel}).
+     * Adds a component to this Canvas.
+     *
+     * Make sure the status panel is not present unless the component
+     * *is* the status panel.
      *
      * @param comp The {@code Component} to add to this canvas.
      * @param i The layer to add the component to (see JLayeredPane).
      */
     private void addToCanvas(Component comp, Integer i) {
-        if (comp != statusPanel && !(comp instanceof JMenuItem)
-            && statusPanel.isVisible()) {
-            removeFromCanvas(statusPanel);
+        if (statusPanel.isVisible()) {
+            if (comp == statusPanel) return;
+            if (!(comp instanceof JMenuItem)) removeFromCanvas(statusPanel);
         }
 
+        if (i == null) i = JLayeredPane.DEFAULT_LAYER;
         try {
-            super.add(comp, (i == null) ? JLayeredPane.DEFAULT_LAYER : i);
+            super.add(comp, i);
         } catch (Exception e) {
             logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
                 + ") failed.", e);
