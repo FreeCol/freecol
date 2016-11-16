@@ -346,16 +346,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
             try {
                 reply = this.connection.ask(request);
                 if (reply == null) break;
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not send \""
-                    + request.getTagName() + "\"-message.", e);
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Exception sending \""
+                    + request.getTagName() + "\"-message.", ioe);
                 break;
             }
 
             try {
                 request = this.connection.handle(reply);
             } catch (FreeColException fce) {
-                logger.log(Level.WARNING, "Exception processing reply \""
+                logger.log(Level.WARNING, "Exception handling \""
                     + reply.getTagName() + "\"-message.", fce);
                 break;
             }

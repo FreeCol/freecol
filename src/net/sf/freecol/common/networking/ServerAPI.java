@@ -186,10 +186,10 @@ public abstract class ServerAPI {
         try {
             return c.handle(e);
         } catch (FreeColException fce) {
-            logger.log(Level.WARNING, "Could not handle: " + e.getTagName(),
-                fce);
+            logger.log(Level.WARNING, "Handler failure for: " + e.getTagName(),
+                       fce);
+            return null;
         }
-        return null;
     }
 
     /**

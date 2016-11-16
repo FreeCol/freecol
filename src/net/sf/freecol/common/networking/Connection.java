@@ -242,21 +242,21 @@ public class Connection implements Closeable {
     }
     
     /**
-     * Sets the MessageHandler for this Connection.
-     *
-     * @param mh The new MessageHandler for this Connection.
-     */
-    public void setMessageHandler(MessageHandler mh) {
-        this.messageHandler = mh;
-    }
-
-    /**
      * Gets the MessageHandler for this Connection.
      *
      * @return The MessageHandler for this Connection.
      */
     public MessageHandler getMessageHandler() {
         return this.messageHandler;
+    }
+
+    /**
+     * Sets the MessageHandler for this Connection.
+     *
+     * @param mh The new MessageHandler for this Connection.
+     */
+    public void setMessageHandler(MessageHandler mh) {
+        this.messageHandler = mh;
     }
 
     /**
@@ -273,14 +273,8 @@ public class Connection implements Closeable {
      */
     @Override
     public void close() {
-        try {
-            disconnect("close");
-        } catch (IOException ioe) {
-            // Failure is expected if the other end has closed already
-            logger.log(Level.FINE, "Disconnect failed for " + this.name, ioe);
-        } finally {
-            reallyClose();
-        }
+        disconnect("close");
+        reallyClose();
     }
 
     /**
@@ -539,24 +533,23 @@ public class Connection implements Closeable {
      * @exception FreeColException if there is trouble with the response.
      */
     public Element handle(Element request) throws FreeColException {
-        try {
-            return this.messageHandler.handle(this, request);
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Handler failure in " + this.toString(),
-                       ex);
-        }
-        return null;
+        return (this.messageHandler == null) ? null
+            : this.messageHandler.handle(this, request);
     }
 
     /**
      * Send a disconnect message.
      *
      * @param reason The reason for the disconnection.
-     * @exception IOException if failed to send the message.
      */
-    public void disconnect(String reason) throws IOException {
-        logger.info("Disconnect " + this + ": " + reason);
-        this.send(new DisconnectMessage(reason));
+    public void disconnect(String reason) {
+        try {
+            send(new DisconnectMessage(reason));
+            logger.info("Disconnect " + getName() + ": " + reason);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Disconnect failed for " + getName(),
+                       ioe);
+        }
     }
 
     /**
@@ -564,10 +557,10 @@ public class Connection implements Closeable {
      */
     public void reconnect() {
         try {
-            this.send(TrivialMessage.RECONNECT_MESSAGE);
+            send(TrivialMessage.RECONNECT_MESSAGE);
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Reconnect failed for " + this.name,
-                ioe);
+            logger.log(Level.WARNING, "Reconnect failed for " + getName(),
+                       ioe);
         }
     }
 

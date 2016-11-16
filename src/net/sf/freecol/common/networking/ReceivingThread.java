@@ -245,14 +245,7 @@ final class ReceivingThread extends Thread {
      */
     private void disconnect(String reason) {
         askToStop();
-        if (connection.getMessageHandler() != null) {
-            try {
-                connection.getMessageHandler().handle(connection,
-                    new DisconnectMessage(reason).toXMLElement());
-            } catch (FreeColException e) {
-                logger.log(Level.WARNING, "Rx disconnect", e);
-            }
-        }
+        connection.disconnect(reason);
     }
 
     /**
