@@ -1046,7 +1046,7 @@ public final class FreeColServer {
         throws FreeColException, IOException, XMLStreamException {
         changeGameState(GameState.LOAD_GAME);
         ServerGame game = readGame(fis, specification, this);
-        integrity = game.checkIntegrity(true);
+        this.integrity = game.checkIntegrity(true);
         if (integrity < 0) {
             logger.warning("Game integrity test failed.");
         } else {
@@ -1058,6 +1058,7 @@ public final class FreeColServer {
         // @compat 0.10.x
         if (savegameVersion < 12) {
             for (Player p : game.getPlayerList()) {
+                p.setReady(true); // Players in running game must be ready
                 // @compat 0.10.5
                 if (p.isIndian()) {
                     for (IndianSettlement is : p.getIndianSettlementList()) {
@@ -1255,6 +1256,7 @@ public final class FreeColServer {
         ServerPlayer aiPlayer = new ServerPlayer(getGame(), false, nation);
         aiPlayer.setConnection(theConnection);
         aiPlayer.setAI(true);
+        aiPlayer.setReady(true);
         DummyConnection aiConnection
             = new DummyConnection("AI connection - " + nation.getId(),
                 new AIInGameInputHandler(this, aiPlayer, getAIMain()));

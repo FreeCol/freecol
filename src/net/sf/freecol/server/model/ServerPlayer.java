@@ -227,6 +227,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             this.monarch = null;
             this.gold = 0;
             this.setAI(true);
+            this.setReady(true);
         } else if (nation.getType() != null) {
             this.nationType = nation.getType();
             try {

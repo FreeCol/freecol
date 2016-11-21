@@ -256,9 +256,7 @@ public final class StartGamePanel extends FreeColPanel {
                 // The ready flag was set to false for single player
                 // mode in order to allow the player to change
                 // whatever he wants.
-                if (singlePlayerGame) {
-                    getMyPlayer().setReady(true);
-                }
+                if (singlePlayerGame) getMyPlayer().setReady(true);
 
                 fcc.getPreGameController().requestLaunch();
                 break;
