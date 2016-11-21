@@ -95,7 +95,7 @@ public class MultipleMessage extends DOMMessage {
      * About to go away.
      */
     public Element handle(FreeColServer freeColServer, Connection connection) {
-        return applyHandler(freeColServer.getInGameInputHandler(), connection);
+        return applyHandler(connection.getMessageHandler(), connection);
     }
 
 
