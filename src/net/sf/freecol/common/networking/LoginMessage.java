@@ -187,7 +187,7 @@ public class LoginMessage extends DOMMessage {
         boolean isCurrentPlayer = false;
 
         switch (freeColServer.getGameState()) {
-        case STARTING_GAME:
+        case PRE_GAME: case LOAD_GAME:
             // Wait until the game has been created.
             // FIXME: is this still needed?
             int timeOut = 20000;
@@ -227,10 +227,8 @@ public class LoginMessage extends DOMMessage {
                 game.setCurrentPlayer(serverPlayer);
             }
 
-            // Ready now to handle pre-game messages.
-            conn.setMessageHandler(freeColServer.getPreGameInputHandler());
-            freeColServer.getServer().addConnection(conn);
-            freeColServer.updateMetaServer(false);
+            // Add the connection, send back the game
+            freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(serverPlayer,
                 new LoginMessage(this.userName, this.version, this.startGame,
                                  freeColServer.getSinglePlayer(),
@@ -271,16 +269,14 @@ public class LoginMessage extends DOMMessage {
             // Ensure there is a current player.
             if (game.getCurrentPlayer() == null) game.setCurrentPlayer(present);
 
-            // Ready to handle in-game messages.
-            conn.setMessageHandler(freeColServer.getInGameInputHandler());
-            freeColServer.getServer().addConnection(conn);
-            freeColServer.updateMetaServer(false);
+            // Add the connection, send back the game
+            freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(present,
                 new LoginMessage(this.userName, this.version, true,
                                  freeColServer.getSinglePlayer(),
                                  game.getCurrentPlayer() == present, game));
 
-        case ENDING_GAME: default:
+        case END_GAME: default:
             break;
         }
         return null; // Bogus, do nothing

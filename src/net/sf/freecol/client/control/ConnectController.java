@@ -299,7 +299,7 @@ public final class ConnectController extends FreeColClientHolder {
 
         StringTemplate err;
         switch (state) {
-        case STARTING_GAME:
+        case PRE_GAME: case LOAD_GAME:
             if (!login(FreeCol.getName(), false, host, port)) return false;
             break;
 
@@ -330,7 +330,7 @@ public final class ConnectController extends FreeColClientHolder {
                 return false;
             break;
 
-        case ENDING_GAME: default:
+        case END_GAME: default:
             getGUI().showErrorMessage(StringTemplate.template("client.ending"));
             return false;
         }

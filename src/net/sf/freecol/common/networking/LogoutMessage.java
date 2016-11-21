@@ -100,7 +100,7 @@ public class LogoutMessage extends AttributeMessage {
         serverPlayer.setConnected(false);
 
         switch (freeColServer.getGameState()) {
-        case STARTING_GAME:
+        case PRE_GAME: case LOAD_GAME:
             LogoutMessage message
                 = new LogoutMessage(serverPlayer, "User has logged out");
             freeColServer.sendToAll(message, serverPlayer);
@@ -112,7 +112,7 @@ public class LogoutMessage extends AttributeMessage {
                 cs = freeColServer.getInGameController().endTurn(serverPlayer);
             }
             break;
-        case ENDING_GAME:
+        case END_GAME:
             break;
         }
 

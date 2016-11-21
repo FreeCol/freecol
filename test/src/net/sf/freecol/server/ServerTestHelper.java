@@ -101,7 +101,7 @@ public final class ServerTestHelper {
             fail(ex.getMessage());
         }
         assertNotNull(server);
-        assertEquals(FreeColServer.GameState.STARTING_GAME,
+        assertEquals(FreeColServer.GameState.PRE_GAME,
                      server.getGameState());
         return server;
     }
@@ -123,7 +123,7 @@ public final class ServerTestHelper {
             fail(e.getMessage());
         }
         assertNotNull(server);
-        assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
+        assertEquals(FreeColServer.GameState.LOAD_GAME, server.getGameState());
         return server;
     }
 

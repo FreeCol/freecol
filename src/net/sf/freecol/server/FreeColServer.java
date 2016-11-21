@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
@@ -158,49 +159,51 @@ public final class FreeColServer {
      */
     public static final String DEFAULT_SPEC = "freecol";
 
-    /** Games are either starting, ending or being played. */
-    public static enum GameState { STARTING_GAME, IN_GAME, ENDING_GAME }
+    /** Games are either starting, being played, or ending. */
+    public static enum GameState { PRE_GAME, LOAD_GAME, IN_GAME, END_GAME };
 
 
-    // Instantiation-time parameters.
-
-    /** Is this a single player game? */
-    private boolean singlePlayer;
-
-    /** Should this game be listed on the meta-server? */
-    private boolean publicServer = false;
+    // Serializable fundamentals
 
     /** The name of this server. */
     private String name;
 
-    /** The current state of the game. */
-    private GameState gameState = GameState.STARTING_GAME;
+    /** Should this game be listed on the meta-server? */
+    private boolean publicServer = false;
 
-    // Networking:
-    private Server server;
+    /** Is this a single player game? */
+    private boolean singlePlayer;
 
-    // Controllers
-    private final UserConnectionHandler userConnectionHandler;
-
-    private final PreGameController preGameController;
-
-    private final PreGameInputHandler preGameInputHandler;
-
-    private final InGameInputHandler inGameInputHandler;
-
-    private final InGameController inGameController;
-
-    /** The AI controller. */
-    private AIMain aiMain;
+    /** The internal provider of random numbers. */
+    private Random random = null;
 
     /** The game underway. */
     private ServerGame game;
 
+    // Non-serialized internals follow
+
+    /** The current state of the game. */
+    private GameState gameState = GameState.PRE_GAME;
+
+    /** The underlying interface to the network. */
+    private Server server;
+
+    /** The handler for new user connections. */
+    private final UserConnectionHandler userConnectionHandler;
+
+    /** The pre-game controller and input handler. */
+    private final PreGameController preGameController;
+    private final PreGameInputHandler preGameInputHandler;
+
+    /** The in-game controller and input handler. */
+    private final InGameController inGameController;
+    private final InGameInputHandler inGameInputHandler;
+
+    /** The AI controller. */
+    private AIMain aiMain;
+
     /** The map generator. */
     private MapGenerator mapGenerator = null;
-
-    /** The internal provider of random numbers. */
-    private Random random = null;
 
     /** The game integrity state. */
     private int integrity = 1;
@@ -403,6 +406,13 @@ public final class FreeColServer {
     }
 
     /**
+     * Shut down this FreeColServer.
+     */
+    public void shutdown() {
+        this.server.shutdown();
+    }
+
+    /**
      * Gets the {@code UserConnectionHandler}.
      *
      * @return The {@code UserConnectionHandler} that is used when a
@@ -423,30 +433,12 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the {@code PreGameInputHandler}.
-     *
-     * @return The {@code PreGameInputHandler}.
-     */
-    public PreGameInputHandler getPreGameInputHandler() {
-        return this.preGameInputHandler;
-    }
-
-    /**
      * Gets the {@code PreGameController}.
      *
      * @return The {@code PreGameController}.
      */
     public PreGameController getPreGameController() {
         return this.preGameController;
-    }
-
-    /**
-     * Gets the {@code InGameInputHandler}.
-     *
-     * @return The {@code InGameInputHandler}.
-     */
-    public InGameInputHandler getInGameInputHandler() {
-        return this.inGameInputHandler;
     }
 
     /**
@@ -483,7 +475,7 @@ public final class FreeColServer {
      * @return The specification from the game.
      */
     public Specification getSpecification() {
-        return this.game.getSpecification();
+        return (this.game == null) ? null : this.game.getSpecification();
     }
 
     /**
@@ -503,37 +495,44 @@ public final class FreeColServer {
      *         and saving the AI objects.
      */
     public AIMain getAIMain() {
-        return aiMain;
+        return this.aiMain;
     }
 
     /**
      * Gets the current state of the game.
      *
-     * @return One of: {@link GameState#STARTING_GAME},
-     *     {@link GameState#IN_GAME} and {@link GameState#ENDING_GAME}.
+     * @return The game state.
      */
     public GameState getGameState() {
-        return gameState;
+        return this.gameState;
     }
 
     /**
-     * Sets the current state of the game.
+     * Change the game state.
      *
-     * @param state The new state to be set.  One of:
-     *     {@link GameState#STARTING_GAME}, {@link GameState#IN_GAME}
-     *     and {@link GameState#ENDING_GAME}.
+     * @param gameState The new {@code GameState}.
      */
-    public void setGameState(GameState state) {
-        gameState = state;
+    private void changeGameState(GameState gameState) {
+        switch (this.gameState = gameState) {
+        case PRE_GAME: case LOAD_GAME:
+            this.server.setMessageHandlerToAllConnections(this.preGameInputHandler);
+            break;
+        case IN_GAME:
+            this.server.setMessageHandlerToAllConnections(this.inGameInputHandler);
+            break;
+        case END_GAME: default:
+            this.server.setMessageHandlerToAllConnections(null);
+            break;
+        }
     }
-
+            
     /**
      * Gets the network server responsible of handling the connections.
      *
      * @return The network server.
      */
     public Server getServer() {
-        return server;
+        return this.server;
     }
 
     /**
@@ -542,7 +541,7 @@ public final class FreeColServer {
      * @return The integrity check result.
      */
     public int getIntegrity() {
-        return integrity;
+        return this.integrity;
     }
 
     /**
@@ -569,7 +568,7 @@ public final class FreeColServer {
      * @return The server random number generator.
      */
     public Random getServerRandom() {
-        return random;
+        return this.random;
     }
 
     /**
@@ -581,11 +580,47 @@ public final class FreeColServer {
         this.random = random;
     }
 
+
+    /**
+     * Add a new user connection.  That is a new connection to the server
+     * that has not yet logged in as a player.
+     *
+     * @param socket The client {@code Socket} the connection arrives on.
+     * @exception IOException if the socket was already broken.
+     */
+    public void addNewUserConnection(Socket socket) throws IOException {
+        final String name = socket.getInetAddress() + ":" + socket.getPort();
+        this.server.addConnection(new Connection(socket,
+                this.userConnectionHandler, FreeCol.SERVER_THREAD + name));
+        logger.info("Client connected from " + name);
+    }
+
+    /**
+     * Add player connection.  That is, a user connection is now
+     * transitioning to a player connection.
+     *
+     * @param connection The new {@code Connection}.
+     */
+    public void addPlayerConnection(Connection connection) {
+        switch (this.gameState) {
+        case PRE_GAME: case LOAD_GAME:
+            connection.setMessageHandler(this.preGameInputHandler);
+            break;
+        case IN_GAME:
+            connection.setMessageHandler(this.inGameInputHandler);
+            break;
+        case END_GAME: default:
+            return;
+        }            
+        this.server.addConnection(connection);
+        updateMetaServer(false);
+    }
+
     /**
      * Start the game.
      *
-     * Called from PreGameController following a requestLaunch message, or
-     * from the test suite.
+     * Called from PreGameController following a requestLaunch message
+     * (or from the test suite).
      *
      * <ol>
      *   <li>Creates the game.
@@ -610,10 +645,9 @@ public final class FreeColServer {
             serverPlayer.send(cs);
         }
 
-        setGameState(FreeColServer.GameState.IN_GAME);
         updateMetaServer(false);
+        changeGameState(GameState.IN_GAME);
         sendToAll(TrivialMessage.START_GAME_MESSAGE, (ServerPlayer)null);
-        getServer().setMessageHandlerToAllConnections(getInGameInputHandler());
     }
 
     /**
@@ -633,8 +667,8 @@ public final class FreeColServer {
      * @param serverPlayer An optional {@code ServerPlayer} to omit.
      */
     public void sendToAll(DOMMessage msg, ServerPlayer serverPlayer) {
-        sendToAll(msg,
-            (serverPlayer == null) ? null : serverPlayer.getConnection());
+        sendToAll(msg, (serverPlayer == null) ? null
+            : serverPlayer.getConnection());
     }
 
     /**
@@ -654,7 +688,7 @@ public final class FreeColServer {
             p -> !((ServerPlayer)p).isAI()
                 && ((ServerPlayer)p).isConnected());
         return new ServerInfo(getName(), address, port, slots, players,
-                              gameState != GameState.STARTING_GAME,
+                              gameState != GameState.PRE_GAME,
                               FreeCol.getVersion(), getGameState().ordinal());
     }
 
@@ -1010,9 +1044,8 @@ public final class FreeColServer {
     private ServerGame loadGame(final FreeColSavegameFile fis,
                                 Specification specification, Server server)
         throws FreeColException, IOException, XMLStreamException {
-
+        changeGameState(GameState.LOAD_GAME);
         ServerGame game = readGame(fis, specification, this);
-        gameState = GameState.IN_GAME;
         integrity = game.checkIntegrity(true);
         if (integrity < 0) {
             logger.warning("Game integrity test failed.");
@@ -1096,7 +1129,7 @@ public final class FreeColServer {
                 ServerPlayer serverPlayer = (ServerPlayer)player;
                 DummyConnection theConnection
                     = new DummyConnection("Server-Server-" + player.getName(),
-                        getInGameInputHandler());
+                                          this.inGameInputHandler);
                 DummyConnection aiConnection
                     = new DummyConnection("Server-AI-" + player.getName(),
                         new AIInGameInputHandler(this, serverPlayer, aiMain));
@@ -1218,7 +1251,7 @@ public final class FreeColServer {
     public ServerPlayer makeAIPlayer(Nation nation) {
         DummyConnection theConnection
             = new DummyConnection("Server connection - " + nation.getId(),
-                getInGameInputHandler());
+                                  this.inGameInputHandler);
         ServerPlayer aiPlayer = new ServerPlayer(getGame(), false, nation);
         aiPlayer.setConnection(theConnection);
         aiPlayer.setAI(true);
@@ -1283,12 +1316,5 @@ public final class FreeColServer {
      */
     public AIPlayer getAIPlayer(Player player) {
         return getAIMain().getAIPlayer(player);
-    }
-
-    /**
-     * Shut down this FreeColServer.
-     */
-    public void shutdown() {
-        server.shutdown();
     }
 }

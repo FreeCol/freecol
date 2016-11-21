@@ -226,16 +226,9 @@ public final class Server extends Thread {
         // ServerSocket is REALLY closed after execution of shutdown.
         synchronized (this.shutdownLock) {
             while (this.running) {
-                Socket clientSocket = null;
                 try {
-                    clientSocket = serverSocket.accept();
-                    String name = clientSocket.getInetAddress() + ":"
-                        + clientSocket.getPort();
-                    logger.info("Got client connection from " + name);
-                    Connection connection = new Connection(clientSocket,
-                        this.freeColServer.getUserConnectionHandler(),
-                        FreeCol.SERVER_THREAD + name);
-                    addConnection(connection);
+                    this.freeColServer
+                        .addNewUserConnection(serverSocket.accept());
                 } catch (IOException|IllegalMonitorStateException e) {
                     if (this.running) {
                         logger.log(Level.WARNING, "Connection failed: ", e);
