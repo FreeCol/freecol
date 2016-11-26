@@ -701,11 +701,15 @@ public abstract class ServerAPI {
      *
      * @param userName The user name.
      * @param version The client version.
+     * @param single True if this is a single player login.
+     * @param current True if the requesting player should become the
+     *     current player.
      * @return True if the server interaction succeeded.
      */
-    public boolean login(String userName, String version) {
+    public boolean login(String userName, String version,
+                         boolean single, boolean current) {
         return ask(null,
-                   new LoginMessage(userName, version));
+            new LoginMessage(userName, version, null, single, current, null));
     }
 
     /**

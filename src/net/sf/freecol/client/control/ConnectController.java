@@ -211,7 +211,9 @@ public final class ConnectController extends FreeColClientHolder {
         if (err == null) {
             // Ask the server to log in a player with the given user name.
             // Control effectively transfers to PGIH.login().
-            if (askServer().login(user, FreeCol.getVersion())) return true;
+            if (askServer().login(user, FreeCol.getVersion(),
+                                  fcc.getSinglePlayer(),
+                                  fcc.currentPlayerIsMyPlayer())) return true;
             err = StringTemplate.template("server.couldNotLogin");
         }
         getGUI().showErrorMessage(err);

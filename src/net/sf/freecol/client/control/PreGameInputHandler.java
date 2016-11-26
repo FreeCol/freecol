@@ -52,6 +52,7 @@ import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
+import net.sf.freecol.server.FreeColServer.GameState;
 
 import org.w3c.dom.Element;
 
@@ -183,12 +184,12 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final String user = message.getUserName();
         final boolean single = message.getSinglePlayer();
         final boolean current = message.getCurrentPlayer();
+        final GameState state = message.getState();
         final Game game = message.getGame(); // This is the real game!
 
         Player player = game.getPlayerByName(user);
         if (player == null) {
-            StringTemplate err = StringTemplate
-                .template("server.noSuchPlayer")
+            StringTemplate err = StringTemplate.template("server.noSuchPlayer")
                 .addName("%player%", user);
             getGUI().showErrorMessage(err);
             logger.warning(Messages.message(err));
@@ -200,18 +201,20 @@ public final class PreGameInputHandler extends ClientInputHandler {
         fcc.addSpecificationActions(game.getSpecification());
         fcc.setLoggedIn(true);
         if (current) game.setCurrentPlayer(player);
+        if (state == GameState.IN_GAME) fcc.changeGameState(true);
         logger.info("FreeColClient logged in to "
             + ((fcc.isInGame()) ? "running"
                 : (game.allPlayersReadyToLaunch()) ? "ready" : "new")
             + " " + ((single) ? "single" : "multi")
-            + "player game as " + user + "/" + player.getId());
+            + "-player game as " + user + "/" + player.getId());
 
         if (fcc.isInGame()) { // Joining existing game, possibly reconnect
+            getGUI().refresh();
             igc().nextModelMessage();
         } else if (game.getMap() != null
             && game.allPlayersReadyToLaunch()) { // Ready to launch!
             pgc().requestLaunch();
-        } else { // More parameters need to be set, or players to become ready
+        } else { // More parameters need to be set or players to become ready
             getGUI().showStartGamePanel(game, player, single);
         }
         return null;

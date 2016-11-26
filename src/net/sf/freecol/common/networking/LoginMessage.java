@@ -46,6 +46,7 @@ public class LoginMessage extends DOMMessage {
     public static final String TAG = "login";
     private static final String CURRENT_PLAYER_TAG = "currentPlayer";
     private static final String SINGLE_PLAYER_TAG = "singlePlayer";
+    private static final String STATE_TAG = "state";
     private static final String USER_NAME_TAG = "userName";
     private static final String VERSION_TAG = "version";
     
@@ -55,6 +56,9 @@ public class LoginMessage extends DOMMessage {
     /** The client FreeCol version. */
     private final String version;
 
+    /** The server state. */
+    private final GameState state;
+    
     /** Is this a single player game. */
     private final boolean singlePlayer;
 
@@ -70,29 +74,21 @@ public class LoginMessage extends DOMMessage {
      *
      * @param userName The name of the user logging in.
      * @param version The version of FreeCol at the client.
+     * @param state The server state.
      * @param singlePlayer True in single player games.
      * @param currentPlayer True if this player is the current player.
      * @param game The entire game.
      */
-    public LoginMessage(String userName, String version, boolean singlePlayer,
-                        boolean currentPlayer, Game game) {
+    public LoginMessage(String userName, String version, GameState state,
+                        boolean singlePlayer, boolean currentPlayer, Game game) {
         super(TAG);
 
         this.userName = userName;
         this.version = version;
+        this.state = state;
         this.singlePlayer = singlePlayer;
         this.currentPlayer = currentPlayer;
         this.game = game;
-    }
-
-    /**
-     * Create a new simple {@code LoginMessage} request.
-     *
-     * @param userName The name of the user logging in.
-     * @param version The version of FreeCol at the client.
-     */
-    public LoginMessage(String userName, String version) {
-        this(userName, version, false, false, null);
     }
 
     /**
@@ -104,6 +100,7 @@ public class LoginMessage extends DOMMessage {
     public LoginMessage(Game game, Element e) {
         this(getStringAttribute(e, USER_NAME_TAG),
              getStringAttribute(e, VERSION_TAG),
+             getEnumAttribute(e, STATE_TAG, GameState.class, (GameState)null),
              getBooleanAttribute(e, SINGLE_PLAYER_TAG, true),
              getBooleanAttribute(e, CURRENT_PLAYER_TAG, false),
              getChild(game, e, 0, Game.class));
@@ -118,6 +115,10 @@ public class LoginMessage extends DOMMessage {
 
     public String getVersion() {
         return this.version;
+    }
+
+    public GameState getState() {
+        return this.state;
     }
 
     public boolean getSinglePlayer() {
@@ -211,6 +212,7 @@ public class LoginMessage extends DOMMessage {
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(serverPlayer,
                 new LoginMessage(this.userName, this.version,
+                                 freeColServer.getGameState(),
                                  freeColServer.getSinglePlayer(),
                                  game.getCurrentPlayer() == serverPlayer,
                                  game));
@@ -253,6 +255,7 @@ public class LoginMessage extends DOMMessage {
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(present,
                 new LoginMessage(this.userName, this.version,
+                                 freeColServer.getGameState(),
                                  freeColServer.getSinglePlayer(),
                                  game.getCurrentPlayer() == present, game));
 
@@ -292,6 +295,7 @@ public class LoginMessage extends DOMMessage {
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(present,
                 new LoginMessage(this.userName, this.version,
+                                 freeColServer.getGameState(),
                                  freeColServer.getSinglePlayer(),
                                  game.getCurrentPlayer() == present, game));
             
@@ -310,9 +314,11 @@ public class LoginMessage extends DOMMessage {
     public Element toXMLElement() {
         Player player = (this.game == null || this.userName == null) ? null
             : this.game.getPlayerByName(this.userName);
+        String state = (this.state == null) ? "" : this.state.toString();
         return new DOMMessage(TAG,
             USER_NAME_TAG, this.userName,
             VERSION_TAG, this.version,
+            STATE_TAG, state,
             SINGLE_PLAYER_TAG, Boolean.toString(this.singlePlayer),
             CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer))
             .add(this.game, player)
