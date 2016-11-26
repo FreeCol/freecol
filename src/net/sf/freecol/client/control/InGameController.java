@@ -4581,7 +4581,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             
             // Wake up human!
-            if (!getFreeColClient().isSinglePlayer()) {
+            if (!getFreeColClient().getSinglePlayer()) {
                 sound("sound.anthem." + player.getNationId());
             }
 
@@ -4605,7 +4605,7 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = getMyPlayer();
         if (player == dead) {
             FreeColDebugger.finishDebugRun(getFreeColClient(), true);
-            if (getFreeColClient().isSinglePlayer()) {
+            if (getFreeColClient().getSinglePlayer()) {
                 if (player.getPlayerType() == Player.PlayerType.RETIRED) {
                     ; // Do nothing, retire routine will quit
 

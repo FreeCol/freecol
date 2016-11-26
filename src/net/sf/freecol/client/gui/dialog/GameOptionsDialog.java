@@ -54,7 +54,7 @@ public final class GameOptionsDialog extends OptionsDialog {
         // Set special cases
         // Disable victory option "All humans defeated"
         // when playing single player
-        if (isEditable() && freeColClient.isSinglePlayer()) {
+        if (isEditable() && freeColClient.getSinglePlayer()) {
             BooleanOptionUI comp = (BooleanOptionUI) getOptionUI()
                 .getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
             if (comp != null) {

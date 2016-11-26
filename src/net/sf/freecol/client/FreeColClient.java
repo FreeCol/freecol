@@ -414,31 +414,12 @@ public final class FreeColClient {
     }
 
     /**
-     * Gets the input handler that will be used before the game has been
-     * started.
-     *
-     * @return The {@code PreGameInputHandler}.
-     */
-    public PreGameInputHandler getPreGameInputHandler() {
-        return preGameInputHandler;
-    }
-
-    /**
      * Gets the controller that will be used when the game has been started.
      *
      * @return The {@code InGameController}.
      */
     public InGameController getInGameController() {
         return inGameController;
-    }
-
-    /**
-     * Gets the input handler that will be used when the game has been started.
-     *
-     * @return The {@code InGameInputHandler}.
-     */
-    public InGameInputHandler getInGameInputHandler() {
-        return inGameInputHandler;
     }
 
     /**
@@ -555,7 +536,7 @@ public final class FreeColClient {
      *     {@code FreeColClient}.
      */
     public ClientOptions getClientOptions() {
-        return clientOptions;
+        return this.clientOptions;
     }
 
     /**
@@ -570,29 +551,33 @@ public final class FreeColClient {
     /**
      * Has the game started?
      *
-     * @return <i>true</i> if the game has started.
-     * @see #setInGame
+     * @return True if the game has started.
      */
     public boolean isInGame() {
-        return inGame;
+        return this.inGame;
     }
 
     /**
-     * Set the game start state.
+     * Change the game state (either in or pre-game).
      *
-     * @param inGame Whether or not the game has started.
+     * @param inGame If true, change to in-game state.
      */
-    public void setInGame(boolean inGame) {
+    public void changeGameState(boolean inGame) {
+        if (inGame) {
+            setMessageHandler(this.inGameInputHandler);
+        } else {
+            setMessageHandler(this.preGameInputHandler);
+        }
         this.inGame = inGame;
     }
-
+        
     /**
      * Are we using the map editor?
      *
      * @return True if the map editor is enabled.
      */
     public boolean isMapEditor() {
-        return mapEditor;
+        return this.mapEditor;
     }
 
     /**
@@ -610,8 +595,8 @@ public final class FreeColClient {
      * @return True if the user is playing in single player mode.
      * @see #setSinglePlayer
      */
-    public boolean isSinglePlayer() {
-        return singlePlayer;
+    public boolean getSinglePlayer() {
+        return this.singlePlayer;
     }
 
     /**
@@ -630,7 +615,7 @@ public final class FreeColClient {
      * @return True if this client is logged in to a server.
      */
     public boolean isLoggedIn() {
-        return loggedIn;
+        return this.loggedIn;
     }
 
     /**
@@ -648,7 +633,7 @@ public final class FreeColClient {
      * @return a {@code boolean} value
      */
     public boolean isHeadless() {
-        return headless;
+        return this.headless;
     }
 
 
@@ -711,10 +696,10 @@ public final class FreeColClient {
      * @return True if the current player is owned by this client.
      */
     public boolean currentPlayerIsMyPlayer() {
-        return inGame
-            && game != null
-            && player != null
-            && player.equals(game.getCurrentPlayer());
+        return this.inGame
+            && this.game != null
+            && this.player != null
+            && this.player.equals(this.game.getCurrentPlayer());
     }
 
     /**
@@ -767,7 +752,7 @@ public final class FreeColClient {
         StringTemplate err = null;
         try {
             if (askServer().connect(FreeCol.CLIENT_THREAD + user, host, port,
-                                    getPreGameInputHandler())) {
+                                    this.preGameInputHandler)) {
                 logger.info("Connected to " + host + ":" + port
                     + " as " + user);
             } else {
@@ -853,7 +838,7 @@ public final class FreeColClient {
      * Quits the application without any questions.
      */
     public void quit() {
-        getConnectController().quitGame(isSinglePlayer());
+        getConnectController().quitGame(getSinglePlayer());
 
         // delete outdated autosave files
         long validPeriod = 1000L * 24L * 60L * 60L // days to ms

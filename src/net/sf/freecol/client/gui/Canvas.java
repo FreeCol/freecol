@@ -1760,7 +1760,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showChatPanel() {
         // FIXME: does it have state, or can we create a new one?
-        if (freeColClient.isSinglePlayer()) return; // chat with who?
+        if (freeColClient.getSinglePlayer()) return; // chat with who?
         showSubPanel(chatPanel, true);
     }
 

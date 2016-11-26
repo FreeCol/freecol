@@ -162,8 +162,7 @@ public final class PreGameController extends FreeColClientHolder {
         getSoundController().playSound("sound.intro." + player.getNationId());
 
         // Switch to InGame mode
-        fcc.setMessageHandler(fcc.getInGameInputHandler());
-        fcc.setInGame(true);
+        fcc.changeGameState(true);
         gui.initializeInGame();
 
         // Clean up autosaves

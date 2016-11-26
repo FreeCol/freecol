@@ -84,7 +84,7 @@ public final class ConnectController extends FreeColClientHolder {
         ResourceManager.setScenarioMapping(null);
 
         final FreeColClient fcc = getFreeColClient();
-        if (!fcc.isHeadless()) fcc.setInGame(false);
+        if (!fcc.isHeadless()) fcc.changeGameState(false);
         fcc.setGame(null);
         fcc.setMyPlayer(null);
         askServer().reset();
