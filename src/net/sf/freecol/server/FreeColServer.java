@@ -680,9 +680,9 @@ public final class FreeColServer {
             return;
         }
 
-        updateMetaServer(false);
         changeServerState(ServerState.IN_GAME);
         sendToAll(TrivialMessage.START_GAME_MESSAGE, (ServerPlayer)null);
+        updateMetaServer(false);
     }
 
     /**
@@ -723,7 +723,7 @@ public final class FreeColServer {
             p -> !((ServerPlayer)p).isAI()
                 && ((ServerPlayer)p).isConnected());
         return new ServerInfo(getName(), address, port, slots, players,
-                              this.serverState != ServerState.PRE_GAME,
+                              this.serverState == ServerState.IN_GAME,
                               FreeCol.getVersion(),
                               getServerState().ordinal());
     }
