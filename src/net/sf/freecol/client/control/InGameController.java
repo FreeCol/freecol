@@ -4665,7 +4665,7 @@ public final class InGameController extends FreeColClientHolder {
      */
     public boolean setInDebugMode() {
         FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
-        updateGUI(null);
+        getConnectController().reconnect();
         return true;
     }
 

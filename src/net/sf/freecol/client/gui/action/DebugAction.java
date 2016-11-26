@@ -67,9 +67,6 @@ public class DebugAction extends FreeColAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if (shouldBeEnabled()) {
-            igc().setInDebugMode();
-            getConnectController().reconnect();
-        }
+        if (shouldBeEnabled()) igc().setInDebugMode();
     }
 }
