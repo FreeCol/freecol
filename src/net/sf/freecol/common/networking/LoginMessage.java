@@ -31,7 +31,7 @@ import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.FreeColServer.GameState;
+import net.sf.freecol.server.FreeColServer.ServerState;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -57,7 +57,7 @@ public class LoginMessage extends DOMMessage {
     private final String version;
 
     /** The server state. */
-    private final GameState state;
+    private final ServerState state;
     
     /** Is this a single player game. */
     private final boolean singlePlayer;
@@ -79,7 +79,7 @@ public class LoginMessage extends DOMMessage {
      * @param currentPlayer True if this player is the current player.
      * @param game The entire game.
      */
-    public LoginMessage(String userName, String version, GameState state,
+    public LoginMessage(String userName, String version, ServerState state,
                         boolean singlePlayer, boolean currentPlayer, Game game) {
         super(TAG);
 
@@ -100,7 +100,8 @@ public class LoginMessage extends DOMMessage {
     public LoginMessage(Game game, Element e) {
         this(getStringAttribute(e, USER_NAME_TAG),
              getStringAttribute(e, VERSION_TAG),
-             getEnumAttribute(e, STATE_TAG, GameState.class, (GameState)null),
+             getEnumAttribute(e, STATE_TAG,
+                              ServerState.class, (ServerState)null),
              getBooleanAttribute(e, SINGLE_PLAYER_TAG, true),
              getBooleanAttribute(e, CURRENT_PLAYER_TAG, false),
              getChild(game, e, 0, Game.class));
@@ -117,7 +118,7 @@ public class LoginMessage extends DOMMessage {
         return this.version;
     }
 
-    public GameState getState() {
+    public ServerState getState() {
         return this.state;
     }
 
@@ -175,7 +176,7 @@ public class LoginMessage extends DOMMessage {
         ServerPlayer present;
         boolean isCurrentPlayer = false;
 
-        switch (freeColServer.getGameState()) {
+        switch (freeColServer.getServerState()) {
         case PRE_GAME:
             if ((game = freeColServer.waitForGame()) == null) {
                 return ChangeSet.clientError((ServerPlayer)null,
@@ -212,7 +213,7 @@ public class LoginMessage extends DOMMessage {
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(serverPlayer,
                 new LoginMessage(this.userName, this.version,
-                                 freeColServer.getGameState(),
+                                 freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
                                  game.getCurrentPlayer() == serverPlayer,
                                  game));
@@ -255,7 +256,7 @@ public class LoginMessage extends DOMMessage {
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(present,
                 new LoginMessage(this.userName, this.version,
-                                 freeColServer.getGameState(),
+                                 freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
                                  game.getCurrentPlayer() == present, game));
 
@@ -295,7 +296,7 @@ public class LoginMessage extends DOMMessage {
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(present,
                 new LoginMessage(this.userName, this.version,
-                                 freeColServer.getGameState(),
+                                 freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
                                  game.getCurrentPlayer() == present, game));
             

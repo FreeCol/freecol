@@ -99,7 +99,7 @@ public class LogoutMessage extends AttributeMessage {
         // option, but for now allow the player to reconnect.
         serverPlayer.setConnected(false);
 
-        switch (freeColServer.getGameState()) {
+        switch (freeColServer.getServerState()) {
         case PRE_GAME: case LOAD_GAME:
             LogoutMessage message
                 = new LogoutMessage(serverPlayer, "User has logged out");

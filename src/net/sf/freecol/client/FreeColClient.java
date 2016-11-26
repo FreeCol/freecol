@@ -60,7 +60,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.FreeColServer.GameState;
+import net.sf.freecol.server.FreeColServer.ServerState;
 
 
 /**
@@ -558,11 +558,11 @@ public final class FreeColClient {
     }
 
     /**
-     * Change the game state (either in or pre-game).
+     * Change the client in-game state (either in or pre-game).
      *
      * @param inGame If true, change to in-game state.
      */
-    public void changeGameState(boolean inGame) {
+    public void changeClientState(boolean inGame) {
         if (inGame) {
             setMessageHandler(this.inGameInputHandler);
         } else {
@@ -687,7 +687,7 @@ public final class FreeColClient {
      */
     public boolean canSaveCurrentGame() {
         return freeColServer != null
-            && (isAdmin() || freeColServer.getGameState() != GameState.IN_GAME);
+            && (isAdmin() || freeColServer.getServerState() != ServerState.IN_GAME);
     }
 
     /**

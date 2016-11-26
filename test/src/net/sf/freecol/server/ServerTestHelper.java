@@ -101,8 +101,8 @@ public final class ServerTestHelper {
             fail(ex.getMessage());
         }
         assertNotNull(server);
-        assertEquals(FreeColServer.GameState.PRE_GAME,
-                     server.getGameState());
+        assertEquals(FreeColServer.ServerState.PRE_GAME,
+                     server.getServerState());
         return server;
     }
 
@@ -123,7 +123,8 @@ public final class ServerTestHelper {
             fail(e.getMessage());
         }
         assertNotNull(server);
-        assertEquals(FreeColServer.GameState.LOAD_GAME, server.getGameState());
+        assertEquals(FreeColServer.ServerState.LOAD_GAME,
+                     server.getServerState());
         return server;
     }
 
@@ -137,7 +138,8 @@ public final class ServerTestHelper {
         } catch (FreeColException e) {
             fail(e.getMessage());
         }
-        assertEquals(FreeColServer.GameState.IN_GAME, serv.getGameState());
+        assertEquals(FreeColServer.ServerState.IN_GAME,
+                     serv.getServerState());
         assertNotNull(serv.getGame());
         assertNotNull(serv.getGame().getMap());
 

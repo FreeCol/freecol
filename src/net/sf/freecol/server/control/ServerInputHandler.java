@@ -141,7 +141,7 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         if (handler == null) {
             // Should we return an error here? The old handler returned null.
             logger.warning("No "
-                + freeColServer.getGameState().toString().toLowerCase()
+                + freeColServer.getServerState().toString().toLowerCase()
                 + " handler for " + tag);
         } else {
             try {

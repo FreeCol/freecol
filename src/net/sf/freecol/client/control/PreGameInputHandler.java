@@ -52,7 +52,7 @@ import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
-import net.sf.freecol.server.FreeColServer.GameState;
+import net.sf.freecol.server.FreeColServer.ServerState;
 
 import org.w3c.dom.Element;
 
@@ -184,7 +184,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final String user = message.getUserName();
         final boolean single = message.getSinglePlayer();
         final boolean current = message.getCurrentPlayer();
-        final GameState state = message.getState();
+        final ServerState state = message.getState();
         final Game game = message.getGame(); // This is the real game!
 
         Player player = game.getPlayerByName(user);
@@ -201,7 +201,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
         fcc.addSpecificationActions(game.getSpecification());
         fcc.setLoggedIn(true);
         if (current) game.setCurrentPlayer(player);
-        if (state == GameState.IN_GAME) fcc.changeGameState(true);
+        if (state == ServerState.IN_GAME) fcc.changeClientState(true);
         logger.info("FreeColClient logged in to "
             + ((fcc.isInGame()) ? "running"
                 : (game.allPlayersReadyToLaunch()) ? "ready" : "new")

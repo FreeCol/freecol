@@ -54,7 +54,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.metaserver.MetaServerUtils;
 import net.sf.freecol.metaserver.ServerInfo;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.FreeColServer.GameState;
+import net.sf.freecol.server.FreeColServer.ServerState;
 
 
 /**
@@ -84,7 +84,7 @@ public final class ConnectController extends FreeColClientHolder {
         ResourceManager.setScenarioMapping(null);
 
         final FreeColClient fcc = getFreeColClient();
-        if (!fcc.isHeadless()) fcc.changeGameState(false);
+        if (!fcc.isHeadless()) fcc.changeClientState(false);
         fcc.setGame(null);
         fcc.setMyPlayer(null);
         askServer().reset();
@@ -285,8 +285,8 @@ public final class ConnectController extends FreeColClientHolder {
     private boolean joinGame(String host, int port) {
         DOMMessage msg = ask(host, port, new GameStateMessage(),
             GameStateMessage.TAG, StringTemplate.template("client.noState"));
-        GameState state = (msg instanceof GameStateMessage)
-            ? ((GameStateMessage)msg).getGameState()
+        ServerState state = (msg instanceof GameStateMessage)
+            ? ((GameStateMessage)msg).getState()
             : null;        
         if (state == null) return false;
 

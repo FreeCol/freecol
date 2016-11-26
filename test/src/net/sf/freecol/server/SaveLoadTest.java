@@ -81,7 +81,8 @@ public class SaveLoadTest extends FreeColTestCase {
         }
         importOption.setValue(null);
 
-        assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
+        assertEquals(FreeColServer.ServerState.IN_GAME,
+                     server.getServerState());
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());
         file.delete();

@@ -22,7 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.FreeColServer.GameState;
+import net.sf.freecol.server.FreeColServer.ServerState;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -46,11 +46,13 @@ public class GameStateMessage extends AttributeMessage {
 
     /**
      * Create a new {@code GameStateMessage} with a given state.
+     *
+     * @param serverState The {@code serverState} to send.
      */
-    public GameStateMessage(GameState gameState) {
+    public GameStateMessage(ServerState serverState) {
         super(TAG);
 
-        setAttribute(STATE_TAG, gameState.toString());
+        setAttribute(STATE_TAG, serverState.toString());
     }
 
     /**
@@ -62,14 +64,14 @@ public class GameStateMessage extends AttributeMessage {
      */
     public GameStateMessage(Game game, Element element) {
         this(getEnumAttribute(element, STATE_TAG,
-                              GameState.class, (GameState)null));
+                              ServerState.class, (ServerState)null));
     }
 
 
     // Public interface
 
-    public GameState getGameState() {
-        return Enum.valueOf(GameState.class, getAttribute(STATE_TAG));
+    public ServerState getState() {
+        return Enum.valueOf(ServerState.class, getAttribute(STATE_TAG));
     }
 
 
@@ -81,6 +83,6 @@ public class GameStateMessage extends AttributeMessage {
         @SuppressWarnings("unused") ServerPlayer serverPlayer) {
         // Called from UserConnectionHandler, without serverPlayer being defined
         return ChangeSet.simpleChange((ServerPlayer)null,
-            new GameStateMessage(freeColServer.getGameState()));
+            new GameStateMessage(freeColServer.getServerState()));
     }
 }

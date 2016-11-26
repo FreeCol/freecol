@@ -159,8 +159,8 @@ public final class FreeColServer {
      */
     public static final String DEFAULT_SPEC = "freecol";
 
-    /** Games are either starting, ending or being played. */
-    public static enum GameState { PRE_GAME, LOAD_GAME, IN_GAME, END_GAME }
+    /** The server is either starting, loading, being played, or ending. */
+    public static enum ServerState { PRE_GAME, LOAD_GAME, IN_GAME, END_GAME }
 
 
     // Serializable fundamentals
@@ -183,7 +183,7 @@ public final class FreeColServer {
     // Non-serialized internals follow
 
     /** The current state of the game. */
-    private GameState gameState = GameState.PRE_GAME;
+    private ServerState serverState = ServerState.PRE_GAME;
 
     /** The underlying interface to the network. */
     private Server server;
@@ -428,7 +428,8 @@ public final class FreeColServer {
      * @return The {@code Controller}.
      */
     public Controller getController() {
-        return (getGameState() == GameState.IN_GAME) ? this.inGameController
+        return (getServerState() == ServerState.IN_GAME)
+            ? this.inGameController
             : this.preGameController;
     }
 
@@ -499,21 +500,23 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the current state of the game.
+     * Gets the current state of the server.
      *
-     * @return The game state.
+     * @return The current {@code ServerState}.
      */
-    public GameState getGameState() {
-        return this.gameState;
+    public ServerState getServerState() {
+        return this.serverState;
     }
 
     /**
-     * Change the game state.
+     * Change the server state.
      *
-     * @param gameState The new {@code GameState}.
+     * @param serverState The new {@code ServerState}.
+     * @return The old server state.
      */
-    private void changeGameState(GameState gameState) {
-        switch (this.gameState = gameState) {
+    private ServerState changeServerState(ServerState serverState) {
+        ServerState ret = this.serverState;
+        switch (this.serverState = serverState) {
         case PRE_GAME: case LOAD_GAME:
             this.server.setMessageHandlerToAllConnections(this.preGameInputHandler);
             break;
@@ -524,6 +527,7 @@ public final class FreeColServer {
             this.server.setMessageHandlerToAllConnections(null);
             break;
         }
+        return ret;
     }
             
     /**
@@ -602,7 +606,7 @@ public final class FreeColServer {
      * @param connection The new {@code Connection}.
      */
     public void addPlayerConnection(Connection connection) {
-        switch (this.gameState) {
+        switch (this.serverState) {
         case PRE_GAME: case LOAD_GAME:
             connection.setMessageHandler(this.preGameInputHandler);
             break;
@@ -646,7 +650,7 @@ public final class FreeColServer {
      *   <li>Creates the game.
      *   <li>Sends updated game information to the clients.
      *   <li>Changes the game state to
-     *         {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}.
+     *         {@link net.sf.freecol.server.FreeColServer.ServerState#IN_GAME}.
      *   <li>Sends the "startGame"-message to the clients.
      *   <li>Switches to using the in-game version of the input handler.
      * </ol>
@@ -657,7 +661,7 @@ public final class FreeColServer {
         logger.info("Starting game.");
         final Game game = buildGame();
 
-        switch (this.gameState) {
+        switch (this.serverState) {
         case PRE_GAME: // Send the updated game to the clients.
             for (Player player : transform(game.getLivePlayers(),
                                            p -> !p.isAI())) {
@@ -672,12 +676,12 @@ public final class FreeColServer {
             break;
         default:
             logger.warning("Invalid startGame when server state = "
-                + this.gameState);
+                + this.serverState);
             return;
         }
 
         updateMetaServer(false);
-        changeGameState(GameState.IN_GAME);
+        changeServerState(ServerState.IN_GAME);
         sendToAll(TrivialMessage.START_GAME_MESSAGE, (ServerPlayer)null);
     }
 
@@ -719,8 +723,9 @@ public final class FreeColServer {
             p -> !((ServerPlayer)p).isAI()
                 && ((ServerPlayer)p).isConnected());
         return new ServerInfo(getName(), address, port, slots, players,
-                              gameState != GameState.PRE_GAME,
-                              FreeCol.getVersion(), getGameState().ordinal());
+                              this.serverState != ServerState.PRE_GAME,
+                              FreeCol.getVersion(),
+                              getServerState().ordinal());
     }
 
     /**
@@ -1075,7 +1080,7 @@ public final class FreeColServer {
     private ServerGame loadGame(final FreeColSavegameFile fis,
                                 Specification specification, Server server)
         throws FreeColException, IOException, XMLStreamException {
-        changeGameState(GameState.LOAD_GAME);
+        changeServerState(ServerState.LOAD_GAME);
         ServerGame game = readGame(fis, specification, this);
         this.integrity = game.checkIntegrity(true);
         if (integrity < 0) {

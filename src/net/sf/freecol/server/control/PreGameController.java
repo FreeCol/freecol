@@ -43,7 +43,7 @@ import net.sf.freecol.server.model.ServerPlayer;
  * to receive and handle network messages from the clients.
  *
  * The game enters the state
- * {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}, when the
+ * {@link net.sf.freecol.server.FreeColServer.ServerState#IN_GAME}, when the
  * {@link #startGame} has successfully been invoked.
  *
  * @see InGameInputHandler
