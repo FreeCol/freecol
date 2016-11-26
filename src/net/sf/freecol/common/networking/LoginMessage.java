@@ -188,19 +188,10 @@ public class LoginMessage extends DOMMessage {
 
         switch (freeColServer.getGameState()) {
         case PRE_GAME: case LOAD_GAME:
-            // Wait until the game has been created.
-            // FIXME: is this still needed?
-            int timeOut = 20000;
-            while ((game = freeColServer.getGame()) == null) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {}
-                if ((timeOut -= 1000) <= 0) {
-                    return ChangeSet.clientError((ServerPlayer)null,
-                        StringTemplate.template("server.timeOut"));
-                }
+            if ((game = freeColServer.waitForGame()) == null) {
+                return ChangeSet.clientError((ServerPlayer)null,
+                    StringTemplate.template("server.timeOut"));
             }
-
             Nation nation = game.getVacantNation();
             if (nation == null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate

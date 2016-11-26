@@ -230,6 +230,48 @@ public final class FreeColServer {
     }
     
     /**
+     * Start a Server at port.
+     *
+     * If the port is specified, just try once.
+     *
+     * If the port is unspecified (negative), try multiple times.
+     *
+     * @param firstPort The port to start trying to connect at.
+     * @return A started {@code Server}.
+     * @exception IOException on failure to open the port.
+     */
+    private Server serverStart(int firstPort) throws IOException {
+        String host = (this.publicServer) ? "0.0.0.0"
+            : InetAddress.getLoopbackAddress().getHostAddress();
+        int port, tries;
+        if (firstPort < 0) {
+            port = FreeCol.getServerPort();
+            tries = 10;
+        } else {
+            port = firstPort;
+            tries = 1;
+        }
+        logger.finest("serverStart(" + firstPort + ") => " + port
+            + " x " + tries);
+        for (int i = tries; i > 0; i--) {
+            try {
+                server = new Server(this, host, port);
+                server.start();
+                break;
+            } catch (BindException be) {
+                if (i == 1) {
+                    throw new IOException("Bind exception starting server at: "
+                        + host + ":" + port, be);
+                }
+            } catch (IOException ie) {
+                if (i == 1) throw ie;
+            }
+            port++;
+        }
+        return server;
+    }
+
+    /**
      * Starts a new server, with a new game.
      *
      * @param publicServer If true, add to the meta-server.
@@ -290,48 +332,6 @@ public final class FreeColServer {
         this.publicServer = updateMetaServer(true);
     }
 
-
-    /**
-     * Start a Server at port.
-     *
-     * If the port is specified, just try once.
-     *
-     * If the port is unspecified (negative), try multiple times.
-     *
-     * @param firstPort The port to start trying to connect at.
-     * @return A started {@code Server}.
-     * @exception IOException on failure to open the port.
-     */
-    private Server serverStart(int firstPort) throws IOException {
-        String host = (this.publicServer) ? "0.0.0.0"
-            : InetAddress.getLoopbackAddress().getHostAddress();
-        int port, tries;
-        if (firstPort < 0) {
-            port = FreeCol.getServerPort();
-            tries = 10;
-        } else {
-            port = firstPort;
-            tries = 1;
-        }
-        logger.finest("serverStart(" + firstPort + ") => " + port
-            + " x " + tries);
-        for (int i = tries; i > 0; i--) {
-            try {
-                server = new Server(this, host, port);
-                server.start();
-                break;
-            } catch (BindException be) {
-                if (i == 1) {
-                    throw new IOException("Bind exception starting server at: "
-                        + host + ":" + port, be);
-                }
-            } catch (IOException ie) {
-                if (i == 1) throw ie;
-            }
-            port++;
-        }
-        return server;
-    }
 
     /**
      * Is the user playing in single player mode?
@@ -614,6 +614,26 @@ public final class FreeColServer {
         }            
         this.server.addConnection(connection);
         updateMetaServer(false);
+    }
+
+    /**
+     * Wait until the game has been created.
+     *
+     * FIXME: is this still needed?
+     *
+     * @return The {@code Game}, or null if the wait times out.
+     */
+    public Game waitForGame() {        
+        final int timeStep = 1000;
+        int timeOut = 20000;
+        Game game = null;
+        while ((game = this.getGame()) == null) {
+            try {
+                Thread.sleep(timeStep);
+            } catch (InterruptedException e) {}
+            if ((timeOut -= timeStep) <= 0) break;
+        }
+        return game;
     }
 
     /**
