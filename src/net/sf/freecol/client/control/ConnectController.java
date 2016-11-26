@@ -78,20 +78,6 @@ public final class ConnectController extends FreeColClientHolder {
 
 
     /**
-     * The game is finishing.  Release/unhook everything.
-     */
-    private void finish() {
-        ResourceManager.setScenarioMapping(null);
-
-        final FreeColClient fcc = getFreeColClient();
-        if (!fcc.isHeadless()) fcc.changeClientState(false);
-        fcc.setGame(null);
-        fcc.setMyPlayer(null);
-        askServer().reset();
-        fcc.setLoggedIn(false);
-    }
-
-    /**
      * Shut down an existing server on a given port.
      *
      * @param port The port to unblock.
@@ -186,6 +172,32 @@ public final class ConnectController extends FreeColClientHolder {
     }
         
     /**
+     * Log out this client.
+     *
+     * @param reason The reason to logout from the server.
+     * @return True if the client is logged out, or at least tried to log out.
+     */
+    private boolean logout(String reason) {
+        final FreeColClient fcc = getFreeColClient();
+        if (!fcc.isLoggedIn()) return true;
+        if (!askServer().logout(fcc.getMyPlayer(), reason)) return false;
+
+        logger.info("Logout request for client " + FreeCol.getName()
+            + ": " + reason);
+        // Server never responds to logout, it just closes the connection,
+        // so we need to mark the logout as having occurred here rather
+        // than in the input handler.
+
+        // Drop all attachment to the game
+        fcc.setLoggedIn(false);    
+        fcc.changeClientState(false);
+        fcc.setGame(null);
+        fcc.setMyPlayer(null);
+
+        return true;
+    }
+
+    /**
      * Starts the client and connects to <i>host:port</i>.
      *
      * Public for the test suite.
@@ -202,7 +214,7 @@ public final class ConnectController extends FreeColClientHolder {
         // Clean up any old connections
         if (askServer().isConnected()) {
             try {
-                askServer().disconnect("logging in");
+                askServer().disconnect("login");
             } catch (IOException ioe) {} // Ignore
         }
 
@@ -213,7 +225,10 @@ public final class ConnectController extends FreeColClientHolder {
             // Control effectively transfers to PGIH.login().
             if (askServer().login(user, FreeCol.getVersion(),
                                   fcc.getSinglePlayer(),
-                                  fcc.currentPlayerIsMyPlayer())) return true;
+                                  fcc.currentPlayerIsMyPlayer())) {
+                logger.info("Login request for client " + FreeCol.getName());
+                return true;
+            }
             err = StringTemplate.template("server.couldNotLogin");
         }
         getGUI().showErrorMessage(err);
@@ -222,9 +237,9 @@ public final class ConnectController extends FreeColClientHolder {
 
     //
     // There are several ways to start a game.
-    // - multi-player (can also be joined while in play)
     // - single player
     // - restore from saved game
+    // - multi-player (can also be joined while in play)
     // - shortcut debug/fast-start
     //
     // They all ultimately have to establish a connection to the server,
@@ -232,103 +247,6 @@ public final class ConnectController extends FreeColClientHolder {
     // Control then effectively transfers to the handler for the login
     // message in {@link PreGameInputHandler}.
     //
-
-    /**
-     * Starts a multiplayer server and connects to it.
-     *
-     * @param specification The {@code Specification} for the game.
-     * @param publicServer Whether to make the server public.
-     * @param port The port in which the server should listen for new clients.
-     * @return True if the game is started successfully.
-     */
-    public boolean startMultiplayerGame(Specification specification,
-                                        boolean publicServer, int port) {
-        final FreeColClient fcc = getFreeColClient();
-        fcc.setMapEditor(false);
-
-        logout("Starting multiplayer");
-
-        if (!unblockServer(port)) return false;
-
-        FreeColServer freeColServer = startServer(publicServer, false,
-                                                  specification, port);
-        if (freeColServer == null) return false;
-        fcc.setFreeColServer(freeColServer);
-        fcc.setSinglePlayer(false);
-
-        return joinGame(freeColServer.getHost(), freeColServer.getPort());
-    }
-
-    /**
-     * Join an existing multiplayer game.
-     *
-     * @param host The name of the machine running the server.
-     * @param port The port to use when connecting to the host.
-     * @return True if the game starts successfully.
-     */
-    public boolean joinMultiplayerGame(String host, int port) {
-        final FreeColClient fcc = getFreeColClient();
-        fcc.setMapEditor(false);
-
-        logout("Joining multiplayer");
-
-        return joinGame(host, port);
-    }
-
-    /**
-     * Join a game.
-     *
-     * @param host The name of the machine running the server.
-     * @param port The port to use when connecting to the host.
-     * @return True if the game starts successfully.
-     */
-    private boolean joinGame(String host, int port) {
-        DOMMessage msg = ask(host, port, new GameStateMessage(),
-            GameStateMessage.TAG, StringTemplate.template("client.noState"));
-        ServerState state = (msg instanceof GameStateMessage)
-            ? ((GameStateMessage)msg).getState()
-            : null;        
-        if (state == null) return false;
-
-        StringTemplate err;
-        switch (state) {
-        case PRE_GAME: case LOAD_GAME:
-            if (!login(FreeCol.getName(), host, port)) return false;
-            break;
-
-        case IN_GAME:
-            // Disable this check if you need to debug a multiplayer client.
-            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-                getGUI().showErrorMessage(StringTemplate
-                    .template("client.debugConnect"));
-                return false;
-            }
-
-            // Find the players, choose one.
-            msg = ask(host, port, new VacantPlayersMessage(),
-                      VacantPlayersMessage.TAG,
-                      StringTemplate.template("client.noPlayers"));
-            List<String> names = (msg instanceof VacantPlayersMessage)
-                ? ((VacantPlayersMessage)msg).getVacantPlayers()
-                : null;
-            if (names == null || names.isEmpty()) return false;
-            String choice = getGUI().getChoice(null,
-                Messages.message("client.choicePlayer"), "cancel",
-                transform(names, alwaysTrue(), n ->
-                    new ChoiceItem<>(Messages.message(StringTemplate
-                            .template("countryName")
-                            .add("%nation%", Messages.nameKey(n))), n)));
-            if (choice == null) return false; // User cancelled
-
-            if (!login(Messages.getRulerName(choice), host, port)) return false;
-            break;
-
-        case END_GAME: default:
-            getGUI().showErrorMessage(StringTemplate.template("client.ending"));
-            return false;
-        }
-        return true;
-    }
 
     /**
      * Starts a new single player game by connecting to the server.
@@ -342,7 +260,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        logout("Start single player");
+        logout("Start single-player");
 
         if (!unblockServer(FreeCol.getServerPort())) return false;
 
@@ -530,31 +448,112 @@ public final class ConnectController extends FreeColClientHolder {
     }
 
     /**
+     * Starts a multiplayer server and connects to it.
+     *
+     * @param specification The {@code Specification} for the game.
+     * @param publicServer Whether to make the server public.
+     * @param port The port in which the server should listen for new clients.
+     * @return True if the game is started successfully.
+     */
+    public boolean startMultiplayerGame(Specification specification,
+                                        boolean publicServer, int port) {
+        final FreeColClient fcc = getFreeColClient();
+        fcc.setMapEditor(false);
+
+        logout("Starting multiplayer");
+
+        if (!unblockServer(port)) return false;
+
+        FreeColServer freeColServer = startServer(publicServer, false,
+                                                  specification, port);
+        if (freeColServer == null) return false;
+        fcc.setFreeColServer(freeColServer);
+        fcc.setSinglePlayer(false);
+
+        return joinGame(freeColServer.getHost(), freeColServer.getPort());
+    }
+
+    /**
+     * Join an existing multiplayer game.
+     *
+     * @param host The name of the machine running the server.
+     * @param port The port to use when connecting to the host.
+     * @return True if the game starts successfully.
+     */
+    public boolean joinMultiplayerGame(String host, int port) {
+        final FreeColClient fcc = getFreeColClient();
+        fcc.setMapEditor(false);
+
+        logout("Joining multiplayer");
+
+        return joinGame(host, port);
+    }
+
+    /**
+     * Join a game.
+     *
+     * @param host The name of the machine running the server.
+     * @param port The port to use when connecting to the host.
+     * @return True if the game starts successfully.
+     */
+    private boolean joinGame(String host, int port) {
+        DOMMessage msg = ask(host, port, new GameStateMessage(),
+            GameStateMessage.TAG, StringTemplate.template("client.noState"));
+        ServerState state = (msg instanceof GameStateMessage)
+            ? ((GameStateMessage)msg).getState()
+            : null;        
+        if (state == null) return false;
+
+        StringTemplate err;
+        switch (state) {
+        case PRE_GAME: case LOAD_GAME:
+            if (!login(FreeCol.getName(), host, port)) return false;
+            break;
+
+        case IN_GAME:
+            // Disable this check if you need to debug a multiplayer client.
+            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+                getGUI().showErrorMessage(StringTemplate
+                    .template("client.debugConnect"));
+                return false;
+            }
+
+            // Find the players, choose one.
+            msg = ask(host, port, new VacantPlayersMessage(),
+                      VacantPlayersMessage.TAG,
+                      StringTemplate.template("client.noPlayers"));
+            List<String> names = (msg instanceof VacantPlayersMessage)
+                ? ((VacantPlayersMessage)msg).getVacantPlayers()
+                : null;
+            if (names == null || names.isEmpty()) return false;
+            String choice = getGUI().getChoice(null,
+                Messages.message("client.choicePlayer"), "cancel",
+                transform(names, alwaysTrue(), n ->
+                    new ChoiceItem<>(Messages.message(StringTemplate
+                            .template("countryName")
+                            .add("%nation%", Messages.nameKey(n))), n)));
+            if (choice == null) return false; // User cancelled
+
+            if (!login(Messages.getRulerName(choice), host, port)) return false;
+            break;
+
+        case END_GAME: default:
+            getGUI().showErrorMessage(StringTemplate.template("client.ending"));
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Reconnects to the server.
      *
      * @return True if the reconnection succeeds.
      */
     public boolean reconnect() {
-        final String host = askServer().getHost();
-        final int port = askServer().getPort();
-        logger.info("Reconnect " + FreeCol.getName()
-            + " to " + host + ":" + port);
-        getGUI().removeInGameComponents();
-        logout("reconnect");
-        return login(FreeCol.getName(), host, port);
-    }
-
-    /**
-     * Sends a logout message to the server.
-     *
-     * @param reason The reason to logout from the server
-     */
-    public void logout(String reason) {
         final FreeColClient fcc = getFreeColClient();
-        if (fcc.isLoggedIn()) {
-            askServer().logout(fcc.getMyPlayer(), reason);
-        }
-        finish();
+        logout("reconnect");
+        return login(FreeCol.getName(),
+                     askServer().getHost(), askServer().getPort());
     }
 
     /**
@@ -570,9 +569,8 @@ public final class ConnectController extends FreeColClientHolder {
                 getFreeColClient().setFreeColServer(null);
             }
         } else {
-            logout("User quit");
+            logout("Quit");
         }
-        finish();
     }
 
     /**
