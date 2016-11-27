@@ -110,7 +110,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     private class ColonyTradeItemPanel extends JPanel
-        implements ActionListener {
+            implements ActionListener {
 
         private final Player source;
         private final JComboBox<Colony> colonyBox;
@@ -136,7 +136,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.addButton.setActionCommand(ADD);
             this.label = Utility.localizedLabel(Messages.getName("model.tradeItem.colony"));
             this.allColonies = getFreeColClient().getClientOptions()
-                .getSortedColonies(source);
+                                                 .getSortedColonies(source);
 
             setLayout(new MigLayout("wrap 1", "", ""));
             setBorder(Utility.SIMPLE_LINE_BORDER);
@@ -215,7 +215,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     private class GoldTradeItemPanel extends JPanel
-        implements ActionListener {
+            implements ActionListener {
 
         private final Player source;
         private final JSpinner spinner;
@@ -238,7 +238,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             addButton.setActionCommand(ADD);
             // adjust entry size
             ((JSpinner.DefaultEditor)this.spinner.getEditor())
-                .getTextField().setColumns(5);
+                                                 .getTextField()
+                                                 .setColumns(5);
 
             setBorder(Utility.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
@@ -264,7 +265,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             int gold = dt.getGoldGivenBy(source);
             if (gold >= 0) {
                 SpinnerNumberModel model
-                    = (SpinnerNumberModel)spinner.getModel();
+                        = (SpinnerNumberModel)spinner.getModel();
                 model.setValue(gold);
             }
         }
@@ -284,8 +285,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                     NegotiationDialog.this.addGoldTradeItem(source, amount);
                     break;
                 case CLEAR:
-                    NegotiationDialog.this
-                            .removeTradeItems(GoldTradeItem.class);
+                    NegotiationDialog.this.removeTradeItems(GoldTradeItem.class);
                     break;
                 default:
                     logger.warning("Bad command: " + command);
@@ -295,20 +295,20 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     private class GoodsTradeItemPanel extends JPanel
-        implements ActionListener {
+            implements ActionListener {
 
         private class GoodsBoxRenderer extends JLabel
-            implements ListCellRenderer<Goods> {
+                implements ListCellRenderer<Goods> {
 
             /**
              * {@inheritDoc}
              */
             @Override
             public Component getListCellRendererComponent(JList<? extends Goods> list,
-                Goods value, int index, boolean isSelected,
-                boolean cellHasFocus) {
+                                                          Goods value, int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
                 setText((value == null) ? ""
-                    : Messages.message(value.getLabel(true)));
+                        : Messages.message(value.getLabel(true)));
                 return this;
             }
         }
@@ -422,20 +422,20 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     private class InciteTradeItemPanel extends JPanel
-        implements ActionListener {
+            implements ActionListener {
 
         private class InciteBoxRenderer extends JLabel
-            implements ListCellRenderer<Player> {
+                implements ListCellRenderer<Player> {
 
             /**
              * {@inheritDoc}
              */
             @Override
             public Component getListCellRendererComponent(JList<? extends Player> list,
-                Player value, int index, boolean isSelected,
-                boolean cellHasFocus) {
+                                                          Player value, int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
                 setText((value == null) ? ""
-                    : Messages.message(value.getNationLabel()));
+                        : Messages.message(value.getNationLabel()));
                 return this;
             }
         }
@@ -473,9 +473,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
             available.clear();
             final Predicate<Player> incitablePred = p ->
-                p != this.other && this.source.getStance(p).isIncitable();
+                    p != this.other && this.source.getStance(p).isIncitable();
             available.addAll(transform(getGame().getLivePlayers(this.source),
-                                       incitablePred));
+                    incitablePred));
 
             add(this.label);
             add(this.victimBox);
@@ -545,18 +545,18 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      * that comboBoxLabel() is externally visible.
      */
     public class StanceTradeItemPanel extends JPanel
-        implements ActionListener {
+            implements ActionListener {
 
         private class StanceBoxRenderer extends JLabel
-            implements ListCellRenderer<Stance> {
+                implements ListCellRenderer<Stance> {
 
             /**
              * {@inheritDoc}
              */
             @Override
             public Component getListCellRendererComponent(JList<? extends Stance> list,
-                Stance value, int index, boolean isSelected,
-                boolean cellHasFocus) {
+                                                          Stance value, int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
                 setText((value == null) ? "" : Messages.getName(value));
                 return this;
             }
@@ -661,18 +661,18 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     private class UnitTradeItemPanel extends JPanel
-        implements ActionListener {
+            implements ActionListener {
 
         private class UnitBoxRenderer extends JLabel
-            implements ListCellRenderer<Unit> {
+                implements ListCellRenderer<Unit> {
 
             /**
              * {@inheritDoc}
              */
             @Override
             public Component getListCellRendererComponent(JList<? extends Unit> list,
-                Unit value, int index, boolean isSelected,
-                boolean cellHasFocus) {
+                                                          Unit value, int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
                 setText((value == null) ? "" : value.getDescription());
                 return this;
             }
@@ -831,84 +831,84 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         final Colony ourColony = (our instanceof Colony) ? (Colony)our : null;
         final Unit otherUnit = (other instanceof Unit) ? (Unit)other : null;
         final Colony otherColony = (other instanceof Colony) ? (Colony)other
-            : null;
+                : null;
 
         this.otherPlayer = ((Ownable)other).getOwner();
         this.agreement = agreement;
         this.comment = comment;
 
         StringTemplate nation = player.getNationLabel(),
-            otherNation = otherPlayer.getNationLabel();
+                otherNation = otherPlayer.getNationLabel();
         this.demand = StringTemplate.template("negotiationDialog.demand")
-            .addStringTemplate("%nation%", nation)
-            .addStringTemplate("%otherNation%", otherNation);
+                .addStringTemplate("%nation%", nation)
+                .addStringTemplate("%otherNation%", otherNation);
         this.offer = StringTemplate.template("negotiationDialog.offer")
-            .addStringTemplate("%nation%", nation)
-            .addStringTemplate("%otherNation%", otherNation);
+                .addStringTemplate("%nation%", nation)
+                .addStringTemplate("%otherNation%", otherNation);
         this.exchangeMessage = Messages.message("negotiationDialog.exchange");
 
         NationSummary ns = igc().getNationSummary(otherPlayer);
         int gold = (ns == null
-            || ns.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
-            : ns.getGold();
+                || ns.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
+                : ns.getGold();
         this.goldDemandPanel = new GoldTradeItemPanel(otherPlayer, gold);
 
         gold = (player.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
-            : player.getGold();
+                : player.getGold();
         this.goldOfferPanel = new GoldTradeItemPanel(player, gold);
 
         StringTemplate tutorial = null;
         TradeContext context = agreement.getContext();
         switch (context) {
-        case CONTACT:
-            if (freeColClient.tutorialMode()) {
-                tutorial = StringTemplate.key("negotiationDialog.contact.tutorial");
-            }
-            this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
-            this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
-            this.inciteDemandPanel = new InciteTradeItemPanel(otherPlayer, player);
-            break;
-        case DIPLOMATIC:
-            this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
-            this.colonyDemandPanel = new ColonyTradeItemPanel(otherPlayer);
-            this.colonyOfferPanel = new ColonyTradeItemPanel(player);
-            this.goodsDemandPanel = this.goodsOfferPanel = null;
-            this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
-            this.inciteDemandPanel = new InciteTradeItemPanel(otherPlayer, player);
-            this.unitOfferPanel = this.unitDemandPanel = null;
-            break;
-        case TRADE:
-            this.stancePanel = null;
-            this.colonyDemandPanel = this.colonyOfferPanel = null;
-            List<Goods> goods = getAnyGoods();
-            this.goodsDemandPanel = new GoodsTradeItemPanel(otherPlayer, goods);
-            GoodsLocation gl = (ourUnit != null) ? ourUnit : ourColony;
-            goods = (ourUnit != null) ? ourUnit.getGoodsList()
-                : ourColony.getCompactGoods();
-            for (Goods g : goods) {
-                if (g.getAmount() > GoodsContainer.CARGO_SIZE) {
-                    g.setAmount(GoodsContainer.CARGO_SIZE);
+            case CONTACT:
+                if (freeColClient.tutorialMode()) {
+                    tutorial = StringTemplate.key("negotiationDialog.contact.tutorial");
                 }
-                g.setLocation(gl);
-            }
-            this.goodsOfferPanel = new GoodsTradeItemPanel(player, goods);
-            this.inciteOfferPanel = this.inciteDemandPanel = null;
-            this.unitDemandPanel = new UnitTradeItemPanel(otherPlayer,
-                    getUnitUnitList(null));
-            this.unitOfferPanel = new UnitTradeItemPanel(player,
-                ((ourUnit != null) ? getUnitUnitList(ourUnit)
-                    : ourColony.getUnitList()));
-            break;
-        case TRIBUTE:
-            this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
-            this.colonyDemandPanel = this.colonyOfferPanel = null;
-            this.goodsDemandPanel = this.goodsOfferPanel = null;
-            this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
-            this.inciteDemandPanel = new InciteTradeItemPanel(otherPlayer, player);
-            this.unitOfferPanel = this.unitDemandPanel = null;
-            break;
-        default:
-            throw new IllegalStateException("Bogus trade context: " + context);
+                this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
+                this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
+                this.inciteDemandPanel = new InciteTradeItemPanel(otherPlayer, player);
+                break;
+            case DIPLOMATIC:
+                this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
+                this.colonyDemandPanel = new ColonyTradeItemPanel(otherPlayer);
+                this.colonyOfferPanel = new ColonyTradeItemPanel(player);
+                this.goodsDemandPanel = this.goodsOfferPanel = null;
+                this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
+                this.inciteDemandPanel = new InciteTradeItemPanel(otherPlayer, player);
+                this.unitOfferPanel = this.unitDemandPanel = null;
+                break;
+            case TRADE:
+                this.stancePanel = null;
+                this.colonyDemandPanel = this.colonyOfferPanel = null;
+                List<Goods> goods = getAnyGoods();
+                this.goodsDemandPanel = new GoodsTradeItemPanel(otherPlayer, goods);
+                GoodsLocation gl = (ourUnit != null) ? ourUnit : ourColony;
+                goods = (ourUnit != null) ? ourUnit.getGoodsList()
+                        : ourColony.getCompactGoods();
+                for (Goods g : goods) {
+                    if (g.getAmount() > GoodsContainer.CARGO_SIZE) {
+                        g.setAmount(GoodsContainer.CARGO_SIZE);
+                    }
+                    g.setLocation(gl);
+                }
+                this.goodsOfferPanel = new GoodsTradeItemPanel(player, goods);
+                this.inciteOfferPanel = this.inciteDemandPanel = null;
+                this.unitDemandPanel = new UnitTradeItemPanel(otherPlayer,
+                        getUnitUnitList(null));
+                this.unitOfferPanel = new UnitTradeItemPanel(player,
+                        ((ourUnit != null) ? getUnitUnitList(ourUnit)
+                                : ourColony.getUnitList()));
+                break;
+            case TRIBUTE:
+                this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
+                this.colonyDemandPanel = this.colonyOfferPanel = null;
+                this.goodsDemandPanel = this.goodsOfferPanel = null;
+                this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
+                this.inciteDemandPanel = new InciteTradeItemPanel(otherPlayer, player);
+                this.unitOfferPanel = this.unitDemandPanel = null;
+                break;
+            default:
+                throw new IllegalStateException("Bogus trade context: " + context);
         }
 
         this.summary = new MigPanel(new MigLayout("wrap 2", "[20px:n:n][]"));
@@ -922,12 +922,12 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                 "[30%|40%|30%]", ""));
         // Main Panel Header
         panel.add(Utility.localizedHeader("negotiationDialog.title."
-                + agreement.getContext().getKey(), false), 
-                  "span 3, center");
-        
+                        + agreement.getContext().getKey(), false),
+                "span 3, center");
+
         // Panel contents Header row
         JTextArea labelDemandMessage = Utility.localizedTextArea(this.demand);
-        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, 
+        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.TINY, Font.BOLD,
                 getImageLibrary().getScaleFactor());
         labelDemandMessage.setFont(font);
@@ -942,15 +942,15 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         // Panel contents
         // TODO: Expand center panel so that contents fill cell horizontally. 
         panel.add(this.goldDemandPanel); // Left pane
-            JPanel centerPanel = new MigPanel();
-            centerPanel.setLayout(new MigLayout("wrap 1"));
-            if (tutorial != null) {
-                // Display only if tutorial variable contents overriden
-                //      Can only occur if: First Contact with a forgeign Nation
-                JTextArea tutArea = Utility.localizedTextArea(tutorial, 30);
-                centerPanel.add(tutArea, "center");
-            }
-            centerPanel.add(this.summary, "top");
+        JPanel centerPanel = new MigPanel();
+        centerPanel.setLayout(new MigLayout("wrap 1"));
+        if (tutorial != null) {
+            // Display only if tutorial variable contents overriden
+            //      Can only occur if: First Contact with a forgeign Nation
+            JTextArea tutArea = Utility.localizedTextArea(tutorial, 30);
+            centerPanel.add(tutArea, "center");
+        }
+        centerPanel.add(this.summary, "top");
         panel.add(centerPanel, "spany, top"); // Center pane
         panel.add(this.goldOfferPanel); // Right pane
 
@@ -994,8 +994,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         updateDialog();
 
         ImageIcon icon = new ImageIcon((otherColony != null)
-            ? getImageLibrary().getSettlementImage(otherColony)
-            : getImageLibrary().getUnitImage(otherUnit));
+                ? getImageLibrary().getSettlementImage(otherColony)
+                : getImageLibrary().getUnitImage(otherUnit));
         initializeDialog(frame, DialogType.QUESTION, true, panel, icon, c);
     }
 
@@ -1007,9 +1007,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     public DiplomaticTrade getResponse() {
         Object value = getValue();
         TradeStatus s = (value == null) ? TradeStatus.REJECT_TRADE
-            : (value == this.accept) ? TradeStatus.ACCEPT_TRADE
-            : (value == this.send) ? TradeStatus.PROPOSE_TRADE
-            : TradeStatus.REJECT_TRADE;
+                : (value == this.accept) ? TradeStatus.ACCEPT_TRADE
+                : (value == this.send) ? TradeStatus.PROPOSE_TRADE
+                : TradeStatus.REJECT_TRADE;
         agreement.setStatus(s);
         return agreement;
     }
@@ -1026,7 +1026,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         final Game game = getGame();
         final Specification spec = getSpecification();
         return transform(spec.getStorableGoodsTypeList(), alwaysTrue(),
-            gt -> new Goods(game, null, gt, GoodsContainer.CARGO_SIZE));
+                gt -> new Goods(game, null, gt, GoodsContainer.CARGO_SIZE));
     }
 
     /**
@@ -1156,8 +1156,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         final Player player = getMyPlayer();
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
-        agreement.add(new ColonyTradeItem(getGame(), source, destination,
-                                          colony));
+        agreement.add(new ColonyTradeItem(getGame(), source, destination, colony));
         updateDialog();
     }
 
@@ -1171,8 +1170,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         final Player player = getMyPlayer();
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
-        agreement.add(new GoldTradeItem(getGame(), source, destination,
-                                        amount));
+        agreement.add(new GoldTradeItem(getGame(), source, destination, amount));
         updateDialog();
     }
 
@@ -1200,8 +1198,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         final Player player = getMyPlayer();
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
-        agreement.add(new InciteTradeItem(getGame(), source, destination,
-                                          victim));
+        agreement.add(new InciteTradeItem(getGame(), source, destination, victim));
         updateDialog();
     }
 
@@ -1213,8 +1210,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     public void addStanceTradeItem(Stance stance) {
         final Player player = getMyPlayer();
 
-        agreement.add(new StanceTradeItem(getGame(), otherPlayer, player,
-                                          stance));
+        agreement.add(new StanceTradeItem(getGame(), otherPlayer, player, stance));
         updateDialog();
     }
 
@@ -1228,8 +1224,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         final Player player = getMyPlayer();
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
-        agreement.add(new UnitTradeItem(getGame(), source, destination,
-                                        unit));
+        agreement.add(new UnitTradeItem(getGame(), source, destination, unit));
         updateDialog();
     }
 
@@ -1242,7 +1237,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     @Override
     public void removeNotify() {
         super.removeNotify();
-        
+
         removeAll();
 
         this.stancePanel = null;
