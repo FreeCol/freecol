@@ -79,6 +79,33 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 /**
  * The panel that allows negotiations between players.
+ * <p>
+ * Panel Layout:
+ * <p>
+ * The Negotiation Dialog is laid out in three columns. The outer two columns are 30% of the panel's width while the
+ *      center column is 40% the panel's width.
+ * <p style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;">
+ * --------------------------------------------------------------------------
+ * |                         negotiationDialog.title                        |
+ * | ---------------------------------------------------------------------- |
+ * |       Left Pane      |       Center Pane       |      Right Pane       |
+ * |                      |      (centerPanel)      |                       |
+ * | ---------------------------------------------------------------------- |
+ * |                       [cancelButton][sendButton]                       |
+ * --------------------------------------------------------------------------
+ * <p>
+ * The Left and Right Panes are laid out as follows:
+ * <p style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;">
+ * | --------------- |
+ * | gold            |
+ * | --------------- |
+ * | colony          |
+ * | --------------- |
+ * | stance          |
+ * | --------------- |
+ * | war declaration |
+ * | --------------- |
+ * TODO: Improve layout description
  */
 public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
