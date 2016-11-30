@@ -27,7 +27,7 @@ classic "Sid Meier's Colonization".
 
 New features should in general not be added before we reach
 FreeCol 1.0.0, unless they are implemented as optional features
-using the class "GameOptions".
+using the class ``GameOptions''.
 
 (Note that if you add a game option, add a default value setting in
 FreeColServer.fixGameOptions so that use of the option does not break
@@ -57,11 +57,11 @@ changes to the codebase.
 
 You may find available tasks in the bug and feature request trackers
 --- just grab any task you are planning to do (in the immediate
-future) by posting a comment telling that you intend to do this task.
-Please create a new bug report/feature request for tasks that are not
-listed here (and before you start working on them). Please remember
-to post a comment when you are done, or if you are unable to complete
-the work.
+future) by posting a comment telling that you intend to do this task
+or by assigning the ticket to yourself. Please create a new bug
+report/feature request for tasks that are not listed here (and
+before you start working on them). Please remember to post a comment
+when you are done, or if you are unable to complete the work.
 
 Major changes to the code should be discussed on the developer's
 mailing list before they are implemented. This is to ensure that your
@@ -163,7 +163,7 @@ You can (and should) subscribe to this list
 
 Git is the tool we are using to manage the changes within our source
 code tree. This system makes it possible for all developers to have
-their own full copy of the project, and supports synchronization
+their own full copy of the project. Git supports synchronization
 between the central version of the code (`the repository') and the
 local copies. Git also makes it possible to undo changes that were
 previously committed to the repository.
@@ -198,6 +198,11 @@ find contributed configuration files for both NetBeans and Eclipse.
 The following information has also been contributed by players that do
 use an IDE.
 
+The FreeCol gitignore file (a list of files and directories that are
+ignored by Git) includes support for the following IDEs: Eclipse,
+JetBrains, JDeveloper, and NetBeans. Certain Linux and Windows specific
+files are also ignored.
+
 \hypertarget{Using Eclipse}{\subsection{Using Eclipse (thanks to ``nobody'')}}
 
 \emph{This section is out of date since we migrated from svn to git.
@@ -206,7 +211,7 @@ Leaving as-is for now in the hope the procedure is similar.}
 Since I'm quite a fan of the Eclipse IDE, I thought I would share my
 experience with building FreeCol in Eclipse on the Windows platform.
 
-I assume that you have installed JDK, Eclipse and SVN (both Eclipse
+I assume that you have installed JDK, Eclipse and Git (both Eclipse
 plug-in and stand alone client). Make sure that your path environment
 variable contains both the JDK and SVN client directories.
 
@@ -344,11 +349,11 @@ There is also some additional documentation
 \href{http://www.freecol.org/documentation/}{here}.
 
 
-\hypertarget{Quality of code}{\section{Quality of code}}
+\hypertarget{Code Quality}{\section{Code Quality}}
 
-First of all, your code will be read and modified by several
-different developers. Therefore it is important to create a
-block of JavaDoc documentation with all methods/classes/packages
+The code you contribute to FreeCol will be read and modified by
+several different developers. Therefore it is important to create
+a block of JavaDoc documentation with all methods/classes/packages
 you implement.
 
 You should also spend more time thinking about the overall
@@ -358,9 +363,8 @@ Please read the \href{http://www.oracle.com/technetwork/java/codeconvtoc-136057.
   Conventions}. This will only take about 15 minutes and will really
 help you write beautiful code.
 
-And one more thing. Please configure your editor in such a way
-that code indentations result in the insertion of 4 spaces, and avoid
-using tabs.
+Please configure your editor or IDE that code indentations
+result in the insertion of 4 spaces. Avoid using tabs.
 
 
 \hypertarget{How to build a FreeCol release}{\chapter{How to make a FreeCol release}}
@@ -496,21 +500,22 @@ bug. Please report such omissions on the
 \href{https://sourceforge.net/p/freecol/pending-features-for-freecol/}{pending
   features} tracker.
 
-Since we do not have access to the source code of the original game,
-we can only guess at the algorithms used. This is particularly true
-in complex, detailed areas such as production and combat. In some
-cases, players have reverse-engineered the algorithm. If you know of
-some calcuation in FreeCol that differs from that of the original
-game, please tell us about it. There is an effort underway to
-completely document Colonization's production amounts
+FreeCol developers do not have access to the source code of the original
+Colonization game, so some assumptions are made as to how to implement
+certain features. This is particularly true in complex, detailed areas
+such as production and combat. In some cases, players have reverse-
+engineered the algorithm. If you know of some calcuation in FreeCol that
+differs from that of the original game, please notify the developer mailing
+list. There is an effort underway to completely document Colonization's
+ production amounts
 \href{https://sourceforge.net/p/freecol/wiki/WWC1D\%20-\%20resource\%20output\%20v2/}{here}.
 
 
 \hypertarget{Changing the Rules}{\chapter{Changing the Rules}}
 
-We would like to make FreeCol configurable, so that the game engine
-becomes capable of emulating many similar games. For this purpose,
-we have made many of the game's features configurable.
+FreeCol is designed with end-user configuration in mind, so that the game
+engine can emulate the other similiar games. For this purpose, the developers
+provide number of configuration options for many of the game's features.
 
 At some point in the future, we will probably add a special rule set
 editor, but at the moment, the most effective option is to edit the file
