@@ -314,6 +314,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Disconnect this player.
+     */
+    public void disconnect() {
+        if (this.connection != null) {
+            this.connection.reallyClose();
+            this.connection = null;
+            this.connected = false;
+        }
+    }
+            
+    /**
      * Send a change set to this player.
      *
      * @param cs The {@code ChangeSet} to send.

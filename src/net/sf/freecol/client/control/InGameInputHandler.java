@@ -63,6 +63,7 @@ import net.sf.freecol.common.networking.GameEndedMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
+import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
@@ -159,6 +160,8 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> incite(e));
         register(IndianDemandMessage.TAG,
             (Connection c, Element e) -> indianDemand(e));
+        register(LogoutMessage.TAG,
+            (Connection c, Element e) -> logout(e));
         register("lootCargo",
             (Connection c, Element e) -> lootCargo(e));
         register("monarchAction",
@@ -720,6 +723,21 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
+     * Handle a "highScore" message.
+     *
+     * @param element The {@code Element} to process.
+     * @return Null.
+     */
+    private Element highScore(Element element) {
+        final Game game = getGame();
+        final HighScoreMessage message
+            = new HighScoreMessage(game, element);
+        invokeLater(() -> { igc().displayHighScores(message.getKey(),
+                                                    message.getScores()); });
+        return null;
+    }
+        
+    /**
      * Handle an "incite" message.
      *
      * @param element The {@code Element} to process.
@@ -738,57 +756,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         return null;
     }
     
-    /**
-     * Handle an incoming nation summary.
-     *
-     * @param element The {@code Element} to process.
-     * @return Null.
-     */
-    private Element nationSummary(Element element) {
-        final Game game = getGame();
-        final Player player = getMyPlayer();
-
-        NationSummaryMessage message = new NationSummaryMessage(game, element);
-        Player other = message.getPlayer(game);
-        NationSummary ns = message.getNationSummary();
-        player.putNationSummary(other, ns);
-        logger.info("Updated nation summary of " + other.getSuffix()
-            + " for " + player.getSuffix() + " with " + ns);
-        return null;
-    }
-
-    /**
-     * Handle a native trade update.
-     *
-     * @param element The {@code Element} to process.
-     * @return Null.
-     */
-    private Element nativeTrade(Element element) {
-        final Game game = getGame();
-
-        final NativeTradeMessage message
-            = new NativeTradeMessage(game, element);
-        final NativeTradeAction action = message.getAction();
-        final NativeTrade nt = message.getNativeTrade();
-        invokeLater(() -> igc().nativeTrade(action, nt));
-        return null;
-    }
-
-    /**
-     * Handle a "highScore" message.
-     *
-     * @param element The {@code Element} to process.
-     * @return Null.
-     */
-    private Element highScore(Element element) {
-        final Game game = getGame();
-        final HighScoreMessage message
-            = new HighScoreMessage(game, element);
-        invokeLater(() -> { igc().displayHighScores(message.getKey(),
-                                                    message.getScores()); });
-        return null;
-    }
-        
     /**
      * Handle an "indianDemand"-request.
      *
@@ -820,6 +787,25 @@ public final class InGameInputHandler extends ClientInputHandler {
                 igc().indianDemand(unit, colony, message.getType(game),
                                    message.getAmount());
             });
+        return null;
+    }
+
+    /**
+     * Handle a logout message.
+     *
+     * @param element The {@code Element} to process.
+     * @return Null.
+     */
+    private Element logout(Element element) {
+        final Game game = getGame();
+        final LogoutMessage message = new LogoutMessage(game, element);
+        final Player player = message.getPlayer(game);
+        final String reason = message.getReason();
+        if (player == null) return null;
+
+        if (game.getCurrentPlayer() == player) {
+            game.setCurrentPlayer(game.getNextPlayer());
+        }            
         return null;
     }
 
@@ -866,6 +852,42 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private Element multiple(Connection connection, Element element) {
         return new MultipleMessage(element).applyHandler(this, connection);
+    }
+
+    /**
+     * Handle an incoming nation summary.
+     *
+     * @param element The {@code Element} to process.
+     * @return Null.
+     */
+    private Element nationSummary(Element element) {
+        final Game game = getGame();
+        final Player player = getMyPlayer();
+
+        NationSummaryMessage message = new NationSummaryMessage(game, element);
+        Player other = message.getPlayer(game);
+        NationSummary ns = message.getNationSummary();
+        player.putNationSummary(other, ns);
+        logger.info("Updated nation summary of " + other.getSuffix()
+            + " for " + player.getSuffix() + " with " + ns);
+        return null;
+    }
+
+    /**
+     * Handle a native trade update.
+     *
+     * @param element The {@code Element} to process.
+     * @return Null.
+     */
+    private Element nativeTrade(Element element) {
+        final Game game = getGame();
+
+        final NativeTradeMessage message
+            = new NativeTradeMessage(game, element);
+        final NativeTradeAction action = message.getAction();
+        final NativeTrade nt = message.getNativeTrade();
+        invokeLater(() -> igc().nativeTrade(action, nt));
+        return null;
     }
 
     /**

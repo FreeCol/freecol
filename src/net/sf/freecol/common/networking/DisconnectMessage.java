@@ -78,15 +78,13 @@ public class DisconnectMessage extends AttributeMessage {
                                    ServerPlayer serverPlayer) {
         if (serverPlayer == null) return null;
 
-        ChangeSet cs = new LogoutMessage(serverPlayer, "disconnect")
-            .serverHandler(freeColServer, serverPlayer);
-
         Connection c = serverPlayer.getConnection();
-        if (c != null) c.reallyClose();
+        if (c != null) {
+            serverPlayer.disconnect();
+            Server server = freeColServer.getServer();
+            if (server != null) server.removeConnection(c);
+        }
 
-        Server server = freeColServer.getServer();
-        if (server != null) server.removeConnection(c);
-
-        return cs;
+        return null;
     }
 }

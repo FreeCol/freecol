@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -93,32 +94,37 @@ public class LogoutMessage extends AttributeMessage {
         if (serverPlayer == null) return null;
         logger.info("Handling logout by " + serverPlayer.getName());
 
-        ChangeSet cs = null;
-
-        // FIXME: Setting the player dead directly should be a server
-        // option, but for now allow the player to reconnect.
-        serverPlayer.setConnected(false);
-
         switch (freeColServer.getServerState()) {
         case PRE_GAME: case LOAD_GAME:
-            LogoutMessage message
-                = new LogoutMessage(serverPlayer, "User has logged out");
-            freeColServer.sendToAll(message, serverPlayer);
             break;
         case IN_GAME:
-            Game game = freeColServer.getGame();
+            ServerGame game = freeColServer.getGame();
             if (game.getCurrentPlayer() == serverPlayer
                 && !freeColServer.getSinglePlayer()) {
-                cs = freeColServer.getInGameController().endTurn(serverPlayer);
+                ChangeSet cs = freeColServer.getInGameController()
+                    .endTurn(serverPlayer);
+                game.sendToAll(cs, serverPlayer);
             }
+            // FIXME: Turn serverPlayer into AI?
             break;
         case END_GAME:
-            break;
+            return null;
         }
 
-        // Withdraw from the metaserver
+        // Make sure the player is disconnected
+        new DisconnectMessage(getReason())
+            .serverHandler(freeColServer, serverPlayer);
+        
+        // Inform other players
+        LogoutMessage message
+            = new LogoutMessage(serverPlayer, serverPlayer.getName()
+                + " has logged out: " + getReason());
+        freeColServer.sendToAll(message, serverPlayer);
+
+        // Update the metaserver
         freeColServer.updateMetaServer(false);
 
-        return cs;
+        // serverPlayer has disconnected, no point returning anything
+        return null;
     }
 }

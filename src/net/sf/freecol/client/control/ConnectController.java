@@ -551,11 +551,8 @@ public final class ConnectController extends FreeColClientHolder {
      */
     public void logout(String reason) {
         final FreeColClient fcc = getFreeColClient();
-        if (fcc.isLoggedIn()) askServer().logout(fcc.getMyPlayer(), reason);
-        try {
-            askServer().disconnect("logout");
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Disconnection error", ioe);
+        if (fcc.isLoggedIn()) {
+            askServer().logout(fcc.getMyPlayer(), reason);
         }
         finish();
     }
@@ -572,10 +569,10 @@ public final class ConnectController extends FreeColClientHolder {
                 server.getController().shutdown();
                 getFreeColClient().setFreeColServer(null);
             }
-            finish();
         } else {
             logout("User quit");
         }
+        finish();
     }
 
     /**
