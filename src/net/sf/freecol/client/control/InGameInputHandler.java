@@ -969,6 +969,10 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element reconnect() {
+        // "reconnect" is sent when the server finds a severe problem that
+        // is likely to be localized to this client.  Call the controller
+        // reconnect dialog that gives the user the option to reload itself
+        // or quit.
         invokeLater(reconnectRunnable);
         return null;
     }

@@ -195,15 +195,18 @@ public final class PreGameInputHandler extends ClientInputHandler {
             logger.warning(Messages.message(err));
             return null;
         }
-        fcc.setGame(game);
-        fcc.setSinglePlayer(single);
-        fcc.setMyPlayer(player);
-        fcc.addSpecificationActions(game.getSpecification());
+
+        // Reattach to the game
         fcc.setLoggedIn(true);
+        fcc.changeClientState(state == ServerState.IN_GAME);
+        fcc.setGame(game);
+        fcc.setMyPlayer(player);
+
+        fcc.setSinglePlayer(single);
+        fcc.addSpecificationActions(game.getSpecification());
         if (current) game.setCurrentPlayer(player);
-        if (state == ServerState.IN_GAME) fcc.changeClientState(true);
-        logger.info("FreeColClient logged in to "
-            + ((fcc.isInGame()) ? "running"
+        logger.info("Login accepted for client " + FreeCol.getName()
+            + " to " + ((fcc.isInGame()) ? "running"
                 : (game.allPlayersReadyToLaunch()) ? "ready" : "new")
             + " " + ((single) ? "single" : "multi")
             + "-player game as " + user + "/" + player.getId());
@@ -233,7 +236,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final Player player = message.getPlayer(game);
         final String reason = message.getReason();
 
-        logger.info("Player " + player.getName() + " logged out: " + reason);
+        logger.info("Logout accepted for player " + player.getName()
+            + ": " + reason);
         game.removePlayer(player);
         getGUI().refreshPlayersTable();
 
