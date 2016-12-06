@@ -40,8 +40,11 @@ import net.sf.freecol.common.util.Utils;
  */
 public final class DefaultHandler extends Handler {
 
+    /** Lock for the writer. */
+    private final Object writerLock = new Object();
+
     /** A writer to write log records with. */
-    private final Writer writer;
+    private Writer writer = null;
 
     /** Flag to enable console logging. */
     private final boolean consoleLogging;
@@ -80,9 +83,11 @@ public final class DefaultHandler extends Handler {
             throw new FreeColException("Can not write in log file \""
                 + fileName + "\".");
         }
-        if ((this.writer = Utils.getFileUTF8Writer(file)) == null) {
-            throw new FreeColException("Can not create writer for log file \""
-                + fileName + "\".");
+        synchronized (this.writerLock) {
+            if ((this.writer = Utils.getFileUTF8Writer(file)) == null) {
+                throw new FreeColException("Can not create writer for log file \""
+                    + fileName + "\".");
+            }
         }
 
         // We should use XMLFormatter here in the future
@@ -112,7 +117,9 @@ public final class DefaultHandler extends Handler {
                 .append("\nOS version: ")
                 .append(System.getProperty("os.version"))
                 .append("\n\n");
-            this.writer.write(sb.toString());
+            synchronized (this.writerLock) {
+                this.writer.write(sb.toString());
+            }
         } catch (IOException ioe) {
             ioe.printStackTrace(System.err);
         }
@@ -123,10 +130,15 @@ public final class DefaultHandler extends Handler {
      */
     @Override
     public void close() {
-        try {
-            this.writer.close();
-        } catch (IOException ioe) {
-            ioe.printStackTrace(System.err);
+        synchronized (this.writerLock) {
+            if (this.writer != null) {
+                try {
+                    this.writer.close();
+                    this.writer = null;
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(System.err);
+                }
+            }
         }
     }
 
@@ -135,10 +147,14 @@ public final class DefaultHandler extends Handler {
      */
     @Override
     public void flush() {
-        try {
-            this.writer.flush();
-        } catch (IOException ioe) {
-            ioe.printStackTrace(System.err);
+        synchronized (this.writerLock) {
+            if (this.writer != null) {
+                try {
+                    this.writer.flush();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(System.err);
+                }
+            }
         }
     }
 
@@ -161,15 +177,18 @@ public final class DefaultHandler extends Handler {
             System.err.println(str);
         }
 
-        try {
-            this.writer.write(str, 0, str.length());
-        } catch (IOException ioe) {
-            System.err.println("Failed to write log record: " + str);
-            ioe.printStackTrace(System.err);
+        synchronized (this.writerLock) {
+            if (this.writer != null) {
+                try {
+                    this.writer.write(str, 0, str.length());
+                    // Because FreeCol is still in a very early stage.
+                    flush();
+                } catch (IOException ioe) {
+                    System.err.println("Failed to write log record: " + str);
+                    ioe.printStackTrace(System.err);
+                }
+            }
         }
-
-        // Because FreeCol is still in a very early stage.
-        flush();
 
         // Do this last, as it shuts down debug runs
         if (record.getThrown() != null) {
