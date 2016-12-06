@@ -287,6 +287,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * this.connection is null, and is used to allow a reconnection
      * after a player logs out.
      *
+     * FIXME: This is probably not needed any more.
+     *
      * @param connected True if this player should be considered as
      *     connected to the server.
      */
@@ -319,8 +321,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void disconnect() {
         if (this.connection != null) {
             this.connection.reallyClose();
-            this.connection = null;
-            this.connected = false;
+            setConnection(null);
         }
     }
             
