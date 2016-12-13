@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
+import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -133,7 +134,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> addPlayer(e));
         register("animateAttack",
             (Connection c, Element e) -> animateAttack(e));
-        register("animateMove",
+        register(AnimateMoveMessage.TAG,
             (Connection c, Element e) -> animateMove(e));
         register(ChatMessage.TAG,
             (Connection c, Element e) -> chat(e));
@@ -383,48 +384,24 @@ public final class InGameInputHandler extends ClientInputHandler {
     private void animateMove(Element element) {
         final Game game = getGame();
         final Player player = getMyPlayer();
+        final AnimateMoveMessage message = new AnimateMoveMessage(game, element);
 
-        String unitId = element.getAttribute("unit");
-        if (unitId.isEmpty()) {
+        final Unit unit = message.getUnit(game);
+        if (unit == null) {
             logger.warning("Animation for: " + player.getId()
-                + " missing unitId.");
+                + " missing Unit.");
             return;
         }
-        Unit u = game.getFreeColGameObject(unitId, Unit.class);
-        if (u == null) {
-            u = selectUnitFromElement(game, element, unitId);
-            //if (u != null) logger.info("Added unit from element: " + unitId);
-        }
-        if (u == null) {
-            logger.warning("Animation for: " + player.getId()
-                + " missing unit:" + unitId);
-            return;
-        }
-        final Unit unit = u;
-
-        String oldTileId = element.getAttribute("oldTile");
-        if (oldTileId.isEmpty()) {
-            logger.warning("Animation for: " + player.getId()
-                + " missing oldTileId");
-            return;
-        }
-        final Tile oldTile = game.getFreeColGameObject(oldTileId, Tile.class);
+        final Tile oldTile = message.getOldTile(game);
         if (oldTile == null) {
             logger.warning("Animation for: " + player.getId()
-                + " missing oldTile: " + oldTileId);
+                + " missing old Tile.");
             return;
         }
-
-        String newTileId = element.getAttribute("newTile");
-        if (newTileId.isEmpty()) {
-            logger.warning("Animation for: " + player.getId()
-                + " missing newTileId");
-            return;
-        }
-        final Tile newTile = game.getFreeColGameObject(newTileId, Tile.class);
+        final Tile newTile = message.getNewTile(game);
         if (newTile == null) {
             logger.warning("Animation for: " + player.getId()
-                + " missing newTile: " + newTileId);
+                + " missing new Tile.");
             return;
         }
 

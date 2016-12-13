@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
@@ -703,18 +704,9 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("animateMove");
-            element.setAttribute("unit", unit.getId());
-            element.setAttribute("oldTile", oldLocation.getTile().getId());
-            element.setAttribute("newTile", newTile.getId());
-            if (!seeOld(serverPlayer)) {
-                // We can not rely on the unit that is about to move
-                // being present on the client side, and it is needed
-                // before we can run the animation, so it is attached
-                // to animateMove.
-                element.appendChild(DOMUtils.toXMLElement(unit, doc, serverPlayer));
-            }
-            return element;
+            return new AnimateMoveMessage(unit, oldLocation.getTile(), newTile,
+                                          !seeOld(serverPlayer))
+                .attachToDocument(doc);
         }
 
         /**
