@@ -326,7 +326,7 @@ public final class FreeColClient {
         Runtime.getRuntime().addShutdownHook(new Thread(quit) {
                 @Override
                 public void run() {
-                    getConnectController().quitGame(true);
+                    getConnectController().stopServer();
                 }
             });
     }

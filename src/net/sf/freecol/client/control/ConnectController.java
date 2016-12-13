@@ -564,23 +564,6 @@ public final class ConnectController extends FreeColClientHolder {
     }
 
     /**
-     * Quits the current game, optionally notifying and stopping the server.
-     *
-     * @param stopServer Whether to stop the server.
-     */
-    public void quitGame(boolean stopServer) {
-        if (stopServer) {
-            final FreeColServer server = getFreeColServer();
-            if (server != null) {
-                server.getController().shutdown();
-                getFreeColClient().setFreeColServer(null);
-            }
-        } else {
-            logout(LogoutReason.QUIT);
-        }
-    }
-
-    /**
      * Gets a list of servers from the meta server.
      *
      * Note: synchronous comms.
