@@ -257,14 +257,4 @@ public class ServerBuilding extends Building implements ServerModelObject {
             csRepairUnits(cs);
         }
     }
-
-    /**
-     * Returns the tag name of the object.
-     *
-     * @return "serverBuilding"
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverBuilding";
-    }
 }

@@ -590,14 +590,4 @@ public class ServerIndianSettlement extends IndianSettlement
         cs.add(See.only(owner), this);
         lb.add(", ");
     }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "serverIndianSettlement"
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverIndianSettlement";
-    }
 }

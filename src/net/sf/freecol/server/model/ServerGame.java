@@ -681,14 +681,4 @@ public class ServerGame extends Game implements ServerModelObject {
             // if (loser != null) sendElement(loser, cs);
         }
     }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "serverGame".
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverGame";
-    }
 }

@@ -878,14 +878,4 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
         lb.add(", ");
     }
-
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "serverColony"
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverColony";
-    }
 }

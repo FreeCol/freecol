@@ -1106,14 +1106,4 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
         lb.add(", ");
     }
-
-    /**
-     * Returns the tag name of the object.
-     *
-     * @return "serverUnit"
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverUnit";
-    }
 }

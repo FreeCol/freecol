@@ -49,13 +49,6 @@ public interface ServerModelObject {
     public String getId();
 
     /**
-     * Gets the tag to use when saving this server object.
-     *
-     * @return The server object tag.
-     */
-    public String getServerXMLElementTagName();
-
-    /**
      * Executes new-turn actions for this server object.
      *
      * @param random A pseudo-random number source.

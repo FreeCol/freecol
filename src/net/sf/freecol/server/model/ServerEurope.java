@@ -302,14 +302,4 @@ public class ServerEurope extends Europe implements ServerModelObject {
             ((ServerUnit)unit).csRepairUnit(cs);
         }
     }
-
-    /**
-     * Returns the tag name of the object.
-     *
-     * @return "serverEurope"
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverEurope";
-    }
 }

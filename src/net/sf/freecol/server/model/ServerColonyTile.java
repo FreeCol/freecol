@@ -129,14 +129,4 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
             }
         }
     }
-
-    /**
-     * Returns the tag name of the object.
-     *
-     * @return "serverColonyTile"
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverColonyTile";
-    }
 }

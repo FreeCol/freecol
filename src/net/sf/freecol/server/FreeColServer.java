@@ -127,13 +127,13 @@ public final class FreeColServer {
     
     // @compat 0.11.6
     public static final String ACTIVE_UNIT_TAG = "activeUnit";
+    public static final String OLD_SERVER_OBJECTS_TAG = "serverObjects";
     // end @compat 0.11.6
     public static final String DEBUG_TAG = "debug";
     public static final String RANDOM_STATE_TAG = "randomState";
     public static final String OWNER_TAG = "owner";
     public static final String PUBLIC_SERVER_TAG = "publicServer";
     public static final String SAVED_GAME_TAG = "savedGame";
-    public static final String SERVER_OBJECTS_TAG = "serverObjects";
     public static final String SINGLE_PLAYER_TAG = "singleplayer";
 
     /**
@@ -930,23 +930,10 @@ public final class FreeColServer {
 
                 xw.writeAttribute(DEBUG_TAG, FreeColDebugger.getDebugModes());
 
-                // Add server side model information:
-                xw.writeStartElement(SERVER_OBJECTS_TAG);
-
-                for (ServerModelObject smo
-                         : this.serverGame.getServerModelObjects()) {
-                    xw.writeStartElement(smo.getServerXMLElementTagName());
-
-                    xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, smo.getId());
-
-                    xw.writeEndElement();
-                }
-
-                xw.writeEndElement();
-
                 if (active != null) {
                     this.serverGame.setInitialActiveUnitId(active.getId());
                 }
+
                 this.serverGame.toXML(xw); // Add the game
 
                 if (this.aiMain != null) { // Add the AIObjects
@@ -1076,8 +1063,10 @@ public final class FreeColServer {
 
             while (xr.moreTags()) {
                 final String tag = xr.getLocalName();
-                if (SERVER_OBJECTS_TAG.equals(tag)) { // No longer used
-                    while (xr.moreTags()) xr.nextTag();
+                // @compat 0.11.6
+                if (OLD_SERVER_OBJECTS_TAG.equals(tag)) { // No longer used
+                    xr.swallowTag(OLD_SERVER_OBJECTS_TAG);
+                // end @compat 0.11.6
 
                 } else if (Game.TAG.equals(tag)) {
                     // Read the game

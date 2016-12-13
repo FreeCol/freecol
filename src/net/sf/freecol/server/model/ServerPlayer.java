@@ -4527,16 +4527,6 @@ outer:  for (Effect effect : effects) {
         }
     }
 
-    /**
-     * Gets the tag name of the object.
-     *
-     * @return "serverPlayer"
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverPlayer";
-    }
-
 
     // Override Object
 
