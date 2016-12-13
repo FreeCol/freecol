@@ -276,6 +276,26 @@ public class DOMUtils {
     }
 
     /**
+     * Create a new document with a root element with a given tag name,
+     * attributes and children.
+     *
+     * @param tag The root element name.
+     * @param map A {@code Map} of attributes.
+     * @param children A list of child {@code FreeColObject}s.
+     * @return The root element of the document.
+     */
+    public static Element createElement(String tag, Map<String,String> map,
+                                        List<? extends FreeColObject> objects) {
+        Document doc = createDocument(tag, map);
+        Element root = doc.getDocumentElement();
+        for (FreeColObject fco : objects) {
+            root.appendChild(doc.importNode(toXMLElement(fco,doc,(Player)null),
+                                            true));
+        }
+        return root;
+    }
+
+    /**
      * Gets the type of an element.
      *
      * @param element The {@code Element} to query.
