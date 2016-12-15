@@ -4364,6 +4364,19 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Save and quit the game.
+     *
+     * Called from and SaveAndQuitAction.
+     *
+     * @return False if the game was not saved, otherwise the game quits.
+     */
+    public boolean saveAndQuit() {
+        if (!saveGame()) return false;
+        getFreeColClient().quit();
+        return true;
+    }
+
+    /**
      * Opens a dialog where the user should specify the filename and
      * saves the game.
      *
