@@ -78,11 +78,10 @@ public class DisconnectMessage extends AttributeMessage {
                                    ServerPlayer serverPlayer) {
         if (serverPlayer == null) return null;
 
-        Connection c = serverPlayer.getConnection();
-        if (c != null) {
-            serverPlayer.disconnect();
-            Server server = freeColServer.getServer();
-            if (server != null) server.removeConnection(c);
+        Connection oldConnection = serverPlayer.disconnect();
+        Server server = freeColServer.getServer();
+        if (oldConnection != null && server != null) {
+            server.removeConnection(oldConnection);
         }
 
         return null;
