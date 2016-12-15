@@ -53,7 +53,7 @@ public class ShowMainAction extends FreeColAction {
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (!getGUI().confirmStopGame()) return;
-        getConnectController().quitGame(true);
+        getConnectController().stopServer();
         getGUI().removeInGameComponents();
         freeColClient.setMapEditor(false);
         freeColClient.setGame(null);

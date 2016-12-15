@@ -261,7 +261,7 @@ public final class StartGamePanel extends FreeColPanel {
                 fcc.getPreGameController().requestLaunch();
                 break;
             case CANCEL:
-                fcc.getConnectController().quitGame(true);
+                fcc.getConnectController().stopServer();
                 gui.removeFromCanvas(this);
                 gui.showNewPanel();
                 break;

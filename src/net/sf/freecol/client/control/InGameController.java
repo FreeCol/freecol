@@ -3582,7 +3582,7 @@ public final class InGameController extends FreeColClientHolder {
         if (getFreeColClient().isInGame()
             && !getGUI().confirmStopGame()) return;
 
-        getConnectController().quitGame(true);
+        getConnectController().stopServer();
         turnReportMessages.clear();
         getGUI().setActiveUnit(null);
         getGUI().removeInGameComponents();

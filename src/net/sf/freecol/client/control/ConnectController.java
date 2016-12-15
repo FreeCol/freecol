@@ -128,6 +128,18 @@ public final class ConnectController extends FreeColClientHolder {
     }
 
     /**
+     * Stop a server if present.
+     */
+    public void stopServer() {
+        final FreeColServer server = getFreeColServer();
+        if (server != null) {
+            server.getController().shutdown();
+            final FreeColClient fcc = getFreeColClient();
+            if (fcc != null) fcc.setFreeColServer(null);
+        }
+    }
+
+    /**
      * Ask the server a question.
      *
      * Handle showing error messages on the GUI.  Only simple messages

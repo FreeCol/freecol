@@ -781,7 +781,7 @@ public final class FreeColClient {
             if (isMapEditor()) {
                 specification = getGame().getSpecification();
             } else if (!prompt || gui.confirmStopGame()) {
-                getConnectController().quitGame(true);
+                getConnectController().stopServer();
                 FreeColSeed.incrementFreeColSeed();
             } else {
                 return;
@@ -838,7 +838,7 @@ public final class FreeColClient {
      * Quits the application without any questions.
      */
     public void quit() {
-        getConnectController().quitGame(getSinglePlayer());
+        if (getSinglePlayer()) getConnectController().stopServer();
 
         // delete outdated autosave files
         long validPeriod = 1000L * 24L * 60L * 60L // days to ms
