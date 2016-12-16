@@ -372,7 +372,26 @@ public final class DefaultTransferHandler extends TransferHandler {
                 Goods goods = label.getGoods();
 
                 // Import the data.
-                if (label.isPartialChosen()) {
+                if (label.isSuperFullChosen()) {
+                    if (goods.getLocation() instanceof GoodsLocation) {
+                        GoodsLocation loc = (GoodsLocation) goods.getLocation();
+                        int amountToTransfer = loc.getGoodsCount(goods.getType());
+                        if (comp instanceof DropTarget) {
+                            DropTarget dt = (DropTarget) comp;
+                            if (dt instanceof CargoPanel) {
+                                CargoPanel cp = (CargoPanel) dt;
+                                Unit carrier = cp.getCarrier();
+                                int spaceTaken = carrier.getCargoSpaceTaken();
+                                int availableHolds = carrier.getCargoCapacity() - spaceTaken;
+                                if (amountToTransfer > GoodsContainer.CARGO_SIZE * availableHolds) {
+                                    amountToTransfer = GoodsContainer.CARGO_SIZE * availableHolds;
+                                    label.setAmount(amountToTransfer);
+                                    goods = label.getGoods();
+                                }
+                            }
+                        }
+                    }
+                } else if (label.isPartialChosen()) {
                     int defaultAmount = goods.getAmount();
                     if (goods.getLocation() instanceof GoodsLocation) {
                         GoodsLocation loc = (GoodsLocation)goods.getLocation();

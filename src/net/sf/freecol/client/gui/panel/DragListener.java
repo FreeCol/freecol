@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -137,15 +138,30 @@ public final class DragListener extends MouseAdapter {
         } else {
             if (comp instanceof AbstractGoodsLabel) {
                 AbstractGoodsLabel label = (AbstractGoodsLabel) comp;
-                if (e.isShiftDown()) {
+                if (e.isShiftDown() && e.isAltDown()) {
+                    Component[] cArr = comp.getParent().getComponents();
+                    int sum = 0;
+                    for (int i = 0; i < cArr.length; i++) {
+                        if (cArr[i] instanceof AbstractGoodsLabel) {
+                            AbstractGoodsLabel abGoods = (AbstractGoodsLabel) cArr[i];
+                            if (abGoods.getAbstractGoods().getType().equals(label.getAbstractGoods().getType())) {
+                                sum += abGoods.getAmount();
+                            }
+                        }
+                    }
+                    label.setSuperFullChosen(true);
+                    label.setAmount(sum);
+                } else if (e.isShiftDown()) {
+                    label.setSuperFullChosen(false);
                     label.setPartialChosen(true);
                 } else if (e.isControlDown()) {
+                    label.setSuperFullChosen(false);
                     label.setFullChosen(true);
                 } else {
+                    label.setSuperFullChosen(false);
                     label.setPartialChosen(false);
                     label.setDefaultAmount();
-                }
-            } else if (comp instanceof UnitLabel) {
+                }            } else if (comp instanceof UnitLabel) {
                 final UnitLabel label = (UnitLabel) comp;
                 final Unit u = label.getUnit();
                 if (u.isCarrier()

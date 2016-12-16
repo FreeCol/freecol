@@ -40,6 +40,11 @@ public class AbstractGoodsLabel extends FreeColLabel {
 
     private boolean fullChosen;
 
+    /**
+     * Special flag for SHIFT+ALT drag functionality on {@code DefaultTransferHandler}
+     */
+    private boolean superFullChosen;
+
 
     /**
      * Initializes this JLabel with the given goods data.
@@ -56,6 +61,24 @@ public class AbstractGoodsLabel extends FreeColLabel {
         setToolTipText(Messages.getName(abstractGoods));
     }
 
+    /**
+     * Has the SHIFT-ALT been pressed on drag?
+     * 
+     * @return True if this label was dragged with SHIFT-ALT
+     */
+    public boolean isSuperFullChosen() {
+        return superFullChosen;
+    }
+
+    /**
+     * Set DRAG-ALL functionality when SHIFT+ALT used on drag from {@code DragListener}
+     * 
+     * @param superFullChosen
+     *            The new state of drag-all 
+     */
+    public void setSuperFullChosen(boolean superFullChosen) {
+        this.superFullChosen = superFullChosen;
+    }
 
     /**
      * Has a partial amount been selected?
