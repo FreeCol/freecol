@@ -285,11 +285,6 @@ final class ReceivingThread extends Thread {
             DOMMessage msg;
             switch (tag) {
 
-            case DisconnectMessage.TAG:
-                // Disconnect at once if needed.
-                askToStop();
-                return;
-
             case Connection.REPLY_TAG:
                 // A reply.  Look up its waiting thread and set a response.
                 NetworkReplyObject nro = waitingThreads.remove(replyId);
@@ -335,6 +330,9 @@ final class ReceivingThread extends Thread {
                     };
                 break;
 
+            case DisconnectMessage.TAG:
+                askToStop(); // Stop soon
+                // Fall through
             default:
                 // An ordinary update message.  Build a thread to handle
                 // it and possibly respond.
