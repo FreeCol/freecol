@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.networking.ClientConnection;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
@@ -41,7 +40,7 @@ public class UserServerAPI extends ServerAPI {
     private final GUI gui;
 
     /** The connection used to communicate with the server. */
-    private ClientConnection clientConnection;
+    private Connection connection;
 
     /** The last name used to login with. */
     private String name = null;
@@ -74,7 +73,7 @@ public class UserServerAPI extends ServerAPI {
      * Only call this if we are sure it is dead.
      */
     public void reset() {
-        this.clientConnection = null;
+        this.connection = null;
     }
 
     /**
@@ -83,8 +82,8 @@ public class UserServerAPI extends ServerAPI {
      * @param mh The new {@code MessageHandler}.
      */
     public void setMessageHandler(MessageHandler mh) {
-        if (this.clientConnection != null) {
-            this.clientConnection.setMessageHandler(mh);
+        if (this.connection != null) {
+            this.connection.setMessageHandler(mh);
         }
         this.messageHandler = mh;
     }
@@ -107,9 +106,8 @@ public class UserServerAPI extends ServerAPI {
         }
         for (int i = tries; i > 0; i--) {
             try {
-                this.clientConnection = new ClientConnection(host, port,
-                    messageHandler, name);
-                if (this.clientConnection != null) {
+                this.connection = new Connection(host, port, messageHandler, name);
+                if (this.connection != null) {
                     // Connected, save the connection information
                     this.name = name;
                     this.host = host;
@@ -121,16 +119,16 @@ public class UserServerAPI extends ServerAPI {
                 if (i <= 1) throw e;
             }
         }
-        return this.clientConnection;
+        return this.connection;
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean disconnect() {
-        if (this.clientConnection != null) {
-            this.clientConnection.disconnect();
-            this.clientConnection.close();
+        if (this.connection != null) {
+            this.connection.disconnect();
+            this.connection.close();
             reset();
         }
         return true;
@@ -157,6 +155,6 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     public Connection getConnection() {
-        return this.clientConnection;
+        return this.connection;
     }
 }
