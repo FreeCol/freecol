@@ -187,7 +187,9 @@ public class LoginMessage extends DOMMessage {
             if (nation == null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.maximumPlayers"));
-            } else if (game.playerNameInUse(this.userName)) {
+            }
+            present = (ServerPlayer)game.getPlayerByName(this.userName);
+            if (present != null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameInUse")
                     .addName("%name%", this.userName));
@@ -196,6 +198,7 @@ public class LoginMessage extends DOMMessage {
             // Complete initialization...
             serverPlayer.initialize(game, game.getLivePlayerList().isEmpty(),
                                     nation);
+
             // ... but override player name.
             serverPlayer.setName(this.userName);
 

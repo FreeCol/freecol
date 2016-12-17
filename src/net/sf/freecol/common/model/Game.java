@@ -691,16 +691,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Checks if the specified player name is in use.
-     *
-     * @param name The name to check.
-     * @return True if the name is already in use.
-     */
-    public boolean playerNameInUse(String name) {
-        return getPlayerByName(name) != null;
-    }
-
-    /**
      * Adds the specified player to the game.
      *
      * @param player The {@code Player} to add.
