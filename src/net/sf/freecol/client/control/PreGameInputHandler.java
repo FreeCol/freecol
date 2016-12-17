@@ -212,7 +212,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
             + "-player game as " + user + "/" + player.getId());
 
         if (fcc.isInGame()) { // Joining existing game, possibly reconnect
-            getGUI().refresh();
+            player.resetIterators();
+            getGUI().reconnect();
             igc().nextModelMessage();
         } else if (game.getMap() != null
             && game.allPlayersReadyToLaunch()) { // Ready to launch!

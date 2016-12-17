@@ -194,6 +194,19 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
+    public void reconnect() {
+        requestFocusInWindow();
+        initializeInGame();
+        closeMenus();
+        clearGotoPath();
+        resetMenuBar();
+        resetMapZoom(); // Should refresh the map
+    }
+        
+    /** 
+     * {@inheritDoc}
+     */
+    @Override
     public void initializeInGame() {
         canvas.initializeInGame();
         enableMapControls(getClientOptions()

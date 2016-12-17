@@ -313,14 +313,13 @@ public final class Canvas extends JDesktopPane {
      *     this component.
      */
     public Canvas(final FreeColClient freeColClient,
-           final GraphicsDevice graphicsDevice,
-           final SwingGUI gui,
-           final Dimension desiredSize,
-           MapViewer mapViewer) {
+                  final GraphicsDevice graphicsDevice,
+                  final SwingGUI gui,
+                  final Dimension desiredSize,
+                  MapViewer mapViewer) {
         this.freeColClient = freeColClient;
         this.gui = gui;
         this.graphicsDevice = graphicsDevice;
-        chatDisplay = new ChatDisplay();
         this.mapViewer = mapViewer;
 
         // Determine if windowed mode should be used and set the window size.
@@ -348,11 +347,12 @@ public final class Canvas extends JDesktopPane {
         setOpaque(false);
         setLayout(null);
 
-        startGamePanel = new StartGamePanel(freeColClient);
+        chatDisplay = new ChatDisplay();
+        chatPanel = new ChatPanel(freeColClient);
         serverListPanel = new ServerListPanel(freeColClient,
             freeColClient.getConnectController());
+        startGamePanel = new StartGamePanel(freeColClient);
         statusPanel = new StatusPanel(freeColClient);
-        chatPanel = new ChatPanel(freeColClient);
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -361,6 +361,17 @@ public final class Canvas extends JDesktopPane {
         createFrame(null, windowBounds);
         mapViewer.startCursorBlinking();
         logger.info("Canvas created.");
+    }
+
+    /**
+     * Check if there is a map to display.
+     *
+     * @return True if there is a map available.
+     */
+    private boolean hasMap() {
+        return this.freeColClient != null
+            && this.freeColClient.getGame() != null
+            && this.freeColClient.getGame().getMap() != null;
     }
 
     public boolean isWindowed() {
@@ -1493,20 +1504,19 @@ public final class Canvas extends JDesktopPane {
         updateSizes();
         Graphics2D g2d = (Graphics2D) g;
         chatDisplay.removeOldMessages();
-
         Dimension size = getSize();
-        if ((freeColClient.getGame() != null)
-                && (freeColClient.getGame().getMap() != null)
-                && (mapViewer.getFocus() != null)
-                && freeColClient.isInGame()) {
-            /* ingame view */
+        if (freeColClient.isMapEditor()) {
+            g2d.setColor(Color.BLACK);
+            g2d.fillRect(0, 0, size.width, size.height);
+
+        } else if (freeColClient.isInGame() && hasMap()
+            && mapViewer.getFocus() != null) {
 
             // paint map
             mapViewer.displayMap(g2d);
 
             // Grey out the map if it is not my turn (and a multiplayer game).
-            if (!freeColClient.isMapEditor() && freeColClient.getGame() != null
-                    && !freeColClient.currentPlayerIsMyPlayer()) {
+            if (!freeColClient.currentPlayerIsMyPlayer()) {
                 if (greyLayer == null) {
                     greyLayer = new GrayLayer(freeColClient);
                 }
@@ -1525,41 +1535,33 @@ public final class Canvas extends JDesktopPane {
             chatDisplay.display(g2d, mapViewer.getImageLibrary(), size);
 
         } else {
-            if (!freeColClient.isMapEditor()) {
-                /* main menu */
-                // TODO: Check if its right to sometimes have an unfocused map
-                //       ingame and end up here after clicking outside map.
-
-                final String bgImageKey = "image.flavor.Canvas.map";
-                if (ResourceManager.hasImageResource(bgImageKey)) {
-                    // Get the background without scaling, to avoid wasting
-                    // memory needlessly keeping an unbounded number of rescaled
-                    // versions of the largest image in FreeCol, forever.
-                    final Image bgImage = ResourceManager.getImage(bgImageKey);
-                    // Draw background image with scaling.
-                    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                    g2d.drawImage(bgImage, 0, 0, size.width, size.height, this);
-                    String versionStr = "v. " + FreeCol.getVersion();
-                    Font oldFont = g2d.getFont();
-                    Color oldColor = g2d.getColor();
-                    Font newFont = oldFont.deriveFont(Font.BOLD);
-                    TextLayout layout = new TextLayout(versionStr, newFont,
-                        g2d.getFontRenderContext());
-                    Rectangle2D bounds = layout.getBounds();
-                    float x = size.width - (float) bounds.getWidth() - 5;
-                    float y = size.height - (float) bounds.getHeight();
-                    g2d.setColor(Color.white);
-                    layout.draw(g2d, x, y);
-                    g2d.setFont(oldFont);
-                    g2d.setColor(oldColor);
-                } else {
-                    g2d.setColor(Color.BLACK);
-                    g2d.fillRect(0, 0, size.width, size.height);
-                }
-
+            /* main menu */
+            // TODO: Check if its right to sometimes have an unfocused map
+            //       ingame and end up here after clicking outside map.
+            final String bgImageKey = "image.flavor.Canvas.map";
+            if (ResourceManager.hasImageResource(bgImageKey)) {
+                // Get the background without scaling, to avoid wasting
+                // memory needlessly keeping an unbounded number of rescaled
+                // versions of the largest image in FreeCol, forever.
+                final Image bgImage = ResourceManager.getImage(bgImageKey);
+                // Draw background image with scaling.
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2d.drawImage(bgImage, 0, 0, size.width, size.height, this);
+                String versionStr = "v. " + FreeCol.getVersion();
+                Font oldFont = g2d.getFont();
+                Color oldColor = g2d.getColor();
+                Font newFont = oldFont.deriveFont(Font.BOLD);
+                TextLayout layout = new TextLayout(versionStr, newFont,
+                    g2d.getFontRenderContext());
+                Rectangle2D bounds = layout.getBounds();
+                float x = size.width - (float) bounds.getWidth() - 5;
+                float y = size.height - (float) bounds.getHeight();
+                g2d.setColor(Color.white);
+                layout.draw(g2d, x, y);
+                g2d.setFont(oldFont);
+                g2d.setColor(oldColor);
             } else {
-                /* map editor??? */
                 g2d.setColor(Color.BLACK);
                 g2d.fillRect(0, 0, size.width, size.height);
             }

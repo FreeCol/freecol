@@ -138,6 +138,11 @@ public class GUI extends FreeColClientHolder {
     public void quit() {}
 
     /**
+     * Reset the GUI on reconnect.
+     */
+    public void reconnect() {}
+
+    /**
      * In game initializations.
      *
      * Called from PreGameController.startGame().

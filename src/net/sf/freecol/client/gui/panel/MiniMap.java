@@ -37,6 +37,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -47,7 +48,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * This component draws a small version of the map.  It allows us to
  * see a larger part of the map and to relocate the viewport by
- * clicking on it.
+ * clicking on it.  Pity its not a FreeColClientHolder.
  */
 public final class MiniMap extends JPanel implements MouseInputListener {
 
@@ -98,6 +99,25 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     private GUI getGUI() {
         return this.freeColClient.getGUI();
+    }
+
+    /**
+     * Internal game accessor.
+     *
+     * @return The {@code Game}.
+     */
+    private Game getGame() {
+        return this.freeColClient.getGame();
+    }
+
+    /**
+     * Internal Map accessor.
+     *
+     * @return The {@code Map}.
+     */
+    private Map getMap() {
+        Game game = getGame();
+        return (game == null) ? null : game.getMap();
     }
 
     /**
@@ -397,6 +417,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
 
     private void focus(int x, int y) {
+        Map map = getMap();
+        if (map == null) return;
+
         int tileX, tileY;
 
         // When focusing out on the minimap, the last available focus out takes a larger jump than previous ones.
@@ -409,7 +432,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             tileY = ((y - adjustY) / tileSize * 4) + firstRow ;
         }
 
-        getGUI().setFocus(freeColClient.getGame().getMap().getTile(tileX,tileY));
+        getGUI().setFocus(map.getTile(tileX,tileY));
     }
 
     private void focus(MouseEvent e) {
