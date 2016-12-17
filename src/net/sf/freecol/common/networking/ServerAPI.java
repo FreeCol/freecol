@@ -79,20 +79,6 @@ public abstract class ServerAPI {
 
 
     /**
-     * Do local client processing for a reply.
-     *
-     * @param reply The reply {@code Element}.
-     */
-    protected abstract void doClientProcessingFor(Element reply);
-
-    /**
-     * Get the connection to communicate with the server.
-     *
-     * @return The {@code Connection} to the server.
-     */
-    protected abstract Connection getConnection();
-
-    /**
      * Connects a client to host:port (or more).
      *
      * @param name The name for the thread.
@@ -104,7 +90,8 @@ public abstract class ServerAPI {
      * @return True if the connection succeeded.
      * @exception IOException on connection failure.
      */
-    public abstract Connection connect(String name, String host, int port,
+    public abstract Connection connect(String name,
+                                       String host, int port,
                                        MessageHandler messageHandler)
         throws IOException;
 
@@ -120,9 +107,33 @@ public abstract class ServerAPI {
      */
     public abstract Connection reconnect() throws IOException;
 
+    /**
+     * Get the connection to communicate with the server.
+     *
+     * @return The {@code Connection} to the server.
+     */
+    public abstract Connection getConnection();
 
-    // Internal message passing routines
+    /**
+     * Do local client processing for a reply.
+     *
+     * @param reply The reply {@code Element}.
+     */
+    protected abstract void doClientProcessingFor(Element reply);
 
+
+    // Utilities
+
+    /**
+     * Sets the message handler for the connection.
+     *
+     * @param mh The new {@code MessageHandler}.
+     */
+    public void setMessageHandler(MessageHandler mh) {
+        Connection c = getConnection();
+        if (c != null) c.setMessageHandler(mh);
+    }
+    
     /**
      * Convenience utility to check the connection.
      *
@@ -131,6 +142,9 @@ public abstract class ServerAPI {
     public boolean isConnected() {
         return getConnection() != null;
     }
+
+
+    // Internal message passing routines
 
     /**
      * Sends a DOMMessage to the server.

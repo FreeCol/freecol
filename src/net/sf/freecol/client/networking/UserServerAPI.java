@@ -40,7 +40,7 @@ public class UserServerAPI extends ServerAPI {
     private final GUI gui;
 
     /** The connection used to communicate with the server. */
-    private Connection connection;
+    private Connection connection = null;
 
     /** The last name used to login with. */
     private String name = null;
@@ -67,35 +67,13 @@ public class UserServerAPI extends ServerAPI {
     }
 
 
-    /**
-     * Just forget about the client.
-     *
-     * Only call this if we are sure it is dead.
-     */
-    public void reset() {
-        this.connection = null;
-    }
-
-    /**
-     * Sets the message handler for the connection.
-     *
-     * @param mh The new {@code MessageHandler}.
-     */
-    public void setMessageHandler(MessageHandler mh) {
-        if (this.connection != null) {
-            this.connection.setMessageHandler(mh);
-        }
-        this.messageHandler = mh;
-    }
-
-
     // Implement ServerAPI
 
     /**
      * {@inheritDoc}
      */
-    public Connection connect(String name, String host, int port,
-                              MessageHandler messageHandler) 
+    public synchronized Connection connect(String name, String host, int port,
+                                           MessageHandler messageHandler) 
         throws IOException {
         int tries;
         if (port < 0) {
@@ -125,11 +103,11 @@ public class UserServerAPI extends ServerAPI {
     /**
      * {@inheritDoc}
      */
-    public boolean disconnect() {
+    public synchronized boolean disconnect() {
         if (this.connection != null) {
             this.connection.disconnect();
             this.connection.close();
-            reset();
+            this.connection = null;
         }
         return true;
     }
@@ -139,6 +117,13 @@ public class UserServerAPI extends ServerAPI {
      */
     public Connection reconnect() throws IOException {
         return connect(this.name, this.host, this.port, this.messageHandler);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public synchronized Connection getConnection() {
+        return this.connection;
     }
 
     /**
@@ -154,7 +139,9 @@ public class UserServerAPI extends ServerAPI {
     /**
      * {@inheritDoc}
      */
-    public Connection getConnection() {
-        return this.connection;
+    @Override
+    public void setMessageHandler(MessageHandler mh) {
+        super.setMessageHandler(mh);
+        this.messageHandler = mh;
     }
 }
