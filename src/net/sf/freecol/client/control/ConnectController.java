@@ -270,9 +270,9 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        logout(LogoutReason.LOGIN);
-
         if (!unblockServer(FreeCol.getServerPort())) return false;
+
+        logout(LogoutReason.LOGIN);
 
         // Load the player mods into the specification that is about to be
         // used to initialize the server.
@@ -398,6 +398,7 @@ public final class ConnectController extends FreeColClientHolder {
         Messages.loadActiveModMessageBundle(options.getActiveMods(),
                                             FreeCol.getLocale());
         if (!unblockServer(port)) return false;
+
         getGUI().showStatusPanel(Messages.message("status.loadingGame"));
 
         final File theFile = file;
@@ -470,9 +471,9 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        logout(LogoutReason.LOGIN);
-
         if (!unblockServer(port)) return false;
+
+        logout(LogoutReason.LOGIN);
 
         FreeColServer freeColServer = startServer(publicServer, false,
                                                   specification, port);
@@ -563,6 +564,17 @@ public final class ConnectController extends FreeColClientHolder {
         return logout(LogoutReason.RECONNECT);
     }
 
+    /**
+     * Full restart needed, log out and stop the server.
+     *
+     * @return True if the reconnection succeeds.
+     */
+    public boolean restart() {
+        boolean ret = logout(LogoutReason.RESTART);
+        stopServer();
+        return ret;
+    }
+    
     /**
      * Gets a list of servers from the meta server.
      *

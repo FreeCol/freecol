@@ -783,7 +783,7 @@ public final class FreeColClient {
             if (isMapEditor()) {
                 specification = getGame().getSpecification();
             } else if (!prompt || gui.confirmStopGame()) {
-                getConnectController().stopServer();
+                getConnectController().restart();
                 FreeColSeed.incrementFreeColSeed();
             } else {
                 return;
@@ -821,7 +821,12 @@ public final class FreeColClient {
      */
     public void askToQuit() {
         if (gui.confirm("quitDialog.areYouSure.text", "ok", "cancel")) {
-            askServer().logout(getMyPlayer(), LogoutReason.QUIT);
+            Player player = getMyPlayer();
+            if (player == null) { // If no player, must be already logged out
+                quit();
+            } else {
+                askServer().logout(getMyPlayer(), LogoutReason.QUIT);
+            }
         }
     }
 

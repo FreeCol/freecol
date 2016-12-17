@@ -60,7 +60,12 @@ public class Game extends FreeColGameObject {
 
     /** Reasons for logging out. */
     public static enum LogoutReason {
-        DEFEATED, LOGIN, LOGOUT, QUIT, RECONNECT
+        DEFEATED,   // Game over, player lost
+        LOGIN,      // Logging in again FIXME: this should go away
+        LOGOUT,     // Player quits but game continues
+        QUIT,       // Player quits and whole game is over
+        RECONNECT,  // Implement reconnect
+        RESTART     // Cancel from StartGame panel
     };
     
     /** State for the FCGO iterator, out here because it has to be static. */
