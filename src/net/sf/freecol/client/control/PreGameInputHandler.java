@@ -234,10 +234,9 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final Game game = getGame();
         final LogoutMessage message = new LogoutMessage(game, element);
         final Player player = message.getPlayer(game);
-        final String reason = message.getReason();
 
         logger.info("Logout accepted for player " + player.getName()
-            + ": " + reason);
+            + ": " + message.getReason());
         game.removePlayer(player);
         getGUI().refreshPlayersTable();
 

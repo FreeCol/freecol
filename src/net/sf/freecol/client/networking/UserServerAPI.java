@@ -43,6 +43,18 @@ public class UserServerAPI extends ServerAPI {
     /** The connection used to communicate with the server. */
     private ClientConnection clientConnection;
 
+    /** The last name used to login with. */
+    private String name = null;
+
+    /** The last host connected to. */
+    private String host = null;
+
+    /** The last port connected to. */
+    private int port = -1;
+
+    /** The last message handler specified. */
+    private MessageHandler messageHandler = null;
+
 
     /**
      * Create the new user wrapper for the server API.
@@ -55,26 +67,6 @@ public class UserServerAPI extends ServerAPI {
         this.gui = gui;
     }
 
-
-    /**
-     * Get the host we are connected to.
-     *
-     * @return The current host, or null if none.
-     */
-    public String getHost() {
-        return (this.clientConnection == null) ? null
-            : this.clientConnection.getHost();
-    }
-
-    /**
-     * Get the port we are connected to.
-     *
-     * @return The current port, or negative if none.
-     */     
-    public int getPort() {
-        return (this.clientConnection == null) ? -1
-            : this.clientConnection.getPort();
-    }
 
     /**
      * Just forget about the client.
@@ -94,6 +86,7 @@ public class UserServerAPI extends ServerAPI {
         if (this.clientConnection != null) {
             this.clientConnection.setMessageHandler(mh);
         }
+        this.messageHandler = mh;
     }
 
 
@@ -116,7 +109,14 @@ public class UserServerAPI extends ServerAPI {
             try {
                 this.clientConnection = new ClientConnection(host, port,
                     messageHandler, name);
-                if (this.clientConnection != null) break;
+                if (this.clientConnection != null) {
+                    // Connected, save the connection information
+                    this.name = name;
+                    this.host = host;
+                    this.port = port;
+                    this.messageHandler = messageHandler;
+                    break;
+                }
             } catch (IOException e) {
                 if (i <= 1) throw e;
             }
@@ -135,7 +135,14 @@ public class UserServerAPI extends ServerAPI {
         }
         return true;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    public Connection reconnect() throws IOException {
+        return connect(this.name, this.host, this.port, this.messageHandler);
+    }
+
     /**
      * {@inheritDoc}
      */

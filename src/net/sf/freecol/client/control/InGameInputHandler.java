@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -799,12 +800,10 @@ public final class InGameInputHandler extends ClientInputHandler {
         final Game game = getGame();
         final LogoutMessage message = new LogoutMessage(game, element);
         final Player player = message.getPlayer(game);
-        final String reason = message.getReason();
+        final LogoutReason reason = message.getReason();
         if (player == null) return null;
 
-        if (game.getCurrentPlayer() == player) {
-            game.setCurrentPlayer(game.getNextPlayer());
-        }            
+        invokeLater(() -> igc().logout(player, reason));
         return null;
     }
 

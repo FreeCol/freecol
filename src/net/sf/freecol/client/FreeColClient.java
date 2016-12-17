@@ -52,6 +52,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -818,7 +819,9 @@ public final class FreeColClient {
      * Quits the application.
      */
     public void askToQuit() {
-        if (gui.confirm("quitDialog.areYouSure.text", "ok", "cancel")) quit();
+        if (gui.confirm("quitDialog.areYouSure.text", "ok", "cancel")) {
+            askServer().logout(getMyPlayer(), LogoutReason.QUIT);
+        }
     }
 
     /**

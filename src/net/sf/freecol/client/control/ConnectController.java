@@ -41,6 +41,8 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.Connection;
@@ -189,7 +191,7 @@ public final class ConnectController extends FreeColClientHolder {
      * @param reason The reason to logout from the server.
      * @return True if the client is logged out, or at least tried to log out.
      */
-    private boolean logout(String reason) {
+    public boolean logout(LogoutReason reason) {
         final FreeColClient fcc = getFreeColClient();
         if (!fcc.isLoggedIn()) return true;
         if (!askServer().logout(fcc.getMyPlayer(), reason)) return false;
@@ -268,7 +270,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        logout("Start single-player");
+        logout(LogoutReason.LOGIN);
 
         if (!unblockServer(FreeCol.getServerPort())) return false;
 
@@ -468,7 +470,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        logout("Starting multiplayer");
+        logout(LogoutReason.LOGIN);
 
         if (!unblockServer(port)) return false;
 
@@ -492,7 +494,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        logout("Joining multiplayer");
+        logout(LogoutReason.LOGIN);
 
         return joinGame(host, port);
     }
@@ -558,10 +560,7 @@ public final class ConnectController extends FreeColClientHolder {
      * @return True if the reconnection succeeds.
      */
     public boolean reconnect() {
-        final FreeColClient fcc = getFreeColClient();
-        logout("reconnect");
-        return login(FreeCol.getName(),
-                     askServer().getHost(), askServer().getPort());
+        return logout(LogoutReason.RECONNECT);
     }
 
     /**
@@ -577,7 +576,7 @@ public final class ConnectController extends FreeColClientHolder {
                 getFreeColClient().setFreeColServer(null);
             }
         } else {
-            logout("Quit");
+            logout(LogoutReason.QUIT);
         }
     }
 

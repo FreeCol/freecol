@@ -73,7 +73,7 @@ public class AIServerAPI extends ServerAPI {
     public Connection connect(String name, String host, int port,
                               MessageHandler messageHandler)
         throws IOException {
-        return null; // Noop
+        return getConnection(); // Noop
     }
 
     /**
@@ -81,5 +81,12 @@ public class AIServerAPI extends ServerAPI {
      */
     public boolean disconnect() {
         return false; // Noop
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Connection reconnect() throws IOException {
+        return getConnection(); // Noop
     }
 }

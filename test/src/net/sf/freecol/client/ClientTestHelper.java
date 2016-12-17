@@ -23,6 +23,7 @@ import junit.framework.*;
 import static org.junit.Assert.*;
 
 import net.sf.freecol.client.control.ConnectController;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
 
@@ -49,6 +50,6 @@ public class ClientTestHelper {
     }
     
     public static void stopClient(FreeColClient client) {
-        client.getConnectController().quitGame(false);
+        client.getConnectController().logout(LogoutReason.QUIT);
     }
 }

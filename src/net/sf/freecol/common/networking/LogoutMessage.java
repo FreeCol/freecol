@@ -20,9 +20,11 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -47,8 +49,9 @@ public class LogoutMessage extends AttributeMessage {
      * @param player The {@code Player} that has logged out.
      * @param reason A reason for logging out.
      */
-    public LogoutMessage(Player player, String reason) {
-        super(TAG, PLAYER_TAG, player.getId(), REASON_TAG, reason);
+    public LogoutMessage(Player player, LogoutReason reason) {
+        super(TAG, PLAYER_TAG, player.getId(),
+              REASON_TAG, String.valueOf(reason));
     }
 
     /**
@@ -78,10 +81,10 @@ public class LogoutMessage extends AttributeMessage {
     /**
      * Get the reason for logging out.
      *
-     * @return The logout reason.
+     * @return The {@code LogoutReason}.
      */
-    public String getReason() {
-        return getAttribute(REASON_TAG);
+    public LogoutReason getReason() {
+        return Enum.valueOf(LogoutReason.class, getAttribute(REASON_TAG));
     }
 
 
@@ -94,37 +97,38 @@ public class LogoutMessage extends AttributeMessage {
         if (serverPlayer == null) return null;
         logger.info("Handling logout by " + serverPlayer.getName());
 
+        LogoutReason reason = getReason();
+        ChangeSet cs = null;
         switch (freeColServer.getServerState()) {
         case PRE_GAME: case LOAD_GAME:
             break;
         case IN_GAME:
             ServerGame game = freeColServer.getGame();
-            if (game.getCurrentPlayer() == serverPlayer
-                && !freeColServer.getSinglePlayer()) {
-                ChangeSet cs = freeColServer.getInGameController()
-                    .endTurn(serverPlayer);
-                game.sendToAll(cs, serverPlayer);
+            if (freeColServer.getSinglePlayer()) {
+                ; // Allow quit if specified
+            } else {
+                if (game.getCurrentPlayer() == serverPlayer) {
+                    cs = freeColServer.getInGameController()
+                        .endTurn(serverPlayer);
+                }
+                // FIXME: Turn serverPlayer into AI?
+                // Do not allow non-admin to quit
+                if (reason == LogoutReason.QUIT
+                    && !serverPlayer.isAdmin()) reason = LogoutReason.LOGOUT;
             }
-            // FIXME: Turn serverPlayer into AI?
             break;
         case END_GAME:
             return null;
         }
 
-        // Make sure the player is disconnected
-        TrivialMessage.DISCONNECT_MESSAGE
-            .serverHandler(freeColServer, serverPlayer);
-        
-        // Inform other players
-        LogoutMessage message
-            = new LogoutMessage(serverPlayer, serverPlayer.getName()
-                + " has logged out: " + getReason());
-        freeColServer.sendToAll(message, serverPlayer);
+        // Inform all players
+        if (cs == null) cs = new ChangeSet();
+        cs.add(See.all(), ChangeSet.ChangePriority.CHANGE_NORMAL,
+               new LogoutMessage(serverPlayer, reason));
 
         // Update the metaserver
         freeColServer.updateMetaServer(false);
 
-        // serverPlayer has disconnected, no point returning anything
-        return null;
+        return cs;
     }
 }

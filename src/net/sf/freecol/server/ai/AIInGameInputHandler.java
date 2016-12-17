@@ -233,7 +233,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case ErrorMessage.TAG:
             case "featureChange":
             case GameEndedMessage.TAG:
-            case LogoutMessage.TAG:
+            case LogoutMessage.TAG: // Ignored, AIs do not log out
             case NativeGiftMessage.TAG:
             case NewTurnMessage.TAG:
             case NewTradeRouteMessage.TAG:

@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -3591,6 +3592,42 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Log out the current player.
+     *
+     * Called from IGIH.logout.
+     *
+     * @param player The {@code Player} that is logging out.
+     * @param reason The reason for logging out.
+     */
+    public void logout(Player player, LogoutReason reason) {
+        if (player == null) return;
+
+        final Game game = getGame();
+        if (game.getCurrentPlayer() == player) {
+            game.setCurrentPlayer(game.getNextPlayer());
+        }
+        if (getMyPlayer() == player) {
+            final FreeColClient fcc = getFreeColClient();
+            askServer().disconnect();
+            switch (reason) {
+            case DEFEATED: case QUIT:
+                fcc.quit();
+                break;
+            case LOGIN:
+                break;
+            case RECONNECT:
+                try {
+                    askServer().reconnect();
+                } catch (IOException ioe) {
+                    logger.log(Level.SEVERE, "Reconnect fail", ioe);
+                    fcc.quit();
+                }
+                break;
+            }
+        }
+    }
+       
+    /**
      * Loot some cargo.
      *
      * Called from GUI.showCaptureGoodsDialog
@@ -4226,9 +4263,10 @@ public final class InGameController extends FreeColClientHolder {
      * Returns no status, this game is going away.
      */
     public void reconnect() {
+        final Player player = getMyPlayer();
         if (getGUI().confirm("reconnect.text", "reconnect.no", "reconnect.yes")) {
             logger.finest("Reconnect quit.");
-            getFreeColClient().quit();
+            askServer().logout(player, LogoutReason.QUIT);
         } else {
             logger.finest("Reconnect accepted.");
             getConnectController().reconnect();
@@ -4627,11 +4665,12 @@ public final class InGameController extends FreeColClientHolder {
                                    "defeatedSinglePlayer.yes", "quit")) {
                     askServer().enterRevengeMode(getGame());
                 } else {
-                    getFreeColClient().quit();
+                    askServer().logout(player, LogoutReason.DEFEATED);
                 }
             } else {
-                if (!getGUI().confirm("defeated.text", "defeated.yes",
-                                 "quit")) getFreeColClient().quit();
+                if (!getGUI().confirm("defeated.text", "defeated.yes", "quit")) {
+                    askServer().logout(player, LogoutReason.DEFEATED);
+                }
             }
         } else {
             player.setStance(dead, null);

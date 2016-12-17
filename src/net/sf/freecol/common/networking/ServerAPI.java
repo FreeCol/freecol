@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -113,6 +114,11 @@ public abstract class ServerAPI {
      * @return True if disconnected.
      */
     public abstract boolean disconnect();
+
+    /**
+     * Reconnect to the server.
+     */
+    public abstract Connection reconnect() throws IOException;
 
 
     // Internal message passing routines
@@ -749,7 +755,7 @@ public abstract class ServerAPI {
      * @param reason The reason for logging out.
      * @return True if the server interaction succeeded.
      */
-    public boolean logout(Player player, String reason) {
+    public boolean logout(Player player, LogoutReason reason) {
         return ask(player.getGame(),
                    new LogoutMessage(player, reason));
     }
