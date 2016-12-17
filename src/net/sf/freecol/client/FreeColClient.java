@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -90,7 +91,7 @@ public final class FreeColClient {
     private FreeColServer freeColServer = null;
 
     /** Encapsulation of the server API. */
-    private final UserServerAPI userServerAPI;
+    private final ServerAPI serverAPI;
 
     /** The GUI encapsulation. */
     private final GUI gui;
@@ -184,7 +185,7 @@ public final class FreeColClient {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
         // Once the basic resources are in place construct other things.
-        this.userServerAPI = new UserServerAPI(gui);
+        this.serverAPI = new UserServerAPI(gui);
 
         // Control.  Controllers expect GUI to be available.
         connectController = new ConnectController(this);
@@ -467,8 +468,8 @@ public final class FreeColClient {
      *
      * @return The user wrapper for the {@code ServerAPI}.
      */
-    public UserServerAPI askServer() {
-        return this.userServerAPI;
+    public ServerAPI askServer() {
+        return this.serverAPI;
     }
 
     /**

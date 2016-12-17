@@ -24,10 +24,10 @@ import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.networking.UserServerAPI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -56,7 +56,7 @@ public class FreeColClientHolder {
      *
      * @return The {@code ServerAPI}.
      */
-    public UserServerAPI askServer() {
+    public ServerAPI askServer() {
         return this.freeColClient.askServer();
     }
 

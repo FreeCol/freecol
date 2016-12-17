@@ -3613,7 +3613,7 @@ public final class InGameController extends FreeColClientHolder {
             case DEFEATED: case QUIT:
                 fcc.quit();
                 break;
-            case LOGIN:
+            case LOGIN: // FIXME: This should not happen, drop when convinced
                 break;
             case RECONNECT:
                 try {
