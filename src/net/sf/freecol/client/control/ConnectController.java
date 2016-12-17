@@ -224,11 +224,7 @@ public final class ConnectController extends FreeColClientHolder {
         fcc.setMapEditor(false);
 
         // Clean up any old connections
-        if (askServer().isConnected()) {
-            try {
-                askServer().disconnect("login");
-            } catch (IOException ioe) {} // Ignore
-        }
+        askServer().disconnect();
 
         // Establish the full connection here
         StringTemplate err = fcc.connect(user, host, port);

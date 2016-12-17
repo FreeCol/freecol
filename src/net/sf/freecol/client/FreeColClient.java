@@ -752,7 +752,7 @@ public final class FreeColClient {
         StringTemplate err = null;
         try {
             if (askServer().connect(FreeCol.CLIENT_THREAD + user, host, port,
-                                    this.preGameInputHandler)) {
+                                    this.preGameInputHandler) != null) {
                 logger.info("Connected to " + host + ":" + port
                     + " as " + user);
             } else {

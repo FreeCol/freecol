@@ -56,55 +56,6 @@ public class UserServerAPI extends ServerAPI {
     }
 
 
-    // Client manipulation
-
-    /**
-     * Connects a client to host:port (or more).
-     *
-     * @param threadName The name for the thread.
-     * @param host The name of the machine running the
-     *     {@code FreeColServer}.
-     * @param port The port to use when connecting to the host.
-     * @param messageHandler The {@code MessageHandler} to use on this
-     *     connection.
-     * @return True if the connection succeeded.
-     * @exception IOException on connection failure.
-     */
-    public boolean connect(String threadName, String host, int port,
-                           MessageHandler messageHandler) 
-        throws IOException {
-        int tries;
-        if (port < 0) {
-            port = FreeCol.getServerPort();
-            tries = 10;
-        } else {
-            tries = 1;
-        }
-        for (int i = tries; i > 0; i--) {
-            try {
-                this.clientConnection = new ClientConnection(host, port,
-                    messageHandler, threadName);
-                if (this.clientConnection != null) break;
-            } catch (IOException e) {
-                if (i <= 1) throw e;
-            }
-        }
-        return this.clientConnection != null;
-    }
-
-    /**
-     * Disconnect the client connection..
-     *
-     * @param reason The reason for the disconnection.
-     * @exception IOException on failure to send the required messages.
-     */
-    public void disconnect(String reason) throws IOException {
-        if (this.clientConnection != null) {
-            this.clientConnection.disconnect();
-            reset();
-        }
-    }
-
     /**
      * Get the host we are connected to.
      *
@@ -147,6 +98,43 @@ public class UserServerAPI extends ServerAPI {
 
 
     // Implement ServerAPI
+
+    /**
+     * {@inheritDoc}
+     */
+    public Connection connect(String name, String host, int port,
+                              MessageHandler messageHandler) 
+        throws IOException {
+        int tries;
+        if (port < 0) {
+            port = FreeCol.getServerPort();
+            tries = 10;
+        } else {
+            tries = 1;
+        }
+        for (int i = tries; i > 0; i--) {
+            try {
+                this.clientConnection = new ClientConnection(host, port,
+                    messageHandler, name);
+                if (this.clientConnection != null) break;
+            } catch (IOException e) {
+                if (i <= 1) throw e;
+            }
+        }
+        return this.clientConnection;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean disconnect() {
+        if (this.clientConnection != null) {
+            this.clientConnection.disconnect();
+            this.clientConnection.close();
+            reset();
+        }
+        return true;
+    }
     
     /**
      * {@inheritDoc}

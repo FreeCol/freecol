@@ -19,9 +19,11 @@
 
 package net.sf.freecol.server.ai;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
 
 import org.w3c.dom.Element;
@@ -63,5 +65,21 @@ public class AIServerAPI extends ServerAPI {
      */
     public Connection getConnection() {
         return (this.owner == null) ? null : this.owner.getConnection();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Connection connect(String name, String host, int port,
+                              MessageHandler messageHandler)
+        throws IOException {
+        return null; // Noop
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean disconnect() {
+        return false; // Noop
     }
 }

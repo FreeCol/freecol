@@ -91,6 +91,29 @@ public abstract class ServerAPI {
      */
     protected abstract Connection getConnection();
 
+    /**
+     * Connects a client to host:port (or more).
+     *
+     * @param name The name for the thread.
+     * @param host The name of the machine running the
+     *     {@code FreeColServer}.
+     * @param port The port to use when connecting to the host.
+     * @param messageHandler The {@code MessageHandler} to use on this
+     *     connection.
+     * @return True if the connection succeeded.
+     * @exception IOException on connection failure.
+     */
+    public abstract Connection connect(String name, String host, int port,
+                                       MessageHandler messageHandler)
+        throws IOException;
+
+    /**
+     * Disconnect from the server.
+     *
+     * @return True if disconnected.
+     */
+    public abstract boolean disconnect();
+
 
     // Internal message passing routines
 
@@ -109,9 +132,16 @@ public abstract class ServerAPI {
      * @param message The {@code DOMMessage} to send.
      * @return True if the send succeeded.
      */
-    private boolean send(DOMMessage message) {
+    protected boolean send(DOMMessage message) {
+        if (message == null) return true;
+        Connection c = getConnection();
+        if (c == null) {
+            logger.log(Level.WARNING, "Not connected, did not send: "
+                        + message.getType());
+            return false;
+        }
         try {
-            getConnection().send(message);
+            c.send(message);
             return true;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not send: " + message.getType(),
