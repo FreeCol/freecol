@@ -28,9 +28,9 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NetworkRequestHandler;
+import net.sf.freecol.common.networking.TrivialMessage;
 
 import org.w3c.dom.Element;
 
@@ -59,7 +59,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     public ClientInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
 
-        register(DisconnectMessage.TAG,
+        register(TrivialMessage.DISCONNECT_TAG,
             (Connection c, Element e) -> disconnect(e));
     }
 

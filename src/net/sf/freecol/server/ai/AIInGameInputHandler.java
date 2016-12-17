@@ -45,7 +45,6 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
-import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.FountainOfYouthMessage;
@@ -230,7 +229,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case ChatMessage.TAG:
             case TrivialMessage.CLOSE_MENUS_TAG:
             case DeleteTradeRouteMessage.TAG:
-            case DisconnectMessage.TAG:                
+            case TrivialMessage.DISCONNECT_TAG:
             case ErrorMessage.TAG:
             case "featureChange":
             case GameEndedMessage.TAG:

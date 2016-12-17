@@ -30,7 +30,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NetworkRequestHandler;
@@ -72,9 +71,9 @@ public abstract class ServerInputHandler extends FreeColServerHolder
             (Connection conn, Element e) -> handler(false, conn,
                 new ChatMessage(getGame(), e)));
 
-        register(DisconnectMessage.TAG,
+        register(TrivialMessage.DISCONNECT_TAG,
             (Connection conn, Element e) -> handler(false, conn,
-                new DisconnectMessage(getGame(), e)));
+                TrivialMessage.DISCONNECT_MESSAGE));
 
         register(LogoutMessage.TAG,
             (Connection conn, Element e) -> handler(false, conn,

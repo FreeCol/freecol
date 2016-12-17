@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
@@ -73,7 +72,7 @@ public final class NetworkHandler implements MessageHandler {
         DOMMessage reply = null;
         final String tag = element.getTagName();
         switch (tag) {
-        case DisconnectMessage.TAG:
+        case TrivialMessage.DISCONNECT_TAG:
             reply = disconnect(connection, element);
             break;
         case RegisterServerMessage.TAG:
@@ -177,7 +176,7 @@ public final class NetworkHandler implements MessageHandler {
      */
     private DOMMessage disconnect(Connection connection, Element element) {
         metaServer.removeConnection(connection);
-        connection.reallyClose();
+        connection.close();
 
         return null;
     }

@@ -317,14 +317,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     /**
      * Disconnect this player.
-     *
-     * @return The old {@code Connection}.
      */
-    public Connection disconnect() {
-        Connection ret = this.connection;
-        if (this.connection != null) this.connection.reallyClose();
+    public void disconnect() {
+        if (this.connection != null) this.connection.close();
         setConnection(null);
-        return ret;
     }
             
     /**

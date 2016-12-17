@@ -621,6 +621,17 @@ public final class FreeColServer {
     }
 
     /**
+     * Remove a player connection.
+     *
+     * @param serverPlayer The {@code ServerPlayer} to disconnect.
+     */
+    public void removePlayerConnection(ServerPlayer serverPlayer) {
+        this.server.removeConnection(serverPlayer.getConnection());
+        serverPlayer.disconnect();
+    }
+
+
+    /**
      * Wait until the game has been created.
      *
      * FIXME: is this still needed?

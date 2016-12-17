@@ -240,12 +240,10 @@ final class ReceivingThread extends Thread {
 
     /**
      * Disconnects this thread.
-     *
-     * @param reason The reason to disconnect.
      */
-    private void disconnect(String reason) {
+    private void disconnect() {
         askToStop();
-        connection.disconnect(reason);
+        connection.disconnect();
     }
 
     /**
@@ -275,7 +273,7 @@ final class ReceivingThread extends Thread {
                 replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
             } catch (XMLStreamException xse) {
                 // EOS can occur when the other end disconnects
-                tag = DisconnectMessage.TAG;
+                tag = TrivialMessage.DISCONNECT_TAG;
                 replyId = -1;
             }
 
@@ -330,7 +328,7 @@ final class ReceivingThread extends Thread {
                     };
                 break;
 
-            case DisconnectMessage.TAG:
+            case TrivialMessage.DISCONNECT_TAG:
                 askToStop(); // Stop soon
                 // Fall through
             default:
@@ -385,12 +383,12 @@ final class ReceivingThread extends Thread {
                     if (!shouldRun()) break;
                     logger.log(Level.WARNING, "XML fail", e);
                     if (++timesFailed > MAXIMUM_RETRIES) {
-                        disconnect("Too many failures (XML)");
+                        disconnect();
                     }
                 } catch (IOException e) {
                     if (!shouldRun()) break;
                     logger.log(Level.WARNING, "IO fail", e);
-                    disconnect("Unexpected IO failure");
+                    disconnect();
                 }
             }
         } catch (Exception e) {
@@ -398,8 +396,7 @@ final class ReceivingThread extends Thread {
         } finally {
             askToStop();
         }
-        // Do not send disconnect again
-        connection.reallyClose();
+        connection.close();
         logger.info("Finished: " + getName());
     }
 }

@@ -141,19 +141,25 @@ public final class MetaRegister {
      */
     public synchronized void addServer(ServerInfo newSi) {
         ServerInfo si = getServer(newSi.getAddress(), newSi.getPort());
-        if (si == null) { // Check connection before adding the server:
-            try (
-                Connection mc = new Connection(newSi.getAddress(),
-                                               newSi.getPort(), null,
-                                               FreeCol.METASERVER_THREAD);
-            ) {
-                mc.disconnect("server replacement");
+        if (si == null) {
+            final String identity = newSi.getName()
+                + " (" + newSi.getAddress() + ":" + newSi.getPort() + ")";
+            // Check connection before adding the server:
+            Connection mc = null;
+            try {
+                mc = new Connection(newSi.getAddress(), newSi.getPort(), null,
+                                    FreeCol.METASERVER_THREAD);
+                if (mc == null) {
+                    logger.info("Server not found: " + identity);
+                } else {
+                    items.add(newSi);
+                    logger.info("Server added:" + identity);
+                }
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Server rejected disconnect.", ioe);
+                logger.log(Level.WARNING, "Server fail: " + identity, ioe);
+            } finally {
+                if (mc != null) mc.close();
             }
-            items.add(newSi);
-            logger.info("Server added:" + newSi.getName()
-                + " (" + newSi.getAddress() + ":" + newSi.getPort() + ")");
         } else {
             si.update(newSi);
         }

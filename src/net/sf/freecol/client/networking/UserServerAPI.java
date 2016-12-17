@@ -100,7 +100,7 @@ public class UserServerAPI extends ServerAPI {
      */
     public void disconnect(String reason) throws IOException {
         if (this.clientConnection != null) {
-            this.clientConnection.disconnect(reason);
+            this.clientConnection.disconnect();
             reset();
         }
     }

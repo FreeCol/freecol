@@ -112,7 +112,7 @@ public class LogoutMessage extends AttributeMessage {
         }
 
         // Make sure the player is disconnected
-        new DisconnectMessage(getReason())
+        TrivialMessage.DISCONNECT_MESSAGE
             .serverHandler(freeColServer, serverPlayer);
         
         // Inform other players

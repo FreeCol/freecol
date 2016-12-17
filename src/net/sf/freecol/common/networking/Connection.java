@@ -273,21 +273,24 @@ public class Connection implements Closeable {
      */
     @Override
     public void close() {
-        disconnect("close");
-        reallyClose();
-    }
-
-    /**
-     * Really closes this connection.
-     */
-    public void reallyClose() {
         if (this.receivingThread != null) this.receivingThread.askToStop();
 
         closeOutputStream();
         closeInputStream();
         closeSocket();
         
-        logger.fine("Connection really closed for " + this.name);
+        logger.fine("Connection closed for " + this.name);
+    }
+
+    /**
+     * Signal that this connection is disconnecting.
+     */
+    public void disconnect() {
+        try {
+            send(TrivialMessage.DISCONNECT_MESSAGE);
+        } catch (IOException ioe) {
+            ; // Ignore, the other end may have shut down first anyway
+        }
     }
 
     /**
@@ -535,21 +538,6 @@ public class Connection implements Closeable {
     public Element handle(Element request) throws FreeColException {
         return (this.messageHandler == null) ? null
             : this.messageHandler.handle(this, request);
-    }
-
-    /**
-     * Send a disconnect message.
-     *
-     * @param reason The reason for the disconnection.
-     */
-    public void disconnect(String reason) {
-        try {
-            send(new DisconnectMessage(reason));
-            logger.info("Disconnect " + getName() + ": " + reason);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Disconnect failed for " + getName(),
-                       ioe);
-        }
     }
 
     /**

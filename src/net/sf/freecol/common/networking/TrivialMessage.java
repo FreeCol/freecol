@@ -48,6 +48,9 @@ public class TrivialMessage extends DOMMessage {
     public static final String CONTINUE_TAG = "continuePlaying";
     public static final TrivialMessage CONTINUE_MESSAGE
         = new TrivialMessage(CONTINUE_TAG);
+    public static final String DISCONNECT_TAG = "disconnect";
+    public static final TrivialMessage DISCONNECT_MESSAGE
+        = new TrivialMessage(DISCONNECT_TAG);
     public static final String END_TURN_TAG = "endTurn";
     public static final TrivialMessage END_TURN_MESSAGE
         = new TrivialMessage(END_TURN_TAG);
@@ -126,6 +129,9 @@ public class TrivialMessage extends DOMMessage {
         switch (this.type) {
         case CONTINUE_TAG:
             return igc(freeColServer).continuePlaying(serverPlayer);
+        case DISCONNECT_TAG:
+            freeColServer.removePlayerConnection(serverPlayer);
+            return null; // Never reply to disconnect
         case END_TURN_TAG:
             return igc(freeColServer).endTurn(serverPlayer);
         case ENTER_REVENGE_MODE_TAG:

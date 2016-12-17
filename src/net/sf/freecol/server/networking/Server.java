@@ -258,6 +258,7 @@ public final class Server extends Thread {
 
         for (Connection c : transform(this.connections.values(),
                                       Connection::isAlive)) {
+            c.disconnect();
             c.close();
         }
         this.connections.clear();
