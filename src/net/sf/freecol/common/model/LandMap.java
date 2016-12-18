@@ -104,7 +104,10 @@ public class LandMap {
         int gen = mgo.getInteger(MapGeneratorOptions.LAND_GENERATOR_TYPE);
         SelectOption so = (SelectOption)
             mgo.getOption(MapGeneratorOptions.LAND_GENERATOR_TYPE);
-        logger.info("Using land generator " + so.getItemValues().get(gen));
+        logger.info("Using land generator " + so.getItemValues().get(gen)
+            + " to make " + width + "x" + height + " map"
+            + " with distance-to-edge=" + distanceToEdge
+            + " and min-tile#=" + minNumberOfTiles);
         generate(gen, distanceToEdge, minNumberOfTiles, random);
     }
 
