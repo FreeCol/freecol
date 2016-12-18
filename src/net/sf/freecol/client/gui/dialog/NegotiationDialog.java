@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.InciteTradeItem;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
@@ -1118,11 +1119,36 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      * Gets a trade item button for a given item.
      *
      * @param item The {@code TradeItem} to make a button for.
+     * @param saleDir Boolean to indicate the EU price for sale (T) or buy (F)
      * @return A new {@code JButton} for the item.
      */
-    private JButton getTradeItemButton(TradeItem item) {
+    private JButton getTradeItemButton(TradeItem item, boolean saleDir) {
+        
+        Market market = getMyPlayer().getMarket();
         JButton button = new JButton(new RemoveAction(item));
-        button.setText(Messages.message(item.getLabel()));
+        
+        // Checks if the items are goods
+        if (item.getGoods() != null) {
+            int buyPriceTotal = market.getBidPrice(item.getGoods().getType(), item.getGoods().getAmount());
+            int salePriceTotal = market.getSalePrice(item.getGoods().getType(), item.getGoods().getAmount());
+            
+            // Depending on saleDir, creates a button for goods w/ EU buy or sale price
+            if (saleDir) {
+                button.setText(Messages.message(item.getLabel()) + " " +
+                        Messages.message(StringTemplate
+                                .template("negotiationDialog.euSalePrice")
+                                .addAmount("%priceTotal%", salePriceTotal)));
+            } else {
+                button.setText(Messages.message(item.getLabel()) + " " +
+                        Messages.message(StringTemplate
+                                .template("negotiationDialog.euBuyPrice")
+                                .addAmount("%priceTotal%", buyPriceTotal)));
+            }
+        } else {
+            // If not goods, follow protocol
+            button.setText(Messages.message(item.getLabel()));
+        }
+        
         button.setMargin(Utility.EMPTY_MARGIN);
         button.setOpaque(false);
         button.setForeground(Utility.LINK_COLOR);
@@ -1145,7 +1171,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         if (!offers.isEmpty()) {
             summary.add(Utility.localizedLabel(this.offer), "span");
             for (TradeItem item : offers) {
-                summary.add(getTradeItemButton(item), "skip");
+                summary.add(getTradeItemButton(item, true), "skip");
             }
         }
 
@@ -1157,7 +1183,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                 summary.add(new JLabel(exchangeMessage), "newline 20, span");
             }
             for (TradeItem item : demands) {
-                summary.add(getTradeItemButton(item), "skip");
+                summary.add(getTradeItemButton(item, false), "skip");
             }
         }
     }

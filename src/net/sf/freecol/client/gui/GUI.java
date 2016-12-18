@@ -707,10 +707,13 @@ public class GUI extends FreeColClientHolder {
      */
     public TradeBuyAction getBuyChoice(Unit unit, Settlement settlement,
                                        Goods goods, int gold, boolean canBuy) {
+        //Get Buy price on Europe Market for comparison
+        int euroPrice = unit.getOwner().getMarket().getBidPrice(goods.getType(), goods.getAmount());
         StringTemplate template = StringTemplate.template("buy.text")
             .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goods.getLabel(true))
-            .addAmount("%gold%", gold);
+            .addAmount("%gold%", gold)
+            .addAmount("%euprice%", euroPrice);
 
         List<ChoiceItem<TradeBuyAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("buy.takeOffer"),
@@ -950,11 +953,14 @@ public class GUI extends FreeColClientHolder {
      */
     public TradeSellAction getSellChoice(Unit unit, Settlement settlement,
                                          Goods goods, int gold) {
+        //Get Sale price on Europe Market for comparison
+        int euroPrice = unit.getOwner().getMarket().getSalePrice(goods.getType(), goods.getAmount());
         StringTemplate goodsTemplate = goods.getLabel(true);
         StringTemplate template = StringTemplate.template("sell.text")
             .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goodsTemplate)
-            .addAmount("%gold%", gold);
+            .addAmount("%gold%", gold)
+            .addAmount("%euprice%", euroPrice);
 
         List<ChoiceItem<TradeSellAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("sell.takeOffer"),

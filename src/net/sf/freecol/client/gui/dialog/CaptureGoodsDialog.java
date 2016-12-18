@@ -41,6 +41,8 @@ import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -83,6 +85,20 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         }
 
 
+        public String pricePerGood(Market lookup) {
+            int total = 0;
+            if (lookup != null && goods != null) {
+                total = lookup.getBidPrice(goods.getType(), goods.getAmount());
+            }
+            StringTemplate template = StringTemplate
+                .template("captureGoodsDialog.europeanValue")
+                .addStringTemplate("%gold%", StringTemplate
+                    .template("goldAmount")
+                    .addAmount("%amount%", total));
+            return Messages.message(template);
+        }
+
+
         // Override Object
 
         /**
@@ -97,9 +113,21 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
     private static class CheckBoxRenderer extends JCheckBox
         implements ListCellRenderer<GoodsItem> {
 
+        private Market market;
+
         public CheckBoxRenderer() {
             //setBackground(UIManager.getColor("List.textBackground"));
             //setForeground(UIManager.getColor("List.textForeground"));
+        }
+
+        /**
+         * Overload constructor for market lookups on good pricing for display
+         *
+         * @param forPriceLookup A {@code Market} to add extra price
+         *     information from.
+         */
+        public CheckBoxRenderer(Market forPriceLookup) {
+            this.market = forPriceLookup;
         }
 
         /**
@@ -111,8 +139,12 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
                                                       int index,
                                                       boolean isSelected,
                                                       boolean hasFocus) {
+            if(market!=null){
+                setText(value.toString() +" "+ value.pricePerGood(market));
+            }else{
+                setText(value.toString());
+            }
             setSelected(value.isSelected());
-            setText(value.toString());
             setEnabled(value.isEnabled());
             return this;
         }
@@ -145,6 +177,13 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
         this.maxCargo = winner.getSpaceLeft();
 
+        GoodsItem[] goods = new GoodsItem[loot.size()];
+        for (int i = 0; i < loot.size(); i++) {
+            goods[i] = new GoodsItem(loot.get(i));
+        }
+        this.goodsList = new JList<>();
+        this.goodsList.setListData(goods);
+
         this.allButton = Utility.localizedButton("all");
         this.allButton.addActionListener((ActionEvent ae) -> {
                 JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
@@ -170,13 +209,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         this.noneButton.setMnemonic('n');
         this.noneButton.setActionCommand(this.noneButton.getText());
 
-        GoodsItem[] goods = new GoodsItem[loot.size()];
-        for (int i = 0; i < loot.size(); i++) {
-            goods[i] = new GoodsItem(loot.get(i));
-        }
-        this.goodsList = new JList<>();
-        this.goodsList.setListData(goods);
-        this.goodsList.setCellRenderer(new CheckBoxRenderer());
+        this.goodsList.setCellRenderer(new CheckBoxRenderer(winner.getOwner().getMarket()));
         this.goodsList.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent me) {

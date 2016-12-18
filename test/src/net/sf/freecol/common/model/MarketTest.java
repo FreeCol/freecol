@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -38,12 +41,37 @@ public class MarketTest extends FreeColTestCase {
         Market dm = p.getMarket();
 
         Specification s = spec();
+        
 
         for (GoodsType good : s.getStorableGoodsTypeList()) {
             assertEquals(good.toString(), good.getInitialBuyPrice(), dm.getCostToBuy(good));
             assertEquals(good.toString(), good.getInitialSellPrice(), dm.getPaidForSale(good));
         }
     }
+    
+    
+    public void testEuropeMarketPricing(){
+         Game g = getStandardGame();
+
+         Player p = g.getPlayerByNationId("model.nation.dutch");
+
+         Specification s = spec();
+
+         Europe eu = p.getEurope();
+
+         for (GoodsType good : s.getGoodsTypeList()) {
+            List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
+            assertEquals(p.getMarket().getSalePrice(good, 1), eu.getOwner().getMarket().getSalePrice(good, 1));
+            goods.add(new AbstractGoods(good, 1));
+            int bidPrice = p.getMarket().getBidPrice(good, 1);
+            int buyCost = p.getMarket().getCostToBuy(good);
+            int priceGoods = eu.priceGoods(goods);
+            assertEquals(buyCost, bidPrice);
+            assertEquals(buyCost, priceGoods);
+         }
+    }
+    
+    
 
     /**
      * Serialization and deserialization?
