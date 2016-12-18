@@ -60,8 +60,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     private final FreeColClient freeColClient;
 
-    private final GUI gui;
-
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
 
     /**
@@ -84,7 +82,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     public MiniMap(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
 
         setLayout(null);
 
@@ -92,6 +89,15 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         addMouseListener(this);
         addMouseMotionListener(this);
+    }
+
+    /**
+     * Internal GUI accessor.
+     *
+     * @return The {@code GUI}.
+     */
+    private GUI getGUI() {
+        return this.freeColClient.getGUI();
     }
 
     /**
@@ -207,7 +213,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         g.setColor(ResourceManager.getColor("color.background.MiniMap"));
         g.fillRect(0, 0, width, height);
 
-        if (gui.getFocus() == null) {
+        if (getGUI().getFocus() == null) {
             return;
         }
 
@@ -217,8 +223,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         int ySize = (height / tileSize) * 4;
 
         /* Center the mini map correctly based on the map's focus */
-        firstColumn = gui.getFocus().getX() - (xSize / 2);
-        firstRow = gui.getFocus().getY() - (ySize / 2);
+        firstColumn = getGUI().getFocus().getX() - (xSize / 2);
+        firstRow = getGUI().getFocus().getY() - (ySize / 2);
 
         /* Make sure the mini map won't try to display tiles off the
          * bounds of the world map */
@@ -285,7 +291,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         AffineTransform baseTransform = g.getTransform();
         AffineTransform rowTransform = null;
 
-        final ImageLibrary library = gui.getImageLibrary();
+        final ImageLibrary library = getGUI().getImageLibrary();
         final ClientOptions clientOptions = freeColClient.getClientOptions();
 
         // Row per row; start with the top modified row
@@ -349,8 +355,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * Use miniRectWidth/Height / 2 to get the upper left corner.
          * x/yTiles are the number of tiles that fit on the large map */
         if (getParent() != null) {
-            int miniRectX = (gui.getFocus().getX() - firstColumn) * tileSize;
-            int miniRectY = (gui.getFocus().getY() - firstRow) * tileSize / 4;
+            int miniRectX = (getGUI().getFocus().getX() - firstColumn) * tileSize;
+            int miniRectY = (getGUI().getFocus().getY() - firstRow) * tileSize / 4;
             Dimension mapTileSize = library.scaleDimension(ImageLibrary.TILE_SIZE);
             int miniRectWidth = (getParent().getWidth() / mapTileSize.width + 1) * tileSize;
             int miniRectHeight = (getParent().getHeight() / mapTileSize.height + 1) * tileSize / 2;
@@ -403,7 +409,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             tileY = ((y - adjustY) / tileSize * 4) + firstRow ;
         }
 
-        gui.setFocus(freeColClient.getGame().getMap().getTile(tileX,tileY));
+        getGUI().setFocus(freeColClient.getGame().getMap().getTile(tileX,tileY));
     }
 
     private void focus(MouseEvent e) {
