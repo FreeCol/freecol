@@ -150,7 +150,7 @@ public class DebugUtils {
         gui.showInformationMessage(join(", ", results));
         if (fails < sPlayer.getSettlementCount()) {
             // Brutally resynchronize
-            freeColClient.getConnectController().reconnect();
+            freeColClient.getConnectController().reconnectBegin();
         }
     }
 
@@ -354,7 +354,7 @@ public class DebugUtils {
         sUnit.setMovesLeft(sUnit.getInitialMovesLeft());
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
 
-        freeColClient.getConnectController().reconnect();
+        freeColClient.getConnectController().reconnectBegin();
         // Note "game" is no longer valid after reconnect.
         Unit unit = freeColClient.getGame()
             .getFreeColGameObject(sUnit.getId(), Unit.class);
@@ -557,7 +557,7 @@ public class DebugUtils {
         if (roleChoice == null) return;
 
         sUnit.changeRole(roleChoice, roleChoice.getMaximumCount());
-        freeColClient.getConnectController().reconnect();
+        freeColClient.getConnectController().reconnectBegin();
     }
 
     /**
@@ -1211,6 +1211,6 @@ public class DebugUtils {
 
         ap.setDebuggingConnection(freeColClient.askServer().getConnection());
         ap.startWorking();
-        freeColClient.getConnectController().reconnect();
+        freeColClient.getConnectController().reconnectBegin();
     }
 }

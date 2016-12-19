@@ -800,7 +800,7 @@ public final class InGameController extends FreeColClientHolder {
         // Check for desync as last thing!
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
             && DebugUtils.checkDesyncAction(getFreeColClient())) {
-            getConnectController().reconnect();
+            getConnectController().reconnectBegin();
             return false;
         }
 
@@ -3607,23 +3607,7 @@ public final class InGameController extends FreeColClientHolder {
             game.setCurrentPlayer(game.getNextPlayer());
         }
         if (getMyPlayer() == player) {
-            final FreeColClient fcc = getFreeColClient();
-            askServer().disconnect();
-            switch (reason) {
-            case DEFEATED: case QUIT:
-                fcc.quit();
-                break;
-            case LOGIN: // FIXME: This should not happen, drop when convinced
-                break;
-            case RECONNECT:
-                try {
-                    askServer().reconnect();
-                } catch (IOException ioe) {
-                    logger.log(Level.SEVERE, "Reconnect fail", ioe);
-                    fcc.quit();
-                }
-                break;
-            }
+            getFreeColClient().getConnectController().logoutEnd(reason);
         }
     }
        
@@ -4269,7 +4253,7 @@ public final class InGameController extends FreeColClientHolder {
             askServer().logout(player, LogoutReason.QUIT);
         } else {
             logger.finest("Reconnect accepted.");
-            getConnectController().reconnect();
+            getConnectController().reconnectBegin();
         }
     }
 
@@ -4717,7 +4701,7 @@ public final class InGameController extends FreeColClientHolder {
      */
     public boolean setInDebugMode() {
         FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
-        getConnectController().reconnect();
+        getConnectController().reconnectBegin();
         return true;
     }
 
