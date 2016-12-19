@@ -37,6 +37,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
@@ -46,6 +47,8 @@ import net.sf.freecol.client.gui.option.OptionUI;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -207,6 +210,38 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
 
 
     // Override OptionsDialog
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean save(File file) {
+        boolean ok = false;
+        try {
+            IntegerOption opWidth = (IntegerOption)getGroup()
+                .getOption(MapGeneratorOptions.MAP_WIDTH);
+            IntegerOption opEdge = (IntegerOption)getGroup()
+                .getOption(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE);
+            int width = opWidth.getValue(), edge = opEdge.getValue();
+            if (width > 4 * edge) {
+                ok = true;
+            } else {
+                getGUI().showErrorMessage(StringTemplate
+                    .template("mapGeneratorOptionsDialog.badWidth")
+                    .addAmount("%width%", width)
+                    .addAmount("%edge%", edge));
+                opEdge.setValue(opEdge.getMinimumValue());
+                return false;
+            }
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Options in disarray", ex);
+        }           
+        if (!ok) {
+            getGUI().showErrorMessage(FreeCol.badFile("error.couldNotSave", file));
+            return false;
+        }
+        return super.save(file);
+    }
 
     /**
      * {@inheritDoc}

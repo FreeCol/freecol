@@ -4584,7 +4584,7 @@
       <optionGroup id="mapGeneratorOptions.landGenerator" >
         <!-- Options for setting the size of the map -->
         <integerOption id="model.option.mapWidth"
-                       value="40" minimumValue="20" maximumValue="200"/>
+                       value="40" minimumValue="30" maximumValue="200"/>
         <integerOption id="model.option.mapHeight"
                        value="100" minimumValue="20" maximumValue="200"/>
         <!-- Option for setting the land mass of the map -->
