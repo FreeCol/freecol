@@ -402,59 +402,63 @@ public final class ConnectController extends FreeColClientHolder {
         getGUI().showStatusPanel(Messages.message("status.loadingGame"));
 
         final File theFile = file;
-        Runnable loadGameJob = () -> {
-            FreeColServer freeColServer = null;
-            StringTemplate err = null;
-            try {
-                final FreeColSavegameFile saveGame
-                    = new FreeColSavegameFile(theFile);
-                freeColServer = new FreeColServer(saveGame,
-                    (Specification)null, port, name);
-                fcc.setFreeColServer(freeColServer);
-                // Server might have bounced to another port.
-                fcc.setSinglePlayer(singlePlayer);
-                igc().setGameConnected();
-                if (login(FreeCol.getName(), freeColServer.getHost(), 
-                          freeColServer.getPort())) {
-                    SwingUtilities.invokeLater(() -> {
-                            ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
-                            if (userMsg != null) {
-                                getGUI().showInformationMessage(userMsg);
-                            }
-                            getGUI().closeStatusPanel();
-                        });
-                    return; // Success!
+        new Thread(FreeCol.CLIENT_THREAD + "Loading-Game") {
+            @Override
+            public void run() {
+                FreeColServer freeColServer = null;
+                StringTemplate err = null;
+                try {
+                    final FreeColSavegameFile saveGame
+                        = new FreeColSavegameFile(theFile);
+                    freeColServer = new FreeColServer(saveGame,
+                        (Specification)null, port, name);
+                    fcc.setFreeColServer(freeColServer);
+                    // Server might have bounced to another port.
+                    fcc.setSinglePlayer(singlePlayer);
+                    igc().setGameConnected();
+                    if (login(FreeCol.getName(), freeColServer.getHost(), 
+                              freeColServer.getPort())) {
+                        SwingUtilities.invokeLater(() -> {
+                                ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
+                                if (userMsg != null) {
+                                    getGUI().showInformationMessage(userMsg);
+                                }
+                                getGUI().closeStatusPanel();
+                            });
+                        return; // Success!
+                    }
+                    err = StringTemplate.template("server.couldNotLogin");
+                } catch (FileNotFoundException fnfe) {
+                    err = FreeCol.errorFromException(fnfe,
+                        FreeCol.badFile("error.couldNotFind", theFile));
+                    logger.log(Level.WARNING, "Can not find file.", fnfe);
+                } catch (IOException ioe) {
+                    err = FreeCol.errorFromException(ioe, "server.initialize");
+                    logger.log(Level.WARNING, "Error starting game.", ioe);
+                } catch (XMLStreamException xse) {
+                    err = FreeCol.errorFromException(xse,
+                        FreeCol.badFile("error.couldNotLoad", theFile));
+                    logger.log(Level.WARNING, "Stream error.", xse);
+                } catch (Exception ex) {
+                    err = FreeCol.errorFromException(ex, "server.initialize");
+                    logger.log(Level.WARNING, "FreeCol error.", ex);
                 }
-                err = StringTemplate.template("server.couldNotLogin");
-            } catch (FileNotFoundException fnfe) {
-                err = FreeCol.errorFromException(fnfe,
-                    FreeCol.badFile("error.couldNotFind", theFile));
-                logger.log(Level.WARNING, "Can not find file.", fnfe);
-            } catch (IOException ioe) {
-                err = FreeCol.errorFromException(ioe, "server.initialize");
-                logger.log(Level.WARNING, "Error starting game.", ioe);
-            } catch (XMLStreamException xse) {
-                err = FreeCol.errorFromException(xse,
-                    FreeCol.badFile("error.couldNotLoad", theFile));
-                logger.log(Level.WARNING, "Stream error.", xse);
-            } catch (Exception ex) {
-                err = FreeCol.errorFromException(ex, "server.initialize");
-                logger.log(Level.WARNING, "FreeCol error.", ex);
+                if (err != null) {
+                    // If this is a debug run, fail hard.
+                    if (fcc.isHeadless()
+                        || FreeColDebugger.getDebugRunTurns() >= 0) {
+                        FreeCol.fatal(Messages.message(err));
+                    }
+                    // login may have received an error message from
+                    // the server, which is already being displayed.
+                    // Do not override it.
+                    if (!getGUI().onClosingErrorPanel(fcc.invokeMainPanel(null))) {
+                        SwingUtilities.invokeLater(new ErrorJob(err,
+                                fcc.invokeMainPanel(null)));
+                    }
+                }
             }
-            if (err != null) {
-                // If this is a debug run, fail hard.
-                if (fcc.isHeadless() || FreeColDebugger.getDebugRunTurns() >= 0) {
-                    FreeCol.fatal(Messages.message(err));
-                }
-                // login may have received an error message from the server,
-                // which is already being displayed.  Do not override it.
-                if (!getGUI().onClosingErrorPanel(fcc.invokeMainPanel(null))) {
-                    SwingUtilities.invokeLater(new ErrorJob(err,
-                            fcc.invokeMainPanel(null)));
-                }
-            }
-        };
-        fcc.setWork(loadGameJob);
+        }.start();
         return true;
     }
 

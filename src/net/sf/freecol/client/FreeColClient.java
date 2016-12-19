@@ -108,9 +108,6 @@ public final class FreeColClient {
     /** The client options specific to this player. */
     private ClientOptions clientOptions;
 
-    /** A worker to perform game loading. */
-    private final Worker worker;
-
     /**
      * Indicates if the game has started, has nothing to do with
      * whether or not the client is logged in.
@@ -194,9 +191,6 @@ public final class FreeColClient {
         inGameController = new InGameController(this);
         inGameInputHandler = new InGameInputHandler(this);
         mapEditorController = new MapEditorController(this);
-
-        worker = new Worker();
-        worker.start();
 
         // Load resources.
         //   - base resources
@@ -726,15 +720,6 @@ public final class FreeColClient {
         return (clientOptions == null || player == null)
             ? Collections.<Colony>emptyList()
             : clientOptions.getSortedColonies(player);
-    }
-
-    /**
-     * Give the worker some work.
-     *
-     * @param runnable The {@code Runnable} to do.
-     */
-    public void setWork(Runnable runnable) {
-        worker.schedule(runnable);
     }
 
     // Fundamental game start/stop/continue actions
