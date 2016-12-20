@@ -120,11 +120,13 @@ public final class ConnectController extends FreeColClientHolder {
             getGUI().showErrorMessage(StringTemplate
                 .template("server.initialize"));
             logger.log(Level.WARNING, "Could not start server.", e);
+            return null;
         }
         if (publicServer && freeColServer != null
             && !freeColServer.getPublicServer()) {
             getGUI().showErrorMessage(StringTemplate
                 .template("server.noRouteToServer"));
+            return null;
         }
         return freeColServer;
     }
@@ -549,7 +551,8 @@ public final class ConnectController extends FreeColClientHolder {
         fcc.setFreeColServer(freeColServer);
         fcc.setSinglePlayer(false);
 
-        return joinGame(freeColServer.getHost(), freeColServer.getPort());
+        return login(FreeCol.getName(),
+                     freeColServer.getHost(), freeColServer.getPort());
     }
 
     /**
@@ -565,17 +568,6 @@ public final class ConnectController extends FreeColClientHolder {
 
         logoutBegin(LogoutReason.LOGIN);
 
-        return joinGame(host, port);
-    }
-
-    /**
-     * Join a game.
-     *
-     * @param host The name of the machine running the server.
-     * @param port The port to use when connecting to the host.
-     * @return True if the game starts successfully.
-     */
-    private boolean joinGame(String host, int port) {
         DOMMessage msg = ask(host, port, new GameStateMessage(),
             GameStateMessage.TAG, StringTemplate.template("client.noState"));
         ServerState state = (msg instanceof GameStateMessage)
