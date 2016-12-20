@@ -124,11 +124,12 @@ public class ChangeSet {
          * @return True if the player satisfies the visibility test.
          */
         public boolean check(ServerPlayer player, boolean perhapsResult) {
-            return (seeNever == player) ? false
+            return (player == null) ? (type == ALL)
+                : (seeNever == player) ? false
                 : (seeAlways == player) ? true
                 : (seePerhaps == player) ? perhapsResult
-                : (type == ONLY) ? false
                 : (type == ALL) ? true
+                : (type == ONLY) ? false
                 : perhapsResult;
         }
 
