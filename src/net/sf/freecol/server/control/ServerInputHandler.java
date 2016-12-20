@@ -145,7 +145,8 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         } else {
             try {
                 ret = handler.handle(connection, element);
-                logger.log(Level.FINEST, "Handling " + tag + " ok");
+                logger.log(Level.FINEST, "Handling " + tag + " ok = "
+                    + ((ret == null) ? "null" : ret.getTagName()));
             } catch (Exception e) {
                 // FIXME: should we really catch Exception? The old code did.
                 logger.log(Level.WARNING, "Handling " + tag + " failed", e);
