@@ -194,13 +194,16 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void reconnect() {
+    public String reconnect() {
+        Unit active = getActiveUnit();
+        setActiveUnit(null);
         requestFocusInWindow();
         initializeInGame();
         closeMenus();
         clearGotoPath();
         resetMenuBar();
         resetMapZoom(); // Should refresh the map
+        return (active == null) ? null : active.getId();
     }
         
     /** 

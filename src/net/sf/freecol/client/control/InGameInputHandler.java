@@ -1138,8 +1138,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         
         for (FreeColGameObject fcgo : message.getObjects()) {
             if ((fcgo instanceof Player && (fcgo == player))
-                || ((fcgo instanceof Settlement || fcgo instanceof Unit)
-                    && player.owns((Ownable)fcgo))) {
+                || ((fcgo instanceof Ownable) && player.owns((Ownable)fcgo))) {
                 visibilityChange = true;//-vis(player)
             }
         }

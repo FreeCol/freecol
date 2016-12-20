@@ -139,8 +139,10 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Reset the GUI on reconnect.
+     *
+     * @return The identifier for the formerly active {@code Unit}.
      */
-    public void reconnect() {}
+    public String reconnect() { return null; }
 
     /**
      * In game initializations.

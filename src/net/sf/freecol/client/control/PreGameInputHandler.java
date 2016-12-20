@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -201,7 +202,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
         fcc.changeClientState(state == ServerState.IN_GAME);
         fcc.setGame(game);
         fcc.setMyPlayer(player);
-
         fcc.setSinglePlayer(single);
         fcc.addSpecificationActions(game.getSpecification());
         if (current) game.setCurrentPlayer(player);
@@ -213,7 +213,14 @@ public final class PreGameInputHandler extends ClientInputHandler {
 
         if (fcc.isInGame()) { // Joining existing game, possibly reconnect
             player.resetIterators();
-            getGUI().reconnect();
+            String active = getGUI().reconnect();
+            Unit u;
+            if (active != null
+                && (u = game.getFreeColGameObject(active, Unit.class)) != null
+                && player.owns(u)) {
+                player.setNextActiveUnit(u);
+                getGUI().setActiveUnit(u);
+            }
             igc().nextModelMessage();
         } else if (game.getMap() != null
             && game.allPlayersReadyToLaunch()) { // Ready to launch!
