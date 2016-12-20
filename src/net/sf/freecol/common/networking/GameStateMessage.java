@@ -52,7 +52,9 @@ public class GameStateMessage extends AttributeMessage {
     public GameStateMessage(ServerState serverState) {
         super(TAG);
 
-        setAttribute(STATE_TAG, serverState.toString());
+        if (serverState != null) {
+            setAttribute(STATE_TAG, serverState.toString());
+        }
     }
 
     /**
