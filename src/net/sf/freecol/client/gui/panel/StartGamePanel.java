@@ -20,7 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.logging.Logger;
 
@@ -36,6 +36,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Specification;
@@ -54,9 +55,6 @@ public final class StartGamePanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(StartGamePanel.class.getName());
 
-    private static final int START = 0, CANCEL = 1,
-        READY = 3, CHAT = 4, GAME_OPTIONS = 5, MAP_GENERATOR_OPTIONS = 6;
-
     private boolean singlePlayerGame;
 
     private JCheckBox readyBox;
@@ -69,6 +67,57 @@ public final class StartGamePanel extends FreeColPanel {
 
     private PlayersTable table;
 
+    private final ActionListener startCmd = ae -> {
+        int row = table.getSelectedRow();
+        int col = table.getSelectedColumn();
+        if (row > -1 && col > -1){
+            table.getCellEditor(row, col).stopCellEditing();
+        }
+        if (!checkVictoryConditions()) return;
+        // The ready flag was set to false for single player
+        // mode in order to allow the player to change
+        // whatever he wants.
+        if (singlePlayerGame) getMyPlayer().setReady(true);
+        getFreeColClient().getPreGameController().requestLaunch();
+    };
+
+    private final ActionListener cancelCmd = ae -> {
+        final SwingGUI gui = getGUI();
+        getFreeColClient().getConnectController().newGame();
+        gui.removeFromCanvas(this);
+        gui.showNewPanel();
+    };
+
+    private final ActionListener readyBoxCmd = ae -> {
+        getFreeColClient().getPreGameController().setReady(readyBox.isSelected());
+        refreshPlayersTable();
+    };
+
+    private final ActionListener chatCmd = ae -> {
+        if (!chat.getText().isEmpty()) {
+            getFreeColClient().getPreGameController().chat(chat.getText());
+            displayChat(getMyPlayer().getName(), chat.getText(), false);
+            chat.setText("");
+        }
+    };
+
+    private final ActionListener gameOptionsCmd = ae -> {
+        final FreeColClient fcc = getFreeColClient();
+        OptionGroup go = getGUI().showGameOptionsDialog(fcc.isAdmin(), true);
+        if (go != null) {
+            fcc.getGame().setGameOptions(go);
+            fcc.getPreGameController().updateGameOptions();
+        }
+    };
+
+    private final ActionListener mapGeneratorOptionsCmd = ae -> {
+        final FreeColClient fcc = getFreeColClient();
+        OptionGroup mgo = getGUI().showMapGeneratorOptionsDialog(fcc.isAdmin());
+        if (mgo != null) {
+            fcc.getGame().setMapGeneratorOptions(mgo);
+            fcc.getPreGameController().updateMapGeneratorOptions();
+        }
+    };
 
     /**
      * Create the panel from which to start a game.
@@ -158,26 +207,19 @@ public final class StartGamePanel extends FreeColPanel {
         add(start, "newline, span, split 2, tag ok");
         add(cancel, "tag cancel");
 
-        start.setActionCommand(String.valueOf(START));
-        cancel.setActionCommand(String.valueOf(CANCEL));
-        readyBox.setActionCommand(String.valueOf(READY));
-        gameOptions.setActionCommand(String.valueOf(GAME_OPTIONS));
-        mapGeneratorOptions.setActionCommand(String.valueOf(MAP_GENERATOR_OPTIONS));
-
         if (!singlePlayerGame) {
-            chat.setActionCommand(String.valueOf(CHAT));
-            chat.addActionListener(this);
+            chat.addActionListener(chatCmd);
             chatArea.setEditable(false);
             chatArea.setLineWrap(true);
             chatArea.setWrapStyleWord(true);
             chatArea.setText("");
         }
 
-        start.addActionListener(this);
-        cancel.addActionListener(this);
-        readyBox.addActionListener(this);
-        gameOptions.addActionListener(this);
-        mapGeneratorOptions.addActionListener(this);
+        start.addActionListener(startCmd);
+        cancel.addActionListener(cancelCmd);
+        readyBox.addActionListener(readyBoxCmd);
+        gameOptions.addActionListener(gameOptionsCmd);
+        mapGeneratorOptions.addActionListener(mapGeneratorOptionsCmd);
 
         setEnabled(true);
     }
@@ -233,71 +275,6 @@ public final class StartGamePanel extends FreeColPanel {
     }
 
 
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        final String command = ae.getActionCommand();
-        final FreeColClient fcc = getFreeColClient();
-        final SwingGUI gui = getGUI();
-        try {
-            switch (Integer.parseInt(command)) {
-            case START:
-                int row = table.getSelectedRow();
-                int col = table.getSelectedColumn();
-                if (row > -1 && col > -1){
-                    table.getCellEditor(row, col).stopCellEditing();
-                }
-                if (!checkVictoryConditions()) break;
-
-                // The ready flag was set to false for single player
-                // mode in order to allow the player to change
-                // whatever he wants.
-                if (singlePlayerGame) getMyPlayer().setReady(true);
-
-                fcc.getPreGameController().requestLaunch();
-                break;
-            case CANCEL:
-                fcc.getConnectController().newGame();
-                break;
-            case READY:
-                fcc.getPreGameController().setReady(readyBox.isSelected());
-                refreshPlayersTable();
-                break;
-            case CHAT:
-                if (!chat.getText().isEmpty()) {
-                    fcc.getPreGameController().chat(chat.getText());
-                    displayChat(getMyPlayer().getName(), chat.getText(),
-                                false);
-                    chat.setText("");
-                }
-                break;
-            case GAME_OPTIONS:
-                OptionGroup go = gui.showGameOptionsDialog(fcc.isAdmin(), true);
-                if (go != null) {
-                    fcc.getGame().setGameOptions(go);
-                    fcc.getPreGameController().updateGameOptions();
-                }
-                break;
-            case MAP_GENERATOR_OPTIONS:
-                OptionGroup mgo = gui.showMapGeneratorOptionsDialog(fcc.isAdmin());
-                if (mgo != null) {
-                    fcc.getGame().setMapGeneratorOptions(mgo);
-                    fcc.getPreGameController().updateMapGeneratorOptions();
-                }
-                break;
-            default:
-                super.actionPerformed(ae);
-            }
-        } catch (NumberFormatException nfe) {
-            logger.warning("Invalid ActionEvent, not a number: " + command);
-        }
-    }
-
-
     // Override Component
 
     /**
@@ -308,12 +285,12 @@ public final class StartGamePanel extends FreeColPanel {
         // Do not propagate to superclass.  This panel is reused so
         // avoid the destructive cleanups in FreeColPanel.removeNotify.
 
-        start.removeActionListener(this);
-        cancel.removeActionListener(this);
-        readyBox.removeActionListener(this);
-        gameOptions.removeActionListener(this);
-        mapGeneratorOptions.removeActionListener(this);
-        if (chat != null) chat.removeActionListener(this);
+        start.removeActionListener(startCmd);
+        cancel.removeActionListener(cancelCmd);
+        readyBox.removeActionListener(readyBoxCmd);
+        gameOptions.removeActionListener(gameOptionsCmd);
+        mapGeneratorOptions.removeActionListener(mapGeneratorOptionsCmd);
+        if (chat != null) chat.removeActionListener(chatCmd);
     }
 
     /**
