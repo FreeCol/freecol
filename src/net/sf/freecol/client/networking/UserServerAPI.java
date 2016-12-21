@@ -72,8 +72,7 @@ public class UserServerAPI extends ServerAPI {
     /**
      * {@inheritDoc}
      */
-    public synchronized Connection connect(String name, String host, int port,
-                                           MessageHandler messageHandler) 
+    public synchronized Connection connect(String name, String host, int port)
         throws IOException {
         int tries;
         if (port < 0) {
@@ -84,13 +83,13 @@ public class UserServerAPI extends ServerAPI {
         }
         for (int i = tries; i > 0; i--) {
             try {
-                this.connection = new Connection(host, port, messageHandler, name);
+                this.connection = new Connection(host, port,
+                                                 this.messageHandler, name);
                 if (this.connection != null) {
                     // Connected, save the connection information
                     this.name = name;
                     this.host = host;
                     this.port = port;
-                    this.messageHandler = messageHandler;
                     break;
                 }
             } catch (IOException e) {
@@ -116,7 +115,7 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     public Connection reconnect() throws IOException {
-        return connect(this.name, this.host, this.port, this.messageHandler);
+        return connect(this.name, this.host, this.port);
     }
 
     /**

@@ -133,6 +133,8 @@ public final class ConnectController extends FreeColClientHolder {
 
     /**
      * Stop a server if present.
+     *
+     * Public for FreeColClient.quit and showMain.
      */
     public void stopServer() {
         final FreeColServer server = getFreeColServer();
@@ -141,6 +143,34 @@ public final class ConnectController extends FreeColClientHolder {
             final FreeColClient fcc = getFreeColClient();
             if (fcc != null) fcc.setFreeColServer(null);
         }
+    }
+
+    /**
+     * Establish the user connection.
+     *
+     * @param user The player name.
+     * @param host The host name to connect to.
+     * @param port The host port to connect to.
+     * @return Null on success, an {@code StringTemplate} error
+     *     message on failure.
+     */
+    private StringTemplate connect(String user, String host, int port) {
+        if (askServer().isConnected()) return null;
+
+        StringTemplate err = null;
+        try {
+            if (askServer().connect(FreeCol.CLIENT_THREAD + user,
+                                    host, port) != null) {
+                getFreeColClient().changeClientState(false);
+                logger.info("Connected to " + host + ":" + port
+                    + " as " + user);
+            } else {
+                err = StringTemplate.template("server.couldNotConnect");
+            }
+        } catch (Exception ex) {
+            err = FreeCol.errorFromException(ex, "server.couldNotConnect");
+        }
+        return err;
     }
 
     /**
@@ -295,7 +325,7 @@ public final class ConnectController extends FreeColClientHolder {
         askServer().disconnect();
 
         // Establish the full connection here
-        StringTemplate err = fcc.connect(user, host, port);
+        StringTemplate err = connect(user, host, port);
         if (err == null) {
             // Ask the server to log in a player with the given user name.
             // Control effectively transfers to PGIH.login().

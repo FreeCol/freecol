@@ -85,14 +85,10 @@ public abstract class ServerAPI {
      * @param host The name of the machine running the
      *     {@code FreeColServer}.
      * @param port The port to use when connecting to the host.
-     * @param messageHandler The {@code MessageHandler} to use on this
-     *     connection.
      * @return True if the connection succeeded.
      * @exception IOException on connection failure.
      */
-    public abstract Connection connect(String name,
-                                       String host, int port,
-                                       MessageHandler messageHandler)
+    public abstract Connection connect(String name, String host, int port)
         throws IOException;
 
     /**

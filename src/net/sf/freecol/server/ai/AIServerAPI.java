@@ -70,8 +70,7 @@ public class AIServerAPI extends ServerAPI {
     /**
      * {@inheritDoc}
      */
-    public Connection connect(String name, String host, int port,
-                              MessageHandler messageHandler)
+    public Connection connect(String name, String host, int port)
         throws IOException {
         return getConnection(); // Noop
     }
