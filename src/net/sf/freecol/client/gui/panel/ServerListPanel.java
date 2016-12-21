@@ -47,8 +47,6 @@ public final class ServerListPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(ServerListPanel.class.getName());
 
-    private static final int CONNECT = 0, CANCEL = 1;
-
     private final ConnectController connectController;
 
     private final JTable table;
@@ -105,11 +103,16 @@ public final class ServerListPanel extends FreeColPanel {
         tableScroll.getViewport().setOpaque(false);
         tableScroll.getColumnHeader().setOpaque(false);
 
-        connect.setActionCommand(String.valueOf(CONNECT));
-        connect.addActionListener(this);
+        connect.addActionListener(ae -> {
+                ServerInfo si = tableModel.getItem(table.getSelectedRow());
+                connectController.joinMultiplayerGame(si.getAddress(),
+                                                      si.getPort());
+            });
 
-        cancel.setActionCommand(String.valueOf(CANCEL));
-        cancel.addActionListener(this);
+        cancel.addActionListener(ae -> {
+                getGUI().removeFromCanvas(this);
+                getGUI().showNewPanel();
+            });
 
         add(tableScroll, "width 400:, height 350:");
         add(connect, "newline 20, split 2");
@@ -169,32 +172,5 @@ public final class ServerListPanel extends FreeColPanel {
      */
     public void refreshTable() {
         tableModel.fireTableDataChanged();
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        final String command = ae.getActionCommand();
-        try {
-            switch (Integer.parseInt(command)) {
-            case CONNECT:
-                ServerInfo si = tableModel.getItem(table.getSelectedRow());
-                connectController.joinMultiplayerGame(si.getAddress(), si.getPort());
-                break;
-            case CANCEL:
-                getGUI().removeFromCanvas(this);
-                getGUI().showNewPanel();
-                break;
-            default:
-                super.actionPerformed(ae);
-            }
-        } catch (NumberFormatException nfe) {
-            logger.warning("Invalid ActionEvent, not a number: " + command);
-        }
     }
 }
