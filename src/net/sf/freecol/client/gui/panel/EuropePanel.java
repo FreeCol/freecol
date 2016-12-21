@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
@@ -52,7 +51,6 @@ import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.MarketLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.common.i18n.Messages;
-import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -64,6 +62,7 @@ import net.sf.freecol.common.model.MarketData;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.model.Constants.*;
 
 
 /**
@@ -590,17 +589,23 @@ public final class EuropePanel extends PortPanel {
                                            "[30%:][30%:][15%:]"));
 
         exitButton = new EuropeButton(Messages.message("close"),
-            KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(), this);
+            KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(),
+            ae -> exitAction());
         trainButton = new EuropeButton(Messages.message("train"),
-            KeyEvent.VK_T, EuropeAction.TRAIN.toString(), this);
+            KeyEvent.VK_T, EuropeAction.TRAIN.toString(),
+            ae -> getGUI().showTrainPanel());
         purchaseButton = new EuropeButton(Messages.message("purchase"),
-            KeyEvent.VK_P, EuropeAction.PURCHASE.toString(), this);
+            KeyEvent.VK_P, EuropeAction.PURCHASE.toString(),
+            ae -> getGUI().showPurchasePanel());
         recruitButton = new EuropeButton(Messages.message("recruit"),
-            KeyEvent.VK_R, EuropeAction.RECRUIT.toString(), this);
+            KeyEvent.VK_R, EuropeAction.RECRUIT.toString(),
+            ae -> getGUI().showRecruitPanel());
         unloadButton = new EuropeButton(Messages.message("unload"),
-            KeyEvent.VK_U, EuropeAction.UNLOAD.toString(), this);
+            KeyEvent.VK_U, EuropeAction.UNLOAD.toString(),
+            ae -> unloadAction());
         sailButton = new EuropeButton(Messages.message("setSail"),
-            KeyEvent.VK_S, EuropeAction.SAIL.toString(), this);
+            KeyEvent.VK_S, EuropeAction.SAIL.toString(),
+            ae -> sailAction());
 
         toAmericaPanel = new DestinationPanel();
         toEuropePanel = new DestinationPanel();
@@ -843,41 +848,6 @@ public final class EuropePanel extends PortPanel {
     @Override
     public List<Unit> getUnitList() {
         return europe.getUnitList();
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        final String command = ae.getActionCommand();
-        EuropeAction act = EuropeAction.valueOf(command);
-        switch (act) {
-        case EXIT:
-            exitAction();
-            break;
-        case PURCHASE:
-            getGUI().showPurchasePanel();
-            break;
-        case RECRUIT:
-            getGUI().showRecruitPanel();
-            break;
-        case SAIL:
-            sailAction();
-            break;
-        case TRAIN:
-            getGUI().showTrainPanel();
-            break;
-        case UNLOAD:
-            unloadAction();
-            break;
-        default:
-            super.actionPerformed(ae);
-            break;
-        }
     }
 
 
