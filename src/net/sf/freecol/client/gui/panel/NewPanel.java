@@ -60,8 +60,7 @@ import net.sf.freecol.metaserver.ServerInfo;
  * game, to join a running game, and to fetch a list of games from the
  * meta-server.
  */
-public final class NewPanel extends FreeColPanel
-    implements ActionListener, ItemListener {
+public final class NewPanel extends FreeColPanel implements ItemListener {
 
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
@@ -189,16 +188,16 @@ public final class NewPanel extends FreeColPanel
                 + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
         this.buttonGroup.add(single);
         single.setActionCommand(String.valueOf(NewPanelAction.SINGLE));
-        single.addActionListener(this);
+        single.addActionListener(ae -> enableComponents());
         this.buttonGroup.add(join);
         join.setActionCommand(String.valueOf(NewPanelAction.JOIN));
-        join.addActionListener(this);
+        join.addActionListener(ae -> enableComponents());
         this.buttonGroup.add(start);
         start.setActionCommand(String.valueOf(NewPanelAction.START));
-        start.addActionListener(this);
+        start.addActionListener(ae -> enableComponents());
         this.buttonGroup.add(meta);
         meta.setActionCommand(String.valueOf(NewPanelAction.META_SERVER));
-        meta.addActionListener(this);
+        meta.addActionListener(ae -> enableComponents());
         single.setSelected(true);
 
         String name = getClientOptions().getText(ClientOptions.NAME);
@@ -260,9 +259,11 @@ public final class NewPanel extends FreeColPanel
             .setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
         this.difficultyBox.addItemListener(this);
         this.difficultyButton = Utility.localizedButton("newPanel.showDifficulty");
-        this.difficultyButton
-            .setActionCommand(String.valueOf(NewPanelAction.SHOW_DIFFICULTY));
-        this.difficultyButton.addActionListener(this);
+        this.difficultyButton.addActionListener(ae -> {
+                this.difficulty = getGUI()
+                    .showDifficultyDialog(this.specification, this.difficulty);
+                update(); // Brings in new difficulty if edited
+            });
 
         this.joinNameLabel = Utility.localizedLabel("host");
         this.joinNameField = new JTextField(FreeCol.getServerHost());
@@ -277,7 +278,11 @@ public final class NewPanel extends FreeColPanel
 
         JButton cancel = Utility.localizedButton("cancel");
         cancel.setActionCommand(String.valueOf(NewPanelAction.CANCEL));
-        cancel.addActionListener(this);
+        cancel.addActionListener(ae -> {
+                final SwingGUI gui = getGUI();
+                gui.removeFromCanvas(this);
+                gui.showMainPanel(null);
+            });
         setCancelComponent(cancel);
 
         // Add all the components
@@ -554,18 +559,6 @@ public final class NewPanel extends FreeColPanel
             default:
                 break;
             }
-            break;
-        case CANCEL:
-            gui.removeFromCanvas(this);
-            gui.showMainPanel(null);
-            break;
-        case SHOW_DIFFICULTY:
-            this.difficulty = gui.showDifficultyDialog(this.specification,
-                                                       this.difficulty);
-            update(); // Brings in new difficulty if edited
-            break;
-        case SINGLE: case JOIN: case START: case META_SERVER:
-            enableComponents();
             break;
         default:
             super.actionPerformed(ae);
