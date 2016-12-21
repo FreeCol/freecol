@@ -56,9 +56,6 @@ public final class TradeRoutePanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TradeRoutePanel.class.getName());
 
-    /** Deassign command string constant. */
-    private static final String DEASSIGN = "deassign";
-
     /** Compare trade routes by name. */
     private static final Comparator<TradeRoute> tradeRouteComparator
         = Comparator.comparing(TradeRoute::getName);
@@ -165,12 +162,16 @@ public final class TradeRoutePanel extends FreeColPanel {
 
         this.deassignRouteButton = Utility.localizedButton("tradeRoutePanel.deassignRoute");
         Utility.localizeToolTip(this.deassignRouteButton, "tradeRoutePanel.deassign.tooltip");
-        this.deassignRouteButton.setActionCommand(DEASSIGN);
-        this.deassignRouteButton.addActionListener(this);
+        this.deassignRouteButton.addActionListener((ae) -> {
+                if (this.unit != null && getRoute() == this.unit.getTradeRoute()) {
+                    igc().clearOrders(this.unit);
+                }
+                getGUI().removeFromCanvas(this);
+            });
 
         JButton cancelButton = Utility.localizedButton("cancel");
-        cancelButton.setActionCommand(CANCEL);
-        cancelButton.addActionListener(this);
+        cancelButton.addActionListener((ae) ->
+            getGUI().removeTradeRoutePanel(this));
         setCancelComponent(cancelButton);
 
         updateButtons();
@@ -307,27 +308,13 @@ public final class TradeRoutePanel extends FreeColPanel {
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
         if (null == command) return;
-        final TradeRoute route = getRoute();
-        switch (command) {
-        case DEASSIGN:
-            if (this.unit != null && route == this.unit.getTradeRoute()) {
-                igc().clearOrders(this.unit);
-            }
-            getGUI().removeFromCanvas(this);
-            break;
-        case OK:
+        if (command.equals(OK)) {
+            final TradeRoute route = getRoute();
             if (this.unit != null && route != null) {
                 igc().assignTradeRoute(this.unit, route);
             }
-            super.actionPerformed(ae);
-            break;
-        case CANCEL:
-            getGUI().removeTradeRoutePanel(this);
-            break;
-        default:
-            super.actionPerformed(ae);
-            break;
         }
+        super.actionPerformed(ae);
     }
 
 
