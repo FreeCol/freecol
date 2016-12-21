@@ -122,18 +122,9 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * |--------------------------------------------------------|
  */
 public final class ColonyPanel extends PortPanel
-    implements ActionListener, PropertyChangeListener {
+    implements PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(ColonyPanel.class.getName());
-
-    private static final int EXIT = 0,
-        BUILDQUEUE = 1,
-        UNLOAD = 2,
-        WAREHOUSE = 4,
-        FILL = 5,
-        COLONY_UNITS = 6,
-        SETGOODS = 7,
-        OCCUPATION = 8;
 
     /** The height of the area in which autoscrolling should happen. */
     public static final int SCROLL_AREA_HEIGHT = 40;
@@ -197,6 +188,62 @@ public final class ColonyPanel extends PortPanel
     private JScrollPane warehouseScroll = null;
     private WarehousePanel warehousePanel = null;
 
+    // The action commands
+
+    private final ActionListener unloadCmd = ae -> {
+        final Unit unit = getSelectedUnit();
+        if (unit == null || !unit.isCarrier()) return;
+        for (Goods goods : unit.getGoodsContainer().getGoods()) {
+            igc().unloadCargo(goods, false);
+        }
+        for (Unit u : unit.getUnitList()) {
+            igc().leaveShip(u);
+        }
+        cargoPanel.update();
+        updateOutsideColonyPanel();
+        unloadButton.setEnabled(false);
+        fillButton.setEnabled(false);
+    };
+
+    private final ActionListener warehouseCmd = ae -> {
+        if (getGUI().showWarehouseDialog(getColony())) {
+            updateWarehousePanel();
+        }
+    };
+
+    private final ActionListener buildQueueCmd = ae -> {
+        getGUI().showBuildQueuePanel(getColony());
+        updateConstructionPanel();
+    };
+
+    private final ActionListener fillCmd = ae -> {
+        final Unit unit = getSelectedUnit();
+        if (unit == null || !unit.isCarrier()) return;
+        final Colony colony = getColony();
+        for (Goods goods : unit.getCompactGoodsList()) {
+            final GoodsType type = goods.getType();
+            int space = unit.getLoadableAmount(type);
+            int count = colony.getGoodsCount(type);
+            if (space > 0 && count > 0) {
+                int n = Math.min(space, count);
+                igc().loadCargo(new Goods(goods.getGame(), colony, type, n),
+                                unit);
+            }
+        }
+    };
+
+    private final ActionListener colonyUnitsCmd =
+        ae -> generateColonyUnitsMenu();
+
+    private final ActionListener setGoodsCmd = ae -> {
+        DebugUtils.setColonyGoods(getFreeColClient(), colony);
+        updateWarehousePanel();
+        updateProduction();
+    };
+
+    private final ActionListener occupationCmd =
+        ae -> colony.setOccupationTrace(!colony.getOccupationTrace());
+
 
     /**
      * The constructor for the panel.
@@ -241,7 +288,6 @@ public final class ColonyPanel extends PortPanel
                      "released");
         SwingUtilities.replaceUIInputMap(unloadButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, unloadIM);
-        unloadButton.setActionCommand(String.valueOf(UNLOAD));
 
         InputMap fillIM = new ComponentInputMap(fillButton);
         fillIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, false),
@@ -250,7 +296,6 @@ public final class ColonyPanel extends PortPanel
                    "released");
         SwingUtilities.replaceUIInputMap(fillButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, fillIM);
-        fillButton.setActionCommand(String.valueOf(FILL));
 
         InputMap warehouseIM = new ComponentInputMap(warehouseButton);
         warehouseIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false),
@@ -259,7 +304,6 @@ public final class ColonyPanel extends PortPanel
                         "released");
         SwingUtilities.replaceUIInputMap(warehouseButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, warehouseIM);
-        warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
 
         InputMap buildQueueIM = new ComponentInputMap(buildQueueButton);
         buildQueueIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0, false),
@@ -268,7 +312,6 @@ public final class ColonyPanel extends PortPanel
                          "released");
         SwingUtilities.replaceUIInputMap(buildQueueButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, buildQueueIM);
-        buildQueueButton.setActionCommand(String.valueOf(BUILDQUEUE));
 
         InputMap colonyUnitsIM = new ComponentInputMap(colonyUnitsButton);
         colonyUnitsIM.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, false),
@@ -277,14 +320,6 @@ public final class ColonyPanel extends PortPanel
                           "released");
         SwingUtilities.replaceUIInputMap(colonyUnitsButton,
             JComponent.WHEN_IN_FOCUSED_WINDOW, colonyUnitsIM);
-        colonyUnitsButton.setActionCommand(String.valueOf(COLONY_UNITS));
-
-        if (setGoodsButton != null) {
-            setGoodsButton.setActionCommand(String.valueOf(SETGOODS));
-        }
-        if (traceWorkButton != null) {
-            traceWorkButton.setActionCommand(String.valueOf(OCCUPATION));
-        }
 
         defaultTransferHandler
             = new DefaultTransferHandler(freeColClient, this);
@@ -407,16 +442,16 @@ public final class ColonyPanel extends PortPanel
         setTransferHandlers(isEditable());
 
         // Enable/disable widgets
-        unloadButton.addActionListener(this);
-        fillButton.addActionListener(this);
-        warehouseButton.addActionListener(this);
-        buildQueueButton.addActionListener(this);
-        colonyUnitsButton.addActionListener(this);
+        unloadButton.addActionListener(unloadCmd);
+        fillButton.addActionListener(fillCmd);
+        warehouseButton.addActionListener(warehouseCmd);
+        buildQueueButton.addActionListener(buildQueueCmd);
+        colonyUnitsButton.addActionListener(colonyUnitsCmd);
         if (setGoodsButton != null) {
-            setGoodsButton.addActionListener(this);
+            setGoodsButton.addActionListener(setGoodsCmd);
         }
         if (traceWorkButton != null) {
-            traceWorkButton.addActionListener(this);
+            traceWorkButton.addActionListener(occupationCmd);
         }
 
         unloadButton.setEnabled(isEditable());
@@ -482,16 +517,16 @@ public final class ColonyPanel extends PortPanel
      * Clean up this colony panel.
      */
     private void cleanup() {
-        unloadButton.removeActionListener(this);
-        fillButton.removeActionListener(this);
-        warehouseButton.removeActionListener(this);
-        buildQueueButton.removeActionListener(this);
-        colonyUnitsButton.removeActionListener(this);
+        unloadButton.removeActionListener(unloadCmd);
+        fillButton.removeActionListener(fillCmd);
+        warehouseButton.removeActionListener(warehouseCmd);
+        buildQueueButton.removeActionListener(buildQueueCmd);
+        colonyUnitsButton.removeActionListener(colonyUnitsCmd);
         if (setGoodsButton != null) {
-            setGoodsButton.removeActionListener(this);
+            setGoodsButton.removeActionListener(setGoodsCmd);
         }
         if (traceWorkButton != null) {
-            traceWorkButton.removeActionListener(this);
+            traceWorkButton.removeActionListener(occupationCmd);
         }
 
         removePropertyChangeListeners();
@@ -960,71 +995,10 @@ public final class ColonyPanel extends PortPanel
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        final Colony colony = getColony();
-        final String command = ae.getActionCommand();
-        final Unit unit = getSelectedUnit();
-
-        if (OK.equals(command)) {
+        if (OK.equals(ae.getActionCommand())) {
             closeColonyPanel();
         } else {
-            int cmd;
-            try {
-                cmd = Integer.parseInt(command);
-            } catch (NumberFormatException nfe) {
-                logger.warning("Invalid action number: " + command);
-                return;
-            }
-            switch (cmd) {
-            case UNLOAD:
-                if (unit == null || !unit.isCarrier()) break;
-                for (Goods goods : unit.getGoodsContainer().getGoods()) {
-                    igc().unloadCargo(goods, false);
-                }
-                for (Unit u : unit.getUnitList()) {
-                    igc().leaveShip(u);
-                }
-                cargoPanel.update();
-                updateOutsideColonyPanel();
-                unloadButton.setEnabled(false);
-                fillButton.setEnabled(false);
-                break;
-            case WAREHOUSE:
-                if (getGUI().showWarehouseDialog(colony)) {
-                    updateWarehousePanel();
-                }
-                break;
-            case BUILDQUEUE:
-                getGUI().showBuildQueuePanel(colony);
-                updateConstructionPanel();
-                break;
-            case FILL:
-                if (unit == null || !unit.isCarrier()) break;
-                for (Goods goods : unit.getCompactGoodsList()) {
-                    final GoodsType type = goods.getType();
-                    int space = unit.getLoadableAmount(type);
-                    int count = colony.getGoodsCount(type);
-                    if (space > 0 && count > 0) {
-                        int n = Math.min(space, count);
-                        igc().loadCargo(new Goods(goods.getGame(), colony,
-                                                  type, n),
-                                        unit);
-                    }
-                }
-                break;
-            case COLONY_UNITS:
-                generateColonyUnitsMenu();
-                break;
-            case SETGOODS:
-                DebugUtils.setColonyGoods(getFreeColClient(), colony);
-                updateWarehousePanel();
-                updateProduction();
-                break;
-            case OCCUPATION:
-                colony.setOccupationTrace(!colony.getOccupationTrace());
-                break;
-            default:
-                super.actionPerformed(ae);
-            }
+            super.actionPerformed(ae);
         }
     }
 
