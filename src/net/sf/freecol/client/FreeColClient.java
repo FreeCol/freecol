@@ -317,13 +317,13 @@ public final class FreeColClient {
             invokeMainPanel(userMsg).run();
         }
 
-        Runtime.getRuntime()
-            .addShutdownHook(new Thread(FreeCol.CLIENT_THREAD + "Quit") {
-                    @Override
-                    public void run() {
-                        quit();
-                    }
-                });
+        String quit = FreeCol.CLIENT_THREAD + "Quit Game";
+        Runtime.getRuntime().addShutdownHook(new Thread(quit) {
+                @Override
+                public void run() {
+                    getConnectController().stopServer();
+                }
+            });
     }
 
     /**
