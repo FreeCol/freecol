@@ -317,13 +317,13 @@ public final class FreeColClient {
             invokeMainPanel(userMsg).run();
         }
 
-        String quit = FreeCol.CLIENT_THREAD + "Quit Game";
-        Runtime.getRuntime().addShutdownHook(new Thread(quit) {
-                @Override
-                public void run() {
-                    getConnectController().stopServer();
-                }
-            });
+        Runtime.getRuntime()
+            .addShutdownHook(new Thread(FreeCol.CLIENT_THREAD + "Quit") {
+                    @Override
+                    public void run() {
+                        quit();
+                    }
+                });
     }
 
     /**
@@ -725,6 +725,19 @@ public final class FreeColClient {
     // Fundamental game start/stop/continue actions
 
     /**
+     * Go back to the main panel.
+     *
+     * Called from ShowMainAction.
+     */
+    public void showMain() {
+        getConnectController().stopServer();
+        setMapEditor(false);
+        setGame(null);
+        changeClientState(false);
+        gui.returnToTitle();
+    }
+
+    /**
      * If currently in a game, displays a quit dialog and if desired,
      * logs out of the current game.
      *
@@ -741,8 +754,8 @@ public final class FreeColClient {
             if (isMapEditor()) {
                 specification = getGame().getSpecification();
             } else if (!prompt || gui.confirmStopGame()) {
-                getConnectController().restart();
                 FreeColSeed.incrementFreeColSeed();
+                getConnectController().restart();
             } else {
                 return;
             }
@@ -805,7 +818,7 @@ public final class FreeColClient {
      * Quits the application without any questions.
      */
     public void quit() {
-        if (getSinglePlayer()) getConnectController().stopServer();
+        getConnectController().stopServer();
 
         // delete outdated autosave files
         long validPeriod = 1000L * 24L * 60L * 60L // days to ms

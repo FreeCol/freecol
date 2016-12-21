@@ -137,9 +137,9 @@ public final class ConnectController extends FreeColClientHolder {
      * Public for FreeColClient.quit and showMain.
      */
     public void stopServer() {
-        final FreeColServer server = getFreeColServer();
-        if (server != null) {
-            server.getController().shutdown();
+        final FreeColServer freeColServer = getFreeColServer();
+        if (freeColServer != null) {
+            freeColServer.getController().shutdown();
             final FreeColClient fcc = getFreeColClient();
             if (fcc != null) fcc.setFreeColServer(null);
         }
@@ -275,9 +275,8 @@ public final class ConnectController extends FreeColClientHolder {
                 fcc.quit();
             }
             break;
-        case RESTART: // "Can not happen"
-            logger.warning("logout(RESTART) detected");
-            fcc.askToQuit();
+        case RESTART: // Get here from "New Game" when in-game
+            stopServer();
             break;
         }
         return true;
@@ -650,9 +649,7 @@ public final class ConnectController extends FreeColClientHolder {
      * @return True if the reconnection succeeds.
      */
     public boolean restart() {
-        boolean ret = logoutBegin(LogoutReason.RESTART);
-        stopServer();
-        return ret;
+        return logoutBegin(LogoutReason.RESTART);
     }
     
     /**
