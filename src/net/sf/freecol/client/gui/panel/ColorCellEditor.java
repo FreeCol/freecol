@@ -43,8 +43,6 @@ public final class ColorCellEditor extends AbstractCellEditor
 
     private static final Logger logger = Logger.getLogger(ColorCellEditor.class.getName());
 
-    private static final String EDIT = "EDIT";
-
     private final FreeColClient freeColClient;
     private final JButton colorEditButton;
     private ColorChooserPanel colorChooserPanel = null;
@@ -61,8 +59,9 @@ public final class ColorCellEditor extends AbstractCellEditor
         this.freeColClient = freeColClient;
 
         this.colorEditButton = new JButton();
-        this.colorEditButton.setActionCommand(EDIT);
-        this.colorEditButton.addActionListener(this);
+        this.colorEditButton.addActionListener(ae ->
+            this.colorChooserPanel = ((SwingGUI)freeColClient.getGUI())
+                .showColorChooserPanel(this));
         this.colorEditButton.setBorderPainted(false);
     }
 
@@ -100,9 +99,6 @@ public final class ColorCellEditor extends AbstractCellEditor
         final String command = ae.getActionCommand();
         SwingGUI gui = (SwingGUI)freeColClient.getGUI();
         if (null != command) switch (command) {
-            case EDIT:
-                this.colorChooserPanel = gui.showColorChooserPanel(this);
-                break;
             case FreeColPanel.OK:
                 if (this.colorChooserPanel != null) {
                     this.currentColor = this.colorChooserPanel.getColor();
