@@ -27,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
-import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol; 
 import net.sf.freecol.client.ClientOptions;
@@ -86,72 +85,6 @@ public final class ConnectController extends FreeColClientHolder {
         super(freeColClient);
     }
 
-
-    /**
-     * Shut down an existing server on a given port.
-     *
-     * @param port The port to unblock.
-     * @return True if there should be no blocking server remaining.
-     */
-    private boolean unblockServer(int port) {
-        FreeColServer freeColServer = getFreeColServer();
-        if (freeColServer != null
-            && freeColServer.getServer().getPort() == port) {
-            if (getGUI().confirm("stopServer.text", "stopServer.yes",
-                                 "stopServer.no")) {
-                freeColServer.getController().shutdown();
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Start a server.
-     *
-     * @param publicServer If true, add to the meta-server.
-     * @param singlePlayer True if this is a single player game.
-     * @param spec The {@code Specification} to use in this game.
-     * @param port The TCP port to use for the public socket.
-     * @return A new {@code FreeColServer} or null on error.
-     */
-    private FreeColServer startServer(boolean publicServer,
-                                      boolean singlePlayer, Specification spec,
-                                      int port) {
-        FreeColServer freeColServer;
-        try {
-            freeColServer = new FreeColServer(publicServer, singlePlayer,
-                                              spec, port, null);
-        } catch (IOException e) {
-            freeColServer = null;
-            getGUI().showErrorMessage(StringTemplate
-                .template("server.initialize"));
-            logger.log(Level.WARNING, "Could not start server.", e);
-            return null;
-        }
-        if (publicServer && freeColServer != null
-            && !freeColServer.getPublicServer()) {
-            getGUI().showErrorMessage(StringTemplate
-                .template("server.noRouteToServer"));
-            return null;
-        }
-        return freeColServer;
-    }
-
-    /**
-     * Stop a server if present.
-     *
-     * Public for FreeColClient.quit and showMain.
-     */
-    public void stopServer() {
-        final FreeColServer freeColServer = getFreeColServer();
-        if (freeColServer != null) {
-            freeColServer.getController().shutdown();
-            final FreeColClient fcc = getFreeColClient();
-            if (fcc != null) fcc.setFreeColServer(null);
-        }
-    }
 
     /**
      * Establish the user connection.
@@ -294,17 +227,17 @@ public final class ConnectController extends FreeColClientHolder {
     }
 
     /**
-     * Starts the client and connects to <i>host:port</i>.
-     *
-     * Public for the test suite.
+     * Request this client log in to <i>host:port</i>.
      *
      * @param user The name of the player to use.
      * @param host The name of the machine running the {@code FreeColServer}.
      * @param port The port to use when connecting to the host.
-     * @return True if the login message was sent.
+     * @return True if the player was already logged in, or if the login
+     *     message was sent.
      */
     public boolean requestLogin(String user, String host, int port) {
         final FreeColClient fcc = getFreeColClient();
+        if (fcc.isLoggedIn()) return true;
         fcc.setMapEditor(false);
 
         // Clean up any old connections
@@ -313,12 +246,13 @@ public final class ConnectController extends FreeColClientHolder {
         // Establish the full connection here
         StringTemplate err = connect(user, host, port);
         if (err == null) {
-            // Ask the server to log in a player with the given user name.
-            // Control effectively transfers to PGIH.login().
+            // Ask the server to log in a player with the given user
+            // name.  Control effectively transfers through the server
+            // back to PGIH.login() and then to login() below.
+            logger.info("Login request for client " + FreeCol.getName());
             if (askServer().login(user, FreeCol.getVersion(),
                                   fcc.getSinglePlayer(),
                                   fcc.currentPlayerIsMyPlayer())) {
-                logger.info("Login request for client " + FreeCol.getName());
                 return true;
             }
             err = StringTemplate.template("server.couldNotLogin");
@@ -419,7 +353,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        if (!unblockServer(FreeCol.getServerPort())) return false;
+        if (!fcc.unblockServer(FreeCol.getServerPort())) return false;
 
         requestLogout(LogoutReason.LOGIN);
 
@@ -432,13 +366,10 @@ public final class ConnectController extends FreeColClientHolder {
         spec.loadMods(mods);
         Messages.loadActiveModMessageBundle(mods, FreeCol.getLocale());
 
-        FreeColServer freeColServer = startServer(false, true, spec, -1);
-        if (freeColServer == null) return false;
-        fcc.setFreeColServer(freeColServer);
-        fcc.setSinglePlayer(true);
-
-        return requestLogin(FreeCol.getName(), freeColServer.getHost(),
-                            freeColServer.getPort());
+        FreeColServer fcs = fcc.startServer(false, true, spec, -1);
+        return (fcs == null) ? false
+            : requestLogin(FreeCol.getName(),
+                           fcs.getHost(), fcs.getPort());
     }
 
     /**
@@ -453,9 +384,9 @@ public final class ConnectController extends FreeColClientHolder {
         final GUI gui = getGUI();
         fcc.setMapEditor(false);
 
-        // Get suggestions for "singlePlayer" and "publicServer"
-        // settings from the file, and update the client options if
-        // possible.
+        // Get suggestions for player name, single/multiplayer and
+        // public server state from the file, and update the client
+        // options if possible.
         final ClientOptions options = getClientOptions();
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
@@ -498,8 +429,9 @@ public final class ConnectController extends FreeColClientHolder {
         }
 
         // Reload the client options saved with this game.
+        final boolean publicServer = defaultPublicServer;
         final boolean singlePlayer;
-        final String name;
+        final String serverName;
         final int port;
         final int sgo = options.getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
         boolean show = sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
@@ -511,78 +443,28 @@ public final class ConnectController extends FreeColClientHolder {
                 return false;
             LoadingSavegameInfo lsd = getGUI().getLoadingSavegameInfo();
             singlePlayer = lsd.isSinglePlayer();
-            name = lsd.getServerName();
+            serverName = lsd.getServerName();
             port = lsd.getPort();
         } else {
             singlePlayer = defaultSinglePlayer;
-            name = null;
+            serverName = null;
             port = -1;
         }
         Messages.loadActiveModMessageBundle(options.getActiveMods(),
                                             FreeCol.getLocale());
-        if (!unblockServer(port)) return false;
+        if (!fcc.unblockServer(port)) return false;
 
         getGUI().showStatusPanel(Messages.message("status.loadingGame"));
-
-        final File theFile = file;
-        new Thread(FreeCol.CLIENT_THREAD + "Loading-Game") {
-            @Override
-            public void run() {
-                FreeColServer freeColServer = null;
-                GUI.ErrorJob ej = null;
-                try {
-                    final FreeColSavegameFile saveGame
-                        = new FreeColSavegameFile(theFile);
-                    freeColServer = new FreeColServer(saveGame,
-                        (Specification)null, port, name);
-                    fcc.setFreeColServer(freeColServer);
-                    // Server might have bounced to another port.
-                    fcc.setSinglePlayer(singlePlayer);
-                    igc().setGameConnected();
-                    if (requestLogin(FreeCol.getName(),
-                            freeColServer.getHost(), freeColServer.getPort())) {
-                        SwingUtilities.invokeLater(() -> {
-                                ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
-                                if (userMsg != null) {
-                                    getGUI().showInformationMessage(userMsg);
-                                }
-                                getGUI().closeStatusPanel();
-                            });
-                        return; // Success!
-                    }
-                    ej = gui.errorJob("server.couldNotLogin");
-                } catch (FileNotFoundException fnfe) {
-                    ej = gui.errorJob(fnfe,
-                        FreeCol.badFile("error.couldNotFind", theFile));
-                    logger.log(Level.WARNING, "Can not find file.", fnfe);
-                } catch (IOException ioe) {
-                    ej = gui.errorJob(ioe, "server.initialize");
-                    logger.log(Level.WARNING, "Error starting game.", ioe);
-                } catch (XMLStreamException xse) {
-                    ej = gui.errorJob(xse,
-                        FreeCol.badFile("error.couldNotLoad", theFile));
-                    logger.log(Level.WARNING, "Stream error.", xse);
-                } catch (Exception ex) {
-                    ej = gui.errorJob(ex, "server.initialize");
-                    logger.log(Level.WARNING, "FreeCol error.", ex);
+        FreeColServer fcs = fcc.startServer(publicServer, singlePlayer, file,
+                                            port, serverName);
+        SwingUtilities.invokeLater(() -> {
+                if (userMsg != null) {
+                    getGUI().showInformationMessage(userMsg);
                 }
-                if (ej != null) {
-                    // If this is a debug run, fail hard.
-                    if (fcc.isHeadless()
-                        || FreeColDebugger.getDebugRunTurns() >= 0) {
-                        FreeCol.fatal(ej.toString());
-                    }
-                    // login may have received an error message from
-                    // the server, which is already being displayed.
-                    // Do not override it.
-                    if (!getGUI().onClosingErrorPanel(fcc.invokeMainPanel(null))) {
-                        ej.setRunnable(fcc.invokeMainPanel(null))
-                            .invokeLater();
-                    }
-                }
-            }
-        }.start();
-        return true;
+                getGUI().closeStatusPanel();
+            });
+        return (fcs == null) ? false
+            : requestLogin(FreeCol.getName(), fcs.getHost(), fcs.getPort());
     }
 
     /**
@@ -598,12 +480,12 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        if (!unblockServer(port)) return false;
+        if (!fcc.unblockServer(port)) return false;
 
         requestLogout(LogoutReason.LOGIN);
 
-        FreeColServer freeColServer = startServer(publicServer, false,
-                                                  specification, port);
+        FreeColServer freeColServer = fcc.startServer(publicServer, false,
+                                                      specification, port);
         if (freeColServer == null) return false;
         fcc.setFreeColServer(freeColServer);
         fcc.setSinglePlayer(false);
@@ -688,7 +570,7 @@ public final class ConnectController extends FreeColClientHolder {
             return;
         }
             
-        stopServer();
+        fcc.stopServer();
         getGUI().removeInGameComponents();
         getGUI().mainTitle();
     }
@@ -711,7 +593,7 @@ public final class ConnectController extends FreeColClientHolder {
             return;
         }
 
-        stopServer();
+        fcc.stopServer();
         getGUI().removeInGameComponents();
         getGUI().showNewPanel(null);
     }

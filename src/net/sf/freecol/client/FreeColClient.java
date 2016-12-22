@@ -21,6 +21,7 @@ package net.sf.freecol.client;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
@@ -321,7 +323,7 @@ public final class FreeColClient {
         Runtime.getRuntime().addShutdownHook(new Thread(quit) {
                 @Override
                 public void run() {
-                    getConnectController().stopServer();
+                    stopServer();
                 }
             });
     }
@@ -610,7 +612,7 @@ public final class FreeColClient {
      *
      * @return True if this client is logged in to a server.
      */
-    public boolean isLoggedIn() {
+    public synchronized boolean isLoggedIn() {
         return this.loggedIn;
     }
 
@@ -713,6 +715,137 @@ public final class FreeColClient {
             : clientOptions.getSortedColonies(player);
     }
 
+
+    // Server handling
+
+    /**
+     * Fail to start a server due to an exception.  Complain and fail back
+     * to the main panel.
+     *
+     * @param ex The {@code Exception} that causes the trouble.
+     * @param template A {@code StringTemplate} with the error message.
+     * @return Null.
+     */
+    private FreeColServer failToMain(Exception ex, StringTemplate template) {
+        GUI.ErrorJob ej = gui.errorJob(ex, template);
+        logger.log(Level.WARNING, Messages.message(template), ex);
+        if (isHeadless() // If this is a debug run, fail hard.
+            || FreeColDebugger.getDebugRunTurns() >= 0) {
+            FreeCol.fatal(ej.toString());
+        }
+        ej.setRunnable(invokeMainPanel(null)).invokeLater();
+        return null;
+    }
+
+    /**
+     * Fail to start a server due to an exception.  Complain and fail back
+     * to the main panel.
+     *
+     * @param ex The {@code Exception} that causes the trouble.
+     * @param key A message key with the error.
+     * @return Null.
+     */
+    private FreeColServer failToMain(Exception ex, String key) {
+        return failToMain(ex, StringTemplate.template(key));
+    }
+    
+    /**
+     * Shut down an existing server on a given port.
+     *
+     * @param port The port to unblock.
+     * @return True if there should be no blocking server remaining.
+     */
+    public boolean unblockServer(int port) {
+        final FreeColServer freeColServer = getFreeColServer();
+        if (freeColServer != null
+            && freeColServer.getServer().getPort() == port) {
+            if (!getGUI().confirm("stopServer.text", "stopServer.yes",
+                                  "stopServer.no")) return false;
+            stopServer();
+        }
+        return true;
+    }
+
+    /**
+     * Stop a server if present.
+     *
+     * Public for FreeColClient.quit and showMain.
+     */
+    public void stopServer() {
+        final FreeColServer freeColServer = getFreeColServer();
+        if (freeColServer != null) {
+            freeColServer.getController().shutdown();
+            setFreeColServer(null);
+            ResourceManager.setScenarioMapping(null);
+        }
+    }
+
+    /**
+     * Start a server.
+     *
+     * @param publicServer If true, add to the meta-server.
+     * @param singlePlayer True if this is a single player game.
+     * @param spec The {@code Specification} to use in this game.
+     * @param port The TCP port to use for the public socket.
+     * @return A new {@code FreeColServer} or null on error.
+     */
+    public FreeColServer startServer(boolean publicServer,
+                                     boolean singlePlayer, Specification spec,
+                                     int port) {
+        final FreeColServer fcs;
+        try {
+            fcs = new FreeColServer(publicServer, singlePlayer, spec,
+                                    port, null);
+        } catch (IOException ioe) {
+            return failToMain(ioe, "server.initialize");
+        }
+        if (publicServer && fcs != null && !fcs.getPublicServer()) {
+            return failToMain(null, "server.noRouteToServer");
+        }
+
+        setFreeColServer(fcs);
+        setSinglePlayer(singlePlayer);
+        return fcs;
+    }
+
+    /**
+     * Start a server with a saved game.
+     *
+     * @param publicServer If true, add to the meta-server.
+     * @param singlePlayer True if this is a single player game.
+     * @param saveFile The saved game {@code File}.
+     * @param port The TCP port to use for the public socket.
+     * @param name An optional name for the server.
+     * @return A new {@code FreeColServer}, or null on error.
+     */
+    public FreeColServer startServer(boolean publicServer,
+                                     boolean singlePlayer,
+                                     File saveFile, int port, String name) {
+        final FreeColSavegameFile fsg;
+        try {
+            fsg = new FreeColSavegameFile(saveFile);
+        } catch (FileNotFoundException fnfe) {
+            return failToMain(fnfe, FreeCol.badFile("error.couldNotFind", saveFile));
+        } catch (IOException ioe) {
+            return failToMain(ioe, "server.initialize");
+        }
+        final FreeColServer fcs;
+        try {
+            fcs = new FreeColServer(fsg, (Specification)null, port, name);
+        } catch (XMLStreamException xse) {
+            return failToMain(xse, FreeCol.badFile("error.couldNotLoad", saveFile));
+        } catch (Exception ex) {
+            return failToMain(ex, "server.initialize");
+        }
+
+        setFreeColServer(fcs);
+        setSinglePlayer(singlePlayer);
+        this.inGameController.setGameConnected();
+        ResourceManager.setScenarioMapping(fsg.getResourceMapping());
+        return fcs;
+    }
+    
+
     // Fundamental game start/stop/continue actions
 
     /**
@@ -805,7 +938,7 @@ System.err.println("LOGGED OUT " + getMyPlayer());
      * Quits the application without any questions.
      */
     public void quit() {
-        getConnectController().stopServer();
+        stopServer();
 
         final ClientOptions co = getClientOptions();
         FreeColDirectories.removeOutdatedAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX),
