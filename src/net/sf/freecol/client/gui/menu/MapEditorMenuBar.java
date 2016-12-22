@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.menu;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionListener;
-import java.io.File;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -44,13 +43,10 @@ import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.client.gui.action.SaveAction;
 import net.sf.freecol.client.gui.action.ScaleMapAction;
 import net.sf.freecol.client.gui.action.ShowMainAction;
+import net.sf.freecol.client.gui.action.StartMapAction;
 import net.sf.freecol.client.gui.action.ZoomInAction;
 import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.panel.Utility;
-import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.option.FileOption;
-import net.sf.freecol.common.option.MapGeneratorOptions;
-import net.sf.freecol.common.option.OptionGroup;
 
 
 /**
@@ -113,22 +109,8 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
         menu.add(getMenuItem(OpenAction.id));
         menu.add(getMenuItem(SaveAction.id));
-        JMenuItem playItem = Utility.localizedMenuItem("startGame");
-        playItem.addActionListener((ActionEvent ae) -> {
-                File startFile = FreeColDirectories.getStartMapFile();
-                freeColClient.getMapEditorController()
-                    .saveMapEditorGame(startFile);
-                OptionGroup options = freeColClient.getGame()
-                    .getMapGeneratorOptions();
-                FileOption fileOption = (FileOption)options
-                    .getOption(MapGeneratorOptions.IMPORT_FILE);
-                fileOption.setValue(startFile);
-                File mapOptionsFile = FreeColDirectories
-                    .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
-                options.save(mapOptionsFile, null, true);
-                freeColClient.newGame(true);
-            });
-        menu.add(playItem);
+        menu.add(getMenuItem(StartMapAction.id));
+
         menu.addSeparator();
 
         menu.add(getMenuItem(PreferencesAction.id));
