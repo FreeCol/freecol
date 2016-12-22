@@ -49,6 +49,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
@@ -61,6 +62,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
@@ -529,7 +531,22 @@ public final class FreeColServer {
         }
         return ret;
     }
-            
+
+    /**
+     * The game is ending, tell all the non-admin players to quit.
+     */
+    public void endGame() {
+        changeServerState(ServerState.END_GAME);
+        ChangeSet cs = new ChangeSet();
+        for (Player p : getGame().getLiveEuropeanPlayerList()) {
+            ServerPlayer sp = (ServerPlayer)p;
+            if (sp.isAdmin()) continue;
+            sp.send(new ChangeSet()
+                .add(See.only(sp), ChangeSet.ChangePriority.CHANGE_NORMAL,
+                     new LogoutMessage(sp, LogoutReason.QUIT)));
+        }
+    }
+        
     /**
      * Gets the network server responsible of handling the connections.
      *

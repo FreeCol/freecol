@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.FreeColServer.ServerState;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.ServerGame;
@@ -103,27 +104,26 @@ public class LogoutMessage extends AttributeMessage {
         case PRE_GAME: case LOAD_GAME:
             break;
         case IN_GAME:
-            ServerGame game = freeColServer.getGame();
             if (freeColServer.getSinglePlayer()) {
                 ; // Allow quit if specified
+            } else if (serverPlayer.isAdmin() && reason == LogoutReason.QUIT) {
+                // If the multiplayer admin quits, its all over
+                freeColServer.endGame();
             } else {
-                if (game.getCurrentPlayer() == serverPlayer) {
+                if (freeColServer.getGame().getCurrentPlayer() == serverPlayer) {
                     cs = freeColServer.getInGameController()
                         .endTurn(serverPlayer);
                 }
                 // FIXME: Turn serverPlayer into AI?
-                // Do not allow non-admin to quit
-                if (reason == LogoutReason.QUIT
-                    && !serverPlayer.isAdmin()) reason = LogoutReason.LOGOUT;
             }
             break;
         case END_GAME:
             return null;
         }
 
-        // Inform all players
+        // Inform the client
         if (cs == null) cs = new ChangeSet();
-        cs.add(See.all(), ChangeSet.ChangePriority.CHANGE_NORMAL,
+        cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_NORMAL,
                new LogoutMessage(serverPlayer, reason));
 
         // Update the metaserver
