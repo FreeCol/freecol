@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Disaster;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -101,6 +102,14 @@ public class DebugUtils {
 
     private static final Logger logger = Logger.getLogger(DebugUtils.class.getName());
 
+    /**
+     * Reconnect utility.
+     */
+    private static void reconnect(FreeColClient freeColClient) {
+        freeColClient.askServer()
+            .logout(freeColClient.getMyPlayer(), LogoutReason.RECONNECT);
+    }
+        
 
     /**
      * Debug action to add buildings to the user colonies.
@@ -148,9 +157,8 @@ public class DebugUtils {
             }
         }
         gui.showInformationMessage(join(", ", results));
-        if (fails < sPlayer.getSettlementCount()) {
-            // Brutally resynchronize
-            freeColClient.getConnectController().reconnectBegin();
+        if (fails < sPlayer.getSettlementCount()) { // Brutally resynchronize
+            reconnect(freeColClient);
         }
     }
 
@@ -354,7 +362,7 @@ public class DebugUtils {
         sUnit.setMovesLeft(sUnit.getInitialMovesLeft());
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
 
-        freeColClient.getConnectController().reconnectBegin();
+        reconnect(freeColClient);
         // Note "game" is no longer valid after reconnect.
         Unit unit = freeColClient.getGame()
             .getFreeColGameObject(sUnit.getId(), Unit.class);
@@ -557,7 +565,7 @@ public class DebugUtils {
         if (roleChoice == null) return;
 
         sUnit.changeRole(roleChoice, roleChoice.getMaximumCount());
-        freeColClient.getConnectController().reconnectBegin();
+        reconnect(freeColClient);
     }
 
     /**
@@ -1211,6 +1219,6 @@ public class DebugUtils {
 
         ap.setDebuggingConnection(freeColClient.askServer().getConnection());
         ap.startWorking();
-        freeColClient.getConnectController().reconnectBegin();
+        reconnect(freeColClient);
     }
 }
