@@ -59,29 +59,6 @@ public final class MapEditorController extends FreeColClientHolder {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorController.class.getName());
 
-    private static class ErrorJob implements Runnable {
-
-        private final GUI gui;
-        private final StringTemplate template;
-        
-
-        public ErrorJob(GUI gui, Exception ex, String key) {
-            this.gui = gui;
-            this.template = FreeCol.errorFromException(ex, key);
-        }
-
-        public ErrorJob(GUI gui, Exception ex, StringTemplate tmpl) {
-            this.gui = gui;
-            this.template = FreeCol.errorFromException(ex, tmpl);
-        }
-
-        @Override
-        public void run() {
-            this.gui.closeMenus();
-            this.gui.showErrorMessage(this.template);
-        }
-    }
-
     public interface IMapTransform {
 
         /**
@@ -301,7 +278,7 @@ public final class MapEditorController extends FreeColClientHolder {
             @Override
             public void run() {
                 final FreeColServer freeColServer = getFreeColServer();
-                ErrorJob ej = null;
+                GUI.ErrorJob ej = null;
                 try {
                     Specification spec = getDefaultSpecification();
                     Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
@@ -315,21 +292,19 @@ public final class MapEditorController extends FreeColClientHolder {
                             gui.refresh();
                         });
                 } catch (FileNotFoundException fnfe) {
-                    reloadMainPanel();
-                    ej = new ErrorJob(gui, fnfe,
+                    ej = gui.errorJob(fnfe,
                         FreeCol.badFile("error.couldNotFind", theFile));
                 } catch (IOException ioe) {
-                    reloadMainPanel();
-                    ej = new ErrorJob(gui, ioe, "server.initialize");
+                    ej = gui.errorJob(ioe, "server.initialize");
                 } catch (XMLStreamException xse) {
-                    reloadMainPanel();
-                    ej = new ErrorJob(gui, xse,
+                    ej = gui.errorJob(xse,
                         FreeCol.badFile("error.couldNotLoad", theFile));
                 } catch (FreeColException ex) {
-                    reloadMainPanel();
-                    ej = new ErrorJob(gui, ex, "server.initialize");
+                    ej = gui.errorJob(ex, "server.initialize");
                 }
-                if (ej != null) SwingUtilities.invokeLater(ej);
+                if (ej != null) {
+                    ej.setRunnable(fcc.invokeMainPanel(null)).invokeLater();
+                }
             }
         }.start();
     }

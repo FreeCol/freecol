@@ -86,6 +86,56 @@ public class GUI extends FreeColClientHolder {
 
     protected static final Logger logger = Logger.getLogger(GUI.class.getName());
 
+    /**
+     * Error handler class to display a message with this GUI.
+     */
+    public class ErrorJob implements Runnable {
+
+        private final StringTemplate template;
+        private Runnable runnable;
+
+        
+        public ErrorJob(Exception ex, String key) {
+            this.template = FreeCol.errorFromException(ex, key);
+            this.runnable = null;
+        }
+
+        public ErrorJob(Exception ex, StringTemplate tmpl) {
+            this.template = FreeCol.errorFromException(ex, tmpl);
+            this.runnable = null;
+        }
+
+        public ErrorJob(String key) {
+            this.template = StringTemplate.template(key);
+            this.runnable = null;
+        }
+
+        public ErrorJob(StringTemplate template) {
+            this.template = template;
+            this.runnable = null;
+        }
+
+        public ErrorJob setRunnable(Runnable runnable) {
+            this.runnable = runnable;
+            return this;
+        }
+
+        public void invokeLater() {
+            SwingUtilities.invokeLater(this);
+        }
+
+        @Override
+        public void run() {
+            GUI.this.closeMenus();
+            GUI.this.showErrorMessage(this.template, null, this.runnable);
+        }
+
+        @Override
+        public String toString() {
+            return Messages.message(this.template);
+        }
+    }
+
     /** Warning levels. */
     private static final String levels[] = {
         "low", "normal", "high"
@@ -122,6 +172,51 @@ public class GUI extends FreeColClientHolder {
         return true;
     }
 
+    // Error handlers
+
+    /**
+     * Create a new error job from a given exception and message key.
+     *
+     * @param ex The {@code Exception} to use.
+     * @param key The message key.
+     * @return An {@code ErrorJob} to display the error using this GUI.
+     */
+    public ErrorJob errorJob(Exception ex, String key) {
+        return new ErrorJob(ex, key);
+    }
+
+    /**
+     * Create a new error job from a given exception and template.
+     *
+     * @param ex The {@code Exception} to use.
+     * @param template The {@code StringTemplate}.
+     * @return An {@code ErrorJob} to display the error using this GUI.
+     */
+    public ErrorJob errorJob(Exception ex, StringTemplate template) {
+        return new ErrorJob(ex, template);
+    }
+    
+    /**
+     * Create a new error job from a given message key.
+     *
+     * @param key The message key.
+     * @return An {@code ErrorJob} to display the error using this GUI.
+     */
+    public ErrorJob errorJob(String key) {
+        return new ErrorJob(key);
+    }
+
+    /**
+     * Create a new error job from a given template.
+     *
+     * @param template The {@code StringTemplate}.
+     * @return An {@code ErrorJob} to display the error using this GUI.
+     */
+    public ErrorJob errorJob(StringTemplate template) {
+        return new ErrorJob(template);
+    }
+    
+    
     // Initialization related methods
 
     /** 
