@@ -820,29 +820,10 @@ public final class FreeColClient {
     public void quit() {
         getConnectController().stopServer();
 
-        // delete outdated autosave files
-        long validPeriod = 1000L * 24L * 60L * 60L // days to ms
-            * clientOptions.getInteger(ClientOptions.AUTOSAVE_VALIDITY);
-        long timeNow = System.currentTimeMillis();
-        File autoSave = FreeColDirectories.getAutosaveDirectory();
-        String[] flist;
-        if (validPeriod != 0L && autoSave != null
-            && (flist = autoSave.list()) != null) {
-            for (String f : flist) {
-                if (!f.endsWith("." + FreeCol.FREECOL_SAVE_EXTENSION)) continue;
-                // delete files which are older than user option allows
-                File saveGameFile = new File(autoSave, f);
-                if (saveGameFile.lastModified() + validPeriod < timeNow) {
-                    try {
-                        saveGameFile.delete();
-                    } catch (SecurityException ex) {
-                        logger.log(Level.WARNING, "Failed to delete: "
-                            + saveGameFile.getPath(), ex);
-                    }
-                }
-            }
-        }
-
+        final ClientOptions co = getClientOptions();
+        FreeColDirectories.removeOutdatedAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX),
+            co.getInteger(ClientOptions.AUTOSAVE_VALIDITY));
+        
         // Exit
         int ret = 0;
         try {
@@ -851,33 +832,5 @@ public final class FreeColClient {
             ret = 1;
         }
         System.exit(ret);
-    }
-
-    /**
-     * Removes automatically created save games.
-     *
-     * Call this function to delete the automatically created save games from
-     * a previous game.
-     */
-    public void removeAutosaves() {
-        final ClientOptions co = getClientOptions();
-        if (!getMyPlayer().isAdmin()
-            || !co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) return;
-        final String prefix = co.getText(ClientOptions.AUTO_SAVE_PREFIX);
-        
-        File asd = FreeColDirectories.getAutosaveDirectory();
-        File[] files;
-        if (asd == null || (files = asd.listFiles()) == null) return;
-        for (File auto : transform(files,
-                                   f -> f.getName().startsWith(prefix))) {
-            try {
-                if (!auto.delete()) {
-                    logger.warning("Failed to delete: " + auto.getPath());
-                }
-            } catch (SecurityException se) {
-                logger.log(Level.WARNING, "Deletion crash for "
-                    + auto.getPath(), se);
-            }
-        }
     }
 }

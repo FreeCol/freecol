@@ -23,14 +23,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.function.Predicate;
+import java.util.List;
 import java.util.stream.Stream;
 import javax.swing.filechooser.FileSystemView;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.util.OSUtils;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -628,6 +631,47 @@ public class FreeColDirectories {
      */
     public static File getAutosaveDirectory() {
         return autosaveDirectory;
+    }
+
+    /**
+     * Get the autosave files.
+     *
+     * @param prefix The autosave file prefix.
+     * @param pred A {@code Predicate} to select files with.
+     * @return A list of of autosaved {@code File}s.
+     */
+    public static List<File> getAutosaveFiles(String prefix,
+                                              Predicate<File> pred) {
+        final String suffix = "." + FreeCol.FREECOL_SAVE_EXTENSION;
+        final File asd = getAutosaveDirectory();
+        final Predicate<File> fullPred = pred.and(f ->
+            f.getName().startsWith(prefix) && f.getName().endsWith(suffix));
+        return (asd == null) ? Collections.<File>emptyList()
+            : transform(asd.listFiles(), fullPred);
+    }
+
+    /**
+     * Remove out of date autosaves.
+     *
+     * @param prefix The autosave file prefix.
+     * @param validPeriod Allow files this many days old.
+     */
+    public static void removeOutdatedAutosaves(String prefix, long validDays) {
+        if (validDays <= 0L) return;
+        final long validMS = 1000L * 24L * 60L * 60L * validDays; // days to ms
+        final long timeNow = System.currentTimeMillis();
+        final Predicate<File> outdatedPred = f -> 
+            f.lastModified() + validMS < timeNow;
+        Utils.deleteFiles(getAutosaveFiles(prefix, outdatedPred));
+    }
+
+    /**
+     * Remove all autosave files.
+     *
+     * @param prefix The autosave file prefix.
+     */
+    public static void removeAutosaves(String prefix) {
+        Utils.deleteFiles(getAutosaveFiles(prefix, alwaysTrue()));
     }
 
     /**

@@ -23,11 +23,13 @@ import java.awt.Color;
 
 import java.util.logging.Logger;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -166,7 +168,10 @@ public final class PreGameController extends FreeColClientHolder {
         gui.initializeInGame();
 
         // Clean up autosaves
-        fcc.removeAutosaves();
+        final ClientOptions co = getClientOptions();
+        if (player.isAdmin() && co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
+            FreeColDirectories.removeAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX));
+        }
 
         // Sort out the unit initialization
         final Game game = getGame();
