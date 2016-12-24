@@ -800,7 +800,8 @@ public final class InGameController extends FreeColClientHolder {
         // Check for desync as last thing!
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
             && DebugUtils.checkDesyncAction(getFreeColClient())) {
-            getConnectController().reconnectBegin();
+            getFreeColClient().getConnectController()
+                .requestLogout(LogoutReason.RECONNECT);
             return false;
         }
 
@@ -4246,13 +4247,14 @@ public final class InGameController extends FreeColClientHolder {
      * Returns no status, this game is going away.
      */
     public void reconnect() {
+        final FreeColClient fcc = getFreeColClient();
         final Player player = getMyPlayer();
         if (getGUI().confirm("reconnect.text", "reconnect.no", "reconnect.yes")) {
             logger.finest("Reconnect quit.");
-            askServer().logout(player, LogoutReason.QUIT);
+            fcc.getConnectController().requestLogout(LogoutReason.QUIT);
         } else {
             logger.finest("Reconnect accepted.");
-            getConnectController().reconnectBegin();
+            fcc.getConnectController().requestLogout(LogoutReason.RECONNECT);
         }
     }
 
@@ -4700,7 +4702,8 @@ public final class InGameController extends FreeColClientHolder {
      */
     public boolean setInDebugMode() {
         FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
-        getConnectController().reconnectBegin();
+        getFreeColClient().getConnectController()
+            .requestLogout(LogoutReason.RECONNECT);
         return true;
     }
 

@@ -796,7 +796,7 @@ public final class FreeColClient {
             if (player == null) { // If no player, must be already logged out
                 quit();
             } else {
-                askServer().logout(getMyPlayer(), LogoutReason.QUIT);
+                getConnectController().requestLogout(LogoutReason.QUIT);
             }
         }
     }

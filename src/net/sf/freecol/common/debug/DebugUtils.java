@@ -106,8 +106,8 @@ public class DebugUtils {
      * Reconnect utility.
      */
     private static void reconnect(FreeColClient freeColClient) {
-        freeColClient.askServer()
-            .logout(freeColClient.getMyPlayer(), LogoutReason.RECONNECT);
+        freeColClient.getConnectController()
+            .requestLogout(LogoutReason.RECONNECT);
     }
         
 

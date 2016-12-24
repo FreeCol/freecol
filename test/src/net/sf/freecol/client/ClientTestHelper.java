@@ -43,13 +43,13 @@ public class ClientTestHelper {
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);
-        assertTrue(connectController.login("test", freeColServer.getHost(),
-                   freeColServer.getPort()));
+        assertTrue(connectController.login("test",
+                   freeColServer.getHost(), freeColServer.getPort()));
         client.getPreGameController().setReady(true);
         return client;
     }
     
     public static void stopClient(FreeColClient client) {
-        client.getConnectController().logoutBegin(LogoutReason.QUIT);
+        client.getConnectController().requestLogout(LogoutReason.QUIT);
     }
 }

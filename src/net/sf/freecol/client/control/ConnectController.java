@@ -225,17 +225,17 @@ public final class ConnectController extends FreeColClientHolder {
     }
         
     /**
-     * Initiate log out of this client from the server.
-     *
-     * Public for the test suite.
+     * Request that this client log out from the server.
      *
      * @param reason The reason to logout from the server.
-     * @return True if the logout message was sent.
+     * @return True if the player is already logged out,
+     *     or a logout request was sent.
      */
-    public boolean logoutBegin(LogoutReason reason) {
+    public boolean requestLogout(LogoutReason reason) {
         final FreeColClient fcc = getFreeColClient();
-        if (!fcc.isLoggedIn()) return true;
         final Player player = fcc.getMyPlayer();
+        if (!fcc.isLoggedIn()) return true;
+        
         logger.info("Logout begin for client " + player.getName()
             + ": " + reason.toString());
         return askServer().logout(player, reason);
@@ -295,7 +295,7 @@ public final class ConnectController extends FreeColClientHolder {
      * @return True if the initial message was sent.
      */
     public boolean reconnectBegin() {
-        return logoutBegin(LogoutReason.RECONNECT);
+        return requestLogout(LogoutReason.RECONNECT);
     }
 
     /**
@@ -374,7 +374,7 @@ public final class ConnectController extends FreeColClientHolder {
 
         if (!unblockServer(FreeCol.getServerPort())) return false;
 
-        logoutBegin(LogoutReason.LOGIN);
+        requestLogout(LogoutReason.LOGIN);
 
         // Load the player mods into the specification that is about to be
         // used to initialize the server.
@@ -553,7 +553,7 @@ public final class ConnectController extends FreeColClientHolder {
 
         if (!unblockServer(port)) return false;
 
-        logoutBegin(LogoutReason.LOGIN);
+        requestLogout(LogoutReason.LOGIN);
 
         FreeColServer freeColServer = startServer(publicServer, false,
                                                   specification, port);
@@ -576,7 +576,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        logoutBegin(LogoutReason.LOGIN);
+        requestLogout(LogoutReason.LOGIN);
 
         DOMMessage msg = ask(host, port, new GameStateMessage(),
             GameStateMessage.TAG, StringTemplate.template("client.noState"));
@@ -630,7 +630,7 @@ public final class ConnectController extends FreeColClientHolder {
      * @return True if the reconnection succeeds.
      */
     public boolean restart() {
-        return logoutBegin(LogoutReason.RESTART);
+        return requestLogout(LogoutReason.RESTART);
     }
     
     /**
