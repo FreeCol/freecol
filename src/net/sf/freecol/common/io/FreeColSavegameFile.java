@@ -22,6 +22,7 @@ package net.sf.freecol.common.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.BufferedInputStream;
+import java.util.List;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
@@ -66,6 +67,10 @@ public class FreeColSavegameFile extends FreeColDataFile {
      */
     public static final String THUMBNAIL_FILE = "thumbnail.png";
 
+    /** Static argument list for getVersion. */
+    private static final List<String> versionList
+        = makeUnmodifiableList(VERSION_TAG);
+
 
     /**
      * Create a new save game file from a given file.
@@ -77,20 +82,35 @@ public class FreeColSavegameFile extends FreeColDataFile {
         super(file);
     }
 
+
+    /**
+     * Peek at the attributes in a saved game.
+     *
+     * @param attributes A list of attribute names to peek at.
+     * @return A list of corresponding attribute values, or null on error.
+     */
+    public List<String> peekAttributes(List<String> attributes)
+        throws IOException, XMLStreamException {
+        final FreeColXMLReader xr = this.getSavedGameFreeColXMLReader();
+        xr.nextTag();
+        List<String> ret = transform(attributes, alwaysTrue(),
+                                     a -> xr.getAttribute(a, (String)null));
+        xr.close();
+        return ret;
+    }
+
     /**
      * Gets the save game version from this saved game.
      *
      * @return The saved game version, or negative on error.
      */
-    public int getSavegameVersion() {
-        int ret;
-        try {
-            FreeColXMLReader xr = this.getSavedGameFreeColXMLReader();
-            xr.nextTag();
-            ret = xr.getAttribute(VERSION_TAG, -1);
-            xr.close();
-        } catch (IOException|XMLStreamException ex) {
-            ret = -1;
+    public int getSavegameVersion() throws IOException, XMLStreamException {
+        List<String> v = this.peekAttributes(versionList);
+        int ret = -1;
+        if (v != null && v.size() == 1) {
+            try {
+                ret = Integer.parseInt(v.get(0));
+            } catch (NumberFormatException nfe) {}
         }
         return ret;
     }
