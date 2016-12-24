@@ -108,16 +108,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      *     tree) that holds all the information.
      */
     protected void disconnect(Element element) {
-        // Updating the GUI should always be done in the EDT:
-        javax.swing.SwingUtilities.invokeLater(() -> {
-                if (getGUI().containsInGameComponents()) {
-                    if (getFreeColServer() == null) {
-                        getGUI().mainTitle();
-                    } else {
-                        getGUI().removeInGameComponents();
-                    }
-                }
-            });
+        ; // Do nothing
     }
 
     /**
