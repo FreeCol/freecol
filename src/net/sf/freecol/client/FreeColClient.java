@@ -615,15 +615,6 @@ public final class FreeColClient {
     }
 
     /**
-     * Sets whether or not this client is logged in to a server.
-     *
-     * @param loggedIn Whether or not this client is logged in to a server.
-     */
-    public void setLoggedIn(boolean loggedIn) {
-        this.loggedIn = loggedIn;
-    }
-
-    /**
      * Is the game in headless mode?
      *
      * @return a {@code boolean} value
@@ -723,6 +714,42 @@ public final class FreeColClient {
     }
 
     // Fundamental game start/stop/continue actions
+
+    /**
+     * Log in to a new game.
+     *
+     * Called when the ConnectController processes a login.
+     *
+     * @param inGame Whether the server is in-game.
+     * @param game The new {@code Game}.
+     * @param player The new client {@code Player}.
+     * @param single True if this is a single player game.
+     */
+    public synchronized void login(boolean inGame, Game game, Player player,
+                                   boolean single) {
+        this.loggedIn = true;
+        changeClientState(inGame);
+        setGame(game);
+        setMyPlayer(player);
+        setSinglePlayer(single);
+        addSpecificationActions(game.getSpecification());
+System.err.println("LOGGED IN " + player);
+    }
+
+    /**
+     * Log this client out.
+     *
+     * Called when the ConnectController processes a logout.
+     */
+    public synchronized void logout() {
+System.err.println("LOGGED OUT " + getMyPlayer());
+        this.loggedIn = false;
+        changeClientState(false);
+        setGame(null);
+        setMyPlayer(null);
+        // Ignore single-player state
+        // FIXME: should remove specification actions
+    }
 
     /**
      * Go back to the main panel.

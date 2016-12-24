@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
@@ -254,10 +255,7 @@ public final class ConnectController extends FreeColClientHolder {
             + ": " + reason.toString());
 
         askServer().disconnect();
-        fcc.changeClientState(false); // No longer in game
-        fcc.setLoggedIn(false);    
-        fcc.setGame(null);
-        fcc.setMyPlayer(null);
+        fcc.logout();
 
         switch (reason) {
         case DEFEATED: case QUIT:
@@ -323,7 +321,7 @@ public final class ConnectController extends FreeColClientHolder {
      * @param port The port to use when connecting to the host.
      * @return True if the login message was sent.
      */
-    public boolean login(String user, String host, int port) {
+    public boolean requestLogin(String user, String host, int port) {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
@@ -345,6 +343,73 @@ public final class ConnectController extends FreeColClientHolder {
         }
         getGUI().showErrorMessage(err);
         return false;
+    }
+
+    /**
+     * Complete a login.
+     *
+     * If we are joining a running game, there is little more
+     * needed to be done.  If we are restoring from saved, the
+     * game should include a map and a full complement of players,
+     * including ours.
+     *
+     * Otherwise we may still need to select a nation, and
+     * optionally change game or map options (using several
+     * possible messages).  {@link StartGamePanel} does this.
+     *
+     * When all the parameters are in place and all players are
+     * ready (trivially true in single player, needs checking in
+     * multiplayer) the client needs to send a requestLaunch
+     * message to ask the server to start the game.  That is
+     * either done here or by the start game panel.
+     *
+     * requestLaunch effectively transfers control to
+     * {@link FreeColServer#startGame}.
+     *
+     * @param state The state of the server.
+     * @param game The new {@code Game} to attach to.
+     * @param user The name of the player in the game.
+     * @param single True if this is a single player game.
+     * @param current True if the player is the current player.
+     */
+    public void login(ServerState state, Game game, String user,
+                      boolean single, boolean current) {
+        final FreeColClient fcc = getFreeColClient();
+
+        Player player = game.getPlayerByName(user);
+        if (player == null) {
+            StringTemplate err = StringTemplate.template("server.noSuchPlayer")
+                .addName("%player%", user);
+            getGUI().showErrorMessage(err);
+            logger.warning(Messages.message(err));
+            return;
+        }
+
+        // Reattach to the game
+        fcc.login(state == ServerState.IN_GAME, game, player, single);
+        if (current) game.setCurrentPlayer(player);
+        logger.info("Login accepted for client " + player.getName()
+            + " to " + ((fcc.isInGame()) ? "running"
+                : (game.allPlayersReadyToLaunch()) ? "ready" : "new")
+            + " " + ((single) ? "single" : "multi")
+            + "-player game as " + user + "/" + player.getId());
+
+        if (fcc.isInGame()) { // Joining existing game, possibly reconnect
+            String active = getGUI().reconnect();
+            Unit u;
+            if (active != null
+                && (u = game.getFreeColGameObject(active, Unit.class)) != null
+                && player.owns(u)) {
+                player.setNextActiveUnit(u);
+                getGUI().setActiveUnit(u);
+            }
+            igc().nextModelMessage();
+        } else if (game.getMap() != null
+            && game.allPlayersReadyToLaunch()) { // Ready to launch!
+            pgc().requestLaunch();
+        } else { // More parameters need to be set or players to become ready
+            getGUI().showStartGamePanel(game, player, single);
+        }
     }
 
     //
@@ -390,8 +455,8 @@ public final class ConnectController extends FreeColClientHolder {
         fcc.setFreeColServer(freeColServer);
         fcc.setSinglePlayer(true);
 
-        return login(FreeCol.getName(), freeColServer.getHost(),
-                     freeColServer.getPort());
+        return requestLogin(FreeCol.getName(), freeColServer.getHost(),
+                            freeColServer.getPort());
     }
 
     /**
@@ -492,8 +557,8 @@ public final class ConnectController extends FreeColClientHolder {
                     // Server might have bounced to another port.
                     fcc.setSinglePlayer(singlePlayer);
                     igc().setGameConnected();
-                    if (login(FreeCol.getName(), freeColServer.getHost(), 
-                              freeColServer.getPort())) {
+                    if (requestLogin(FreeCol.getName(),
+                            freeColServer.getHost(), freeColServer.getPort())) {
                         SwingUtilities.invokeLater(() -> {
                                 ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
                                 if (userMsg != null) {
@@ -561,8 +626,8 @@ public final class ConnectController extends FreeColClientHolder {
         fcc.setFreeColServer(freeColServer);
         fcc.setSinglePlayer(false);
 
-        return login(FreeCol.getName(),
-                     freeColServer.getHost(), freeColServer.getPort());
+        return requestLogin(FreeCol.getName(),
+                            freeColServer.getHost(), freeColServer.getPort());
     }
 
     /**
@@ -621,7 +686,7 @@ public final class ConnectController extends FreeColClientHolder {
             getGUI().showErrorMessage(StringTemplate.template("client.ending"));
             return false;
         }
-        return login(name, host, port);
+        return requestLogin(name, host, port);
     }
 
     /**
