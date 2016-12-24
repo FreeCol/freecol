@@ -104,24 +104,36 @@ public class LogoutMessage extends AttributeMessage {
         case PRE_GAME: case LOAD_GAME:
             break;
         case IN_GAME:
-            if (freeColServer.getSinglePlayer()) {
-                ; // Allow quit if specified
-            } else if (serverPlayer.isAdmin() && reason == LogoutReason.QUIT) {
-                // If the multiplayer admin quits, its all over
-                freeColServer.endGame();
-            } else {
-                if (freeColServer.getGame().getCurrentPlayer() == serverPlayer) {
-                    cs = freeColServer.getInGameController()
-                        .endTurn(serverPlayer);
+            boolean endTurn = false;
+            switch (reason) {
+            case DEFEATED:
+                endTurn = true;
+                break;
+            case LOGIN: // FIXME: should go away
+                break;
+            case MAIN_TITLE: case NEW_GAME: case QUIT:
+                if (freeColServer.getSinglePlayer() || serverPlayer.isAdmin()) {
+                    // End completely for single player, or multiplayer admin
+                    freeColServer.endGame();
+                } else {
+                    endTurn = true;
+                    // FIXME: turn multiplayer withdrawing player into an AI?
                 }
-                // FIXME: Turn serverPlayer into AI?
+                break;
+            case RECONNECT:
+                break;
+            }
+            if (endTurn
+                && freeColServer.getGame().getCurrentPlayer() == serverPlayer) {
+                cs = freeColServer.getInGameController()
+                    .endTurn(serverPlayer);
             }
             break;
         case END_GAME:
             return null;
         }
 
-        // Inform the client
+        // Confirm the logout with the given reason.
         if (cs == null) cs = new ChangeSet();
         cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_NORMAL,
                new LogoutMessage(serverPlayer, reason));

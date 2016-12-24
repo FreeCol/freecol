@@ -874,10 +874,10 @@ System.err.println("LOGGED IN " + player);
      *
      * Called when the ConnectController processes a logout.
      */
-    public synchronized void logout() {
+    public synchronized void logout(boolean inGame) {
 System.err.println("LOGGED OUT " + getMyPlayer());
         this.loggedIn = false;
-        changeClientState(false);
+        changeClientState(inGame);
         setGame(null);
         setMyPlayer(null);
         // Ignore single-player state

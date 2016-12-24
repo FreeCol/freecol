@@ -188,23 +188,27 @@ public final class ConnectController extends FreeColClientHolder {
             + ": " + reason.toString());
 
         askServer().disconnect();
-        fcc.logout();
 
         switch (reason) {
         case DEFEATED: case QUIT:
+            fcc.logout(false);
             fcc.quit();
             break;
         case LOGIN: // FIXME: This should not happen, drop when convinced
             logger.warning("logout(LOGIN) detected\n"
                 + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+            fcc.logout(false);
             break;
         case MAIN_TITLE: // All the way back to the MainPanel
+            fcc.logout(false);
             mainTitle();
             break;
         case NEW_GAME: // Back to the NewPanel
+            fcc.logout(false);
             newGame();
             break;
         case RECONNECT:
+            fcc.logout(true);
             final String name = player.getName();
             try {
                 if (askServer().reconnect() != null
@@ -355,7 +359,10 @@ public final class ConnectController extends FreeColClientHolder {
 
         if (!fcc.unblockServer(FreeCol.getServerPort())) return false;
 
-        requestLogout(LogoutReason.LOGIN);
+        if (fcc.isLoggedIn()) { // Should not happen, warn and suppress
+            logger.warning("startSinglePlayer while logged in!");
+            requestLogout(LogoutReason.LOGIN);
+        }
 
         // Load the player mods into the specification that is about to be
         // used to initialize the server.
@@ -454,6 +461,11 @@ public final class ConnectController extends FreeColClientHolder {
                                             FreeCol.getLocale());
         if (!fcc.unblockServer(port)) return false;
 
+        if (fcc.isLoggedIn()) { // Should not happen, warn and suppress
+            logger.warning("startSavedGame while logged in!");
+            requestLogout(LogoutReason.LOGIN);
+        }
+
         getGUI().showStatusPanel(Messages.message("status.loadingGame"));
         FreeColServer fcs = fcc.startServer(publicServer, singlePlayer, file,
                                             port, serverName);
@@ -482,7 +494,10 @@ public final class ConnectController extends FreeColClientHolder {
 
         if (!fcc.unblockServer(port)) return false;
 
-        requestLogout(LogoutReason.LOGIN);
+        if (fcc.isLoggedIn()) { // Should not happen, warn and suppress
+            logger.warning("startMultiPlayer while logged in!");
+            requestLogout(LogoutReason.LOGIN);
+        }
 
         FreeColServer freeColServer = fcc.startServer(publicServer, false,
                                                       specification, port);

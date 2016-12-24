@@ -30,6 +30,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
@@ -185,11 +186,14 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final Game game = getGame();
         final LogoutMessage message = new LogoutMessage(game, element);
         final Player player = message.getPlayer(game);
+        final LogoutReason reason = message.getReason();
 
-        logger.info("Logout accepted for player " + player.getName()
-            + ": " + message.getReason());
         game.removePlayer(player);
         getGUI().refreshPlayersTable();
+        if (player == getMyPlayer()) {
+            getFreeColClient().getConnectController()
+                .logout(reason);
+        }
 
         return null;
     }
