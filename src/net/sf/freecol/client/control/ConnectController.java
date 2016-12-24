@@ -69,6 +69,12 @@ public final class ConnectController extends FreeColClientHolder {
 
     private static final Logger logger = Logger.getLogger(ConnectController.class.getName());
 
+    /** Fixed argument list for startSavedGame. */
+    private static final List<String> savedKeys
+        = makeUnmodifiableList(FreeColServer.OWNER_TAG,
+                               FreeColServer.SINGLE_PLAYER_TAG,
+                               FreeColServer.PUBLIC_SERVER_TAG);
+
 
     /**
      * Creates a new {@code ConnectController}.
@@ -400,55 +406,48 @@ public final class ConnectController extends FreeColClientHolder {
         final GUI gui = getGUI();
         fcc.setMapEditor(false);
 
+        // Get suggestions for "singlePlayer" and "publicServer"
+        // settings from the file, and update the client options if
+        // possible.
         final ClientOptions options = getClientOptions();
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
         FreeColSavegameFile fis = null;
         try {
             fis = new FreeColSavegameFile(file);
-        } catch (IOException ioe) {
-            gui.errorJob(FreeCol.badFile("error.couldNotLoad", file))
-                .invokeLater();
-            logger.log(Level.WARNING, "Could not open save file: " + file.getName());
-            return false;
-        }
-        options.merge(fis);
-        options.fixClientOptions();
-
-        // Get suggestions for "singlePlayer" and "publicServer"
-        // settings from the file, and update the client options if
-        // possible.
-        try (
-             FreeColXMLReader xr = fis.getSavedGameFreeColXMLReader();
-             ) {
-            xr.nextTag();
-
-            String str = xr.getAttribute(FreeColServer.OWNER_TAG, (String)null);
-            if (str != null) FreeCol.setName(str);
-
-            defaultSinglePlayer
-                = xr.getAttribute(FreeColServer.SINGLE_PLAYER_TAG, false);
-            defaultPublicServer
-                = xr.getAttribute(FreeColServer.PUBLIC_SERVER_TAG, false);
-
         } catch (FileNotFoundException fnfe) {
             gui.errorJob(fnfe, FreeCol.badFile("error.couldNotFind", file))
                 .invokeLater();
             logger.log(Level.WARNING, "Can not find file: " + file.getName(),
                        fnfe);
             return false;
-        } catch (XMLStreamException xse) {
-            gui.errorJob(xse, FreeCol.badFile("error.couldNotLoad", file))
+        } catch (IOException ioe) {
+            gui.errorJob(FreeCol.badFile("error.couldNotLoad", file))
                 .invokeLater();
-            logger.log(Level.WARNING, "Error reading game from: "
-                + file.getName(), xse);
+            logger.log(Level.WARNING, "Could not load file: " + file.getName(),
+                       ioe);
             return false;
+        }
+        options.merge(fis);
+        options.fixClientOptions();
+        List<String> values = null;
+        try {
+            values = fis.peekAttributes(savedKeys);
         } catch (Exception ex) {
             gui.errorJob(ex, FreeCol.badFile("error.couldNotLoad", file))
                 .invokeLater();
-            logger.log(Level.WARNING, "Could not load game from: "
-                + file.getName(), ex);
+            logger.log(Level.WARNING, "Could not read from: " + file.getName(),
+                       ex);
             return false;
+        }
+        if (values != null && values.size() == savedKeys.size()) {
+            String str = values.get(0);
+            if (str != null) FreeCol.setName(str);
+            defaultSinglePlayer = Boolean.parseBoolean(values.get(1));
+            defaultPublicServer = Boolean.parseBoolean(values.get(2));
+        } else {
+            defaultSinglePlayer = true;
+            defaultPublicServer = false;
         }
 
         // Reload the client options saved with this game.
