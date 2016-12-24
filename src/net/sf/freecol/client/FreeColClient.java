@@ -752,46 +752,6 @@ System.err.println("LOGGED OUT " + getMyPlayer());
     }
 
     /**
-     * Go back to the main panel.
-     *
-     * Called from ShowMainAction.
-     */
-    public void showMain() {
-        getConnectController().stopServer();
-        setMapEditor(false);
-        setGame(null);
-        changeClientState(false);
-        gui.returnToTitle();
-    }
-
-    /**
-     * If currently in a game, displays a quit dialog and if desired,
-     * logs out of the current game.
-     *
-     * When the game is clear, show the new game panel.
-     *
-     * Called from the New action, often from the button on the MainPanel,
-     * and IGC.victory()
-     *
-     * @param prompt If true, prompt to confirm stopping the game.
-     */
-    public void newGame(boolean prompt) {
-        Specification specification = null;
-        if (getGame() != null) {
-            if (isMapEditor()) {
-                specification = getGame().getSpecification();
-            } else if (!prompt || gui.confirmStopGame()) {
-                FreeColSeed.incrementFreeColSeed();
-                getConnectController().restart();
-            } else {
-                return;
-            }
-        }
-        gui.removeInGameComponents();
-        gui.showNewPanel(specification);
-    }
-
-    /**
      * Continue playing after winning the game.
      */
     public void continuePlaying() {

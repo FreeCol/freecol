@@ -248,7 +248,7 @@ public final class ConnectController extends FreeColClientHolder {
      * @param reason The reason to logout from the server.
      * @return True if the logout completes.
      */
-    public boolean logoutEnd(LogoutReason reason) {
+    public boolean logout(LogoutReason reason) {
         final FreeColClient fcc = getFreeColClient();
         final Player player = fcc.getMyPlayer();
         logger.info("Logout end for client " + player.getName()
@@ -265,10 +265,19 @@ public final class ConnectController extends FreeColClientHolder {
             logger.warning("logout(LOGIN) detected\n"
                 + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
             break;
+        case MAIN_TITLE: // All the way back to the MainPanel
+            mainTitle();
+            break;
+        case NEW_GAME: // Back to the NewPanel
+            newGame();
+            break;
         case RECONNECT:
             final String name = player.getName();
             try {
-                if (reconnectEnd(name)) {
+                if (askServer().reconnect() != null
+                    && askServer().login(name, FreeCol.getVersion(),
+                                         fcc.getSinglePlayer(),
+                                         fcc.currentPlayerIsMyPlayer())) {
                     logger.info("Reconnected for client " + name);
                 } else {
                     logger.severe("Reconnect failed for client " + name);
@@ -280,35 +289,8 @@ public final class ConnectController extends FreeColClientHolder {
                 fcc.quit();
             }
             break;
-        case RESTART: // Get here from "New Game" when in-game
-            stopServer();
-            break;
         }
         return true;
-    }
-
-    /**
-     * Initiate reconnect of this client to the server.
-     *
-     * @return True if the initial message was sent.
-     */
-    public boolean reconnectBegin() {
-        return requestLogout(LogoutReason.RECONNECT);
-    }
-
-    /**
-     * Complete reconnect to the server.
-     *
-     * @param name The name of the player to reconnect as.
-     * @return True if the reconnect succeeds.
-     * @exception IOException on comms failure.
-     */
-    private boolean reconnectEnd(String name) throws IOException {
-        final FreeColClient fcc = getFreeColClient();
-        return askServer().reconnect() != null
-            && askServer().login(name, FreeCol.getVersion(),
-                                 fcc.getSinglePlayer(),
-                                 fcc.currentPlayerIsMyPlayer());
     }
 
     /**
@@ -690,14 +672,50 @@ public final class ConnectController extends FreeColClientHolder {
     }
 
     /**
-     * Full restart needed, log out and stop the server.
+     * Reset to the MainPanel.
      *
-     * @return True if the reconnection succeeds.
+     * Called from ShowMainAction.
      */
-    public boolean restart() {
-        return requestLogout(LogoutReason.RESTART);
+    public void mainTitle() {
+        final FreeColClient fcc = getFreeColClient();
+        
+        if (fcc.isMapEditor()) fcc.setMapEditor(false);
+
+        if (fcc.isLoggedIn()) {
+            if (getGUI().confirmStopGame()) {
+                requestLogout(LogoutReason.MAIN_TITLE);
+            }
+            return;
+        }
+            
+        stopServer();
+        getGUI().removeInGameComponents();
+        getGUI().mainTitle();
     }
     
+    /**
+     * Reset to the NewPanel (except in the map editor).
+     */
+    public void newGame() {
+        final FreeColClient fcc = getFreeColClient();
+
+        if (fcc.isMapEditor()) {
+            fcc.getMapEditorController().newMap();
+            return;
+        }
+
+        if (fcc.isLoggedIn()) {
+            if (getGUI().confirmStopGame()) {
+                requestLogout(LogoutReason.NEW_GAME);
+            }
+            return;
+        }
+
+        stopServer();
+        getGUI().removeInGameComponents();
+        getGUI().showNewPanel(null);
+    }
+
     /**
      * Gets a list of servers from the meta server.
      *

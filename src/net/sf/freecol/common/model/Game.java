@@ -63,9 +63,10 @@ public class Game extends FreeColGameObject {
         DEFEATED,   // Game over, player lost
         LOGIN,      // Logging in again FIXME: this should go away
         LOGOUT,     // Player quits but game continues
+        MAIN_TITLE, // Complete reset back to the MainPanel
+        NEW_GAME,   // Part reset back to the NewPanel
         QUIT,       // Player quits and whole game is over
         RECONNECT,  // Implement reconnect
-        RESTART     // Cancel from StartGame panel
     };
     
     /** State for the FCGO iterator, out here because it has to be static. */

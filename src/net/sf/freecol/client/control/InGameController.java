@@ -3607,7 +3607,7 @@ public final class InGameController extends FreeColClientHolder {
             game.setCurrentPlayer(game.getNextPlayer());
         }
         if (getMyPlayer() == player) {
-            getFreeColClient().getConnectController().logoutEnd(reason);
+            getFreeColClient().getConnectController().logout(reason);
         }
     }
        
@@ -4640,21 +4640,25 @@ public final class InGameController extends FreeColClientHolder {
 
         final Player player = getMyPlayer();
         if (player == dead) {
-            FreeColDebugger.finishDebugRun(getFreeColClient(), true);
-            if (getFreeColClient().getSinglePlayer()) {
+            final FreeColClient fcc = getFreeColClient();
+            FreeColDebugger.finishDebugRun(fcc, true);
+            if (fcc.getSinglePlayer()) {
                 if (player.getPlayerType() == Player.PlayerType.RETIRED) {
                     ; // Do nothing, retire routine will quit
 
                 } else if (player.getPlayerType() != Player.PlayerType.UNDEAD
                     && getGUI().confirm("defeatedSinglePlayer.text",
-                                   "defeatedSinglePlayer.yes", "quit")) {
+                                        "defeatedSinglePlayer.yes", "quit")) {
                     askServer().enterRevengeMode(getGame());
                 } else {
-                    askServer().logout(player, LogoutReason.DEFEATED);
+                    fcc.getConnectController()
+                        .requestLogout(LogoutReason.DEFEATED);
                 }
             } else {
-                if (!getGUI().confirm("defeated.text", "defeated.yes", "quit")) {
-                    askServer().logout(player, LogoutReason.DEFEATED);
+                if (!getGUI().confirm("defeated.text",
+                                      "defeated.yes", "quit")) {
+                    fcc.getConnectController()
+                        .requestLogout(LogoutReason.DEFEATED);
                 }
             }
         } else {
@@ -4894,7 +4898,7 @@ public final class InGameController extends FreeColClientHolder {
      */
     public boolean victory(Boolean quit) {
         if (quit) {
-            getFreeColClient().newGame(false);
+            getFreeColClient().getConnectController().newGame();
         } else {
             askServer().continuePlaying();
         }

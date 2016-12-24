@@ -49,10 +49,6 @@ public class NewAction extends FreeColAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if (freeColClient.isMapEditor()) {
-            freeColClient.getMapEditorController().newMap();
-        } else {
-            freeColClient.newGame(true);
-        }
+        getFreeColClient().getConnectController().newGame();
     }
 }

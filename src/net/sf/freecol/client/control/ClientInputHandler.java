@@ -100,7 +100,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
         javax.swing.SwingUtilities.invokeLater(() -> {
                 if (getGUI().containsInGameComponents()) {
                     if (getFreeColServer() == null) {
-                        getGUI().returnToTitle();
+                        getGUI().mainTitle();
                     } else {
                         getGUI().removeInGameComponents();
                     }

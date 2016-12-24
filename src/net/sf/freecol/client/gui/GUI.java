@@ -1171,7 +1171,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Complete reset back to the main panel.
      */
-    public void returnToTitle() {}
+    public void mainTitle() {}
 
     public void showAboutPanel() {}
 

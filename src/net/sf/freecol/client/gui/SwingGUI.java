@@ -1046,8 +1046,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void returnToTitle() {
-        canvas.returnToTitle();
+    public void mainTitle() {
+        canvas.mainTitle();
         playSound("sound.intro.general");
     }
 
