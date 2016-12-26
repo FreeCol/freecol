@@ -383,10 +383,9 @@ public final class ConnectController extends FreeColClientHolder {
      * Loads and starts a game from the given file.
      *
      * @param file The saved game.
-     * @param userMsg An optional message key to be displayed early.
      * @return True if the game starts successully.
      */
-    public boolean startSavedGame(File file, final String userMsg) {
+    public boolean startSavedGame(File file) {
         final FreeColClient fcc = getFreeColClient();
         final GUI gui = getGUI();
         fcc.setMapEditor(false);
@@ -466,15 +465,8 @@ public final class ConnectController extends FreeColClientHolder {
             requestLogout(LogoutReason.LOGIN);
         }
 
-        getGUI().showStatusPanel(Messages.message("status.loadingGame"));
         FreeColServer fcs = fcc.startServer(publicServer, singlePlayer, file,
                                             port, serverName);
-        SwingUtilities.invokeLater(() -> {
-                if (userMsg != null) {
-                    getGUI().showInformationMessage(userMsg);
-                }
-                getGUI().closeStatusPanel();
-            });
         return (fcs == null) ? false
             : requestLogin(FreeCol.getName(), fcs.getHost(), fcs.getPort());
     }

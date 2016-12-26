@@ -3588,7 +3588,7 @@ public final class InGameController extends FreeColClientHolder {
         getGUI().setActiveUnit(null);
         getGUI().removeInGameComponents();
         FreeColDirectories.setSavegameFile(file.getPath());
-        getConnectController().startSavedGame(file, null);
+        getConnectController().startSavedGame(file);
     }
 
     /**

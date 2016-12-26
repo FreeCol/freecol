@@ -298,11 +298,18 @@ public final class FreeColClient {
         //
         if (savedGame != null) { // Restore from saved
             soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(() -> {
-                    if (!connectController.startSavedGame(savedGame, userMsg)) {
-                        gui.showMainPanel(userMsg);
-                    }
-                });
+            SwingUtilities.invokeLater(() ->
+                getGUI().showStatusPanel(Messages.message("status.loadingGame")));
+            if (connectController.startSavedGame(savedGame)) {
+                SwingUtilities.invokeLater(() -> {
+                        gui.closeStatusPanel();
+                        if (userMsg != null) {
+                            gui.showInformationMessage(userMsg);
+                        }
+                    });
+            } else {
+                invokeMainPanel(userMsg).run();
+            }
         } else if (spec != null) { // Debug or fast start
             soundController.playSound("sound.intro.general");
             SwingUtilities.invokeLater(() -> {
