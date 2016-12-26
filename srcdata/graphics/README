@@ -1,0 +1,20 @@
+
+FreeCol Artwork
+---------------
+
+These are the source files for the graphics in FreeCol, including the
+photoshop/paintshop files and in some cases rendered png's.  
+
+I originally used jasc paintshop pro 7, but I've switched to photoshop
+6.  I can give you access to these files if you want.  It will have to
+be on my web server, I haven't been able to get an ftp srever to work
+properly.  The primary things to consider for terrain items is the shape
+and size of the tiles (I have a template for this) and colours being in
+the same range as the rest of the tiles (this was actually applied
+midway through the creation of graphics, so it's not as neat - ah well).
+
+Cheers,
+Stephen
+
+
+
