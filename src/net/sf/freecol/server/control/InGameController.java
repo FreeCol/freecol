@@ -3046,6 +3046,7 @@ public final class InGameController extends Controller {
             nt.setBuy(false);
             nt.addToUnit(item);
             session.getNativeTrade().mergeFrom(nt);
+            session.getNativeTrade().setBuy(false);
             cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
                    new NativeTradeMessage(action, nt));
             break;
@@ -3057,6 +3058,7 @@ public final class InGameController extends Controller {
             nt.setSell(false);
             nt.removeFromUnit(item);
             session.getNativeTrade().mergeFrom(nt);
+            session.getNativeTrade().setSell(false);
             cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
                    new NativeTradeMessage(action, nt));
             break;
@@ -3068,6 +3070,7 @@ public final class InGameController extends Controller {
             nt.setGift(false);
             nt.removeFromUnit(item);
             session.getNativeTrade().mergeFrom(nt);
+            session.getNativeTrade().setGift(false);
             cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
                    new NativeTradeMessage(action, nt));
             break;
