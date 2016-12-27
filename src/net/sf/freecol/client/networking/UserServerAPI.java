@@ -128,16 +128,6 @@ public class UserServerAPI extends ServerAPI {
     /**
      * {@inheritDoc}
      */
-    protected void doClientProcessingFor(Element reply) {
-        String sound = reply.getAttribute("sound");
-        if (sound != null && !sound.isEmpty()) {
-            this.gui.playSound(sound);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setMessageHandler(MessageHandler mh) {
         super.setMessageHandler(mh);

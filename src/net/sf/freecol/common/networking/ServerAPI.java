@@ -110,13 +110,6 @@ public abstract class ServerAPI {
      */
     public abstract Connection getConnection();
 
-    /**
-     * Do local client processing for a reply.
-     *
-     * @param reply The reply {@code Element}.
-     */
-    protected abstract void doClientProcessingFor(Element reply);
-
 
     // Utilities
 
@@ -266,7 +259,6 @@ public abstract class ServerAPI {
             return false;
         }
 
-        doClientProcessingFor(reply);
         resolve(handle(reply));
         return true;
     }

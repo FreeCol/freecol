@@ -280,11 +280,18 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (element == null) return null;
         Element reply = super.handle(connection, element);
 
-        // If there is a "flush" attribute present, encourage the client
-        // to display any new messages.
-        if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
-            && currentPlayerIsMyPlayer()) {
-            invokeLater(displayModelMessagesRunnable);
+        if (currentPlayerIsMyPlayer()) {
+            // Play a sound if specified
+            String sound = element.getAttribute("sound");
+            if (sound != null && !sound.isEmpty()) {
+                getGUI().playSound(sound);
+            }
+            // If there is a "flush" attribute present, encourage the
+            // client to display any new messages.
+            if (Boolean.TRUE.toString()
+                .equals(element.getAttribute("flush"))) {
+                invokeLater(displayModelMessagesRunnable);
+            }
         }
         return reply;
     }
