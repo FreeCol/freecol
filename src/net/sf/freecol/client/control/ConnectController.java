@@ -314,14 +314,19 @@ public final class ConnectController extends FreeColClientHolder {
             + " " + ((single) ? "single" : "multi")
             + "-player game as " + user + "/" + player.getId());
 
-        if (fcc.isInGame()) { // Joining existing game, possibly reconnect
+        if (fcc.isInGame()) { // Joining existing game or possibly reconnect
             String active = getGUI().reconnect();
             Unit u;
             if (active != null
                 && (u = game.getFreeColGameObject(active, Unit.class)) != null
                 && player.owns(u)) {
                 player.setNextActiveUnit(u);
+                getGUI().changeViewMode(GUI.MOVE_UNITS_MODE);
                 getGUI().setActiveUnit(u);
+                getGUI().centerActiveUnit();
+            } else {
+                getGUI().changeViewMode(GUI.VIEW_TERRAIN_MODE);
+                getGUI().setSelectedTile(player.getFallbackTile());
             }
             igc().nextModelMessage();
         } else if (game.getMap() != null
@@ -512,37 +517,41 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         fcc.setMapEditor(false);
 
-        requestLogout(LogoutReason.LOGIN);
+        if (fcc.isLoggedIn()) { // Should not happen, warn and suppress
+            logger.warning("joinMultiPlayer while logged in!");
+            requestLogout(LogoutReason.LOGIN);
+        }
 
-        DOMMessage msg = ask(host, port, new GameStateMessage(),
-            GameStateMessage.TAG, StringTemplate.template("client.noState"));
-        ServerState state = (msg instanceof GameStateMessage)
-            ? ((GameStateMessage)msg).getState()
-            : null;        
-        if (state == null) return false;
-
-        String name = null;
-        switch (state) {
+        // Connect and disconnect, allow GameState message to arrive
+        String name = FreeCol.getName();
+        StringTemplate err = connect(name, host, port);
+        if (err != null) {
+            getGUI().showErrorMessage(err);
+            return false;
+        }
+        while (fcc.getServerState() == null) {
+            try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+        }
+        askServer().disconnect();
+        
+        switch (fcc.getServerState()) {
         case PRE_GAME: case LOAD_GAME:
-            name = FreeCol.getName();
+            // Name is good
             break;
 
         case IN_GAME:
+            /*
             // Disable this check if you need to debug a multiplayer client.
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
                 getGUI().showErrorMessage(StringTemplate
                     .template("client.debugConnect"));
                 return false;
             }
-
+            */
             // Find the players, choose one.
-            msg = ask(host, port, new VacantPlayersMessage(),
-                      VacantPlayersMessage.TAG,
-                      StringTemplate.template("client.noPlayers"));
-            List<String> names = (msg instanceof VacantPlayersMessage)
-                ? ((VacantPlayersMessage)msg).getVacantPlayers()
-                : null;
-            if (names == null || names.isEmpty()) return false;
+            List<String> names = fcc.getVacantPlayerNames();
+            if (names.isEmpty()) return false;
+            if (names.contains(name)) break; // Already there, use it
             String choice = getGUI().getChoice(null,
                 Messages.message("client.choicePlayer"), "cancel",
                 transform(names, alwaysTrue(), n ->

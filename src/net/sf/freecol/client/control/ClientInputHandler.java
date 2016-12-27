@@ -28,9 +28,11 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.common.networking.TrivialMessage;
+import net.sf.freecol.common.networking.VacantPlayersMessage;
 
 import org.w3c.dom.Element;
 
@@ -61,6 +63,10 @@ public abstract class ClientInputHandler extends FreeColClientHolder
 
         register(TrivialMessage.DISCONNECT_TAG,
             (Connection c, Element e) -> disconnect(e));
+        register(GameStateMessage.TAG,
+            (Connection c, Element e) -> gameState(e));
+        register(VacantPlayersMessage.TAG,
+            (Connection c, Element e) -> vacantPlayers(e));
     }
 
 
@@ -107,6 +113,36 @@ public abstract class ClientInputHandler extends FreeColClientHolder
                 }
             });
 
+        return null;
+    }
+
+    /**
+     * Handle a "gameState"-message.
+     *
+     * @param element The {@code Element} to process.
+     * @return Null.
+     */
+    private Element gameState(Element element) {
+        final FreeColClient fcc = getFreeColClient();
+        final GameStateMessage message
+            = new GameStateMessage(fcc.getGame(), element);
+
+        fcc.setServerState(message.getState());
+        return null;
+    }
+
+    /**
+     * Handle a "vacantPlayers"-message.
+     *
+     * @param element The {@code Element} to process.
+     * @return Null.
+     */
+    private Element vacantPlayers(Element element) {
+        final FreeColClient fcc = getFreeColClient();
+        final VacantPlayersMessage message
+            = new VacantPlayersMessage(fcc.getGame(), element);
+
+        fcc.setVacantPlayerNames(message.getVacantPlayers());
         return null;
     }
 

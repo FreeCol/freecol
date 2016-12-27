@@ -62,11 +62,13 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateServerMessage;
+import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -611,9 +613,19 @@ public final class FreeColServer {
      */
     public void addNewUserConnection(Socket socket) throws IOException {
         final String name = socket.getInetAddress() + ":" + socket.getPort();
-        this.server.addConnection(new Connection(socket,
-                this.userConnectionHandler, FreeCol.SERVER_THREAD + name));
-        logger.info("Client connected from " + name);
+        Connection c = new Connection(socket, this.userConnectionHandler,
+                                      FreeCol.SERVER_THREAD + name);
+        this.server.addConnection(c);
+        try {
+            c.send(new GameStateMessage(this.serverState));
+            if (this.serverState == ServerState.IN_GAME) {
+                c.send(new VacantPlayersMessage().setVacantPlayers(getGame()));
+            }
+            logger.info("Client connected from " + name);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Client connected from " + name
+                + " but failed to send new user state messages", ioe);
+        }
     }
 
     /**

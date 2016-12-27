@@ -274,23 +274,16 @@ public class LoginMessage extends DOMMessage {
                         transform(game.getLiveEuropeanPlayers(),
                                   alwaysTrue(), Player::getName,
                             Collectors.joining(", "))));
+            } else if (present.isAI()) { // Allow to join over AI player
+                present.setAI(false);
+                freeColServer.sendToAll(new SetAIMessage(present, false),
+                                        present);
             } else if (present.isConnected()) {
                 // Another player already connected on the name
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameInUse")
                     .addName("%name%", this.userName));
             }
-            // Allow to join as AI?
-            // else if (!present.isAI()) {
-            //    return ChangeSet.clientError((ServerPlayer)null, StringTemplate
-            //        .template("server.userNameInUse")
-            //        .addName("%name%", this.userName));
-            //if (present.isAI()) {
-            //    present.setAI(false);
-            //    freeColServer.sendToAll(new SetAIMessage(present, false),
-            //                            present);
-            //}
-            //}
 
             present.setConnection(conn);
             present.setConnected(true);

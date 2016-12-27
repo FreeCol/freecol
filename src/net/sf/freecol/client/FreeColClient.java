@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -133,7 +134,13 @@ public final class FreeColClient {
     /** Run in headless mode. */
     private final boolean headless;
 
+    /** Cached value of server state. */
+    private ServerState cachedServerState = null;
 
+    /** Cached list of vacant players. */
+    private List<String> cachedVacantPlayerNames = new ArrayList<>();
+
+    
     public FreeColClient(final InputStream splashStream,
                          final String fontName) {
         this(splashStream, fontName, FreeCol.GUI_SCALE_DEFAULT, true);
@@ -632,7 +639,45 @@ public final class FreeColClient {
         return this.headless;
     }
 
+    /**
+     * Get the server state, or at least our most recently cached value.
+     *
+     * @return A server state.
+     */
+    public ServerState getServerState() {
+        return (this.freeColServer == null) ? this.cachedServerState
+            : this.freeColServer.getServerState();
+    }
 
+    /**
+     * Set the cached server state.
+     *
+     * @param state The new {@code ServerState}.
+     */
+    public void setServerState(ServerState state) {
+        this.cachedServerState = state;
+    }
+
+    /**
+     * Get the cached list of vacant player names.
+     *
+     * @return A list of available player names.
+     */
+    public List<String> getVacantPlayerNames() {
+        return this.cachedVacantPlayerNames;
+    }
+
+    /**
+     * Set the cached list of vacant player names.
+     *
+     * @param names The new vacant player names.
+     */
+    public void setVacantPlayerNames(List<String> names) {
+        this.cachedVacantPlayerNames.clear();
+        this.cachedVacantPlayerNames.addAll(names);
+    }
+    
+    
     // Utilities
 
     /**

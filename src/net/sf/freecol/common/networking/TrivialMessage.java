@@ -130,7 +130,9 @@ public class TrivialMessage extends DOMMessage {
         case CONTINUE_TAG:
             return igc(freeColServer).continuePlaying(serverPlayer);
         case DISCONNECT_TAG:
-            freeColServer.removePlayerConnection(serverPlayer);
+            if (serverPlayer != null) {
+                freeColServer.removePlayerConnection(serverPlayer);
+            }
             return null; // Never reply to disconnect
         case END_TURN_TAG:
             return igc(freeColServer).endTurn(serverPlayer);
