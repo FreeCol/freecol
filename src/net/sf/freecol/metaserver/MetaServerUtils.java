@@ -20,6 +20,7 @@
 package net.sf.freecol.metaserver;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -27,6 +28,8 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -58,6 +61,28 @@ public class MetaServerUtils {
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not connect to meta-server: ",
                 FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT);
+        }
+        return null;
+    }
+
+    /**
+     * Gets a list of servers from the meta server.
+     *
+     * Note: synchronous comms.
+     *
+     * @return A list of {@link ServerInfo} objects, or null on error.
+     */
+    public static List<ServerInfo> getServerList() {
+        Connection mc = getMetaServerConnection();
+        if (mc == null) return null;
+
+        try {
+            DOMMessage message = mc.ask(null, new ServerListMessage());
+            if (message instanceof ServerListMessage) {
+                return ((ServerListMessage)message).getServers();
+            }
+        } finally {
+            mc.close();
         }
         return null;
     }

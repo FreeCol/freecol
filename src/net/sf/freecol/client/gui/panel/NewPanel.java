@@ -51,6 +51,7 @@ import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.metaserver.MetaServerUtils;
 import net.sf.freecol.metaserver.ServerInfo;
 
 
@@ -547,7 +548,7 @@ public final class NewPanel extends FreeColPanel
                         this.publicServer.isSelected(), serverPort)) return;
                 break;
             case META_SERVER:
-                List<ServerInfo> servers = cc.getServerList();
+                List<ServerInfo> servers = MetaServerUtils.getServerList();
                 if (servers != null) gui.showServerListPanel(servers);
                 break;
             default:
