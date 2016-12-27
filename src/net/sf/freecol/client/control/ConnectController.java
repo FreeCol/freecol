@@ -208,7 +208,7 @@ public final class ConnectController extends FreeColClientHolder {
             newGame();
             break;
         case RECONNECT:
-            fcc.logout(true);
+            fcc.logout(false);
             final String name = player.getName();
             try {
                 if (askServer().reconnect() != null
