@@ -26,8 +26,6 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Implementation of the ServerAPI for an AI without neither attached
@@ -55,11 +53,6 @@ public class AIServerAPI extends ServerAPI {
 
     // Implement ServerAPI
     
-    /**
-     * {@inheritDoc}
-     */
-    protected void doClientProcessingFor(Element reply) {}
-
     /**
      * {@inheritDoc}
      */
