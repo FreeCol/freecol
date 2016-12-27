@@ -115,50 +115,6 @@ public final class ConnectController extends FreeColClientHolder {
     }
 
     /**
-     * Ask the server a question.
-     *
-     * Handle showing error messages on the GUI.  Only simple messages
-     * will work here.
-     *
-     * @param host The name of the machine running the
-     *     {@code FreeColServer}.
-     * @param port The port to use when connecting to the host.
-     * @param query The {@code DOMMessage} query to send.
-     * @param replyTag The expected tag of the reply, or null for anything.
-     * @param err An optional {@code StringTemplate} override for any
-     *     error messages.
-     * @return The reply message matching the specified tag, or null on error.
-     */
-    private DOMMessage ask(String host, int port, DOMMessage query,
-                           String replyTag, StringTemplate err) {
-        DOMMessage reply;
-        try (
-            Connection c = new Connection(host, port, null,
-                                          FreeCol.CLIENT_THREAD)
-        ) {
-            reply = c.ask(getGame(), query, replyTag);
-        } catch (IOException ioe) {
-            getGUI().showErrorMessage(FreeCol.errorFromException(ioe,
-                    "server.couldNotConnect"));
-            logger.log(Level.WARNING, "Could not connect to " + host
-                + ":" + port, ioe);
-            return null;
-        }
-        if (reply == null) {
-            ;
-        } else if (replyTag == null || reply.isType(replyTag)) {
-            return reply;
-        } else if (reply.isType(ErrorMessage.TAG)) {
-            ErrorMessage em = (ErrorMessage)reply;
-            if (err != null) em.setTemplate(err);
-            getGUI().showErrorMessage(em.getTemplate(), em.getMessage());
-        } else {
-            throw new IllegalStateException("Bogus tag: " + reply.getType());
-        }
-        return null;
-    }
-        
-    /**
      * Request that this client log out from the server.
      *
      * @param reason The reason to logout from the server.
