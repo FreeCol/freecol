@@ -866,7 +866,6 @@ public final class FreeColClient {
         setMyPlayer(player);
         setSinglePlayer(single);
         addSpecificationActions(game.getSpecification());
-System.err.println("LOGGED IN " + player);
     }
 
     /**
@@ -875,7 +874,6 @@ System.err.println("LOGGED IN " + player);
      * Called when the ConnectController processes a logout.
      */
     public synchronized void logout(boolean inGame) {
-System.err.println("LOGGED OUT " + getMyPlayer());
         this.loggedIn = false;
         changeClientState(inGame);
         setGame(null);
