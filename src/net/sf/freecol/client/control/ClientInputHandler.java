@@ -46,11 +46,21 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     private static final Logger logger = Logger.getLogger(ClientInputHandler.class.getName());
 
     /**
+     * Handle a request to a client.
+     * 
+     * @param connection The {@code Connection} the request was sent on.
+     * @param element The root {@code Element} of the message.
+     */
+    public interface ClientNetworkRequestHandler {
+        void handle(Connection connection, Element element);
+    }
+        
+    /**
      * The handler map provides named handlers for network
      * requests.  Each handler deals with a given request type.
      */
-    private final Map<String, NetworkRequestHandler> handlerMap
-        = Collections.synchronizedMap(new HashMap<String, NetworkRequestHandler>());
+    private final Map<String, ClientNetworkRequestHandler> handlerMap
+        = Collections.synchronizedMap(new HashMap<String, ClientNetworkRequestHandler>());
 
 
     /**
@@ -74,9 +84,9 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * Register a network request handler.
      * 
      * @param name The handler name.
-     * @param handler The {@code NetworkRequestHandler} to register.
+     * @param handler The {@code ClientNetworkRequestHandler} to register.
      */
-    protected final void register(String name, NetworkRequestHandler handler) {
+    protected final void register(String name, ClientNetworkRequestHandler handler) {
         this.handlerMap.put(name, handler);
     }
 
@@ -84,10 +94,10 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * Unregister a network request handler.
      * 
      * @param name The handler name.
-     * @param handler The {@code NetworkRequestHandler} to unregister.
+     * @param handler The {@code ClienNetworkRequestHandler} to unregister.
      * @return True if the supplied handler was actually removed.
      */
-    protected final boolean unregister(String name, NetworkRequestHandler handler) {
+    protected final boolean unregister(String name, ClientNetworkRequestHandler handler) {
         return this.handlerMap.remove(name, handler);
     }
 
@@ -99,9 +109,8 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    protected Element disconnect(Element element) {
+    protected void disconnect(Element element) {
         // Updating the GUI should always be done in the EDT:
         javax.swing.SwingUtilities.invokeLater(() -> {
                 if (getGUI().containsInGameComponents()) {
@@ -112,38 +121,32 @@ public abstract class ClientInputHandler extends FreeColClientHolder
                     }
                 }
             });
-
-        return null;
     }
 
     /**
      * Handle a "gameState"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element gameState(Element element) {
+    private void gameState(Element element) {
         final FreeColClient fcc = getFreeColClient();
         final GameStateMessage message
             = new GameStateMessage(fcc.getGame(), element);
 
         fcc.setServerState(message.getState());
-        return null;
     }
 
     /**
      * Handle a "vacantPlayers"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element vacantPlayers(Element element) {
+    private void vacantPlayers(Element element) {
         final FreeColClient fcc = getFreeColClient();
         final VacantPlayersMessage message
             = new VacantPlayersMessage(fcc.getGame(), element);
 
         fcc.setVacantPlayerNames(message.getVacantPlayers());
-        return null;
     }
 
 
@@ -155,20 +158,17 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     public Element handle(Connection connection, Element element) {
         if (element == null) return null;
         final String tag = element.getTagName();
-        NetworkRequestHandler handler = handlerMap.get(tag);
-        Element reply = null;
-        if (handler == null) {
-            logger.warning("Client ignore: " + tag);
-        } else {
-            try {
-                reply = handler.handle(connection, element);
-                logger.log(Level.FINEST, "Client ok: " + tag
-                    + " to " + ((reply == null) ? "null" : reply.getTagName()));
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, "Client on " + connection.toString()
-                    + " failed for: " + tag, ex);
+        ClientNetworkRequestHandler handler = handlerMap.get(tag);
+        try {
+            if (handler == null) {
+                logger.warning("Client ignored: " + tag);
+            } else {
+                handler.handle(connection, element);
+                logger.log(Level.FINEST, "Client handled: " + tag);
             }
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Client failed: " + tag, ex);
         }
-        return reply;
+        return null;
     }
 }

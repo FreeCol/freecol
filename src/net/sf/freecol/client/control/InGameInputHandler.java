@@ -303,11 +303,9 @@ public final class InGameInputHandler extends ClientInputHandler {
      * Handle an "addPlayer"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element addPlayer(Element element) {
+    private void addPlayer(Element element) {
         new AddPlayerMessage(getGame(), element);
-        return null;
     }
 
     /**
@@ -315,9 +313,8 @@ public final class InGameInputHandler extends ClientInputHandler {
      * required.  It does not actually perform any attacks.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element animateAttack(Element element) {
+    private void animateAttack(Element element) {
         final Game game = getGame();
         final Player player = getMyPlayer();
         String str;
@@ -373,7 +370,6 @@ public final class InGameInputHandler extends ClientInputHandler {
                 igc().animateAttack(attacker, defender,
                                     attackerTile, defenderTile, success);
             });
-        return null;
     }
 
     /**
@@ -382,9 +378,8 @@ public final class InGameInputHandler extends ClientInputHandler {
      * positions, which happens in an "update".
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element animateMove(Element element) {
+    private void animateMove(Element element) {
         final Game game = getGame();
         final Player player = getMyPlayer();
 
@@ -392,7 +387,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (unitId.isEmpty()) {
             logger.warning("Animation for: " + player.getId()
                 + " missing unitId.");
-            return null;
+            return;
         }
         Unit u = game.getFreeColGameObject(unitId, Unit.class);
         if (u == null) {
@@ -402,7 +397,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (u == null) {
             logger.warning("Animation for: " + player.getId()
                 + " missing unit:" + unitId);
-            return null;
+            return;
         }
         final Unit unit = u;
 
@@ -410,62 +405,57 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (oldTileId.isEmpty()) {
             logger.warning("Animation for: " + player.getId()
                 + " missing oldTileId");
-            return null;
+            return;
         }
         final Tile oldTile = game.getFreeColGameObject(oldTileId, Tile.class);
         if (oldTile == null) {
             logger.warning("Animation for: " + player.getId()
                 + " missing oldTile: " + oldTileId);
-            return null;
+            return;
         }
 
         String newTileId = element.getAttribute("newTile");
         if (newTileId.isEmpty()) {
             logger.warning("Animation for: " + player.getId()
                 + " missing newTileId");
-            return null;
+            return;
         }
         final Tile newTile = game.getFreeColGameObject(newTileId, Tile.class);
         if (newTile == null) {
             logger.warning("Animation for: " + player.getId()
                 + " missing newTile: " + newTileId);
-            return null;
+            return;
         }
 
         invokeAndWait(() -> { igc().animateMove(unit, oldTile, newTile); });
-        return null;
     }
 
     /**
      * Handle a "chat"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element chat(Element element) {
+    private void chat(Element element) {
         final Game game = getGame();
         final ChatMessage chatMessage = new ChatMessage(game, element);
 
         invokeLater(() ->
             igc().chat(chatMessage.getPlayer(game), chatMessage.getMessage(),
                        chatMessage.isPrivate()));
-        return null;
     }
 
     /**
      * Handle an "chooseFoundingFather"-request.
      *
      * @param element The {@code Element} to process.
-     * @return Null.  The choice is returned asynchronously.
      */
-    private Element chooseFoundingFather(Element element) {
+    private void chooseFoundingFather(Element element) {
         final Game game = getGame();
         final ChooseFoundingFatherMessage message
             = new ChooseFoundingFatherMessage(game, element);
 
         invokeLater(() ->
             igc().chooseFoundingFather(message.getFathers(game)));
-        return null;
     }
 
     /**
@@ -475,12 +465,9 @@ public final class InGameInputHandler extends ClientInputHandler {
      * that the offering player has assumed this player has
      * refused-by-inaction, and therefore, the popup needs to be
      * closed.
-     *
-     * @return Null.
      */
-    private Element closeMenus() {
+    private void closeMenus() {
         invokeAndWait(closeMenusRunnable);
-        return null;
     }
 
     /**
@@ -492,7 +479,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @param element The {@code Element} to process.
      * @return A diplomacy response, or null if none required.
      */
-    private Element diplomacy(Element element) {
+    private void diplomacy(Element element) {
         final Game game = getGame();
         final DiplomacyMessage message
             = new DiplomacyMessage(getGame(), element);
@@ -503,18 +490,17 @@ public final class InGameInputHandler extends ClientInputHandler {
         final FreeColGameObject our = message.getOtherFCGO(game);
         if (our == null) {
             logger.warning("Our FCGO omitted from diplomacy message.");
-            return null;
+            return;
         }
         final FreeColGameObject other = message.getOurFCGO(game);
         if (other == null) {
             logger.warning("Other FCGO omitted from diplomacy message.");
-            return null;
+            return;
         }
 
         invokeLater(() -> {
                 igc().diplomacy(our, other, agreement);
             });
-        return null;
     }
 
     /**
@@ -522,9 +508,8 @@ public final class InGameInputHandler extends ClientInputHandler {
      * Element.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element disposeUnits(Element element) {
+    private void disposeUnits(Element element) {
         final Game game = getGame();
         DOMMessage.mapChildren(element, (e) -> {
                 // Do not read the whole unit out of the element as we
@@ -540,29 +525,25 @@ public final class InGameInputHandler extends ClientInputHandler {
                 }
                 return u;
             });
-        return null;
     }
 
     /**
      * Handle an "error"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element error(Element element) {
+    private void error(Element element) {
         final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
         invokeLater(() -> igc().error(errorMessage.getTemplate(),
                                       errorMessage.getMessage()));
-        return null;
     }
 
     /**
      * Adds a feature to or removes a feature from a FreeColGameObject.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element featureChange(Element element) {
+    private void featureChange(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         final boolean add = DOMMessage.getBooleanAttribute(element, "add", false);
@@ -570,7 +551,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         final FreeColGameObject object = game.getFreeColGameObject(id);
         if (object == null) {
             logger.warning("featureChange with null object");
-            return null;
+            return;
         }
 
         DOMMessage.mapChildren(element, (e) -> {
@@ -649,16 +630,14 @@ public final class InGameInputHandler extends ClientInputHandler {
                 }
                 return null;
             });
-        return null;
     }
 
     /**
      * Handle a first contact with a native nation.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element firstContact(Element element) {
+    private void firstContact(Element element) {
         final Game game = getGame();
         final FirstContactMessage message
             = new FirstContactMessage(game, element);
@@ -666,31 +645,29 @@ public final class InGameInputHandler extends ClientInputHandler {
         final Player player = message.getPlayer(game);
         if (player == null || player != getMyPlayer()) {
             logger.warning("firstContact with bad player: " + player);
-            return null;
+            return;
         }
         final Player other = message.getOtherPlayer(game);
         if (other == null || other == player || !other.isIndian()) {
             logger.warning("firstContact with bad other player: " + other);
-            return null;
+            return;
         }
         final Tile tile = message.getTile(game);
         if (tile != null && tile.getOwner() != other) {
             logger.warning("firstContact with bad tile: " + tile);
-            return null;
+            return;
         }
         final int n = message.getSettlementCount();
 
         invokeLater(() -> { igc().firstContact(player, other, tile, n); });
-        return null;
     }
 
     /**
      * Ask the player to choose migrants from a fountain of youth event.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element fountainOfYouth(Element element) {
+    private void fountainOfYouth(Element element) {
         final Game game = getGame();
         final FountainOfYouthMessage message
             = new FountainOfYouthMessage(game, element);
@@ -698,20 +675,18 @@ public final class InGameInputHandler extends ClientInputHandler {
         final int n = message.getMigrants();
         if (n <= 0) {
             logger.warning("Invalid migrants attribute: " + n);
-            return null;
+            return;
         }
 
         invokeLater(() -> { igc().fountainOfYouth(n); });
-        return null;
     }
 
     /**
      * Handle a "gameEnded"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element gameEnded(Element element) {
+    private void gameEnded(Element element) {
         final Game game = getGame();
         final GameEndedMessage message = new GameEndedMessage(game, element);
 
@@ -719,38 +694,34 @@ public final class InGameInputHandler extends ClientInputHandler {
         final Player winner = message.getWinner(game);
         if (winner == null) {
             logger.warning("Invalid player for gameEnded");
-            return null;
+            return;
         }
         final String highScore = message.getScore();
 
         if (winner == getMyPlayer()) {
             invokeLater(() -> { igc().victory(highScore); });
         }
-        return null;
     }
 
     /**
      * Handle a "highScore" message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element highScore(Element element) {
+    private void highScore(Element element) {
         final Game game = getGame();
         final HighScoreMessage message
             = new HighScoreMessage(game, element);
         invokeLater(() -> { igc().displayHighScores(message.getKey(),
                                                     message.getScores()); });
-        return null;
     }
         
     /**
      * Handle an "incite" message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element incite(Element element) {
+    private void incite(Element element) {
         final Game game = getGame();
         final Player player = getMyPlayer();
         final InciteMessage message = new InciteMessage(game, element);
@@ -760,17 +731,14 @@ public final class InGameInputHandler extends ClientInputHandler {
         final int gold = message.getGold();
         
         invokeLater(() -> { igc().incite(unit, is, enemy, gold); });
-        return null;
     }
     
     /**
      * Handle an "indianDemand"-request.
      *
      * @param element The {@code Element} to process.
-     * @return An {@code IndianDemand} message containing the response,
-     *     or null on error.
      */
-    private Element indianDemand(Element element) {
+    private void indianDemand(Element element) {
         final Game game = getGame();
         final Player player = getMyPlayer();
         final IndianDemandMessage message
@@ -779,13 +747,13 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (unit == null) {
             logger.warning("IndianDemand with null unit: "
                 + element.getAttribute("unit"));
-            return null;
+            return;
         }
         final Colony colony = message.getColony(game);
         if (colony == null) {
             logger.warning("IndianDemand with null colony: "
                 + element.getAttribute("colony"));
-            return null;
+            return;
         } else if (!player.owns(colony)) {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
@@ -794,58 +762,51 @@ public final class InGameInputHandler extends ClientInputHandler {
                 igc().indianDemand(unit, colony, message.getType(game),
                                    message.getAmount());
             });
-        return null;
     }
 
     /**
      * Handle a logout message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element logout(Element element) {
+    private void logout(Element element) {
         final Game game = getGame();
         final LogoutMessage message = new LogoutMessage(game, element);
         final Player player = message.getPlayer(game);
         final LogoutReason reason = message.getReason();
-        if (player == null) return null;
+        if (player == null) return;
 
         invokeLater(() -> igc().logout(player, reason));
-        return null;
     }
 
     /**
      * Ask the player to choose something to loot.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element lootCargo(Element element) {
+    private void lootCargo(Element element) {
         final Game game = getGame();
         final LootCargoMessage message = new LootCargoMessage(game, element);
         final Unit unit = message.getUnit(game);
         final String defenderId = message.getDefenderId();
         final List<Goods> goods = message.getGoods();
-        if (unit == null || goods == null) return null;
+        if (unit == null || goods == null) return;
 
         invokeLater(() -> igc().loot(unit, goods, defenderId));
-        return null;
     }
 
     /**
      * Handle a "monarchAction"-request.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element monarchAction(Element element) {
+    private void monarchAction(Element element) {
         final Game game = getGame();
         final MonarchActionMessage message
             = new MonarchActionMessage(game, element);
 
         invokeLater(() -> igc().monarch(message.getAction(),
                 message.getTemplate(), message.getMonarchKey()));
-        return null;
     }
 
     /**
@@ -853,21 +814,20 @@ public final class InGameInputHandler extends ClientInputHandler {
      *
      * @param connection The {@code Connection} the element arrived on.
      * @param element The {@code Element} to process.
-     * @return An {@code Element} containing the response/s.
      */
-    private Element multiple(Connection connection, Element element) {
+    private void multiple(Connection connection, Element element) {
         Element result = new MultipleMessage(element).applyHandler(this, connection);
-        assert result == null;
-        return null;
+        if (result != null) {
+            logger.warning("Multiple message -> " + result.getTagName());
+        }
     }
 
     /**
      * Handle an incoming nation summary.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element nationSummary(Element element) {
+    private void nationSummary(Element element) {
         final Game game = getGame();
         final Player player = getMyPlayer();
 
@@ -877,70 +837,63 @@ public final class InGameInputHandler extends ClientInputHandler {
         player.putNationSummary(other, ns);
         logger.info("Updated nation summary of " + other.getSuffix()
             + " for " + player.getSuffix() + " with " + ns);
-        return null;
     }
 
     /**
      * Handle a native trade update.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element nativeTrade(Element element) {
+    private void nativeTrade(Element element) {
         final Game game = getGame();
 
         final NativeTradeMessage message
             = new NativeTradeMessage(game, element);
         final NativeTradeAction action = message.getAction();
         final NativeTrade nt = message.getNativeTrade();
+
         invokeLater(() -> igc().nativeTrade(action, nt));
-        return null;
     }
 
     /**
      * Ask the player to name the new land.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element newLandName(Element element) {
+    private void newLandName(Element element) {
         final Game game = getGame();
         NewLandNameMessage message = new NewLandNameMessage(game, element);
         final Unit unit = message.getUnit(getMyPlayer());
         final String defaultName = message.getNewLandName();
         if (unit == null || defaultName == null 
-            || !unit.hasTile()) return null;
+            || !unit.hasTile()) return;
 
         invokeLater(() -> igc().newLandName(defaultName, unit));
-        return null;
     }
 
     /**
      * Ask the player to name a new region.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element newRegionName(Element element) {
+    private void newRegionName(Element element) {
         final Game game = getGame();
         NewRegionNameMessage message = new NewRegionNameMessage(game, element);
         final Tile tile = message.getTile(game);
         final Unit unit = message.getUnit(getMyPlayer());
         final Region region = message.getRegion(game);
         final String defaultName = message.getNewRegionName();
-        if (defaultName == null || region == null) return null;
+        if (defaultName == null || region == null) return;
 
         invokeLater(() -> igc().newRegionName(region, defaultName, tile, unit));
-        return null;
     }
 
     /**
      * Handle a "newTradeRoute" message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element newTradeRoute(Element element) {
+    private void newTradeRoute(Element element) {
         final Game game = getGame();
         NewTradeRouteMessage message = new NewTradeRouteMessage(game, element);
         if (message != null) {
@@ -948,49 +901,43 @@ public final class InGameInputHandler extends ClientInputHandler {
             TradeRoute tr = message.getTradeRoute();
             if (tr != null) player.addTradeRoute(tr);
         }
-        return null;
     }
         
     /**
      * Handle a "newTurn"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element newTurn(Element element) {
+    private void newTurn(Element element) {
         final Game game = getGame();
         final NewTurnMessage message = new NewTurnMessage(game, element);
         int n = message.getTurnNumber();
         if (n < 0) {
             logger.warning("Invalid turn for newTurn");
-            return null;
+            return;
         }
 
         invokeLater(() -> igc().newTurn(n));
-        return null;
+        return;
     }
 
     /**
      * Handle an "reconnect"-message.
-     *
-     * @return Null.
      */
-    private Element reconnect() {
+    private void reconnect() {
         // "reconnect" is sent when the server finds a severe problem that
         // is likely to be localized to this client.  Call the controller
         // reconnect dialog that gives the user the option to reload itself
         // or quit.
         invokeLater(reconnectRunnable);
-        return null;
     }
 
     /**
      * Handle a "remove"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element remove(Element element) {
+    private void remove(Element element) {
         final Game game = getGame();
         final FreeColGameObject divert
             = game.getFreeColGameObject(element.getAttribute("divert"));
@@ -1011,16 +958,14 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (!objects.isEmpty()) {
             invokeLater(() -> igc().remove(objects, divert));
         }
-        return null;
     }
 
     /**
      * Handle a "scoutSpeakToChief"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element scoutSpeakToChief(Element element) {
+    private void scoutSpeakToChief(Element element) {
         final Game game = getGame();
         final ScoutSpeakToChiefMessage message
             = new ScoutSpeakToChiefMessage(game, element);
@@ -1031,33 +976,28 @@ public final class InGameInputHandler extends ClientInputHandler {
             invokeLater(() ->
                 igc().scoutSpeakToChief(unit, is, result));
         }
-        return null;
     }
 
     /**
      * Handle a "setAI"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element setAI(Element element) {
+    private void setAI(Element element) {
         final Game game = getGame();
         final SetAIMessage message = new SetAIMessage(game, element);
         
         final Player p = message.getPlayer(game);
         final boolean ai = message.getAI();
         if (p != null) p.setAI(ai);
-
-        return null;
     }
 
     /**
      * Handle a "setCurrentPlayer"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element setCurrentPlayer(Element element) {
+    private void setCurrentPlayer(Element element) {
         final Game game = getGame();
         final SetCurrentPlayerMessage message
             = new SetCurrentPlayerMessage(game, element);
@@ -1065,40 +1005,36 @@ public final class InGameInputHandler extends ClientInputHandler {
         final Player player = message.getPlayer(game);
         if (player == null) {
             logger.warning("Invalid player for setCurrentPlayer");
-            return null;
+            return;
         }
 
         igc().setCurrentPlayer(player); // It is safe to call this one directly
-        return null;
     }
 
     /**
      * Handle a "setDead"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element setDead(Element element) {
+    private void setDead(Element element) {
         final Game game = getGame();
         final SetDeadMessage message = new SetDeadMessage(game, element);
         
         final Player player = message.getPlayer(game);
         if (player == null) {
             logger.warning("Invalid player for setDead");
-            return null;
+            return;
         }
 
         invokeLater(() -> igc().setDead(player));
-        return null;
     }
 
     /**
      * Handle a "setStance"-request.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element setStance(Element element) {
+    private void setStance(Element element) {
         final Game game = getGame();
         final SetStanceMessage message = new SetStanceMessage(game, element);
 
@@ -1106,40 +1042,36 @@ public final class InGameInputHandler extends ClientInputHandler {
         final Player p1 = message.getFirstPlayer(game);
         if (p1 == null) {
             logger.warning("Invalid player1 for setStance");
-            return null;
+            return;
         }
         final Player p2 = message.getSecondPlayer(game);
         if (p2 == null) {
             logger.warning("Invalid player2 for setStance");
-            return null;
+            return;
         }
 
         invokeLater(() -> igc().setStance(stance, p1, p2));
-        return null;
     }
 
     /**
      * Handle a "spyResult" message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element spySettlement(Element element) {
+    private void spySettlement(Element element) {
         final Game game = getGame();
         final SpySettlementMessage message
             = new SpySettlementMessage(game, element);
         final Tile spyTile = message.getSpyTile();
         invokeLater(() -> igc().spyColony(spyTile));
-        return null;
     }
 
     /**
      * Handle an "update"-message.
      *
      * @param element The {@code Element} to process.
-     * @return Null.
      */
-    private Element update(Element element) {
+    private void update(Element element) {
         final Player player = getMyPlayer();
         final Game game = getGame();
         final UpdateMessage message = new UpdateMessage(game, element);
@@ -1152,7 +1084,5 @@ public final class InGameInputHandler extends ClientInputHandler {
             }
         }
         if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
-
-        return null;
     }
 }
