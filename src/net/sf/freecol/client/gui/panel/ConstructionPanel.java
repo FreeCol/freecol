@@ -93,14 +93,9 @@ public class ConstructionPanel extends MigPanel
     }
 
 
-    public void setColony(Colony newColony) {
-        if (newColony != colony) {
-            cleanup();
-            this.colony = newColony;
-            initialize();
-        }
-    }
-
+    /**
+     * Add a listener for button presses on this panel to show the BuildQueuePanel
+     */
     public void initialize() {
         if (colony != null) {
             // we are interested in changes to the build queue, as well as
@@ -119,6 +114,9 @@ public class ConstructionPanel extends MigPanel
         update();
     }
 
+    /**
+     * Removes PropertyChangeListeners and MouseListeners
+     */
     public void cleanup() {
         if (colony != null) {
             colony.removePropertyChangeListener(EVENT, this);
@@ -128,10 +126,28 @@ public class ConstructionPanel extends MigPanel
         }
     }
 
+    /**
+     * This method updates the Construction Panel.
+     *
+     * With zero arguments, the update() method can only be
+     * run on what a given colony is currently building.
+     */
     public void update() {
         update((colony == null) ? null : colony.getCurrentlyBuilding());
     }
 
+    /**
+     * This method updates the Construction Panel.
+     *
+     * With one argument, the update() method can be called
+     * to update the panel based on a called {@code BuildableType}
+     * This method is used when a change to to the
+     * {@code BuildQueuePanel} are made.
+     *
+     * @param buildable
+     *
+     * @see BuildQueuePanel for the only use of the one-argument method.
+     */
     public void update(BuildableType buildable) {
         removeAll();
         final ImageLibrary lib = ((SwingGUI)freeColClient.getGUI())
@@ -185,10 +201,18 @@ public class ConstructionPanel extends MigPanel
     }
 
 
-    public final StringTemplate getDefaultLabel() {
+    /**
+     * @return A {@code StringTemplate} of the ConstructionPanel's Label
+     */
+    private final StringTemplate getDefaultLabel() {
         return defaultLabel;
     }
 
+    /**
+     * Set the ConstructionPanel's Label as a {@code StringTemplate}
+     *
+     * @param newDefaultLabel
+     */
     public final void setDefaultLabel(final StringTemplate newDefaultLabel) {
         this.defaultLabel = newDefaultLabel;
     }
@@ -198,6 +222,8 @@ public class ConstructionPanel extends MigPanel
 
     /**
      * {@inheritDoc}
+     *
+     * Upon a change to a bound parameter, call the {@link #update()} method.
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
