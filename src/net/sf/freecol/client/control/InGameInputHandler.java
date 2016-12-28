@@ -856,7 +856,9 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return An {@code Element} containing the response/s.
      */
     private Element multiple(Connection connection, Element element) {
-        return new MultipleMessage(element).applyHandler(this, connection);
+        Element result = new MultipleMessage(element).applyHandler(this, connection);
+        assert result == null;
+        return null;
     }
 
     /**
