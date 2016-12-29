@@ -202,6 +202,10 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
     /**
      * {@inheritDoc}
+     *
+     * Changes a property upon an interaction event, then logs the change
+     * when FreeCol is run on the Level.FINEST setting. The logging can be
+     * useful for debugging issues with a given building.
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {

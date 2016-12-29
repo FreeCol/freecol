@@ -102,6 +102,16 @@ public final class ClassicMapControls extends MapControls {
         component.add(panel, CONTROLS_LAYER);
     }
 
+    /**
+     * A simple boolean value of whether the class
+     * has a parent class or not.
+     *
+     * @return <b>true</b> if the given instance of
+     *         the ClassicMapControls has a parent,
+     *         <b>false</b> if no parent exists
+     *
+     * @since 0.10.6
+     */
     @Override
     public boolean isShowing() {
         return panel.getParent() != null;
@@ -125,6 +135,18 @@ public final class ClassicMapControls extends MapControls {
         panel.repaint();
     }
 
+    /**
+     * Makes a {@code JButton} for a given arrow direction.
+     * By default, the direction and arrow parameters should
+     * be the same literal direction, just formatted for a
+     * unique context.
+     *
+     * @param direction The Direction on the {@code Map} to move
+     * @param arrow The Direction of the arrow itself
+     * @return A JButton with the correct display and action
+     *
+     * @since 0.10.6
+     */
     private JButton makeButton(String direction, String arrow) {
         JButton button
             = new JButton(am.getFreeColAction("moveAction." + direction));

@@ -113,6 +113,12 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private static final DataFlavor BUILD_LIST_FLAVOR
         = new DataFlavor(List.class, "BuildListFlavor");
 
+    // This private constant can be established here, rather than in {@code FreeColPanel}
+    // with the other constants so that the resource is only initialized when this class
+    // is called.
+    /* Constant used by #actionPerformed() */
+    private static final String FAIL = "FAIL";
+
     /**
      * This class implements a transfer handler able to transfer
      * {@code BuildQueueItem}s between the build queue list, the
@@ -991,7 +997,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        final String FAIL = "FAIL";
         if (this.colony.getOwner() == getMyPlayer()) {
             String command = ae.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(this

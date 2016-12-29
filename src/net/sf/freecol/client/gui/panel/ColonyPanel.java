@@ -66,6 +66,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.ProductionLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.tooltip.*;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -1456,6 +1457,11 @@ public final class ColonyPanel extends PortPanel
 
         /**
          * {@inheritDoc}
+         *
+         * Specifies that this Panel uses the OutsideColonyPanelUI,
+         * which directs the Program Look and Feel (PLAF) by specifying
+         * the {@code FreeColBrightPanelUI} class, which is called from
+         * {@link FreeColLookAndFeel#getDefaults()} method.
          */
         @Override
         public String getUIClassID() {
@@ -2099,12 +2105,18 @@ public final class ColonyPanel extends PortPanel
                 removeAll();
             }
 
+            /**
+             * Adds PropertyChangeListeners
+             */
             private void addPropertyChangeListeners() {
                 if (this.colonyTile != null) {
                     this.colonyTile.addPropertyChangeListener(this);
                 }
             }
 
+            /**
+             * Removes PropertyChangeListeners
+             */
             private void removePropertyChangeListeners() {
                 if (this.colonyTile != null) {
                     this.colonyTile.removePropertyChangeListener(this);
@@ -2252,6 +2264,11 @@ public final class ColonyPanel extends PortPanel
 
             /**
              * {@inheritDoc}
+             *
+             * @return - <b>true</b> if the specified {@code Unit} is a person,
+             *           <b>false</b> otherwise
+             *
+             * @see net.sf.freecol.common.model.Ability#PERSON
              */
             @Override
             public boolean accepts(Unit unit) {
@@ -2260,6 +2277,8 @@ public final class ColonyPanel extends PortPanel
 
             /**
              * {@inheritDoc}
+             *
+             * @return <b>false</b>, always
              */
             @Override
             public boolean accepts(Goods goods) {
@@ -2298,6 +2317,8 @@ public final class ColonyPanel extends PortPanel
 
             /**
              * {@inheritDoc}
+             *
+             * Updates the production value via {@link #updateProduction()}
              */
             @Override
             public void propertyChange(PropertyChangeEvent event) {

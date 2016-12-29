@@ -29,6 +29,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.label.CargoLabel;
 import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
@@ -234,6 +235,11 @@ public class CargoPanel extends FreeColPanel
 
     /**
      * {@inheritDoc}
+     *
+     * Specifies that this Panel uses the CargoPanelUI, which
+     * directs the Program Look and Feel (PLAF) by specifying the
+     * {@code FreeColBrightPanelUI} class, which is called from
+     * {@link FreeColLookAndFeel#getDefaults()} method.
      */
     @Override
     public String getUIClassID() {

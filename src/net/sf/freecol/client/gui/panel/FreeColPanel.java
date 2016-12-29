@@ -54,6 +54,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
 
+    // Create some constants that the panels can use to for various states/actions.
     protected static final String CANCEL = "CANCEL";
     protected static final String OK = "OK";
     protected static final String HELP = "HELP";

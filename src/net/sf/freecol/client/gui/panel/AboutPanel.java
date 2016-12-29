@@ -73,10 +73,13 @@ public final class AboutPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(AboutPanel.class.getName());
 
+    /** The main FreeCol website */
     public static final String SITE_URL
         = "http://www.freecol.org";
+    /** The FreeCol SourceForge project link */
     public static final String PROJECT_URL
         = "http://sourceforge.net/projects/freecol/";
+    /** The link to the user manual for FreeCol users */
     private static final String MANUAL_URL
         = "http://www.freecol.org/documentation/freecol-user-manual.html";
 
@@ -156,6 +159,10 @@ public final class AboutPanel extends FreeColPanel {
 
     /**
      * {@inheritDoc}
+     *
+     * Launch a browser with the link clicked from the panel.
+     *
+     * @see OSUtils#launchBrowser(String)
      */
     @Override
     public void actionPerformed(ActionEvent ae) {

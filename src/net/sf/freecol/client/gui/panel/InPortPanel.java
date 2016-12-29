@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Component;
 
 import net.sf.freecol.client.gui.label.UnitLabel;
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -79,6 +80,11 @@ public abstract class InPortPanel extends UnitPanel {
 
     /**
      * {@inheritDoc}
+     *
+     * Specifies that this Panel uses the InPortPanelUI, which
+     * directs the Program Look and Feel (PLAF) by specifying the
+     * {@code FreeColBrightPanelUI} class, which is called from
+     * {@link FreeColLookAndFeel#getDefaults()} method.
      */
     @Override
     public String getUIClassID() {

@@ -38,6 +38,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -238,6 +239,11 @@ public final class TilePanel extends FreeColPanel {
 
     /**
      * {@inheritDoc}
+     *
+     * Specifies that this Panel uses the TilePanelUI, which
+     * directs the Program Look and Feel (PLAF) by specifying the
+     * {@code FreeColBrightPanelUI} class, which is called from
+     * {@link FreeColLookAndFeel#getDefaults()} method.
      */
     @Override
     public String getUIClassID() {

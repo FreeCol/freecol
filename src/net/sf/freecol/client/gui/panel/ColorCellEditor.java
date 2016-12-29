@@ -1,20 +1,20 @@
 /**
- *  Copyright (C) 2002-2016   The FreeCol Team
- *
- *  This file is part of FreeCol.
- *
- *  FreeCol is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  FreeCol is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2002-2016   The FreeCol Team
+ * <p>
+ * This file is part of FreeCol.
+ * <p>
+ * FreeCol is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * FreeCol is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
@@ -39,16 +39,16 @@ import net.sf.freecol.client.gui.SwingGUI;
  * A table cell editor that can be used to edit colors.
  */
 public final class ColorCellEditor extends AbstractCellEditor
-    implements TableCellEditor, ActionListener {
+        implements TableCellEditor, ActionListener {
 
     private static final Logger logger = Logger.getLogger(ColorCellEditor.class.getName());
 
     private static final String EDIT = "EDIT";
 
-    private final FreeColClient        freeColClient;
-    private final JButton              colorEditButton;
-    private ColorChooserPanel          colorChooserPanel = null;
-    private Color                      currentColor;
+    private final FreeColClient freeColClient;
+    private final JButton colorEditButton;
+    private ColorChooserPanel colorChooserPanel = null;
+    private Color currentColor;
 
 
     /**
@@ -74,9 +74,9 @@ public final class ColorCellEditor extends AbstractCellEditor
      */
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
-        boolean hasFocus, int row, int column) {
+                                                 boolean hasFocus, int row, int column) {
 
-        this.currentColor = (Color)value;
+        this.currentColor = (Color) value;
         return this.colorEditButton;
     }
 
@@ -107,12 +107,14 @@ public final class ColorCellEditor extends AbstractCellEditor
                 if (this.colorChooserPanel != null) {
                     this.currentColor = this.colorChooserPanel.getColor();
                     gui.removeFromCanvas(this.colorChooserPanel);
-                }   fireEditingStopped();
+                }
+                fireEditingStopped();
                 break;
             case FreeColPanel.CANCEL:
                 if (this.colorChooserPanel != null) {
                     gui.removeFromCanvas(this.colorChooserPanel);
-                }   fireEditingCanceled();
+                }
+                fireEditingCanceled();
                 break;
             default:
                 logger.warning("Bad event: " + command);
