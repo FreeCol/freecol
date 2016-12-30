@@ -61,8 +61,6 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.option.OptionGroup;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The API for client/server messaging.
@@ -136,6 +134,23 @@ public abstract class ServerAPI {
     // Internal message passing routines
 
     /**
+     * Check the connection.
+     *
+     * @param operation The proposed operation.
+     * @param type The proposed type of message.
+     * @return The {@code Connection} if valid, or null if not.
+     */
+    private Connection check(String operation, String type) {
+        final Connection c = getConnection();
+        if (c == null) {
+            logger.log(Level.WARNING, "Not connected, did not " + operation
+                       + ": " + type);
+            return null;
+        }
+        return c;
+    }
+
+    /**
      * Sends a DOMMessage to the server.
      *
      * @param message The {@code DOMMessage} to send.
@@ -143,20 +158,8 @@ public abstract class ServerAPI {
      */
     private boolean send(DOMMessage message) {
         if (message == null) return true;
-        final Connection c = getConnection();
-        if (c == null) {
-            logger.log(Level.WARNING, "Not connected, did not send: "
-                       + message.getType());
-            return false;
-        }
-        try {
-            c.send(message);
-            return true;
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to send: " + message.getType(),
-                       ioe);
-        }
-        return false;
+        final Connection c = check("send", message.getType());
+        return (c == null) ? false : c.send(message);
     }
 
     /**
@@ -171,35 +174,13 @@ public abstract class ServerAPI {
      *
      * @param game The current {@code Game}.
      * @param message A {@code DOMMessage} to send.
-     * @return True if the message was sent, and there was no I/O error
-     *     or handler failure.
+     * @return True if the server interaction succeeded, that is, there was
+     *     no I/O problem and the reply was not an error message.
      */
     private boolean ask(Game game, DOMMessage message) {
         if (message == null) return true;
-        final Connection c = getConnection();
-        if (c == null) {
-            logger.log(Level.WARNING, "Not connected, did not ask: "
-                       + message.getType());
-                return false;
-        }
-        Element reply = null;
-        try {
-            reply = c.ask(message);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to ask: " + message.getType(),
-                       ioe);
-            return false;
-        }
-        if (reply == null) return true;
-        final String tag = reply.getTagName();
-        try {
-            Element result = c.handle(reply);
-            assert result == null; // All client handlers now return null.
-        } catch (FreeColException fce) {
-            logger.log(Level.WARNING, "Handler failure for: " + tag, fce);
-            return false;
-        }
-        return !ErrorMessage.TAG.equals(tag);
+        final Connection c = check("ask", message.getType());
+        return (c == null) ? false : c.request(game, message);
     }
 
 

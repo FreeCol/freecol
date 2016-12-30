@@ -616,16 +616,11 @@ public final class FreeColServer {
         Connection c = new Connection(socket, this.userConnectionHandler,
                                       FreeCol.SERVER_THREAD + name);
         this.server.addConnection(c);
-        try {
-            c.send(new GameStateMessage(this.serverState));
-            if (this.serverState == ServerState.IN_GAME) {
-                c.send(new VacantPlayersMessage().setVacantPlayers(getGame()));
-            }
-            logger.info("Client connected from " + name);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Client connected from " + name
-                + " but failed to send new user state messages", ioe);
+        c.send(new GameStateMessage(this.serverState));
+        if (this.serverState == ServerState.IN_GAME) {
+            c.send(new VacantPlayersMessage().setVacantPlayers(getGame()));
         }
+        logger.info("Client connected from " + name);
     }
 
     /**
@@ -826,16 +821,9 @@ public final class FreeColServer {
 
         Connection mc = MetaServerUtils.getMetaServerConnection();
         if (mc != null) {
-            try {
-                mc.send(new RemoveServerMessage(mc));
-                return true;
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Network error leaving meta-server: "
-                    + FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT,
-                    ioe);
-            } finally {
-                mc.close();
-            }
+            mc.send(new RemoveServerMessage(mc));
+            mc.close();
+            return true;
         }
         return cancelPublicServer();
     }
@@ -1378,7 +1366,7 @@ public final class FreeColServer {
         }
 
         for (Player player : getGame().getLiveEuropeanPlayerList()) {
-            ((ServerPlayer)player).getConnection().reconnect();
+            ((ServerPlayer)player).getConnection().sendReconnect();
         }
     }
 

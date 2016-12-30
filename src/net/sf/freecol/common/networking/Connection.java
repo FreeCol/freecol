@@ -327,11 +327,7 @@ public class Connection implements Closeable {
      * Signal that this connection is disconnecting.
      */
     public void disconnect() {
-        try {
-            send(TrivialMessage.DISCONNECT_MESSAGE);
-        } catch (IOException ioe) {
-            ; // Ignore, the other end may have shut down first anyway
-        }
+        send(TrivialMessage.DISCONNECT_MESSAGE);
     }
 
     /**
@@ -437,9 +433,6 @@ public class Connection implements Closeable {
 
 
     // Wrappers, to be promoted soon
-    public void send(DOMMessage message) throws IOException {
-        send(message.toXMLElement());
-    }
     public void sendAndWait(DOMMessage message) throws IOException {
         sendAndWait(message.toXMLElement());
     }
@@ -543,9 +536,20 @@ public class Connection implements Closeable {
      */
     public void handleUpdate(DOMMessage msg)
         throws FreeColException, IOException {
-        Element element = msg.toXMLElement();
-        Element reply = handle(element);
+        Element reply = handle(msg);
         if (reply != null) send(reply);
+    }
+
+    /**
+     * Handle a message.
+     *
+     * @param message The {@code DOMMessage} to handle.
+     * @return The response from the handler.
+     * @exception FreeColException if there is a handler problem.
+     */
+    public Element handle(DOMMessage message) throws FreeColException {
+        Element element = message.toXMLElement();
+        return handle(element);
     }
 
     /**
@@ -553,7 +557,7 @@ public class Connection implements Closeable {
      *
      * @param request The request {@code Element} to handle.
      * @return The reply from the message handler.
-     * @exception FreeColException if there is trouble with the response.
+     * @exception FreeColException if there is a handler problem.
      */
     public Element handle(Element request) throws FreeColException {
         return (this.messageHandler == null) ? null
@@ -561,15 +565,63 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Send a reconnect message, ignoring (but logging) I/O errors.
+     * Client request.
+     *
+     * @param game The enclosing {@code Game}.
+     * @param message A {@code DOMMessage} to process.
+     * @return True if the message was sent, the reply handled, and the
+     *     reply was not an error message.
      */
-    public void reconnect() {
+    public boolean request(Game game, DOMMessage message) {
+        // Better if we could do this, but it fails for now.
+        //
+        // DOMMessage reply = ask(game, message);
+        // if (reply == null) return true;
+        // final String tag = reply.getType();
+
+        Element reply = null;
         try {
-            send(TrivialMessage.RECONNECT_MESSAGE);
+            reply = ask(message);
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Reconnect failed for " + getName(),
+            reply = new ErrorMessage(StringTemplate
+                .template("connection.io")
+                .addName("%extra%", ioe.getMessage())).toXMLElement();
+        }
+        if (reply == null) return true;
+        final String tag = reply.getTagName();
+        
+        try {
+            Element e = handle(reply);
+            assert e == null; // client handlers now all return null
+        } catch (FreeColException fce) {
+            logger.log(Level.WARNING, "Failed to handle: " + tag, fce);
+            return false;
+        }
+        return !ErrorMessage.TAG.equals(tag);
+    }
+        
+    /**
+     * Client send.
+     *
+     * @param message A {@code DOMMessage} to send.
+     * @return True if the message was sent.
+     */
+    public boolean send(DOMMessage message) {
+        try {
+            send(message.toXMLElement());
+            return true;
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Failed to send: " + message.getType(),
                        ioe);
         }
+        return false;
+    }
+    
+    /**
+     * Send a reconnect message.
+     */
+    public void sendReconnect() {
+        send(TrivialMessage.RECONNECT_MESSAGE);
     }
 
 
