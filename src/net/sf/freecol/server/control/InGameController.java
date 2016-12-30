@@ -2342,7 +2342,6 @@ public final class InGameController extends Controller {
      * Gets the list of high scores.
      *
      * @param serverPlayer The {@code ServerPlayer} querying the scores.
-     * @param A key for the high score message.
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet getHighScores(ServerPlayer serverPlayer, String key) {

@@ -144,7 +144,7 @@ public class ConstructionPanel extends MigPanel
      * This method is used when a change to to the
      * {@code BuildQueuePanel} are made.
      *
-     * @param buildable
+     * @param buildable The BuildableType object to update.
      *
      * @see BuildQueuePanel for the only use of the one-argument method.
      */
@@ -211,7 +211,7 @@ public class ConstructionPanel extends MigPanel
     /**
      * Set the ConstructionPanel's Label as a {@code StringTemplate}
      *
-     * @param newDefaultLabel
+     * @param newDefaultLabel The default StringTemplate label of the panel.
      */
     public final void setDefaultLabel(final StringTemplate newDefaultLabel) {
         this.defaultLabel = newDefaultLabel;

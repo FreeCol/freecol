@@ -615,7 +615,6 @@ public final class FreeColClient {
      * Sets whether or not this game is a single player game.
      *
      * @param singlePlayer Whether or not this game is a single player game.
-     * @see #isSinglePlayer
      */
     public void setSinglePlayer(boolean singlePlayer) {
         this.singlePlayer = singlePlayer;

@@ -47,9 +47,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
 
     /**
      * Handle a request to a client.
-     * 
-     * @param connection The {@code Connection} the request was sent on.
-     * @param element The root {@code Element} of the message.
+     *
      */
     public interface ClientNetworkRequestHandler {
         void handle(Connection connection, Element element);

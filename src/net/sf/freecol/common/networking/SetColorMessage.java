@@ -79,7 +79,7 @@ public class SetColorMessage extends AttributeMessage {
     /**
      * Get the color.
      *
-     * @return The new {@Color}.
+     * @return The new {@code Color}.
      */
     public Color getColor() {
         Color color = null;

@@ -131,7 +131,6 @@ public class ServerInfo {
      * Gets the current state of the game.
      * 
      * @return The current state of the game.
-     * @see net.sf.freecol.server.FreeColServer#getGameState
      */
     public int getGameState() {
         return this.gameState;
@@ -157,7 +156,6 @@ public class ServerInfo {
      * @param isGameStarted True if the game has started.
      * @param version The version of the server.
      * @param gameState The current state of the game.
-     * @param si The new {@code ServerInfo} to update with.
      */
     public void update(String name, String address, int port,
                        int slotsAvailable, int currentlyPlaying,

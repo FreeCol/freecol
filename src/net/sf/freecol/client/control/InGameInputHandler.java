@@ -477,7 +477,6 @@ public final class InGameInputHandler extends ClientInputHandler {
      * it and return the response with appropriate response set.
      *
      * @param element The {@code Element} to process.
-     * @return A diplomacy response, or null if none required.
      */
     private void diplomacy(Element element) {
         final Game game = getGame();

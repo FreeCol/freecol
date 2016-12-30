@@ -654,7 +654,6 @@ public class FreeColDirectories {
      * Remove out of date autosaves.
      *
      * @param prefix The autosave file prefix.
-     * @param validPeriod Allow files this many days old.
      */
     public static void removeOutdatedAutosaves(String prefix, long validDays) {
         if (validDays <= 0L) return;

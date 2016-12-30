@@ -43,8 +43,6 @@ public class SetAvailableMessage extends AttributeMessage {
     /**
      * Create a new {@code SetAvailableMessage}.
      *
-     * @param player The {@code Player} to set.
-     * @param ai The new AI state.
      */
     public SetAvailableMessage(Nation nation, NationState state) {
         super(TAG, NATION_TAG, nation.getId(),

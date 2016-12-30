@@ -44,7 +44,7 @@ import net.sf.freecol.server.model.ServerPlayer;
  *
  * The game enters the state
  * {@link net.sf.freecol.server.FreeColServer.ServerState#IN_GAME}, when the
- * {@link #startGame} has successfully been invoked.
+ *  has successfully been invoked.
  *
  * @see InGameInputHandler
  */

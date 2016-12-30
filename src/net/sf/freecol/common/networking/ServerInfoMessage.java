@@ -63,7 +63,6 @@ public abstract class ServerInfoMessage extends AttributeMessage {
     /**
      * Create a new {@code ServerInfoMessage} from a supplied element.
      *
-     * @param game The {@code Game} this message belongs to.
      * @param element The {@code Element} to use to create the message.
      */
     protected ServerInfoMessage(String tag, Element element) {

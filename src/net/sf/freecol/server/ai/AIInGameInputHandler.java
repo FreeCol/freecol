@@ -314,7 +314,6 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Replies to fountain of youth offer.
      *
      * @param message The {@code FountainOfYouthMessage} to process.
-     * @param element The {@code Element} to process.
      * @return Null.
      */
     private Element fountainOfYouth(FountainOfYouthMessage message) {

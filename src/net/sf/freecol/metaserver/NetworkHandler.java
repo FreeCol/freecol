@@ -116,8 +116,6 @@ public final class NetworkHandler implements MessageHandler {
     /**
      * Handles a "serverList"-request.
      *
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
      * @return A {@code ServerListMessage} with attached {@code ServerInfo}
      *     for each current server known to the meta-register.
      */

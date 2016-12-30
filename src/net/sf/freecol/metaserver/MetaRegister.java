@@ -135,9 +135,10 @@ public final class MetaRegister {
 
     /**
      * Adds a new server with the given attributes.
+     * <p>
+     * The Exception subclass {@link IOException} causes a {@link Logger} call if the connection fails.
      *
      * @param newSi The new {@code ServerInfo} to add.
-     * @exception IOException if the connection fails.
      */
     public synchronized void addServer(ServerInfo newSi) {
         ServerInfo si = getServer(newSi.getAddress(), newSi.getPort());
@@ -157,8 +158,6 @@ public final class MetaRegister {
                 }
             } catch (IOException ioe) {
                 logger.log(Level.WARNING, "Server fail: " + identity, ioe);
-            } finally {
-                if (mc != null) mc.close();
             }
         } else {
             si.update(newSi);
