@@ -47,23 +47,23 @@ import net.sf.freecol.common.util.Utils;
 public class GenerateDocumentation {
 
     private static final File STRING_DIRECTORY =
-        new File("data/strings");
+            new File("data/strings");
     private static final File RULE_DIRECTORY =
-        new File("data/rules/classic");
+            new File("data/rules/classic");
     private static final String XSL = "specification.xsl";
-    
+
     private static final File DESTINATION_DIRECTORY =
-        new File("doc");
+            new File("doc");
 
     private static final Map<String, String> resources = new HashMap<>();
 
     private static final String[] sourceFiles
-        = STRING_DIRECTORY.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.matches("FreeColMessages.*\\.properties");
-            }
-        });
+            = STRING_DIRECTORY.list(new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.matches("FreeColMessages.*\\.properties");
+        }
+    });
 
 
 
@@ -82,8 +82,8 @@ public class GenerateDocumentation {
         System.out.println("Processing source file: resources.properties");
         File sourceFile = new File(RULE_DIRECTORY, "resources.properties");
         try (
-            Reader reader = Utils.getFileUTF8Reader(sourceFile);
-            BufferedReader bufferedReader = new BufferedReader(reader);
+                Reader reader = Utils.getFileUTF8Reader(sourceFile);
+                BufferedReader bufferedReader = new BufferedReader(reader);
         ) {
             String line = bufferedReader.readLine();
             while (line != null) {
@@ -122,8 +122,8 @@ public class GenerateDocumentation {
             File sourceFile = new File(STRING_DIRECTORY, name);
 
             try (
-                Reader reader = Utils.getFileUTF8Reader(sourceFile);
-                BufferedReader bufferedReader = new BufferedReader(reader);
+                    Reader reader = Utils.getFileUTF8Reader(sourceFile);
+                    BufferedReader bufferedReader = new BufferedReader(reader);
             ) {
                 String line = bufferedReader.readLine();
                 while (line != null) {
@@ -131,8 +131,8 @@ public class GenerateDocumentation {
                     if (index >= 0) {
                         String key = line.substring(0, index).trim();
                         String value = line.substring(index + 1).trim()
-                            .replace("<", "&lt;").replace(">", "&gt;")
-                            .replace("&", "&amp;");
+                                           .replace("<", "&lt;").replace(">", "&gt;")
+                                           .replace("&", "&amp;");
                         Map<String, String> map = translations.get(key);
                         if (map == null) {
                             map = new HashMap<>();
@@ -148,7 +148,7 @@ public class GenerateDocumentation {
         }
         File destinationFile = new File(DESTINATION_DIRECTORY, "freecol.tmx");
         try (
-             Writer out = Utils.getFileUTF8Writer(destinationFile);
+                Writer out = Utils.getFileUTF8Writer(destinationFile);
         ) {
             out.write("<?xml version =\"1.0\" encoding=\"UTF-8\"?>\n");
             out.write("<tmx version=\"1.4b\">\n");
@@ -187,9 +187,9 @@ public class GenerateDocumentation {
                 continue;
             }
             if (languages.length == 0
-                || Arrays.binarySearch(languages, languageCode) >= 0) {
+                    || Arrays.binarySearch(languages, languageCode) >= 0) {
                 System.out.println("Generating localized documentation for language code "
-                                   + languageCode);
+                                           + languageCode);
 
                 Messages.loadMessageBundle(Messages.getLocale(languageCode));
                 try {
@@ -200,14 +200,14 @@ public class GenerateDocumentation {
                         stylesheet = factory.newTransformer(xsl);
                     } catch (TransformerException tce) {
                         System.err.println("Problem with " + XSL + " at: "
-                            + tce.getLocationAsString());
+                                                   + tce.getLocationAsString());
                         tce.printStackTrace();
                         continue;
                     }
 
                     Source request  = new StreamSource(new File(RULE_DIRECTORY, "specification.xml"));
                     Result response = new StreamResult(new File(DESTINATION_DIRECTORY, "specification_"
-                                                                + languageCode + ".html"));
+                            + languageCode + ".html"));
                     stylesheet.transform(request, response);
                 }
                 catch (TransformerException e) {
@@ -219,12 +219,12 @@ public class GenerateDocumentation {
 
     public static String getResource(String key) {
         final String[] options = {
-            null,null,/*placeholders*/ "icon", "flavor", "tileitem" };
+                null,null,/*placeholders*/ "icon", "flavor", "tileitem" };
         String ourKey = key;
         final String[] splitKey = key.split("\\.");
         String found = resources.get(ourKey);
         if (found == null && splitKey.length > 2
-            && splitKey[0].equals("model")) {
+                && splitKey[0].equals("model")) {
             String suffix = (splitKey[1].equals("tile")) ? ".center.r0" : "";
             options[0] = splitKey[1];
             options[1] = splitKey[1] + "icon";
@@ -244,8 +244,7 @@ public class GenerateDocumentation {
     public static String localize(String template, String key, String number) {
         double num = Double.parseDouble(number);
         StringTemplate stringTemplate = StringTemplate.template(template)
-            .addAmount(key, num);
+                                                      .addAmount(key, num);
         return Messages.message(stringTemplate);
     }
 }
-

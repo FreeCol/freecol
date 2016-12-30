@@ -54,15 +54,15 @@ public class ForestMaker {
     private static final int HALF_HEIGHT = BASE_HEIGHT / 2;
 
     private static final int[] LIMIT = {
-        HALF_WIDTH, HALF_WIDTH, -HALF_WIDTH, -HALF_WIDTH
+            HALF_WIDTH, HALF_WIDTH, -HALF_WIDTH, -HALF_WIDTH
     };
 
     private static final double[] SLOPE = {
-        -0.5, 0.5, -0.5, 0.5
+            -0.5, 0.5, -0.5, 0.5
     };
 
     private static final int[] POWERS_OF_TWO
-        = { 1, 2, 4, 8 };
+            = { 1, 2, 4, 8 };
 
 
     private static final boolean drawBorders = true;
@@ -134,7 +134,7 @@ public class ForestMaker {
         }
 
         String riverName = "data/rules/classic/resources/images/terrain/"
-            + "ocean/center0.png";
+                + "ocean/center0.png";
         BufferedImage river = ImageIO.read(new File(riverName));
         // grab a rectangle completely filled with water
         river = river.getSubimage(44, 22, 40, 20);
@@ -151,7 +151,7 @@ public class ForestMaker {
             File destinationDirectory = new File(DESTDIR, baseName);
             if (!destinationDirectory.exists()) {
                 System.out.println("Destination directory " + destinationDirectory.getPath()
-                                   + " does not exist.");
+                                           + " does not exist.");
                 continue;
             }
             File[] imageFiles = sourceDirectory.listFiles();
@@ -160,7 +160,7 @@ public class ForestMaker {
                 continue;
             } else {
                 System.out.println(imageFiles.length + " images found in source directory "
-                                   + arg + ".");
+                                           + arg + ".");
             }
             List<BufferedImage> images = new ArrayList<>(imageFiles.length);
             int maximumHeight = 0;
@@ -181,18 +181,18 @@ public class ForestMaker {
             int numberOfImages = images.size();
             Random random = new Random(1492);
 
-            /**
-             * In order to ensure that trees do not occlude the rivers
-             * on other tiles, we must move the rivers to the top NE
-             * and NW edges of the tile.
-             *
-             * If we consider two adjoining edges of the diamond to be
-             * vectors, any point within the diamond can be generated
-             * as the addition of these two vectors, suitably scaled.
-             * For the sake of convenience, we choose the two edges
-             * that will be shortened if a river is present, i.e. the
-             * SE and SW edges, and move the origin to their
-             * intersection.
+            /*
+              In order to ensure that trees do not occlude the rivers
+              on other tiles, we must move the rivers to the top NE
+              and NW edges of the tile.
+
+              If we consider two adjoining edges of the diamond to be
+              vectors, any point within the diamond can be generated
+              as the addition of these two vectors, suitably scaled.
+              For the sake of convenience, we choose the two edges
+              that will be shortened if a river is present, i.e. the
+              SE and SW edges, and move the origin to their
+              intersection.
              */
             for (int index = 0; index < 16; index++) {
                 BufferedImage base = new BufferedImage(BASE_WIDTH, BASE_HEIGHT + MARGIN,
@@ -249,20 +249,20 @@ public class ForestMaker {
                         int width = image.getWidth();
                         int height = image.getHeight();
                         int halfWidth = width / 2;
-                        /**
-                         * Find a point for the root of the tree, that
-                         * is the center of the lower edge of the tree
-                         * image.
+                        /*
+                          Find a point for the root of the tree, that
+                          is the center of the lower edge of the tree
+                          image.
                          */
                         float a = random.nextFloat();
                         float b = random.nextFloat();
                         int x = (int) (a * right.x + b * left.x);
                         int y = (int) (a * right.y + b * left.y);
-                        /**
-                         * Additional constraint: the left and right
-                         * edges of the tree image must be within the
-                         * tile bounds (this will fail if the tree
-                         * image is too large).
+                        /*
+                          Additional constraint: the left and right
+                          edges of the tree image must be within the
+                          tile bounds (this will fail if the tree
+                          image is too large).
                          */
                         if (x - halfWidth < - HALF_WIDTH) {
                             x = -HALF_WIDTH + halfWidth; // left
@@ -282,7 +282,7 @@ public class ForestMaker {
                          * "above" the line defined by that edge.
                          */
                         if ((branches[1] || branches[3])
-                            && crown < -BASE_HEIGHT + RIVER_HEIGHT + (x + halfWidth) / 2) {
+                                && crown < -BASE_HEIGHT + RIVER_HEIGHT + (x + halfWidth) / 2) {
                             continue;
                         }
                         /**
@@ -292,7 +292,7 @@ public class ForestMaker {
                          * "above" the line defined by that edge.
                          */
                         if ((branches[0] || branches[2])
-                            && crown < -BASE_HEIGHT + RIVER_HEIGHT - (x - halfWidth) / 2) {
+                                && crown < -BASE_HEIGHT + RIVER_HEIGHT - (x - halfWidth) / 2) {
                             continue;
                         }
                         //System.out.println("x=" + x + ", y=" + (y - height));
@@ -324,7 +324,6 @@ public class ForestMaker {
         int height = HALF_HEIGHT - Math.abs(x) / 2;
         return (height == 0) ? 0 : random.nextInt(2 * height) - height;
     }
-
 
 }
 
