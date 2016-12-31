@@ -143,75 +143,20 @@ public abstract class ServerAPI {
      */
     private boolean send(DOMMessage message) {
         if (message == null) return true;
-        Connection c = getConnection();
+        final Connection c = getConnection();
         if (c == null) {
             logger.log(Level.WARNING, "Not connected, did not send: "
-                        + message.getType());
+                       + message.getType());
             return false;
         }
         try {
             c.send(message);
             return true;
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Could not send: " + message.getType(),
+            logger.log(Level.WARNING, "Failed to send: " + message.getType(),
                        ioe);
         }
         return false;
-    }
-
-    /**
-     * Sends a DOMMessage query the server and waits for a reply.
-     *
-     * @param message The {@code DOMMessage} to send.
-     * @return The reply, or null if there was a problem.
-     */
-    private Element ask(DOMMessage message) {
-        Element reply = null;
-        try {
-            reply = getConnection().ask(message);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Could not ask: " + message.getType(),
-                       ioe);
-        }
-        return reply;
-    }
-
-    /**
-     * Loop sending requests and handling replies from the server until
-     * they reduce to null.
-     *
-     * @param e The initial request {@code Element}.
-     */
-    private void resolve(Element e) {
-        final Connection c = getConnection();
-        while (e != null) {
-            try {
-                e = handle(c.ask(e));
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Could not resolve: " + e.getTagName(),
-                    ioe);
-                break;
-            }
-        }
-    }
-
-    /**
-     * Handle an element.
-     *
-     * @param e The {@code Element} to handle.
-     * @return The resulting element.
-     */
-    private Element handle(Element e) {
-        if (e == null) return null;
-        final Connection c = getConnection();
-        if (c == null) return null;
-        try {
-            return c.handle(e);
-        } catch (FreeColException fce) {
-            logger.log(Level.WARNING, "Handler failure for: " + e.getTagName(),
-                       fce);
-            return null;
-        }
     }
 
     /**
@@ -226,14 +171,35 @@ public abstract class ServerAPI {
      *
      * @param game The current {@code Game}.
      * @param message A {@code DOMMessage} to send.
-     * @return True if the server interaction succeeded.
+     * @return True if the message was sent, and there was no I/O error
+     *     or handler failure.
      */
     private boolean ask(Game game, DOMMessage message) {
-        Element reply = ask(message);
+        if (message == null) return true;
+        final Connection c = getConnection();
+        if (c == null) {
+            logger.log(Level.WARNING, "Not connected, did not ask: "
+                       + message.getType());
+                return false;
+        }
+        Element reply = null;
+        try {
+            reply = c.ask(message);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Failed to ask: " + message.getType(),
+                       ioe);
+            return false;
+        }
         if (reply == null) return true;
-
-        resolve(handle(reply));
-        return !ErrorMessage.TAG.equals(reply.getTagName());
+        final String tag = reply.getTagName();
+        try {
+            Element result = c.handle(reply);
+            assert result == null; // All client handlers now return null.
+        } catch (FreeColException fce) {
+            logger.log(Level.WARNING, "Handler failure for: " + tag, fce);
+            return false;
+        }
+        return !ErrorMessage.TAG.equals(tag);
     }
 
 
