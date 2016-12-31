@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
@@ -292,7 +294,29 @@ public abstract class AIPlayer extends AIObject {
         return result;
     }
 
+    /**
+     * Do some work in a subthread.
+     *
+     * @param runnable The {@code Runnable} work to do.
+     */
+    public void invoke(final Runnable runnable) {
+        final String name = FreeCol.SERVER_THREAD + "AIPlayer("
+            + getPlayer().getName() + ")";
+        Thread thread = new Thread(name) {
+                @Override
+                public void run() {
+                    try {
+                        runnable.run();
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Thread " + name + " fail", e);
+                    }
+                }
+            };
+        logger.finest("Starting " + name + " " + thread.toString());
+        thread.start();
+    }
 
+    
     // AI behaviour interface to be implemented by subclasses
 
     /**

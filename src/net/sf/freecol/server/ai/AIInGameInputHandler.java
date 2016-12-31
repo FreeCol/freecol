@@ -216,7 +216,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = setAI(new SetAIMessage(game, element));
                 break;
             case SetCurrentPlayerMessage.TAG:
-                reply = setCurrentPlayer(new SetCurrentPlayerMessage(game, element));
+                setCurrentPlayer(new SetCurrentPlayerMessage(game, element));
                 break;
                 
             // Since we're the server, we can see everything.
@@ -487,28 +487,16 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Handles a "setCurrentPlayer"-message.
      *
      * @param message The {@code SetCurrentPlayerMessage} to process.
-     * @return Null.
      */
-    private Element setCurrentPlayer(SetCurrentPlayerMessage message) {
+    private void setCurrentPlayer(SetCurrentPlayerMessage message) {
         final Player currentPlayer = message.getPlayer(getGame());
 
         if (currentPlayer != null
             && getMyPlayer().getId().equals(currentPlayer.getId())) {
-            String name = getMyPlayer().getName();
-            logger.finest("Starting new Thread for " + name);
-            name = FreeCol.SERVER_THREAD + "AIPlayer (" + name + ")";
-            new Thread(name) {
-                @Override
-                public void run() {
-                    try {
-                        getAIPlayer().startWorking();
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "AI player failed while working!", e);
-                    }
+            getAIPlayer().invoke(() -> {
+                    getAIPlayer().startWorking();
                     AIMessage.askEndTurn(getAIPlayer());
-                }
-            }.start();
+                });
         }
-        return null;
     }
 }
