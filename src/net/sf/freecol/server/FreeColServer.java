@@ -1205,10 +1205,10 @@ public final class FreeColServer {
             if (player.isAI()) {
                 ServerPlayer serverPlayer = (ServerPlayer)player;
                 DummyConnection theConnection
-                    = new DummyConnection("Server-Server-" + player.getName(),
+                    = new DummyConnection("Server->AI-" + player.getName(),
                                           this.inGameInputHandler);
                 DummyConnection aiConnection
-                    = new DummyConnection("Server-AI-" + player.getName(),
+                    = new DummyConnection("AI-" + player.getName() + "->Server",
                         new AIInGameInputHandler(this, serverPlayer, aiMain));
                 aiConnection.setConnection(theConnection);
                 theConnection.setConnection(aiConnection);
