@@ -217,10 +217,6 @@ public abstract class ServerAPI {
     /**
      * Sends the specified message to the server and processes the reply.
      *
-     * Handle error replies if they have a messageId or when in debug mode.
-     * This routine allows code simplification in much of the following
-     * client-server communication.
-     *
      * In following routines we follow the convention that server I/O
      * is confined to the ask<em>foo</em>() routine, which typically
      * returns true if the server interaction succeeded, which does
@@ -236,14 +232,8 @@ public abstract class ServerAPI {
         Element reply = ask(message);
         if (reply == null) return true;
 
-        if (ErrorMessage.TAG.equals(reply.getTagName())) {
-            // Shortcut error processing
-            handle(reply);
-            return false;
-        }
-
         resolve(handle(reply));
-        return true;
+        return !ErrorMessage.TAG.equals(reply.getTagName());
     }
 
 
