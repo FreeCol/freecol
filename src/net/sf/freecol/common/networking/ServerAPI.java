@@ -141,7 +141,7 @@ public abstract class ServerAPI {
      * @param message The {@code DOMMessage} to send.
      * @return True if the send succeeded.
      */
-    protected boolean send(DOMMessage message) {
+    private boolean send(DOMMessage message) {
         if (message == null) return true;
         Connection c = getConnection();
         if (c == null) {
@@ -151,23 +151,6 @@ public abstract class ServerAPI {
         }
         try {
             c.send(message);
-            return true;
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Could not send: " + message.getType(),
-                       ioe);
-        }
-        return false;
-    }
-
-    /**
-     * Sends a DOMMessage to the server and waits for a reply.
-     *
-     * @param message The {@code DOMMessage} to send.
-     * @return True if the send succeeded.
-     */
-    private boolean sendAndWait(DOMMessage message) {
-        try {
-            getConnection().sendAndWait(message);
             return true;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not send: " + message.getType(),
