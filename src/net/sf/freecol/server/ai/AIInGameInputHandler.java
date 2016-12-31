@@ -182,13 +182,13 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = firstContact(new FirstContactMessage(game, element));
                 break;
             case FountainOfYouthMessage.TAG:
-                reply = fountainOfYouth(new FountainOfYouthMessage(game, element));
+                fountainOfYouth(new FountainOfYouthMessage(game, element));
                 break;
             case IndianDemandMessage.TAG:
                 reply = indianDemand(new IndianDemandMessage(game, element));
                 break;
             case "lootCargo":
-                reply = lootCargo(new LootCargoMessage(game, element));
+                lootCargo(new LootCargoMessage(game, element));
                 break;
             case "monarchAction":
                 reply = monarchAction(new MonarchActionMessage(game, element));
@@ -197,7 +197,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = multiple(connection, element);
                 break;
             case NationSummaryMessage.TAG:
-                reply = nationSummary(new NationSummaryMessage(game, element));
+                nationSummary(new NationSummaryMessage(game, element));
                 break;
             case NativeTradeMessage.TAG:
                 reply = nativeTrade(new NativeTradeMessage(game, element));
@@ -213,7 +213,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                     + " refer to any previous error message.");
                 break;
             case SetAIMessage.TAG:
-                reply = setAI(new SetAIMessage(game, element));
+                setAI(new SetAIMessage(game, element));
                 break;
             case SetCurrentPlayerMessage.TAG:
                 setCurrentPlayer(new SetCurrentPlayerMessage(game, element));
@@ -314,14 +314,14 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Replies to fountain of youth offer.
      *
      * @param message The {@code FountainOfYouthMessage} to process.
-     * @return Null.
      */
-    private Element fountainOfYouth(FountainOfYouthMessage message) {
+    private void fountainOfYouth(FountainOfYouthMessage message) {
         final AIPlayer aiPlayer = getAIPlayer();
         final int n = message.getMigrants();
 
-        for (int i = 0; i < n; i++) AIMessage.askEmigrate(aiPlayer, 0);
-        return null;
+        getAIPlayer().invoke(() -> {
+                for (int i = 0; i < n; i++) AIMessage.askEmigrate(aiPlayer, 0);
+            });
     }
 
     /**
@@ -353,25 +353,27 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Replies to loot cargo offer.
      *
      * @param message The {@code LootCargoMessage} to process.
-     * @return Null.
      */
-    private Element lootCargo(LootCargoMessage message) {
+    private void lootCargo(LootCargoMessage message) {
         final Game game = getGame();
         final Market market = getMyPlayer().getMarket();
         final Unit unit = message.getUnit(game);
+        final List<Goods> initialGoods = message.getGoods();
+        final String defenderId = message.getDefenderId();
 
-        List<Goods> goods = sort(message.getGoods(),
-                                 market.getSalePriceComparator());
-        List<Goods> loot = new ArrayList<>();
-        int space = unit.getSpaceLeft();
-        while (!goods.isEmpty()) {
-            Goods g = goods.remove(0);
-            if (g.getSpaceTaken() > space) continue; // Approximate
-            loot.add(g);
-            space -= g.getSpaceTaken();
-        }
-        AIMessage.askLoot(getAIUnit(unit), message.getDefenderId(), loot);
-        return null;
+        getAIPlayer().invoke(() -> {
+                List<Goods> goods = sort(initialGoods,
+                                         market.getSalePriceComparator());
+                List<Goods> loot = new ArrayList<>();
+                int space = unit.getSpaceLeft();
+                while (!goods.isEmpty()) {
+                    Goods g = goods.remove(0);
+                    if (g.getSpaceTaken() > space) continue; // Approximate
+                    loot.add(g);
+                    space -= g.getSpaceTaken();
+                }
+                AIMessage.askLoot(getAIUnit(unit), defenderId, loot);
+            });
     }
 
     /**
@@ -421,9 +423,8 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Handle an incoming nation summary.
      *
      * @param message The {@code NationSummaryMessage} to process.
-     * @return Null.
      */
-    private Element nationSummary(NationSummaryMessage message) {
+    private void nationSummary(NationSummaryMessage message) {
         final AIPlayer aiPlayer = getAIPlayer();
         final Player player = aiPlayer.getPlayer();
         final Player other = message.getPlayer(getGame());
@@ -432,7 +433,6 @@ public final class AIInGameInputHandler implements MessageHandler {
         player.putNationSummary(other, ns);
         logger.info("Updated nation summary of " + other.getSuffix()
             + " for AI " + player.getSuffix());
-        return null;
     }
 
     /**
@@ -473,14 +473,12 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Handle a "setAI"-message.
      *
      * @param message The {@code SetAIMessage} to process.
-     * @return Null.
      */
-    private Element setAI(SetAIMessage message) {
+    private void setAI(SetAIMessage message) {
         final Player p = message.getPlayer(getGame());
         final boolean ai = message.getAI();
 
         if (p != null) p.setAI(ai);
-        return null;
     }
 
     /**
