@@ -20,10 +20,8 @@
 package net.sf.freecol.server.ai;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
 
 
@@ -32,8 +30,6 @@ import net.sf.freecol.common.networking.ServerAPI;
  * GUI nor real connection to the server.
  */
 public class AIServerAPI extends ServerAPI {
-
-    private static final Logger logger = Logger.getLogger(AIServerAPI.class.getName());
 
     /** The AI player that owns this wrapper. */
     private AIPlayer owner;

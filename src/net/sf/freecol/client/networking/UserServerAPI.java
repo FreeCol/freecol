@@ -27,8 +27,6 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Implementation of the ServerAPI for a player with attached GUI and
