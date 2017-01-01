@@ -57,6 +57,11 @@ public class ReportPanel extends FreeColPanel {
 
     protected JScrollPane scrollPane;
 
+    /**
+     * The default layout contrains of the {@code JScrollPane}s in this class.
+     */
+    private static final String SCROLL_PANE_SIZE = "cell 0 1, height 100%, width 100%";
+
 
     /**
      * Creates the basic FreeCol report panel.
@@ -79,7 +84,7 @@ public class ReportPanel extends FreeColPanel {
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
-        add(scrollPane, "cell 0 1, height 100%, width 100%");
+        add(scrollPane, SCROLL_PANE_SIZE);
         add(okButton, "cell 0 2, tag ok");
 
         float scale = getImageLibrary().getScaleFactor();
@@ -127,7 +132,7 @@ public class ReportPanel extends FreeColPanel {
 
     protected void setMainComponent(Component main) {
         remove(scrollPane);
-        add(main, "cell 0 1, height 100%, width 100%");
+        add(main, SCROLL_PANE_SIZE);
     }
 
 
