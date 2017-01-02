@@ -259,6 +259,23 @@ public class AIMessage {
     }
 
     /**
+     * Handle a first contact.
+     *
+     * @param aiPlayer The {@code AIPlayer} being contacted.
+     * @param contactor The contacting {@code Player}.
+     * @param contactee The contacted {@code Player}.
+     * @param tile The contact {@code Tile}.
+     * @param ack The treaty acceptance state.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askFirstContact(AIPlayer aiPlayer, Player contactor,
+                                          Player contactee, Tile tile,
+                                          boolean ack) {
+        return aiPlayer.askServer()
+            .firstContact(contactor, contactee, tile, ack);
+    }
+
+    /**
      * Makes demands to a colony.  One and only one of goods or gold is valid.
      *
      * @param aiUnit The {@code AIUnit} that is demanding.

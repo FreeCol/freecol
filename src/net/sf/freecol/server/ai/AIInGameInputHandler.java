@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.AssignTradeRouteMessage;
@@ -180,7 +181,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = diplomacy(new DiplomacyMessage(game, element));
                 break;
             case FirstContactMessage.TAG:
-                reply = firstContact(new FirstContactMessage(game, element));
+                firstContact(new FirstContactMessage(game, element));
                 break;
             case FountainOfYouthMessage.TAG:
                 fountainOfYouth(new FountainOfYouthMessage(game, element));
@@ -307,10 +308,18 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Replies to a first contact offer.
      *
      * @param message The {@code FirstContactMessage} to process.
-     * @return An {@code Element} containing the response/s.
      */
-    private Element firstContact(FirstContactMessage message) {
-        return message.setResult(true).toXMLElement();
+    private void firstContact(FirstContactMessage message) {
+        final AIPlayer aiPlayer = getAIPlayer();
+        final Game game = getGame();
+        final Player contactor = message.getPlayer(game);
+        final Player contactee = message.getOtherPlayer(game);
+        final Tile tile = message.getTile(game);
+
+        aiPlayer.invoke(() -> {
+                AIMessage.askFirstContact(aiPlayer, contactor, contactee,
+                                          tile, true);
+            });
     }
 
     /**
