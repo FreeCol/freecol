@@ -205,7 +205,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 nativeTrade(new NativeTradeMessage(game, element));
                 break;
             case NewLandNameMessage.TAG:
-                reply = newLandName(new NewLandNameMessage(game, element));
+                newLandName(new NewLandNameMessage(game, element));
                 break;
             case NewRegionNameMessage.TAG:
                 reply = newRegionName(new NewRegionNameMessage(game, element));
@@ -467,10 +467,15 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Replies to offer to name the new land.
      *
      * @param message The {@code NewLandNameMessage} to process.
-     * @return An {@code Element} containing the response/s.
      */
-    private Element newLandName(NewLandNameMessage message) {
-        return message.toXMLElement();
+    private void newLandName(NewLandNameMessage message) {
+        final AIPlayer aiPlayer = getAIPlayer();
+        final Unit unit = message.getUnit(aiPlayer.getPlayer());
+        final String name = message.getNewLandName();
+
+        aiPlayer.invoke(() -> {
+                AIMessage.askNewLandName(aiPlayer, unit, name);
+            });
     }
 
     /**

@@ -383,6 +383,20 @@ public class AIMessage {
     }
 
     /**
+     * Response to discovering the new world.
+     *
+     * @param aiPlayer The discovering {@code AIPlayer}.
+     * @param unit The {@code Unit} that made the discovery.
+     * @param name The new land name.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askNewLandName(AIPlayer aiPlayer, Unit unit,
+                                         String name) {
+        return aiPlayer.askServer()
+            .newLandName(unit, name);
+    }
+
+    /**
      * An AIUnit is put outside a colony.
      *
      * @param aiUnit The {@code AIUnit} to put out.
