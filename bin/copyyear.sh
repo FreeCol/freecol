@@ -11,5 +11,5 @@ find ./data ./schema ./src ./packaging ./test \
     -a \( -name \*.java -o -name \*.xml -o -name \*.xsd -o -name copyright \
         -o -name README -o -name FreeColMessages.properties \) \
     -exec sed -i -e "s/\(Copyright (C) 2...-\)2...\( *The FreeCol Team\)/\1$Y\2/" {} \;
-exec find ./www.freecol.org -name -type f -a \*.html \
+exec find ./www.freecol.org -type f -a -name \*.html \
     -exec sed -i -e "s/\(&copy; 2...-\)2...\( *FreeCol\)/\1$Y\2/" {} \;
