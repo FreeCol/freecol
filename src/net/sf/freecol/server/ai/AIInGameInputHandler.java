@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
@@ -208,7 +209,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 newLandName(new NewLandNameMessage(game, element));
                 break;
             case NewRegionNameMessage.TAG:
-                reply = newRegionName(new NewRegionNameMessage(game, element));
+                newRegionName(new NewRegionNameMessage(game, element));
                 break;
             case TrivialMessage.RECONNECT_TAG:
                 logger.warning("Reconnect on illegal operation,"
@@ -482,10 +483,18 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Replies to offer to name a new region name.
      *
      * @param message The {@code NewRegionNameMessage} to process.
-     * @return An {@code Element} containing the response/s.
      */
-    private Element newRegionName(NewRegionNameMessage message) {
-        return message.toXMLElement();
+    private void newRegionName(NewRegionNameMessage message) {
+        final AIPlayer aiPlayer = getAIPlayer();
+        final Game game = getGame();
+        final Region region = message.getRegion(game);
+        final Tile tile = message.getTile(game);
+        final Unit unit = message.getUnit(aiPlayer.getPlayer());
+        final String name = message.getNewRegionName();
+
+        aiPlayer.invoke(() -> {
+                AIMessage.askNewRegionName(aiPlayer, region, tile, unit, name);
+            });
     }
 
     /**

@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -394,6 +395,22 @@ public class AIMessage {
                                          String name) {
         return aiPlayer.askServer()
             .newLandName(unit, name);
+    }
+
+    /**
+     * Response to discovering a new region.
+     *
+     * @param aiPlayer The discovering {@code AIPlayer}.
+     * @param region The {@code Region} that was discovered.
+     * @param tile The {@code Tile} of discovery.
+     * @param unit The {@code Unit} that was discovering.
+     * @param name The new region name.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askNewRegionName(AIPlayer aiPlayer, Region region,
+                                           Tile tile, Unit unit, String name) {
+        return aiPlayer.askServer()
+            .newRegionName(region, tile, unit, name);
     }
 
     /**
