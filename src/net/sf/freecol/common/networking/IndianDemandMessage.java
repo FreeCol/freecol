@@ -126,7 +126,8 @@ public class IndianDemandMessage extends AttributeMessage {
      * @return The result of this demand.
      */
     public Boolean getResult() {
-        return getBooleanAttribute(RESULT_TAG);
+        return (hasAttribute(RESULT_TAG)) ? getBooleanAttribute(RESULT_TAG)
+            : null;
     }
 
     /**

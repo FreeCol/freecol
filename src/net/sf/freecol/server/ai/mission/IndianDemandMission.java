@@ -49,6 +49,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
 
@@ -378,6 +379,7 @@ public class IndianDemandMission extends Mission {
 
             // Load the goods.
             lbAt(lb);
+            AIPlayer aiPlayer = getAIPlayer();
             Colony colony = (Colony)getTarget();
             Player enemy = colony.getOwner();
             Goods goods = selectGoods(colony);
@@ -390,8 +392,8 @@ public class IndianDemandMission extends Mission {
                 amount = enemy.getGold() / 20;
                 if (amount == 0) amount = enemy.getGold();
             }
-            this.demanded
-                = AIMessage.askIndianDemand(aiUnit, colony, type, amount);
+            this.demanded = AIMessage.askIndianDemand(aiPlayer, unit, colony,
+                                                      type, amount, null);
             lb.add(", demand made ", (this.demanded) ? "" : "un",
                    "successfully");
             return lbWait(lb);

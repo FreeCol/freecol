@@ -2425,7 +2425,7 @@ public final class InGameController extends Controller {
     /**
      * Indians making demands of a colony.
      *
-     * @param serverPlayer The {@code ServerPlayer} that is demanding.
+     * @param serverPlayer The {@code ServerPlayer} that sent the message.
      * @param unit The {@code Unit} making the demands.
      * @param colony The {@code Colony} that is demanded of.
      * @param type The {@code GoodsType} being demanded, null

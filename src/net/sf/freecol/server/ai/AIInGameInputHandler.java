@@ -188,7 +188,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 fountainOfYouth(new FountainOfYouthMessage(game, element));
                 break;
             case IndianDemandMessage.TAG:
-                reply = indianDemand(new IndianDemandMessage(game, element));
+                indianDemand(new IndianDemandMessage(game, element));
                 break;
             case LootCargoMessage.TAG:
                 lootCargo(new LootCargoMessage(game, element));
@@ -341,25 +341,26 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Handles an "indianDemand"-message.
      *
      * @param message The {@code IndianDemandMessage} to process.
-     * @return The original message with the acceptance state set if querying
-     *     the colony player (result == null), or null if reporting the final
-     *     result to the native player (result != null).
      */
-    private Element indianDemand(IndianDemandMessage message) {
+    private void indianDemand(IndianDemandMessage message) {
         final Game game = getGame();
         final AIPlayer aiPlayer = getAIPlayer();
         final Unit unit = message.getUnit(game);
         final Colony colony = message.getColony(game);
         final GoodsType type = message.getType(game);
         final int amount = message.getAmount();
+        final Boolean initialResult = message.getResult();
 
         Boolean result = aiPlayer.indianDemand(unit, colony, type, amount,
-                                               message.getResult());
-        if (result == null) return null;
-        message.setResult(result);
+                                               initialResult);
         logger.finest("AI handling native demand by " + unit
-            + " at " + colony.getName() + " result: " + result);
-        return message.toXMLElement();
+            + " at " + colony + " result: " + initialResult + " -> " + result);
+        if (result != null) {
+            aiPlayer.invoke(() -> {
+                    AIMessage.askIndianDemand(aiPlayer, unit, colony,
+                                              type, amount, result);
+                });
+        }
     }
 
     /**

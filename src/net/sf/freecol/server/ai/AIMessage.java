@@ -280,17 +280,21 @@ public class AIMessage {
     /**
      * Makes demands to a colony.  One and only one of goods or gold is valid.
      *
-     * @param aiUnit The {@code AIUnit} that is demanding.
+     * @param aiPlayer The {@code AIPlayer} that is demanding or responding.
+     * @param unit The {@code Unit} that is demanding.
      * @param colony The {@code Colony} to demand of.
      * @param type The {@code GoodsType} to demand.
      * @param amount The amount of goods to demand.
+     * @param result Null if this is the initial demand, true/false if this
+     *     is a response.
      * @return True if the message was sent, a non-error reply returned, and
      *     the demand was accepted.
      */
-    public static boolean askIndianDemand(AIUnit aiUnit, Colony colony,
-                                          GoodsType type, int amount) {
-        return aiUnit.getAIOwner().askServer()
-            .indianDemand(aiUnit.getUnit(), colony, type, amount, null);
+    public static boolean askIndianDemand(AIPlayer aiPlayer, Unit unit,
+                                          Colony colony, GoodsType type,
+                                          int amount, Boolean result) {
+        return aiPlayer.askServer()
+            .indianDemand(unit, colony, type, amount, result);
     }
 
     /**
