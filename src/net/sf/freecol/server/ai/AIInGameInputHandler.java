@@ -190,11 +190,11 @@ public final class AIInGameInputHandler implements MessageHandler {
             case IndianDemandMessage.TAG:
                 reply = indianDemand(new IndianDemandMessage(game, element));
                 break;
-            case "lootCargo":
+            case LootCargoMessage.TAG:
                 lootCargo(new LootCargoMessage(game, element));
                 break;
-            case "monarchAction":
-                reply = monarchAction(new MonarchActionMessage(game, element));
+            case MonarchActionMessage.TAG:
+                monarchAction(new MonarchActionMessage(game, element));
                 break;
             case MultipleMessage.TAG:
                 reply = multiple(connection, element);
@@ -393,32 +393,33 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Handles a "monarchAction"-message.
      *
      * @param message The {@code MonarchActionMessage} to process.
-     * @return An {@code Element} containing the response/s.
      */
-    private Element monarchAction(MonarchActionMessage message) {
+    private void monarchAction(MonarchActionMessage message) {
+        final AIPlayer aiPlayer = getAIPlayer();
         final MonarchAction action = message.getAction();
 
         boolean accept;
         switch (action) {
         case RAISE_TAX_WAR: case RAISE_TAX_ACT:
             accept = getAIPlayer().acceptTax(message.getTax());
-            message.setResult(accept);
             logger.finest("AI player monarch action " + action
                           + " = " + accept);
             break;
 
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
             accept = getAIPlayer().acceptMercenaries();
-            message.setResult(accept);
             logger.finest("AI player monarch action " + action
                           + " = " + accept);
             break;
 
         default:
             logger.finest("AI player ignoring monarch action " + action);
-            return null;
+            return;
         }
-        return message.toXMLElement();
+
+        aiPlayer.invoke(() -> {
+                AIMessage.askMonarchAction(aiPlayer, action, accept);
+            });
     }
 
     /**

@@ -78,32 +78,56 @@ public class MonarchSession extends Session {
         this.price = price;
     }
 
-    public void complete(boolean result, ChangeSet cs) {
+
+    /**
+     * Primitive level to finishing the session with the given result.
+     *
+     * @param result The result of the session, null means ignored.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    private void completeInternal(Boolean result, ChangeSet cs) {
         switch (action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:
-            serverPlayer.csRaiseTax(tax, goods, result, cs);
+            if (result == null) {
+                serverPlayer.ignoreTax(tax, goods, cs);
+            } else {
+                serverPlayer.csRaiseTax(tax, goods, result, cs);
+            }
             break;
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
-            if (result) serverPlayer.csAddMercenaries(mercenaries, price, cs);
+            if (result == null) {
+                serverPlayer.ignoreMercenaries(cs);
+            } else if (result) {
+                serverPlayer.csAddMercenaries(mercenaries, price, cs);
+            }
             break;
         default:
             break;
         }
-        super.complete(cs);
+    }
+
+    /**
+     * Explicit completion of the session with a given result.
+     *
+     * Called from the controller when the player returns a definite response.
+     *
+     * @param result Whether to accept or reject the demand.
+     * @param cs A {@code ChangeSet} to update.
+     * @return Whether the session was already complete.
+     */
+    public boolean complete(boolean result, ChangeSet cs) {
+        boolean ret = super.complete(cs);
+        if (!ret) {
+            completeInternal(result, cs);
+        }
+        return ret;
     }
 
     @Override
     public boolean complete(ChangeSet cs) {
         boolean ret = super.complete(cs);
-        switch (action) {
-        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
-            serverPlayer.ignoreTax(tax, goods, cs);
-            break;
-        case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
-            serverPlayer.ignoreMercenaries(cs);
-            break;
-        default:
-            break;
+        if (!ret) {
+            completeInternal(null, cs);
         }
         return ret;
     }

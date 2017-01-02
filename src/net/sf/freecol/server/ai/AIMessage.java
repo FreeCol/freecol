@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
@@ -319,6 +320,21 @@ public class AIMessage {
                                   List<Goods> goods) {
         return aiUnit.getAIOwner().askServer()
             .loot(aiUnit.getUnit(), defenderId, goods);
+    }
+
+    /**
+     * Handle answering the monarch.
+     *
+     * @param aiPlayer The {@code AIPlayer} that is responding.
+     * @param action The {@code MonarchAction} responded to.
+     * @param accept Whether the action is accepted or not.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askMonarchAction(AIPlayer aiPlayer,
+                                           MonarchAction action,
+                                           boolean accept) {
+        return aiPlayer.askServer()
+            .answerMonarch(aiPlayer.getGame(), action, accept);
     }
 
     /**
