@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
@@ -200,7 +201,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 nationSummary(new NationSummaryMessage(game, element));
                 break;
             case NativeTradeMessage.TAG:
-                reply = nativeTrade(new NativeTradeMessage(game, element));
+                nativeTrade(new NativeTradeMessage(game, element));
                 break;
             case NewLandNameMessage.TAG:
                 reply = newLandName(new NewLandNameMessage(game, element));
@@ -441,14 +442,16 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Handle a native trade message.
      *
      * @param message The {@code NativeTradeMessage} to process.
-     * @return An {@code Element} containing the response/s.
      */
-    private Element nativeTrade(NativeTradeMessage message) {
+    private void nativeTrade(NativeTradeMessage message) {
+        final AIPlayer aiPlayer = getAIPlayer();
         final NativeTrade nt = message.getNativeTrade();
-        final NativeTrade.NativeTradeAction action = message.getAction();
+        final NativeTradeAction action = message.getAction();
 
-        return new NativeTradeMessage(getAIPlayer().handleTrade(action, nt),
-                                      nt).toXMLElement();
+        NativeTradeAction result = aiPlayer.handleTrade(action, nt);
+        aiPlayer.invoke(() -> {
+                AIMessage.askNativeTrade(aiPlayer, result, nt);
+            });
     }
 
     /**

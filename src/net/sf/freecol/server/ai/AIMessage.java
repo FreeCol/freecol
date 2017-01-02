@@ -29,6 +29,8 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
@@ -347,6 +349,20 @@ public class AIMessage {
     public static boolean askNativeGift(AIUnit aiUnit, Colony colony) {
         return aiUnit.getAIOwner().askServer()
             .nativeGift(aiUnit.getUnit(), colony);
+    }
+
+    /**
+     * Respond to a native trade offer.
+     *
+     * @param aiPlayer The {@code AIPlayer} that is trading.
+     * @param action The {@code NativeTradeAction} to take.
+     * @param nt The proposed {@code NativeTrade}.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askNativeTrade(AIPlayer aiPlayer,
+        NativeTradeAction action, NativeTrade nt) {
+        return aiPlayer.askServer()
+            .nativeTrade(action, nt);
     }
 
     /**
