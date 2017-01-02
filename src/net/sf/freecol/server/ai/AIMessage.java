@@ -24,6 +24,7 @@ import java.util.List;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -115,6 +116,21 @@ public class AIMessage {
             .changeWorkImprovementType(aiUnit.getUnit(), type);
     }
 
+    /**
+     * Choose a founding father for an AI player.
+     *
+     * @param aiPlayer The {@code AIPlayer} that is choosing.
+     * @param fathers A list of {@code FoundingFather}s to choose from.
+     * @param father The {@code FoundingFather} that has been chosen.
+     * @return True if the message was sent.
+     */
+    public static boolean askChooseFoundingFather(AIPlayer aiPlayer,
+                                                  List<FoundingFather> fathers,
+                                                  FoundingFather father) {
+        return aiPlayer.askServer()
+            .chooseFoundingFather(fathers, father);
+    }
+                                  
     /**
      * Claims a tile for a colony.
      *

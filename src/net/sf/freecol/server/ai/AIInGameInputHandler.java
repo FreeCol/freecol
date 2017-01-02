@@ -173,7 +173,7 @@ public final class AIInGameInputHandler implements MessageHandler {
         try {
             switch (tag) {
             case ChooseFoundingFatherMessage.TAG:
-                reply = chooseFoundingFather(new ChooseFoundingFatherMessage(game, element));
+                chooseFoundingFather(new ChooseFoundingFatherMessage(game, element));
                 break;
             case "diplomacy":
                 reply = diplomacy(new DiplomacyMessage(game, element));
@@ -262,16 +262,18 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Only meaningful for AIPlayer types that implement selectFoundingFather.
      *
      * @param message The {@code ChooseFoundingFatherMessage} to process.
-     * @return An {@code Element} containing the response/s.
      */
-    private Element chooseFoundingFather(ChooseFoundingFatherMessage message) {
+    private void chooseFoundingFather(ChooseFoundingFatherMessage message) {
         final AIPlayer aiPlayer = getAIPlayer();
         final List<FoundingFather> fathers = message.getFathers(getGame());
+        final FoundingFather ff = aiPlayer.selectFoundingFather(fathers);
 
-        FoundingFather ff = aiPlayer.selectFoundingFather(fathers);
-        if (ff != null) message.setFather(ff);
-        logger.finest(aiPlayer.getId() + " chose founding father: " + ff);
-        return message.toXMLElement();
+        if (ff != null) {
+            logger.finest(aiPlayer.getId() + " chose founding father: " + ff);
+            aiPlayer.invoke(() -> {
+                    AIMessage.askChooseFoundingFather(aiPlayer, fathers, ff);
+                });
+        }
     }
 
     /**
