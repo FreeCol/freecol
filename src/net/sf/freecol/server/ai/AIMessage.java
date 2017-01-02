@@ -23,8 +23,10 @@ import java.util.List;
 
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -172,6 +174,24 @@ public class AIMessage {
             .clearSpeciality(aiUnit.getUnit());
     }
  
+    /**
+     * Do some diplomacy.
+     *
+     * @param aiPlayer The {@code AIPlayer} being diplomatic.
+     * @param our Our object ({@code Unit} or {@code Colony})
+     *     conducting the diplomacy.
+     * @param other The other object ({@code Unit} or {@code Colony})
+     *     to negotiate with.
+     * @param dt The {@code DiplomaticTrade} agreement to propose.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askDiplomacy(AIPlayer aiPlayer, FreeColGameObject our,
+                                       FreeColGameObject other,
+                                       DiplomaticTrade dt) {
+        return aiPlayer.askServer()
+            .diplomacy(our, other, dt);
+    }
+
     /**
      * An AIUnit disbands.
      *

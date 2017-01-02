@@ -57,8 +57,10 @@ public abstract class Session {
      * @param key A unique key to lookup this transaction with.
      */
     protected Session(String key) {
-        if (getSession(key) != null) {
-            throw new IllegalArgumentException("Duplicate session: " + key);
+        Session s = getSession(key);
+        if (s != null) {
+            throw new IllegalArgumentException("Duplicate session: " + key
+                                               + " -> " + s);
         }
         this.key = key;
         this.completed = false;
@@ -128,6 +130,7 @@ public abstract class Session {
             ret = this.completed;
             this.completed = true;
         }
+System.err.println("DIPSESSION-COMPLETE " + this.key);
         return ret;
     }
 
@@ -177,6 +180,7 @@ public abstract class Session {
             allSessions.clear();
         }
         for (Session ts : sessions) ts.complete(cs);
+System.err.println("DIPSESSION-COMPLETE-ALL" + allSessions.size());
     }
 
     /**

@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -178,8 +179,8 @@ public final class AIInGameInputHandler implements MessageHandler {
             case ChooseFoundingFatherMessage.TAG:
                 chooseFoundingFather(new ChooseFoundingFatherMessage(game, element));
                 break;
-            case "diplomacy":
-                reply = diplomacy(new DiplomacyMessage(game, element));
+            case DiplomacyMessage.TAG:
+                diplomacy(new DiplomacyMessage(game, element));
                 break;
             case FirstContactMessage.TAG:
                 firstContact(new FirstContactMessage(game, element));
@@ -283,26 +284,33 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Handles an "diplomacy"-message.
      *
      * @param message The {@code DiplomacyMessage} to process.
-     * @return An {@code Element} containing the response/s.
      */
-    private Element diplomacy(DiplomacyMessage message) {
+    private void diplomacy(DiplomacyMessage message) {
+        final AIPlayer aiPlayer = getAIPlayer();
         final Game game = getGame();
+        final FreeColGameObject our = message.getOurFCGO(game);
+        final FreeColGameObject other = message.getOtherFCGO(game);
         final DiplomaticTrade agreement = message.getAgreement();
 
-        // Shortcut if no negotiation is required
-        if (agreement.getStatus() != DiplomaticTrade.TradeStatus.PROPOSE_TRADE)
-            return null;
         StringBuilder sb = new StringBuilder(256);
         sb.append("AI Diplomacy: ").append(agreement);
-        TradeStatus status = getAIPlayer().acceptDiplomaticTrade(agreement);
-        agreement.setStatus(status);
-        sb.append(" -> ").append(agreement);
-        logger.fine(sb.toString());
+        switch (agreement.getStatus()) {
+        case PROPOSE_TRADE:
+            agreement.setStatus(aiPlayer.acceptDiplomaticTrade(agreement));
+            sb.append(" -> ").append(agreement);
+            logger.fine(sb.toString());
+            break;
+        default: // Do not need to respond to others
+            sb.append(" -> ignoring ").append(agreement.getStatus());
+            logger.fine(sb.toString());
+            return;
+        }
 
-        // Note: transposing {our,other} here, the message is in sender sense
-        return new DiplomacyMessage(message.getOtherFCGO(game),
-                                    message.getOurFCGO(game), agreement)
-            .toXMLElement();
+        aiPlayer.invoke(() -> {
+                // Note: transposing {our,other} here, the message is
+                // in sender sense.
+                AIMessage.askDiplomacy(aiPlayer, our, other, agreement);
+            });
     }
 
     /**
