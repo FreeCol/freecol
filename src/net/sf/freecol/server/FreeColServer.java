@@ -753,16 +753,15 @@ public final class FreeColServer {
      * @return A suitable record.
      */
     private ServerInfo getServerInfo(Connection mc) {
-        int port = mc.getSocket().getPort();
-        String address = mc.getHostAddress();
-        if (getName() == null) setName(address + ":" + port);
+        if (getName() == null) setName(mc.getSocketName());
         int slots = count(game.getLiveEuropeanPlayers(),
             p -> !p.isREF() && ((ServerPlayer)p).isAI()
                 && !((ServerPlayer)p).isConnected());
         int players = count(game.getLivePlayers(),
             p -> !((ServerPlayer)p).isAI()
                 && ((ServerPlayer)p).isConnected());
-        return new ServerInfo(getName(), address, port, slots, players,
+        return new ServerInfo(getName(), mc.getHostAddress(), mc.getPort(),
+                              slots, players,
                               this.serverState == ServerState.IN_GAME,
                               FreeCol.getVersion(),
                               getServerState().ordinal());

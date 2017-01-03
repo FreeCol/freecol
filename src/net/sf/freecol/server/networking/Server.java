@@ -57,7 +57,7 @@ public final class Server extends Thread {
     /** The public "well-known" socket to which clients may connect. */
     private final ServerSocket serverSocket;
 
-    /** A hash of Connection objects, keyed by the Socket they relate to. */
+    /** A map of Connection objects, keyed by their Socket. */
     private final HashMap<Socket, Connection> connections = new HashMap<>();
 
     /**

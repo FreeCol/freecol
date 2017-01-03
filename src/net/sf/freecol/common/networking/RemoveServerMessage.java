@@ -41,8 +41,7 @@ public class RemoveServerMessage extends ServerInfoMessage {
      */
     public RemoveServerMessage(Connection conn) {
         super(TAG, new ServerInfo(null,
-                                  conn.getHostAddress(),
-                                  conn.getSocket().getPort(),
+                                  conn.getHostAddress(), conn.getPort(),
                                   0, 0, false, null, 0));
     }
 

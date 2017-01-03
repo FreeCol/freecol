@@ -70,7 +70,10 @@ public class Connection implements Closeable {
 
     private InputStream in;
 
-    private Socket socket;
+    /** The socket connected to the other end of the connection. */
+    private Socket socket = null;
+    /** A lock for the socket. */
+    private final Object socketLock = new Object();
 
     /** The transformer for output, also used as a lock for out. */
     private final Transformer outTransformer;
@@ -98,8 +101,8 @@ public class Connection implements Closeable {
         this.name = name;
         this.outTransformer = Utils.makeTransformer(false, false);
 
+        setSocket(null);
         this.in = null;
-        this.socket = null;
         this.out = null;
         this.receivingThread = null;
         this.messageHandler = null;
@@ -127,7 +130,7 @@ public class Connection implements Closeable {
                       String name) throws IOException {
         this(name);
 
-        this.socket = socket;
+        setSocket(socket);
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
         this.receivingThread = new ReceivingThread(this, this.in, name);
@@ -170,19 +173,44 @@ public class Connection implements Closeable {
     }
 
     /**
+     * Get the socket.
+     *
+     * @return The current {@code Socket}.
+     */
+    public Socket getSocket() {
+        synchronized (this.socketLock) {
+            return this.socket;
+        }
+    }
+
+    /**
+     * Set the socket.
+     *
+     * @param socket The new {@code Socket}.
+     */
+    private void setSocket(Socket socket) {
+        synchronized (this.socketLock) {
+            this.socket = socket;
+        }
+    }
+
+    /**
      * Close and clear the socket.
      */
     private void closeSocket() {
-        if (this.socket == null) return;
-        try {
-            this.socket.close();
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error closing socket", ioe);
-        } finally {
-            this.socket = null;
+        synchronized (this.socketLock) {
+            if (this.socket != null) {
+                try {
+                    this.socket.close();
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Error closing socket", ioe);
+                } finally {
+                    this.socket = null;
+                }
+            }
         }
     }
-    
+
     /**
      * Close and clear the output stream.
      */
@@ -219,26 +247,37 @@ public class Connection implements Closeable {
      * @return True if the connection is alive.
      */
     public boolean isAlive() {
-        return this.socket != null;
-    }
-
-    /**
-     * Gets the socket.
-     *
-     * @return The {@code Socket} used while communicating with
-     *     the other peer.
-     */
-    public Socket getSocket() {
-        return this.socket;
+        return getSocket() != null;
     }
 
     /**
      * Get the host address of this connection.
      *
-     * @return The host address.
+     * @return The host address, or an empty string on error.
      */
     public String getHostAddress() {
-        return getSocket().getInetAddress().getHostAddress();
+        Socket socket = getSocket();
+        return (socket == null) ? ""
+            : socket.getInetAddress().getHostAddress();
+    }
+
+    /**
+     * Get the port for this connection.
+     *
+     * @return The port number, or negative on error.
+     */
+    public int getPort() {
+        Socket socket = getSocket();
+        return (socket == null) ? -1 : socket.getPort();
+    }
+
+    /**
+     * Get the printable description of the socket.
+     *
+     * @return *host-address*:*port-number* or an empty string on error.
+     */
+    public String getSocketName() {
+        return (isAlive()) ? getHostAddress() + ":" + getPort() : "";
     }
     
     /**
@@ -561,12 +600,8 @@ public class Connection implements Closeable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
-        sb.append("[Connection ").append(this.name);
-        if (this.socket != null) {
-            sb.append(" (").append(this.socket.getInetAddress())
-                .append(':').append(this.socket.getPort()).append(')');
-        }
-        sb.append(']');
+        sb.append("[Connection ").append(this.name).append(" (")
+            .append(getSocketName()).append(")]");
         return sb.toString();
     }
 }
