@@ -1505,14 +1505,12 @@ public final class Canvas extends JDesktopPane {
         Graphics2D g2d = (Graphics2D) g;
         chatDisplay.removeOldMessages();
         Dimension size = getSize();
+
         if (freeColClient.isMapEditor()) {
             g2d.setColor(Color.BLACK);
             g2d.fillRect(0, 0, size.width, size.height);
 
-        } else if (freeColClient.isInGame() && hasMap()
-            && mapViewer.getFocus() != null) {
-
-            // paint map
+        } else if (freeColClient.isInGame() && hasMap()) {
             mapViewer.displayMap(g2d);
 
             // Grey out the map if it is not my turn (and a multiplayer game).

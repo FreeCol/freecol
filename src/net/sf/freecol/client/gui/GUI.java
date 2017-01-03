@@ -235,9 +235,11 @@ public class GUI extends FreeColClientHolder {
     /**
      * Reset the GUI on reconnect.
      *
-     * @return The identifier for the formerly active {@code Unit}.
+     * @param active An optional active {@code Unit}.
+     * @param tile An optional {@code Tile} to focus on if there is no
+     *     active unit.
      */
-    public String reconnect() { return null; }
+    public void reconnect(Unit active, Tile tile) {}
 
     /**
      * In game initializations.

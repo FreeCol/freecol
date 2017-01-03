@@ -194,16 +194,22 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public String reconnect() {
-        Unit active = getActiveUnit();
+    public void reconnect(Unit active, Tile tile) {
         setActiveUnit(null);
         requestFocusInWindow();
         initializeInGame();
         closeMenus();
         clearGotoPath();
         resetMenuBar();
-        resetMapZoom(); // Should refresh the map
-        return (active == null) ? null : active.getId();
+        resetMapZoom(); // This should refresh the map
+        changeViewMode(GUI.VIEW_TERRAIN_MODE);
+        setSelectedTile(tile);
+        setFocus(tile);
+        if (active != null) {
+            changeViewMode(GUI.MOVE_UNITS_MODE);
+            setActiveUnit(active);
+            centerActiveUnit();
+        }
     }
         
     /** 

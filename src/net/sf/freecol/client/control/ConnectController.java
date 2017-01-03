@@ -119,7 +119,18 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         final Player player = fcc.getMyPlayer();
         if (!fcc.isLoggedIn()) return true;
-        
+
+        // Save our active unit on reconnect.
+        if (reason == LogoutReason.RECONNECT) {
+            Unit active = getGUI().getActiveUnit();
+            if (active != null && player.owns(active)) {
+                FreeColServer fcs = fcc.getFreeColServer();
+                if (fcs != null) {
+                    fcs.getGame().setInitialActiveUnitId(active.getId());
+                }
+            }
+        }
+            
         logger.info("Logout begin for client " + player.getName()
             + ": " + reason.toString());
         return askServer().logout(player, reason);
@@ -265,19 +276,7 @@ public final class ConnectController extends FreeColClientHolder {
             + "-player game as " + user + "/" + player.getId());
 
         if (fcc.isInGame()) { // Joining existing game or possibly reconnect
-            String active = getGUI().reconnect();
-            Unit u;
-            if (active != null
-                && (u = game.getFreeColGameObject(active, Unit.class)) != null
-                && player.owns(u)) {
-                player.setNextActiveUnit(u);
-                getGUI().changeViewMode(GUI.MOVE_UNITS_MODE);
-                getGUI().setActiveUnit(u);
-                getGUI().centerActiveUnit();
-            } else {
-                getGUI().changeViewMode(GUI.VIEW_TERRAIN_MODE);
-                getGUI().setSelectedTile(player.getFallbackTile());
-            }
+            fcc.restoreGUI(player);
             igc().nextModelMessage();
         } else if (game.getMap() != null
             && game.allPlayersReadyToLaunch()) { // Ready to launch!
@@ -422,8 +421,10 @@ public final class ConnectController extends FreeColClientHolder {
 
         FreeColServer fcs = fcc.startServer(publicServer, singlePlayer, file,
                                             port, serverName);
-        return (fcs == null) ? false
-            : requestLogin(FreeCol.getName(), fcs.getHost(), fcs.getPort());
+        if (fcs == null) return false;
+        fcc.setFreeColServer(fcs);
+        fcc.setSinglePlayer(true);
+        return requestLogin(FreeCol.getName(), fcs.getHost(), fcs.getPort());
     }
 
     /**
@@ -446,14 +447,12 @@ public final class ConnectController extends FreeColClientHolder {
             requestLogout(LogoutReason.LOGIN);
         }
 
-        FreeColServer freeColServer = fcc.startServer(publicServer, false,
-                                                      specification, port);
-        if (freeColServer == null) return false;
-        fcc.setFreeColServer(freeColServer);
+        FreeColServer fcs = fcc.startServer(publicServer, false,
+                                            specification, port);
+        if (fcs == null) return false;
+        fcc.setFreeColServer(fcs);
         fcc.setSinglePlayer(false);
-
-        return requestLogin(FreeCol.getName(),
-                            freeColServer.getHost(), freeColServer.getPort());
+        return requestLogin(FreeCol.getName(), fcs.getHost(), fcs.getPort());
     }
 
     /**

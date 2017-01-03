@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -766,6 +767,17 @@ public final class FreeColClient {
             : clientOptions.getSortedColonies(player);
     }
 
+    /**
+     * Set up the GUI after the game starts or a player reconnects.
+     *
+     * @param player The client {@code Player}.
+     */
+    public void restoreGUI(Player player) {
+        final Game game = getGame();
+        Unit u = game.getInitialActiveUnit();
+        getGUI().reconnect((u != null && player.owns(u)) ? u : null,
+                           player.getFallbackTile());
+    }
 
     // Server handling
 

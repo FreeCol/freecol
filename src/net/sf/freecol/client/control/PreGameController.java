@@ -175,22 +175,8 @@ public final class PreGameController extends FreeColClientHolder {
 
         // Sort out the unit initialization
         final Game game = getGame();
-        Tile entryTile = (player.getEntryLocation() == null) ? null
-            : player.getEntryLocation().getTile();
-        if (currentPlayerIsMyPlayer()) {
-            Unit activeUnit = game.getInitialActiveUnit();
-            if (activeUnit != null) {
-                player.resetIterators();
-                player.setNextActiveUnit(activeUnit);
-                gui.setActiveUnit(activeUnit);
-            } else {
-                gui.setSelectedTile(entryTile);
-            }
-            game.setInitialActiveUnitId(null);
-        } else {
-            gui.setSelectedTile(entryTile);
-        }
-        gui.setupMouseListeners();
+        fcc.restoreGUI(player);
+        game.setInitialActiveUnitId(null);
 
         // Check for debug skipping
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
