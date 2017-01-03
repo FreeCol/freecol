@@ -101,7 +101,7 @@ public class DiplomacySession extends TimedSession {
         return makeSessionKey(DiplomacySession.class,
                               o1.getOwner(), o2.getOwner());
     }
-                                                  
+
 
     /**
      * Get the game this session is in.

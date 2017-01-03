@@ -2847,7 +2847,9 @@ public final class InGameController extends Controller {
         if (tile != null) {
             Unit u = tile.getFirstUnit();
             Settlement s = tile.getOwningSettlement();
-            session = Session.lookup(DiplomacySession.class, u, s);
+            if (u != null && s != null) {
+                session = DiplomacySession.findContactSession(u, s);
+            }
         }
         if (result) {
             if (tile != null) {
