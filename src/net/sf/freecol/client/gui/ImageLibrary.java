@@ -103,7 +103,7 @@ public final class ImageLibrary {
                                ICON_COIN = "image.icon.coin",
                                BELLS = "image.icon.model.goods.bells";
 
-    public static enum PathType {
+    public enum PathType {
         NAVAL,
         WAGON,
         HORSE,

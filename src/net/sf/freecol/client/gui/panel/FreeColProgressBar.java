@@ -115,7 +115,7 @@ public class FreeColProgressBar extends JPanel {
     }
 
     /**
-     * Upate the data of the progress bar.
+     * Update the data of the progress bar.
      *
      * @param min the minimum value of the progress bar
      * @param max the maximum value of the progress bar
@@ -145,6 +145,12 @@ public class FreeColProgressBar extends JPanel {
 
     // Override JComponent
 
+
+    /**
+     * Render the FreeColProgressBar
+     *
+     * @param g The instance of the Graphics Library FreeCol is using
+     */
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D)g.create();
@@ -162,7 +168,7 @@ public class FreeColProgressBar extends JPanel {
         if (value >= max) {
             dvalue = width;
         } else if (max > 0) {
-            dvalue = width * value / max;
+            dvalue = (width * value) / max;
         }
         if (dvalue > 0) {
             if (dvalue > width) {
@@ -173,9 +179,9 @@ public class FreeColProgressBar extends JPanel {
         }
         int dstep = 0;
         if (max > 0) {
-            dstep = width * step / max;
+            dstep = (width * step) / max;
             if (dstep > 0) {
-                if (dstep + dvalue > width) {
+                if ((dstep + dvalue) > width) {
                     dstep = width - dvalue;
                 }
                 g2d.setColor(new Color(0, 0, 0, 40));
@@ -185,25 +191,26 @@ public class FreeColProgressBar extends JPanel {
         }
 
         String stepSignal = (step < 0) ? "-" : "+";
-        String progress = String.valueOf(value) + stepSignal
-            + Math.abs(step) + "/" + max;
+        StringBuilder progress = new StringBuilder(32);
+        progress.append(String.valueOf(value)).append(stepSignal).append(Math.abs(step)).append("/").append(max);
         String turnsString;
         if (max <= value) { // Already complete
             turnsString = "0";
         } else if (step > 0) { // There is progress, how many turns to go?
             int turns = (max - value) / step;
-            if ((max - value) % step > 0) {
+            if (((max - value) % step) > 0) {
                 turns++;
             }
             turnsString = Integer.toString(turns);
         } else { // No progress
             turnsString = Messages.message("notApplicable");
         }
-        progress += " " + Messages.message(StringTemplate
-            .template("freeColProgressBar.turnsToComplete")
-            .addName("%number%", turnsString));
+        progress.append(' ')
+                .append(Messages.message(StringTemplate.template("freeColProgressBar.turnsToComplete")
+                                                       .addName("%number%", turnsString))
+                       );
 
-        int stringWidth = g2d.getFontMetrics().stringWidth(progress);
+        int stringWidth = g2d.getFontMetrics().stringWidth(progress.toString());
         int stringHeight = g2d.getFontMetrics().getAscent()
             + g2d.getFontMetrics().getDescent();
         int restWidth = getWidth() - stringWidth;
@@ -220,8 +227,8 @@ public class FreeColProgressBar extends JPanel {
         g2d.setColor(Color.BLACK);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString(progress,
-                       (restWidth - iconWidth) / 2 + iconWidth,
+        g2d.drawString(progress.toString(),
+                       (restWidth - iconWidth) / 2 + (iconWidth + 8),
                        getHeight() / 2 + stringHeight / 4);
         g2d.dispose();
     }
