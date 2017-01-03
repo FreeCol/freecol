@@ -91,7 +91,8 @@ public class FirstContactMessage extends AttributeMessage {
     }
             
     public boolean getResult() {
-        return getBooleanAttribute(RESULT_TAG);
+        return (hasAttribute(RESULT_TAG)) ? getBooleanAttribute(RESULT_TAG)
+            : null;
     }
 
     public FirstContactMessage setResult(boolean result) {
