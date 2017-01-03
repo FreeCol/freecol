@@ -539,6 +539,7 @@ public class ServerGame extends Game implements ServerModelObject {
             // owner too.
             Stance stance = tradeItem.getStance();
             if (stance != null
+                && source.getStance(dest) != stance
                 && !source.csChangeStance(stance, dest, true, cs)) {
                 logger.warning("Stance trade failure: " + stance);
             }
