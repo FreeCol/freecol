@@ -151,6 +151,7 @@ public class ActionManager extends OptionGroup {
         add(new ShowMainAction(freeColClient));
         add(new ShowMapGeneratorOptionsAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
+        add(new StartMapAction(freeColClient));
         add(new TilePopupAction(freeColClient));
         add(new ToggleViewModeAction(freeColClient));
         add(new TradeRouteAction(freeColClient));
