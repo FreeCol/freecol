@@ -594,11 +594,13 @@ public class DebugUtils {
         boolean problemDetected = lb.grew();
         boolean goodsProblemDetected = false;
         for (GoodsType sg : sGame.getSpecification().getGoodsTypeList()) {
-            int sPrice = sPlayer.getMarket().getBidPrice(sg, 1);
+            int sAmount = sPlayer.getMarket().getAmountInMarket(sg);
             GoodsType cg = cGame.getSpecification().getGoodsType(sg.getId());
-            int cPrice = cPlayer.getMarket().getBidPrice(cg, 1);
-            if (sPrice != cPrice) {
-                lb.add("Goods prices for ", sg, " differ.\n");
+            int cAmount = cPlayer.getMarket().getAmountInMarket(cg);
+            if (sAmount != cAmount) {
+                lb.add("Goods amounts for ", sg, " differ: ",
+                       sPlayer.getMarket().getMarketData(sg), "!=",
+                       cPlayer.getMarket().getMarketData(sg), "\n");
                 goodsProblemDetected = true;
             }
         }
