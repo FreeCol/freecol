@@ -258,6 +258,7 @@ public class DiplomacySession extends TimedSession {
         final ServerPlayer s1 = (ServerPlayer)p1;
         final ServerPlayer s2 = (ServerPlayer)p2;
         final Predicate<Session> pred = s -> (s instanceof DiplomacySession)
+            && ((DiplomacySession)s).getAgreement() != null
             && (((DiplomacySession)s).getAgreement().getContext()
                 == DiplomaticTrade.TradeContext.CONTACT)
             && ((((DiplomacySession)s).getOwner() == s1

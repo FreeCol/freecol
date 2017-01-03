@@ -120,6 +120,26 @@ public class DiplomaticTrade extends FreeColGameObject {
         this.version = version;
     }
 
+    /**
+     * Make a new diplomatic trade for a given context that establishes
+     * peace between two given players.
+     *
+     * @param context The {@code TradeContext} the peace arises in.
+     * @param sender The sending {@code Player}.
+     * @param recipient The recipient {@code Player}.
+     * @return A suitable {@code DiplomaticTrade}.
+     */
+    public static DiplomaticTrade makePeaceTreaty(TradeContext context,
+                                                  Player sender,
+                                                  Player recipient) {
+        final Game game = sender.getGame();
+        DiplomaticTrade dt = new DiplomaticTrade(game, context,
+                                                 sender, recipient, null, 0);
+        dt.add(new StanceTradeItem(game, sender, recipient, Stance.PEACE));
+        dt.add(new StanceTradeItem(game, recipient, sender, Stance.PEACE));
+        return dt;
+    }
+
 
     /**
      * Get the trade context.

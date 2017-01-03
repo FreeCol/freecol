@@ -1720,10 +1720,8 @@ public final class InGameController extends FreeColClientHolder {
         
         // Europeans might be human players, so we convert to a diplomacy
         // dialog.
-        DiplomaticTrade agreement
-            = new DiplomaticTrade(game, TradeContext.TRIBUTE, player, other,
-                                  null, 0);
-        agreement.add(new StanceTradeItem(game, player, other, Stance.PEACE));
+        DiplomaticTrade agreement = DiplomaticTrade
+            .makePeaceTreaty(TradeContext.TRIBUTE, player, other);
         agreement.add(new GoldTradeItem(game, other, player, amount));
         return moveDiplomacy(unit, direction, agreement);
     }

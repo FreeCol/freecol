@@ -4219,9 +4219,11 @@ outer:  for (Effect effect : effects) {
             // Establish a diplomacy session so that if the player
             // accepts the tile offer, we can verify that the offer
             // was made.
-            new DiplomacySession(tile.getFirstUnit(),
-                                 tile.getOwningSettlement(),
-                                 FreeCol.getTimeout(false));
+            DiplomacySession ds = new DiplomacySession(tile.getFirstUnit(),
+                tile.getOwningSettlement(), FreeCol.getTimeout(false));
+            ds.setAgreement(DiplomaticTrade
+                .makePeaceTreaty(DiplomaticTrade.TradeContext.CONTACT,
+                                 this, other));
         }
     }
 
@@ -4249,9 +4251,8 @@ outer:  for (Effect effect : effects) {
         }
 
         // Initial agreement goes first to this player
-        DiplomaticTrade agreement = new DiplomaticTrade(game,
-            DiplomaticTrade.TradeContext.CONTACT, other, this, null, 0);
-        agreement.add(new StanceTradeItem(game, other, this, Stance.PEACE));
+        DiplomaticTrade agreement = DiplomaticTrade
+            .makePeaceTreaty(DiplomaticTrade.TradeContext.CONTACT, this, other);
         DiplomacySession session = (settlement == null)
             ? new DiplomacySession(unit, otherUnit, FreeCol.getTimeout(false))
             : new DiplomacySession(unit, settlement, FreeCol.getTimeout(false));
