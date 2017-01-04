@@ -195,6 +195,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void reconnect(Unit active, Tile tile) {
+        setupMouseListeners();
         setActiveUnit(null);
         requestFocusInWindow();
         initializeInGame();
