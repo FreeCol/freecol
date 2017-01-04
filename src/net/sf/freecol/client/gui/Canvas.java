@@ -1507,8 +1507,12 @@ public final class Canvas extends JDesktopPane {
         Dimension size = getSize();
 
         if (freeColClient.isMapEditor()) {
-            g2d.setColor(Color.BLACK);
-            g2d.fillRect(0, 0, size.width, size.height);
+            if (hasMap()) {
+                mapViewer.displayMap(g2d);
+            } else {
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(0, 0, size.width, size.height);
+            }
 
         } else if (freeColClient.isInGame() && hasMap()) {
             mapViewer.displayMap(g2d);
