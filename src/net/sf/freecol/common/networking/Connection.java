@@ -348,8 +348,8 @@ public class Connection implements Closeable {
         try {
             transformer.transform(source, new StreamResult(sw));
             sw.append(END_OF_STREAM);
-        } catch (TransformerException te) {
-            logger.log(Level.WARNING, "Failed to transform element", te);
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Failed to transform element", ex);
             sw = null;
         }
         return sw;
