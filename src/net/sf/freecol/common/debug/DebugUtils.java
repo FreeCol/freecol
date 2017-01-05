@@ -592,15 +592,16 @@ public class DebugUtils {
         sMap.forEachTile(t -> sPlayer.canSee(t),
                          t -> checkDesyncTile(cGame, sPlayer, t, lb));
         boolean problemDetected = lb.grew();
+        // Do not check goods amount, the server only sends changes to
+        // the client when the *price* changes.
         boolean goodsProblemDetected = false;
         for (GoodsType sg : sGame.getSpecification().getGoodsTypeList()) {
-            int sAmount = sPlayer.getMarket().getAmountInMarket(sg);
+            int sPrice = sPlayer.getMarket().getBidPrice(sg, 1);
             GoodsType cg = cGame.getSpecification().getGoodsType(sg.getId());
-            int cAmount = cPlayer.getMarket().getAmountInMarket(cg);
-            if (sAmount != cAmount) {
-                lb.add("Goods amounts for ", sg, " differ: ",
-                       sPlayer.getMarket().getMarketData(sg), "!=",
-                       cPlayer.getMarket().getMarketData(sg), "\n");
+            int cPrice = cPlayer.getMarket().getBidPrice(cg, 1);
+            if (sPrice != cPrice) {
+                lb.add("Goods prices for ", sg, " differ: ", sPrice,
+                    "!=", cPrice, " ");
                 goodsProblemDetected = true;
             }
         }

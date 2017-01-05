@@ -1773,8 +1773,8 @@ outer:  for (Effect effect : effects) {
                 + ", initial: " + type.getInitialAmount());
             addExtraTrade(new AbstractGoods(type, amount));
         }
-
         flushExtraTrades(random);
+
         csFlushMarket(cs);
     }
 
