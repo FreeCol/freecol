@@ -71,12 +71,10 @@ public abstract class TimedSession extends Session {
     /**
      * Cancel the timer task.
      */
-    protected void cancel() {
-        synchronized(this.timer) {
-            if (this.timer != null) {
-                this.timer.cancel();
-                this.timer = null;
-            }
+    protected synchronized void cancel() {
+        if (this.timer != null) {
+            this.timer.cancel();
+            this.timer = null;
         }
     }
 
