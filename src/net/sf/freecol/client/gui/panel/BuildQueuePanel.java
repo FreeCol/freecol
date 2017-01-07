@@ -111,13 +111,35 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             .class.getName());
 
     private static final DataFlavor BUILD_LIST_FLAVOR
-        = new DataFlavor(List.class, "BuildListFlavor");
+        = new DataFlavor(List.class, "IndexedBuildableFlavor");
 
     // This private constant can be established here, rather than in {@code FreeColPanel}
     // with the other constants so that the resource is only initialized when this class
     // is called.
     /* Constant used by #actionPerformed() */
     private static final String FAIL = "FAIL";
+
+    /**
+     * This class represents a buildable, that is dragged/dropped
+     * accompanied by its index in the source list where it is dragged from.
+     */
+    private class IndexedBuildable {
+        private final BuildableType buildable;
+        private final int index;
+
+        IndexedBuildable(BuildableType buildable, int index) {
+            this.buildable = buildable;
+            this.index = index;
+        }
+
+        BuildableType getBuildable() {
+            return buildable;
+        }
+
+        int getIndex() {
+            return index;
+        }
+    }
 
     /**
      * This class implements a transfer handler able to transfer
@@ -131,7 +153,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         public class BuildablesTransferable implements Transferable {
 
-            private final List<? extends BuildableType> buildables;
+            private final List<IndexedBuildable> indexedBuildables;
 
             private final DataFlavor[] supportedFlavors = {
                 BUILD_LIST_FLAVOR
@@ -141,10 +163,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             /**
              * Default constructor.
              *
-             * @param buildables The build queue to transfer.
+             * @param indexedBuildables The build queue to transfer.
              */
-            public BuildablesTransferable(List<? extends BuildableType> buildables) {
-                this.buildables = buildables;
+            public BuildablesTransferable(List<IndexedBuildable> indexedBuildables) {
+                this.indexedBuildables = indexedBuildables;
             }
 
 
@@ -153,8 +175,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
              *
              * @return The build queue.
              */
-            public List<? extends BuildableType> getBuildables() {
-                return this.buildables;
+            public List<IndexedBuildable> getBuildables() {
+                return this.indexedBuildables;
             }
 
 
@@ -166,7 +188,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             @Override
             public Object getTransferData(DataFlavor flavor)
                 throws UnsupportedFlavorException {
-                if (isDataFlavorSupported(flavor)) return this.buildables;
+                if (isDataFlavorSupported(flavor)) return this.indexedBuildables;
                 throw new UnsupportedFlavorException(flavor);
             }
 
@@ -221,21 +243,19 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             // Collect the transferred buildables.
             final JList<BuildableType> bql
                 = BuildQueuePanel.this.buildQueueList;
-            List<BuildableType> queue = new ArrayList<>();
+            List<IndexedBuildable> queue = new ArrayList<>();
             for (Object object : (List<?>)transferData) {
                 // Fail if:
                 // - dropping a non-Buildable
                 // - dropping a unit in the Building list
                 // - dropping a building in the Unit list
-                // - no minimum index for the buildable is found
-                if (!(object instanceof BuildableType)
-                    || (object instanceof UnitType
-                        && target == BuildQueuePanel.this.buildingList)
-                    || (object instanceof BuildingType
-                        && target == BuildQueuePanel.this.unitList)
-                    || getMinimumIndex((BuildableType)object) < 0)
+                if (!(object instanceof IndexedBuildable)
+                            || (((IndexedBuildable)object).getBuildable() instanceof UnitType
+                            && target == BuildQueuePanel.this.buildingList)
+                            || (((IndexedBuildable)object).getBuildable() instanceof BuildingType
+                            && target == BuildQueuePanel.this.unitList))
                     return false;
-                queue.add((BuildableType)object);
+                queue.add((IndexedBuildable)object);
             }
 
             // Handle the cases where the BQL is not the target.
@@ -267,16 +287,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             // This is where the dragged target was dropped.
             int preferredIndex = target.getSelectedIndex();
             int maxIndex = targetModel.size();
-            int prevPos = -1;
+            final int prevPos = queue.get(0).getIndex();
             if (isOrderingQueue) {
-                // Find previous position
-                for (int i = 0; i < targetModel.getSize(); i++) {
-                    if (targetModel.getElementAt(i) == queue.get(0)) {
-                        prevPos = i;
-                        break;
-                    }
-                }
-
                 // Suppress dropping the selection onto itself.
                 if (preferredIndex != -1 && prevPos == preferredIndex) {
                     //indices = null;
@@ -284,7 +296,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 }
 
                 // Insist drop is within bounds.
-                int maximumIndex = getMaximumIndex(queue.get(0));
+                int maximumIndex = getMaximumIndex(queue.get(0).getBuildable());
                 if (preferredIndex > maximumIndex) {
                     //indices = null;
                     return false;
@@ -293,8 +305,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 this.numberOfItems = queue.size();
 
                 // Remove all transferring elements from the build queue.
-                for (BuildableType bt : queue) {
-                    targetModel.removeElement(bt);
+                for (IndexedBuildable ib : queue) {
+                    targetModel.removeElementAt(ib.getIndex());
                 }
             }
 
@@ -305,7 +317,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             }
 
             for (int index = 0; index < queue.size(); index++) {
-                BuildableType toBuild = queue.get(index);
+                BuildableType toBuild = queue.get(index).getBuildable();
                 int minimumIndex = getMinimumIndex(toBuild);
 
                 // minimumIndex == targetModel.size() means it has to
@@ -363,11 +375,17 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         @Override
         protected Transferable createTransferable(JComponent comp) {
-            
             this.source = BuildQueuePanel.this.convertJComp(comp);
             if (this.source == null) return null;
-            //this.indices = this.source.getSelectedIndices();
-            return new BuildablesTransferable(this.source.getSelectedValuesList());
+            int[] indicesArray = this.source.getSelectedIndices();
+            List<? extends BuildableType> buildableTypes = this.source.getSelectedValuesList();
+            List<IndexedBuildable> indexedBuildables = new ArrayList<>(indicesArray.length);
+            int i = 0;
+            for (int index : indicesArray) {
+                BuildableType bt = buildableTypes.get(i++);
+                indexedBuildables.add(new IndexedBuildable(bt, index));
+            }
+            return new BuildablesTransferable(indexedBuildables);
         }
 
         /**
@@ -419,11 +437,11 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 if (jlist.getSelectedIndex() < 0) {
                     jlist.setSelectedIndex(jlist.locationToIndex(e.getPoint()));
                 }
-                for (BuildableType bt : jlist.getSelectedValuesList()) {
+                for (int index : jlist.getSelectedIndices()) {
                     if (this.add) {
-                        model.addElement(bt);
+                        model.addElement(jlist.getModel().getElementAt(index));
                     } else {
-                        model.removeElement(bt);
+                        model.removeElementAt(index);
                     }
                 }
                 updateAllLists();
