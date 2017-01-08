@@ -1002,8 +1002,13 @@ public final class FreeColClient {
         stopServer();
 
         final ClientOptions co = getClientOptions();
-        FreeColDirectories.removeOutdatedAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX),
-            co.getInteger(ClientOptions.AUTOSAVE_VALIDITY));
+        List<String> excludeSuffixes = new ArrayList<>(2);
+        excludeSuffixes.add(co.getText(ClientOptions.LAST_TURN_NAME));
+        excludeSuffixes.add(co.getText(ClientOptions.BEFORE_LAST_TURN_NAME));
+        FreeColDirectories.removeOutdatedAutosaves(
+                co.getText(ClientOptions.AUTO_SAVE_PREFIX),
+                excludeSuffixes,
+                co.getInteger(ClientOptions.AUTOSAVE_VALIDITY));
         
         // Exit
         int ret = 0;
