@@ -173,7 +173,6 @@ public final class AIInGameInputHandler implements MessageHandler {
 
         final Game game = getGame();
         final String tag = element.getTagName();
-        Element reply = null;
         try {
             switch (tag) {
             case ChooseFoundingFatherMessage.TAG:
@@ -198,7 +197,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 monarchAction(new MonarchActionMessage(game, element));
                 break;
             case MultipleMessage.TAG:
-                reply = multiple(connection, element);
+                multiple(connection, element);
                 break;
             case NationSummaryMessage.TAG:
                 nationSummary(new NationSummaryMessage(game, element));
@@ -213,8 +212,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 newRegionName(new NewRegionNameMessage(game, element));
                 break;
             case TrivialMessage.RECONNECT_TAG:
-                logger.warning("Reconnect on illegal operation,"
-                    + " refer to any previous error message.");
+                logger.info("Reconnect on illegal operation.");
                 break;
             case SetAIMessage.TAG:
                 setAI(new SetAIMessage(game, element));
@@ -256,7 +254,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             logger.log(Level.WARNING, "AI input handler for " + getMyPlayer()
                 + " caught error handling " + tag, e);
         }
-        return reply;
+        return null;
     }
 
     // Individual message handlers
@@ -436,10 +434,9 @@ public final class AIInGameInputHandler implements MessageHandler {
      *
      * @param connection The {@code Connection} the element arrived on.
      * @param element The {@code Element} to process.
-     * @return An {@code Element} containing the response/s.
      */
-    public Element multiple(Connection connection, Element element) {
-        return new MultipleMessage(element).applyHandler(this, connection);
+    private void multiple(Connection connection, Element element) {
+        new MultipleMessage(element).applyHandler(this, connection);
     }
 
     /**
