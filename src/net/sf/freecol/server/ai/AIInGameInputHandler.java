@@ -386,7 +386,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                                          market.getSalePriceComparator());
                 List<Goods> loot = new ArrayList<>();
                 int space = unit.getSpaceLeft();
-                while (!goods.isEmpty()) {
+                while (!goods.isEmpty() && space > 0) {
                     Goods g = goods.remove(0);
                     if (g.getSpaceTaken() > space) continue; // Approximate
                     loot.add(g);
