@@ -31,9 +31,9 @@ import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.control.ChangeSet.See;
 
 
 /**

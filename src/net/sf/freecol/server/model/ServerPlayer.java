@@ -92,6 +92,9 @@ import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.ChangeSet.ChangePriority;
+import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -106,9 +109,6 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
-import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.control.ChangeSet.ChangePriority;
-import net.sf.freecol.server.control.ChangeSet.See;
 
 import org.w3c.dom.Element;
 

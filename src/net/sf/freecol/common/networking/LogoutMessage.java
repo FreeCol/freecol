@@ -22,10 +22,9 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
-import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -125,8 +124,7 @@ public class LogoutMessage extends AttributeMessage {
             }
             if (endTurn
                 && freeColServer.getGame().getCurrentPlayer() == serverPlayer) {
-                cs = freeColServer.getInGameController()
-                    .endTurn(serverPlayer);
+                cs = freeColServer.getInGameController().endTurn(serverPlayer);
             }
             break;
         case END_GAME:

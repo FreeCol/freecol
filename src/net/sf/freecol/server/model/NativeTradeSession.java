@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.control.ChangeSet.See;
+import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.ChangeSet.See;
 
 
 /**

@@ -100,6 +100,9 @@ import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.ChangeSet.ChangePriority;
+import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -123,8 +126,6 @@ import net.sf.freecol.common.util.Utils;
 
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.REFAIPlayer;
-import net.sf.freecol.server.control.ChangeSet.ChangePriority;
-import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.DiplomacySession;
 import net.sf.freecol.server.model.LootSession;
 import net.sf.freecol.server.model.MonarchSession;

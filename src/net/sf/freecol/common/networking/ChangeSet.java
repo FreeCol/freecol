@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.server.control;
+package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
 import java.util.Collection;

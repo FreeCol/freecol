@@ -56,7 +56,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
     
 import org.w3c.dom.Document;

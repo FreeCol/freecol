@@ -25,8 +25,8 @@ import java.util.Set;
 
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
+import net.sf.freecol.common.networking.ChangeSet;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;

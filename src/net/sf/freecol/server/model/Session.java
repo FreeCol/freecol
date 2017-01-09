@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.networking.ChangeSet;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.server.control.ChangeSet;
 
 
 /**

@@ -22,7 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.Random;
 
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.common.networking.ChangeSet;
 
 
 /**
