@@ -113,14 +113,13 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element addPlayer(Element element) {
-        // The message constructor interns the new players directly.
-        new AddPlayerMessage(getFreeColClient().getGame(), element);
+    private void addPlayer(Element element) {
+        final Game game = getGame();
 
+        // The message constructor interns the new players directly.
+        new AddPlayerMessage(game, element);
         getGUI().refreshPlayersTable();
-        return null;
     }
 
     /**
@@ -128,16 +127,14 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element chat(Element element)  {
+    private void chat(Element element)  {
         final Game game = getGame();
         final ChatMessage chatMessage = new ChatMessage(game, element);
 
         getGUI().displayChatMessage(chatMessage.getPlayer(game),
                                     chatMessage.getMessage(),
                                     chatMessage.isPrivate());
-        return null;
     }
 
     /**
@@ -145,13 +142,12 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element error(Element element)  {
+    private void error(Element element)  {
         final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
+
         getGUI().showErrorMessage(errorMessage.getTemplate(),
                                   errorMessage.getMessage());
-        return null;
     }
 
     /**
@@ -159,9 +155,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element login(Element element) {
+    private void login(Element element) {
         final LoginMessage message = new LoginMessage(new Game(), element);
         final String user = message.getUserName();
         final boolean single = message.getSinglePlayer();
@@ -171,8 +166,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
 
         getFreeColClient().getConnectController()
             .login(state, game, user, single, current);
-
-        return null;
     }
 
     /**
@@ -180,9 +173,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element logout(Element element) {
+    private void logout(Element element) {
         final Game game = getGame();
         final LogoutMessage message = new LogoutMessage(game, element);
         final Player player = message.getPlayer(game);
@@ -194,8 +186,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             getFreeColClient().getConnectController()
                 .logout(reason);
         }
-
-        return null;
     }
 
     /**
@@ -204,10 +194,11 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @param connection The {@code Connection} the element arrived on.
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return The result of handling the last {@code Element}.
      */
-    public Element multiple(Connection connection, Element element) {
-        return new MultipleMessage(element).applyHandler(this, connection);
+    public void multiple(Connection connection, Element element) {
+        Element result = new MultipleMessage(element)
+            .applyHandler(this, connection);
+        assert result == null;
     }
 
     /**
@@ -215,9 +206,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element ready(Element element) {
+    private void ready(Element element) {
         final Game game = getGame();
         final ReadyMessage message = new ReadyMessage(game, element);
 
@@ -227,8 +217,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             player.setReady(ready);
             getGUI().refreshPlayersTable();
         }
-
-        return null;
     }
 
     /**
@@ -236,18 +224,16 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element setAvailable(Element element) {
+    private void setAvailable(Element element) {
         final Game game = getGame();
-        final Specification spec = getSpecification();
+        final Specification spec = game.getSpecification();
         final SetAvailableMessage message
             = new SetAvailableMessage(game, element);
 
         game.getNationOptions().setNationState(message.getNation(spec),
                                                message.getNationState());
         getGUI().refreshPlayersTable();
-        return null;
     }
 
     /**
@@ -255,9 +241,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element setColor(Element element) {
+    private void setColor(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         final SetColorMessage message = new SetColorMessage(game, element);
@@ -274,7 +259,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
         } else {
             logger.warning("Invalid nation: " + message.toString());
         }
-        return null;
     }
 
     /**
@@ -282,9 +266,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element setNation(Element element) {
+    private void setNation(Element element) {
         final Game game = getGame();
         final SetNationMessage message = new SetNationMessage(game, element);
 
@@ -294,8 +277,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             player.setNation(nation);
             getGUI().refreshPlayersTable();
         }
-
-        return null;
     }
 
     /**
@@ -303,9 +284,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element setNationType(Element element) {
+    private void setNationType(Element element) {
         final Game game = getGame();
         final SetNationTypeMessage message
             = new SetNationTypeMessage(game, element);
@@ -316,8 +296,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             player.changeNationType(nationType);
             getGUI().refreshPlayersTable();
         }
-
-        return null;
     }
 
     /**
@@ -329,9 +307,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element startGame(@SuppressWarnings("unused") Element element) {
+    private void startGame(@SuppressWarnings("unused") Element element) {
         new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
                 @Override
                 public void run() {
@@ -351,7 +328,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
                         });
                 }
             }.start();
-        return null;
     }
 
     /**
@@ -359,9 +335,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element update(Element element) {
+    private void update(Element element) {
         final Game game = getGame();
         final UpdateMessage message = new UpdateMessage(game, element);
 
@@ -373,7 +348,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 logger.warning("Game node expected: " + fcgo.getId());
             }
         }
-        return null;
     }
 
     /**
@@ -381,18 +355,16 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element updateGameOptions(Element element) {
+    private void updateGameOptions(Element element) {
         final Game game = getGame();
-        final Specification spec = getSpecification();
+        final Specification spec = game.getSpecification();
         final UpdateGameOptionsMessage message
             = new UpdateGameOptionsMessage(game, element);
 
         if (!spec.mergeGameOptions(message.getGameOptions(), "client")) {
             logger.warning("Game option update failed");
         }
-        return null;
     }
     
     /**
@@ -400,11 +372,10 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return Null.
      */
-    private Element updateMapGeneratorOptions(Element element) {
+    private void updateMapGeneratorOptions(Element element) {
         final Game game = getGame();
-        final Specification spec = getSpecification();
+        final Specification spec = game.getSpecification();
         final UpdateMapGeneratorOptionsMessage message
             = new UpdateMapGeneratorOptionsMessage(game, element);
 
@@ -412,6 +383,5 @@ public final class PreGameInputHandler extends ClientInputHandler {
                                            "client")) {
             logger.warning("Map generator option update failed");
         }
-        return null;
     }
 }
