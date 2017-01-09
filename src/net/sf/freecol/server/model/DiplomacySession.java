@@ -98,9 +98,6 @@ public class DiplomacySession extends TimedSession {
      * @return A diplomacy session key.
      */
     private static String makeDiplomacySessionKey(Ownable o1, Ownable o2) {
-System.err.println("DIPSESSION: " + o1 + "/" + o1.getOwner()
-    + " " + o2 + "/" + o2.getOwner() + "\n"
-    + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
         return makeSessionKey(DiplomacySession.class,
                               o1.getOwner(), o2.getOwner());
     }

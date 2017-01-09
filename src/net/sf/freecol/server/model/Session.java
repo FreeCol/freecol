@@ -130,7 +130,6 @@ public abstract class Session {
             ret = this.completed;
             this.completed = true;
         }
-System.err.println("DIPSESSION-COMPLETE " + this.key);
         return ret;
     }
 
@@ -180,7 +179,6 @@ System.err.println("DIPSESSION-COMPLETE " + this.key);
             allSessions.clear();
         }
         for (Session ts : sessions) ts.complete(cs);
-System.err.println("DIPSESSION-COMPLETE-ALL" + allSessions.size());
     }
 
     /**

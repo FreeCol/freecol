@@ -4233,23 +4233,27 @@ outer:  for (Effect effect : effects) {
      *
      * @param unit The {@code Unit} making contact.
      * @param settlement The {@code Settlement} being contacted.
-     * @param otherUnit The {@code Unit} being contacted.
+     * @param otherUnit The other {@code Unit} being contacted.
      * @param cs A {@code ChangeSet} to update.
      */
     public void csEuropeanFirstContact(Unit unit, Settlement settlement,
                                        Unit otherUnit, ChangeSet cs) {
         final Game game = getGame();
 
+        DiplomacySession ds;
         ServerPlayer other;
         if (settlement instanceof Colony) {
             other = (ServerPlayer)settlement.getOwner();
+            ds = DiplomacySession.findContactSession(unit, settlement);
         } else if (otherUnit != null) {
             other = (ServerPlayer)otherUnit.getOwner();
+            ds = DiplomacySession.findContactSession(unit, otherUnit);
         } else {
             throw new RuntimeException("Non-null settlement or "
                     + "other unit required.");
         }
-
+        if (ds != null) return; // Ongoing contact, no action required
+        
         // Initial agreement goes first to this player
         DiplomaticTrade agreement = DiplomaticTrade
             .makePeaceTreaty(DiplomaticTrade.TradeContext.CONTACT, this, other);
