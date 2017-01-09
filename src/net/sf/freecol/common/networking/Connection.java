@@ -366,6 +366,7 @@ public class Connection implements Closeable {
     protected void log(Element element, boolean send) {
         synchronized (this.logTransformer) {
             if (this.logWriter == null) return;
+            this.logTransformer.reset();
             StringWriter sw = elementToStringWriter(this.logTransformer, element);
             if (sw == null) return;
             StringBuffer sb = sw.getBuffer();
@@ -390,6 +391,7 @@ public class Connection implements Closeable {
     private void sendInternal(Element element) throws IOException {
         synchronized (this.outTransformer) {
             if (this.out == null) return;
+            this.outTransformer.reset();
             StringWriter sw = elementToStringWriter(this.outTransformer, element);
             if (sw == null) return;
             this.out.write(sw.toString().getBytes("UTF-8"));
