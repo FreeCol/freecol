@@ -2304,8 +2304,7 @@ outer:  for (Effect effect : effects) {
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
                     logger.warning("Bogus attack from " + attackerTile
-                        + " to " + defenderTile
-                        + "\n" + FreeColDebugger.stackTraceToString());
+                        + " to " + defenderTile);
                 } else {
                     cs.addAttack(vis, attackerUnit, defenderUnit, true);
                 }
@@ -2318,8 +2317,7 @@ outer:  for (Effect effect : effects) {
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
                     logger.warning("Bogus attack from " + attackerTile
-                        + " to " + defenderTile
-                        + "\n" + FreeColDebugger.stackTraceToString());
+                        + " to " + defenderTile);
                 } else {
                     cs.addAttack(vis, attackerUnit, defenderUnit, false);
                 }

@@ -399,4 +399,17 @@ public class FreeColDebugger {
         }
         lb.shrink("\n");
     }
+
+    /**
+     * Log a warning with a stack trace.
+     *
+     * @param logger The {@code Logger} to log to.
+     * @param warn The warning message.
+     */
+    public static void trace(Logger logger, String warn) {
+        LogBuilder lb = new LogBuilder(512);
+        lb.add(warn, "\n");
+        addStackTrace(lb);
+        logger.warning(lb.toString());
+    }
 }

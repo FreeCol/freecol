@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -2925,11 +2926,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
             int uc = getDisplayUnitCount();
             if (uc <= 0) {
-                logger.warning("Unit count fail: " + uc + " id=" + getId()
-                        + " unitCount=" + getUnitCount()
-                        + " scope=" + xw.getWriteScope()
-                        + "/" + xw.getWriteScope().getClient() + "\n"
-                        + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+                FreeCol.trace(logger, "Unit count fail: " + uc
+                    + " id=" + getId()
+                    + " unitCount=" + getUnitCount()
+                    + " scope=" + xw.getWriteScope()
+                    + "/" + xw.getWriteScope().getClient());
             }
             xw.writeAttribute(UNIT_COUNT_TAG, uc);
         }

@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
 
 import org.apache.commons.cli.CommandLine;
@@ -428,6 +429,16 @@ public final class FreeCol {
      */
     public static void gripe(String key) {
         System.err.println(Messages.message(key));
+    }
+
+    /**
+     * Log a warning with a stack trace.
+     *
+     * @param logger The {@code Logger} to log to.
+     * @param warn The warning message.
+     */
+    public static void trace(Logger logger, String warn) {
+        FreeColDebugger.trace(logger, warn);
     }
 
     /**

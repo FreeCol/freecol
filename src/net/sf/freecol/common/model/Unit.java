@@ -950,11 +950,6 @@ public class Unit extends GoodsLocation
      */
     public void setLocationNoUpdate(Location newLocation) {
         this.location = newLocation;
-        if (newLocation instanceof Colony) {
-            logger.warning("Unit->Colony " + this.getId()
-                + " " + ((Colony)newLocation).getId() + "\n"
-                + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
-        }                
     }
 
     /**

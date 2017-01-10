@@ -35,7 +35,6 @@ import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.LoadingSavegameInfo;
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
@@ -156,8 +155,7 @@ public final class ConnectController extends FreeColClientHolder {
             fcc.quit();
             break;
         case LOGIN: // FIXME: This should not happen, drop when convinced
-            logger.warning("logout(LOGIN) detected\n"
-                + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+            FreeCol.trace(logger, "logout(LOGIN) detected");
             fcc.logout(false);
             break;
         case MAIN_TITLE: // All the way back to the MainPanel

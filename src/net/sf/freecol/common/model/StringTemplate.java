@@ -129,7 +129,7 @@ public class StringTemplate extends FreeColObject {
 
     public static StringTemplate name(String value) {
         if (value == null) {
-            logger.warning("NULL NAME TEMPLATE\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+            net.sf.freecol.FreeCol.trace(logger, "Null name template");
         }
         return new StringTemplate(value, null, TemplateType.NAME);
     }

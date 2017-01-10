@@ -30,13 +30,13 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.FontLibrary.FontSize;
 import net.sf.freecol.client.gui.FontLibrary.FontType;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
@@ -144,12 +144,10 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         super(lib, ag);
 
         if (getType() == null) {
-            logger.warning("Bad production label (no type)\n"
-                                   + FreeColDebugger.stackTraceToString());
+            FreeCol.trace(logger, "Bad production label (no type)");
         } else if (getAmount() == 0 && stockNumber < 0) {
-            logger.warning("Bad production label: " + ag
-                                   + " stock=" + stockNumber
-                                   + "\n" + FreeColDebugger.stackTraceToString());
+            FreeCol.trace(logger, "Bad production label: " + ag
+                + " stock=" + stockNumber);
         }
 
         this.maximumProduction = maximumProduction;
@@ -160,19 +158,19 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         final GoodsType horses = freeColClient.getGame().getSpecification()
                                               .getGoodsType("model.goods.horses");
         this.maxIcons = (ag.getType() == horses) ? 1
-                                                 : options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
+            : options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         this.displayNumber = options
-                .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
+            .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
         this.goodsIcon = (ag.getType() == null) ? null
-                                                : new ImageIcon(lib.getIconImage(ag.getType()));
+            : new ImageIcon(lib.getIconImage(ag.getType()));
         this.compressedWidth = (this.goodsIcon == null) ? 0
-                                                        : this.goodsIcon.getIconWidth() * 2;
+            : this.goodsIcon.getIconWidth() * 2;
 
         setFont(FontLibrary.createFont(FontType.SIMPLE,
-                                       FontSize.TINY, Font.BOLD, lib.getScaleFactor()));
+                FontSize.TINY, Font.BOLD, lib.getScaleFactor()));
         setForeground((getAmount() < 0) ? Color.RED : Color.WHITE);
         setToolTipText((getType() == null || getAmount() == 0) ? null
-                                                               : Messages.message(getAbstractGoods().getLabel()));
+            : Messages.message(getAbstractGoods().getLabel()));
 
         final int amount = getAmount();
         boolean showMax = amount > 0 && maximumProduction > amount;
@@ -190,7 +188,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             }
 
             BufferedImage dummy = new BufferedImage(1, 1,
-                                                    BufferedImage.TYPE_INT_ARGB);
+                BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = dummy.createGraphics();
             this.stringImage = lib.getStringImage(g, number,
                                                   getForeground(), getFont());
@@ -209,7 +207,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     @Override
     public void paintComponent(Graphics g) {
         int stringWidth = (this.stringImage == null) ? 0
-                                                     : stringImage.getWidth(null);
+            : stringImage.getWidth(null);
         int drawImageCount = Math.min(Math.abs(getAmount()), this.maxIcons);
         if (drawImageCount == 0) drawImageCount = 1;
         int iconWidth = this.goodsIcon.getIconWidth();
