@@ -52,7 +52,7 @@ public class FreeColTcFile extends FreeColModFile {
      * @throws IOException if thrown while opening the file.
      */
     public FreeColTcFile(final String id) throws IOException {
-        super(new File(FreeColDirectories.getRulesDirectory(), id));
+        super(FreeColDirectories.getTcFile(id));
     }
 
 

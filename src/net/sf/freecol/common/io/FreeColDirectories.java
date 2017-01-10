@@ -983,6 +983,21 @@ public class FreeColDirectories {
     }
 
     /**
+     * Get a total-conversion file.
+     *
+     * @param id The name of the TC to find.
+     * @return The TC file found.
+     * @exception IOException if there is a problem reading the file.
+     */
+    public static File getTcFile(String id) throws IOException {
+        File ret = new File(getRulesDirectory(), id);
+        if (!ret.canRead()) {
+            throw new IOException("Can not read " + ret.getPath());
+        }
+        return ret;
+    }
+
+    /**
      * Gets the user cache directory, that is the directory under which
      * the transient user files live.
      *
