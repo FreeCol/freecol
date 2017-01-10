@@ -147,7 +147,7 @@ public class Messages {
      * @return A list of message file names.
      */
     private static List<String> getMessageFileNames(Locale locale) {
-        return FreeColDataFile.getFileNames(MESSAGE_FILE_PREFIX,
+        return FreeColDirectories.getLocaleFileNames(MESSAGE_FILE_PREFIX,
             MESSAGE_FILE_SUFFIX, locale);
     }
 
@@ -158,7 +158,7 @@ public class Messages {
      * @return A list of mod message file names.
      */
     private static List<String> getModMessageFileNames(Locale locale) {
-        return FreeColDataFile.getFileNames(MOD_MESSAGE_FILE_PREFIX,
+        return FreeColDirectories.getLocaleFileNames(MOD_MESSAGE_FILE_PREFIX,
             MESSAGE_FILE_SUFFIX, locale);
     }
         

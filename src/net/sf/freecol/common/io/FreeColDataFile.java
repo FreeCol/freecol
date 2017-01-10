@@ -114,43 +114,13 @@ public class FreeColDataFile {
     }
 
     /**
-     * Gets a list containing the names of all message files to load.
-     *
-     * @param prefix The file name prefix.
-     * @param suffix The file name suffix.
-     * @param locale The {@code Locale} to generate file names for.
-     * @return A list of candidate file names.
-     */
-    public static List<String> getFileNames(String prefix, String suffix,
-                                            Locale locale) {
-        String language = locale.getLanguage();
-        String country = locale.getCountry();
-        String variant = locale.getVariant();
-
-        List<String> result = new ArrayList<>(4);
-
-        if (!language.isEmpty()) language = "_" + language;
-        if (!country.isEmpty()) country = "_" + country;
-        if (!variant.isEmpty()) variant = "_" + variant;
-
-        result.add(prefix + suffix);
-        String filename = prefix + language + suffix;
-        if (!result.contains(filename)) result.add(filename);
-        filename = prefix + language + country + suffix;
-        if (!result.contains(filename)) result.add(filename);
-        filename = prefix + language + country + variant + suffix;
-        if (!result.contains(filename)) result.add(filename);
-        return result;
-    }
-
-    /**
      * Get a list of candidate resource file names for a given locale.
      *
      * @return A list of resource file names.
      */
     public static List<String> getResourceFileNames() {
-        return getFileNames(RESOURCE_FILE_PREFIX, RESOURCE_FILE_SUFFIX,
-                            Locale.getDefault());
+        return FreeColDirectories.getLocaleFileNames(RESOURCE_FILE_PREFIX,
+            RESOURCE_FILE_SUFFIX, Locale.getDefault());
     }
 
     /**

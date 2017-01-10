@@ -24,10 +24,12 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 import javax.swing.filechooser.FileSystemView;
 
@@ -807,6 +809,38 @@ public class FreeColDirectories {
      */
     public static File getI18nPluralsFile() {
         return new File(getI18nDirectory(), PLURALS_FILE_NAME);
+    }
+
+    /**
+     * Gets a list containing the names of all possible message files
+     * for a locale.
+     *
+     * @param prefix The file name prefix.
+     * @param suffix The file name suffix.
+     * @param locale The {@code Locale} to generate file names for.
+     * @return A list of candidate file names.
+     */
+    public static List<String> getLocaleFileNames(String prefix,
+                                                  String suffix,
+                                                  Locale locale) {
+        String language = locale.getLanguage();
+        String country = locale.getCountry();
+        String variant = locale.getVariant();
+
+        List<String> result = new ArrayList<>(4);
+
+        if (!language.isEmpty()) language = "_" + language;
+        if (!country.isEmpty()) country = "_" + country;
+        if (!variant.isEmpty()) variant = "_" + variant;
+
+        result.add(prefix + suffix);
+        String filename = prefix + language + suffix;
+        if (!result.contains(filename)) result.add(filename);
+        filename = prefix + language + country + suffix;
+        if (!result.contains(filename)) result.add(filename);
+        filename = prefix + language + country + variant + suffix;
+        if (!result.contains(filename)) result.add(filename);
+        return result;
     }
 
     /**
