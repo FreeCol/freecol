@@ -745,6 +745,16 @@ public class FreeColDirectories {
     }
 
     /**
+     * Get a compatibility file.
+     *
+     * @param name The name of the compatibility file.
+     * @return The {@code File} found.
+     */
+    public static File getCompatibilityFile(String name) {
+        return new File(getBaseDirectory(), name);
+    }
+
+    /**
      * Gets the data directory.
      *
      * @return The directory where the data files are located.

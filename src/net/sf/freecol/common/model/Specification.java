@@ -2033,8 +2033,7 @@ public final class Specification {
             zero10X = true;
         }
         if (!zero10X) return;
-        File base = FreeColDirectories.getBaseDirectory();
-        File rolf = new File(base, ROLES_COMPAT_FILE_NAME); 
+        File rolf = FreeColDirectories.getCompatibilityFile(ROLES_COMPAT_FILE_NAME);
         try (
             FileInputStream fis = new FileInputStream(rolf);
         ) {
@@ -3028,8 +3027,7 @@ public final class Specification {
 
         if (this.needUnitChangeTypes) {
             this.needUnitChangeTypes = false;
-            File base = FreeColDirectories.getBaseDirectory();
-            File uctf = new File(base, UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
+            File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
             try (
                  FileInputStream fis = new FileInputStream(uctf);
                  ) {
