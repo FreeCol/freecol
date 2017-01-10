@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 import javax.swing.filechooser.FileSystemView;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.util.OSUtils;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -736,6 +738,16 @@ public class FreeColDirectories {
      */
     public static File getDataDirectory() {
         return dataDirectory;
+    }
+
+    /**
+     * Get the debug-run save file.
+     *
+     * @return The save {@code File}, if any.
+     */
+    public static File getDebugRunSaveFile() {
+        return new File(System.getProperty("user.dir"),
+                        FreeColDebugger.getDebugRunSave());
     }
 
     /**

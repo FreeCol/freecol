@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Player;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -252,7 +253,7 @@ public class FreeColDebugger {
             FreeColServer fcs = freeColClient.getFreeColServer();
             if (fcs != null) {
                 try {
-                    fcs.saveGame(new File(".", getDebugRunSave()),
+                    fcs.saveGame(FreeColDirectories.getDebugRunSaveFile(),
                                  freeColClient.getClientOptions(), null);
                 } catch (IOException e) {}
             }
