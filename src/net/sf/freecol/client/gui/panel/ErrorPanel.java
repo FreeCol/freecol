@@ -80,8 +80,7 @@ public final class ErrorPanel extends FreeColPanel {
     public ErrorPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout());
 
-        File logFile = new File(FreeColDirectories.getLogFilePath());
-        String message = Utils.getUTF8Contents(logFile);
+        String message = FreeColDirectories.getLogFileContents();
         if (message == null) message = Messages.message("errorPanel.loadError");
 
         JTextArea textArea = Utility.getDefaultTextArea(message, columnWidth);

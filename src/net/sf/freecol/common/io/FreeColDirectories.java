@@ -770,6 +770,15 @@ public class FreeColDirectories {
     }
 
     /**
+     * Get the contents of the log file.
+     *
+     * @return A string of the log file contents, or null on error.
+     */
+    public static String getLogFileContents() {
+        return Utils.getUTF8Contents(new File(getLogFilePath()));
+    }
+
+    /**
      * Gets the log file path.
      *
      * @return The log file path.
