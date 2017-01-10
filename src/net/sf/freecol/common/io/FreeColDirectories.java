@@ -637,6 +637,16 @@ public class FreeColDirectories {
     }
 
     /**
+     * Get a specific autosave file.
+     *
+     * @param name The name of the file.
+     * @return The {@code File} found.
+     */
+    public static File getAutosaveFile(String name) {
+        return new File(getAutosaveDirectory(), name);
+    }
+
+    /**
      * Get the autosave files.
      *
      * @param prefix The autosave file prefix.

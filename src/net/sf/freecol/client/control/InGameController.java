@@ -536,9 +536,10 @@ public final class InGameController extends FreeColClientHolder {
         final String beforeLastTurnName = prefix + "-"
             + options.getText(ClientOptions.BEFORE_LAST_TURN_NAME)
             + "." + FreeCol.FREECOL_SAVE_EXTENSION;
-        File autoSaveDir = FreeColDirectories.getAutosaveDirectory();
-        File lastTurnFile = new File(autoSaveDir, lastTurnName);
-        File beforeLastTurnFile = new File(autoSaveDir, beforeLastTurnName);
+       
+        File lastTurnFile = FreeColDirectories.getAutosaveFile(lastTurnName);
+        File beforeLastTurnFile
+            = FreeColDirectories.getAutosaveFile(beforeLastTurnName);
         // if "last-turn" file exists, shift it to "before-last-turn" file
         if (lastTurnFile.exists()) {
             try {
@@ -563,7 +564,7 @@ public final class InGameController extends FreeColClientHolder {
         int turnNumber = game.getTurn().getNumber();
         if (saveGamePeriod >= 1 && turnNumber % saveGamePeriod == 0) {
             String fileName = prefix + "-" + getSaveGameString(game);
-            saveGame(new File(autoSaveDir, fileName));
+            saveGame(FreeColDirectories.getAutosaveFile(fileName));
         }
     }
 
