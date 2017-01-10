@@ -210,19 +210,19 @@ public final class CanvasMouseListener extends FreeColClientHolder
         if (tile == null) return;
 
         switch (canvas.getViewMode()) {
-            case GUI.MOVE_UNITS_MODE:
-                // Clear goto order when active unit is on the tile, else
-                // try to display a settlement.
-                Unit unit = canvas.getActiveUnit();
-                if (unit != null && unit.getTile() == tile) {
-                    igc().clearGotoOrders(unit);
-                    canvas.updateCurrentPathForActiveUnit();
-                } else {
-                    immediateSettlement(tile);
-                }
-                break;
-            case GUI.VIEW_TERRAIN_MODE: default:
-                break;
+        case GUI.MOVE_UNITS_MODE:
+            // Clear goto order when active unit is on the tile, else
+            // try to display a settlement.
+            Unit unit = canvas.getActiveUnit();
+            if (unit != null && unit.getTile() == tile) {
+                igc().clearGotoOrders(unit);
+                canvas.updateCurrentPathForActiveUnit();
+            } else {
+                immediateSettlement(tile);
+            }
+            break;
+        case GUI.VIEW_TERRAIN_MODE: default:
+            break;
         }
         getGUI().setSelectedTile(tile);
     }
