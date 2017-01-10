@@ -56,8 +56,6 @@ public class FreeColDataFile {
     private static final Logger logger = Logger.getLogger(FreeColDataFile.class.getName());
 
     protected static final String ZIP_FILE_EXTENSION = "zip";
-    private static final String RESOURCE_FILE_PREFIX = "resources";
-    private static final String RESOURCE_FILE_SUFFIX = ".properties";
 
     /** A fake URI scheme for resources delegating to other resources. */
     private static final String resourceScheme = "resource:";
@@ -111,16 +109,6 @@ public class FreeColDataFile {
             logger.log(Level.WARNING, "Exception while reading data file.", e);
             return expected;
         }
-    }
-
-    /**
-     * Get a list of candidate resource file names for a given locale.
-     *
-     * @return A list of resource file names.
-     */
-    public static List<String> getResourceFileNames() {
-        return FreeColDirectories.getLocaleFileNames(RESOURCE_FILE_PREFIX,
-            RESOURCE_FILE_SUFFIX, Locale.getDefault());
     }
 
     /**
@@ -182,7 +170,7 @@ public class FreeColDataFile {
         LogBuilder lb = new LogBuilder(64);
         lb.add("Resource mapping");
         lb.mark();
-        for (String fileName : getResourceFileNames()) {
+        for (String fileName : FreeColDirectories.getResourceFileNames()) {
             try (
                 final InputStream is = getInputStream(fileName);
             ) {

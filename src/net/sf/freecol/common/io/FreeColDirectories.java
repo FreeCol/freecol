@@ -77,6 +77,10 @@ public class FreeColDirectories {
 
     private static final String PLURALS_FILE_NAME = "plurals.xml";
 
+    private static final String RESOURCE_FILE_PREFIX = "resources";
+
+    private static final String RESOURCE_FILE_SUFFIX = ".properties";
+
     private static final String RULES_DIRECTORY = "rules";
 
     private static final String SAVE_DIRECTORY = "save";
@@ -926,6 +930,16 @@ public class FreeColDirectories {
     public static File getOptionsFile(String name) {
         File dir = getOptionsDirectory();
         return (dir == null) ? null : new File(dir, name);
+    }
+
+    /**
+     * Get a list of candidate resource file names for a given locale.
+     *
+     * @return A list of resource file names.
+     */
+    public static List<String> getResourceFileNames() {
+        return getLocaleFileNames(RESOURCE_FILE_PREFIX, RESOURCE_FILE_SUFFIX,
+                                  Locale.getDefault());
     }
 
     /**
