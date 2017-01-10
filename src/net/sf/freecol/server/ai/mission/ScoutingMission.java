@@ -140,10 +140,8 @@ public class ScoutingMission extends Mission {
             ? 12 / (path.getTotalTurns() + 1)
             : (loc instanceof IndianSettlement)
             ? 2000 / (path.getTotalTurns() + 1)
-            : (loc instanceof Tile)
-            ? ((((Tile)loc).hasLostCityRumour())
-                ? 1000 / (path.getTotalTurns() + 1)
-                : 50 / (path.getTotalTurns() + 1))
+            : (loc instanceof Tile && ((Tile)loc).hasLostCityRumour())
+            ? 1000 / (path.getTotalTurns() + 1)
             : Integer.MIN_VALUE;
     }
 
