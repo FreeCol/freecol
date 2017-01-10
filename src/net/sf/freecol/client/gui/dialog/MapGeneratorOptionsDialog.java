@@ -84,10 +84,13 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
         if (isEditable()) {
             loadDefaultOptions();
             // FIXME: The update should be solved by PropertyEvent.
-            File mapDirectory = FreeColDirectories.getMapsDirectory();
-            if (mapDirectory != null && mapDirectory.isDirectory()) {
+
+            final List<File> mapFiles = FreeColDirectories.getMapFileList();
+            if (mapFiles == null) {
+                logger.warning("Could not find map files!");
+            } else {
                 JPanel mapPanel = new JPanel();
-                for (File f : loadMapFiles(mapDirectory)) {
+                for (File f : mapFiles) {
                     JButton mapButton = makeMapButton(f);
                     if (mapButton == null) continue;
                     mapButton.addActionListener((ActionEvent ae) -> {
@@ -107,21 +110,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             }
         }
         initialize(frame, choices());
-    }
-
-    /**
-     * Load any map files in a directory.
-     *
-     * For now we are relying on the directory only containing save
-     * games that happen to be valid maps.
-     *
-     * @param dir The directory to load from.
-     * @return A list of potential map files.
-     */
-    private List<File> loadMapFiles(File dir) {
-        final Comparator<File> comp = Comparator.comparing(File::getName);
-        return transform(fileStream(dir), FreeColSavegameFile::fileFilter,
-                         Function.identity(), comp);
     }
 
     /**

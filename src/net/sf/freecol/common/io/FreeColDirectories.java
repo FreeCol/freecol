@@ -27,6 +27,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +52,10 @@ public class FreeColDirectories {
 
     private static final Comparator<File> fileModificationComparator
         = Comparator.comparingLong(File::lastModified);
+
+    private static final Comparator<File> fileNameComparator
+        = Comparator.comparing(File::getName);
+
 
     private static final String AUTOSAVE_DIRECTORY = "autosave";
 
@@ -89,11 +94,14 @@ public class FreeColDirectories {
 
     private static final String RULES_DIRECTORY = "rules";
 
+    private static final String SAVE_GAME_SUFFIX = ".fsg";
+
     private static final String SAVE_DIRECTORY = "save";
 
     private static final String START_MAP_NAME = "startMap.fsg";
 
-    private static final String SEPARATOR = System.getProperty("file.separator");
+    private static final String SEPARATOR
+        = System.getProperty("file.separator");
 
     private static final String XDG_CONFIG_HOME_ENV = "XDG_CONFIG_HOME";
     private static final String XDG_CONFIG_HOME_DEFAULT = ".config";
@@ -101,6 +109,12 @@ public class FreeColDirectories {
     private static final String XDG_DATA_HOME_DEFAULT = ".local/share";
     private static final String XDG_CACHE_HOME_ENV = "XDG_CACHE_HOME";
     private static final String XDG_CACHE_HOME_DEFAULT = ".cache";
+
+    /** Predicate to select readable files that look like saved games. */
+    private static final Predicate<File> saveGameFilter = f ->
+        f.isFile() && f.canRead()
+            && f.getName().endsWith(SAVE_GAME_SUFFIX);
+
 
     // Public names, used by the respective dialogs
 
@@ -117,6 +131,7 @@ public class FreeColDirectories {
     public static final String MAP_GENERATOR_OPTIONS_FILE_NAME
         = "map_generator_options.xml";
 
+    
 
     /**
      * The directory containing automatically created save games.  At
@@ -517,7 +532,19 @@ public class FreeColDirectories {
             autosaveDirectory = dir;
         }
     }
-        
+
+    /**
+     * Collect files from a directory that match a predicate.
+     *
+     * @param dir The directory to load from.
+     * @param pred A {@code Predicate} to match files with.
+     * @return A list of {@code File}s.
+     */
+    private static List<File> collectFiles(File dir, Predicate<File> pred) {
+        return transform(fileStream(dir), pred, Function.<File>identity(),
+                         fileNameComparator);
+    }
+
 
     // Main initialization/bootstrap routines.
     // These need to be called early before the subsidiary directory
@@ -674,7 +701,7 @@ public class FreeColDirectories {
         final Predicate<File> fullPred = pred.and(f ->
             f.getName().startsWith(prefix) && f.getName().endsWith(suffix));
         return (asd == null) ? Collections.emptyList()
-            : transform(asd.listFiles(), fullPred);
+            : collectFiles(asd, fullPred);
     }
 
     /**
@@ -965,6 +992,17 @@ public class FreeColDirectories {
      */
     public static File getMapsDirectory() {
         return new File(getDataDirectory(), MAPS_DIRECTORY);
+    }
+
+    /**
+     * Get the map files.
+     *
+     * @return A list of map files, or null on error.
+     */
+    public static List<File> getMapFileList() {
+        final File mapsDirectory = getMapsDirectory();
+        return (mapsDirectory == null || !mapsDirectory.isDirectory()) ? null
+            : collectFiles(mapsDirectory, saveGameFilter);
     }
 
     /**
