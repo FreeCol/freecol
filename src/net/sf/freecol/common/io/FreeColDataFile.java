@@ -259,24 +259,4 @@ public class FreeColDataFile {
     public String getPath() {
         return file.getPath();
     }
-
-    /**
-     * Check a file is some sort of FreeColDataFile.
-     *
-     * @param f The {@code File} to test.
-     * @param requiredFile If non-null, the filter will accept a directory
-     *     containing this file.
-     * @param endings If the file has one of these suffixes it is acceptable.
-     * @return True if the file is suitable.
-     */
-    public static boolean fileFilter(File f, String requiredFile,
-                                     String... endings) {
-        final String name = f.getName();
-        return (name.startsWith("."))
-            ? false
-            : (requiredFile != null && f.isDirectory())
-            ? new File(f, requiredFile).exists()
-            : any(endings, e -> name.endsWith("." + e)
-                && name.length() > e.length());
-    }
 }

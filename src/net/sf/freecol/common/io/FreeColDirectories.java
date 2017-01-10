@@ -1130,6 +1130,30 @@ public class FreeColDirectories {
     }
 
     /**
+     * Gets the save game files in a given directory.
+     *
+     * @param directory The base directory, or the default locations if null.
+     * @return A stream of save game {@code File}s.
+     */
+    public static Stream<File> getSavegameFiles(File directory) {
+        return (directory == null)
+            ? flatten(Stream.of(FreeColDirectories.getSaveDirectory(),
+                                FreeColDirectories.getAutosaveDirectory()),
+                      d -> fileStream(d, saveGameFilter))
+            : fileStream(directory, saveGameFilter);
+    }
+
+    /**
+     * Gets the save game files in a given directory.
+     *
+     * @param directory The base directory, or the default locations if null.
+     * @return A list of save game {@code File}s.
+     */
+    public static List<File> getSavegameFileList(File directory) {
+        return toList(getSavegameFiles(directory));
+    }
+
+    /**
      * Sets the save game file.
      *
      * @param path The path to the new save game file.
@@ -1157,9 +1181,7 @@ public class FreeColDirectories {
      * @return The recent save game {@code File}, or null if not found.
      */
     public static File getLastSaveGameFile() {
-        return maximize(flatten(Stream.of(FreeColDirectories.getSaveDirectory(),
-                                          FreeColDirectories.getAutosaveDirectory()),
-                                FreeColSavegameFile::getFiles),
+        return maximize(getSavegameFiles(null),
                         fileModificationComparator);
     }
 

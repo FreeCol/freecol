@@ -172,27 +172,4 @@ public class FreeColSavegameFile extends FreeColDataFile {
         throws IOException {
         return new FreeColXMLReader(getInputStream(SAVEGAME_FILE));
     }
-
-
-    /**
-     * Helper to filter suitable file candidates to be made into
-     * FreeColSaveGameFiles.
-     *
-     * @param f The {@code File} to examine.
-     * @return True if the file is suitable.
-     */
-    public static boolean fileFilter(File f) {
-        return fileFilter(f, SAVEGAME_FILE, FreeCol.FREECOL_SAVE_EXTENSION,
-                          ZIP_FILE_EXTENSION);
-    }
-
-    /**
-     * Find all the saved game files in a given directory.
-     *
-     * @param directory The directory to look in.
-     * @return A stream of the saved game files found in the directory.
-     */
-    public static Stream<File> getFiles(File directory) {
-        return fileStream(directory, FreeColSavegameFile::fileFilter);
-    }
 }

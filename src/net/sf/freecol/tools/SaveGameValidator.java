@@ -29,6 +29,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -53,8 +54,8 @@ public class SaveGameValidator {
             File file = new File(name);
             if (file.exists()) {
                 if (file.isDirectory()) {
-                    allFiles.addAll(toList(FreeColSavegameFile.getFiles(file)));
-                } else if (FreeColSavegameFile.fileFilter(file)) {
+                    allFiles.addAll(FreeColDirectories.getSavegameFileList(file));
+                } else if (FreeColDirectories.saveGameFilter.test(file)) {
                     allFiles.add(file);
                 }
             }
