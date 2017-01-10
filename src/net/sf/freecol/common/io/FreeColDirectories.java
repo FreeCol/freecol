@@ -73,7 +73,13 @@ public class FreeColDirectories {
 
     private static final String MAPS_DIRECTORY = "maps";
 
+    private static final String MESSAGE_FILE_PREFIX = "FreeColMessages";
+
+    private static final String MESSAGE_FILE_SUFFIX = ".properties";
+
     private static final String MODS_DIRECTORY = "mods";
+
+    private static final String MOD_MESSAGE_FILE_PREFIX = "ModMessages";
 
     private static final String PLURALS_FILE_NAME = "plurals.xml";
 
@@ -662,7 +668,7 @@ public class FreeColDirectories {
      * @return A list of of autosaved {@code File}s.
      */
     private static List<File> getAutosaveFiles(String prefix,
-                                              Predicate<File> pred) {
+                                               Predicate<File> pred) {
         final String suffix = "." + FreeCol.FREECOL_SAVE_EXTENSION;
         final File asd = getAutosaveDirectory();
         final Predicate<File> fullPred = pred.and(f ->
@@ -807,12 +813,62 @@ public class FreeColDirectories {
     }
 
     /**
+     * Get a list of candidate message file names for a given locale.
+     *
+     * @param locale The {@code Locale} to generate file names for.
+     * @return A list of message {@code File}s.
+     */
+    public static List<File> getI18nMessageFileList(Locale locale) {
+        List<File> result = new ArrayList<>();
+        File i18nDirectory = getI18nDirectory();
+        for (String name : getMessageFileNames(locale)) {
+            File f = new File(i18nDirectory, name);
+            if (f.canRead()) result.add(f);
+        }
+        return result;
+    }
+
+    /**
      * Get the i18n plurals file.
      *
      * @return The plurals {@code File}.
      */
     public static File getI18nPluralsFile() {
         return new File(getI18nDirectory(), PLURALS_FILE_NAME);
+    }
+
+    /**
+     * Get a list of all the supported language identifiers.
+     *
+     * @return A list of language identifiers for which there is an
+     *     i18n-message file.
+     */
+    public static List<String> getLanguageIdList() {
+        File[] files = getI18nDirectory().listFiles();
+        return (files == null) ? Collections.<String>emptyList()
+            : transform(files, f -> f.canRead(), f -> getLanguageId(f));
+    }
+    
+    /**
+     * If this a messages file, work out which language identifier it
+     * belongs to.
+     *
+     * @param file The {@code File} to test.
+     * @return The language identifier found, or null on failure.
+     */
+    public static String getLanguageId(File file) {
+        if (file == null) return null;
+        final String name = file.getName();
+        // Make sure it is at least a messages file.
+        if (name == null
+            || !name.startsWith(MESSAGE_FILE_PREFIX)
+            || !name.endsWith(MESSAGE_FILE_SUFFIX)) return null;
+        String languageId = name.substring(MESSAGE_FILE_PREFIX.length(),
+            name.length() - MESSAGE_FILE_SUFFIX.length());
+        return ("".equals(languageId)) ? "en" // FreeColMessages.properties
+            : ("_qqq".equals(languageId)) ? null // qqq is explanations only
+            : (languageId.startsWith("_")) ? languageId.substring(1)
+            : languageId;
     }
 
     /**
@@ -909,6 +965,28 @@ public class FreeColDirectories {
      */
     public static File getMapsDirectory() {
         return new File(getDataDirectory(), MAPS_DIRECTORY);
+    }
+
+    /**
+     * Get the message file names for a given locale.
+     *
+     * @param locale The {@code Locale} to generate names for.
+     * @return A list of potential message file names.
+     */
+    public static List<String> getMessageFileNames(Locale locale) {
+        return getLocaleFileNames(MESSAGE_FILE_PREFIX, MESSAGE_FILE_SUFFIX,
+                                  locale);
+    }
+
+    /**
+     * Get the mod message file names for a given locale.
+     *
+     * @param locale The {@code Locale} to generate names for.
+     * @return A list of potential mod message file names.
+     */
+    public static List<String> getModMessageFileNames(Locale locale) {
+        return getLocaleFileNames(MOD_MESSAGE_FILE_PREFIX, MESSAGE_FILE_SUFFIX,
+                                  locale);
     }
 
     /**

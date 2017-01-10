@@ -194,27 +194,8 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     private static void initializeLanguages() {
         if (!languages.isEmpty()) return;
 
-        File i18nDirectory = FreeColDirectories.getI18nDirectory();
-        File[] files = i18nDirectory.listFiles();
-        if (files == null) {
-            throw new RuntimeException("No language files could be found"
-                + " in the <" + i18nDirectory + "> directory.");
-        }
-        for (File file : files) {
-            String nam = file.getName();
-            if (nam == null
-                || !nam.startsWith(Messages.MESSAGE_FILE_PREFIX)
-                || !nam.endsWith(Messages.MESSAGE_FILE_SUFFIX)) continue;
-            String languageId
-                = nam.substring(Messages.MESSAGE_FILE_PREFIX.length(),
-                    nam.length() - Messages.MESSAGE_FILE_SUFFIX.length());
-            if ("".equals(languageId)) { // FreeColMessages.properties
-                languageId = "en";
-            } else if ("_qqq".equals(languageId)) { // qqq is explanations only
-                continue;
-            } else if (languageId.startsWith("_")) {
-                languageId = languageId.substring(1);
-            }
+        for (String languageId : FreeColDirectories.getLanguageIdList()) {
+            if (languageId == null) continue;
             try {
                 languages.add(new Language(languageId,
                         Messages.getLocale(languageId)));

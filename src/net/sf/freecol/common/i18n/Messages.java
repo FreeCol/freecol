@@ -90,10 +90,6 @@ public class Messages {
 
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
 
-    public static final String MESSAGE_FILE_PREFIX = "FreeColMessages";
-    public static final String MOD_MESSAGE_FILE_PREFIX = "ModMessages";
-    public static final String MESSAGE_FILE_SUFFIX = ".properties";
-
     public static final String DESCRIPTION_SUFFIX = ".description";
     public static final String SHORT_DESCRIPTION_SUFFIX = ".shortDescription";
     public static final String NAME_SUFFIX = ".name";
@@ -141,28 +137,6 @@ public class Messages {
     }
 
     /**
-     * Get a list of candidate message file names for a given locale.
-     *
-     * @param locale The {@code Locale} to generate file names for.
-     * @return A list of message file names.
-     */
-    private static List<String> getMessageFileNames(Locale locale) {
-        return FreeColDirectories.getLocaleFileNames(MESSAGE_FILE_PREFIX,
-            MESSAGE_FILE_SUFFIX, locale);
-    }
-
-    /**
-     * Get a list of candidate mod message file names for a given locale.
-     *
-     * @param locale The {@code Locale} to generate file names for.
-     * @return A list of mod message file names.
-     */
-    private static List<String> getModMessageFileNames(Locale locale) {
-        return FreeColDirectories.getLocaleFileNames(MOD_MESSAGE_FILE_PREFIX,
-            MESSAGE_FILE_SUFFIX, locale);
-    }
-        
-    /**
      * Load the message bundle for the given locale
      *
      * Error messages have to go to System.err as this routine is called
@@ -199,13 +173,11 @@ public class Messages {
             ? Locale.getDefault() : locale;
         setGrammaticalNumber(NumberRules.getNumberForLanguage(loc.getLanguage()));
 
-        for (String name : getMessageFileNames(locale)) {
-            File file = new File(FreeColDirectories.getI18nDirectory(), name);
-            if (!file.exists()) continue; // Expected
+        for (File f : FreeColDirectories.getI18nMessageFileList(locale)) {
             try {
-                loadMessages(new FileInputStream(file));
+                loadMessages(new FileInputStream(f));
             } catch (IOException e) {
-                System.err.println("Failed to load messages from " + name
+                System.err.println("Failed to load messages from " + f.getPath()
                     + ": " + e.getMessage());
             }
         }
@@ -263,7 +235,8 @@ public class Messages {
         allMods.addAll(Mods.getAllMods());
         allMods.addAll(Mods.getRuleSets());
 
-        List<String> filenames = getMessageFileNames(locale);
+        List<String> filenames
+            = FreeColDirectories.getModMessageFileNames(locale);
         for (FreeColModFile fcmf : allMods) {
             for (String name : filenames) {
                 try {
@@ -285,8 +258,10 @@ public class Messages {
      */
     public static void loadActiveModMessageBundle(List<FreeColModFile> mods,
                                                   Locale locale) {
+        List<String> filenames
+            = FreeColDirectories.getModMessageFileNames(locale);
         for (FreeColModFile fcmf : mods) {
-            for (String name : getModMessageFileNames(locale)) {
+            for (String name : filenames) {
                 try {
                     loadMessages(fcmf.getInputStream(name));
                 } catch (IOException e) { // Failures expected
