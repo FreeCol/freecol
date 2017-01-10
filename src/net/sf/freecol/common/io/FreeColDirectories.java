@@ -20,6 +20,7 @@ package net.sf.freecol.common.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
@@ -784,6 +785,43 @@ public class FreeColDirectories {
      */
     public static void setLogFilePath(String path) {
         logFilePath = path;
+    }
+
+    /**
+     * Gets a new log writer.
+     *
+     * @return The log {@code Writer}.
+     * @exception FreeColException if there was a problem creating the writer.
+     */
+    public static Writer getLogWriter() throws FreeColException {
+        String path = getLogFilePath();
+        File file = new File(path);
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                throw new FreeColException("Log file \"" + path
+                    + "\" could not be created.");
+            } else if (file.isFile()) {
+                try {
+                    file.delete();
+                } catch (SecurityException ex) {} // Do what?
+            }
+        }
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new FreeColException("Log file \"" + path
+                + "\" could not be created.", e);
+        }
+        if (!file.canWrite()) {
+            throw new FreeColException("Can not write in log file \""
+                + path + "\".");
+        }
+        Writer writer = Utils.getFileUTF8Writer(file);
+        if (writer == null) {
+            throw new FreeColException("Can not create writer for log file \""
+                + path + "\".");
+        }
+        return writer;
     }
 
     /**

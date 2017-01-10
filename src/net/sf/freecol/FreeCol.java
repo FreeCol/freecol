@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -294,9 +295,9 @@ public final class FreeCol {
         for (Handler handler : baseLogger.getHandlers()) {
             baseLogger.removeHandler(handler);
         }
-        String logFile = FreeColDirectories.getLogFilePath();
         try {
-            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile));
+            Writer writer = FreeColDirectories.getLogWriter();
+            baseLogger.addHandler(new DefaultHandler(consoleLogging, writer));
             for (LogLevel ll : logLevels) ll.buildLogger();
         } catch (FreeColException e) {
             System.err.println("Logging initialization failure: "

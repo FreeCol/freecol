@@ -54,42 +54,13 @@ public final class DefaultHandler extends Handler {
      * The constructor to use.
      * 
      * @param consoleLogging The flag to log to the console as well.
-     * @param fileName The name of a file to log to.
-     * @exception FreeColException In case the log file could not be
-     *     created/written to.
+     * @param writer The {@code Writer} to use for logging.
      */
-    public DefaultHandler(boolean consoleLogging, String fileName)
+    public DefaultHandler(boolean consoleLogging, Writer writer)
         throws FreeColException {
         this.consoleLogging = consoleLogging;
-
-        File file = new File(fileName);
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                throw new FreeColException("Log file \"" + fileName
-                    + "\" could not be created.");
-            } else if (file.isFile()) {
-                try {
-                    file.delete();
-                } catch (SecurityException ex) {} // Do what?
-            }
-        }
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            throw new FreeColException("Log file \"" + fileName
-                + "\" could not be created.", e);
-        }
-        if (!file.canWrite()) {
-            throw new FreeColException("Can not write in log file \""
-                + fileName + "\".");
-        }
-        synchronized (this.writerLock) {
-            if ((this.writer = Utils.getFileUTF8Writer(file)) == null) {
-                throw new FreeColException("Can not create writer for log file \""
-                    + fileName + "\".");
-            }
-        }
-
+        this.writer = writer;
+        
         // We should use XMLFormatter here in the future
         // or maybe a self-made HTMLFormatter.
         setFormatter(new TextFormatter());
