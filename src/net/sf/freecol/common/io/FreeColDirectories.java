@@ -73,6 +73,8 @@ public class FreeColDirectories {
 
     private static final String MODS_DIRECTORY = "mods";
 
+    private static final String PLURALS_FILE_NAME = "plurals.xml";
+
     private static final String RULES_DIRECTORY = "rules";
 
     private static final String SAVE_DIRECTORY = "save";
@@ -786,6 +788,15 @@ public class FreeColDirectories {
      */
     public static String getLogFileContents() {
         return Utils.getUTF8Contents(new File(getLogFilePath()));
+    }
+
+    /**
+     * Get the i18n plurals file.
+     *
+     * @return The plurals {@code File}.
+     */
+    public static File getI18nPluralsFile() {
+        return new File(getI18nDirectory(), PLURALS_FILE_NAME);
     }
 
     /**

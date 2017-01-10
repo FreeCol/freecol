@@ -177,10 +177,9 @@ public class Messages {
             Locale.setDefault(locale);
         }
 
-        File i18nDirectory = FreeColDirectories.getI18nDirectory();
         if (!NumberRules.isInitialized()) {
             // attempt to read grammatical rules
-            File cldr = new File(i18nDirectory, "plurals.xml");
+            File cldr = FreeColDirectories.getI18nPluralsFile();
             if (cldr.exists()) {
                 try {
                     try (FileInputStream in = new FileInputStream(cldr)) {
@@ -201,7 +200,7 @@ public class Messages {
         setGrammaticalNumber(NumberRules.getNumberForLanguage(loc.getLanguage()));
 
         for (String name : getMessageFileNames(locale)) {
-            File file = new File(i18nDirectory, name);
+            File file = new File(FreeColDirectories.getI18nDirectory(), name);
             if (!file.exists()) continue; // Expected
             try {
                 loadMessages(new FileInputStream(file));
