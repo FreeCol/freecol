@@ -42,6 +42,7 @@ import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Role;
@@ -235,7 +236,7 @@ public class Messages {
     public static void loadModMessageBundle(Locale locale) {
         List<FreeColModFile> allMods = new ArrayList<>();
         allMods.addAll(Mods.getAllMods());
-        allMods.addAll(Mods.getRuleSets());
+        allMods.addAll(FreeColTcFile.getRulesList());
 
         List<String> filenames
             = FreeColDirectories.getModMessageFileNames(locale);

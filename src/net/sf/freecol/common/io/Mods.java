@@ -97,14 +97,4 @@ public class Mods {
     public static FreeColModFile getFreeColModFile(String id) {
         return allMods.get(id);
     }
-
-    /**
-     * Gets all available rulesets.
-     *
-     * @return A list of {@code FreeColModFile}s containing rulesets.
-     */
-    public static List<FreeColTcFile> getRuleSets() {
-        return transform(fileStream(FreeColDirectories.getRulesDirectory()),
-                         FreeColTcFile::fileFilter, FreeColTcFile::make);
-    }
 }

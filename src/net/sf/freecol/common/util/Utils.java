@@ -309,4 +309,33 @@ public class Utils {
             }
         }
     }
+
+    /**
+     * Does a readable file have a matching suffix?
+     *
+     * @param file The {@code File} to check.
+     * @param suffixes Suffixes to test.
+     * @return True if any suffix matches.
+     */
+    public static boolean fileAnySuffix(File file, String... suffixes) {
+        if (file == null || !file.isFile() || !file.canRead()) return false;
+        final String name = file.getName();
+        for (String s : suffixes) if (name.endsWith(s)) return true;
+        return false;
+    }
+
+    /**
+     * Does a directory contain the given file/s?
+     *
+     * @param dir The directory {@code File} to check.
+     * @param names The name of the files to find therein.
+     * @return True if the file is present and readable.
+     */
+    public static boolean directoryAllPresent(File dir, String... names) {
+        if (dir == null || !dir.isDirectory() || !dir.canRead()) return false;
+        for (String n : names) {
+            if (!new File(dir, n).canRead()) return false;
+        }
+        return true;
+    }
 }

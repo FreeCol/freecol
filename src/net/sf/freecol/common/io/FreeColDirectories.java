@@ -84,6 +84,8 @@ public class FreeColDirectories {
 
     private static final String MODS_DIRECTORY = "mods";
 
+    private static final String MOD_FILE_SUFFIX = ".fmd";
+
     private static final String MOD_MESSAGE_FILE_PREFIX = "ModMessages";
 
     private static final String PLURALS_FILE_NAME = "plurals.xml";
@@ -98,22 +100,23 @@ public class FreeColDirectories {
 
     private static final String SAVE_DIRECTORY = "save";
 
+    private static final String SPECIFICATION_FILE_NAME = "specification.xml";
+
     private static final String START_MAP_NAME = "startMap.fsg";
 
     private static final String SEPARATOR
         = System.getProperty("file.separator");
 
+    private static final String TC_FILE_SUFFIX = ".ftc";
+
+    private static final String ZIP_FILE_SUFFIX = ".zip";
+    
     private static final String XDG_CONFIG_HOME_ENV = "XDG_CONFIG_HOME";
     private static final String XDG_CONFIG_HOME_DEFAULT = ".config";
     private static final String XDG_DATA_HOME_ENV = "XDG_DATA_HOME";
     private static final String XDG_DATA_HOME_DEFAULT = ".local/share";
     private static final String XDG_CACHE_HOME_ENV = "XDG_CACHE_HOME";
     private static final String XDG_CACHE_HOME_DEFAULT = ".cache";
-
-    /** Predicate to select readable files that look like saved games. */
-    private static final Predicate<File> saveGameFilter = f ->
-        f.isFile() && f.canRead()
-            && f.getName().endsWith(SAVE_GAME_SUFFIX);
 
 
     // Public names, used by the respective dialogs
@@ -131,8 +134,28 @@ public class FreeColDirectories {
     public static final String MAP_GENERATOR_OPTIONS_FILE_NAME
         = "map_generator_options.xml";
 
-    
+    public static final String MOD_DESCRIPTOR_FILE_NAME = "mod.xml";
 
+    /** Predicate to filter suitable candidates to be made into mods. */
+    private static final Predicate<File> modFileFilter = f ->
+        Utils.fileAnySuffix(f, MOD_FILE_SUFFIX, ZIP_FILE_SUFFIX)
+            || Utils.directoryAllPresent(f, MOD_DESCRIPTOR_FILE_NAME);
+
+    /**
+     * Predicate to select readable files that look like saved games.
+     * Public for SaveGameValidator.
+     */
+    public static final Predicate<File> saveGameFilter = f ->
+        f.isFile() && f.canRead()
+            && f.getName().endsWith(SAVE_GAME_SUFFIX);
+
+    /** Predicate to filter suitable candidates to be made into TCs. */
+    private static final Predicate<File> tcFileFilter = f ->
+        Utils.fileAnySuffix(f, TC_FILE_SUFFIX, ZIP_FILE_SUFFIX)
+            || Utils.directoryAllPresent(f, MOD_DESCRIPTOR_FILE_NAME,
+                                         SPECIFICATION_FILE_NAME);
+
+    
     /**
      * The directory containing automatically created save games.  At
      * program start, the path of this directory is based on the path
@@ -1159,6 +1182,15 @@ public class FreeColDirectories {
             throw new IOException("Can not read " + ret.getPath());
         }
         return ret;
+    }
+
+    /**
+     * Get all available rules files.
+     *
+     * @return A list of {@code File}s containing rulesets.
+     */
+    public static List<File> getTcFileList() {
+        return collectFiles(getRulesDirectory(), tcFileFilter);
     }
 
     /**

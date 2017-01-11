@@ -44,11 +44,15 @@ public class ModTest extends FreeColTestCase {
     public void testGetRuleSets() {
         // Check that all rule sets can be loaded
         Set<String> ids = new HashSet<String>();
-        for (FreeColModFile mod : Mods.getRuleSets()) {
+        for (FreeColModFile mod : Mods.getAllMods()) {
             assertNotNull("Null identifier for " + mod, mod.getId());
             ids.add(mod.getId());
         }
-
+        for (FreeColTcFile tc : FreeColTcFile.getRulesList()) {
+            assertNotNull("Null identifier for " + tc, tc.getId());
+            ids.add(tc.getId());
+        }
+            
         assertTrue(ids.contains("freecol"));
         assertTrue(ids.contains("classic"));
         // Testing has no mod descriptor

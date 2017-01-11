@@ -21,9 +21,12 @@ package net.sf.freecol.common.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.resources.ResourceMapping;
 
 
@@ -79,30 +82,20 @@ public class FreeColTcFile extends FreeColModFile {
         return result;
     }
 
-
     /**
-     * Helper to filter suitable file candidates to be made into
-     * FreeColTcFiles with {@link #make(File)}
+     * Get all the standard rule sets.
      *
-     * @param f The {@code File} to examine.
-     * @return True if the file is suitable.
+     * @return A list of {@code FreeColTcFile}s holding the rule sets.
      */
-    public static boolean fileFilter(File f) {
-        return fileFilter(f, MOD_DESCRIPTOR_FILE, "ftc", ZIP_FILE_EXTENSION);
-    }
-
-    /**
-     * Helper to make a TC file from a given file, logging the exception.
-     *
-     * @param f The {@code File} to try to make the TC from.
-     * @return A new {@code FreeColTcFile}, or null on error.
-     */
-    public static FreeColTcFile make(File f) {
-        try {
-            return new FreeColTcFile(f);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to load TC from: " + f, ioe);
+    public static List<FreeColTcFile> getRulesList() {
+        List<FreeColTcFile> ret = new ArrayList<>();
+        for (File f : FreeColDirectories.getTcFileList()) {
+            try {
+                ret.add(new FreeColTcFile(f));
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Failed to load TC from: " + f, ioe);
+            }
         }
-        return null;
+        return ret;
     }
 }

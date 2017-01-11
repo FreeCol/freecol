@@ -226,7 +226,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         String selectTC;
         if (this.fixedSpecification == null) { // Allow TC selection
             selectTC = FreeCol.getTC();
-            for (FreeColTcFile tc : Mods.getRuleSets()) {
+            for (FreeColTcFile tc : FreeColTcFile.getRulesList()) {
                 this.rulesBox.addItem(tc);
                 if (selectTC.equals(tc.getId())) {
                     this.rulesBox.setSelectedItem(tc);
@@ -234,7 +234,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             }
         } else { // Force the use of the TC that contains the given spec
             selectTC = this.fixedSpecification.getId();
-            for (FreeColTcFile tc : Mods.getRuleSets()) {
+            for (FreeColTcFile tc : FreeColTcFile.getRulesList()) {
                 if (selectTC.equals(tc.getId())) {
                     this.rulesBox.addItem(tc);
                     this.rulesBox.setSelectedItem(tc);
