@@ -246,6 +246,114 @@ final class ReceivingThread extends Thread {
         connection.disconnect();
     }
 
+    // Individual parts of listen().  Work in progress
+    private String peek(FreeColXMLReader xr) {
+        try {
+            xr.nextTag();
+            return xr.getLocalName();
+        } catch (XMLStreamException xse) {
+            // Expected to fail at EOS
+        }
+        return TrivialMessage.DISCONNECT_TAG;
+    }
+
+    private DOMMessage reader(BufferedInputStream bis)
+        throws IOException, SAXException {
+        bis.reset();
+        return new DOMMessage(bis);
+    }
+
+    private void reply(DOMMessage msg, int replyId) {
+        NetworkReplyObject nro = waitingThreads.remove(replyId);
+        if (nro == null) {
+            logger.warning("Could not find reply: " + replyId);
+        } else {
+            nro.setResponse(msg);
+        }
+    }
+
+    private Thread query(DOMMessage msg, final int replyId) {
+        return new Thread(this.connection.getName() + "-query-" + replyId + "-"
+                          + msg.getType()) {
+            @Override
+            public void run() {
+                final String tag = msg.getType();
+                try {
+                    ReceivingThread.this.connection.handleQuery(msg, replyId);
+                } catch (FreeColException fce) {
+                    logger.log(Level.WARNING, "Query " + replyId
+                        + " handler for " + tag + " failed", fce);
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Query " + replyId
+                        + " response send for " + tag + " failed", ioe);
+                }
+            }
+        };
+    }
+
+    private Thread update(DOMMessage msg) {
+        return new Thread(this.connection.getName() + "-update-"
+                          + msg.getType()) {
+            @Override
+            public void run() {
+                final String tag = msg.getType();
+                try {
+                    ReceivingThread.this.connection.handleUpdate(msg);
+                } catch (FreeColException fce) {
+                    logger.log(Level.WARNING, "Update handler for " + tag
+                        + " failed", fce);
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Update send for " + tag
+                        + " failed", ioe);
+                }
+            }
+        };
+    }
+
+    /**
+     * Respond to an incoming message according to it tag
+     * optionally starting a handler thread.
+     *
+     * @param bis The {@code BufferedInputStream} to read the message from.
+     * @param tag The message tag.
+     * @param replyId The replyId, if any.
+     */
+    private void handle(BufferedInputStream bis, String tag, int replyId)
+        throws IOException, SAXException {
+        Thread t = null;
+        DOMMessage msg;
+        switch (tag) {
+
+        case Connection.REPLY_TAG:
+            // A reply.  Always respond, even when failing, so as to
+            // unblock the waiting thread.
+            try {
+                msg = reader(bis);
+                reply(msg, replyId);
+            } catch (IOException|SAXException ex) {
+                reply(null, replyId);
+                throw ex;
+            }
+            return;
+
+        case Connection.QUESTION_TAG:
+            // A query.  Build a thread to handle it and send a reply.
+            msg = reader(bis);
+            t = query(msg, replyId);
+            break;
+            
+        default:
+            // An ordinary update message.  Build a thread to handle
+            // it and possibly respond.
+            msg = reader(bis);
+            t = update(msg);
+            break;
+        }
+
+        // Start the thread
+        t.start();
+    }
+
     /**
      * Listens to the InputStream and calls the MessageHandler for
      * each message received.
@@ -260,134 +368,53 @@ final class ReceivingThread extends Thread {
         // Open a rewindable stream
         final int LOOK_AHEAD = Connection.BUFFER_SIZE;
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
+
+        // Start using FreeColXMLReader.  This must grow.
+        FreeColXMLReader xr = null;
         bis.mark(LOOK_AHEAD);
-        FreeColXMLReader xr = new FreeColXMLReader(bis);
-
-        // Peek at the tag of the first item in the stream.
         try {
-            String tag;
-            int replyId;
-            try {
-                xr.nextTag();
-                tag = xr.getLocalName();
+            xr = new FreeColXMLReader(bis); //.setTracing(true);
+            String tag = peek(xr);
+            int replyId = -1;
+            if (TrivialMessage.DISCONNECT_TAG.equals(tag)) {
+                // Could not read tag, or real disconnect.
+                // Signal stop, and do *not* try to read reply id, it will fail
+                askToStop();
+            } else {
                 replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
-            } catch (XMLStreamException xse) {
-                // EOS can occur when the other end disconnects
-                tag = TrivialMessage.DISCONNECT_TAG;
-                replyId = -1;
             }
-
-            // Respond to message according to tag, optionally defining a
-            // thread to start.
-            Thread t = null;
-            DOMMessage msg;
-            switch (tag) {
-
-            case Connection.REPLY_TAG:
-                // A reply.  Look up its waiting thread and set a response.
-                NetworkReplyObject nro = waitingThreads.remove(replyId);
-                if (nro == null) {
-                    logger.warning("Could not find replyId: " + replyId);
-                    return;
-                }
-                try {
-                    bis.reset();
-                    msg = new DOMMessage(bis);
-                    nro.setResponse(msg);
-                } catch (IOException|SAXException ex) {
-                    // Always respond, even when failed, so as to unblock the
-                    // waiting thread.
-                    nro.setResponse(null);
-                    throw ex;
-                }
-                return;
-
-            case Connection.QUESTION_TAG:
-                // A query.  Build a thread to handle it and send a reply.
-                bis.reset();
-                msg = new DOMMessage(bis);
-                final int finalReplyId = replyId;
-                t = new Thread(msg.getType()) {
-                        @Override
-                        public void run() {
-                            String tag = msg.getType();
-                            try {
-                                ReceivingThread.this.connection
-                                    .handleQuery(msg, finalReplyId);
-                            } catch (FreeColException fce) {
-                                logger.log(Level.WARNING, "Query "
-                                    + finalReplyId
-                                    + " handler for " + tag + " failed", fce);
-                            } catch (IOException ioe) {
-                                logger.log(Level.WARNING, "Query "
-                                    + finalReplyId
-                                    + " response send for " + tag + " failed",
-                                    ioe);
-                            }
-                        }
-                    };
-                break;
-
-            case TrivialMessage.DISCONNECT_TAG:
-                askToStop(); // Stop soon
-                // Fall through
-            default:
-                // An ordinary update message.  Build a thread to handle
-                // it and possibly respond.
-                bis.reset();
-                msg = new DOMMessage(bis);
-                t = new Thread(msg.getType()) {
-                        @Override
-                        public void run() {
-                            String tag = msg.getType();
-                            try {
-                                ReceivingThread.this.connection.handleUpdate(msg);
-                            } catch (FreeColException fce) {
-                                logger.log(Level.WARNING, "Update handler for "
-                                    + tag + " failed", fce);
-                            } catch (IOException ioe) {
-                                logger.log(Level.WARNING, "Update send for "
-                                    + tag + " failed", ioe);
-                            }
-                        }
-                    };
-                break;
-            }
-
-            // Start the optional thread
-            if (t != null) {
-                t.setName(this.connection.getName() + "-MessageHandler-"
-                    + t.getName());
-                t.start();
-            }
+            handle(bis, tag, replyId);
         } finally {
-            xr.close();
+            if (xr != null) xr.close();
         }
     }
 
+
+    // Override Thread
+
     /**
-     * Receives messages from the network in a loop. This method is
-     * invoked when the thread starts and the thread will stop when
-     * this method returns.
+     * {@inheritDoc}
      */
     @Override
     public void run() {
+        // Receive messages from the network in a loop. This method is
+        // invoked when the thread starts and the thread will stop when
+        // this method returns.
         int timesFailed = 0;
-
         try {
             while (shouldRun()) {
                 try {
                     listen();
                     timesFailed = 0;
-                } catch (SAXException|XMLStreamException e) {
+                } catch (SAXException|XMLStreamException ex) {
                     if (!shouldRun()) break;
-                    logger.log(Level.WARNING, "XML fail", e);
+                    logger.log(Level.WARNING, "XML fail", ex);
                     if (++timesFailed > MAXIMUM_RETRIES) {
                         disconnect();
                     }
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     if (!shouldRun()) break;
-                    logger.log(Level.WARNING, "IO fail", e);
+                    logger.log(Level.WARNING, "IO fail", ioe);
                     disconnect();
                 }
             }
