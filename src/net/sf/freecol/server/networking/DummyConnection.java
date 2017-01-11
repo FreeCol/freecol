@@ -36,6 +36,7 @@ public final class DummyConnection extends Connection {
     /** The message handler to simulate using when receiving messages. */
     private MessageHandler outgoingMessageHandler;
 
+    /** The other connection, to which outgoing requests are forwarded .*/
     private DummyConnection otherConnection;
 
 
@@ -63,16 +64,6 @@ public final class DummyConnection extends Connection {
     }
 
     /**
-     * Sets the other connection for this dummy connection.
-     *
-     * @param dc The {@code DummyConnection} to connect to.
-     */
-    public void setConnection(DummyConnection dc) {
-        this.otherConnection = dc;
-        setOutgoingMessageHandler(dc.getMessageHandler());
-    }
-
-    /**
      * Gets the {@code DummyConnection} this object is connected to.
      *
      * @return The {@code DummyConnection} .
@@ -80,6 +71,19 @@ public final class DummyConnection extends Connection {
     public DummyConnection getOtherConnection() {
         return otherConnection;
     }
+
+    /**
+     * Sets the other connection for this dummy connection.
+     *
+     * @param dc The {@code DummyConnection} to connect to.
+     */
+    public void setOtherConnection(DummyConnection dc) {
+        this.otherConnection = dc;
+        setOutgoingMessageHandler(dc.getMessageHandler());
+    }
+
+
+    // Override Connection
 
     /**
      * {@inheritDoc}
@@ -94,36 +98,24 @@ public final class DummyConnection extends Connection {
      */
     @Override
     public void close() {
-        // Do nothing.
+        this.otherConnection = null;
     }
 
     /**
-     * Sends the given message over this Connection.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information
-     * @throws IOException If an error occur while sending the message.
-     * @see #sendAndWait(Element)
-     * @see #ask(Element)
+     * {@inheritDoc}
      */
     @Override
     public void send(Element element) throws IOException {
+        if (!isAlive()) return;
         try {
-            outgoingMessageHandler.handle(getOtherConnection(), element);
+            getOtherConnection().handle(element);
             log(element, true);
         } catch (FreeColException e) {
         }
     }
 
     /**
-     * Sends the given message over this {@code Connection} and waits for
-     * confirmation of receival before returning.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information
-     * @throws IOException If an error occur while sending the message.
-     * @see #send(Element)
-     * @see #ask(Element)
+     * {@inheritDoc}
      */
     @Override
     public void sendAndWait(Element element) throws IOException {
@@ -131,21 +123,15 @@ public final class DummyConnection extends Connection {
     }
 
     /**
-     * Sends a message to the other peer and returns the reply.
-     *
-     * @param request The question for the other peer.
-     * @return The reply from the other peer.
-     * @throws IOException If an error occur while sending the message.
-     * @see #send
-     * @see #sendAndWait
+     * {@inheritDoc}
      */
     @Override
     public Element ask(Element request) throws IOException {
+        if (!isAlive()) return null;
         Element reply;
         try {
             log(request, true);
-            reply = outgoingMessageHandler.handle(getOtherConnection(),
-                                                  request);
+            reply = getOtherConnection().handle(request);
             log(reply, false);            
         } catch (FreeColException e) {
             reply = null;

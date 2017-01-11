@@ -615,7 +615,7 @@ public final class FreeColServer {
         final String name = socket.getInetAddress() + ":" + socket.getPort();
         Connection c = new Connection(socket, this.userConnectionHandler,
                                       FreeCol.SERVER_THREAD + name);
-        this.server.addConnection(c);
+        getServer().addConnection(c);
         c.send(new GameStateMessage(this.serverState));
         if (this.serverState == ServerState.IN_GAME) {
             c.send(new VacantPlayersMessage().setVacantPlayers(getGame()));
@@ -640,7 +640,7 @@ public final class FreeColServer {
         case END_GAME: default:
             return;
         }            
-        this.server.addConnection(connection);
+        getServer().addConnection(connection);
         updateMetaServer(false);
     }
 
@@ -650,10 +650,28 @@ public final class FreeColServer {
      * @param serverPlayer The {@code ServerPlayer} to disconnect.
      */
     public void removePlayerConnection(ServerPlayer serverPlayer) {
-        this.server.removeConnection(serverPlayer.getConnection());
+        getServer().removeConnection(serverPlayer.getConnection());
         serverPlayer.disconnect();
     }
 
+    /**
+     * Establish the connections for an AI player.
+     *
+     * @param aiPlayer The AI {@code ServerPlayer} to connect.
+     */
+    private void addAIConnection(ServerPlayer aiPlayer) {
+        DummyConnection theConnection
+            = new DummyConnection("Server-to-AI-" + aiPlayer.getSuffix(),
+                                  this.inGameInputHandler);
+        DummyConnection aiConnection
+            = new DummyConnection("AI-" + aiPlayer.getSuffix() + "-to-Server",
+                new AIInGameInputHandler(this, aiPlayer, getAIMain()));
+        aiConnection.setOtherConnection(theConnection);
+        theConnection.setOtherConnection(aiConnection);
+        aiPlayer.setConnection(theConnection);
+        getServer().addDummyConnection(theConnection);
+    }
+        
 
     /**
      * Wait until the game has been created.
@@ -1190,18 +1208,9 @@ public final class FreeColServer {
 
         for (Player player : game.getLivePlayerList()) {
             if (player.isAI()) {
-                ServerPlayer serverPlayer = (ServerPlayer)player;
-                DummyConnection theConnection
-                    = new DummyConnection("Server->AI-" + player.getName(),
-                                          this.inGameInputHandler);
-                DummyConnection aiConnection
-                    = new DummyConnection("AI-" + player.getName() + "->Server",
-                        new AIInGameInputHandler(this, serverPlayer, aiMain));
-                aiConnection.setConnection(theConnection);
-                theConnection.setConnection(aiConnection);
-                server.addDummyConnection(theConnection);
-                serverPlayer.setConnection(theConnection);
-                serverPlayer.setConnected(true);
+                ServerPlayer aiPlayer = (ServerPlayer)player;
+                addAIConnection(aiPlayer);
+                aiPlayer.setConnected(true);
             }
             if (player.isEuropean()) {
                 // The map will be invalid, so trigger a recalculation of the
@@ -1322,19 +1331,10 @@ public final class FreeColServer {
      * @return The new AI {@code ServerPlayer}.
      */
     public ServerPlayer makeAIPlayer(Nation nation) {
-        DummyConnection theConnection
-            = new DummyConnection("Server connection - " + nation.getId(),
-                                  this.inGameInputHandler);
         ServerPlayer aiPlayer = new ServerPlayer(getGame(), false, nation);
-        aiPlayer.setConnection(theConnection);
         aiPlayer.setAI(true);
         aiPlayer.setReady(true);
-        DummyConnection aiConnection
-            = new DummyConnection("AI connection - " + nation.getId(),
-                new AIInGameInputHandler(this, aiPlayer, getAIMain()));
-        aiConnection.setConnection(theConnection);
-        theConnection.setConnection(aiConnection);
-        getServer().addDummyConnection(theConnection);
+        addAIConnection(aiPlayer);
 
         getGame().addPlayer(aiPlayer);
         // Add to the AI, which was previously deferred because the
