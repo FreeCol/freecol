@@ -105,25 +105,38 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    public void send(Element element) throws IOException {
-        if (!isAlive()) return;
+    public boolean send(Element element) {
+        if (!isAlive()) return false;
         try {
             getOtherConnection().handle(element);
             log(element, true);
-        } catch (FreeColException e) {
-        }
+            return true;
+        } catch (FreeColException e) {}
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void sendAndWait(Element element) throws IOException {
-        send(element);
+    public boolean sendAndWait(Element request) {
+        try {
+            log(request, true);
+            Element reply = getOtherConnection().handle(request);
+            log(reply, false);
+            return true;
+        } catch (FreeColException fce) {}
+        return false;
     }
 
     /**
-     * {@inheritDoc}
+     * Sends a message to the other peer and returns the reply.
+     *
+     * @param request The question for the other peer.
+     * @return The reply from the other peer.
+     * @throws IOException If an error occur while sending the message.
+     * @see #send
+     * @see #sendAndWait
      */
     @Override
     public Element ask(Element request) throws IOException {

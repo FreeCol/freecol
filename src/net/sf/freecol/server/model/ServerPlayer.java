@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.model;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -109,8 +108,6 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -327,50 +324,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Send a change set to this player.
      *
      * @param cs The {@code ChangeSet} to send.
+     * @return True if the message was sent.
      */
-    public void send(ChangeSet cs) {
-        askElement(cs.build(this));
-    }
-
-    /**
-     * Send a message to the player, and return the resulting message.
-     *
-     * @param game The {@code Game} to build the return message in.
-     * @param request The {@code DOMMessage} to send.
-     * @return The resulting {@code DOMMessage}.
-     */
-    public DOMMessage ask(Game game, DOMMessage request) {
-        return (isConnected()) ? this.connection.ask(game, request) : null;
-    }
-    
-    /**
-     * Send an element to this player.
-     * Do not use (sole use in send() above). This will go away.
-     *
-     * @param request An {@code Element} containing the update.
-     */
-    private void askElement(Element request) {
-        if (!isConnected()) return;
-
-        while (request != null) {
-            Element reply;
-            try {
-                reply = this.connection.ask(request);
-                if (reply == null) break;
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Exception sending \""
-                    + request.getTagName() + "\"-message.", ioe);
-                break;
-            }
-
-            try {
-                request = this.connection.handle(reply);
-            } catch (FreeColException fce) {
-                logger.log(Level.WARNING, "Exception handling \""
-                    + reply.getTagName() + "\"-message.", fce);
-                break;
-            }
-        }
+    public boolean send(ChangeSet cs) {
+        return (isConnected()) ? this.connection.sendAndWait(cs.build(this))
+            : false;
     }
 
     /**
@@ -387,7 +345,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         return ChangeSet.clientError(See.only(this), template);
     }
-
 
     /**
      * Convenience function to create a client error message, log it,

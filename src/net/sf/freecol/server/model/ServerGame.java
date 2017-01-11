@@ -168,9 +168,10 @@ public class ServerGame extends Game implements ServerModelObject {
      *
      * @param serverPlayer The {@code ServerPlayer} to send to.
      * @param cs The {@code ChangeSet} to send.
+     * @return True if the change was sent.
      */
-    public void sendTo(ServerPlayer serverPlayer, ChangeSet cs) {
-        serverPlayer.send(cs);
+    public boolean sendTo(ServerPlayer serverPlayer, ChangeSet cs) {
+        return serverPlayer.send(cs);
     }
 
     /**

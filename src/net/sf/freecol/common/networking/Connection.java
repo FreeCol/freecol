@@ -449,14 +449,22 @@ public class Connection implements Closeable {
      *
      * @param element The {@code Element} (root element in a
      *     DOM-parsed XML tree) that holds all the information
-     * @exception IOException If an error occur while sending the message.
+     * @return True if the message was sent or was null.
      * @see #sendAndWait(Element)
      * @see #ask(Element)
      */
-    public void send(Element element) throws IOException {
-        sendInternal(element);
-        log(element, true);
-        logger.fine("Send: " + element.getTagName());
+    public boolean send(Element element) {
+        if (element == null) return true;
+        final String tag = element.getTagName();
+        try {
+            sendInternal(element);
+            log(element, true);
+            logger.fine("Send: " + tag);
+            return true;
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Send fail: " + tag, ioe);
+        }
+        return false;
     }
 
     /**
@@ -465,13 +473,21 @@ public class Connection implements Closeable {
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information
-     * @exception IOException If an error occur while sending the message.
+     * @return True if the message was sent or was null.
      * @see #send(Element)
      * @see #ask(Element)
      */
-    public void sendAndWait(Element element) throws IOException {
-        askInternal(element);
-        logger.fine("SendAndWait: " + element.getTagName());
+    public boolean sendAndWait(Element element) {
+        if (element == null) return true;
+        final String tag = element.getTagName();
+        try {
+            askInternal(element);
+            logger.fine("SendAndWait: " + tag);
+            return true;
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "SendAndWait fail: " + tag, ioe);
+        }
+        return false;
     }
 
     /**
@@ -610,14 +626,7 @@ public class Connection implements Closeable {
      * @return True if the message was sent.
      */
     public boolean send(DOMMessage message) {
-        try {
-            send(message.toXMLElement());
-            return true;
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to send: " + message.getType(),
-                       ioe);
-        }
-        return false;
+        return send(message.toXMLElement());
     }
     
     /**
