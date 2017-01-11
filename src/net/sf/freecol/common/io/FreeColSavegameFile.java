@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
@@ -61,9 +62,8 @@ public class FreeColSavegameFile extends FreeColDataFile {
     /**
      * The name of the image file that contains the map thumbnail,
      * i.e. a view of the game map as seen by the owner of the game
-     * when saving. The thumbnail image is used by the {@link
-     * MapGeneratorOptionsDialog}, in
-     * particular.
+     * when saving. The thumbnail image is used by
+     * {@link MapGeneratorOptionsDialog}..
      */
     public static final String THUMBNAIL_FILE = "thumbnail.png";
 
@@ -100,6 +100,18 @@ public class FreeColSavegameFile extends FreeColDataFile {
     }
 
     /**
+     * Get the properties in this save game.
+     *
+     * @return The {@code Properties} found.
+     * @exception IOException if there is a problem reading the properties.
+     */
+    public Properties getProperties() throws IOException {
+        Properties properties = new Properties();
+        properties.load(getInputStream(SAVEGAME_PROPERTIES));
+        return properties;
+    }
+        
+    /**
      * Gets the save game version from this saved game.
      *
      * @return The saved game version, or negative on error.
@@ -120,12 +132,23 @@ public class FreeColSavegameFile extends FreeColDataFile {
      *
      * Only still needed by the validator.
      *
-     * @return An {@code InputStream} to the file
-     *      "savegame.xml" within this data file.
+     * @return An {@code InputStream} to the save game file within
+     *     this data file.
      * @exception IOException if there is a problem opening the input stream.
      */
     public BufferedInputStream getSavegameInputStream() throws IOException {
         return getInputStream(SAVEGAME_FILE);
+    }
+
+    /**
+     * Gets the input stream to the thumbnail file.
+     *
+     * @return An {@code InputStream} to the thumbnail file within
+     *      this data file.
+     * @exception IOException if there is a problem opening the input stream.
+     */
+    public BufferedInputStream getThumbnailInputStream() throws IOException {
+        return getInputStream(THUMBNAIL_FILE);
     }
 
     /**

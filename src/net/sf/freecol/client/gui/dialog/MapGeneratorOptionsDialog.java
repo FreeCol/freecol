@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
@@ -181,29 +182,42 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      *     on failure.
      */
     private JButton makeMapButton(File file) {
-        String mapName = file.getName().substring(0, file.getName()
-                                                         .lastIndexOf('.'));
-        JButton mapButton = Utility.localizedButton("freecol.map." + mapName);
+        final String mapName = file.getName()
+            .substring(0, file.getName().lastIndexOf('.'));
+        JButton mapButton = null;
+
+        FreeColSavegameFile savegame;
         try {
-            FreeColSavegameFile savegame = new FreeColSavegameFile(file);
-            Image thumbnail = ImageIO.read(savegame
-                .getInputStream(FreeColSavegameFile.THUMBNAIL_FILE));
+            savegame = new FreeColSavegameFile(file);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Failed to make save game for: "
+                + mapName, ioe);
+            return null;
+        }
+
+        Image thumbnail;
+        try {
+            thumbnail = ImageIO.read(savegame.getThumbnailInputStream());
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Failed to read thumbnail for: "
+                + mapName, ioe);
+            thumbnail = null;
+        }
+
+        if (thumbnail != null) {
+            mapButton = Utility.localizedButton("freecol.map." + mapName);
             mapButton.setIcon(new ImageIcon(thumbnail));
+            mapButton.setHorizontalTextPosition(JButton.CENTER);
+            mapButton.setVerticalTextPosition(JButton.BOTTOM);
             try {
-                Properties properties = new Properties();
-                properties.load(savegame
-                    .getInputStream(FreeColSavegameFile.SAVEGAME_PROPERTIES));
+                Properties properties = savegame.getProperties();
                 mapButton.setToolTipText(properties.getProperty("map.width")
                     + "\u00D7"
                     + properties.getProperty("map.height"));
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Unable to load savegame.", e);
-                return null;
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Failed to read properties for: "
+                    + mapName, ioe);
             }
-            mapButton.setHorizontalTextPosition(JButton.CENTER);
-            mapButton.setVerticalTextPosition(JButton.BOTTOM);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to read thumbnail.", e);
         }
         return mapButton;
     }
