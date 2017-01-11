@@ -150,9 +150,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /** The connection for this player. */
     private Connection connection;
 
-    /** An overriding switch indicating connection. */
-    private boolean connected = false;
-
     /** Remaining emigrants to select due to a fountain of youth */
     private int remainingEmigrants = 0;
 
@@ -274,23 +271,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return True if this player is currently connected to the server.
      */
     public boolean isConnected() {
-        return this.connected;
-    }
-
-    /**
-     * Sets the "connected"-status of this player.
-     *
-     * This allows an override of the default check of whether
-     * this.connection is null, and is used to allow a reconnection
-     * after a player logs out.
-     *
-     * FIXME: This is probably not needed any more.
-     *
-     * @param connected True if this player should be considered as
-     *     connected to the server.
-     */
-    public void setConnected(boolean connected) {
-        this.connected = connected;
+        return this.connection != null;
     }
 
     /**
@@ -309,7 +290,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void setConnection(Connection connection) {
         this.connection = connection;
-        this.connected = this.connection != null;
     }
 
     /**

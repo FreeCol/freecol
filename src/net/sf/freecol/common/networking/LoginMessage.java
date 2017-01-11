@@ -249,7 +249,6 @@ public class LoginMessage extends DOMMessage {
             }
 
             present.setConnection(conn);
-            present.setConnected(true);
 
             // Ensure there is a current player.
             if (game.getCurrentPlayer() == null) game.setCurrentPlayer(present);
@@ -285,7 +284,6 @@ public class LoginMessage extends DOMMessage {
             }
 
             present.setConnection(conn);
-            present.setConnected(true);
 
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(conn);

@@ -1210,7 +1210,6 @@ public final class FreeColServer {
             if (player.isAI()) {
                 ServerPlayer aiPlayer = (ServerPlayer)player;
                 addAIConnection(aiPlayer);
-                aiPlayer.setConnected(true);
             }
             if (player.isEuropean()) {
                 // The map will be invalid, so trigger a recalculation of the
