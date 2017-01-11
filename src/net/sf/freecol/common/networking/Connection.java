@@ -515,29 +515,6 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Sends a message to the peer and returns a message of requested type
-     * or error in reply.
-     *
-     * @param game The {@code Game} to create the reply message in.
-     * @param message The {@code DOMMessage} to send.
-     * @param replyTag The requested tag of the reply.
-     * @return A {@code DOMMessage} in reply, either of the requested
-     *     type or error.
-     */
-    public DOMMessage ask(Game game, DOMMessage message, String replyTag) {
-        DOMMessage reply = ask(game, message);
-        return (replyTag == null
-            || (reply != null
-                && (reply.isType(replyTag)
-                    || reply.isType(ErrorMessage.TAG)))) ? reply
-            : new ErrorMessage(StringTemplate
-                .template("connection.wrong")
-                .addName("%sentTag%", (message == null) ? "-" : message.getType())
-                .addName("%expectedTag%", replyTag)
-                .addName("%actualTag%", (reply == null) ? "-" : reply.getType()));
-    }
-
-    /**
      * Handle a query (has QUESTION_TAG), with given reply identifier,
      * and send a reply (has REPLY_TAG and the given reply identifier).
      * 
