@@ -72,8 +72,8 @@ public class Connection implements Closeable {
 
     /** The socket connected to the other end of the connection. */
     private Socket socket = null;
-    /** A lock for the socket. */
-    private final Object socketLock = new Object();
+    /** A lock for the socket and input stream. */
+    private final Object lock = new Object();
 
     /** The transformer for output, also used as a lock for out. */
     private final Transformer outTransformer;
@@ -178,7 +178,7 @@ public class Connection implements Closeable {
      * @return The current {@code Socket}.
      */
     public Socket getSocket() {
-        synchronized (this.socketLock) {
+        synchronized (this.lock) {
             return this.socket;
         }
     }
@@ -189,7 +189,7 @@ public class Connection implements Closeable {
      * @param socket The new {@code Socket}.
      */
     private void setSocket(Socket socket) {
-        synchronized (this.socketLock) {
+        synchronized (this.lock) {
             this.socket = socket;
         }
     }
@@ -198,7 +198,7 @@ public class Connection implements Closeable {
      * Close and clear the socket.
      */
     private void closeSocket() {
-        synchronized (this.socketLock) {
+        synchronized (this.lock) {
             if (this.socket != null) {
                 try {
                     this.socket.close();
@@ -231,13 +231,15 @@ public class Connection implements Closeable {
      * Close and clear the input stream.
      */
     private void closeInputStream() {
-        if (this.in == null) return;
-        try {
-            this.in.close();
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error closing input", ioe);
-        } finally {
-            this.in = null;
+        synchronized (this.lock) {
+            if (this.in == null) return;
+            try {
+                this.in.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error closing input", ioe);
+            } finally {
+                this.in = null;
+            }
         }
     }
 
