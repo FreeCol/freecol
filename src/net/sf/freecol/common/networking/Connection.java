@@ -68,17 +68,20 @@ public class Connection implements Closeable {
 
     private static final int TIMEOUT = 5000; // 5s
 
-    private InputStream in;
-
     /** The socket connected to the other end of the connection. */
     private Socket socket = null;
-    /** A lock for the socket and input stream. */
-    private final Object lock = new Object();
 
-    /** The transformer for output, also used as a lock for out. */
+    /** The input stream to read from, derived from the socket. */
+    private InputStream in;
+    /** A lock for the input side, including the socket. */
+    private final Object inputLock = new Object();
+
+    /** The transformer for output. */
     private final Transformer outTransformer;
-    /** The output stream to write to. */
+    /** The output stream to write to, derived from the socket. */
     private OutputStream out;
+    /** A lock for the output side. */
+    private final Object outputLock = new Object();
 
     private ReceivingThread receivingThread;
 
@@ -178,7 +181,7 @@ public class Connection implements Closeable {
      * @return The current {@code Socket}.
      */
     public Socket getSocket() {
-        synchronized (this.lock) {
+        synchronized (this.inputLock) {
             return this.socket;
         }
     }
@@ -189,7 +192,7 @@ public class Connection implements Closeable {
      * @param socket The new {@code Socket}.
      */
     private void setSocket(Socket socket) {
-        synchronized (this.lock) {
+        synchronized (this.inputLock) {
             this.socket = socket;
         }
     }
@@ -198,7 +201,7 @@ public class Connection implements Closeable {
      * Close and clear the socket.
      */
     private void closeSocket() {
-        synchronized (this.lock) {
+        synchronized (this.inputLock) {
             if (this.socket != null) {
                 try {
                     this.socket.close();
@@ -215,7 +218,7 @@ public class Connection implements Closeable {
      * Close and clear the output stream.
      */
     private void closeOutputStream() {
-        synchronized (this.outTransformer) {
+        synchronized (this.outputLock) {
             if (this.out == null) return;
             try {
                 this.out.close();
@@ -231,7 +234,7 @@ public class Connection implements Closeable {
      * Close and clear the input stream.
      */
     private void closeInputStream() {
-        synchronized (this.lock) {
+        synchronized (this.inputLock) {
             if (this.in == null) return;
             try {
                 this.in.close();
@@ -362,7 +365,7 @@ public class Connection implements Closeable {
      * @param send True if sending (else replying).
      */
     protected void log(Element element, boolean send) {
-        synchronized (this.logTransformer) {
+        synchronized (this.outputLock) {
             if (this.logWriter == null) return;
             this.logTransformer.reset();
             StringWriter sw = elementToStringWriter(this.logTransformer, element);
@@ -387,7 +390,7 @@ public class Connection implements Closeable {
      * @exception IOException If an error occur while sending the message.
      */
     private void sendInternal(Element element) throws IOException {
-        synchronized (this.outTransformer) {
+        synchronized (this.outputLock) {
             if (this.out == null) return;
             this.outTransformer.reset();
             StringWriter sw = elementToStringWriter(this.outTransformer, element);
