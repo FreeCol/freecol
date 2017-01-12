@@ -51,8 +51,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents a player.  The player can be either a human player or an
@@ -330,19 +328,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected Player(Game game) {
         super(game);
-    }
-
-    /**
-     * Initiates a new {@code Player} from an {@code Element} and
-     * registers this {@code Player} at the specified game.
-     *
-     * @param game The enclosing {@code Game}.
-     * @param e An XML-element that will be used to initialize this object.
-     */
-    public Player(Game game, Element e) {
-        super(game, null);
-
-        DOMMessage.readFromXMLElement(this, e);
     }
 
     /**
