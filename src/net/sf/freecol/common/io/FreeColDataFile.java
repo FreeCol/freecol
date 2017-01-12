@@ -159,8 +159,7 @@ public class FreeColDataFile {
     }
 
     /**
-     * Creates a {@code ResourceMapping} from the available
-     * resource files.
+     * Creates a {@code ResourceMapping} from the available resource files.
      *
      * @return A {@code ResourceMapping} or {@code null}
      *     there is no resource mapping file.
@@ -168,16 +167,16 @@ public class FreeColDataFile {
     public ResourceMapping getResourceMapping() {
         final Properties properties = new Properties();
         LogBuilder lb = new LogBuilder(64);
-        lb.add("Resource mapping");
+        lb.add("Resource mappings:");
         lb.mark();
         for (String fileName : FreeColDirectories.getResourceFileNames()) {
             try (
                 final InputStream is = getInputStream(fileName);
             ) {
                 properties.load(is);
-                lb.add(", ", file, "/", fileName, " loaded");
+                lb.add(' ', file, '/', fileName, ":ok");
             } catch (FileNotFoundException e) { // Expected failure
-                lb.add(", ", file, "/", fileName, " not found");
+                lb.add(' ', file, '/', fileName, ":not-found");
             } catch (IOException e) {
                 logger.log(Level.WARNING, "ResourceMapping read exception: "
                     + file + "/" + fileName, e);
@@ -246,7 +245,7 @@ public class FreeColDataFile {
                 }
             }
         }
-        if (lb.grew()) lb.log(logger, Level.INFO);
+        if (lb.grew()) lb.log(logger, Level.FINE);
         return rc;
     }
 

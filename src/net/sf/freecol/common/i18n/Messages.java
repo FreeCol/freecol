@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
@@ -47,6 +48,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -237,15 +239,19 @@ public class Messages {
 
         List<String> filenames
             = FreeColDirectories.getModMessageFileNames(locale);
+        LogBuilder lb = new LogBuilder(32);
+        lb.add("Failed to load mod messages:");
+        lb.mark();
         for (FreeColModFile fcmf : allMods) {
             for (String name : filenames) {
                 try {
                     loadMessages(fcmf.getInputStream(name));
                 } catch (IOException e) { // Failures expected
-                    logger.warning("Failed to load mod messages: " + name);
+                    lb.add(' ', fcmf.getId(), '/', name);
                 }
             }
         }
+        if (lb.grew()) lb.log(logger, Level.FINE);
     }
 
     /**
@@ -260,16 +266,19 @@ public class Messages {
                                                   Locale locale) {
         List<String> filenames
             = FreeColDirectories.getModMessageFileNames(locale);
+        LogBuilder lb = new LogBuilder(32);
+        lb.add("Failed to load active mod messages:");
+        lb.mark();
         for (FreeColModFile fcmf : mods) {
             for (String name : filenames) {
                 try {
                     loadMessages(fcmf.getInputStream(name));
                 } catch (IOException e) { // Failures expected
-                    logger.warning("Failed to load active mod messages: "
-                        + name);
+                    lb.add(' ', fcmf.getId(), '/', name);
                 }
             }
         }
+        if (lb.grew()) lb.log(logger, Level.FINE);
     }
     
     /**

@@ -79,7 +79,6 @@ public class ResourceManager {
      * @param mapping The mapping between IDs and files.
      */
     public static synchronized void setBaseMapping(final ResourceMapping mapping) {
-        logger.info("setBaseMapping " + mapping);
         baseMapping = mapping;
         update(mapping != null);
     }
@@ -91,7 +90,6 @@ public class ResourceManager {
      * @param mapping The mapping between IDs and files.
      */
     public static synchronized void setTcMapping(final ResourceMapping mapping) {
-        logger.info("setTcMapping " + mapping);
         tcMapping = mapping;
         update(mapping != null);
     }
@@ -103,7 +101,6 @@ public class ResourceManager {
      * @param mapping A list of the mappings between IDs and files.
      */
     public static synchronized void setModMapping(final ResourceMapping mapping) {
-        logger.info("setModMapping " + mapping);
         modMapping = mapping;
         update(mapping != null);
     }
@@ -115,7 +112,6 @@ public class ResourceManager {
      * @param mapping The mapping between IDs and files.
      */
     public static synchronized void setScenarioMapping(final ResourceMapping mapping) {
-        logger.info("setScenarioMapping " + mapping);
         scenarioMapping = mapping;
         // As this is called when loading a new savegame,
         // use it as a hint for cleaning up
@@ -187,15 +183,14 @@ public class ResourceManager {
                 @Override
                 public void run() {
                     // Make a local list of the resources to load.
-                    logger.info("Background thread started");
+                    logger.info("Preload background thread started");
                     List<Resource> resources
                         = new ArrayList<>(getResources().values());
                     int n = 0;
                     for (Resource r : resources) {
                         if (preloadThread != this) {
-                            logger.info(
-                                "Background thread cancelled after it preloaded "
-                                + n + " resources.");
+                            logger.info("Preload background thread cancelled"
+                                + " after it preloaded " + n + " resources.");
                             return;
                         }
                         // TODO: Filter list before running thread?
@@ -204,7 +199,7 @@ public class ResourceManager {
                             n++;
                         }
                     }
-                    logger.info("Background thread preloaded " + n
+                    logger.info("Preload background thread preloaded " + n
                         + " resources.");
                 }
             };
@@ -222,27 +217,22 @@ public class ResourceManager {
      * @return true when the resource exists.
      */
     public static synchronized boolean hasResource(final String key) {
-        logger.finest("hasResource(" + key + ")");
         return mergedContainer.containsKey(key);
     }
 
     public static synchronized boolean hasImageResource(final String key) {
-        //logger.finest("hasImageResource(" + key + ")");
         return mergedContainer.containsImageKey(key);
     }
 
     public static synchronized boolean hasColorResource(final String key) {
-        //logger.finest("hasColorResource(" + key + ")");
         return mergedContainer.containsColorKey(key);
     }
 
     public static synchronized Map<String, Resource> getResources() {
-        logger.finest("getResources");
         return mergedContainer.getResources();
     }
 
     public static synchronized Map<String, ImageResource> getImageResources() {
-        logger.finest("getImageResources");
         return mergedContainer.getImageResources();
     }
 
@@ -253,7 +243,6 @@ public class ResourceManager {
      * @return a list of all keys starting with the given prefix
      */
     public static synchronized List<String> getImageKeys(String prefix) {
-        //logger.finest("getImageKeys(" + prefix + ")");
         return mergedContainer.getImageKeys(prefix);
     }
 
@@ -267,7 +256,6 @@ public class ResourceManager {
      */
     public static synchronized List<String> getImageKeys(String prefix,
                                                               String suffix) {
-        logger.finest("getImageKeys(" + prefix + ", " + suffix + ")");
         return mergedContainer.getImageKeys(prefix, suffix);
     }
 
@@ -278,7 +266,6 @@ public class ResourceManager {
      * @return a set of all keysstarting with the given prefix
      */
     public static synchronized Set<String> getImageKeySet(String prefix) {
-        //logger.finest("getImageKeySet(" + prefix + ")");
         return mergedContainer.getImageKeySet(prefix);
     }
 
@@ -291,57 +278,43 @@ public class ResourceManager {
      */
     private static synchronized ColorResource getColorResource(final String key) {
         final ColorResource r = mergedContainer.getColorResource(key);
-        if (r == null) {
-            logger.warning("getColorResource(" + key + ") failed");
-        }
+        if (r == null) logger.warning("getColorResource(" + key + ") failed");
         return r;
     }
 
     private static synchronized FontResource getFontResource(final String key) {
         final FontResource r = mergedContainer.getFontResource(key);
-        if (r == null) {
-            logger.warning("getFontResource(" + key + ") failed");
-        }
+        if (r == null) logger.warning("getFontResource(" + key + ") failed");
         return r;
     }
 
     private static synchronized StringResource getStringResource(final String key) {
         final StringResource r = mergedContainer.getStringResource(key);
-        if (r == null) {
-            logger.warning("getStringResource(" + key + ") failed");
-        }
+        if (r == null) logger.warning("getStringResource(" + key + ") failed");
         return r;
     }
 
     private static synchronized FAFileResource getFAFileResource(final String key) {
         final FAFileResource r = mergedContainer.getFAFileResource(key);
-        if (r == null) {
-            logger.warning("getFAFileResource(" + key + ") failed");
-        }
+        if (r == null) logger.warning("getFAFileResource(" + key + ") failed");
         return r;
     }
 
     private static synchronized SZAResource getSZAResource(final String key) {
         final SZAResource r = mergedContainer.getSZAResource(key);
-        if (r == null) {
-            logger.warning("getSZAResource(" + key + ") failed");
-        }
+        if (r == null) logger.warning("getSZAResource(" + key + ") failed");
         return r;
     }
 
     private static synchronized AudioResource getAudioResource(final String key) {
         final AudioResource r = mergedContainer.getAudioResource(key);
-        if (r == null) {
-            logger.warning("getAudioResource(" + key + ") failed");
-        }
+        if (r == null) logger.warning("getAudioResource(" + key + ") failed");
         return r;
     }
 
     private static synchronized VideoResource getVideoResource(final String key) {
         final VideoResource r = mergedContainer.getVideoResource(key);
-        if (r == null) {
-            logger.warning("getVideoResource(" + key + ") failed");
-        }
+        if (r == null) logger.warning("getVideoResource(" + key + ") failed");
         return r;
     }
 
