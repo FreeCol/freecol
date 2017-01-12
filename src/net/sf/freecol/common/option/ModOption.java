@@ -62,7 +62,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      * @return A list of {@code FreeColModFile}s.
      */
     public final List<FreeColModFile> getChoices() {
-        return new ArrayList<>(Mods.getAllMods());
+        return new ArrayList<>(FreeColModFile.getModsList());
     }
 
 
@@ -114,7 +114,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     @Override
     protected void setValue(String valueString, String defaultValueString) throws XMLStreamException {
         String id = (valueString != null) ? valueString : defaultValueString;
-        FreeColModFile fcmf = Mods.getModFile(id);
+        FreeColModFile fcmf = Mods.getFreeColModFile(id);
         if (fcmf == null) {
             throw new XMLStreamException("Could not find mod for: " + id);
         }

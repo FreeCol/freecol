@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.function.Predicate;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -31,6 +34,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.model.Specification;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -41,7 +45,6 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
     private static final Logger logger = Logger.getLogger(FreeColModFile.class.getName());
 
     protected static final String SPECIFICATION_FILE = "specification.xml";
-    protected static final String MOD_DESCRIPTOR_FILE = "mod.xml";
 
     /** The identifier for this mod. */
     private String id;
@@ -99,7 +102,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      * @exception IOException if thrown while opening the input stream.
      */
     private InputStream getModDescriptorInputStream() throws IOException {
-        return getInputStream(MOD_DESCRIPTOR_FILE);
+        return getInputStream(FreeColDirectories.MOD_DESCRIPTOR_FILE_NAME);
     }
 
     /**
@@ -139,30 +142,20 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
         return parent;
     }
 
-
     /**
-     * Helper to filter suitable file candidates to be made into
-     * FreeColModFiles with {@link #make(File)}
+     * Get all the standard mods.
      *
-     * @param f The {@code File} to examine.
-     * @return True if the file is suitable.
+     * @return A list of {@code FreeColModFile}s holding the mods.
      */
-    public static boolean fileFilter(File f) {
-        return fileFilter(f, MOD_DESCRIPTOR_FILE, "fmd", ZIP_FILE_EXTENSION);
-    }
-
-    /**
-     * Helper to make a mod file from a given file, logging the exception.
-     *
-     * @param f The {@code File} to try to make the mod from.
-     * @return A new {@code FreeColModFile}, or null on error.
-     */
-    public static FreeColModFile make(File f) {
-        try {
-            return new FreeColModFile(f);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to load mod from: " + f, ioe);
+    public static List<FreeColModFile> getModsList() {
+        List<FreeColModFile> ret = new ArrayList<>();
+        for (File f : FreeColDirectories.getModFileList()) {
+            try {
+                ret.add(new FreeColModFile(f));
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Failed to load mod from: " + f, ioe);
+            }
         }
-        return null;
+        return ret;
     }
 }

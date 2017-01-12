@@ -1051,6 +1051,18 @@ public class FreeColDirectories {
     }
 
     /**
+     * Get a list of the standard and current user mod files.
+     *
+     * @return A list of mod {@code File}s.
+     */
+    public static List<File> getModFileList() {
+        List<File> ret = new ArrayList<>();
+        ret.addAll(collectFiles(getStandardModsDirectory(), modFileFilter));
+        ret.addAll(collectFiles(getUserModsDirectory(), modFileFilter));
+        return ret;
+    }
+
+    /**
      * Gets the directory where the user options are saved.
      *
      * @return The directory to save user options in.

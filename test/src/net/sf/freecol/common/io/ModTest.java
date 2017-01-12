@@ -27,27 +27,21 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ModTest extends FreeColTestCase {
 
-    public void testGetAllMods() {
-        // There should not be any mods present until they are loaded.
-        assertTrue(Mods.getAllMods().isEmpty());
-        // Load them and check that there are some mods
-        Mods.loadMods();
-        assertFalse(Mods.getAllMods().isEmpty());
-        // Check that all mod files can be loaded
-        for (FreeColModFile mod : Mods.getAllMods()) {
+    public void testAllMods() {
+        Set<String> ids = new HashSet<String>();
+        // Check that all mods can be loaded
+        for (FreeColModFile mod : FreeColModFile.getModsList()) {
             assertNotNull("Null identifier for " + mod, mod.getId());
-            assertEquals(mod, Mods.getModFile(mod.getId()));
+            ids.add(mod.getId());
         }
 
+        assertFalse(ids.isEmpty());
+        assertTrue(ids.contains("example"));
     }
 
     public void testGetRuleSets() {
         // Check that all rule sets can be loaded
         Set<String> ids = new HashSet<String>();
-        for (FreeColModFile mod : Mods.getAllMods()) {
-            assertNotNull("Null identifier for " + mod, mod.getId());
-            ids.add(mod.getId());
-        }
         for (FreeColTcFile tc : FreeColTcFile.getRulesList()) {
             assertNotNull("Null identifier for " + tc, tc.getId());
             ids.add(tc.getId());

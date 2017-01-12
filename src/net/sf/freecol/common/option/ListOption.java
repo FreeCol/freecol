@@ -256,7 +256,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
                 logger.log(Level.FINEST, "Found old-style mod value: {0}",
                         modId);
                 if (modId != null) {
-                    FreeColModFile fcmf = Mods.getModFile(modId);
+                    FreeColModFile fcmf = Mods.getFreeColModFile(modId);
                     if (fcmf != null) {
                         ModOption modOption = new ModOption(getSpecification());
                         modOption.setValue(fcmf);

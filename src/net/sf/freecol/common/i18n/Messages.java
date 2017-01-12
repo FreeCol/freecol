@@ -234,16 +234,12 @@ public class Messages {
      * @param locale The {@code Locale} to load resources for.
      */
     public static void loadModMessageBundle(Locale locale) {
-        List<FreeColModFile> allMods = new ArrayList<>();
-        allMods.addAll(Mods.getAllMods());
-        allMods.addAll(FreeColTcFile.getRulesList());
-
         List<String> filenames
             = FreeColDirectories.getModMessageFileNames(locale);
         LogBuilder lb = new LogBuilder(32);
         lb.add("Failed to load mod messages:");
         lb.mark();
-        for (FreeColModFile fcmf : allMods) {
+        for (FreeColModFile fcmf : FreeColModFile.getModsList()) {
             for (String name : filenames) {
                 try {
                     loadMessages(fcmf.getInputStream(name));

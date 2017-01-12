@@ -43,19 +43,6 @@ public class Mods {
 
 
     /**
-     * Loads all valid mods from a specified directory.
-     *
-     * @param dir The directory to load from.
-     */
-    private static void loadModDirectory(File dir) {
-        for (FreeColModFile fcmf : transform(fileStream(dir),
-                                             FreeColModFile::fileFilter,
-                                             FreeColModFile::make)) {
-            allMods.put(fcmf.getId(), fcmf);
-        }
-    }
-
-    /**
      * Require all mods to be loaded.  This must be delayed until
      * the mods directories are defined.
      *
@@ -63,29 +50,9 @@ public class Mods {
      */
     public static void loadMods() {
         allMods.clear();
-        loadModDirectory(FreeColDirectories.getStandardModsDirectory());
-        loadModDirectory(FreeColDirectories.getUserModsDirectory());
-    }
-
-    /**
-     * Gets the mod with the given object identifier.
-     *
-     * @param id The identifier of the mod to search for.
-     * @return The {@code FreeColModFile} for the mod, or null if
-     *     not found.
-     */
-    public static FreeColModFile getModFile(String id) {
-        return allMods.get(id);
-    }
-
-    /**
-     * Gets all available mods.
-     * User mods before standard mods to allow user override.
-     *
-     * @return A list of {@code FreeColModFile}s contain mods.
-     */
-    public static Collection<FreeColModFile> getAllMods() {
-        return allMods.values();
+        for (FreeColModFile fcmf : FreeColModFile.getModsList()) {
+            allMods.put(fcmf.getId(), fcmf);
+        }
     }
 
     /**
