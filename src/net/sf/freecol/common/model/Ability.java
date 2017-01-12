@@ -23,9 +23,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.networking.DOMMessage;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -421,7 +418,7 @@ public final class Ability extends Feature {
      *
      * @param specification The {@code Specification} to use.
      */
-    protected Ability(Specification specification) {
+    public Ability(Specification specification) {
         super(specification);
     }
 
@@ -483,18 +480,6 @@ public final class Ability extends Feature {
         this(specification);
 
         readFromXML(xr);
-    }
-
-    /**
-     * Creates a new {@code Ability} instance.
-     *
-     * @param e The {@code Element} to read from.
-     * @param specification A {@code Specification} to refer to.
-     */
-    public Ability(Element e, Specification specification) {
-        this(specification);
-
-        DOMMessage.readFromXMLElement(this, e);
     }
 
 

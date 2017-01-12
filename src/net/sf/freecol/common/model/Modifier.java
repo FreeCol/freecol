@@ -26,10 +26,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Utils;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -192,7 +189,7 @@ public class Modifier extends Feature {
      *
      * @param specification The defining {@code Specification}.
      */
-    protected Modifier(Specification specification) {
+    public Modifier(Specification specification) {
         super(specification);
     }
 
@@ -280,18 +277,6 @@ public class Modifier extends Feature {
         this(specification);
 
         readFromXML(xr);
-    }
-
-    /**
-     * Creates a new {@code Modifier} instance.
-     *
-     * @param e The {@code Element} to read from.
-     * @param specification The {@code Specification} to refer to.
-     */
-    public Modifier(Element e, Specification specification) {
-        this(specification);
-
-        DOMMessage.readFromXMLElement(this, e);
     }
 
 

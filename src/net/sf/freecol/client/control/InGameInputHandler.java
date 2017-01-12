@@ -557,17 +557,21 @@ public final class InGameInputHandler extends ClientInputHandler {
                 final String tag = DOMMessage.getType(e);
                 switch (tag) {
                 case Ability.TAG:
+                    Ability a = new Ability(spec);
+                    DOMMessage.readFromXMLElement(a, e);
                     if (add) {
-                        object.addAbility(new Ability(e, spec));
+                        object.addAbility(a);
                     } else {
-                        object.removeAbility(new Ability(e, spec));
+                        object.removeAbility(a);
                     }
                     break;
                 case Modifier.TAG:
+                    Modifier m = new Modifier(spec);
+                    DOMMessage.readFromXMLElement(m, e);
                     if (add) {
-                        object.addModifier(new Modifier(e, spec));
+                        object.addModifier(m);
                     } else {
-                        object.removeModifier(new Modifier(e, spec));
+                        object.removeModifier(m);
                     }
                     break;
                 case FoundingFather.TAG:
