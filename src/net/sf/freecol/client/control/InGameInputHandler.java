@@ -262,7 +262,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         }
         Unit u = null;
         if (found != null) {
-            u = new Unit(game, found);
+            u = DOMUtils.readElement(game, found, Unit.class);
             if (u.getLocation() == null) {
                 throw new RuntimeException("Null location: " + u);
             }

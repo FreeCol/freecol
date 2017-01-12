@@ -49,9 +49,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
-import org.w3c.dom.Element;
-
-
 /**
  * Represents all pieces that can be moved on the map-board. This includes:
  * colonists, ships, wagon trains e.t.c.
@@ -240,18 +237,6 @@ public class Unit extends GoodsLocation
      */
     protected Unit(Game game) {
         super(game);
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param game The enclosing {@code Game}.
-     * @param e An XML-element that will be used to initialize this object.
-     */
-    public Unit(Game game, Element e) {
-        super(game, null);// Must override identifier when called client side
-
-        net.sf.freecol.common.util.DOMUtils.readFromXMLElement(this, e);
     }
 
     /**
