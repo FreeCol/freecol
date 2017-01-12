@@ -34,7 +34,6 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.MessageHandler;
-import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -52,6 +51,22 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(ServerInputHandler.class.getName());
+
+    /**
+     * A network request handler knows how to handle in a given request type.
+     */
+    public interface NetworkRequestHandler {
+
+        /**
+         * Handle a request represented by an {@link Element} and
+         * return another {@link Element} or null as the answer.
+         * 
+         * @param connection The message's {@code Connection}.
+         * @param element The root {@code Element} of the message.
+         * @return The reply {@code Element}, which may be null.
+         */
+        Element handle(Connection connection, Element element);
+    };
 
     /**
      * The handler map provides named handlers for network

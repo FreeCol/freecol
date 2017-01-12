@@ -30,7 +30,6 @@ import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.MessageHandler;
-import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 
