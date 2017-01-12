@@ -90,7 +90,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 error(new ErrorMessage(getGame(), e)));
         register(LoginMessage.TAG,
             (Connection c, Element e) ->
-                login(new LoginMessage(new Game(), e)));
+                new LoginMessage(new Game(), e).clientHandler(freeColClient));
         register(LogoutMessage.TAG,
             (Connection c, Element e) ->
                 logout(new LogoutMessage(getGame(), e)));
@@ -161,22 +161,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final String text = message.getMessage();
 
         getGUI().showErrorMessage(template, text);
-    }
-
-    /**
-     * Handle a "login"-request.
-     *
-     * @param message The {@code LoginMessage} to process.
-     */
-    private void login(LoginMessage message) {
-        final String user = message.getUserName();
-        final boolean single = message.getSinglePlayer();
-        final boolean current = message.getCurrentPlayer();
-        final ServerState state = message.getState();
-        final Game game = message.getGame(); // This is the real game!
-
-        getFreeColClient().getConnectController()
-            .login(state, game, user, single, current);
     }
 
     /**

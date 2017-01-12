@@ -22,7 +22,11 @@ package net.sf.freecol.common.networking;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -106,6 +110,31 @@ public class LoginMessage extends ObjectMessage {
              getChild(game, e, 0, Game.class));
     }
 
+    /**
+     * Create a new {@code LoginMessage} from a stream.
+     *
+     * @param game A {@code Game} (not actually used, the actual game is read
+     *     from the stream).
+     * @param xr The {@code FreeColXMLReader} to read the message from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public LoginMessage(@SuppressWarnings("unused")Game game,
+                        FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG);
+        
+        this.userName = xr.getAttribute(USER_NAME_TAG, (String)null);
+        this.version = xr.getAttribute(VERSION_TAG, (String)null);
+        this.state = xr.getAttribute(STATE_TAG, ServerState.class, (ServerState)null);
+        this.singlePlayer = xr.getAttribute(SINGLE_PLAYER_TAG, true);
+        this.currentPlayer = xr.getAttribute(CURRENT_PLAYER_TAG, false);
+
+        xr.nextTag();
+        final String tag = xr.getLocalName();
+        this.game = (Game.TAG.equals(tag)) ? new Game(null, xr) : null;
+        xr.closeTag(TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -115,43 +144,15 @@ public class LoginMessage extends ObjectMessage {
         return MessagePriority.EARLY;
     }
         
-
-    // Public interface
-
-    public String getUserName() {
-        return this.userName;
-    }
-
-    public String getVersion() {
-        return this.version;
-    }
-
-    public ServerState getState() {
-        return this.state;
-    }
-
-    public boolean getSinglePlayer() {
-        return this.singlePlayer;
-    }
-
-    public boolean getCurrentPlayer() {
-        return this.currentPlayer;
-    }
-
-    public Game getGame() {
-        return this.game;
-    }
-
     /**
-     * Get the player (if any) with the current name in a given game.
-     *
-     * @param game The {@code Game} to look up.
-     * @return The {@code ServerPlayer} found.
+     * {@inheritDoc}
      */
-    public ServerPlayer getPlayerByName(Game game) {
-        return (ServerPlayer)game.getPlayerByName(this.userName);
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        freeColClient.getConnectController()
+            .login(this.state, this.game, this.userName,
+                   this.singlePlayer, this.currentPlayer);
     }
-
 
     /**
      * {@inheritDoc}
@@ -196,7 +197,7 @@ public class LoginMessage extends ObjectMessage {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.maximumPlayers"));
             }
-            present = (ServerPlayer)serverGame.getPlayerByName(this.userName);
+            present = getPlayer(serverGame);
             if (present != null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameInUse")
@@ -238,7 +239,7 @@ public class LoginMessage extends ObjectMessage {
                     .template("error.mapEditorGame"));
             }
             serverGame = freeColServer.getGame(); // Restoring from existing.
-            present = getPlayerByName(serverGame);
+            present = getPlayer(serverGame);
             if (present == null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameNotPresent")
@@ -277,7 +278,7 @@ public class LoginMessage extends ObjectMessage {
 
         case IN_GAME:
             serverGame = freeColServer.getGame(); // Restoring existing game.
-            present = getPlayerByName(serverGame);
+            present = getPlayer(serverGame);
             if (present == null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameNotPresent")
@@ -314,14 +315,12 @@ public class LoginMessage extends ObjectMessage {
     }
 
     /**
-     * Convert this LoginMessage to XML.
-     *
-     * @return The XML representation of this message.
+     * {@inheritDoc}
      */
     @Override
     public Element toXMLElement() {
         Player player = (this.game == null || this.userName == null) ? null
-            : this.game.getPlayerByName(this.userName);
+            : getPlayer(this.game);
         String state = (this.state == null) ? "" : this.state.toString();
         return new DOMMessage(TAG,
             USER_NAME_TAG, this.userName,
@@ -331,5 +330,42 @@ public class LoginMessage extends ObjectMessage {
             CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer))
             .add(this.game, player)
             .toXMLElement();
+    }
+
+
+    // Public interface
+
+    public String getUserName() {
+        return this.userName;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public ServerState getState() {
+        return this.state;
+    }
+
+    public boolean getSinglePlayer() {
+        return this.singlePlayer;
+    }
+
+    public boolean getCurrentPlayer() {
+        return this.currentPlayer;
+    }
+
+    public Game getGame() {
+        return this.game;
+    }
+
+    /**
+     * Get the player (if any) with the current name in a given game.
+     *
+     * @param game The {@code Game} to look up.
+     * @return The {@code ServerPlayer} found.
+     */
+    public ServerPlayer getPlayer(Game game) {
+        return (ServerPlayer)game.getPlayerByName(this.userName);
     }
 }

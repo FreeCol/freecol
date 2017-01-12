@@ -238,6 +238,20 @@ public class Game extends FreeColGameObject {
         setSpecification(specification);
     }
 
+    /**
+     * Creates a new {@code Game} instance from a stream.
+     *
+     * @param game A base {@code Game} (not used here, this is a very
+     *     special case).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if an error occurs
+     */
+    public Game(@SuppressWarnings("unused")Game game,
+                FreeColXMLReader xr) throws XMLStreamException {
+        this();
+        
+        readFromXML(xr);
+    }
 
     /**
      * Instantiate an uninitialized FreeColGameObject within a game.
@@ -263,7 +277,7 @@ public class Game extends FreeColGameObject {
                 new Class[] { Game.class, String.class },
                 new Object[] { game, (String)null }); // No intern!
         } catch (Introspector.IntrospectorException ex) {
-            // Allow another try on failure
+            ; // Allow another try on failure
         }
 
         if (game != null

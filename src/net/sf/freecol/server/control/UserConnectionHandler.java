@@ -83,7 +83,7 @@ public final class UserConnectionHandler extends ServerInputHandler {
         // player ignored.  Find the real player associated with the name
         // in the login message.  That is the one that needs to see the
         // response.
-        ServerPlayer real = message.getPlayerByName(freeColServer.getGame());
+        ServerPlayer real = message.getPlayer(freeColServer.getGame());
         Message m = cs.build(real);
         return (m == null) ? null : ((DOMMessage)m).toXMLElement();
     }
