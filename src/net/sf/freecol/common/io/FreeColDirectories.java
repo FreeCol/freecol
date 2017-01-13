@@ -871,7 +871,7 @@ public class FreeColDirectories {
     public static List<File> getI18nMessageFileList(Locale locale) {
         List<File> result = new ArrayList<>();
         File i18nDirectory = getI18nDirectory();
-        for (String name : getMessageFileNames(locale)) {
+        for (String name : getMessageFileNameList(locale)) {
             File f = new File(i18nDirectory, name);
             if (f.canRead()) result.add(f);
         }
@@ -1034,7 +1034,7 @@ public class FreeColDirectories {
      * @param locale The {@code Locale} to generate names for.
      * @return A list of potential message file names.
      */
-    public static List<String> getMessageFileNames(Locale locale) {
+    public static List<String> getMessageFileNameList(Locale locale) {
         return getLocaleFileNames(MESSAGE_FILE_PREFIX, MESSAGE_FILE_SUFFIX,
                                   locale);
     }

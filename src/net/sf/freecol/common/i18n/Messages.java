@@ -177,11 +177,32 @@ public class Messages {
         setGrammaticalNumber(NumberRules.getNumberForLanguage(loc.getLanguage()));
 
         for (File f : FreeColDirectories.getI18nMessageFileList(locale)) {
+            if (!f.canRead()) continue;
             try {
                 loadMessages(new FileInputStream(f));
-            } catch (IOException e) {
-                System.err.println("Failed to load messages from " + f.getPath()
-                    + ": " + e.getMessage());
+            } catch (IOException ioe) {
+                System.err.println("Failed to load messages from "
+                    + f.getPath() + ": " + ioe.getMessage());
+            }
+        }
+        List<String> filenames
+            = FreeColDirectories.getMessageFileNameList(locale);
+        for (FreeColTcFile fctf : FreeColTcFile.getRulesList()) {
+            for (String fn : filenames) {
+                InputStream is = null;
+                try {
+                    is = fctf.getInputStream(fn);
+                } catch (IOException ioe) {
+                    continue; // Expecting failure
+                }
+                try {
+                    loadMessages(is);
+                } catch (IOException ioe) {
+                    System.err.println("Failed to load rules messages from "
+                        + fn + ": " + ioe.getMessage());
+                } finally {
+                    try { is.close(); } catch (IOException x) {}
+                }
             }
         }
     }
