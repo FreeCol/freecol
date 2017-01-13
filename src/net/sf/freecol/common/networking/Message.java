@@ -19,150 +19,70 @@
 
 package net.sf.freecol.common.networking;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import net.sf.freecol.common.model.FreeColObject;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
-import net.sf.freecol.common.debug.FreeColDebugger;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
 /**
- * Class for parsing raw message data into an XML-tree and for creating new
- * XML-trees.
+ * Base abstract class for all messages.
  */
-public class Message {
+public abstract class Message {
 
     protected static final Logger logger = Logger.getLogger(Message.class.getName());
 
-    private static final String FREECOL_PROTOCOL_VERSION = "0.1.6";
-
-    private static final String INVALID_MESSAGE = "invalid";
-
-    /** The actual Message data. */
-    protected Document document;
-
-
+    /**
+     * Deliberately trivial constructor.
+     */
     protected Message() {
         // empty constructor
     }
 
     /**
-     * Constructs a new Message with data from the given String. The
-     * constructor to use if this is an INCOMING message.
+     * Constructs a new message with data from the given input stream.
      * 
-     * @param msg The raw message data.
-     * @exception IOException should not be thrown.
-     * @exception SAXException if thrown during parsing.
-     */
-    public Message(String msg) throws SAXException, IOException {
-        this(new InputSource(new StringReader(msg)));
-    }
-
-    /**
-     * Constructs a new Message with data from the given InputStream. The
-     * constructor to use if this is an INCOMING message.
-     * 
-     * @param inputStream The {@code InputStream} to get the XML-data
-     *            from.
+     * @param inputStream The {@code InputStream} to read.
      * @exception IOException if thrown by the {@code InputStream}.
      * @exception SAXException if thrown during parsing.
      */
     public Message(InputStream inputStream) throws SAXException, IOException {
-        this(new InputSource(inputStream));
+        readInputStream(inputStream);
     }
 
     /**
-     * Constructs a new Message with data from the given InputSource. The
-     * constructor to use if this is an INCOMING message.
+     * Build a new message with the given type.
      * 
-     * @param inputSource The {@code InputSource} to get the XML-data
-     *            from.
-     * @exception IOException if thrown by the {@code InputSource}.
-     * @exception SAXException if thrown during parsing.
+     * @param type The main message type.
      */
-    private Message(InputSource inputSource) throws SAXException, IOException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document tempDocument = null;
-        boolean dumpMsgOnError
-            = FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS);
-        if (dumpMsgOnError) {
-            inputSource.setByteStream(new BufferedInputStream(inputSource.getByteStream()));
-
-            inputSource.getByteStream().mark(1000000);
-        }
-
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            tempDocument = builder.parse(inputSource);
-        } catch (ParserConfigurationException pce) {
-            // Parser with specified options can't be built
-            logger.log(Level.WARNING, "Parser error", pce);
-        } catch (IOException|SAXException ex) {
-            throw ex;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // Xerces throws ArrayIndexOutOfBoundsException when it barfs on
-            // some FreeCol messages. I'd like to see the messages upon which
-            // it barfs
-            if (dumpMsgOnError) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                inputSource.getByteStream().reset();
-                while (true) {
-                    int i = inputSource.getByteStream().read();
-                    if (-1 == i) {
-                        break;
-                    }
-                    baos.write(i);
-                }
-                logger.severe(baos.toString("UTF-8"));
-            }
-            throw e;
-        }
-        document = tempDocument;
+    public Message(String type) {
+        setType(type);
     }
+    
 
     /**
-     * Constructs a new Message with data from the given XML-document.
-     * 
-     * @param document The document representing an XML-message.
+     * Get the message tag.
+     *
+     * @return The message tag.
      */
-    public Message(Document document) {
-        this.document = document;
-    }
-
-
+    abstract public String getType();
+    
     /**
-     * Gets the {@code Document} holding the message data.
-     * 
-     * @return The {@code Document} holding the message data.
+     * Set the message tag.
+     *
+     * @param type The new message tag.
      */
-    public Document getDocument() {
-        return document;
-    }
-
-    /**
-     * Gets the type of this Message.
-     * 
-     * @return The type of this Message.
-     */
-    public String getType() {
-        return (document != null && document.getDocumentElement() != null)
-            ? document.getDocumentElement().getTagName()
-            : INVALID_MESSAGE;
-    }
-
+    abstract protected void setType(String type);
+    
     /**
      * Checks if this message is of a given type.
      * 
@@ -174,72 +94,96 @@ public class Message {
     }
 
     /**
-     * Gets an attribute from the root element.
+     * Checks if an attribute is present in this message.
      * 
-     * @param key The key of the attribute.
+     * @param key The attribute to look for.
+     * @return True if the attribute is present.
+     */
+    abstract public boolean hasAttribute(String key);
+
+    /**
+     * Gets an attribute from this message.
+     * 
+     * @param key The attribute to look for.
      * @return The value of the attribute with the given key.
      */
-    public String getAttribute(String key) {
-        return document.getDocumentElement().getAttribute(key);
-    }
+    abstract public String getAttribute(String key);
 
     /**
-     * Checks if an attribute is set on the root element.
+     * Sets an attribute in this message.
      * 
-     * @param attribute The attribute in which to verify the existence of.
-     * @return {@code true} if the root element has the given attribute.
+     * @param key The attribute to set.
+     * @param value The new value of the attribute.
      */
-    public boolean hasAttribute(String attribute) {
-        return document.getDocumentElement().hasAttribute(attribute);
-    }
+    abstract public void setAttribute(String key, String value);
 
     /**
-     * Sets an attribute on the root element.
-     * 
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
-     */
-    public void setAttribute(String key, String value) {
-        document.getDocumentElement().setAttribute(key, value);
-    }
-
-    /**
-     * Sets an attribute on the root element.
-     * 
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
-     */
-    public void setAttribute(String key, int value) {
-        setAttribute(key, Integer.toString(value));
-    }
-
-    /**
-     * Dummy serialization stub.
-     * Must be overridden by subclasses.
+     * Get all the attributes in this message.
      *
-     * @return Null.
+     * @param element The {@code Element} to extract from.
+     * @return A {@code Map} of the attributes.
      */
-    public Element toXMLElement() {
-        return null; // do nothing
+    abstract public Map<String,String> getAttributes();
+    
+    /**
+     * Set all the attributes in a map.
+     *
+     * @param attributes The map of key, value pairs to set.
+     */
+    public void setAttributes(Map<String, String> attributes) {
+        forEachMapEntry(attributes,
+                        e -> setAttribute(e.getKey(), e.getValue()));
     }
 
     /**
-     * Gets the current version of the FreeCol protocol.
-     * 
-     * @return The version of the FreeCol protocol.
+     * Get the array attrubutes of this message.
+     *
+     * @return A list of the array attributes found.
      */
-    public static String getFreeColProtocolVersion() {
-        return FREECOL_PROTOCOL_VERSION;
+    public List<String> getArrayAttributes() {
+        List<String> result = new ArrayList<>();
+        String key;
+        int i = 0;
+        for (;;) {
+            key = FreeColObject.arrayKey(i);
+            if (!hasAttribute(key)) break;
+            result.add(getAttribute(key));
+            i++;
+        }
+        return result;
     }
-
-
-    // Override Object
 
     /**
-     * {@inheritDoc}
+     * Set a list of attributes as an array.
+     *
+     * @param attributes The list of attributes.
      */
-    @Override
-    public String toString() {
-        return document.getDocumentElement().toString();
+    public void setArrayAttributes(List<String> attributes) {
+        int i = 0;
+        for (String a : attributes) {
+            setAttribute(FreeColObject.arrayKey(i), a);
+            i++;
+        }
+    }                
+
+    /**
+     * Set an array of attributes.
+     *
+     * @param attributes The array of attributes.
+     */
+    public void setArrayAttributes(String[] attributes) {
+        if (attributes != null) {
+            for (int i = 0; i < attributes.length; i++) {
+                setAttribute(FreeColObject.arrayKey(i), attributes[i]);
+            }
+        }
     }
+
+    /**
+     * Build this message from an input stream.
+     *
+     * @param inputStream The {@code InputStream} to read.
+     */
+    abstract public void readInputStream(InputStream inputStream)
+        throws IOException, SAXException;
 }
