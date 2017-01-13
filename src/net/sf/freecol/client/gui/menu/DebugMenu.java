@@ -303,18 +303,6 @@ public class DebugMenu extends JMenu {
             });
         dam.setEnabled(true);
 
-        final JMenuItem useAI = Utility.localizedMenuItem("menuBar.debug.useAI");
-        useAI.setOpaque(false);
-        useAI.setMnemonic(KeyEvent.VK_A);
-        useAI.setAccelerator(KeyStroke.getKeyStroke('A',
-            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
-                | InputEvent.ALT_MASK));
-        this.add(useAI);
-        useAI.addActionListener((ActionEvent ae) -> {
-                DebugUtils.useAI(freeColClient);
-            });
-        useAI.setEnabled(hasServer);
-
         dami.setOpaque(false);
         dami.setMnemonic(KeyEvent.VK_I);
         this.add(dami);

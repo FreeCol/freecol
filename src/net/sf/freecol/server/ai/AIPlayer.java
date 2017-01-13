@@ -74,12 +74,6 @@ public abstract class AIPlayer extends AIObject {
     /** The PRNG to use for this AI player. */
     private Random aiRandom;
 
-    /**
-     * Temporary variable, used for debugging purposes only.
-     * See setDebuggingConnection()
-     */
-    private Connection debuggingConnection;
-
     /** The wrapper for the server. */
     private AIServerAPI serverAPI;
 
@@ -168,21 +162,8 @@ public abstract class AIPlayer extends AIObject {
      *     server.
      */
     public Connection getConnection() {
-        return (debuggingConnection != null) ? debuggingConnection
-            : ((DummyConnection)player.getConnection()).getOtherConnection();
-    }
-
-    /**
-     * Sets the {@code Connection} to be used while communicating with
-     * the server.
-     *
-     * This method is only used for debugging.
-     *
-     * @param debuggingConnection The {@code Connection} to be
-     *     used for debugging.
-     */
-    public void setDebuggingConnection(Connection debuggingConnection) {
-        this.debuggingConnection = debuggingConnection;
+        return ((DummyConnection)this.player.getConnection())
+            .getOtherConnection();
     }
 
     /**

@@ -1201,27 +1201,4 @@ public class DebugUtils {
 
         freeColClient.getGUI().showInformationMessage(lb.toString());
     }
-
-    /**
-     * Debug action to run the AI.
-     *
-     * Called from the debug menu.
-     *
-     * @param freeColClient The {@code FreeColClient} for the game.
-     */
-    public static void useAI(final FreeColClient freeColClient) {
-        final FreeColServer server = freeColClient.getFreeColServer();
-        final Player player = freeColClient.getMyPlayer();
-        final AIMain aiMain = server.getAIMain();
-        final AIPlayer ap = aiMain.getAIPlayer(player);
-
-        String consistency = aiMain.checkSortConsistency();
-        if (consistency != null) {
-            freeColClient.getGUI().showInformationMessage(consistency);
-        }
-
-        ap.setDebuggingConnection(freeColClient.askServer().getConnection());
-        ap.startWorking();
-        reconnect(freeColClient);
-    }
 }
