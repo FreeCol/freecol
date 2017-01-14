@@ -73,7 +73,7 @@ public class SetStanceMessage extends AttributeMessage {
      * @return The {@code Stance} value.
      */
     public Stance getStance() {
-        return Enum.valueOf(Stance.class, getAttribute(STANCE_TAG));
+        return Enum.valueOf(Stance.class, getStringAttribute(STANCE_TAG));
     }
 
     /**
@@ -83,7 +83,7 @@ public class SetStanceMessage extends AttributeMessage {
      * @return The player whose stance changes.
      */
     public Player getFirstPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(FIRST_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(FIRST_TAG), Player.class);
     }
 
     /**
@@ -93,7 +93,7 @@ public class SetStanceMessage extends AttributeMessage {
      * @return The player the stance changed to.
      */
     public Player getSecondPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(SECOND_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(SECOND_TAG), Player.class);
     }
 
     // No server handler required.

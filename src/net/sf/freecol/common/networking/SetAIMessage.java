@@ -69,7 +69,7 @@ public class SetAIMessage extends AttributeMessage {
      * @return The {@code Player} to set the AI state of.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(PLAYER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
     }
 
     /**
@@ -78,7 +78,7 @@ public class SetAIMessage extends AttributeMessage {
      * @return The AI state.
      */
     public boolean getAI() {
-        return getBooleanAttribute(AI_TAG);
+        return getBooleanAttribute(AI_TAG, false);
     }
 
     // No server handler method required.

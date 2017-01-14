@@ -55,7 +55,7 @@ import org.xml.sax.SAXException;
  * Class for parsing raw message data into an XML-tree and for creating new
  * XML-trees.
  */
-public class DOMMessage {
+public class DOMMessage extends Message {
 
     protected static final Logger logger = Logger.getLogger(DOMMessage.class.getName());
 
@@ -70,7 +70,7 @@ public class DOMMessage {
      * @param tag The main tag.
      */
     private DOMMessage(String tag) {
-        this.document = DOMUtils.createDocument(tag);
+        super(tag);
     }
         
     /**
@@ -83,7 +83,7 @@ public class DOMMessage {
      */
     public DOMMessage(InputStream inputStream)
         throws SAXException, IOException {
-        this.document = DOMUtils.readDocument(new InputSource(inputStream));
+        super(inputStream);
     }
 
     /**
@@ -95,10 +95,7 @@ public class DOMMessage {
     public DOMMessage(String tag, String... attributes) {
         this(tag);
         
-        String[] all = attributes;
-        for (int i = 0; i < all.length; i += 2) {
-            if (all[i+1] != null) this.setAttribute(all[i], all[i+1]);
-        }
+        setStringAttributes(attributes);
     }
     
     /**
@@ -113,7 +110,7 @@ public class DOMMessage {
         final int n = map.getLength();
         for (int i = 0; i < n; i++) {
             Node node = map.item(i);
-            this.setAttribute(node.getNodeName(), node.getNodeValue());
+            this.setStringAttribute(node.getNodeName(), node.getNodeValue());
         }
     }
 
@@ -124,112 +121,6 @@ public class DOMMessage {
      */
     private Element getElement() {
         return this.document.getDocumentElement();
-    }
-
-    /**
-     * Gets the type of this DOMMessage.
-     *
-     * @return The type of this DOMMessage.
-     */
-    public String getType() {
-        return (this.document != null && getElement() != null)
-            ? DOMUtils.getType(getElement())
-            : INVALID_MESSAGE;
-    }
-
-    /**
-     * Checks if this message is of a given type.
-     *
-     * @param type The type you wish to test against.
-     * @return {@code true} if the type of this message equals the given
-     *         type and {@code false} otherwise.
-     */
-    public boolean isType(String type) {
-        return getType().equals(type);
-    }
-
-    /**
-     * Gets an attribute from the root element.
-     *
-     * @param key The key of the attribute.
-     * @return The value of the attribute with the given key.
-     */
-    public String getAttribute(String key) {
-        return getElement().getAttribute(key);
-    }
-
-    /**
-     * Sets an attribute on the root element.
-     *
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
-     */
-    public void setAttribute(String key, String value) {
-        getElement().setAttribute(key, value);
-    }
-
-    /**
-     * Sets an attribute on the root element.
-     *
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
-     */
-    public void setAttribute(String key, int value) {
-        setAttribute(key, Integer.toString(value));
-    }
-
-    /**
-     * Set a list of attributes as an array.
-     *
-     * @param attributes The list of attribute strings.
-     * @return This message.
-     */
-    public DOMMessage setArrayAttributes(List<String> attributes) {
-        if (!attributes.isEmpty()) {
-            int i = 0;
-            for (String a : attributes) {
-                setAttribute(FreeColObject.arrayKey(i), a);
-                i++;
-            }
-        }
-        return this;
-    }                
-
-    /**
-     * Set a array of attributes.
-     *
-     * @param attributes The array of attribute strings.
-     * @return This message.
-     */
-    public DOMMessage setArrayAttributes(String[] attributes) {
-        if (attributes != null) {
-            for (int i = 0; i < attributes.length; i++) {
-                setAttribute(FreeColObject.arrayKey(i), attributes[i]);
-            }
-        }
-        return this;
-    }                
-    
-    /**
-     * Set all the attributes in a map.
-     *
-     * @param attributes The map of attribute strings.
-     * @return This message.
-     */
-    public DOMMessage setAttributes(Map<String, String> attributes) {
-        forEachMapEntry(attributes,
-                        e -> setAttribute(e.getKey(), e.getValue()));
-        return this;
-    }
-
-    /**
-     * Checks if an attribute is set on the root element.
-     *
-     * @param attribute The attribute in which to verify the existence of.
-     * @return {@code true} if the root element has the given attribute.
-     */
-    public boolean hasAttribute(String attribute) {
-        return getElement().hasAttribute(attribute);
     }
 
     public DOMMessage add(Element e) {
@@ -284,7 +175,7 @@ public class DOMMessage {
     public Element attachToDocument(Document doc) {
         return (Element)doc.adoptNode(this.toXMLElement());
     }
-    
+
     /**
      * Server-side handler for this message.
      *
@@ -295,6 +186,61 @@ public class DOMMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         return serverPlayer.clientError("Invalid message type: " + getType());
+    }
+
+
+    // Implement Message
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getType() {
+        return (this.document != null && getElement() != null)
+            ? DOMUtils.getType(getElement())
+            : INVALID_MESSAGE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setType(String tag) {
+        this.document = DOMUtils.createDocument(tag);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasAttribute(String attribute) {
+        return getElement().hasAttribute(attribute);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getStringAttribute(String key) {
+        return getElement().getAttribute(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setStringAttribute(String key, String value) {
+        getElement().setAttribute(key, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String,String> getStringAttributes() {
+        return DOMUtils.getAttributeMap(getElement());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void readInputStream(InputStream inputStream)
+        throws IOException, SAXException {
+        this.document = DOMUtils.readDocument(new InputSource(inputStream));
     }
 
 

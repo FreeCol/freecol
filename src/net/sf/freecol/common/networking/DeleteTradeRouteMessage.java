@@ -65,7 +65,7 @@ public class DeleteTradeRouteMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String tradeRouteId = getAttribute(TRADE_ROUTE_TAG);
+        final String tradeRouteId = getStringAttribute(TRADE_ROUTE_TAG);
         
         TradeRoute tradeRoute;
         try {

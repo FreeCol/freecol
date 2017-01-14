@@ -79,8 +79,8 @@ public class MissionaryMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String unitId = getAttribute(UNIT_TAG);
-        final String directionString = getAttribute(DIRECTION_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String directionString = getStringAttribute(DIRECTION_TAG);
 
         Unit unit;
         try {
@@ -103,7 +103,7 @@ public class MissionaryMessage extends AttributeMessage {
         }
 
         Unit missionary = is.getMissionary();
-        boolean denounce = getBooleanAttribute(DENOUNCE_TAG);
+        boolean denounce = getBooleanAttribute(DENOUNCE_TAG, false);
         if (denounce) {
             if (missionary == null) {
                 return serverPlayer.clientError("Denouncing an empty mission at: "

@@ -72,7 +72,7 @@ public class SetColorMessage extends AttributeMessage {
      * @return The {@code Nation}.
      */
     public Nation getNation(Specification spec) {
-        return spec.getNation(getAttribute(NATION_TAG));
+        return spec.getNation(getStringAttribute(NATION_TAG));
     }
 
     /**
@@ -83,7 +83,7 @@ public class SetColorMessage extends AttributeMessage {
     public Color getColor() {
         Color color = null;
         try {
-            int rgb = Integer.decode(getAttribute(COLOR_TAG));
+            int rgb = getIntegerAttribute(COLOR_TAG, 0);
             color = new Color(rgb);
         } catch (NumberFormatException nfe) {}
         return color;

@@ -76,20 +76,20 @@ public class InciteMessage extends AttributeMessage {
     // Public interface
 
     public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
+        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
     }
 
     public IndianSettlement getSettlement(Unit unit) {
-        return unit.getAdjacentSettlement(getAttribute(SETTLEMENT_TAG),
+        return unit.getAdjacentSettlement(getStringAttribute(SETTLEMENT_TAG),
                                           IndianSettlement.class);
     }
 
     public Player getEnemy(Game game) {
-        return game.getFreeColGameObject(getAttribute(ENEMY_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(ENEMY_TAG), Player.class);
     }
 
     public int getGold() {
-        return getIntegerAttribute(GOLD_TAG);
+        return getIntegerAttribute(GOLD_TAG, -1);
     }
 
 
@@ -119,7 +119,7 @@ public class InciteMessage extends AttributeMessage {
         ServerPlayer enemy = (ServerPlayer)getEnemy(game);
         if (enemy == null) {
             return serverPlayer.clientError("Not a player: "
-                + getAttribute(ENEMY_TAG));
+                + getStringAttribute(ENEMY_TAG));
         } else if (enemy == serverPlayer) {
             return serverPlayer.clientError("Inciting against oneself!");
         } else if (!enemy.isEuropean()) {
@@ -133,7 +133,7 @@ public class InciteMessage extends AttributeMessage {
         int gold = getGold();
         if (gold < 0) {
             return serverPlayer.clientError("Bad gold: "
-                + getAttribute(GOLD_TAG));
+                + getStringAttribute(GOLD_TAG));
         }
 
         // Valid, proceed to incite.

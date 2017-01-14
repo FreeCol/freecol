@@ -75,7 +75,7 @@ public class LogoutMessage extends AttributeMessage {
      * @return The player found.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(PLAYER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
     }
 
     /**
@@ -84,7 +84,7 @@ public class LogoutMessage extends AttributeMessage {
      * @return The {@code LogoutReason}.
      */
     public LogoutReason getReason() {
-        return Enum.valueOf(LogoutReason.class, getAttribute(REASON_TAG));
+        return Enum.valueOf(LogoutReason.class, getStringAttribute(REASON_TAG));
     }
 
 

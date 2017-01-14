@@ -68,8 +68,8 @@ public class DeclareIndependenceMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String nationName = getAttribute(NATION_NAME_TAG);
-        final String countryName = getAttribute(COUNTRY_NAME_TAG);
+        final String nationName = getStringAttribute(NATION_NAME_TAG);
+        final String countryName = getStringAttribute(COUNTRY_NAME_TAG);
         
         if (nationName == null || nationName.isEmpty()) {
             return serverPlayer.clientError("Empty nation name.");

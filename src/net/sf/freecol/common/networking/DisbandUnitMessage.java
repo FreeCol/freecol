@@ -65,7 +65,7 @@ public class DisbandUnitMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String unitId = getAttribute(UNIT_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
 
         Unit unit;
         try {

@@ -75,9 +75,9 @@ public class UnloadGoodsMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Specification spec = freeColServer.getSpecification();
-        final String typeId = getAttribute(TYPE_TAG);
-        final String amountString = getAttribute(AMOUNT_TAG);
-        final String carrierId = getAttribute(CARRIER_TAG);
+        final String typeId = getStringAttribute(TYPE_TAG);
+        final int amount = getIntegerAttribute(AMOUNT_TAG, -1);
+        final String carrierId = getStringAttribute(CARRIER_TAG);
         
         Unit carrier;
         try {
@@ -96,15 +96,8 @@ public class UnloadGoodsMessage extends AttributeMessage {
             return serverPlayer.clientError("Not a goods type: " + typeId);
         }
 
-        int amount;
-        try {
-            amount = Integer.parseInt(amountString);
-        } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad amount: " + amountString);
-        }
         if (amount <= 0) {
-            return serverPlayer.clientError("Amount must be positive: "
-                + amountString);
+            return serverPlayer.clientError("Invalid amount: " + amount);
         }
         int present = carrier.getGoodsCount(type);
         if (present < amount) {

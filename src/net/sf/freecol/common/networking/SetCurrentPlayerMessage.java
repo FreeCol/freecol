@@ -65,7 +65,7 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
      * @return The {@code Player} whose turn it now is.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(PLAYER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
     }
 
     // No server handler required.

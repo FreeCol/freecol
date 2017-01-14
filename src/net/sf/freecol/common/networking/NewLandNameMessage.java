@@ -72,7 +72,7 @@ public class NewLandNameMessage extends AttributeMessage {
      * @return The {@code Unit} of this message.
      */
     public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
+        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
     }
 
     /**
@@ -81,7 +81,7 @@ public class NewLandNameMessage extends AttributeMessage {
      * @return The new land name of this message.
      */
     public String getNewLandName() {
-        return getAttribute(NEW_LAND_NAME_TAG);
+        return getStringAttribute(NEW_LAND_NAME_TAG);
     }
 
 

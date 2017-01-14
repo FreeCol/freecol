@@ -65,7 +65,7 @@ public class EmigrateUnitMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String slotString = getAttribute(SLOT_TAG);
+        final String slotString = getStringAttribute(SLOT_TAG);
 
         Europe europe = serverPlayer.getEurope();
         if (europe == null) {

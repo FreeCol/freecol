@@ -72,9 +72,9 @@ public class EquipForRoleMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
-        final String unitId = getAttribute(UNIT_TAG);
-        final String roleId = getAttribute(ROLE_TAG);
-        final String countString = getAttribute(COUNT_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String roleId = getStringAttribute(ROLE_TAG);
+        final String countString = getStringAttribute(COUNT_TAG);
 
         Unit unit;
         try {

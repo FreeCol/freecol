@@ -75,7 +75,7 @@ public class ChatMessage extends AttributeMessage {
      * @return The player that sent this ChatMessage.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(SENDER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(SENDER_TAG), Player.class);
     }
 
     /**
@@ -84,7 +84,7 @@ public class ChatMessage extends AttributeMessage {
      * @return The text of this ChatMessage.
      */
     public String getMessage() {
-        return getAttribute(MESSAGE_TAG);
+        return getStringAttribute(MESSAGE_TAG);
     }
 
     /**
@@ -93,7 +93,7 @@ public class ChatMessage extends AttributeMessage {
      * @return True if this ChatMessage is private.
      */
     public boolean isPrivate() {
-        return getBooleanAttribute(PRIVATE_TAG);
+        return getBooleanAttribute(PRIVATE_TAG, false);
     }
 
 
@@ -106,7 +106,7 @@ public class ChatMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer server,
                                    ServerPlayer serverPlayer) {
         /* Do not trust the client-supplied sender name */
-        setAttribute(SENDER_TAG, serverPlayer.getId());
+        setStringAttribute(SENDER_TAG, serverPlayer.getId());
 
         server.getInGameController()
             .chat(serverPlayer, getMessage(), isPrivate());

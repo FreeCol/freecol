@@ -80,7 +80,7 @@ public class SetBuildQueueMessage extends AttributeMessage {
      * @return The colony.
      */
     public Colony getColony(Player player) {
-        return player.getOurFreeColGameObject(getAttribute(COLONY_TAG),
+        return player.getOurFreeColGameObject(getStringAttribute(COLONY_TAG),
                                               Colony.class);
     }
 

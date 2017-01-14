@@ -69,7 +69,7 @@ public class GameEndedMessage extends AttributeMessage {
      * @return The {@code Player} that won.
      */
     public Player getWinner(Game game) {
-        return game.getFreeColGameObject(getAttribute(WINNER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(WINNER_TAG), Player.class);
     }
 
     /**
@@ -80,7 +80,7 @@ public class GameEndedMessage extends AttributeMessage {
      * @return The score attribute.
      */
     public String getScore() {
-        return getAttribute(HIGH_SCORE_TAG);
+        return getStringAttribute(HIGH_SCORE_TAG);
     }
 
     // No server handler method required.

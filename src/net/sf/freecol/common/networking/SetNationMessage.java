@@ -73,7 +73,7 @@ public class SetNationMessage extends AttributeMessage {
      * @return The {@code Player} found, or null.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(PLAYER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
     }
 
     /**
@@ -83,7 +83,7 @@ public class SetNationMessage extends AttributeMessage {
      * @return The {@code Nation}.
      */
     public Nation getValue(Specification spec) {
-        return spec.getNation(getAttribute(VALUE_TAG));
+        return spec.getNation(getStringAttribute(VALUE_TAG));
     }
 
 

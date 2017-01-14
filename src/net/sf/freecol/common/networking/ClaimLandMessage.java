@@ -76,9 +76,9 @@ public class ClaimLandMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
-        final String tileId = getAttribute(TILE_TAG);
-        final String claimantId = getAttribute(CLAIMANT_TAG);
-        final String priceString = getAttribute(PRICE_TAG);
+        final String tileId = getStringAttribute(TILE_TAG);
+        final String claimantId = getStringAttribute(CLAIMANT_TAG);
+        final String priceString = getStringAttribute(PRICE_TAG);
 
         Tile tile = game.getFreeColGameObject(tileId, Tile.class);
         if (tile == null) {

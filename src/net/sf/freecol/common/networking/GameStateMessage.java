@@ -52,7 +52,7 @@ public class GameStateMessage extends AttributeMessage {
         super(TAG);
 
         if (serverState != null) {
-            setAttribute(STATE_TAG, serverState.toString());
+            setStringAttribute(STATE_TAG, serverState.toString());
         }
     }
 
@@ -72,7 +72,7 @@ public class GameStateMessage extends AttributeMessage {
     // Public interface
 
     public ServerState getState() {
-        return Enum.valueOf(ServerState.class, getAttribute(STATE_TAG));
+        return Enum.valueOf(ServerState.class, getStringAttribute(STATE_TAG));
     }
 
 

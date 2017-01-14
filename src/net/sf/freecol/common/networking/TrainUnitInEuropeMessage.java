@@ -65,7 +65,7 @@ public class TrainUnitInEuropeMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String typeId = getAttribute(UNIT_TYPE_TAG);
+        final String typeId = getStringAttribute(UNIT_TYPE_TAG);
         
         UnitType type = freeColServer.getSpecification().getUnitType(typeId);
         if (type == null) {

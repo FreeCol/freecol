@@ -74,28 +74,27 @@ public class FirstContactMessage extends AttributeMessage {
     // Public interface
 
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(PLAYER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
     }
 
     public Player getOtherPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(OTHER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(OTHER_TAG), Player.class);
     }
 
     public Tile getTile(Game game) {
-        return game.getFreeColGameObject(getAttribute(TILE_TAG), Tile.class);
+        return game.getFreeColGameObject(getStringAttribute(TILE_TAG), Tile.class);
     }
 
     public int getSettlementCount() {
-        return getIntegerAttribute(CAMPS_TAG);
+        return getIntegerAttribute(CAMPS_TAG, -1);
     }
             
     public boolean getResult() {
-        return (hasAttribute(RESULT_TAG)) ? getBooleanAttribute(RESULT_TAG)
-            : null;
+        return getBooleanAttribute(RESULT_TAG, (Boolean)null);
     }
 
     public FirstContactMessage setResult(boolean result) {
-        setAttribute(RESULT_TAG, String.valueOf(result));
+        setBooleanAttribute(RESULT_TAG, result);
         return this;
     }
 
@@ -107,8 +106,8 @@ public class FirstContactMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
-        final String playerId = getAttribute(PLAYER_TAG);
-        final String otherId = getAttribute(OTHER_TAG);
+        final String playerId = getStringAttribute(PLAYER_TAG);
+        final String otherId = getStringAttribute(OTHER_TAG);
 
         Player first = getPlayer(game);
         if (first == null) {

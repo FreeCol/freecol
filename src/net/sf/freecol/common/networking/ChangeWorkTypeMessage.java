@@ -71,8 +71,8 @@ public class ChangeWorkTypeMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Specification spec = freeColServer.getSpecification();
-        final String unitId = getAttribute(UNIT_TAG);
-        final String workTypeId = getAttribute(WORK_TYPE_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String workTypeId = getStringAttribute(WORK_TYPE_TAG);
 
         Unit unit;
         try {

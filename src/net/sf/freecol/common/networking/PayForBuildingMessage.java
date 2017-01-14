@@ -65,7 +65,7 @@ public class PayForBuildingMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String colonyId = getAttribute(COLONY_TAG);
+        final String colonyId = getStringAttribute(COLONY_TAG);
         
         Colony colony;
         try {

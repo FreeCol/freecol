@@ -66,7 +66,7 @@ public class PayArrearsMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final GoodsType goodsType = freeColServer.getSpecification()
-            .getGoodsType(getAttribute(GOODS_TYPE_TAG));
+            .getGoodsType(getStringAttribute(GOODS_TYPE_TAG));
 
         // Proceed to pay.
         return freeColServer.getInGameController()

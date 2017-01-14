@@ -70,8 +70,8 @@ public class WorkMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
-        final String unitId = getAttribute(UNIT_TAG);
-        final String workLocationId = getAttribute(WORK_LOCATION_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String workLocationId = getStringAttribute(WORK_LOCATION_TAG);
 
         Unit unit;
         try {

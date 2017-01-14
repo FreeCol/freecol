@@ -69,8 +69,8 @@ public class SetDestinationMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
-        final String unitId = getAttribute(UNIT_TAG);
-        final String destinationId = getAttribute(DESTINATION_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String destinationId = getStringAttribute(DESTINATION_TAG);
 
         Unit unit;
         try {

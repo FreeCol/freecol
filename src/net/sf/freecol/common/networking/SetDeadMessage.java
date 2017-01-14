@@ -65,7 +65,7 @@ public class SetDeadMessage extends AttributeMessage {
      * @return The {@code Player} that has died.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(PLAYER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
     }
 
     // No server handler required.

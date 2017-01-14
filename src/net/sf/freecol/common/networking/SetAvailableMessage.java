@@ -70,7 +70,7 @@ public class SetAvailableMessage extends AttributeMessage {
      * @return The {@code Nation} found.
      */
     public Nation getNation(Specification spec) {
-        return spec.getNation(getAttribute(NATION_TAG));
+        return spec.getNation(getStringAttribute(NATION_TAG));
     }
 
     /**
@@ -79,7 +79,7 @@ public class SetAvailableMessage extends AttributeMessage {
      * @return The new {@code NationState}.
      */
     public NationState getNationState() {
-        return Enum.valueOf(NationState.class, getAttribute(STATE_TAG));
+        return Enum.valueOf(NationState.class, getStringAttribute(STATE_TAG));
     }
 
 

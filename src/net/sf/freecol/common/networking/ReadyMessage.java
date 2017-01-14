@@ -70,7 +70,7 @@ public class ReadyMessage extends AttributeMessage {
      * @return The {@code Player} to set the AI state of.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getAttribute(PLAYER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
     }
 
     /**
@@ -79,7 +79,7 @@ public class ReadyMessage extends AttributeMessage {
      * @return True if the player is ready.
      */
     public boolean getValue() {
-        return getBooleanAttribute(VALUE_TAG);
+        return getBooleanAttribute(VALUE_TAG, false);
     }
 
 

@@ -81,7 +81,7 @@ public class NewRegionNameMessage extends AttributeMessage {
      * @return The region of this message.
      */
     public Region getRegion(Game game) {
-        return game.getFreeColGameObject(getAttribute(REGION_TAG), Region.class);
+        return game.getFreeColGameObject(getStringAttribute(REGION_TAG), Region.class);
     }
 
     /**
@@ -91,7 +91,7 @@ public class NewRegionNameMessage extends AttributeMessage {
      * @return The tile of this message.
      */
     public Tile getTile(Game game) {
-        return game.getFreeColGameObject(getAttribute(TILE_TAG), Tile.class);
+        return game.getFreeColGameObject(getStringAttribute(TILE_TAG), Tile.class);
     }
 
     /**
@@ -101,7 +101,7 @@ public class NewRegionNameMessage extends AttributeMessage {
      * @return The {@code Unit} of this message.
      */
     public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
+        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
     }
 
     /**
@@ -110,7 +110,7 @@ public class NewRegionNameMessage extends AttributeMessage {
      * @return The new region name of this message.
      */
     public String getNewRegionName() {
-        return getAttribute(NEW_REGION_NAME_TAG);
+        return getStringAttribute(NEW_REGION_NAME_TAG);
     }
 
 
@@ -125,7 +125,7 @@ public class NewRegionNameMessage extends AttributeMessage {
         Tile tile = getTile(game);
         if (!serverPlayer.hasExplored(tile)) {
             return serverPlayer.clientError("Can not claim discovery in unexplored tile: "
-                + getAttribute(TILE_TAG));
+                + getStringAttribute(TILE_TAG));
         }
 
         Unit unit;
@@ -140,7 +140,7 @@ public class NewRegionNameMessage extends AttributeMessage {
             return serverPlayer.clientError("No discoverable region in: "
                 + tile.getId());
         }
-        String regionId = getAttribute(REGION_TAG);
+        String regionId = getStringAttribute(REGION_TAG);
         if (!region.getId().equals(regionId)) {
             return serverPlayer.clientError("Region mismatch, "
                 + region.getId() + " != " + regionId);

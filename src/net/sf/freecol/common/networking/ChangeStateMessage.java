@@ -69,8 +69,8 @@ public class ChangeStateMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String unitId = getAttribute(UNIT_TAG);
-        final String stateString = getAttribute(STATE_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String stateString = getStringAttribute(STATE_TAG);
 
         Unit unit;
         try {

@@ -85,14 +85,14 @@ public abstract class ServerInfoMessage extends AttributeMessage {
      * @return The {@code ServerInfo} found.
      */
     public ServerInfo getServerInfo() {
-        return new ServerInfo(getAttribute(NAME_TAG),
-                              getAttribute(ADDRESS_TAG),
-                              getIntegerAttribute(PORT_TAG),
-                              getIntegerAttribute(SLOTS_AVAILABLE_TAG),
-                              getIntegerAttribute(CURRENTLY_PLAYING_TAG),
-                              getBooleanAttribute(IS_GAME_STARTED_TAG),
-                              getAttribute(VERSION_TAG),
-                              getIntegerAttribute(GAME_STATE_TAG));
+        return new ServerInfo(getStringAttribute(NAME_TAG),
+                              getStringAttribute(ADDRESS_TAG),
+                              getIntegerAttribute(PORT_TAG, -1),
+                              getIntegerAttribute(SLOTS_AVAILABLE_TAG, -1),
+                              getIntegerAttribute(CURRENTLY_PLAYING_TAG, -1),
+                              getBooleanAttribute(IS_GAME_STARTED_TAG, false),
+                              getStringAttribute(VERSION_TAG),
+                              getIntegerAttribute(GAME_STATE_TAG, -1));
     }
 
     /**
@@ -101,7 +101,7 @@ public abstract class ServerInfoMessage extends AttributeMessage {
      * @return The address attribute.
      */
     public String getAddress() {
-        return getAttribute(ADDRESS_TAG);
+        return getStringAttribute(ADDRESS_TAG);
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class ServerInfoMessage extends AttributeMessage {
      * @param address The new address.
      */
     public void setAddress(String address) {
-        setAttribute(ADDRESS_TAG, address);
+        setStringAttribute(ADDRESS_TAG, address);
     }
 
     /**
@@ -119,6 +119,6 @@ public abstract class ServerInfoMessage extends AttributeMessage {
      * @return The port attribute.
      */
     public int getPort() {
-        return getIntegerAttribute(PORT_TAG);
+        return getIntegerAttribute(PORT_TAG, -1);
     }
 }

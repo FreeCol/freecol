@@ -69,8 +69,8 @@ public class SetCurrentStopMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String unitId = getAttribute(UNIT_TAG);
-        final String indexString = getAttribute(INDEX_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String indexString = getStringAttribute(INDEX_TAG);
 
         ServerUnit serverUnit;
         try {

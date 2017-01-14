@@ -84,7 +84,7 @@ public class IndianDemandMessage extends AttributeMessage {
      * @return The {@code Unit} found.
      */
     public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
+        return game.getFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
     }
 
     /**
@@ -94,7 +94,7 @@ public class IndianDemandMessage extends AttributeMessage {
      * @return The {@code Colony} found.
      */
     public Colony getColony(Game game) {
-        return game.getFreeColGameObject(getAttribute(COLONY_TAG), Colony.class);
+        return game.getFreeColGameObject(getStringAttribute(COLONY_TAG), Colony.class);
     }
 
     /**
@@ -104,7 +104,7 @@ public class IndianDemandMessage extends AttributeMessage {
      * @return The {@code GoodsType} found.
      */
     public GoodsType getType(Game game) {
-        String typeId = getAttribute(TYPE_TAG);
+        String typeId = getStringAttribute(TYPE_TAG);
         return (typeId == null) ? null
             : game.getSpecification().getGoodsType(typeId);
     }
@@ -116,7 +116,7 @@ public class IndianDemandMessage extends AttributeMessage {
      *     none or invalid.
      */
     public int getAmount() {
-        return getIntegerAttribute(AMOUNT_TAG);
+        return getIntegerAttribute(AMOUNT_TAG, -1);
     }
 
     /**
@@ -125,8 +125,7 @@ public class IndianDemandMessage extends AttributeMessage {
      * @return The result of this demand.
      */
     public Boolean getResult() {
-        return (hasAttribute(RESULT_TAG)) ? getBooleanAttribute(RESULT_TAG)
-            : null;
+        return getBooleanAttribute(RESULT_TAG, (Boolean)null);
     }
 
     /**
@@ -136,9 +135,7 @@ public class IndianDemandMessage extends AttributeMessage {
      * @return This message.
      */
     public IndianDemandMessage setResult(Boolean result) {
-        if (result != null) {
-            setAttribute(RESULT_TAG, String.valueOf(result));
-        }
+        setBooleanAttribute(RESULT_TAG, result);
         return this;
     }
 
@@ -150,8 +147,8 @@ public class IndianDemandMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
-        final String unitId = getAttribute(UNIT_TAG);
-        final String colonyId = getAttribute(COLONY_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String colonyId = getStringAttribute(COLONY_TAG);
         final Boolean result = getResult();
         
         Unit unit;

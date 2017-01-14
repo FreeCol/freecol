@@ -102,12 +102,60 @@ public abstract class Message {
     abstract public boolean hasAttribute(String key);
 
     /**
-     * Gets an attribute from this message.
-     * 
+     * Get a boolean attribute value.
+     *
      * @param key The attribute to look for.
-     * @return The value of the attribute with the given key.
+     * @param defaultValue The fallback result.
+     * @return The boolean value, or the default value if no boolean is found.
      */
-    abstract public String getAttribute(String key);
+    public Boolean getBooleanAttribute(String key, Boolean defaultValue) {
+        try {
+            return Boolean.parseBoolean(getStringAttribute(key));
+        } catch (NumberFormatException nfe) {}
+        return defaultValue;
+    }
+
+    /**
+     * Get an integer attribute value.
+     *
+     * @param key The attribute to look for.
+     * @param defaultValue The fallback result.
+     * @return The integer value, or the default value if no integer is found.
+     */
+    public Integer getIntegerAttribute(String key, int defaultValue) {
+        try {
+            return Integer.parseInt(getStringAttribute(key));
+        } catch (NumberFormatException nfe) {}
+        return defaultValue;
+    }
+
+    /**
+     * Get a string attribute value.
+     *
+     * @param key The attribute to look for.
+     * @return The string value found, or null if the attribute was absent.
+     */
+    abstract public String getStringAttribute(String key);
+
+    /**
+     * Sets an attribute in this message with n boolean value.
+     *
+     * @param key The attribute to set.
+     * @param value The value of the attribute.
+     */
+    public void setBooleanAttribute(String key, Boolean value) {
+        if (value != null) setStringAttribute(key, Boolean.toString(value));
+    }
+
+    /**
+     * Sets an attribute in this message with an integer value.
+     *
+     * @param key The attribute to set.
+     * @param value The value of the attribute.
+     */
+    public void setIntegerAttribute(String key, int value) {
+        setStringAttribute(key, Integer.toString(value));
+    }
 
     /**
      * Sets an attribute in this message.
@@ -115,7 +163,7 @@ public abstract class Message {
      * @param key The attribute to set.
      * @param value The new value of the attribute.
      */
-    abstract public void setAttribute(String key, String value);
+    abstract public void setStringAttribute(String key, String value);
 
     /**
      * Get all the attributes in this message.
@@ -123,16 +171,29 @@ public abstract class Message {
      * @param element The {@code Element} to extract from.
      * @return A {@code Map} of the attributes.
      */
-    abstract public Map<String,String> getAttributes();
+    abstract public Map<String,String> getStringAttributes();
     
     /**
      * Set all the attributes in a map.
      *
-     * @param attributes The map of key, value pairs to set.
+     * @param attributes The map of key,value pairs to set.
      */
-    public void setAttributes(Map<String, String> attributes) {
+    public void setStringAttributes(Map<String, String> attributes) {
         forEachMapEntry(attributes,
-                        e -> setAttribute(e.getKey(), e.getValue()));
+                        e -> setStringAttribute(e.getKey(), e.getValue()));
+    }
+
+    /**
+     * Set all the attributes from an array.
+     *
+     * @param attributes An array of alternating key,value pairs.
+     */
+    public void setStringAttributes(String[] attributes) {
+        for (int i = 0; i < attributes.length; i += 2) {
+            if (attributes[i+1] != null) {
+                setStringAttribute(attributes[i], attributes[i+1]);
+            }
+        }
     }
 
     /**
@@ -141,30 +202,32 @@ public abstract class Message {
      * @return A list of the array attributes found.
      */
     public List<String> getArrayAttributes() {
-        List<String> result = new ArrayList<>();
-        String key;
-        int i = 0;
-        for (;;) {
-            key = FreeColObject.arrayKey(i);
+        List<String> ret = new ArrayList<>();
+        int n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, -1);
+        for (int i = 0; i < n; i++) {
+            String key = FreeColObject.arrayKey(i);
             if (!hasAttribute(key)) break;
-            result.add(getAttribute(key));
-            i++;
+            ret.add(getStringAttribute(key));
         }
-        return result;
+        return ret;
     }
 
     /**
      * Set a list of attributes as an array.
      *
-     * @param attributes The list of attributes.
+     * @param attributes A list of attribute values.
      */
     public void setArrayAttributes(List<String> attributes) {
-        int i = 0;
-        for (String a : attributes) {
-            setAttribute(FreeColObject.arrayKey(i), a);
-            i++;
+        if (attributes != null) {
+            int i = 0;
+            for (String a : attributes) {
+                String key = FreeColObject.arrayKey(i);
+                i++;
+                setStringAttribute(key, a);
+            }
+            setIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, i);
         }
-    }                
+    }
 
     /**
      * Set an array of attributes.
@@ -174,7 +237,7 @@ public abstract class Message {
     public void setArrayAttributes(String[] attributes) {
         if (attributes != null) {
             for (int i = 0; i < attributes.length; i++) {
-                setAttribute(FreeColObject.arrayKey(i), attributes[i]);
+                setStringAttribute(FreeColObject.arrayKey(i), attributes[i]);
             }
         }
     }

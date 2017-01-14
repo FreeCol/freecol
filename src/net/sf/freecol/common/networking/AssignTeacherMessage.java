@@ -68,8 +68,8 @@ public class AssignTeacherMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String studentId = getAttribute(STUDENT_TAG);
-        final String teacherId = getAttribute(TEACHER_TAG);
+        final String studentId = getStringAttribute(STUDENT_TAG);
+        final String teacherId = getStringAttribute(TEACHER_TAG);
 
         Unit student;
         try {

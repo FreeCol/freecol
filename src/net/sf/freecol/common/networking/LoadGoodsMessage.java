@@ -83,10 +83,10 @@ public class LoadGoodsMessage extends AttributeMessage {
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
         final Specification spec = freeColServer.getSpecification();
-        final String locationId = getAttribute(LOCATION_TAG);
-        final String typeId = getAttribute(TYPE_TAG);
-        final String carrierId = getAttribute(CARRIER_TAG);
-        final String amountString = getAttribute(AMOUNT_TAG);
+        final String locationId = getStringAttribute(LOCATION_TAG);
+        final String typeId = getStringAttribute(TYPE_TAG);
+        final String carrierId = getStringAttribute(CARRIER_TAG);
+        final String amountString = getStringAttribute(AMOUNT_TAG);
 
         FreeColGameObject fcgo = game.getFreeColGameObject(locationId);
         if (!(fcgo instanceof Location)) {

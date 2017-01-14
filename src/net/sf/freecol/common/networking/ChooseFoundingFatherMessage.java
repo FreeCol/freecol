@@ -86,7 +86,8 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      * @param fathers A list of {@code FoundingFather}.
      */
     private void setFatherAttributes(List<FoundingFather> fathers) {
-        setAttributes(transform(fathers, alwaysTrue(), Function.identity(),
+        setStringAttributes(transform(fathers, alwaysTrue(),
+                Function.identity(),
                 Collectors.toMap(ff -> ff.getType().getKey(),
                                  FoundingFather::getId)));
     }
@@ -101,7 +102,7 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      * @return The chosen {@code FoundingFather}, or null if none set.
      */
     public final FoundingFather getFather(Game game) {
-        String id = getAttribute(FOUNDING_FATHER_TAG);
+        String id = getStringAttribute(FOUNDING_FATHER_TAG);
         return (id == null) ? null
             : game.getSpecification().getFoundingFather(id);
     }
@@ -113,7 +114,7 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      * @return This message.
      */
     public final ChooseFoundingFatherMessage setFather(FoundingFather ff) {
-        setAttribute(FOUNDING_FATHER_TAG, (ff == null) ? null : ff.getId());
+        setStringAttribute(FOUNDING_FATHER_TAG, (ff == null) ? null : ff.getId());
         return this;
     }
 
@@ -126,7 +127,7 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
     public final List<FoundingFather> getFathers(Game game) {
         final Specification spec = game.getSpecification();
         return transform(fatherKeys, tid -> hasAttribute(tid),
-                         tid -> spec.getFoundingFather(getAttribute(tid)));
+                         tid -> spec.getFoundingFather(getStringAttribute(tid)));
     }
 
 

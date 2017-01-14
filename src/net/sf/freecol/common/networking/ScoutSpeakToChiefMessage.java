@@ -75,16 +75,16 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
     // Public interface
 
     public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(getAttribute(UNIT_TAG), Unit.class);
+        return game.getFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
     }
 
     public IndianSettlement getSettlement(Game game) {
-        return game.getFreeColGameObject(getAttribute(SETTLEMENT_TAG),
+        return game.getFreeColGameObject(getStringAttribute(SETTLEMENT_TAG),
                                          IndianSettlement.class);
     }
 
     public String getResult() {
-        String result = getAttribute(RESULT_TAG);
+        String result = getStringAttribute(RESULT_TAG);
         return (result == null) ? "" : result;
     }
 
@@ -95,8 +95,8 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String unitId = getAttribute(UNIT_TAG);
-        final String settlementId = getAttribute(SETTLEMENT_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String settlementId = getStringAttribute(SETTLEMENT_TAG);
 
         Unit unit;
         try {

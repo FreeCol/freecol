@@ -76,9 +76,9 @@ public class EmbarkMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String unitId = getAttribute(UNIT_TAG);
-        final String carrierId = getAttribute(CARRIER_TAG);
-        final String directionString = getAttribute(DIRECTION_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String carrierId = getStringAttribute(CARRIER_TAG);
+        final String directionString = getStringAttribute(DIRECTION_TAG);
 
         ServerUnit unit;
         try {

@@ -1353,9 +1353,9 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return new AttributeMessage(this.name)
-                .setAttributes(this.attributes)
-                .attachToDocument(doc);
+            DOMMessage ret = new AttributeMessage(this.name);
+            ret.setStringAttributes(this.attributes);
+            return ret.attachToDocument(doc);
         }
 
         /**

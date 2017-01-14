@@ -67,7 +67,7 @@ public class NewTurnMessage extends AttributeMessage {
      * @return The turn number.
      */
     public int getTurnNumber() {
-        return getIntegerAttribute(TURN_TAG);
+        return getIntegerAttribute(TURN_TAG, 0);
     }
 
 

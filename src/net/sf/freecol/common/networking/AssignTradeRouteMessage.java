@@ -70,8 +70,8 @@ public class AssignTradeRouteMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String unitId = getAttribute(UNIT_TAG);
-        final String tradeRouteId = getAttribute(TRADE_ROUTE_TAG);
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String tradeRouteId = getStringAttribute(TRADE_ROUTE_TAG);
 
         Unit unit;
         try {

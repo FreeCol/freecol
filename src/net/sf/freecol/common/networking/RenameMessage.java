@@ -69,7 +69,7 @@ public class RenameMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String nameableId = getAttribute(NAMEABLE_TAG);
+        final String nameableId = getStringAttribute(NAMEABLE_TAG);
         
         FreeColGameObject fcgo;
         try {
@@ -83,6 +83,7 @@ public class RenameMessage extends AttributeMessage {
 
         // Proceed to rename.
         return freeColServer.getInGameController()
-            .renameObject(serverPlayer, (Nameable)fcgo, getAttribute(NAME_TAG));
+            .renameObject(serverPlayer, (Nameable)fcgo,
+                          getStringAttribute(NAME_TAG));
     }
 }

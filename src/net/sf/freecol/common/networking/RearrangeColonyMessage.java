@@ -221,16 +221,16 @@ public class RearrangeColonyMessage extends AttributeMessage {
     private void setArrangementAttributes(List<Arrangement> arrangements) {
         int i = 0;
         for (Arrangement a : arrangements) {
-            setAttribute(a.unitKey(i), a.unit.getId());
-            setAttribute(a.locKey(i), a.loc.getId());
+            setStringAttribute(a.unitKey(i), a.unit.getId());
+            setStringAttribute(a.locKey(i), a.loc.getId());
             if (a.work != null) {
-                setAttribute(a.workKey(i), a.work.getId());
+                setStringAttribute(a.workKey(i), a.work.getId());
             }
-            setAttribute(a.roleKey(i), a.role.toString());
-            setAttribute(a.roleCountKey(i), String.valueOf(a.roleCount));
+            setStringAttribute(a.roleKey(i), a.role.toString());
+            setStringAttribute(a.roleCountKey(i), String.valueOf(a.roleCount));
             i++;
         }
-        setAttribute(FreeColObject.ARRAY_SIZE_TAG, String.valueOf(i));
+        setIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, i);
     }
 
 
@@ -242,7 +242,7 @@ public class RearrangeColonyMessage extends AttributeMessage {
      * @return True if there are no arrangements.
      */
     public boolean isEmpty() {
-        return getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG) == 0;
+        return getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, 0) == 0;
     }
 
     /**
@@ -253,19 +253,14 @@ public class RearrangeColonyMessage extends AttributeMessage {
      */
     public List<Arrangement> getArrangements(Game game) {
         List<Arrangement> ret = new ArrayList<>();
-        int n;
-        try {
-            n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG);
-        } catch (NumberFormatException nfe) {
-            n = 0;
-        }
+        int n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, 0);
         for (int i = 0; i < n; i++) {
             ret.add(new Arrangement(game,
-                                    getAttribute(Arrangement.unitKey(i)),
-                                    getAttribute(Arrangement.locKey(i)),
-                                    getAttribute(Arrangement.workKey(i)),
-                                    getAttribute(Arrangement.roleKey(i)),
-                                    getAttribute(Arrangement.roleCountKey(i))));
+                                    getStringAttribute(Arrangement.unitKey(i)),
+                                    getStringAttribute(Arrangement.locKey(i)),
+                                    getStringAttribute(Arrangement.workKey(i)),
+                                    getStringAttribute(Arrangement.roleKey(i)),
+                                    getStringAttribute(Arrangement.roleCountKey(i))));
         }
         return ret;
     }
@@ -277,7 +272,7 @@ public class RearrangeColonyMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final String colonyId = getAttribute(COLONY_TAG);
+        final String colonyId = getStringAttribute(COLONY_TAG);
         final Game game = serverPlayer.getGame();
         final List<Arrangement> arrangements = getArrangements(game);
         

@@ -64,7 +64,7 @@ public class FountainOfYouthMessage extends AttributeMessage {
      * @return The number of migrants.
      */
     public int getMigrants() {
-        return getIntegerAttribute(MIGRANTS_TAG);
+        return getIntegerAttribute(MIGRANTS_TAG, -1);
     }
 
     // No server handler required.
