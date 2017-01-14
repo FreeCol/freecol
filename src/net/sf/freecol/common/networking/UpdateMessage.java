@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 
 
@@ -64,8 +65,8 @@ public class UpdateMessage extends DOMMessage {
     public UpdateMessage(Game game, Element element) {
         this(null);
 
-        for (FreeColGameObject f : mapChildren(element, (e) ->
-                DOMMessage.updateFromElement(game, e))) {
+        for (FreeColGameObject f : DOMUtils.mapChildren(element, (e) ->
+                DOMUtils.updateFromElement(game, e))) {
             if (f != null) this.fcgos.add(f);
         }
     }

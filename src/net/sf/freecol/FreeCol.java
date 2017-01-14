@@ -82,6 +82,9 @@ public final class FreeCol {
     /** The FreeCol release version number. */
     private static final String FREECOL_VERSION = "0.11.6";
 
+    /** The FreeCol protocol version number. */
+    private static final String FREECOL_PROTOCOL_VERSION = "0.1.6";
+
     /** The difficulty levels. */
     private static final String[] DIFFICULTIES = {
         "veryEasy", "easy", "medium", "hard", "veryHard"
@@ -1275,6 +1278,15 @@ public final class FreeCol {
      */
     public static String getVersion() {
         return FREECOL_VERSION;
+    }
+
+    /**
+     * Gets the current version of the FreeCol protocol.
+     *
+     * @return The version of the FreeCol protocol.
+     */
+    public static String getFreeColProtocolVersion() {
+        return FREECOL_PROTOCOL_VERSION;
     }
 
     /**

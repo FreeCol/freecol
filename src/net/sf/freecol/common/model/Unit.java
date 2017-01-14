@@ -251,7 +251,7 @@ public class Unit extends GoodsLocation
     public Unit(Game game, Element e) {
         super(game, null);// Must override identifier when called client side
 
-        DOMMessage.readFromXMLElement(this, e);
+        net.sf.freecol.common.util.DOMUtils.readFromXMLElement(this, e);
     }
 
     /**

@@ -70,7 +70,7 @@ public final class DefaultHandler extends Handler {
             sb.append("FreeCol game version: ")
                 .append(FreeCol.getRevision())
                 .append("\nFreeCol protocol version: ")
-                .append(DOMMessage.getFreeColProtocolVersion())
+                .append(FreeCol.getFreeColProtocolVersion())
                 .append("\n\nJava vendor: ")
                 .append(System.getProperty("java.vendor"))
                 .append("\nJava version: ")

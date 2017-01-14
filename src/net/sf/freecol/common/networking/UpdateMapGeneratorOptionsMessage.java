@@ -27,6 +27,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 
 
@@ -61,7 +62,7 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
     protected UpdateMapGeneratorOptionsMessage(Element element) {
         this(new OptionGroup(MapGeneratorOptions.TAG));
 
-        readFromXMLElement(this.options, element);
+        DOMUtils.readFromXMLElement(this.options, element);
     }
     
     /**
@@ -72,7 +73,7 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateMapGeneratorOptionsMessage(Game game, Element element) {
-        this(getChildElement(element, OptionGroup.TAG));
+        this(DOMUtils.getChildElement(element, OptionGroup.TAG));
     }
 
 

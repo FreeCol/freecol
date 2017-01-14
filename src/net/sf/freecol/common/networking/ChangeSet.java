@@ -55,6 +55,7 @@ import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.networking.SetStanceMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
@@ -419,17 +420,18 @@ public class ChangeSet {
             element.setAttribute("defenderTile", defender.getTile().getId());
             element.setAttribute("success", Boolean.toString(success));
             if (!serverPlayer.canSeeUnit(attacker)) {
-                element.appendChild(DOMMessage.toXMLElement(attacker, doc,
-                                                            (Player)null));
+                element.appendChild(DOMUtils.toXMLElement(attacker, doc,
+                                                          (Player)null));
                 if (attacker.getLocation() instanceof Unit) {
                     Unit loc = (Unit)attacker.getLocation();
-                    element.appendChild(DOMMessage.toXMLElement(loc, doc, serverPlayer));
+                    element.appendChild(DOMUtils.toXMLElement(loc, doc,
+                                                              serverPlayer));
                 }
             }
             if (!serverPlayer.canSeeUnit(defender)
                 || this.defenderInSettlement) {
-                element.appendChild(DOMMessage.toXMLElement(defender, doc,
-                                                            (Player)null));
+                element.appendChild(DOMUtils.toXMLElement(defender, doc,
+                                                          (Player)null));
             }
             return element;
         }
@@ -710,7 +712,7 @@ public class ChangeSet {
                 // being present on the client side, and it is needed
                 // before we can run the animation, so it is attached
                 // to animateMove.
-                element.appendChild(DOMMessage.toXMLElement(unit, doc, serverPlayer));
+                element.appendChild(DOMUtils.toXMLElement(unit, doc, serverPlayer));
             }
             return element;
         }
@@ -821,7 +823,7 @@ public class ChangeSet {
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("update");
-            element.appendChild(DOMMessage.toXMLElement(fcgo, doc, serverPlayer));
+            element.appendChild(DOMUtils.toXMLElement(fcgo, doc, serverPlayer));
             return element;
         }
 
@@ -890,7 +892,7 @@ public class ChangeSet {
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("update");
-            element.appendChild(DOMMessage.toXMLElementPartial(fcgo, doc, fields));
+            element.appendChild(DOMUtils.toXMLElementPartial(fcgo, doc, fields));
             return element;
         }
 
@@ -954,7 +956,7 @@ public class ChangeSet {
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("addPlayer");
-            element.appendChild(DOMMessage.toXMLElement(this.player, doc, serverPlayer));
+            element.appendChild(DOMUtils.toXMLElement(this.player, doc, serverPlayer));
             return element;
         }
 
@@ -1049,12 +1051,12 @@ public class ChangeSet {
             // only visible if the deeper ownership test succeeds.
             if (fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo)) {
                 for (FreeColGameObject o : contents) {
-                    element.appendChild(DOMMessage.toXMLElementPartial(o, doc));
+                    element.appendChild(DOMUtils.toXMLElementPartial(o, doc));
                 }
                 element.setAttribute("divert", (tile != null) ? tile.getId()
                                      : serverPlayer.getId());
             }
-            element.appendChild(DOMMessage.toXMLElementPartial(fcgo, doc));
+            element.appendChild(DOMUtils.toXMLElementPartial(fcgo, doc));
             return element;
         }
 
@@ -1861,7 +1863,7 @@ public class ChangeSet {
         List<Change> c = sort(changes, changeComparator);
         List<Element> elements = new ArrayList<>();
         List<Change> diverted = new ArrayList<>();
-        Document doc = DOMMessage.createNewDocument();
+        Document doc = DOMUtils.createNewDocument();
 
         // For all sorted changes, if it is notifiable to the target
         // player then convert it to an Element, or divert for later

@@ -98,8 +98,7 @@ public class ErrorMessage extends DOMMessage {
         super(TAG);
 
         this.message = element.getAttribute(MESSAGE_TAG);
-        this.template = DOMMessage.getChild(game, element, 0,
-                                            StringTemplate.class);
+        this.template = getChild(game, element, 0, StringTemplate.class);
     }
 
 

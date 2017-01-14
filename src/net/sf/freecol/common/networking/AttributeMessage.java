@@ -27,6 +27,7 @@ import java.util.Map;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
@@ -86,7 +87,7 @@ public class AttributeMessage extends TrivialMessage {
     public AttributeMessage(Game game, Element element) {
         this(element.getTagName());
 
-        this.attributes.putAll(getAttributeMap(element));
+        this.attributes.putAll(DOMUtils.getAttributeMap(element));
     }
 
 
@@ -222,6 +223,6 @@ public class AttributeMessage extends TrivialMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createElement(getType(), this.attributes);
+        return DOMUtils.createElement(getType(), this.attributes);
     }
 }

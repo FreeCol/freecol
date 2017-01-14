@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 
 
@@ -78,7 +79,7 @@ public class LootCargoMessage extends DOMMessage {
 
         this.winnerId = getStringAttribute(element, WINNER_TAG);
         this.loserId = getStringAttribute(element, LOSER_TAG);
-        this.goods = getChildren(game, element, Goods.class);
+        this.goods = DOMUtils.getChildren(game, element, Goods.class);
     }
 
 

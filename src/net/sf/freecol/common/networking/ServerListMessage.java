@@ -28,6 +28,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.metaserver.ServerInfo;
 import net.sf.freecol.server.FreeColServer;
 
+import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 
 
@@ -62,7 +63,7 @@ public class ServerListMessage extends DOMMessage {
     public ServerListMessage(Game game, Element element) {
         this();
 
-        this.servers.addAll(mapChildren(element,
+        this.servers.addAll(DOMUtils.mapChildren(element,
                 e -> new RegisterServerMessage(null, element).getServerInfo()));
     }
 

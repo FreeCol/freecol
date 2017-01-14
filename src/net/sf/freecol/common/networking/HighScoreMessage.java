@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 
 
@@ -67,7 +68,7 @@ public class HighScoreMessage extends DOMMessage {
     public HighScoreMessage(Game game, Element element) {
         this(getStringAttribute(element, KEY_TAG));
 
-        setScores(getChildren(game, element, HighScore.class));
+        setScores(DOMUtils.getChildren(game, element, HighScore.class));
     }
 
 

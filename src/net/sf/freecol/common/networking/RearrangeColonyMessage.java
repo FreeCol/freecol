@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -87,11 +88,11 @@ public class RearrangeColonyMessage extends AttributeMessage {
 
         public Arrangement readFromElement(Game game, Element e, int i) {
             init(game,
-                getStringAttribute(e, unitKey(i)),
-                getStringAttribute(e, locKey(i)),
-                getStringAttribute(e, workKey(i)),
-                getStringAttribute(e, roleKey(i)),
-                getStringAttribute(e, roleCountKey(i)));
+                 getStringAttribute(e, unitKey(i)),
+                 getStringAttribute(e, locKey(i)),
+                 getStringAttribute(e, workKey(i)),
+                 getStringAttribute(e, roleKey(i)),
+                 getStringAttribute(e, roleCountKey(i)));
             return this;
         }
 

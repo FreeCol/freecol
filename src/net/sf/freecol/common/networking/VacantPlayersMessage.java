@@ -29,6 +29,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 
 
@@ -57,7 +58,7 @@ public class VacantPlayersMessage extends AttributeMessage {
     public VacantPlayersMessage(Game game, Element element) {
         super(TAG);
 
-        setArrayAttributes(getArrayAttributes(element));
+        setArrayAttributes(DOMUtils.getArrayAttributes(element));
     }
 
 

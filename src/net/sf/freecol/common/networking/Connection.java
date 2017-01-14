@@ -40,6 +40,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -417,7 +418,7 @@ public class Connection implements Closeable {
             throw new IOException("wait(ReceivingThread) for: " + tag);
         }
 
-        Element question = DOMMessage.createElement(QUESTION_TAG);
+        Element question = DOMUtils.createElement(QUESTION_TAG);
         question.setAttribute(NETWORK_REPLY_ID_TAG,
                               Integer.toString(networkReplyId));
         question.appendChild(question.getOwnerDocument()
@@ -523,7 +524,7 @@ public class Connection implements Closeable {
                 .template("connection.io")
                 .addName("%extra%", e.getMessage()));
         }
-        return DOMMessage.createMessage(game, reply);
+        return DOMUtils.createMessage(game, reply);
     }
 
     /**

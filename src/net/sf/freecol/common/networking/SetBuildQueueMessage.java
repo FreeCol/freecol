@@ -31,6 +31,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 
 
@@ -65,7 +66,8 @@ public class SetBuildQueueMessage extends AttributeMessage {
      */
     public SetBuildQueueMessage(Game game, Element element) {
         super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
-        setArrayAttributes(getArrayAttributes(element));
+
+        setArrayAttributes(DOMUtils.getArrayAttributes(element));
     }
 
 

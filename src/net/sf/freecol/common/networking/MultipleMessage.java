@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 
+import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 
 
@@ -59,7 +60,7 @@ public class MultipleMessage extends DOMMessage {
      * @param element An element containing the sub-{@code Element}s.
      */
     public MultipleMessage(Element element) {
-        this(mapChildren(element, Function.identity()));
+        this(DOMUtils.mapChildren(element, Function.identity()));
     }
 
     /**
@@ -72,7 +73,7 @@ public class MultipleMessage extends DOMMessage {
     public MultipleMessage(Game game, Element element) {
         this((List<Element>)null);
 
-        this.elements.addAll(mapChildren(element, Function.identity()));
+        this.elements.addAll(DOMUtils.mapChildren(element, Function.identity()));
     }
 
 
@@ -87,7 +88,7 @@ public class MultipleMessage extends DOMMessage {
      */
     public Element applyHandler(MessageHandler handler,
                                 Connection connection) {
-        return handleList(handler, connection, this.elements);
+        return DOMUtils.handleList(handler, connection, this.elements);
     }
 
 

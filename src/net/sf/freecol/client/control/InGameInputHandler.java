@@ -82,6 +82,7 @@ import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 
+import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -254,7 +255,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         Element found = null;
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element)nodes.item(i);
-            if (id.equals(DOMMessage.readId(e))) {
+            if (id.equals(DOMUtils.readId(e))) {
                 found = e;
                 break;
             }
@@ -510,12 +511,12 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private void disposeUnits(Element element) {
         final Game game = getGame();
-        DOMMessage.mapChildren(element, (e) -> {
+        DOMUtils.mapChildren(element, (e) -> {
                 // Do not read the whole unit out of the element as we
                 // are only going to dispose of it, not forgetting
                 // that the server may have already done so and its
                 // view will only mislead us here in the client.
-                final String id = DOMMessage.readId(e);
+                final String id = DOMUtils.readId(e);
                 Unit u = game.getFreeColGameObject(id, Unit.class);
                 if (u == null) {
                     logger.warning("Object is not a unit");
@@ -545,20 +546,20 @@ public final class InGameInputHandler extends ClientInputHandler {
     private void featureChange(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        final boolean add = DOMMessage.getBooleanAttribute(element, "add", false);
-        final String id = DOMMessage.readId(element);
+        final boolean add = DOMUtils.getBooleanAttribute(element, "add", false);
+        final String id = DOMUtils.readId(element);
         final FreeColGameObject object = game.getFreeColGameObject(id);
         if (object == null) {
             logger.warning("featureChange with null object");
             return;
         }
 
-        DOMMessage.mapChildren(element, (e) -> {
-                final String tag = DOMMessage.getType(e);
+        DOMUtils.mapChildren(element, (e) -> {
+                final String tag = DOMUtils.getType(e);
                 switch (tag) {
                 case Ability.TAG:
                     Ability a = new Ability(spec);
-                    DOMMessage.readFromXMLElement(a, e);
+                    DOMUtils.readFromXMLElement(a, e);
                     if (add) {
                         object.addAbility(a);
                     } else {
@@ -567,7 +568,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                     break;
                 case Modifier.TAG:
                     Modifier m = new Modifier(spec);
-                    DOMMessage.readFromXMLElement(m, e);
+                    DOMUtils.readFromXMLElement(m, e);
                     if (add) {
                         object.addModifier(m);
                     } else {
@@ -577,7 +578,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 case FoundingFather.TAG:
                     FoundingFather ff;
                     if (object instanceof Player && add
-                        && (ff = spec.getFoundingFather(DOMMessage.readId(e))) != null) {
+                        && (ff = spec.getFoundingFather(DOMUtils.readId(e))) != null) {
                         Player player = (Player)object;
                         player.addFather(ff);
                         player.invalidateCanSeeTiles(); // Might be coronado
@@ -589,7 +590,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 case HistoryEvent.TAG:
                     if (object instanceof Player && add) {
                         Player player = (Player)object;
-                        player.addHistory(DOMMessage.readElement(game, e, HistoryEvent.class));
+                        player.addHistory(DOMUtils.readElement(game, e, HistoryEvent.class));
                     } else {
                         logger.warning(tag + " feature change failure: "
                             + object + "/" + add);
@@ -598,7 +599,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 case LastSale.TAG:
                     if (object instanceof Player && add) {
                         Player player = (Player)object;
-                        player.addLastSale(DOMMessage.readElement(game, e, LastSale.class));
+                        player.addLastSale(DOMUtils.readElement(game, e, LastSale.class));
                     } else {
                         logger.warning(tag + " feature change failure: "
                             + object + "/" + add);
@@ -607,7 +608,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 case ModelMessage.TAG:
                     if (object instanceof Player && add) {
                         Player player = (Player)object;
-                        player.addModelMessage(DOMMessage.readElement(game, e, ModelMessage.class));
+                        player.addModelMessage(DOMUtils.readElement(game, e, ModelMessage.class));
                     } else {
                         logger.warning(tag + " feature change failure: "
                             + object + "/" + add);
@@ -617,9 +618,9 @@ public final class InGameInputHandler extends ClientInputHandler {
                     if (object instanceof Player) {
                         Player player = (Player)object;
                         if (add) {
-                            player.addTradeRoute(DOMMessage.readElement(game, e, TradeRoute.class));
+                            player.addTradeRoute(DOMUtils.readElement(game, e, TradeRoute.class));
                         } else {
-                            player.removeTradeRoute(DOMMessage.readElement(game, e, TradeRoute.class));
+                            player.removeTradeRoute(DOMUtils.readElement(game, e, TradeRoute.class));
                         }
                     } else {
                         logger.warning(tag + " feature change failure: "
@@ -945,8 +946,8 @@ public final class InGameInputHandler extends ClientInputHandler {
         final FreeColGameObject divert
             = game.getFreeColGameObject(element.getAttribute("divert"));
         final List<FreeColGameObject> objects = new ArrayList<>();
-        DOMMessage.mapChildren(element, (e) -> {
-                final String id = DOMMessage.readId(e);
+        DOMUtils.mapChildren(element, (e) -> {
+                final String id = DOMUtils.readId(e);
                 FreeColGameObject fcgo = game.getFreeColGameObject(id);
                 if (fcgo != null) {
                     // Null fcgo can happen legitimately when an
