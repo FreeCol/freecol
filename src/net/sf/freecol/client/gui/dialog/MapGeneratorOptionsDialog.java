@@ -225,7 +225,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             IntegerOption opEdge = (IntegerOption)getGroup()
                 .getOption(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE);
             int width = opWidth.getValue(), edge = opEdge.getValue();
-            if (width > 4 * edge) {
+            if (width >= 4 * edge) {
                 ok = true;
             } else {
                 getGUI().showErrorMessage(StringTemplate
