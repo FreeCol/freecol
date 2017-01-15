@@ -256,7 +256,7 @@ public class Messages {
      */
     public static void loadModMessageBundle(Locale locale) {
         List<String> filenames
-            = FreeColDirectories.getModMessageFileNames(locale);
+            = FreeColDirectories.getMessageFileNameList(locale);
         LogBuilder lb = new LogBuilder(32);
         lb.add("Failed to load mod messages:");
         lb.mark();
