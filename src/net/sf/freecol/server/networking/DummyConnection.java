@@ -20,6 +20,8 @@
 package net.sf.freecol.server.networking;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
@@ -33,8 +35,7 @@ import org.w3c.dom.Element;
  */
 public final class DummyConnection extends Connection {
 
-    /** The message handler to simulate using when receiving messages. */
-    private MessageHandler outgoingMessageHandler;
+    private static final Logger logger = Logger.getLogger(DummyConnection.class.getName());
 
     /** The other connection, to which outgoing requests are forwarded .*/
     private DummyConnection otherConnection;
@@ -55,21 +56,12 @@ public final class DummyConnection extends Connection {
 
 
     /**
-     * Sets the outgoing MessageHandler for this Connection.
-     *
-     * @param mh The new MessageHandler for this Connection.
-     */
-    private void setOutgoingMessageHandler(MessageHandler mh) {
-        this.outgoingMessageHandler = mh;
-    }
-
-    /**
      * Gets the {@code DummyConnection} this object is connected to.
      *
      * @return The {@code DummyConnection} .
      */
     public DummyConnection getOtherConnection() {
-        return otherConnection;
+        return this.otherConnection;
     }
 
     /**
@@ -79,7 +71,6 @@ public final class DummyConnection extends Connection {
      */
     public void setOtherConnection(DummyConnection dc) {
         this.otherConnection = dc;
-        setOutgoingMessageHandler(dc.getMessageHandler());
     }
 
 
@@ -106,13 +97,7 @@ public final class DummyConnection extends Connection {
      */
     @Override
     public boolean sendElement(Element element) {
-        if (!isAlive()) return false;
-        try {
-            getOtherConnection().handleElement(element);
-            log(element, true);
-            return true;
-        } catch (FreeColException e) {}
-        return false;
+        return sendAndWaitElement(element);
     }
 
     /**
@@ -120,12 +105,17 @@ public final class DummyConnection extends Connection {
      */
     @Override
     public boolean sendAndWaitElement(Element request) {
+        if (!isAlive()) return false;
+        if (request == null) return true;
+        final String tag = request.getTagName();
         try {
-            log(request, true);
             Element reply = getOtherConnection().handleElement(request);
+            log(request, true);
             log(reply, false);
             return true;
-        } catch (FreeColException fce) {}
+        } catch (FreeColException fce) {
+            logger.log(Level.WARNING, "Dummy send-handler fail: " + tag, fce);
+        }
         return false;
     }
 
@@ -140,13 +130,15 @@ public final class DummyConnection extends Connection {
      */
     @Override
     public Element askElement(Element request) throws IOException {
-        if (!isAlive()) return null;
+        if (!isAlive() || request == null) return null;
+        final String tag = request.getTagName();
         Element reply;
         try {
             log(request, true);
             reply = getOtherConnection().handleElement(request);
             log(reply, false);            
-        } catch (FreeColException e) {
+        } catch (FreeColException fce) {
+            logger.log(Level.WARNING, "Dummy-ask handler fail: " + tag, fce);
             reply = null;
         }
         return reply;
