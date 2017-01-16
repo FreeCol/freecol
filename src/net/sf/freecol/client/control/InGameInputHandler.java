@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
+import net.sf.freecol.common.networking.AnimateAttackMessage;
 import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
@@ -132,7 +133,7 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         register(AddPlayerMessage.TAG,
             (Connection c, Element e) -> addPlayer(e));
-        register("animateAttack",
+        register(AnimateAttackMessage.TAG,
             (Connection c, Element e) -> animateAttack(e));
         register(AnimateMoveMessage.TAG,
             (Connection c, Element e) -> animateMove(e));
@@ -319,58 +320,35 @@ public final class InGameInputHandler extends ClientInputHandler {
     private void animateAttack(Element element) {
         final Game game = getGame();
         final Player player = getMyPlayer();
-        String str;
-        Unit u;
+        final AnimateAttackMessage message
+            = new AnimateAttackMessage(game, element);
+        final Unit attacker = message.getAttacker(game);
+        final Unit defender = message.getDefender(game);
+        final Tile attackerTile = message.getAttackerTile(game);
+        final Tile defenderTile = message.getDefenderTile(game);
+        final boolean result = message.getResult();
 
-        if ((str = element.getAttribute("attacker")).isEmpty()) {
+        if (attacker == null) {
             throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " missing attacker attribute.");
+                + player.getId() + " missing attacker.");
         }
-        if ((u = game.getFreeColGameObject(str, Unit.class)) == null
-            && (u = selectUnitFromElement(game, element, str)) == null) {
+        if (defender == null) {
             throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " omitted attacker: " + str);
+                + player.getId() + " omitted defender.");
         }
-        final Unit attacker = u;
-
-        if ((str = element.getAttribute("defender")).isEmpty()) {
-            throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " missing defender attribute.");
-        }
-        if ((u = game.getFreeColGameObject(str, Unit.class)) == null
-            && (u = selectUnitFromElement(game, element, str)) == null) {
-            throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " omitted defender: " + str);
-        }
-        final Unit defender = u;
-
-        if ((str = element.getAttribute("attackerTile")).isEmpty()) {
-            throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " missing attacker tile attribute.");
-        }
-        final Tile attackerTile = game.getFreeColGameObject(str, Tile.class);
         if (attackerTile == null) {
             throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " omitted attacker tile: " + str);
+                + player.getId() + " omitted attacker tile.");
         }
-
-        if ((str = element.getAttribute("defenderTile")).isEmpty()) {
-            throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " missing defender tile attribute.");
-        }
-        final Tile defenderTile = game.getFreeColGameObject(str, Tile.class);
         if (defenderTile == null) {
             throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " omitted defender tile: " + str);
+                + player.getId() + " omitted defender tile.");
         }
-
-        final boolean success
-            = Boolean.parseBoolean(element.getAttribute("success"));
 
         // All is well, do the animation.
         invokeAndWait(() -> {
                 igc().animateAttack(attacker, defender,
-                                    attackerTile, defenderTile, success);
+                                    attackerTile, defenderTile, result);
             });
     }
 

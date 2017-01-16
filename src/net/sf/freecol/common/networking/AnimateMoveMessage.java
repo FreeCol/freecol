@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent when moving a unit.
+ * The message sent to tell a client to show a movement animation.
  */
 public class AnimateMoveMessage extends DOMMessage {
 

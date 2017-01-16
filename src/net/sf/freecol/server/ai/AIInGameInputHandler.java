@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
+import net.sf.freecol.common.networking.AnimateAttackMessage;
 import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.ChatMessage;
@@ -226,7 +227,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             // Therefore most of these messages are useless.
             // This may change one day.
             case AddPlayerMessage.TAG:
-            case "animateAttack":
+            case AnimateAttackMessage.TAG:
             case AnimateMoveMessage.TAG:
             case AssignTradeRouteMessage.TAG:
             case ChatMessage.TAG:

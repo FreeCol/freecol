@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.AnimateAttackMessage;
 import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -379,6 +380,33 @@ public class ChangeSet {
         }
 
         /**
+         * Is the attacker visible to a player?
+         *
+         * @return The attacker visibility.
+         */
+        private boolean attackerVisible(ServerPlayer serverPlayer) {
+            return serverPlayer.canSeeUnit(this.attacker);
+        }
+
+        /**
+         * Is the defender visible to a player?
+         *
+         * A false positive can occur as the defender may *start*
+         * invisible because it is in a settlement, but the settlement
+         * falls, exposing the defender (the defender dies).
+         * Defenders in settlements must always be considered to be
+         * invisible to other players as the animation happens while
+         * the settlement stands.
+         *
+         * @return The defender visibility.
+         */
+        private boolean defenderVisible(ServerPlayer serverPlayer) {
+            return serverPlayer.canSeeUnit(this.defender)
+                && (!this.defenderInSettlement
+                    || serverPlayer.owns(this.defender));
+        }
+
+        /**
          * Gets the sort priority.
          *
          * @return "CHANGE_ANIMATION".
@@ -414,27 +442,9 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("animateAttack");
-            element.setAttribute("attacker", attacker.getId());
-            element.setAttribute("defender", defender.getId());
-            element.setAttribute("attackerTile", attacker.getTile().getId());
-            element.setAttribute("defenderTile", defender.getTile().getId());
-            element.setAttribute("success", Boolean.toString(success));
-            if (!serverPlayer.canSeeUnit(attacker)) {
-                element.appendChild(DOMUtils.toXMLElement(attacker, doc,
-                                                          (Player)null));
-                if (attacker.getLocation() instanceof Unit) {
-                    Unit loc = (Unit)attacker.getLocation();
-                    element.appendChild(DOMUtils.toXMLElement(loc, doc,
-                                                              serverPlayer));
-                }
-            }
-            if (!serverPlayer.canSeeUnit(defender)
-                || this.defenderInSettlement) {
-                element.appendChild(DOMUtils.toXMLElement(defender, doc,
-                                                          (Player)null));
-            }
-            return element;
+            return new AnimateAttackMessage(attacker, defender, success,
+                !attackerVisible(serverPlayer), !defenderVisible(serverPlayer))
+                .attachToDocument(doc);
         }
 
         /**
