@@ -678,26 +678,6 @@ public final class FreeColServer {
     }
         
     /**
-     * Wait until the game has been created.
-     *
-     * FIXME: is this still needed?
-     *
-     * @return The {@code Game}, or null if the wait times out.
-     */
-    public Game waitForGame() {        
-        final int timeStep = 1000;
-        int timeOut = 20000;
-        Game game = null;
-        while ((game = getGame()) == null) {
-            try {
-                Thread.sleep(timeStep);
-            } catch (InterruptedException e) {}
-            if ((timeOut -= timeStep) <= 0) break;
-        }
-        return game;
-    }
-
-    /**
      * Start the game.
      *
      * Called from PreGameController following a requestLaunch message
