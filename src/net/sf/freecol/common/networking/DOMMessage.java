@@ -255,8 +255,8 @@ public class DOMMessage extends Message {
      * @param defaultValue A default value to return on failure.
      * @return The boolean value found, or the default value on error.
      */
-    public static boolean getBooleanAttribute(Element element, String tag,
-                                              boolean defaultValue) {
+    public static Boolean getBooleanAttribute(Element element, String tag,
+                                              Boolean defaultValue) {
         return DOMUtils.getBooleanAttribute(element, tag, defaultValue);
     }
 
