@@ -243,7 +243,7 @@ final class ReceivingThread extends Thread {
      */
     private void disconnect() {
         askToStop();
-        connection.disconnect();
+        connection.sendDisconnect();
     }
 
     // Individual parts of listen().  Work in progress

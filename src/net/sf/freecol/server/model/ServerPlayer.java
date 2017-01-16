@@ -307,7 +307,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return True if the message was sent.
      */
     public boolean send(ChangeSet cs) {
-        return (isConnected()) ? this.connection.sendAndWait(cs.build(this))
+        return (isConnected())
+            ? this.connection.sendAndWaitElement(cs.build(this))
             : false;
     }
 

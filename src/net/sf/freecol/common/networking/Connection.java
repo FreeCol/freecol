@@ -314,26 +314,29 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Close this connection.
-     */
-    @Override
-    public void close() {
-        if (this.receivingThread != null) this.receivingThread.askToStop();
-
-        closeOutputStream();
-        closeInputStream();
-        closeSocket();
-        
-        logger.fine("Connection closed for " + this.name);
-    }
-
-    /**
      * Signal that this connection is disconnecting.
      */
-    public void disconnect() {
+    public void sendDisconnect() {
         send(TrivialMessage.DISCONNECT_MESSAGE);
     }
 
+    /**
+     * Send a reconnect message.
+     */
+    public void sendReconnect() {
+        send(TrivialMessage.RECONNECT_MESSAGE);
+    }
+
+    /**
+     * Disconnect this connection.
+     */
+    public void disconnect() {
+        sendDisconnect();
+        close();
+    }
+
+    // Element processing.  To go away
+    
     /**
      * Write an element into a string writer.
      *
@@ -434,16 +437,6 @@ public class Connection implements Closeable {
         log((response == null) ? null : response.toXMLElement(), false);
         return response;
     }
-
-
-    // Wrappers, to be promoted soon
-    public void sendAndWait(DOMMessage message) throws IOException {
-        sendAndWait(message.toXMLElement());
-    }
-    public Element ask(DOMMessage message) throws IOException {
-        return ask(message.toXMLElement());
-    }
-
     
     /**
      * Main public routine to send a message over this connection.
@@ -454,7 +447,7 @@ public class Connection implements Closeable {
      * @see #sendAndWait(Element)
      * @see #ask(Element)
      */
-    public boolean send(Element element) {
+    public boolean sendElement(Element element) {
         if (element == null) return true;
         final String tag = element.getTagName();
         try {
@@ -478,7 +471,7 @@ public class Connection implements Closeable {
      * @see #send(Element)
      * @see #ask(Element)
      */
-    public boolean sendAndWait(Element element) {
+    public boolean sendAndWaitElement(Element element) {
         if (element == null) return true;
         final String tag = element.getTagName();
         try {
@@ -500,12 +493,33 @@ public class Connection implements Closeable {
      * @see #send(Element)
      * @see #sendAndWait(Element)
      */
-    public Element ask(Element element) throws IOException {
+    public Element askElement(Element element) throws IOException {
         DOMMessage reply = askInternal(element);
         logger.fine("Ask: " + element.getTagName()
             + ", reply: " + ((reply == null) ? "null" : reply.getType()));
         return (reply == null) ? null
             : (Element)reply.toXMLElement().getFirstChild();
+    }
+
+    /**
+     * Handle a request.
+     *
+     * @param request The request {@code Element} to handle.
+     * @return The reply from the message handler.
+     * @exception FreeColException if there is a handler problem.
+     */
+    public Element handleElement(Element request) throws FreeColException {
+        return (this.messageHandler == null) ? null
+            : this.messageHandler.handle(this, request);
+    }
+
+
+
+    public void sendAndWait(DOMMessage message) throws IOException {
+        sendAndWaitElement(message.toXMLElement());
+    }
+    public Element ask(DOMMessage message) throws IOException {
+        return askElement(message.toXMLElement());
     }
 
     /**
@@ -540,7 +554,7 @@ public class Connection implements Closeable {
         throws FreeColException, IOException {
         Element element = msg.toXMLElement(), reply;
         element = (Element)element.getFirstChild();
-        reply = handle(element);
+        reply = handleElement(element);
         msg = new DOMMessage(REPLY_TAG,
             NETWORK_REPLY_ID_TAG, Integer.toString(replyId));
         if (reply != null) msg.add(reply);
@@ -557,7 +571,7 @@ public class Connection implements Closeable {
     public void handleUpdate(DOMMessage msg)
         throws FreeColException, IOException {
         Element reply = handle(msg);
-        if (reply != null) send(reply);
+        if (reply != null) sendElement(reply);
     }
 
     /**
@@ -569,20 +583,11 @@ public class Connection implements Closeable {
      */
     public Element handle(DOMMessage message) throws FreeColException {
         Element element = message.toXMLElement();
-        return handle(element);
+        return handleElement(element);
     }
 
-    /**
-     * Handle a request.
-     *
-     * @param request The request {@code Element} to handle.
-     * @return The reply from the message handler.
-     * @exception FreeColException if there is a handler problem.
-     */
-    public Element handle(Element request) throws FreeColException {
-        return (this.messageHandler == null) ? null
-            : this.messageHandler.handle(this, request);
-    }
+
+    // Client handling
 
     /**
      * Client request.
@@ -611,7 +616,7 @@ public class Connection implements Closeable {
         final String tag = reply.getTagName();
         
         try {
-            Element e = handle(reply);
+            Element e = handleElement(reply);
             assert e == null; // client handlers now all return null
         } catch (FreeColException fce) {
             logger.log(Level.WARNING, "Failed to handle: " + tag, fce);
@@ -627,14 +632,23 @@ public class Connection implements Closeable {
      * @return True if the message was sent.
      */
     public boolean send(DOMMessage message) {
-        return send(message.toXMLElement());
+        return sendElement(message.toXMLElement());
     }
     
+
+    // Implement Closeable
+
     /**
-     * Send a reconnect message.
+     * Close this connection.
      */
-    public void sendReconnect() {
-        send(TrivialMessage.RECONNECT_MESSAGE);
+    public void close() {
+        if (this.receivingThread != null) this.receivingThread.askToStop();
+
+        closeOutputStream();
+        closeInputStream();
+        closeSocket();
+        
+        logger.fine("Connection closed for " + this.name);
     }
 
 

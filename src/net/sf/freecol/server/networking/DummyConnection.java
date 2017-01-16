@@ -105,10 +105,10 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    public boolean send(Element element) {
+    public boolean sendElement(Element element) {
         if (!isAlive()) return false;
         try {
-            getOtherConnection().handle(element);
+            getOtherConnection().handleElement(element);
             log(element, true);
             return true;
         } catch (FreeColException e) {}
@@ -119,10 +119,10 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    public boolean sendAndWait(Element request) {
+    public boolean sendAndWaitElement(Element request) {
         try {
             log(request, true);
-            Element reply = getOtherConnection().handle(request);
+            Element reply = getOtherConnection().handleElement(request);
             log(reply, false);
             return true;
         } catch (FreeColException fce) {}
@@ -139,12 +139,12 @@ public final class DummyConnection extends Connection {
      * @see #sendAndWait
      */
     @Override
-    public Element ask(Element request) throws IOException {
+    public Element askElement(Element request) throws IOException {
         if (!isAlive()) return null;
         Element reply;
         try {
             log(request, true);
-            reply = getOtherConnection().handle(request);
+            reply = getOtherConnection().handleElement(request);
             log(reply, false);            
         } catch (FreeColException e) {
             reply = null;
