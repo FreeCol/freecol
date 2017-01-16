@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColModFile;
-import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.util.Utils;
@@ -114,7 +113,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     @Override
     protected void setValue(String valueString, String defaultValueString) throws XMLStreamException {
         String id = (valueString != null) ? valueString : defaultValueString;
-        FreeColModFile fcmf = Mods.getFreeColModFile(id);
+        FreeColModFile fcmf = FreeColModFile.getFreeColModFile(id);
         if (fcmf == null) {
             throw new XMLStreamException("Could not find mod for: " + id);
         }

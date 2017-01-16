@@ -35,7 +35,6 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -577,7 +576,7 @@ public class ClientOptions extends OptionGroup {
         final Predicate<FreeColModFile> validModPred = m ->
             m != null && m.getId() != null;
         final Function<FreeColModFile, FreeColModFile> modFileMapper = m ->
-            Mods.getFreeColModFile(m.getId());
+            FreeColModFile.getFreeColModFile(m.getId());
         return transform(mlo.getOptionValues(), validModPred, modFileMapper,
                          toListNoNulls());
     }

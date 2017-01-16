@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.function.Predicate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -43,6 +45,9 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
 
     private static final Logger logger = Logger.getLogger(FreeColModFile.class.getName());
+
+    /** A cache of all the mods. */
+    private static final Map<String, FreeColModFile> allMods = new HashMap<>();
 
     protected static final String SPECIFICATION_FILE = "specification.xml";
 
@@ -124,16 +129,6 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
     }
 
     /**
-     * Gets the object identifier of this mod.
-     *
-     * @return The object identifier of the mod.
-     */
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    /**
      * Gets the parent of the mod.
      *
      * @return The mod parent name.
@@ -157,5 +152,44 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
             }
         }
         return ret;
+    }
+
+
+    // Implement ObjectWithId
+
+    /**
+     * Gets the object identifier of this mod.
+     *
+     * @return The object identifier of the mod.
+     */
+    @Override
+    public String getId() {
+        return id;
+    }
+
+
+    // Cache manipulation
+
+    /**
+     * Require all mods to be loaded.  This must be delayed until
+     * the mods directories are defined.
+     *
+     * User mods are loaded after standard mods to allow user override.
+     */
+    public static void loadMods() {
+        allMods.clear();
+        for (FreeColModFile fcmf : FreeColModFile.getModsList()) {
+            allMods.put(fcmf.getId(), fcmf);
+        }
+    }
+
+    /**
+     * Get a mod by id.
+     *
+     * @param id The mod file identifier to look for.
+     * @return The {@code FreeColModFile} found, or null if none present.
+     */
+    public static FreeColModFile getFreeColModFile(String id) {
+        return allMods.get(id);
     }
 }

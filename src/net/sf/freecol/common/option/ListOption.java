@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -256,7 +255,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
                 logger.log(Level.FINEST, "Found old-style mod value: {0}",
                         modId);
                 if (modId != null) {
-                    FreeColModFile fcmf = Mods.getFreeColModFile(modId);
+                    FreeColModFile fcmf = FreeColModFile.getFreeColModFile(modId);
                     if (fcmf != null) {
                         ModOption modOption = new ModOption(getSpecification());
                         modOption.setValue(fcmf);

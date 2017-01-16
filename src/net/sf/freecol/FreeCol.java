@@ -48,8 +48,8 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
-import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
@@ -333,7 +333,7 @@ public final class FreeCol {
 
         // Now we have the user mods directory and the locale is now
         // stable, load the mods and their messages.
-        Mods.loadMods();
+        FreeColModFile.loadMods();
         Messages.loadModMessageBundle(locale);
 
         // Report on where we are.

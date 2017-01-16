@@ -43,7 +43,6 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
-import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
