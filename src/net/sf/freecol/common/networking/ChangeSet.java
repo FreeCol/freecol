@@ -629,22 +629,10 @@ public class ChangeSet {
      * Encapsulate a move.
      */
     private static class MoveChange extends Change {
+
         private final Unit unit;
         private final Location oldLocation;
         private final Tile newTile;
-
-        private boolean seeOld(ServerPlayer serverPlayer) {
-            Tile oldTile = oldLocation.getTile();
-            return serverPlayer.owns(unit)
-                || (oldTile != null
-                    && serverPlayer.canSee(oldTile)
-                    && !oldTile.hasSettlement()
-                    && !(oldLocation instanceof Unit));
-        }
-
-        private boolean seeNew(ServerPlayer serverPlayer) {
-            return serverPlayer.canSeeUnit(unit);
-        }
 
 
         /**
@@ -658,9 +646,49 @@ public class ChangeSet {
         public MoveChange(See see, Unit unit, Location oldLocation,
                           Tile newTile) {
             super(see);
-            this.unit = unit;
             this.oldLocation = oldLocation;
             this.newTile = newTile;
+            if (unit.isOnCarrier()) {
+                // Change the unit to a version with a link to an otherwise
+                // empty carrier.
+                Game game = unit.getGame();
+                Unit carrier = unit.getCarrier().copy(game, Unit.class);
+                for (Unit u : carrier.getUnitList()) {
+                    if (u.getId().equals(unit.getId())) {
+                        unit = u;
+                    } else {
+                        carrier.remove(u);
+                    }
+                }
+                carrier.removeAll();
+            }
+            this.unit = unit;
+        }
+
+
+        /**
+         * Can a player see the old tile?
+         *
+         * @param serverPlayer The {@code ServerPlayer} to test.
+         * @return True if the old tile is visible.
+         */
+        private boolean seeOld(ServerPlayer serverPlayer) {
+            Tile oldTile = oldLocation.getTile();
+            return serverPlayer.owns(unit)
+                || (oldTile != null
+                    && serverPlayer.canSee(oldTile)
+                    && !oldTile.hasSettlement()
+                    && !(oldLocation instanceof Unit));
+        }
+
+        /**
+         * Can a player see the new tile?
+         *
+         * @param serverPlayer The {@code ServerPlayer} to test.
+         * @return True if the new tile is visible.
+         */
+        private boolean seeNew(ServerPlayer serverPlayer) {
+            return serverPlayer.canSeeUnit(unit);
         }
 
         /**
