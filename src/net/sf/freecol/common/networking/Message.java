@@ -109,9 +109,11 @@ public abstract class Message {
      * @return The boolean value, or the default value if no boolean is found.
      */
     public Boolean getBooleanAttribute(String key, Boolean defaultValue) {
-        try {
-            return Boolean.parseBoolean(getStringAttribute(key));
-        } catch (NumberFormatException nfe) {}
+        if (hasAttribute(key)) {
+            try {
+                return Boolean.parseBoolean(getStringAttribute(key));
+            } catch (NumberFormatException nfe) {}
+        }
         return defaultValue;
     }
 
@@ -123,9 +125,11 @@ public abstract class Message {
      * @return The integer value, or the default value if no integer is found.
      */
     public Integer getIntegerAttribute(String key, int defaultValue) {
-        try {
-            return Integer.parseInt(getStringAttribute(key));
-        } catch (NumberFormatException nfe) {}
+        if (hasAttribute(key)) {
+            try {
+                return Integer.parseInt(getStringAttribute(key));
+            } catch (NumberFormatException nfe) {}
+        }
         return defaultValue;
     }
 
