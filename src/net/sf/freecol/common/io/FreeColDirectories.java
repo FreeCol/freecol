@@ -31,6 +31,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.filechooser.FileSystemView;
 
@@ -39,6 +40,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.util.OSUtils;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -687,6 +689,23 @@ public class FreeColDirectories {
             : null;
     }
 
+    /**
+     * Remove disallowed parts of a user supplied file name.
+     *
+     * @param The input file name.
+     * @return A sanitized file name.
+     */
+    private static String sanitize(String fileName) {
+        List<String> strings = new ArrayList<String>();
+        for (int i = 0; i < fileName.length(); i++) {
+            String s = fileName.substring(i, i+1);
+            if (SEPARATOR.equals(s)) continue;
+            strings.add(s);
+        }
+        return join("", strings);
+    }
+
+
     // Directory accessors.
     // Where there are supported command line arguments there will also
     // be a mutator.
@@ -703,11 +722,11 @@ public class FreeColDirectories {
     /**
      * Get a specific autosave file.
      *
-     * @param name The name of the file.
+     * @param fileName The name of the file.
      * @return The {@code File} found.
      */
-    public static File getAutosaveFile(String name) {
-        return new File(getAutosaveDirectory(), name);
+    public static File getAutosaveFile(String fileName) {
+        return new File(getAutosaveDirectory(), sanitize(fileName));
     }
 
     /**
@@ -734,8 +753,9 @@ public class FreeColDirectories {
      *
      * @param prefix The autosave file prefix.
      * @param excludeSuffixes Only files not ending with any of these prefixes
-     *                        will be removed.
-     * @param validDays Only files older than this amount of days will be removed.
+     *     will be removed.
+     * @param validDays Only files older than this amount of days will
+     *     be removed.
      */
     public static void removeOutdatedAutosaves(String prefix,
                                                List<String> excludeSuffixes,
@@ -745,13 +765,14 @@ public class FreeColDirectories {
         final long timeNow = System.currentTimeMillis();
         final Predicate<File> outdatedPred = f -> 
             f.lastModified() + validMS < timeNow;
-
         final String extension = "." + FreeCol.FREECOL_SAVE_EXTENSION;
+        final List<String> ex = transform(excludeSuffixes, alwaysTrue(),
+                                          s -> sanitize(s));
         final Predicate<File> suffixPred = f ->
-            excludeSuffixes.stream().noneMatch(
-                    excludeSuffix -> f.getName().endsWith(excludeSuffix + extension));
+            ex.stream().noneMatch(suf -> f.getName().endsWith(suf + extension));
 
-        Utils.deleteFiles(getAutosaveFiles(prefix, outdatedPred.and(suffixPred)));
+        Utils.deleteFiles(getAutosaveFiles(sanitize(prefix),
+                                           outdatedPred.and(suffixPred)));
     }
 
     /**
@@ -760,7 +781,7 @@ public class FreeColDirectories {
      * @param prefix The autosave file prefix.
      */
     public static void removeAutosaves(String prefix) {
-        Utils.deleteFiles(getAutosaveFiles(prefix, alwaysTrue()));
+        Utils.deleteFiles(getAutosaveFiles(sanitize(prefix), alwaysTrue()));
     }
 
     /**
@@ -809,11 +830,13 @@ public class FreeColDirectories {
     /**
      * Get a compatibility file.
      *
-     * @param name The name of the compatibility file.
+     * Not sanitizing the file name as it is fixed in all current uses.
+     *
+     * @param fileName The name of the compatibility file.
      * @return The {@code File} found.
      */
-    public static File getCompatibilityFile(String name) {
-        return new File(getBaseDirectory(), name);
+    public static File getCompatibilityFile(String fileName) {
+        return new File(getBaseDirectory(), fileName);
     }
 
     /**
@@ -1075,12 +1098,12 @@ public class FreeColDirectories {
     /**
      * Get an options file from the options directory.
      *
-     * @param name The name of the file within the options directory.
+     * @param fileName The name of the file within the options directory.
      * @return The options file.
      */
-    public static File getOptionsFile(String name) {
+    public static File getOptionsFile(String fileName) {
         File dir = getOptionsDirectory();
-        return (dir == null) ? null : new File(dir, name);
+        return (dir == null) ? null : new File(dir, sanitize(fileName));
     }
 
     /**

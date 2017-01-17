@@ -235,7 +235,7 @@ public class LoginMessage extends DOMMessage {
                     .addName("%names%",
                         transform(game.getLiveEuropeanPlayers(),
                                   alwaysTrue(), Player::getName,
-                            Collectors.joining(", "))));
+                                  Collectors.joining(", "))));
             } else if (present.isConnected()) {
                 // Another player already connected on the name
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
