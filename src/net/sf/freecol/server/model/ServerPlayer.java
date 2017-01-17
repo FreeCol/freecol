@@ -4518,7 +4518,6 @@ outer:  for (Effect effect : effects) {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[ServerPlayer ").append(getId())
             .append(' ').append(getName())
-            .append(' ').append(this.connection)
             .append(']');
         return sb.toString();
     }

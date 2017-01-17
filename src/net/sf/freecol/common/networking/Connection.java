@@ -111,9 +111,9 @@ public class Connection implements Closeable {
         this.receivingThread = null;
         this.messageHandler = null;
 
-        // Always make a (pretty printing) transformer, as we need a lock,
-        // but only make the log writer in COMMS-debug mode.
-        this.logTransformer = Utils.makeTransformer(false, true);
+        // Make a (pretty printing) transformer, but only make the log
+        // writer in COMMS-debug mode.
+        this.logTransformer = Utils.makeTransformer(true, true);
         this.logWriter
             = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS))
             ? Utils.getUTF8Writer(System.err)
