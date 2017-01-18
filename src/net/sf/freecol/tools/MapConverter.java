@@ -42,7 +42,8 @@ public class MapConverter {
 
     public static void main(String[] args) throws Exception {
 
-        Specification specification = new FreeColTcFile("freecol").getSpecification();
+        FreeColTcFile.loadTCs();
+        Specification specification = FreeColTcFile.getFreeColTcFile("freecol").getSpecification();
 
         for (String filename : args) {
             File out = new File(filename);

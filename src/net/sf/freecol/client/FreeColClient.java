@@ -212,18 +212,13 @@ public final class FreeColClient {
         // need to move to base because the action manager requires them.
         //
         // Not so easy, since the ActionManager also creates tile
-        // improvement actions, which depend on the
-        // specification. However, this step could probably be
-        // delayed.
-        try {
-            FreeColTcFile tcData = new FreeColTcFile("classic");
-            ResourceManager.setTcMapping(tcData.getResourceMapping());
-        } catch (IOException e) {
-            fatal(Messages.message("client.classic") + "\n" + e.getMessage());
-        }
+        // improvement actions, which depend on the specification.
+        // However, this step could probably be delayed.
+        FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile("classic");
+        ResourceManager.setTcMapping(tcData.getResourceMapping());
 
+        // Swing system and look-and-feel initialization.
         if (!this.headless) {
-            // Swing system and look-and-feel initialization.
             try {
                 gui.installLookAndFeel(fontName);
             } catch (Exception e) {

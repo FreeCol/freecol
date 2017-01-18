@@ -74,6 +74,7 @@ public class FreeColTestCase extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
+        FreeColTcFile.loadTCs();
         if (updateLocale) {
             updateLocale = false;
             Messages.loadMessageBundle(Locale.US);
@@ -126,8 +127,9 @@ public class FreeColTestCase extends TestCase {
     public static Specification getSpecification(String name) {
         Specification result = specifications.get(name);
         if (result == null) {
+            FreeColTcFile.loadTCs();
             try {
-                FreeColTcFile tc = new FreeColTcFile(name);
+                FreeColTcFile tc = FreeColTcFile.getFreeColTcFile(name);
                 result = FreeCol.loadSpecification(tc, null, "model.difficulty.medium");
                 specifications.put(name, result);
             } catch (Exception e) {

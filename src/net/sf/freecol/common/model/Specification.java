@@ -2996,7 +2996,7 @@ public final class Specification {
                                           (String)null);
         if (parentId != null) {
             try {
-                FreeColTcFile parent = new FreeColTcFile(parentId);
+                FreeColTcFile parent = FreeColTcFile.getFreeColTcFile(parentId);
                 load(parent.getSpecificationInputStream());
                 initialized = false;
             } catch (IOException e) {

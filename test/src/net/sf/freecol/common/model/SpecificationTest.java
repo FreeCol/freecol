@@ -89,7 +89,7 @@ public final class SpecificationTest extends FreeColTestCase {
     public void testLoad() {
         Specification spec = null;
         try {
-            spec = new FreeColTcFile("freecol").getSpecification();
+            spec = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -375,7 +375,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
         // restore original values
         try {
-            spec = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
+            spec = FreeColTcFile.getFreeColTcFile("freecol").getSpecification();
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -403,7 +403,8 @@ public final class SpecificationTest extends FreeColTestCase {
 
         // restore original values
         try {
-            spec = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
+            spec = FreeColTcFile.getFreeColTcFile("freecol")
+                .getSpecification();
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -436,14 +437,14 @@ public final class SpecificationTest extends FreeColTestCase {
         
     public void testLoadMods() {
         try {
-            Specification specification = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
-            int numberOfUnitTypes = specification.getUnitTypeList().size();
+            Specification spec = FreeColTcFile.getFreeColTcFile("freecol")
+                .getSpecification();
+            int numberOfUnitTypes = spec.getUnitTypeList().size();
             List<FreeColModFile> mods = new ArrayList<>();
             mods.add(new FreeColModFile(new File("data/mods/example")));
-            specification.loadMods(mods);
-            UnitType milkmaid = specification.getUnitType("model.unit.milkmaid");
-            assertEquals(numberOfUnitTypes + 1, 
-                specification.getUnitTypeList().size());
+            spec.loadMods(mods);
+            UnitType milkmaid = spec.getUnitType("model.unit.milkmaid");
+            assertEquals(numberOfUnitTypes + 1, spec.getUnitTypeList().size());
         } catch (Exception e) {
             fail(e.getMessage());
         }

@@ -177,9 +177,10 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      * User mods are loaded after standard mods to allow user override.
      */
     public static void loadMods() {
-        allMods.clear();
-        for (FreeColModFile fcmf : FreeColModFile.getModsList()) {
-            allMods.put(fcmf.getId(), fcmf);
+        if (allMods.isEmpty()) {
+            for (FreeColModFile fcmf : FreeColModFile.getModsList()) {
+                allMods.put(fcmf.getId(), fcmf);
+            }
         }
     }
 

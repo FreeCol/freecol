@@ -85,12 +85,8 @@ public class SoundTest extends FreeColTestCase {
     }
 
     public void testClassic() {
-        try {
-            FreeColTcFile tcData = new FreeColTcFile("classic");
-            ResourceManager.setTcMapping(tcData.getResourceMapping());
-        } catch (IOException e) {
-            fail("Could not load classic ruleset.");
-        }
+        FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile("classic");
+        ResourceManager.setTcMapping(tcData.getResourceMapping());
 
         playSound("sound.intro.model.nation.english");
         playSound("sound.intro.model.nation.dutch");

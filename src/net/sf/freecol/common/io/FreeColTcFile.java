@@ -22,7 +22,9 @@ package net.sf.freecol.common.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +39,9 @@ public class FreeColTcFile extends FreeColModFile {
 
     private static final Logger logger = Logger.getLogger(FreeColTcFile.class.getName());
 
+    /** A cache of all the TCs. */
+    private static final Map<String, FreeColTcFile> allTCs = new HashMap<>();
+
 
     /**
      * Opens the given file for reading.
@@ -48,16 +53,6 @@ public class FreeColTcFile extends FreeColModFile {
         super(file);
     }
 
-    /**
-     * Opens the file with the given name for reading.
-     *
-     * @param id The identifier of the TC to load.
-     * @throws IOException if thrown while opening the file.
-     */
-    public FreeColTcFile(final String id) throws IOException {
-        super(FreeColDirectories.getTcFile(id));
-    }
-
 
     /**
      * {@inheritDoc}
@@ -65,20 +60,17 @@ public class FreeColTcFile extends FreeColModFile {
     @Override
     public ResourceMapping getResourceMapping() {
         ResourceMapping result = new ResourceMapping();
-        try {
-            if (getParent() != null) {
-                final FreeColTcFile parentTcData = new FreeColTcFile(getParent());
-                result.addAll(parentTcData.getResourceMapping());
-            }
-            // Add the local data *after* the parent data so that the local
-            // values can override (eventual call is Map.putAll).
-            // Note that FreeColDataFile.getResourceMapping logs the load,
-            // and thus the log messages will appear to be in the reverse
-            // order, which mislead me until looking at the code.
-            result.addAll(super.getResourceMapping());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (getParent() != null) {
+            final FreeColTcFile parentTcData
+                = FreeColTcFile.getFreeColTcFile(getParent());
+            result.addAll(parentTcData.getResourceMapping());
         }
+        // Add the local data *after* the parent data so that the local
+        // values can override (eventual call is Map.putAll).
+        // Note that FreeColDataFile.getResourceMapping logs the load,
+        // and thus the log messages will appear to be in the reverse
+        // order, which mislead me until looking at the code.
+        result.addAll(super.getResourceMapping());
         return result;
     }
 
@@ -97,5 +89,29 @@ public class FreeColTcFile extends FreeColModFile {
             }
         }
         return ret;
+    }
+
+
+    // Cache manipulation
+
+    /**
+     * Require all TCs to be loaded.
+     */
+    public static void loadTCs() {
+        if (allTCs.isEmpty()) {
+            for (FreeColTcFile fctf : FreeColTcFile.getRulesList()) {
+                allTCs.put(fctf.getId(), fctf);
+            }
+        }
+    }
+
+    /**
+     * Get a TC by id.
+     *
+     * @param id The TC file identifier to look for.
+     * @return The {@code FreeColTcFile} found, or null if none present.
+     */
+    public static FreeColTcFile getFreeColTcFile(String id) {
+        return allTCs.get(id);
     }
 }

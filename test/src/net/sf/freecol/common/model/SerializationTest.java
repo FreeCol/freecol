@@ -177,7 +177,7 @@ public class SerializationTest extends FreeColTestCase {
         Specification spec1 = null;
         Specification spec2 = null;
         try {
-            spec1 = new FreeColTcFile("classic").getSpecification();
+            spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             FreeColXMLWriter xw = new FreeColXMLWriter(sw,
@@ -214,7 +214,7 @@ public class SerializationTest extends FreeColTestCase {
         Specification spec1 = null;
         Specification spec2 = null;
         try {
-            spec1 = new FreeColTcFile("classic").getSpecification();
+            spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             FreeColXMLWriter xw = new FreeColXMLWriter(sw,

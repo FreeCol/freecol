@@ -332,7 +332,8 @@ public final class FreeCol {
         }
 
         // Now we have the user mods directory and the locale is now
-        // stable, load the mods and their messages.
+        // stable, load the TCs, the mods and their messages.
+        FreeColTcFile.loadTCs();
         FreeColModFile.loadMods();
         Messages.loadModMessageBundle(locale);
 
@@ -1231,10 +1232,7 @@ public final class FreeCol {
      * @return The {@code FreeColTcFile}.
      */
     public static FreeColTcFile getTCFile() {
-        try {
-            return new FreeColTcFile(getTC());
-        } catch (IOException ioe) {}
-        return null;
+        return FreeColTcFile.getFreeColTcFile(getTC());
     }
 
     /**
