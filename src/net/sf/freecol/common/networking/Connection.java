@@ -514,11 +514,10 @@ public class Connection implements Closeable {
     }
 
 
-
-    public void sendAndWait(DOMMessage message) throws IOException {
+    public <T extends DOMMessage> void sendAndWait(T message) throws IOException {
         sendAndWaitElement(message.toXMLElement());
     }
-    public Element ask(DOMMessage message) throws IOException {
+    public <T extends DOMMessage> Element ask(T message) throws IOException {
         return askElement(message.toXMLElement());
     }
 
@@ -529,7 +528,7 @@ public class Connection implements Closeable {
      * @param message The {@code DOMMessage} to send.
      * @return A {@code DOMMessage} created from the reply.
      */
-    public DOMMessage ask(Game game, DOMMessage message) {
+    public <T extends DOMMessage> DOMMessage ask(Game game, T message) {
         Element reply;
         try {
             reply = ask(message);
@@ -592,12 +591,13 @@ public class Connection implements Closeable {
     /**
      * Client request.
      *
+     * @param T The message type.
      * @param game The enclosing {@code Game}.
      * @param message A {@code DOMMessage} to process.
      * @return True if the message was sent, the reply handled, and the
      *     reply was not an error message.
      */
-    public boolean request(Game game, DOMMessage message) {
+    public <T extends DOMMessage> boolean request(Game game, T message) {
         // Better if we could do this, but it fails for now.
         //
         // DOMMessage reply = ask(game, message);
@@ -628,10 +628,11 @@ public class Connection implements Closeable {
     /**
      * Client send.
      *
+     * @param T The message type.
      * @param message A {@code DOMMessage} to send.
      * @return True if the message was sent.
      */
-    public boolean send(DOMMessage message) {
+    public <T extends DOMMessage> boolean send(T message) {
         return sendElement(message.toXMLElement());
     }
     
