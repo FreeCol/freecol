@@ -370,10 +370,8 @@ public class ChangeSet {
             super(see);
             Game game = attacker.getGame();
             this.defenderInSettlement = defender.getTile().hasSettlement();
-            this.attacker = attacker.copy(game, Unit.class);
-            this.attacker.setLocationNoUpdate(this.attacker.getTile());
-            this.defender = defender.copy(game, Unit.class);
-            this.defender.setLocationNoUpdate(this.defender.getTile());
+            this.attacker = reduceUnitVisibility(attacker);
+            this.defender = reduceUnitVisibility(defender);
             this.defender.setWorkType(null);
             this.defender.setState(Unit.UnitState.ACTIVE);            
             this.success = success;
@@ -648,21 +646,7 @@ public class ChangeSet {
             super(see);
             this.oldLocation = oldLocation;
             this.newTile = newTile;
-            if (unit.isOnCarrier()) {
-                // Change the unit to a version with a link to an otherwise
-                // empty carrier.
-                Game game = unit.getGame();
-                Unit carrier = unit.getCarrier().copy(game, Unit.class);
-                for (Unit u : carrier.getUnitList()) {
-                    if (u.getId().equals(unit.getId())) {
-                        unit = u;
-                    } else {
-                        carrier.remove(u);
-                    }
-                }
-                carrier.removeAll();
-            }
-            this.unit = unit;
+            this.unit = reduceUnitVisibility(unit);
         }
 
 
@@ -2026,6 +2010,34 @@ public class ChangeSet {
         return cs;
     }
     
+    /**
+     * Copy a unit, reduce visibility into any carrier and reference to a
+     * settlement.  Used when unit information is attached to an animation.
+     *
+     * @param unit The {@code Unit} to examine.
+     * @return The {@code Unit} with reduced visibility into the carrier.
+     */
+    private static Unit reduceUnitVisibility(Unit unit) {
+        final Game game = unit.getGame();
+        final Tile tile = unit.getTile();
+        if (unit.isOnCarrier()) {
+            Unit carrier = unit.getCarrier().copy(game, Unit.class);
+            for (Unit u : carrier.getUnitList()) {
+                if (u.getId().equals(unit.getId())) {
+                    unit = u;
+                } else {
+                    carrier.remove(u);
+                }
+            }
+            carrier.removeAll();
+            carrier.setLocationNoUpdate(tile);
+        } else {
+            unit = unit.copy(game, Unit.class);
+            unit.setLocationNoUpdate(tile);
+        }
+        return unit;
+    }
+
 
     // Override Object
 
