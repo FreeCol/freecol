@@ -229,7 +229,11 @@ public final class Server extends Thread {
                 try {
                     this.freeColServer
                         .addNewUserConnection(serverSocket.accept());
-                } catch (IOException|IllegalMonitorStateException e) {
+                } catch (Exception e) {
+                    // While we probably only should get IOException,
+                    // catch all exceptions as there have been
+                    // sightings of spurious NPEs and other fail in
+                    // the Java libraries.
                     if (this.running) {
                         logger.log(Level.WARNING, "Connection failed: ", e);
                     }
