@@ -186,9 +186,7 @@ public class DOMUtils {
     public static DOMMessage createMessage(Game game, Element element) {
         if (element == null) return null;
         String tag = element.getTagName();
-        tag = "net.sf.freecol.common.networking."
-            + tag.substring(0, 1).toUpperCase() + tag.substring(1)
-            + "Message";
+        tag = "net.sf.freecol.common.networking." + capitalize(tag) + "Message";
         DOMMessage message;
         Class<?> tagClass = Introspector.getClassByName(tag);
         if (tagClass == null) {

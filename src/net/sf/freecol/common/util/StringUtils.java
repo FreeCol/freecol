@@ -200,4 +200,26 @@ public class StringUtils {
         }
         return result;
     }
+
+    /**
+     * Capitalize a string in the default locale.
+     *
+     * @param s The {@code String} to capitalize.
+     * @return The capitalized string.
+     */
+    public static String capitalize(String s) {
+        return capitalize(s, Locale.US);
+    }
+
+    /**
+     * Capitalize a string in a specific locale.
+     *
+     * @param s The {@code String} to capitalize.
+     * @param locale The {@code Locale} to apply.
+     * @return The capitalized string.
+     */
+    public static String capitalize(String s, Locale locale) {
+        return (s == null || s.length() == 0) ? s
+            : s.substring(0, 1).toUpperCase(locale) + s.substring(1);
+    }
 }

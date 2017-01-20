@@ -74,6 +74,7 @@ import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -192,8 +193,7 @@ public class ServerGame extends Game implements ServerModelObject {
         throws ClassNotFoundException, IllegalAccessException,
                InstantiationException, InvocationTargetException,
                NoSuchMethodException {
-        type = "net.sf.freecol.server.model."
-            + type.substring(0,1).toUpperCase() + type.substring(1);
+        type = "net.sf.freecol.server.model." + capitalize(type);
         Class<?> c = Class.forName(type);
         return c.getConstructor(Game.class, String.class)
             .newInstance(this, id);

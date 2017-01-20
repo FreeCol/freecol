@@ -35,6 +35,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -158,7 +159,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             if (name.equals(key) && languageNames.containsKey(key)) {
                 name = languageNames.get(key);
             }
-            return name.substring(0, 1).toUpperCase(locale) + name.substring(1);
+            return capitalize(name, locale);
         }
     }
 

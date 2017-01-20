@@ -1153,9 +1153,7 @@ public class Game extends FreeColGameObject {
      * @return The location class.
      */
     public static Class<? extends FreeColGameObject> getLocationClass(String id) {
-        String tag = FreeColObject.getIdType(id);
-        tag = Character.toUpperCase(tag.charAt(0)) + tag.substring(1);
-        return locationClasses.get(tag);
+        return locationClasses.get(capitalize(FreeColObject.getIdType(id)));
     }
 
     /**
