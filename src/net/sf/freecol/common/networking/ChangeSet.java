@@ -43,7 +43,6 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.AnimateAttackMessage;
@@ -51,6 +50,7 @@ import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.FeatureChangeMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.networking.SetStanceMessage;
@@ -1157,10 +1157,7 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return new DOMMessage("featureChange",
-                                  FreeColObject.ID_ATTRIBUTE_TAG, this.parent.getId(),
-                                  "add", Boolean.toString(this.add))
-                .add(child)
+            return new FeatureChangeMessage(this.parent, this.child, this.add)
                 .attachToDocument(doc);
         }
 
@@ -1772,21 +1769,6 @@ public class ChangeSet {
     public ChangeSet addStance(See see, Player first, Stance stance,
                                Player second) {
         changes.add(new StanceChange(see, first, stance, second));
-        return this;
-    }
-
-    /**
-     * Helper function to add a new trade route change to a ChangeSet.
-     * Also adds the trade route to the player.
-     *
-     * @param serverPlayer The {@code ServerPlayer} adding the route.
-     * @param tradeRoute The new {@code TradeRoute}.
-     * @return The updated {@code ChangeSet}.
-     */
-    public ChangeSet addTradeRoute(ServerPlayer serverPlayer,
-                                   TradeRoute tradeRoute) {
-        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
-                                      tradeRoute, true));
         return this;
     }
 

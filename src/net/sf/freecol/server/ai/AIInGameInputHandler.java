@@ -52,6 +52,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.FeatureChangeMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.FountainOfYouthMessage;
 import net.sf.freecol.common.networking.GameEndedMessage;
@@ -235,7 +236,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case DeleteTradeRouteMessage.TAG:
             case TrivialMessage.DISCONNECT_TAG:
             case ErrorMessage.TAG:
-            case "featureChange":
+            case FeatureChangeMessage.TAG:
             case GameEndedMessage.TAG:
             case LogoutMessage.TAG: // Ignored, AIs do not log out
             case NativeGiftMessage.TAG:

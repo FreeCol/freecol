@@ -300,10 +300,30 @@ public class DOMUtils {
         Element element, int index, boolean intern, Class<T> returnClass) {
         NodeList nl = element.getChildNodes();
         Element e;
-        return (index < nl.getLength()
-            && (e = (Element)nl.item(index)) != null)
-            ? readGameElement(game, e, intern, returnClass)
-            : null;
+        return (index >= nl.getLength()
+            || (e = (Element)nl.item(index)) == null)
+            ? null
+            : readGameElement(game, e, intern, returnClass);
+    }
+
+    /**
+     * Convenience method to extract a child FreeColObject from an element.
+     *
+     * @param <T> The actual return type.
+     * @param game The {@code Game} to instantiate within.
+     * @param element The parent {@code Element}.
+     * @param index The index of the child element.
+     * @param returnClass The expected class of the child.
+     * @return A new instance of the return class, or null on error.
+     */
+    public static <T extends FreeColObject> T getChild(Game game,
+        Element element, int index) {
+        NodeList nl = element.getChildNodes();
+        Element e;
+        return (index >= nl.getLength()
+            || (e = (Element)nl.item(index)) == null)
+            ? null
+            : readElement(game, e, true);
     }
 
     /**
@@ -320,10 +340,10 @@ public class DOMUtils {
         Element element, int index, Class<T> returnClass) {
         NodeList nl = element.getChildNodes();
         Element e;
-        return (index < nl.getLength()
-            && (e = (Element)nl.item(index)) != null)
-            ? readElement(game, e, returnClass)
-            : null;
+        return (index >= nl.getLength()
+            || (e = (Element)nl.item(index)) == null)
+            ? null
+            : readElement(game, e, true, returnClass);
     }
 
     /**
@@ -558,6 +578,45 @@ public class DOMUtils {
         Element element, boolean intern, Class<T> returnClass) {
         T ret = FreeColGameObject.newInstance(game, returnClass);
         if (ret != null) readFromXMLElement(ret, element, intern);
+        return ret;
+    }
+
+    /**
+     * Get a FreeColObject class corresponding to the element tag.
+     *
+     * @param e The {@code Element} to query.
+     * @return The class, or null if none found.
+     */
+    public static <T extends FreeColObject> Class<T> getElementClass(Element e) {
+        return FreeColObject.getFreeColObjectClass(e.getTagName());
+    }
+
+    /**
+     * Read a new FreeCol object from an element.
+     *
+     * @param <T> The actual return type.
+     * @param game The {@code Game} to check for existing objects.
+     * @param element The {@code Element} to read from.
+     * @param intern Whether to intern the instantiated object.
+     * @return The object found or instantiated, or null on error.
+     */
+    public static <T extends FreeColObject> T readElement(Game game,
+        Element element, boolean intern) {
+        final Class<T> c = getElementClass(element);
+        if (c == null) return null;
+
+        T ret = null;
+        try (
+            FreeColXMLReader xr = makeElementReader(element);
+        ) {
+            xr.setReadScope((intern) ? FreeColXMLReader.ReadScope.NORMAL
+                : FreeColXMLReader.ReadScope.NOINTERN);
+            xr.nextTag();
+            ret = FreeColGameObject.newInstance(game, c);
+            if (ret != null) readFromXMLElement(ret, element);
+        } catch (IOException|XMLStreamException ex) {
+            throw new RuntimeException("XML failure", ex);
+        }
         return ret;
     }
 

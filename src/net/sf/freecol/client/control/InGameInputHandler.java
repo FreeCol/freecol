@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Goods;
@@ -61,6 +62,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.FeatureChangeMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.FountainOfYouthMessage;
 import net.sf.freecol.common.networking.GameEndedMessage;
@@ -150,7 +152,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> disconnect(e));
         register(ErrorMessage.TAG,
             (Connection c, Element e) -> error(e));
-        register("featureChange",
+        register(FeatureChangeMessage.TAG,
             (Connection c, Element e) -> featureChange(e));
         register(FirstContactMessage.TAG,
             (Connection c, Element e) -> firstContact(e));
@@ -431,84 +433,59 @@ public final class InGameInputHandler extends ClientInputHandler {
     private void featureChange(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        final boolean add = DOMUtils.getBooleanAttribute(element, "add", false);
-        final String id = DOMUtils.readId(element);
-        final FreeColGameObject parent = game.getFreeColGameObject(id);
+        final FeatureChangeMessage message
+            = new FeatureChangeMessage(game, element);
+        final FreeColGameObject parent = message.getParent(game);
+        final FreeColObject child = message.getChild();
+        final boolean add = message.getAdd();
         if (parent == null) {
-            logger.warning("featureChange with null object");
+            logger.warning("featureChange with null parent.");
+            return;
+        }
+        if (child == null) {
+            logger.warning("featureChange with null child.");
             return;
         }
 
-        DOMUtils.mapChildren(element, (e) -> {
-                final String tag = DOMUtils.getType(e);
-                switch (tag) {
-                case Ability.TAG:
-                    Ability a = DOMUtils.readElement(game, e, false, Ability.class);
-                    if (add) {
-                        parent.addAbility(a);
-                    } else {
-                        parent.removeAbility(a);
-                    }
-                    break;
-                case Modifier.TAG:
-                    Modifier m = DOMUtils.readElement(game, e, false, Modifier.class);
-                    if (add) {
-                        parent.addModifier(m);
-                    } else {
-                        parent.removeModifier(m);
-                    }
-                    break;
-                case HistoryEvent.TAG:
-                    if (parent instanceof Player && add) {
-                        HistoryEvent he = DOMUtils.readElement(game, e, true, HistoryEvent.class);
-                        Player player = (Player)parent;
-                        player.addHistory(he);
-                    } else {
-                        logger.warning(tag + " feature change failure: "
-                            + parent + "/" + add);
-                    }
-                    break;
-                case LastSale.TAG:
-                    if (parent instanceof Player && add) {
-                        LastSale ls = DOMUtils.readElement(game, e, true, LastSale.class);
-                        Player player = (Player)parent;
-                        player.addLastSale(ls);
-                    } else {
-                        logger.warning(tag + " feature change failure: "
-                            + parent + "/" + add);
-                    }
-                    break;
-                case ModelMessage.TAG:
-                    if (parent instanceof Player && add) {
-                        ModelMessage mm = DOMUtils.readElement(game, e, true, ModelMessage.class);
-                        Player player = (Player)parent;
-                        player.addModelMessage(mm);
-                    } else {
-                        logger.warning(tag + " feature change failure: "
-                            + parent + "/" + add);
-                    }
-                    break;
-                case TradeRoute.TAG:
-                    if (parent instanceof Player) {
-                        TradeRoute tr = DOMUtils.readElement(game, e, true, TradeRoute.class);
-                        Player player = (Player)parent;
-                        if (add) {
-                            player.addTradeRoute(tr);
-                        } else {
-                            player.removeTradeRoute(tr);
-                        }
-                    } else {
-                        logger.warning(tag + " feature change failure: "
-                            + parent + "/" + add);
-                    }
-                    break;
-                    
-                default:
-                    logger.warning("featureChange unrecognized: " + tag);
-                    break;
-                }
-                return null;
-            });
+        if (child instanceof Ability) {
+            if (add) {
+                parent.addAbility((Ability)child);
+            } else {
+                parent.removeAbility((Ability)child);
+            }
+        } else if (child instanceof Modifier) {
+            if (add) {
+                parent.addModifier((Modifier)child);
+            } else {
+                parent.removeModifier((Modifier)child);
+            }
+        } else if (child instanceof HistoryEvent) {
+            if (parent instanceof Player && add) {
+                Player player = (Player)parent;
+                player.addHistory((HistoryEvent)child);
+            } else {
+                logger.warning("Feature change NYI: "
+                    + parent + "/" + add + "/" + child);
+            }
+        } else if (child instanceof LastSale) {
+            if (parent instanceof Player && add) {
+                Player player = (Player)parent;
+                player.addLastSale((LastSale)child);
+            } else {
+                logger.warning("Feature change NYI: "
+                    + parent + "/" + add + "/" + child);
+            }
+        } else if (child instanceof ModelMessage) {
+            if (parent instanceof Player && add) {
+                Player player = (Player)parent;
+                player.addModelMessage((ModelMessage)child);
+            } else {
+                logger.warning("Feature change NYI: "
+                    + parent + "/" + add + "/" + child);
+            }
+        } else {        
+            logger.warning("featureChange unrecognized: " + child);
+        }
     }
 
     /**
