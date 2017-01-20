@@ -552,14 +552,51 @@ public class DOMUtils {
      * @param <T> The actual return type.
      * @param game The {@code Game} to check for existing objects.
      * @param element The {@code Element} to read from.
+     * @param intern Whether to intern the instantiated object.
+     * @param returnClass The expected return class.
+     * @return The object found or instantiated, or null on error.
+     */
+    public static <T extends FreeColObject> T readElement(Game game,
+        Element element, boolean intern, Class<T> returnClass) {
+        T ret = FreeColGameObject.newInstance(game, returnClass);
+        if (ret != null) readFromXMLElement(ret, element, intern);
+        return ret;
+    }
+
+    /**
+     * Read a new FreeCol object from an element.
+     *
+     * @param <T> The actual return type.
+     * @param game The {@code Game} to check for existing objects.
+     * @param element The {@code Element} to read from.
      * @param returnClass The expected return class.
      * @return The object found or instantiated, or null on error.
      */
     public static <T extends FreeColObject> T readElement(Game game,
         Element element, Class<T> returnClass) {
-        T ret = FreeColGameObject.newInstance(game, returnClass);
-        if (ret != null) readFromXMLElement(ret, element, true);
-        return ret;
+        return readElement(game, element, true, returnClass);
+    }
+
+    /**
+     * Initialize a FreeColObject from an Element.
+     *
+     * @param fco The {@code FreeColObject} to read into.
+     * @param intern Whether to intern the instantiated object.
+     * @param element An XML-element that will be used to initialize
+     *      the object.
+     */
+    public static void readFromXMLElement(FreeColObject fco, Element element,
+                                          boolean intern) {
+        try (
+            FreeColXMLReader xr = makeElementReader(element);
+        ) {
+            xr.setReadScope((intern) ? FreeColXMLReader.ReadScope.NORMAL
+                : FreeColXMLReader.ReadScope.NOINTERN);
+            xr.nextTag();
+            fco.readFromXML(xr);
+        } catch (IOException|XMLStreamException ex) {
+            throw new RuntimeException("XML failure", ex);
+        }
     }
 
     /**
@@ -595,28 +632,6 @@ public class DOMUtils {
             return new FreeColXMLReader(sr);
         } catch (TransformerException ex) {
             throw new RuntimeException("Reader creation failure", ex);
-        }
-    }
-
-    /**
-     * Initialize a FreeColObject from an Element.
-     *
-     * @param fco The {@code FreeColObject} to read into.
-     * @param intern Whether to intern the instantiated object.
-     * @param element An XML-element that will be used to initialize
-     *      the object.
-     */
-    public static void readFromXMLElement(FreeColObject fco, Element element,
-                                          boolean intern) {
-        try (
-            FreeColXMLReader xr = makeElementReader(element);
-        ) {
-            xr.setReadScope((intern) ? FreeColXMLReader.ReadScope.NORMAL
-                : FreeColXMLReader.ReadScope.NOINTERN);
-            xr.nextTag();
-            fco.readFromXML(xr);
-        } catch (IOException|XMLStreamException ex) {
-            throw new RuntimeException("XML failure", ex);
         }
     }
 

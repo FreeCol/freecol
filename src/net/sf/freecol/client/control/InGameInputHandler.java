@@ -433,8 +433,8 @@ public final class InGameInputHandler extends ClientInputHandler {
         final Specification spec = game.getSpecification();
         final boolean add = DOMUtils.getBooleanAttribute(element, "add", false);
         final String id = DOMUtils.readId(element);
-        final FreeColGameObject object = game.getFreeColGameObject(id);
-        if (object == null) {
+        final FreeColGameObject parent = game.getFreeColGameObject(id);
+        if (parent == null) {
             logger.warning("featureChange with null object");
             return;
         }
@@ -443,73 +443,63 @@ public final class InGameInputHandler extends ClientInputHandler {
                 final String tag = DOMUtils.getType(e);
                 switch (tag) {
                 case Ability.TAG:
-                    Ability a = new Ability(spec);
-                    DOMUtils.readFromXMLElement(a, e);
+                    Ability a = DOMUtils.readElement(game, e, false, Ability.class);
                     if (add) {
-                        object.addAbility(a);
+                        parent.addAbility(a);
                     } else {
-                        object.removeAbility(a);
+                        parent.removeAbility(a);
                     }
                     break;
                 case Modifier.TAG:
-                    Modifier m = new Modifier(spec);
-                    DOMUtils.readFromXMLElement(m, e);
+                    Modifier m = DOMUtils.readElement(game, e, false, Modifier.class);
                     if (add) {
-                        object.addModifier(m);
+                        parent.addModifier(m);
                     } else {
-                        object.removeModifier(m);
-                    }
-                    break;
-                case FoundingFather.TAG:
-                    FoundingFather ff;
-                    if (object instanceof Player && add
-                        && (ff = spec.getFoundingFather(DOMUtils.readId(e))) != null) {
-                        Player player = (Player)object;
-                        player.addFather(ff);
-                        player.invalidateCanSeeTiles(); // Might be coronado
-                    } else {
-                        logger.warning(tag + " feature change failure: "
-                            + object + "/" + add);
+                        parent.removeModifier(m);
                     }
                     break;
                 case HistoryEvent.TAG:
-                    if (object instanceof Player && add) {
-                        Player player = (Player)object;
-                        player.addHistory(DOMUtils.readElement(game, e, HistoryEvent.class));
+                    if (parent instanceof Player && add) {
+                        HistoryEvent he = DOMUtils.readElement(game, e, true, HistoryEvent.class);
+                        Player player = (Player)parent;
+                        player.addHistory(he);
                     } else {
                         logger.warning(tag + " feature change failure: "
-                            + object + "/" + add);
+                            + parent + "/" + add);
                     }
                     break;
                 case LastSale.TAG:
-                    if (object instanceof Player && add) {
-                        Player player = (Player)object;
-                        player.addLastSale(DOMUtils.readElement(game, e, LastSale.class));
+                    if (parent instanceof Player && add) {
+                        LastSale ls = DOMUtils.readElement(game, e, true, LastSale.class);
+                        Player player = (Player)parent;
+                        player.addLastSale(ls);
                     } else {
                         logger.warning(tag + " feature change failure: "
-                            + object + "/" + add);
+                            + parent + "/" + add);
                     }
                     break;
                 case ModelMessage.TAG:
-                    if (object instanceof Player && add) {
-                        Player player = (Player)object;
-                        player.addModelMessage(DOMUtils.readElement(game, e, ModelMessage.class));
+                    if (parent instanceof Player && add) {
+                        ModelMessage mm = DOMUtils.readElement(game, e, true, ModelMessage.class);
+                        Player player = (Player)parent;
+                        player.addModelMessage(mm);
                     } else {
                         logger.warning(tag + " feature change failure: "
-                            + object + "/" + add);
+                            + parent + "/" + add);
                     }
                     break;
                 case TradeRoute.TAG:
-                    if (object instanceof Player) {
-                        Player player = (Player)object;
+                    if (parent instanceof Player) {
+                        TradeRoute tr = DOMUtils.readElement(game, e, true, TradeRoute.class);
+                        Player player = (Player)parent;
                         if (add) {
-                            player.addTradeRoute(DOMUtils.readElement(game, e, TradeRoute.class));
+                            player.addTradeRoute(tr);
                         } else {
-                            player.removeTradeRoute(DOMUtils.readElement(game, e, TradeRoute.class));
+                            player.removeTradeRoute(tr);
                         }
                     } else {
                         logger.warning(tag + " feature change failure: "
-                            + object + "/" + add);
+                            + parent + "/" + add);
                     }
                     break;
                     

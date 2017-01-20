@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Feature;
-import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -1547,22 +1546,6 @@ public class ChangeSet {
         changes.add(new RemoveChange(See.perhaps().except(owner), tile,
                                      Stream.of(fcgo)));
         changes.add(new ObjectChange(See.perhaps().except(owner), tile));
-        return this;
-    }
-
-    /**
-     * Helper function to add a founding father addition event to a ChangeSet.
-     * Also adds the father to the owner.
-     *
-     * @param serverPlayer The {@code ServerPlayer} adding the father.
-     * @param father The {@code FoundingFather} to add.
-     * @return The updated {@code ChangeSet}.
-     */
-    public ChangeSet addFather(ServerPlayer serverPlayer,
-                               FoundingFather father) {
-        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
-                                      father, true));
-        serverPlayer.addFather(father);
         return this;
     }
 
