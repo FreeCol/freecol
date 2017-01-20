@@ -316,6 +316,14 @@ public class ChangeSet {
          * Specialize a Change for a particular player.
          *
          * @param serverPlayer The {@code ServerPlayer} to update.
+         * @return A specialized {@code DOMMessage}.
+         */
+        public abstract DOMMessage toMessage(ServerPlayer serverPlayer);
+            
+        /**
+         * Specialize a Change for a particular player.
+         *
+         * @param serverPlayer The {@code ServerPlayer} to update.
          * @param doc The owner {@code Document} to build the element in.
          * @return An {@code Element} encapsulating this change.
          */
@@ -405,25 +413,21 @@ public class ChangeSet {
         }
 
         /**
-         * Gets the sort priority.
-         *
-         * @return "CHANGE_ANIMATION".
+         * {@inheritDoc}
          */
-        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_ANIMATION.getPriority();
         }
 
         /**
-         * Should a player perhaps be notified of this attack?  Do not
-         * use canSeeUnit because that gives a false negative for
-         * units in settlements, which should be animated.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to notify.
-         * @return True if the player should be notified.
+         * {@inheritDoc}
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
+            // Should a player perhaps be notified of this attack?  Do
+            // not just use canSeeUnit because that gives a false
+            // negative for units in settlements, which should be
+            // animated.
             return serverPlayer == attacker.getOwner()
                 || serverPlayer == defender.getOwner()
                 || (serverPlayer.canSee(attacker.getTile())
@@ -431,24 +435,23 @@ public class ChangeSet {
         }
 
         /**
-         * Specialize a AttackChange into an "animateAttack" element
-         * for a particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return An "animateAttack" element.
+         * {@inheritDoc}
          */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
             return new AnimateAttackMessage(attacker, defender, success,
-                !attackerVisible(serverPlayer), !defenderVisible(serverPlayer))
-                .attachToDocument(doc);
+                !attackerVisible(serverPlayer), !defenderVisible(serverPlayer));
         }
 
         /**
          * {@inheritDoc}
          */
-        @Override
+        public Element toElement(ServerPlayer serverPlayer, Document doc) {
+            return toMessage(serverPlayer).attachToDocument(doc);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         public void attachToElement(Element element) {} // Noop
 
 
@@ -493,10 +496,9 @@ public class ChangeSet {
             this.value = value;
         }
 
+
         /**
-         * Gets the sort priority.
-         *
-         * @return "CHANGE_ATTRIBUTE", attributes are special.
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
@@ -504,34 +506,32 @@ public class ChangeSet {
         }
 
         /**
-         * AttributeChanges are tacked onto the final Element, not converted
-         * directly.
-         *
-         * @return false.
+         * {@inheritDoc}
          */
         @Override
         public boolean convertsToElement() {
+            // AttributeChanges are tacked onto the final Element, not
+            // converted directly.
             return false;
         }
 
         /**
-         * We do not specialize AttributeChanges.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return Null.
+         * {@inheritDoc}
          */
-        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return new AttributeMessage(key, value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             return null;
         }
 
         /**
-         * Tack attributes onto the element.
-         *
-         * @param element The {@code Element} to attach to.
+         * {@inheritDoc}
          */
-        @Override
         public void attachToElement(Element element) {
             element.setAttribute(key, value);
         }
@@ -576,10 +576,9 @@ public class ChangeSet {
             this.message = message;
         }
 
+
         /**
-         * Gets the sort priority.
-         *
-         * @return The priority.
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
@@ -587,16 +586,20 @@ public class ChangeSet {
         }
 
         /**
-         * Specialize a MessageChange to a particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return An element.
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return this.message;
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = message.toXMLElement();
-            return (Element) doc.importNode(element, true);
+            Element element = toMessage(serverPlayer).toXMLElement();
+            return (Element)doc.importNode(element, true);
         }
 
         /**
@@ -649,7 +652,6 @@ public class ChangeSet {
             this.unit = reduceUnitVisibility(unit);
         }
 
-
         /**
          * Can a player see the old tile?
          *
@@ -675,10 +677,9 @@ public class ChangeSet {
             return serverPlayer.canSeeUnit(unit);
         }
 
+
         /**
-         * Gets the sort priority.
-         *
-         * @return "CHANGE_ANIMATION"
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
@@ -686,10 +687,7 @@ public class ChangeSet {
         }
 
         /**
-         * Should a player perhaps be notified of this move?
-         *
-         * @param serverPlayer The {@code ServerPlayer} to notify.
-         * @return True if the player should be notified.
+         * {@inheritDoc}
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
@@ -697,12 +695,7 @@ public class ChangeSet {
         }
 
         /**
-         * There are consequences to a move.  If the player can not
-         * see the unit after the move, it should be removed.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to notify.
-         * @return A RemoveChange if the unit disappears (but not if it
-         *     is destroyed, that is handled elsewhere).
+         * {@inheritDoc}
          */
         @Override
         public List<Change> consequences(ServerPlayer serverPlayer) {
@@ -717,18 +710,20 @@ public class ChangeSet {
         }
 
         /**
-         * Specialize a MoveChange into an "animateMove" element for a
-         * particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return An "animateMove" element.
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return new AnimateMoveMessage(unit, oldLocation.getTile(), newTile,
+                                          !seeOld(serverPlayer));
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return new AnimateMoveMessage(unit, oldLocation.getTile(), newTile,
-                                          !seeOld(serverPlayer))
-                .attachToDocument(doc);
+            return toMessage(serverPlayer).attachToDocument(doc);
         }
 
         /**
@@ -761,7 +756,9 @@ public class ChangeSet {
      * Encapsulate a FreeColGameObject update.
      */
     private static class ObjectChange extends Change {
+
         protected final FreeColGameObject fcgo;
+
 
         /**
          * Build a new ObjectChange for a single object.
@@ -784,9 +781,7 @@ public class ChangeSet {
         }
 
         /**
-         * Gets the sort priority.
-         *
-         * @return "CHANGE_UPDATE"
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
@@ -794,10 +789,7 @@ public class ChangeSet {
         }
 
         /**
-         * Should a player perhaps be notified of this update?
-         *
-         * @param serverPlayer The {@code ServerPlayer} to notify.
-         * @return True if the object update can is notifiable.
+         * {@inheritDoc}
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
@@ -827,12 +819,15 @@ public class ChangeSet {
         }
 
         /**
-         * Specialize a ObjectChange to a particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return An "update" element, or null if the update should not
-         *     be visible to the player.
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return null; // NYI
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
@@ -869,7 +864,9 @@ public class ChangeSet {
      * Encapsulate a partial update of a FreeColGameObject.
      */
     private static class PartialObjectChange extends ObjectChange {
+
         private final String[] fields;
+
 
         /**
          * Build a new PartialObjectChange for a single object.
@@ -886,10 +883,7 @@ public class ChangeSet {
 
 
         /**
-         * Should a player perhaps be notified of this update?
-         *
-         * @param serverPlayer The {@code ServerPlayer} to notify.
-         * @return False.  Revert to default from ObjectChange special case.
+         * {@inheritDoc}
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
@@ -897,11 +891,15 @@ public class ChangeSet {
         }
 
         /**
-         * Specialize a PartialObjectChange to a particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return An "update" element.
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return null; // NYI
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
@@ -933,7 +931,9 @@ public class ChangeSet {
      * Encapsulate a new player change.
      */
     private static class PlayerChange extends Change {
+
         private final ServerPlayer player;
+
 
         /**
          * Build a new PlayerChange.
@@ -946,10 +946,9 @@ public class ChangeSet {
             this.player = player;
         }
 
+
         /**
-         * Gets the sort priority.
-         *
-         * @return "CHANGE_EARLY".
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
@@ -962,6 +961,14 @@ public class ChangeSet {
         @Override
         public boolean isNotifiable(ServerPlayer serverPlayer) {
             return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return null; // NYI
         }
 
         /**
@@ -1004,9 +1011,11 @@ public class ChangeSet {
      * -vis: If removing settlements or units, visibility changes.
      */
     private static class RemoveChange extends Change {
+
         private final Tile tile;
         private final FreeColGameObject fcgo;
         private final List<? extends FreeColGameObject> contents;
+
 
         /**
          * Build a new RemoveChange for an object that is disposed.
@@ -1023,10 +1032,9 @@ public class ChangeSet {
             this.fcgo = this.contents.remove(this.contents.size() - 1);
         }
 
+
         /**
-         * Gets the sort priority.
-         *
-         * @return "CHANGE_REMOVE"
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
@@ -1034,15 +1042,12 @@ public class ChangeSet {
         }
 
         /**
-         * Should a player perhaps be notified of this removal?
-         * They should if they can see the tile, and there is no
-         * other-player settlement present.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to notify.
-         * @return True if the player should be notified.
+         * {@inheritDoc}
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
+            // Notifiable if the player can see the tile, and there is no
+            // other-player settlement present.
             Settlement settlement;
             return tile != null
                 && serverPlayer.canSee(tile)
@@ -1052,11 +1057,15 @@ public class ChangeSet {
         }
 
         /**
-         * Specialize a RemoveChange to a particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return A "remove" element.
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return null; // NYI
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
@@ -1110,6 +1119,7 @@ public class ChangeSet {
         private final FreeColObject child;
         private final boolean add;
 
+
         /**
          * Build a new FeatureChange.
          *
@@ -1126,10 +1136,9 @@ public class ChangeSet {
             this.add = add;
         }
 
+
         /**
-         * Gets the sort priority.
-         *
-         * @return "CHANGE_OWNED"
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
@@ -1137,12 +1146,15 @@ public class ChangeSet {
         }
 
         /**
-         * Specialize a feature change into an element for a
-         * particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return A "featureChange" element.
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return null; // NYI
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
@@ -1184,8 +1196,10 @@ public class ChangeSet {
      * Encapsulates a spying action.
      */
     private static class SpyChange extends Change {
+
         private final Unit unit;
         private final Settlement settlement;
+
 
         /**
          * Build a new SpyChange.
@@ -1200,10 +1214,9 @@ public class ChangeSet {
             this.settlement = settlement;
         }
 
+
         /**
-         * Gets the sort priority.
-         *
-         * @return priority.
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
@@ -1211,16 +1224,19 @@ public class ChangeSet {
         }
 
         /**
-         * Specialize a SpyChange into an element with the supplied name.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return An element.
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return new SpySettlementMessage(unit, settlement);
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return new SpySettlementMessage(unit, settlement)
-                .attachToDocument(doc);
+            return toMessage(serverPlayer).attachToDocument(doc);
         }
 
         /**
@@ -1251,9 +1267,11 @@ public class ChangeSet {
      * Encapsulate a stance change.
      */
     private static class StanceChange extends Change {
+
         private final Player first;
         private final Stance stance;
         private final Player second;
+
 
         /**
          * Build a new StanceChange.
@@ -1271,10 +1289,9 @@ public class ChangeSet {
             this.second = second;
         }
 
+
         /**
-         * Gets the sort priority.
-         *
-         * @return "CHANGE_STANCE"
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
@@ -1282,16 +1299,19 @@ public class ChangeSet {
         }
 
         /**
-         * Specialize a StanceChange to a particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return A "setStance" element.
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return new SetStanceMessage(stance, first, second);
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return new SetStanceMessage(stance, first, second)
-                .attachToDocument(doc);
+            return toMessage(serverPlayer).attachToDocument(doc);
         }
 
         /**
@@ -1325,9 +1345,11 @@ public class ChangeSet {
      * from its name.
      */
     private static class TrivialChange extends Change {
+
         private final int priority;
         private final String name;
         private final String[] attributes;
+
 
         /**
          * Build a new TrivialChange.
@@ -1348,28 +1370,31 @@ public class ChangeSet {
             this.attributes = attributes;
         }
 
+
         /**
-         * Gets the sort priority.
-         *
-         * @return priority.
+         * {@inheritDoc}
          */
         @Override
         public int getPriority() {
-            return priority;
+            return this.priority;
         }
 
         /**
-         * Specialize a TrivialChange into an element with the supplied name.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document}.
-         * @return An element.
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            AttributeMessage ret = new AttributeMessage(this.name);
+            ret.setStringAttributes(this.attributes);
+            return ret;
+        }
+
+        /**
+         * {@inheritDoc}
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            DOMMessage ret = new AttributeMessage(this.name);
-            ret.setStringAttributes(this.attributes);
-            return ret.attachToDocument(doc);
+            return toMessage(serverPlayer).attachToDocument(doc);
         }
 
         /**
