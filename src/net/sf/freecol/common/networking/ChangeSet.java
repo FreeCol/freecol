@@ -376,12 +376,10 @@ public class ChangeSet {
                             boolean success) {
             super(see);
             Game game = attacker.getGame();
-            this.defenderInSettlement = defender.getTile().hasSettlement();
-            this.attacker = reduceUnitVisibility(attacker);
-            this.defender = reduceUnitVisibility(defender);
-            this.defender.setWorkType(null);
-            this.defender.setState(Unit.UnitState.ACTIVE);            
+            this.attacker = attacker.copy(game, Unit.class);
+            this.defender = defender.copy(game, Unit.class);
             this.success = success;
+            this.defenderInSettlement = defender.getTile().hasSettlement();
         }
 
         /**
@@ -437,7 +435,11 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return new AnimateAttackMessage(attacker, defender, success,
+            Unit a = (serverPlayer.owns(attacker)) ? attacker
+                : attacker.reduceVisibility(attacker.getTile());
+            Unit d = (serverPlayer.owns(defender)) ? defender
+                : defender.reduceVisibility(defender.getTile());
+            return new AnimateAttackMessage(a, d, success,
                 !attackerVisible(serverPlayer), !defenderVisible(serverPlayer));
         }
 
@@ -646,9 +648,9 @@ public class ChangeSet {
         public MoveChange(See see, Unit unit, Location oldLocation,
                           Tile newTile) {
             super(see);
+            this.unit = unit;
             this.oldLocation = oldLocation;
             this.newTile = newTile;
-            this.unit = reduceUnitVisibility(unit);
         }
 
         /**
@@ -713,7 +715,9 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return new AnimateMoveMessage(unit, oldLocation.getTile(), newTile,
+            Unit u = (serverPlayer.owns(unit)) ? unit
+                : unit.reduceVisibility(oldLocation.getTile());
+            return new AnimateMoveMessage(u, oldLocation.getTile(), newTile,
                                           !seeOld(serverPlayer));
         }
 
@@ -2000,34 +2004,6 @@ public class ChangeSet {
         return cs;
     }
     
-    /**
-     * Copy a unit, reduce visibility into any carrier and reference to a
-     * settlement.  Used when unit information is attached to an animation.
-     *
-     * @param unit The {@code Unit} to examine.
-     * @return The {@code Unit} with reduced visibility into the carrier.
-     */
-    private static Unit reduceUnitVisibility(Unit unit) {
-        final Game game = unit.getGame();
-        final Tile tile = unit.getTile();
-        if (unit.isOnCarrier()) {
-            Unit carrier = unit.getCarrier().copy(game, Unit.class);
-            for (Unit u : carrier.getUnitList()) {
-                if (u.getId().equals(unit.getId())) {
-                    unit = u;
-                } else {
-                    carrier.remove(u);
-                }
-            }
-            carrier.removeAll();
-            carrier.setLocationNoUpdate(tile);
-        } else {
-            unit = unit.copy(game, Unit.class);
-            unit.setLocationNoUpdate(tile);
-        }
-        return unit;
-    }
-
 
     // Override Object
 

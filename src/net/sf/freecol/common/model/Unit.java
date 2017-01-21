@@ -3720,6 +3720,41 @@ public class Unit extends GoodsLocation
         return ret;
     }
 
+    /**
+     * Copy the unit, reduce visibility into any carrier and reference
+     * to a settlement.
+     *
+     * This is used when unit information is attached to an animation.
+     * The normal scope rules are inadequate there as the unit *must* be
+     * visible, but would normally be invisible if in a settlement or
+     * on a carrier.
+     *
+     * @param tile The {@code Tile} the unit appears at.
+     * @return This {@code Unit} with reduced visibility.
+     */
+    public Unit reduceVisibility(Tile tile) {
+        final Game game = getGame();
+        Unit ret = null;
+        if (isOnCarrier()) {
+            Unit carrier = getCarrier().copy(game, Unit.class);
+            for (Unit u : carrier.getUnitList()) {
+                if (u.getId().equals(getId())) {
+                    ret = u;
+                } else {
+                    carrier.remove(u);
+                }
+            }
+            carrier.removeAll(); // Goods!
+            carrier.setLocationNoUpdate(tile);
+        } else {
+            ret = this.copy(game, Unit.class);
+            ret.setLocationNoUpdate(tile);
+            ret.setWorkType(null);
+            ret.setState(Unit.UnitState.ACTIVE);            
+        }
+        return ret;
+    }
+
 
     // Interface Consumer
 
