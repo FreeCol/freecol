@@ -952,6 +952,19 @@ public abstract class FreeColObject
     }
 
     /**
+     * Serialize this FreeColObject to a string for a target player.
+     *
+     * @param player The {@code Player} to serialize the object to.
+     * @return The serialized object, or null if the stream could not be
+     *     created.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public String serialize(Player player) throws XMLStreamException {
+        return serialize(WriteScope.toClient(player));
+    }
+
+    /**
      * Copy a FreeColObject.
      *
      * The copied object and its internal descendents will be
@@ -971,6 +984,28 @@ public abstract class FreeColObject
         T ret = null;
         try (
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize()));
+        ) {
+            ret = xr.copy(game, returnClass);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
+        }
+        return ret;
+    }
+
+    /**
+     * Copy a FreeColObject for a target player.
+     *
+     * @param <T> The actual return type.
+     * @param game The {@code Game} to add the object to.
+     * @param returnClass The expected return class.
+     * @param player The {@code Player} that will see the result.
+     * @return The copied object, or null on error.
+     */
+    public <T extends FreeColObject> T copy(Game game, Class<T> returnClass,
+                                            Player player) {
+        T ret = null;
+        try (
+            FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize(player)));
         ) {
             ret = xr.copy(game, returnClass);
         } catch (Exception e) {
