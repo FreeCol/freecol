@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.FreeCol;
@@ -26,12 +27,11 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.networking.AddPlayerMessage;
-import net.sf.freecol.common.networking.ErrorMessage;
-import net.sf.freecol.common.networking.SetAIMessage;
+import net.sf.freecol.common.networking.ChangeSet.See;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -171,23 +171,23 @@ public class LoginMessage extends DOMMessage {
         }
 
         Connection conn = serverPlayer.getConnection();
-        Game game;
+        ServerGame serverGame;
         ServerPlayer present;
         boolean isCurrentPlayer = false;
 
         switch (freeColServer.getServerState()) {
         case PRE_GAME:
-            if ((game = freeColServer.getGame()) == null) {
+            if ((serverGame = freeColServer.getGame()) == null) {
                 return ChangeSet.clientError((ServerPlayer)null,
                     StringTemplate.template("server.timeOut"));
             }
 
-            Nation nation = game.getVacantNation();
+            Nation nation = serverGame.getVacantNation();
             if (nation == null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.maximumPlayers"));
             }
-            present = (ServerPlayer)game.getPlayerByName(this.userName);
+            present = (ServerPlayer)serverGame.getPlayerByName(this.userName);
             if (present != null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameInUse")
@@ -195,30 +195,33 @@ public class LoginMessage extends DOMMessage {
             }
 
             // Complete initialization...
-            serverPlayer.initialize(game, game.getLivePlayerList().isEmpty(),
+            serverPlayer.initialize(serverGame,
+                                    serverGame.getLivePlayerList().isEmpty(),
                                     nation);
 
             // ... but override player name.
             serverPlayer.setName(this.userName);
 
             // Add the new player and inform all other players
-            game.addPlayer(serverPlayer);
-            freeColServer.sendToAll(new AddPlayerMessage(serverPlayer),
-                                    serverPlayer);
+            ChangeSet cs = new ChangeSet();
+            serverGame.addPlayer(serverPlayer);
+            cs.addNewPlayer(serverPlayer);
 
             // Ensure there is a current player.
-            if (game.getCurrentPlayer() == null) {
-                game.setCurrentPlayer(serverPlayer);
+            if (serverGame.getCurrentPlayer() == null) {
+                serverGame.setCurrentPlayer(serverPlayer);
             }
 
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(conn);
-            return ChangeSet.simpleChange(serverPlayer,
-                new LoginMessage(this.userName, this.version,
-                                 freeColServer.getServerState(),
-                                 freeColServer.getSinglePlayer(),
-                                 game.getCurrentPlayer() == serverPlayer,
-                                 game));
+            cs.add(See.only(serverPlayer),
+                   ChangeSet.ChangePriority.CHANGE_EARLY,
+                   new LoginMessage(this.userName, this.version,
+                                    freeColServer.getServerState(),
+                                    freeColServer.getSinglePlayer(),
+                                    serverGame.getCurrentPlayer() == serverPlayer,
+                                    serverGame));
+            return cs;
 
         case LOAD_GAME:
             if (FreeColServer.MAP_EDITOR_NAME.equals(this.userName)) {
@@ -226,14 +229,14 @@ public class LoginMessage extends DOMMessage {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("error.mapEditorGame"));
             }
-            game = freeColServer.getGame(); // Restoring from existing game.
-            present = getPlayerByName(game);
+            serverGame = freeColServer.getGame(); // Restoring from existing.
+            present = getPlayerByName(serverGame);
             if (present == null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameNotPresent")
                     .addName("%name%", userName)
                     .addName("%names%",
-                        transform(game.getLiveEuropeanPlayers(),
+                        transform(serverGame.getLiveEuropeanPlayers(),
                                   alwaysTrue(), Player::getName,
                                   Collectors.joining(", "))));
             } else if (present.isConnected()) {
@@ -251,7 +254,9 @@ public class LoginMessage extends DOMMessage {
             present.setConnection(conn);
 
             // Ensure there is a current player.
-            if (game.getCurrentPlayer() == null) game.setCurrentPlayer(present);
+            if (serverGame.getCurrentPlayer() == null) {
+                serverGame.setCurrentPlayer(present);
+            }
 
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(conn);
@@ -259,23 +264,22 @@ public class LoginMessage extends DOMMessage {
                 new LoginMessage(this.userName, this.version,
                                  freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
-                                 game.getCurrentPlayer() == present, game));
+                                 serverGame.getCurrentPlayer() == present,
+                                 serverGame));
 
         case IN_GAME:
-            game = freeColServer.getGame(); // Restoring from existing game.
-            present = getPlayerByName(game);
+            serverGame = freeColServer.getGame(); // Restoring existing game.
+            present = getPlayerByName(serverGame);
             if (present == null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameNotPresent")
                     .addName("%name%", userName)
                     .addName("%names%",
-                        transform(game.getLiveEuropeanPlayers(),
+                        transform(serverGame.getLiveEuropeanPlayers(),
                                   alwaysTrue(), Player::getName,
                             Collectors.joining(", "))));
             } else if (present.isAI()) { // Allow to join over AI player
-                present.setAI(false);
-                freeColServer.sendToAll(new SetAIMessage(present, false),
-                                        present);
+                serverGame.changeAI(present, false);
             } else if (present.isConnected()) {
                 // Another player already connected on the name
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
@@ -291,7 +295,8 @@ public class LoginMessage extends DOMMessage {
                 new LoginMessage(this.userName, this.version,
                                  freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
-                                 game.getCurrentPlayer() == present, game));
+                                 serverGame.getCurrentPlayer() == present,
+                                 serverGame));
             
         case END_GAME: default:
             break;

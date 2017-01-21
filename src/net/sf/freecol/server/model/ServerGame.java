@@ -220,9 +220,18 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param players A list of new {@code ServerPlayer}s.
      */
     public void updatePlayers(List<ServerPlayer> players) {
-        ChangeSet cs = new ChangeSet();
-        for (ServerPlayer sp : players) cs.addPlayer(sp);
-        sendToAll(cs);
+        sendToAll(new ChangeSet().addPlayers(players));
+    }
+
+    /**
+     * Change the AI state of a player.
+     *
+     * @param serverPlayer The {@code ServerPlayer} to change.
+     * @param ai The new AI state.
+     */
+    public void changeAI(ServerPlayer serverPlayer, boolean ai) {
+        serverPlayer.setAI(ai);
+        sendToAll(ChangeSet.aiChange(serverPlayer, ai));
     }
 
     /**

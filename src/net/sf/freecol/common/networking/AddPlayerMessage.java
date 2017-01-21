@@ -44,14 +44,11 @@ public class AddPlayerMessage extends DOMMessage {
 
     /**
      * Create a new {@code AddPlayerMessage}.
-     *
-     * @param player The {@code Player}s to add.
      */
-    public AddPlayerMessage(Player player) {
+    public AddPlayerMessage() {
         super(TAG);
 
         this.players.clear();
-        if (player != null) this.players.add(player);
     }
 
     /**
@@ -62,7 +59,7 @@ public class AddPlayerMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AddPlayerMessage(Game game, Element element) {
-        this(null);
+        this();
 
         // Making this message implicitly updates the game.
         // TODO: should this do a non-interning read and have the client
@@ -81,6 +78,17 @@ public class AddPlayerMessage extends DOMMessage {
      */
     public List<Player> getPlayers() {
         return this.players;
+    }
+
+    /**
+     * Add a player to the message.
+     *
+     * @param p The {@code Player} to add.
+     * @return This message.
+     */
+    public AddPlayerMessage addPlayer(Player p) {
+        this.players.add(p);
+        return this;
     }
 
 

@@ -935,18 +935,19 @@ public class ChangeSet {
      */
     private static class PlayerChange extends Change {
 
-        private final ServerPlayer player;
+        private final List<ServerPlayer> serverPlayers = new ArrayList<>();
 
 
         /**
          * Build a new PlayerChange.
          *
          * @param see The visibility of this change.
-         * @param player The {@code Player} to add.
+         * @param serverPlayers The {@code ServerPlayer}s to add.
          */
-        public PlayerChange(See see, ServerPlayer player) {
+        public PlayerChange(See see, List<ServerPlayer> serverPlayers) {
             super(see);
-            this.player = player;
+            this.serverPlayers.clear();
+            this.serverPlayers.addAll(serverPlayers);
         }
 
 
@@ -955,7 +956,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return ChangePriority.CHANGE_EARLY.getPriority();
+            return ChangePriority.CHANGE_NORMAL.getPriority();
         }
 
         /**
@@ -971,7 +972,14 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return null; // NYI
+            final Game game = serverPlayer.getGame();
+            AddPlayerMessage message = new AddPlayerMessage();
+            for (ServerPlayer sp : serverPlayers) {
+                Player p = (serverPlayer.getId().equals(sp.getId())) ? sp
+                    : sp.copy(game, Player.class, serverPlayer);
+                message.addPlayer(p);
+            }
+            return message;
         }
 
         /**
@@ -979,9 +987,7 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("addPlayer");
-            element.appendChild(DOMUtils.toXMLElement(this.player, doc, serverPlayer));
-            return element;
+            return toMessage(serverPlayer).attachToDocument(doc);
         }
 
         /**
@@ -1001,9 +1007,11 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
-                .append(' ').append(player.getId())
-                .append(']');
+                .append(" #").append(getPriority());
+            for (ServerPlayer sp : this.serverPlayers) {
+                sb.append(' ').append(sp.getId());
+            }
+            sb.append(']');
             return sb.toString();
         }
     }
@@ -1688,12 +1696,30 @@ public class ChangeSet {
     /**
      * Helper function to add a new player to a ChangeSet.
      *
+     * The added player should not be visible, as this is called
+     * pre-game to update other players, but the actual player may not
+     * yet even have a Game.
+     *
      * @param serverPlayer The new {@code ServerPlayer} to add.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addPlayer(ServerPlayer serverPlayer) {
+    public ChangeSet addNewPlayer(ServerPlayer serverPlayer) {
         changes.add(new PlayerChange(See.all().except(serverPlayer),
-                                     serverPlayer));
+                                     Collections.singletonList(serverPlayer)));
+        return this;
+    }
+
+    /**
+     * Helper function to add new players to a ChangeSet.
+     *
+     * Used when adding the AI players en masse, or when adding the REF.
+     * No care need be taken with visibility wrt AIs.
+     *
+     * @param serverPlayers A list of new {@code ServerPlayer}s to add.
+     * @return The updated {@code ChangeSet}.
+     */
+    public ChangeSet addPlayers(List<ServerPlayer> serverPlayers) {
+        changes.add(new PlayerChange(See.all(), serverPlayers));
         return this;
     }
 
@@ -1790,6 +1816,7 @@ public class ChangeSet {
         changes.add(new TrivialChange(see, name, cp.getPriority(), attributes));
         return this;
     }
+
 
     // Conversion of a change set to a corresponding element.
 
@@ -2004,6 +2031,16 @@ public class ChangeSet {
         return cs;
     }
     
+    /**
+     * Get a new ChangeSet that changes a player AI state.
+     *
+     * @param serverPlayer The {@code ServerPlayer} to change.
+     * @param ai The new AI state.
+     */
+    public static ChangeSet aiChange(ServerPlayer serverPlayer, boolean ai) {
+        return simpleChange(See.all(), new SetAIMessage(serverPlayer, ai));
+    }
+
 
     // Override Object
 

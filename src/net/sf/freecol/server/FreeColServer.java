@@ -1269,9 +1269,10 @@ public final class FreeColServer {
             !e.getKey().isUnknownEnemy()
                 && e.getValue() != NationState.NOT_AVAILABLE
                 && serverGame.getPlayerByNationId(e.getKey().getId()) == null;
-        serverGame.updatePlayers(transform(serverGame.getNationOptions().getNations().entrySet(),
-                                     availablePred, e -> makeAIPlayer(e.getKey()),
-                                     Player.playerComparator));
+        serverGame.updatePlayers(transform(serverGame.getNationOptions()
+                .getNations().entrySet(),
+                availablePred, e -> makeAIPlayer(e.getKey()),
+                Player.playerComparator));
 
         // We need a fake unknown enemy player
         if (serverGame.getUnknownEnemy() == null) {

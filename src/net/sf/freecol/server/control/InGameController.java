@@ -20,6 +20,7 @@
 package net.sf.freecol.server.control;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1403,7 +1404,7 @@ public final class InGameController extends Controller {
 
         // Create the REF.
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
-        cs.addPlayer(refPlayer);
+        cs.addPlayers(Collections.singletonList(refPlayer));
         // Update the intervention force
         final Monarch monarch = serverPlayer.getMonarch();
         monarch.updateInterventionForce();
