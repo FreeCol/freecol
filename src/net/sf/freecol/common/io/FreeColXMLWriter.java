@@ -328,7 +328,10 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      */
     public void writeAttribute(String attributeName, FreeColObject value) throws XMLStreamException {
         if (value != null) {
-            xmlStreamWriter.writeAttribute(attributeName, value.getId());
+            String id = value.getId();
+            if (id != null) {
+                xmlStreamWriter.writeAttribute(attributeName, value.getId());
+            }
         }
     }
 
