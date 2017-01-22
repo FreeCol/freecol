@@ -89,15 +89,66 @@ public class DOMUtils {
     };
 
     /**
-     * Gets the type of an element.
+     * Make a new reader for an element.
      *
-     * @param element The {@code Element} to query.
-     * @return The type of the element.
+     * @param element The {@code Element} to read.
+     * @return A new {@code FreeColXMLReader} to read from.
+     * @exception IOException if the reader can not be created,
+     *     and miscellaneous run time exceptions for problems with the
+     *     transformer mechanisms.
      */
-    public static String getType(Element element) {
-        return (element == null) ? null : element.getTagName();
+    private static FreeColXMLReader makeElementReader(Element element)
+        throws IOException {
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xmlTransformer = factory.newTransformer();
+            StringWriter stringWriter = new StringWriter();
+            xmlTransformer.transform(new DOMSource(element),
+                                     new StreamResult(stringWriter));
+            String xml = stringWriter.toString();
+            StringReader sr = new StringReader(xml);
+            return new FreeColXMLReader(sr);
+        } catch (TransformerException ex) {
+            throw new RuntimeException("Reader creation failure", ex);
+        }
     }
 
+    /**
+     * Convenience method to find the first child element with the
+     * specified tagname.
+     *
+     * @param element The {@code Element} to search for the child
+     *     element in.
+     * @param index The index of the child element.
+     * @return The child element with the given index, or null if none
+     *     present.
+     */
+    private static Element getChildElement(Element element, int index) {
+        if (element == null) return null;
+        NodeList nl = element.getChildNodes();
+        return (nl == null || index >= nl.getLength()
+            || !(nl.item(index) instanceof Element)) ? null
+            : (Element)nl.item(index);
+    }
+
+    /**
+     * Get a list of the child elements.
+     *
+     * @param element The parent {@code Element} to query.
+     * @return A list of child {@code Element}s.
+     */
+    private static List<Element> getChildElementList(Element element) {
+        List<Element> ret = new ArrayList<>();
+        NodeList nl = element.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            if (nl.item(i) instanceof Element) ret.add((Element)nl.item(i));
+        }
+        return ret;
+    }
+
+
+    // Public interface
+    
     /**
      * Creates and returns a new XML-document.
      *
@@ -123,16 +174,6 @@ public class DOMUtils {
     }
 
     /**
-     * Create a new document with a root element with a given tag name.
-     *
-     * @param tag The root element name.
-     * @return The root element of the document.
-     */
-    public static Element createElement(String tag) {
-        return createDocument(tag).getDocumentElement();
-    }
-
-    /**
      * Create a new document with a root element with a given tag name
      * and attributes.
      *
@@ -148,6 +189,64 @@ public class DOMUtils {
     }
     
     /**
+     * Read a Document from an input source.
+     * 
+     * @param inputSource An {@code InputSource} to read from.
+     * @return The resulting {@code Document}.
+     * @exception IOException if thrown by the input stream.
+     * @exception SAXException if thrown during parsing.
+     */
+    public static Document readDocument(InputSource inputSource)
+        throws SAXException, IOException {
+        Document tempDocument = null;
+        boolean dumpMsgOnError = true;
+        if (dumpMsgOnError) {
+            inputSource.setByteStream(new BufferedInputStream(inputSource.getByteStream()));
+
+            inputSource.getByteStream().mark(1000000);
+        }
+        try {
+            synchronized (parser) {
+                tempDocument = parser.parse(inputSource);
+            }
+        } catch (IOException ex) {
+            //} catch (IOException|SAXException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            // Xerces throws ArrayIndexOutOfBoundsException when it barfs on
+            // some FreeCol messages. I'd like to see the messages upon which
+            // it barfs.
+            // Its also throwing SAXParseException in BR#2925
+            if (dumpMsgOnError) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                inputSource.getByteStream().reset();
+                while (true) {
+                    int i = inputSource.getByteStream().read();
+                    if (-1 == i) {
+                        break;
+                    }
+                    baos.write(i);
+                }
+                logger.log(Level.SEVERE, baos.toString("UTF-8"), ex);
+            } else {
+                logger.log(Level.WARNING, "Parse error", ex);
+            }
+            throw ex;
+        }
+        return tempDocument;
+    }
+
+    /**
+     * Create a new document with a root element with a given tag name.
+     *
+     * @param tag The root element name.
+     * @return The root element of the document.
+     */
+    public static Element createElement(String tag) {
+        return createDocument(tag).getDocumentElement();
+    }
+
+    /**
      * Create a new document with a root element with a given tag name
      * and attributes.
      *
@@ -160,22 +259,15 @@ public class DOMUtils {
     }
 
     /**
-     * Utility to extract the attributes of an element into a map.
+     * Gets the type of an element.
      *
-     * @param element The {@code Element} to extract from.
-     * @return A {@code Map} of the attributes.
+     * @param element The {@code Element} to query.
+     * @return The type of the element.
      */
-    public static Map<String,String> getAttributeMap(Element element) {
-        Map<String, String> map = new HashMap<>();
-        NamedNodeMap nnm = element.getAttributes();
-        final int n = nnm.getLength();
-        for (int i = 0; i < n; i++) {
-            Node node = nnm.item(i);
-            map.put(node.getNodeName(), node.getNodeValue());
-        }
-        return map;
+    public static String getType(Element element) {
+        return (element == null) ? null : element.getTagName();
     }
-    
+
     /**
      * Create a DOMMessage from an element.
      *
@@ -226,20 +318,6 @@ public class DOMUtils {
     }
 
     /**
-     * Handle the child nodes of an element.
-     *
-     * @param mh The {@code MessageHandler} to handle the nodes.
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
-     * @return An {@code Element} containing the response/s.
-     */
-    public static final Element handleChildren(MessageHandler mh,
-        Connection connection, Element element) {
-        return handleList(mh, connection,
-                          mapChildren(element, Function.identity()));
-    }
-
-    /**
      * Handle a list of messages.
      *
      * @param mh The {@code MessageHandler} to handle the messages.
@@ -275,12 +353,8 @@ public class DOMUtils {
      * @return The first child element with the given name.
      */
     public static Element getChildElement(Element element, String tagName) {
-        NodeList n = element.getChildNodes();
-        for (int i = 0; i < n.getLength(); i++) {
-            if (n.item(i) instanceof Element
-                && ((Element)n.item(i)).getTagName().equals(tagName)) {
-                return (Element)n.item(i);
-            }
+        for (Element e : getChildElementList(element)) {
+            if (e.getTagName().equals(tagName)) return e;
         }
         return null;
     }
@@ -298,11 +372,8 @@ public class DOMUtils {
      */
     public static <T extends FreeColGameObject> T getChild(Game game,
         Element element, int index, boolean intern, Class<T> returnClass) {
-        NodeList nl = element.getChildNodes();
-        Element e;
-        return (index >= nl.getLength()
-            || (e = (Element)nl.item(index)) == null)
-            ? null
+        Element e = getChildElement(element, index);
+        return (e == null) ? null
             : readGameElement(game, e, intern, returnClass);
     }
 
@@ -318,11 +389,8 @@ public class DOMUtils {
      */
     public static <T extends FreeColObject> T getChild(Game game,
         Element element, int index) {
-        NodeList nl = element.getChildNodes();
-        Element e;
-        return (index >= nl.getLength()
-            || (e = (Element)nl.item(index)) == null)
-            ? null
+        Element e = getChildElement(element, index);
+        return (e == null) ? null
             : readElement(game, e, true);
     }
 
@@ -338,11 +406,8 @@ public class DOMUtils {
      */
     public static <T extends FreeColObject> T getChild(Game game,
         Element element, int index, Class<T> returnClass) {
-        NodeList nl = element.getChildNodes();
-        Element e;
-        return (index >= nl.getLength()
-            || (e = (Element)nl.item(index)) == null)
-            ? null
+        Element e = getChildElement(element, index);
+        return (e == null) ? null
             : readElement(game, e, true, returnClass);
     }
 
@@ -359,9 +424,8 @@ public class DOMUtils {
     public static <T extends FreeColObject> List<T> getChildren(Game game,
         Element element, Class<T> returnClass) {
         List<T> ret = new ArrayList<>();
-        NodeList nl = element.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            T t = getChild(game, element, i, returnClass);
+        for (Element e : getChildElementList(element)) {
+            T t = readElement(game, e, true, returnClass);
             if (t != null) ret.add(t);
         }
         return ret;
@@ -378,33 +442,30 @@ public class DOMUtils {
     public static <T> List<T> mapChildren(Element element,
         Function<? super Element, ? extends T> mapper) {
         List<T> ret = new ArrayList<>();
-        NodeList nl = element.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            Element e = (Element)nl.item(i);
-            if (e == null) continue;
-            T x = mapper.apply((Element)nl.item(i));
+        for (Element e : getChildElementList(element)) {
+            T x = mapper.apply(e);
             if (x != null) ret.add(x);
         }
         return ret;
     }
 
     /**
-     * Get all the attributes of an element as a map.
+     * Utility to extract the attributes of an element into a map.
      *
-     * @param element The {@code Element} to query.
-     * @return A map of the attribute pairs found.
+     * @param element The {@code Element} to extract from.
+     * @return A {@code Map} of the attributes.
      */
-    public static Map<String, String> getAttributes(Element element) {
-        Map<String, String> result = new HashMap<>();
-        final NamedNodeMap map = element.getAttributes();
-        final int n = map.getLength();
+    public static Map<String,String> getAttributeMap(Element element) {
+        Map<String, String> map = new HashMap<>();
+        NamedNodeMap nnm = element.getAttributes();
+        final int n = nnm.getLength();
         for (int i = 0; i < n; i++) {
-            Node node = map.item(i);
-            result.put(node.getNodeName(), node.getNodeValue());
+            Node node = nnm.item(i);
+            map.put(node.getNodeName(), node.getNodeValue());
         }
-        return result;
+        return map;
     }
-        
+    
     /**
      * Get an array of string attributes from an element.
      *
@@ -424,82 +485,6 @@ public class DOMUtils {
         return result;
     }
 
-    /**
-     * Read a Document from an input source.
-     * 
-     * @param inputSource An {@code InputSource} to read from.
-     * @return The resulting {@code Document}.
-     * @exception IOException if thrown by the input stream.
-     * @exception SAXException if thrown during parsing.
-     */
-    public static Document readDocument(InputSource inputSource)
-        throws SAXException, IOException {
-        Document tempDocument = null;
-        boolean dumpMsgOnError = true;
-        if (dumpMsgOnError) {
-            inputSource.setByteStream(new BufferedInputStream(inputSource.getByteStream()));
-
-            inputSource.getByteStream().mark(1000000);
-        }
-        try {
-            synchronized (parser) {
-                tempDocument = parser.parse(inputSource);
-            }
-        } catch (IOException ex) {
-            //} catch (IOException|SAXException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            // Xerces throws ArrayIndexOutOfBoundsException when it barfs on
-            // some FreeCol messages. I'd like to see the messages upon which
-            // it barfs.
-            // Its also throwing SAXParseException in BR#2925
-            if (dumpMsgOnError) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                inputSource.getByteStream().reset();
-                while (true) {
-                    int i = inputSource.getByteStream().read();
-                    if (-1 == i) {
-                        break;
-                    }
-                    baos.write(i);
-                }
-                logger.log(Level.SEVERE, baos.toString("UTF-8"), ex);
-            } else {
-                logger.log(Level.WARNING, "Parse error", ex);
-            }
-            throw ex;
-        }
-        return tempDocument;
-    }
-
-    /**
-     * Convert an element to a string.
-     *
-     * @param element The {@code Element} to convert.
-     * @return The {@code String} representation of an element.
-     */
-    public static String elementToString(Element element) {
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer xt = factory.newTransformer();
-            StringWriter sw = new StringWriter();
-            xt.transform(new DOMSource(element), new StreamResult(sw));
-            String result = sw.toString();
-
-            // Drop the <?xml...?> part if present to keep logging concise.
-            if (result.startsWith("<?xml")) {
-                final String xmlEnd = "?>";
-                int index = result.indexOf(xmlEnd);
-                if (index > 0) {
-                    result = result.substring(index + xmlEnd.length());
-                }
-            }
-            return result;
-        } catch (TransformerException e) {
-            logger.log(Level.WARNING, "TransformerException", e);
-        }
-        return null;
-    }
 
     // @compat 0.10.x
     /**
@@ -668,31 +653,6 @@ public class DOMUtils {
     }
 
     /**
-     * Make a new reader for an element.
-     *
-     * @param element The {@code Element} to read.
-     * @return A new {@code FreeColXMLReader} to read from.
-     * @exception IOException if the reader can not be created,
-     *     and miscellaneous run time exceptions for problems with the
-     *     transformer mechanisms.
-     */
-    private static FreeColXMLReader makeElementReader(Element element)
-        throws IOException {
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer xmlTransformer = factory.newTransformer();
-            StringWriter stringWriter = new StringWriter();
-            xmlTransformer.transform(new DOMSource(element),
-                                     new StreamResult(stringWriter));
-            String xml = stringWriter.toString();
-            StringReader sr = new StringReader(xml);
-            return new FreeColXMLReader(sr);
-        } catch (TransformerException ex) {
-            throw new RuntimeException("Reader creation failure", ex);
-        }
-    }
-
-    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *
@@ -803,6 +763,34 @@ public class DOMUtils {
         }
     }
 
+    /**
+     * Convert an element to a string.
+     *
+     * @param element The {@code Element} to convert.
+     * @return The {@code String} representation of an element.
+     */
+    public static String elementToString(Element element) {
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xt = factory.newTransformer();
+            StringWriter sw = new StringWriter();
+            xt.transform(new DOMSource(element), new StreamResult(sw));
+            String result = sw.toString();
+
+            // Drop the <?xml...?> part if present to keep logging concise.
+            if (result.startsWith("<?xml")) {
+                final String xmlEnd = "?>";
+                int index = result.indexOf(xmlEnd);
+                if (index > 0) {
+                    result = result.substring(index + xmlEnd.length());
+                }
+            }
+            return result;
+        } catch (TransformerException e) {
+            logger.log(Level.WARNING, "TransformerException", e);
+        }
+        return null;
+    }
 
     // Duplicates from DOMMessage
 
@@ -877,5 +865,4 @@ public class DOMUtils {
         }
         return defaultValue;
     }
-    
 }
