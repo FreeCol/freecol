@@ -45,16 +45,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.networking.AnimateAttackMessage;
-import net.sf.freecol.common.networking.AnimateMoveMessage;
-import net.sf.freecol.common.networking.AttributeMessage;
-import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.ErrorMessage;
-import net.sf.freecol.common.networking.FeatureChangeMessage;
-import net.sf.freecol.common.networking.MultipleMessage;
-import net.sf.freecol.common.networking.SetDeadMessage;
-import net.sf.freecol.common.networking.SetStanceMessage;
-import net.sf.freecol.common.networking.SpySettlementMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -326,8 +316,10 @@ public class ChangeSet {
          * @param doc The owner {@code Document} to build the element in.
          * @return An {@code Element} encapsulating this change.
          */
-        public abstract Element toElement(ServerPlayer serverPlayer,
-                                          Document doc);
+        public Element toElement(ServerPlayer serverPlayer, Document doc) {
+            DOMMessage message = toMessage(serverPlayer);
+            return (message == null) ? null : message.attachToDocument(doc);
+        }
 
         /**
          * Some changes can not be directly specialized, but need to be
@@ -435,19 +427,13 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            if (!isNotifiable(serverPlayer)) return null;
             Unit a = (serverPlayer.owns(attacker)) ? attacker
                 : attacker.reduceVisibility(attacker.getTile());
             Unit d = (serverPlayer.owns(defender)) ? defender
                 : defender.reduceVisibility(defender.getTile());
             return new AnimateAttackMessage(a, d, success,
                 !attackerVisible(serverPlayer), !defenderVisible(serverPlayer));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return toMessage(serverPlayer).attachToDocument(doc);
         }
 
         /**
@@ -526,13 +512,6 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
         public void attachToElement(Element element) {
             element.setAttribute(key, value);
         }
@@ -591,7 +570,7 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return this.message;
+            return (isNotifiable(serverPlayer)) ? this.message : null;
         }
 
         /**
@@ -599,8 +578,9 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = toMessage(serverPlayer).toXMLElement();
-            return (Element)doc.importNode(element, true);
+            DOMMessage message = toMessage(serverPlayer);
+            return (message == null) ? null
+                : (Element)doc.importNode(message.toXMLElement(), true);
         }
 
         /**
@@ -715,18 +695,11 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            if (!isNotifiable(serverPlayer)) return null;
             Unit u = (serverPlayer.owns(unit)) ? unit
                 : unit.reduceVisibility(oldLocation.getTile());
             return new AnimateMoveMessage(u, oldLocation.getTile(), newTile,
                                           !seeOld(serverPlayer));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return toMessage(serverPlayer).attachToDocument(doc);
         }
 
         /**
@@ -972,6 +945,7 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            if (!isNotifiable(serverPlayer)) return null;
             final Game game = serverPlayer.getGame();
             AddPlayerMessage message = new AddPlayerMessage();
             for (ServerPlayer sp : serverPlayers) {
@@ -980,14 +954,6 @@ public class ChangeSet {
                 message.addPlayer(p);
             }
             return message;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return toMessage(serverPlayer).attachToDocument(doc);
         }
 
         /**
@@ -1178,16 +1144,8 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return null; // NYI
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return new FeatureChangeMessage(this.parent, this.child, this.add)
-                .attachToDocument(doc);
+            return (!isNotifiable(serverPlayer)) ? null
+                : new FeatureChangeMessage(this.parent, this.child, this.add);
         }
 
         /**
@@ -1253,15 +1211,8 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return new SpySettlementMessage(unit, settlement);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return toMessage(serverPlayer).attachToDocument(doc);
+            return (!isNotifiable(serverPlayer)) ? null
+                : new SpySettlementMessage(unit, settlement);
         }
 
         /**
@@ -1328,15 +1279,8 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return new SetStanceMessage(stance, first, second);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return toMessage(serverPlayer).attachToDocument(doc);
+            return (!isNotifiable(serverPlayer)) ? null
+                : new SetStanceMessage(stance, first, second);
         }
 
         /**
@@ -1409,17 +1353,10 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            if (!isNotifiable(serverPlayer)) return null;
             AttributeMessage ret = new AttributeMessage(this.name);
             ret.setStringAttributes(this.attributes);
             return ret;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            return toMessage(serverPlayer).attachToDocument(doc);
         }
 
         /**
@@ -1924,7 +1861,8 @@ public class ChangeSet {
             Change change = c.remove(0);
             if (change.isNotifiable(serverPlayer)) {
                 if (change.convertsToElement()) {
-                    elements.add(change.toElement(serverPlayer, doc));
+                    Element e = change.toElement(serverPlayer, doc);
+                    if (e != null) elements.add(e);
                 } else {
                     diverted.add(change);
                 }
