@@ -391,17 +391,25 @@ public class Connection implements Closeable {
      *
      * @param element The {@code Element} (root element in a
      *     DOM-parsed XML tree) that holds all the information
+     * @return True if the message was sent.
      * @exception IOException If an error occur while sending the message.
      */
-    private void sendInternal(Element element) throws IOException {
-        synchronized (this.outputLock) {
-            if (this.out == null) return;
-            this.outTransformer.reset();
-            StringWriter sw = elementToStringWriter(this.outTransformer, element);
-            if (sw == null) return;
-            this.out.write(sw.toString().getBytes("UTF-8"));
-            this.out.flush();
+    private boolean sendInternal(Element element) throws IOException {
+        try {
+            synchronized (this.outputLock) {
+                if (this.out == null) return false;
+                this.outTransformer.reset();
+                StringWriter sw = elementToStringWriter(this.outTransformer, element);
+                if (sw == null) 
+                    this.out.write(sw.toString().getBytes("UTF-8"));
+                this.out.flush();
+            }
+        } catch (IOException ioe) {
+            throw ioe;
+        } catch (Exception ex) {
+            throw new IOException("sendInternal internal fail", ex);
         }
+        return true;
     }
 
     /**
@@ -429,7 +437,7 @@ public class Connection implements Closeable {
 
         NetworkReplyObject nro
             = this.receivingThread.waitForNetworkReply(networkReplyId);
-        sendInternal(question);
+        if (!sendInternal(question)) return null;
         log(question, true);
 
         // Wait for response
