@@ -42,6 +42,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -248,11 +249,51 @@ public class Game extends FreeColGameObject {
      */
     public <T extends FreeColObject> T newInstance(Class<T> returnClass,
                                                    boolean server) {
-        @SuppressWarnings("unchecked")
-        Class<T> rc = (server) ? (Class<T>)serverClasses.get(returnClass)
-            : null;
-        return FreeColGameObject.newInstance(this,
-            (rc == null) ? returnClass : rc);
+        // Do not restrict trying the full (Game,String) constructor
+        // as there are FCOs that implement it (e.g. Goods).
+        if (server) {
+            @SuppressWarnings("unchecked")
+            Class<T> sc = (Class<T>)serverClasses.get(returnClass);
+            if (sc != null) returnClass = sc;
+        }
+        try {
+            return Introspector.instantiate(returnClass,
+                new Class[] { Game.class, String.class },
+                new Object[] { this, (String)null }); // No intern!
+        } catch (Introspector.IntrospectorException ex) {
+            // Allow another try on failure
+        }
+
+        if (FreeColSpecObject.class.isAssignableFrom(returnClass)) {
+            try {
+                return Introspector.instantiate(returnClass,
+                    new Class[] { Specification.class },
+                    new Object[] { getSpecification() });
+            } catch (Introspector.IntrospectorException ex) {
+                logger.log(Level.WARNING, "newInstance(spec) fail for: "
+                    + returnClass.getName(), ex);
+            }
+        } else { // Or just use the trivial constructor
+            try {
+                return Introspector.instantiate(returnClass,
+                    new Class[] {}, new Object[] {});
+            } catch (Introspector.IntrospectorException ex) {
+                logger.log(Level.WARNING, "newInstance(trivial) fail for: "
+                    + returnClass.getName(), ex);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Instantiate an uninitialized FreeColGameObject within a game.
+     *
+     * @param <T> The actual return type.
+     * @param returnClass The required {@code FreeColObject} class.
+     * @return The new uninitialized object, or null on error.
+     */
+    public <T extends FreeColObject> T newInstance(Class<T> returnClass) {
+        return newInstance(returnClass, false); // Default to non-server
     }
     
     /**
@@ -1171,7 +1212,7 @@ public class Game extends FreeColGameObject {
         try {
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
             xr.nextTag();
-            T ret = FreeColGameObject.newInstance(this, returnClass);
+            T ret = newInstance(returnClass);
             ret.readFromXML(xr);
             return ret;
 

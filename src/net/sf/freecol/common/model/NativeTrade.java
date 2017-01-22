@@ -142,7 +142,7 @@ public class NativeTrade extends FreeColGameObject {
 
 
     /**
-     * Simple constructor, used in FreeColGameObject.newInstance.
+     * Simple constructor, used in Game.newInstance.
      *
      * @param game The enclosing {@code Game}.
      * @param id The identifier (ignored).

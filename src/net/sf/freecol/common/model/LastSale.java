@@ -41,7 +41,7 @@ public final class LastSale extends FreeColObject {
 
 
     /**
-     * Trivial constructor to allow creation with FreeColObject.newInstance.
+     * Trivial constructor to allow creation with Game.newInstance.
      */
     public LastSale() {}
 

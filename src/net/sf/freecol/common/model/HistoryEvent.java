@@ -97,7 +97,7 @@ public class HistoryEvent extends StringTemplate {
 
 
     /**
-     * Trivial constructor to allow creation with FreeColObject.newInstance.
+     * Trivial constructor to allow creation with Game.newInstance.
      */
     public HistoryEvent() {}
 

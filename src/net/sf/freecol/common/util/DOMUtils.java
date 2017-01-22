@@ -562,7 +562,7 @@ public class DOMUtils {
      */
     public static <T extends FreeColObject> T readElement(Game game,
         Element element, boolean intern, Class<T> returnClass) {
-        T ret = FreeColGameObject.newInstance(game, returnClass);
+        T ret = game.newInstance(returnClass);
         if (ret != null) readFromElement(ret, element, intern);
         return ret;
     }
@@ -599,7 +599,7 @@ public class DOMUtils {
             xr.setReadScope((intern) ? FreeColXMLReader.ReadScope.NORMAL
                 : FreeColXMLReader.ReadScope.NOINTERN);
             xr.nextTag();
-            ret = FreeColGameObject.newInstance(game, c);
+            ret = game.newInstance(c);
             if (ret != null) readFromElement(ret, element);
         } catch (IOException|XMLStreamException ex) {
             throw new RuntimeException("XML failure", ex);

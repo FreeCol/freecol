@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -102,29 +101,6 @@ public abstract class FreeColGameObject extends FreeColObject {
         this.disposed = false;
     }
         
-
-    /**
-     * Instantiate an uninitialized FreeColGameObject within a game.
-     *
-     * @param <T> The actual return type.
-     * @param game The {@code Game} to instantiate within.
-     * @param returnClass The required {@code FreeColObject} class.
-     * @return The new uninitialized object, or null on error.
-     */
-    public static <T extends FreeColObject> T newInstance(Game game,
-        Class<T> returnClass) {
-        try {
-            return Introspector.instantiate(returnClass,
-                new Class[] { Game.class, String.class },
-                new Object[] { game, (String)null }); // No intern!
-        } catch (Introspector.IntrospectorException ex) {}
-        // OK, did not work, try the simpler constructors
-        return (FreeColSpecObject.class.isAssignableFrom(returnClass))
-            ? FreeColSpecObject.newInstance(game.getSpecification(),
-                                            returnClass)
-            : FreeColObject.newInstance(returnClass);
-    }
-
     /**
      * Sets the unique identifier of this object and registers it in its
      * {@code Game} with that identifier, i.e. "intern" this object.

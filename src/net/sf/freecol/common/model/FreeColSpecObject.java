@@ -19,12 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.util.Introspector;
 
 
 /**
@@ -32,7 +28,6 @@ import net.sf.freecol.common.util.Introspector;
  */
 public abstract class FreeColSpecObject extends FreeColObject {
 
-    protected static final Logger logger = Logger.getLogger(FreeColSpecObject.class.getName());
 
     /** The {@code Specification} this object uses, which may be null. */
     private Specification specification;
@@ -48,26 +43,6 @@ public abstract class FreeColSpecObject extends FreeColObject {
     }
 
 
-    /**
-     * Instantiate a FreeCol specification object.
-     *
-     * @param <T> The actual instance type.
-     * @param spec The {@code Specification} to use in the constructor.
-     * @param returnClass The expected class of the object.
-     * @return The new spec object, or null on error.
-     */
-    public static <T extends FreeColObject> T newInstance(Specification spec,
-        Class<T> returnClass) {
-        try {
-            return Introspector.instantiate(returnClass,
-                new Class[] { Specification.class },
-                new Object[] { spec });
-        } catch (Introspector.IntrospectorException ex) {
-            logger.log(Level.WARNING, "newInstance failure", ex);
-        }
-        return null;
-    }
-        
     /**
      * Get the specification.  It may be null.
      *

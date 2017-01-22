@@ -102,24 +102,6 @@ public abstract class FreeColObject
     // ready.  However we do have this utility.
 
     /**
-     * Instantiate a FreeColObject class with its trivial constructor.
-     *
-     * @param <T> The actual instance type.
-     * @param returnClass The required FreeColObject class.
-     * @return The new object or null on error.
-     */
-    public static <T extends FreeColObject> T newInstance(Class<T> returnClass) {
-        try {
-            return Introspector.instantiate(returnClass,
-                new Class[] {}, new Object[] {});
-        } catch (Introspector.IntrospectorException ex) {
-            logger.log(Level.WARNING, "Unable to instantiate: "
-                + returnClass.getName(), ex);
-        }
-        return null;
-    }
-
-    /**
      * Get the FreeColObject class corresponding to a class name.
      *
      * @param name The class name.

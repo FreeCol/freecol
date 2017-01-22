@@ -811,7 +811,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
     private <T extends FreeColObject> T uninternedRead(Game game,
         Class<T> returnClass) throws XMLStreamException {
 
-        T ret = FreeColGameObject.newInstance(game, returnClass);
+        T ret = game.newInstance(returnClass,
+                                 getReadScope() == ReadScope.SERVER);
         if (ret == null) {
             throw new XMLStreamException("Could not create instance of "
                 + returnClass.getName());
