@@ -4488,13 +4488,11 @@ public class Unit extends GoodsLocation
         if (hitPoints < 0) hitPoints = xr.getAttribute(OLD_HIT_POINTS_TAG, -1);
         // end @compat
 
-        teacher = xr.makeFreeColGameObject(game, TEACHER_TAG,
-                                           Unit.class, false);
+        teacher = xr.makeFreeColObject(game, TEACHER_TAG, Unit.class, false);
 
-        student = xr.makeFreeColGameObject(game, STUDENT_TAG,
-                                           Unit.class, false);
+        student = xr.makeFreeColObject(game, STUDENT_TAG, Unit.class, false);
 
-        setHomeIndianSettlement(xr.makeFreeColGameObject(game,
+        setHomeIndianSettlement(xr.makeFreeColObject(game,
                 INDIAN_SETTLEMENT_TAG, IndianSettlement.class, false));
 
         treasureAmount = xr.getAttribute(TREASURE_AMOUNT_TAG, 0);
@@ -4629,8 +4627,7 @@ public class Unit extends GoodsLocation
                    || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
                    // end @compat 0.11.3
                    ) {
-            workImprovement = xr.readFreeColGameObject(game,
-                                                       TileImprovement.class);
+            workImprovement = xr.readFreeColObject(game, TileImprovement.class);
 
         } else {
             super.readChild(xr);

@@ -538,7 +538,7 @@ public class DOMUtils {
                 ? FreeColXMLReader.ReadScope.NORMAL
                 : FreeColXMLReader.ReadScope.NOINTERN);
             xr.nextTag();
-            ret = xr.readFreeColGameObject(game, returnClass);
+            ret = xr.readFreeColObject(game, returnClass);
         } catch (XMLStreamException|IOException ex) {
             logger.log(Level.WARNING, "Reader fail", ex);
         }

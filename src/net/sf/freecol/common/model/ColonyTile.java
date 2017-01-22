@@ -538,8 +538,8 @@ public class ColonyTile extends WorkLocation {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        workTile = xr.makeFreeColGameObject(getGame(), WORK_TILE_TAG,
-                                            Tile.class, true);
+        workTile = xr.makeFreeColObject(getGame(), WORK_TILE_TAG,
+                                        Tile.class, true);
     }
 
     /**

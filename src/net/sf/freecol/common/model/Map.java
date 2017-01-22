@@ -2649,10 +2649,10 @@ public class Map extends FreeColGameObject implements Location {
         final String tag = xr.getLocalName();
 
         if (Region.TAG.equals(tag)) {
-            addRegion(xr.readFreeColGameObject(game, Region.class));
+            addRegion(xr.readFreeColObject(game, Region.class));
 
         } else if (Tile.TAG.equals(tag)) {
-            Tile t = xr.readFreeColGameObject(game, Tile.class);
+            Tile t = xr.readFreeColObject(game, Tile.class);
             setTile(t, t.getX(), t.getY());
 
             // @compat 0.10.x

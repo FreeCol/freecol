@@ -3045,10 +3045,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             xr.closeTag(POPULATION_QUEUE_TAG);
 
         } else if (Building.TAG.equals(tag)) {
-            addBuilding(xr.readFreeColGameObject(game, Building.class));
+            addBuilding(xr.readFreeColObject(game, Building.class));
 
         } else if (ColonyTile.TAG.equals(tag)) {
-            addColonyTile(xr.readFreeColGameObject(game, ColonyTile.class));
+            addColonyTile(xr.readFreeColObject(game, ColonyTile.class));
 
         } else if (ExportData.TAG.equals(tag)) {
             ExportData data = new ExportData(xr);

@@ -4109,8 +4109,8 @@ public class Player extends FreeColGameObject implements Nameable {
         final String tag = xr.getLocalName();
 
         if (BAN_MISSIONS_TAG.equals(tag)) {
-            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
-                                                     Player.class, true);
+            Player player = xr.makeFreeColObject(game, PLAYER_TAG,
+                                                 Player.class, true);
             if (player != null && player.isEuropean()) addMissionBan(player);
             xr.closeTag(BAN_MISSIONS_TAG);
 
@@ -4129,15 +4129,15 @@ public class Player extends FreeColGameObject implements Nameable {
             offeredFathers.addAll(ofs);
 
         } else if (STANCE_TAG.equals(tag)) {
-            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
-                                                     Player.class, true);
+            Player player = xr.makeFreeColObject(game, PLAYER_TAG,
+                                                 Player.class, true);
             stance.put(player.getId(),
                 xr.getAttribute(VALUE_TAG, Stance.class, Stance.UNCONTACTED));
             xr.closeTag(STANCE_TAG);
 
         } else if (TENSION_TAG.equals(tag)) {
-            tension.put(xr.makeFreeColGameObject(game, PLAYER_TAG,
-                                                 Player.class, true),
+            tension.put(xr.makeFreeColObject(game, PLAYER_TAG,
+                                             Player.class, true),
                         new Tension(xr.getAttribute(VALUE_TAG, 0)));
             xr.closeTag(TENSION_TAG);
         
@@ -4146,10 +4146,10 @@ public class Player extends FreeColGameObject implements Nameable {
             if (ability.isIndependent()) addAbility(ability);
 
         } else if (Europe.TAG.equals(tag)) {
-            europe = xr.readFreeColGameObject(game, Europe.class);
+            europe = xr.readFreeColObject(game, Europe.class);
 
         } else if (HighSeas.TAG.equals(tag)) {
-            highSeas = xr.readFreeColGameObject(game, HighSeas.class);
+            highSeas = xr.readFreeColObject(game, HighSeas.class);
 
         } else if (HistoryEvent.TAG.equals(tag)) {
             addHistory(new HistoryEvent(xr));
@@ -4158,7 +4158,7 @@ public class Player extends FreeColGameObject implements Nameable {
             addLastSale(new LastSale(xr));
 
         } else if (Market.TAG.equals(tag)) {
-            market = xr.readFreeColGameObject(game, Market.class);
+            market = xr.readFreeColObject(game, Market.class);
 
         } else if (ModelMessage.TAG.equals(tag)) {
             addModelMessage(new ModelMessage(xr));
@@ -4168,10 +4168,10 @@ public class Player extends FreeColGameObject implements Nameable {
             if (modifier.isIndependent()) addModifier(modifier);
 
         } else if (Monarch.TAG.equals(tag)) {
-            monarch = xr.readFreeColGameObject(game, Monarch.class);
+            monarch = xr.readFreeColObject(game, Monarch.class);
 
         } else if (TradeRoute.TAG.equals(tag)) {
-            addTradeRoute(xr.readFreeColGameObject(game, TradeRoute.class));
+            addTradeRoute(xr.readFreeColObject(game, TradeRoute.class));
 
         } else {
             super.readChild(xr);

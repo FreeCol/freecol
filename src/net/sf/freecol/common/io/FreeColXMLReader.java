@@ -600,7 +600,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 Class<? extends FreeColGameObject> c
                     = game.getLocationClass(attrib);
                 if (c != null) {
-                    fco = makeFreeColGameObject(game, attributeName, c,
+                    fco = makeFreeColObject(game, attributeName, c,
                         getReadScope() == ReadScope.SERVER);
                 }
             }
@@ -716,7 +716,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
-     * Either get an existing {@code FreeColGameObject} from a stream
+     * Either get an existing {@code FreeColObject} from a stream
      * attribute or create it if it does not exist.
      *
      * Use this routine when the object may not necessarily already be
@@ -727,12 +727,12 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @param attributeName The required attribute name.
      * @param returnClass The class of object.
      * @param required If true a null result should throw an exception.
-     * @return The {@code FreeColGameObject} found or made, or null
+     * @return The {@code FreeColObject} found or made, or null
      *     if the attribute was not present.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public <T extends FreeColGameObject> T makeFreeColGameObject(Game game,
+    public <T extends FreeColObject> T makeFreeColObject(Game game,
         String attributeName, Class<T> returnClass,
         boolean required) throws XMLStreamException {
         final String id =
@@ -750,7 +750,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             FreeColObject fco = lookup(game, id);
             if (fco == null) {
                 T ret = game.newInstance(returnClass,
-                    getReadScope() == ReadScope.SERVER);
+                                         getReadScope() == ReadScope.SERVER);
                 if (ret == null) {
                     String err = "Failed to create " + returnClass.getName()
                         + " with id: " + id;
@@ -760,8 +760,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
                         logger.warning(err);
                     }
                 } else {
-                    if (shouldIntern()) {
-                        ret.internId(id);
+                    if (shouldIntern() && ret instanceof FreeColGameObject) {
+                        ((FreeColGameObject)ret).internId(id);
                     } else {
                         uninterned.put(id, ret);
                     }
@@ -779,20 +779,20 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
-     * Do a normal interning read of a {@code FreeColGameObject}.
+     * Do a normal interning read of a {@code FreeColObject}.
      *
      * @param <T> The actual return type.
      * @param game The {@code Game} to look in.
      * @param returnClass The class to expect.
-     * @return The {@code FreeColGameObject} found, or null there
+     * @return The {@code FreeColObject} found, or null there
      *     was no ID_ATTRIBUTE_TAG present.
      * @exception XMLStreamException if there is problem reading the stream.
      */
-    private <T extends FreeColGameObject> T internedRead(Game game,
+    private <T extends FreeColObject> T internedRead(Game game,
         Class<T> returnClass) throws XMLStreamException {
 
-        T ret = makeFreeColGameObject(game, FreeColObject.ID_ATTRIBUTE_TAG, 
-                                      returnClass, false);
+        T ret = makeFreeColObject(game, FreeColObject.ID_ATTRIBUTE_TAG, 
+                                  returnClass, false);
         if (ret != null) ret.readFromXML(this);
         return ret;
     }
@@ -825,7 +825,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
-     * Reads a {@code FreeColGameObject} from a stream.
+     * Reads a {@code FreeColObject} from a stream.
      * Expects the object to be identified by the standard ID_ATTRIBUTE_TAG.
      *
      * Use this routine when the object may or may not have been
@@ -835,11 +835,11 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @param <T> The actual return type.
      * @param game The {@code Game} to look in.
      * @param returnClass The class to expect.
-     * @return The {@code FreeColGameObject} found, or null there
+     * @return The {@code FreeColObject} found, or null there
      *     was no ID_ATTRIBUTE_TAG present.
      * @exception XMLStreamException if there is problem reading the stream.
      */
-    public <T extends FreeColGameObject> T readFreeColGameObject(Game game,
+    public <T extends FreeColObject> T readFreeColObject(Game game,
         Class<T> returnClass) throws XMLStreamException {
         return (shouldIntern())
             ? internedRead(game, returnClass)

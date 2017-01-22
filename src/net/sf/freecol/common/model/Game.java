@@ -1428,7 +1428,7 @@ public class Game extends FreeColGameObject {
                 throw new XMLStreamException("Tried to read " + tag
                     + " with null specification");
             }
-            map = xr.readFreeColGameObject(game, Map.class);
+            map = xr.readFreeColObject(game, Map.class);
 
         } else if (NationOptions.TAG.equals(tag)) {
             if (this.specification == null) {
@@ -1442,7 +1442,7 @@ public class Game extends FreeColGameObject {
                 throw new XMLStreamException("Tried to read " + tag
                     + " with null specification");
             }
-            Player player = xr.readFreeColGameObject(game, Player.class);
+            Player player = xr.readFreeColObject(game, Player.class);
             if (player.isUnknownEnemy()) {
                 setUnknownEnemy(player);
             } else {

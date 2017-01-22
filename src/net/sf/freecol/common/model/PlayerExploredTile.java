@@ -257,12 +257,11 @@ public class PlayerExploredTile extends FreeColGameObject {
         final Specification spec = getSpecification();
         final Game game = getGame();
 
-        player = xr.makeFreeColGameObject(game, PLAYER_TAG,
-                                          Player.class, true);
+        player = xr.makeFreeColObject(game, PLAYER_TAG, Player.class, true);
 
-        tile = xr.makeFreeColGameObject(game, TILE_TAG, Tile.class, true);
+        tile = xr.makeFreeColObject(game, TILE_TAG, Tile.class, true);
 
-        owner = xr.makeFreeColGameObject(game, OWNER_TAG, Player.class, false);
+        owner = xr.makeFreeColObject(game, OWNER_TAG, Player.class, false);
 
         // FIXME: makeFreeColGameObject is more logical, but will fail ATM
         // if the settlement has been destroyed while this pet-player can
@@ -277,8 +276,8 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         alarm = new Tension(xr.getAttribute(ALARM_TAG, 0));
 
-        mostHated = xr.makeFreeColGameObject(game, MOST_HATED_TAG,
-                                             Player.class, false);
+        mostHated = xr.makeFreeColObject(game, MOST_HATED_TAG,
+                                         Player.class, false);
 
 
         // @compat 0.10.7
@@ -331,21 +330,21 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         if (MISSIONARY_TAG.equals(tag)) {
             xr.nextTag(); // advance to the Unit tag
-            missionary = xr.readFreeColGameObject(game, Unit.class);
+            missionary = xr.readFreeColObject(game, Unit.class);
             xr.closeTag(MISSIONARY_TAG);
 
         } else if (LostCityRumour.TAG.equals(tag)) {
-            addTileItem(xr.readFreeColGameObject(game, LostCityRumour.class));
+            addTileItem(xr.readFreeColObject(game, LostCityRumour.class));
 
         } else if (Resource.TAG.equals(tag)) {
-            addTileItem(xr.readFreeColGameObject(game, Resource.class));
+            addTileItem(xr.readFreeColObject(game, Resource.class));
 
         } else if (TileImprovement.TAG.equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
                    // end @compat 0.11.3
                    ) {
-            addTileItem(xr.readFreeColGameObject(game, TileImprovement.class));
+            addTileItem(xr.readFreeColObject(game, TileImprovement.class));
 
         } else {
             super.readChild(xr);

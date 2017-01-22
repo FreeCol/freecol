@@ -1644,7 +1644,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
         } else if (MISSIONARY_TAG.equals(tag)) {
             xr.nextTag();
-            missionary = xr.readFreeColGameObject(game, Unit.class);
+            missionary = xr.readFreeColObject(game, Unit.class);
             missionary.setLocationNoUpdate(this);
             xr.closeTag(MISSIONARY_TAG);
 
@@ -1656,8 +1656,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         // end @compat
 
         } else if (OWNED_UNITS_TAG.equals(tag)) {
-            Unit unit = xr.makeFreeColGameObject(game, ID_ATTRIBUTE_TAG,
-                                                 Unit.class, true);
+            Unit unit = xr.makeFreeColObject(game, ID_ATTRIBUTE_TAG,
+                                             Unit.class, true);
             addOwnedUnit(unit);
             xr.closeTag(OWNED_UNITS_TAG);
 

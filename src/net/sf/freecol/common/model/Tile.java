@@ -2651,7 +2651,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 xr.setReadScope(FreeColXMLReader.ReadScope.NOINTERN);
                 xr.nextTag();
                 xr.expectTag(Tile.TAG);
-                Tile tile = xr.readFreeColGameObject(game, Tile.class);
+                Tile tile = xr.readFreeColObject(game, Tile.class);
 
                 // Temporary workaround for BR#2618 on input
                 Colony colony = tile.getColony();
@@ -2687,10 +2687,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // end @compat
 
         } else if (Colony.TAG.equals(tag)) {
-            settlement = xr.readFreeColGameObject(game, Colony.class);
+            settlement = xr.readFreeColObject(game, Colony.class);
 
         } else if (IndianSettlement.TAG.equals(tag)) {
-            settlement = xr.readFreeColGameObject(game, IndianSettlement.class);
+            settlement = xr.readFreeColObject(game, IndianSettlement.class);
 
         // @compat 0.10.7
         } else if (PlayerExploredTile.TAG.equals(tag)) {
@@ -2713,7 +2713,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 setIndianSettlementInternals(player, skill, wanted);
             }
 
-            PlayerExploredTile pet = xr.readFreeColGameObject(game,
+            PlayerExploredTile pet = xr.readFreeColObject(game,
                 PlayerExploredTile.class);
             pet.fixCache();
         // end @compat 0.10.7
@@ -2723,7 +2723,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                    || OLD_TILE_ITEM_CONTAINER_TAG.equals(tag)
                    // end @compat 0.11.3
                    ) {
-            tileItemContainer = xr.readFreeColGameObject(game,
+            tileItemContainer = xr.readFreeColObject(game,
                 TileItemContainer.class);
 
         } else {

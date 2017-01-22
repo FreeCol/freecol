@@ -625,7 +625,7 @@ public class TileItemContainer extends FreeColGameObject {
         final String tag = xr.getLocalName();
 
         if (LostCityRumour.TAG.equals(tag)) {
-            LostCityRumour lcr = xr.readFreeColGameObject(game, LostCityRumour.class);
+            LostCityRumour lcr = xr.readFreeColObject(game, LostCityRumour.class);
             if (lcr != null) {
                 // @compat 0.10.4
                 // Fix LCR tile, see LostCityRumour.readAttributes
@@ -635,14 +635,14 @@ public class TileItemContainer extends FreeColGameObject {
             }
 
         } else if (Resource.TAG.equals(tag)) {
-            addTileItem(xr.readFreeColGameObject(game, Resource.class));
+            addTileItem(xr.readFreeColObject(game, Resource.class));
 
         } else if (TileImprovement.TAG.equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
                    // end @compat 0.11.3
                    ) {
-            addTileItem(xr.readFreeColGameObject(game, TileImprovement.class));
+            addTileItem(xr.readFreeColObject(game, TileImprovement.class));
 
         } else {
             super.readChild(xr);

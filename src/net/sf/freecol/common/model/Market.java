@@ -553,8 +553,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         final String tag = xr.getLocalName();
 
         if (MarketData.TAG.equals(tag)) {
-            MarketData data = xr.readFreeColGameObject(getGame(), 
-                                                       MarketData.class);
+            MarketData data = xr.readFreeColObject(getGame(), MarketData.class);
             putMarketData(data.getGoodsType(), data);
 
         } else {

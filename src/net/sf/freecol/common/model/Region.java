@@ -580,8 +580,7 @@ public class Region extends FreeColGameObject implements Nameable {
         discoveredBy = xr.findFreeColGameObject(getGame(), DISCOVERED_BY_TAG,
             Player.class, (Player)null, false);
 
-        parent = xr.makeFreeColGameObject(getGame(), PARENT_TAG,
-                                          Region.class, false);
+        parent = xr.makeFreeColObject(getGame(), PARENT_TAG, Region.class, false);
     }
 
     /**
@@ -603,8 +602,8 @@ public class Region extends FreeColGameObject implements Nameable {
         final String tag = xr.getLocalName();
 
         if (CHILD_TAG.equals(tag)) {
-            addChild(xr.makeFreeColGameObject(getGame(), ID_ATTRIBUTE_TAG,
-                                              Region.class, true));
+            addChild(xr.makeFreeColObject(getGame(), ID_ATTRIBUTE_TAG,
+                                          Region.class, true));
             xr.closeTag(CHILD_TAG);
         
         } else {

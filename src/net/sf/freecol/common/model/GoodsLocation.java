@@ -344,8 +344,7 @@ public abstract class GoodsLocation extends UnitLocation {
         final String tag = xr.getLocalName();
 
         if (GoodsContainer.TAG.equals(tag)) {
-            goodsContainer = xr.readFreeColGameObject(getGame(),
-                                                      GoodsContainer.class);
+            goodsContainer = xr.readFreeColObject(getGame(), GoodsContainer.class);
             goodsContainer.setLocation(this);
 
         } else {
