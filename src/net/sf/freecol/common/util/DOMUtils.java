@@ -360,7 +360,8 @@ public class DOMUtils {
     }
 
     /**
-     * Convenience method to extract a child FreeColGameObject from an element.
+     * Extract a child FreeColGameObject from an element given the
+     * expected class.
      *
      * @param <T> The actual return type.
      * @param game The {@code Game} to instantiate within.
@@ -378,24 +379,7 @@ public class DOMUtils {
     }
 
     /**
-     * Convenience method to extract a child FreeColObject from an element.
-     *
-     * @param <T> The actual return type.
-     * @param game The {@code Game} to instantiate within.
-     * @param element The parent {@code Element}.
-     * @param index The index of the child element.
-     * @param returnClass The expected class of the child.
-     * @return A new instance of the return class, or null on error.
-     */
-    public static <T extends FreeColObject> T getChild(Game game,
-        Element element, int index) {
-        Element e = getChildElement(element, index);
-        return (e == null) ? null
-            : readElement(game, e, true);
-    }
-
-    /**
-     * Convenience method to extract a child FreeColObject from an element.
+     * Extract a child FreeColObject from an element given its class.
      *
      * @param <T> The actual return type.
      * @param game The {@code Game} to instantiate within.
@@ -407,13 +391,28 @@ public class DOMUtils {
     public static <T extends FreeColObject> T getChild(Game game,
         Element element, int index, Class<T> returnClass) {
         Element e = getChildElement(element, index);
-        return (e == null) ? null
-            : readElement(game, e, true, returnClass);
+        return (e == null) ? null : readElement(game, e, true, returnClass);
     }
 
     /**
-     * Convenience method to extract all child elements of a
-     * particular class.
+     * Extract a child FreeColObject from an element without knowing the class.
+     *
+     * @param <T> The actual return type.
+     * @param game The {@code Game} to instantiate within.
+     * @param element The parent {@code Element}.
+     * @param index The index of the child element.
+     * @param returnClass The expected class of the child.
+     * @return A new instance of the return class, or null on error.
+     */
+    public static <T extends FreeColObject> T getChild(Game game,
+        Element element, int index) {
+        Element e = getChildElement(element, index);
+        return (e == null) ? null : readElement(game, e, true);
+    }
+
+    /**
+     * Extract all child FreeColObjects from an element given their
+     * common class.
      *
      * @param <T> The actual list member return type.
      * @param game The {@code Game} to instantiate within.
@@ -515,6 +514,7 @@ public class DOMUtils {
      */
     public static <T extends FreeColGameObject> T readGameElement(Game game,
         Element element, boolean intern, Class<T> returnClass) {
+        if (element == null) return null;
         T ret = null;
         try (
             FreeColXMLReader xr = makeElementReader(element);
@@ -525,7 +525,7 @@ public class DOMUtils {
             xr.nextTag();
             ret = xr.readFreeColObject(game, returnClass);
         } catch (XMLStreamException|IOException ex) {
-            logger.log(Level.WARNING, "Reader fail", ex);
+            throw new RuntimeException("readGameElement fail", ex);
         }
         return ret;
     }
@@ -539,16 +539,17 @@ public class DOMUtils {
      */
     public static FreeColGameObject updateFromElement(Game game,
                                                       Element element) {
+        if (element == null) return null;
         String id = readId(element);
         FreeColGameObject fcgo = game.getFreeColGameObject(id);
         if (fcgo == null) {
             logger.warning("Update object not present: " + id);
             return null;
         }
-        readFromXMLElement(fcgo, element, true);
+        readFromElement(fcgo, element, true);
         return fcgo;
     }
-        
+
     /**
      * Read a new FreeCol object from an element.
      *
@@ -562,7 +563,7 @@ public class DOMUtils {
     public static <T extends FreeColObject> T readElement(Game game,
         Element element, boolean intern, Class<T> returnClass) {
         T ret = FreeColGameObject.newInstance(game, returnClass);
-        if (ret != null) readFromXMLElement(ret, element, intern);
+        if (ret != null) readFromElement(ret, element, intern);
         return ret;
     }
 
@@ -587,6 +588,7 @@ public class DOMUtils {
      */
     public static <T extends FreeColObject> T readElement(Game game,
         Element element, boolean intern) {
+        if (element == null) return null;
         final Class<T> c = getElementClass(element);
         if (c == null) return null;
 
@@ -598,7 +600,7 @@ public class DOMUtils {
                 : FreeColXMLReader.ReadScope.NOINTERN);
             xr.nextTag();
             ret = FreeColGameObject.newInstance(game, c);
-            if (ret != null) readFromXMLElement(ret, element);
+            if (ret != null) readFromElement(ret, element);
         } catch (IOException|XMLStreamException ex) {
             throw new RuntimeException("XML failure", ex);
         }
@@ -627,8 +629,8 @@ public class DOMUtils {
      * @param element An XML-element that will be used to initialize
      *      the object.
      */
-    public static void readFromXMLElement(FreeColObject fco, Element element,
-                                          boolean intern) {
+    public static void readFromElement(FreeColObject fco, Element element,
+                                       boolean intern) {
         try (
             FreeColXMLReader xr = makeElementReader(element);
         ) {
@@ -648,8 +650,8 @@ public class DOMUtils {
      * @param element An XML-element that will be used to initialize
      *      the object.
      */
-    public static void readFromXMLElement(FreeColObject fco, Element element) {
-        readFromXMLElement(fco, element, true);
+    public static void readFromElement(FreeColObject fco, Element element) {
+        readFromElement(fco, element, true);
     }
 
     /**
