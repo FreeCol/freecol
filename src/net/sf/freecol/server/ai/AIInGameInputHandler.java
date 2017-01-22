@@ -69,6 +69,7 @@ import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
+import net.sf.freecol.common.networking.RemoveMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
@@ -242,7 +243,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case NativeGiftMessage.TAG:
             case NewTurnMessage.TAG:
             case NewTradeRouteMessage.TAG:
-            case "remove":
+            case RemoveMessage.TAG:
             case ScoutSpeakToChiefMessage.TAG:
             case SetDeadMessage.TAG:
             case SetStanceMessage.TAG:

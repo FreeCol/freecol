@@ -1024,7 +1024,6 @@ public class ChangeSet {
     private static class RemoveChange extends Change {
 
         private final Tile tile;
-        private final FreeColGameObject fcgo;
         private final List<? extends FreeColGameObject> contents;
 
 
@@ -1040,8 +1039,30 @@ public class ChangeSet {
             super(see);
             this.tile = (loc instanceof Tile) ? (Tile)loc : null;
             this.contents = toList(objects);
-            this.fcgo = this.contents.remove(this.contents.size() - 1);
         }
+
+
+        /**
+         * By convention, the main object is last.  All other objects are
+         * internal to it and should be removed first if visible.
+         *
+         * @return The main object.
+         */
+        private FreeColGameObject getMainObject() {
+            return this.contents.get(this.contents.size() - 1);
+        }
+
+        /**
+         * Should we tell a player to remove all the objects or just
+         * the main one?
+         *
+         * @param serverPlayer A {@code ServerPlayer} to check.
+         * @return True if all the objects must go.
+         */
+        private boolean fullRemoval(ServerPlayer serverPlayer) {
+            FreeColGameObject fcgo = getMainObject();
+            return fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo);
+        }            
 
 
         /**
@@ -1080,18 +1101,14 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("remove");
+            final String divertId = (tile != null) ? tile.getId()
+                : serverPlayer.getId();
             // The main object may be visible, but the contents are
             // only visible if the deeper ownership test succeeds.
-            if (fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo)) {
-                for (FreeColGameObject o : contents) {
-                    element.appendChild(DOMUtils.toXMLElementPartial(o, doc));
-                }
-                element.setAttribute("divert", (tile != null) ? tile.getId()
-                                     : serverPlayer.getId());
-            }
-            element.appendChild(DOMUtils.toXMLElementPartial(fcgo, doc));
-            return element;
+            return new RemoveMessage(divertId,
+                ((fullRemoval(serverPlayer)) ? this.contents
+                    : Collections.singletonList(getMainObject())))
+                .attachToDocument(doc);
         }
 
         /**
@@ -1116,7 +1133,7 @@ public class ChangeSet {
             for (FreeColGameObject f : contents) {
                 sb.append(' ').append(f.getId());
             }
-            sb.append(' ').append(fcgo.getId()).append(']');
+            sb.append(']');
             return sb.toString();
         }
     }

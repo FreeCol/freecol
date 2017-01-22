@@ -79,6 +79,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.NewTurnMessage;
+import net.sf.freecol.common.networking.RemoveMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
@@ -188,7 +189,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> newTradeRoute(e));
         register(TrivialMessage.RECONNECT_TAG,
             (Connection c, Element e) -> reconnect());
-        register("remove",
+        register(RemoveMessage.TAG,
             (Connection c, Element e) -> remove(e));
         register(ScoutSpeakToChiefMessage.TAG,
             (Connection c, Element e) -> scoutSpeakToChief(e));
@@ -808,23 +809,10 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private void remove(Element element) {
         final Game game = getGame();
-        final FreeColGameObject divert
-            = game.getFreeColGameObject(element.getAttribute("divert"));
-        final List<FreeColGameObject> objects = new ArrayList<>();
+        final RemoveMessage message = new RemoveMessage(game, element);
+        final FreeColGameObject divert = message.getDivertObject(game);
+        final List<FreeColGameObject> objects = message.getRemovals(game);
 
-        DOMUtils.mapChildren(element, (e) -> {
-                final String id = DOMUtils.readId(e);
-                FreeColGameObject fcgo = game.getFreeColGameObject(id);
-                if (fcgo != null) {
-                    // Null fcgo can happen legitimately when an
-                    // update that removes pointers to a disappearing
-                    // unit happens, then a gc which drops the weak
-                    // reference in freeColGameObjects, before this
-                    // remove is processed.
-                    objects.add(fcgo);
-                }
-                return fcgo;
-            });
         if (!objects.isEmpty()) {
             invokeLater(() -> igc().remove(objects, divert));
         }
