@@ -172,7 +172,17 @@ public class ServerGame extends Game implements ServerModelObject {
      * @return True if the change was sent.
      */
     public boolean sendTo(ServerPlayer serverPlayer, ChangeSet cs) {
-        return serverPlayer.send(cs);
+        try {
+            return serverPlayer.send(cs);
+        } catch (Exception e) {
+            // Catch all manner of exceptions here to localize failure to
+            // just one player.  Nothing is expected, but the entire output
+            // side of serialization is potentially exercised here, so it is
+            // a good place to find new fails.
+            logger.log(Level.WARNING, "sendTo(" + serverPlayer.getId()
+                + "," + cs.toString() + ") failed", e);
+        }
+        return false;
     }
 
     /**
