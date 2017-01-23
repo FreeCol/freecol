@@ -65,7 +65,7 @@ public class AddPlayerMessage extends DOMMessage {
         // TODO: should this do a non-interning read and have the client
         // handlers do more checking?
         this.players.addAll(DOMUtils.mapChildren(element, (e) ->
-                DOMUtils.readGameElement(game, e, true, Player.class)));
+                DOMUtils.readElement(game, e, true, Player.class)));
     }
 
 
