@@ -3715,15 +3715,16 @@ public class Player extends FreeColGameObject implements Nameable {
         Class<T> returnClass) {
         T t = getGame().getFreeColGameObject(id, returnClass);
         if (t == null) {
-            throw new IllegalStateException("Not a " + returnClass.getName()
-                + ": " + id);
+            FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
+            throw new RuntimeException("Not a " + returnClass.getName()
+                + ": " + id + "/" + fcgo);
         } else if (t instanceof Ownable) {
             if (!owns((Ownable)t)) {
                 throw new IllegalStateException(returnClass.getName()
-                    + " not owned by " + getId() + ": " + id);
+                    + " not owned by " + getId() + ": " + id + "/" + t);
             }
         } else {
-            throw new IllegalStateException("Not ownable: " + id);
+            throw new RuntimeException("Not ownable: " + id + "/" + t);
         }
         return t;
     }

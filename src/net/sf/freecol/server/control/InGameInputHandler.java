@@ -236,10 +236,10 @@ public final class InGameInputHandler extends ServerInputHandler {
             (Connection conn, Element e) -> handler(false, conn,
                 new NativeTradeMessage(getGame(), e)));
         register(NewLandNameMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new NewLandNameMessage(getGame(), e)));
         register(NewRegionNameMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new NewRegionNameMessage(getGame(), e)));
         register(NewTradeRouteMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
