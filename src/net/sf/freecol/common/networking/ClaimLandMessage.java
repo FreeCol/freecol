@@ -90,12 +90,12 @@ public class ClaimLandMessage extends AttributeMessage {
             .getFreeColObjectClass(FreeColObject.getIdType(claimantId));
         Unit unit = null;
         Settlement settlement = null;
-        if (c.isAssignableFrom(Unit.class)) {
+        if (Unit.class.isAssignableFrom(c)) {
             unit = serverPlayer.getOurFreeColGameObject(claimantId, Unit.class);
             if (unit.getTile() != tile) {
                 return serverPlayer.clientError("Unit not at tile: " + tileId);
             }
-        } else if (c.isAssignableFrom(Settlement.class)) {
+        } else if (Settlement.class.isAssignableFrom(c)) {
             settlement = serverPlayer.getOurFreeColGameObject(claimantId,
                                                         Settlement.class);
             if (settlement.getOwner().isEuropean()
