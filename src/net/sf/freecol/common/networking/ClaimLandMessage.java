@@ -20,6 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
@@ -85,20 +86,18 @@ public class ClaimLandMessage extends AttributeMessage {
             return serverPlayer.clientError("Not a file: " + tileId);
         }
 
+        Class<? extends FreeColObject> c = FreeColObject
+            .getFreeColObjectClass(FreeColObject.getIdType(claimantId));
         Unit unit = null;
-        try {
-            unit = serverPlayer.getOurFreeColGameObject(claimantId, Unit.class);
-        } catch (IllegalStateException e) {} // Expected to fail sometimes...
         Settlement settlement = null;
-        try {
-            settlement = serverPlayer.getOurFreeColGameObject(claimantId,
-                                                        Settlement.class);
-        } catch (IllegalStateException e) {} // ...as is this one...
-        if (unit != null) {
+        if (c.isAssignableFrom(Unit.class)) {
+            unit = serverPlayer.getOurFreeColGameObject(claimantId, Unit.class);
             if (unit.getTile() != tile) {
                 return serverPlayer.clientError("Unit not at tile: " + tileId);
             }
-        } else if (settlement != null) {
+        } else if (c.isAssignableFrom(Settlement.class)) {
+            settlement = serverPlayer.getOurFreeColGameObject(claimantId,
+                                                        Settlement.class);
             if (settlement.getOwner().isEuropean()
                 && !settlement.getTile().isAdjacent(tile)) {
                 return serverPlayer.clientError("Settlement can not claim tile: "
