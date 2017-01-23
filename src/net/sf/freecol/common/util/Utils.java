@@ -278,7 +278,10 @@ public class Utils {
         Transformer tf = null;
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setAttribute("indent-number", new Integer(2));
             tf = factory.newTransformer();
+            tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            tf.setOutputProperty(OutputKeys.METHOD, "xml");
             if (!declaration) {
                 tf.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             }

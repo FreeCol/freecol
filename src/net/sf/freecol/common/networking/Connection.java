@@ -113,11 +113,13 @@ public class Connection implements Closeable {
 
         // Make a (pretty printing) transformer, but only make the log
         // writer in COMMS-debug mode.
-        this.logTransformer = Utils.makeTransformer(true, true);
-        this.logWriter
-            = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS))
-            ? Utils.getUTF8Writer(System.err)
-            : null;
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
+            this.logWriter = Utils.getUTF8Writer(System.err);
+            this.logTransformer = Utils.makeTransformer(true, true);
+        } else {
+            this.logWriter = null;
+            this.logTransformer = null;
+        }
     }
 
     /**
@@ -369,10 +371,10 @@ public class Connection implements Closeable {
      * @param send True if sending (else replying).
      */
     protected void log(Element element, boolean send) {
-        synchronized (this.outputLock) {
-            if (this.logWriter == null) return;
-            this.logTransformer.reset();
-            StringWriter sw = elementToStringWriter(this.logTransformer, element);
+        if (this.logWriter == null) return;
+        synchronized (this.logWriter) {
+            StringWriter sw
+                = elementToStringWriter(this.logTransformer, element);
             if (sw == null) return;
             StringBuffer sb = sw.getBuffer();
             try {
@@ -398,8 +400,8 @@ public class Connection implements Closeable {
         try {
             synchronized (this.outputLock) {
                 if (this.out == null) return false;
-                this.outTransformer.reset();
-                StringWriter sw = elementToStringWriter(this.outTransformer, element);
+                StringWriter sw
+                    = elementToStringWriter(this.outTransformer, element);
                 if (sw == null) return false;
                 this.out.write(sw.toString().getBytes("UTF-8"));
                 this.out.flush();
