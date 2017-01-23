@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -65,9 +66,11 @@ public class UpdateMessage extends DOMMessage {
     public UpdateMessage(Game game, Element element) {
         this(null);
 
-        for (FreeColGameObject f : DOMUtils.mapChildren(element, (e) ->
+        for (FreeColObject fco : DOMUtils.mapChildren(element, (e) ->
                 DOMUtils.updateFromElement(game, e))) {
-            if (f != null) this.fcgos.add(f);
+            if (fco != null
+                && FreeColGameObject.class.isAssignableFrom(fco.getClass()))
+                this.fcgos.add((FreeColGameObject)fco);
         }
     }
 

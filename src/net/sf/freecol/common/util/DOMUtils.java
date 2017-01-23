@@ -507,37 +507,23 @@ public class DOMUtils {
      * @param element The {@code Element} containing the object.
      * @return The updated {@code FreeColGameObject}.
      */
-    public static FreeColGameObject updateFromElement(Game game,
-                                                      Element element) {
+    public static FreeColObject updateFromElement(Game game, Element element) {
         if (element == null) return null;
         String id = readId(element);
-        FreeColGameObject fcgo = game.getFreeColGameObject(id);
-        if (fcgo == null) {
+        FreeColObject fco = game.getFreeColGameObject(id);
+        if (fco == null) {
             logger.warning("Update object not present: " + id);
             return null;
         }
-        readFromElement(fcgo, element, true);
-        return fcgo;
-    }
-
-    /**
-     * Initialize a FreeColObject from an Element.
-     *
-     * @param fco The {@code FreeColObject} to read into.
-     * @param intern Whether to intern the instantiated object.
-     * @param element An XML-element that will be used to initialize
-     *      the object.
-     */
-    public static void readFromElement(FreeColObject fco, Element element,
-                                       boolean intern) {
         try (
-             FreeColXMLReader xr = makeElementReader(element, intern);
+             FreeColXMLReader xr = makeElementReader(element, true);
         ) {
             xr.nextTag();
             fco.readFromXML(xr);
         } catch (IOException|XMLStreamException ex) {
             throw new RuntimeException("readFromElement fail", ex);
         }
+        return fco;
     }
 
     /**
