@@ -528,7 +528,12 @@ public class Connection implements Closeable {
         sendAndWaitElement(message.toXMLElement());
     }
     public <T extends DOMMessage> Element ask(T message) throws IOException {
-        return askElement(message.toXMLElement());
+        try {
+            return askElement(message.toXMLElement());
+        } catch (Exception e) { // Catch undocumented exception in Java libs
+            logger.log(Level.WARNING, "Unexpected exception", e);
+        }
+        return null;
     }
 
     /**
