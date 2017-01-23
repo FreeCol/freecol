@@ -55,17 +55,6 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
     }
 
     /**
-     * Internal constructor from element.
-     *
-     * @param element The {@code Element} to read from.
-     */
-    protected UpdateMapGeneratorOptionsMessage(Element element) {
-        this(new OptionGroup(MapGeneratorOptions.TAG));
-
-        DOMUtils.readFromElement(this.options, element, true);
-    }
-    
-    /**
      * Create a new {@code UpdateMapGeneratorOptionsMessage} from a
      * supplied element.
      *
@@ -73,7 +62,7 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateMapGeneratorOptionsMessage(Game game, Element element) {
-        this(DOMUtils.getChildElement(element, OptionGroup.TAG));
+        this(DOMUtils.getChild(game, element, 0, false, OptionGroup.class));
     }
 
 

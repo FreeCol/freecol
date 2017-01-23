@@ -360,22 +360,6 @@ public class DOMUtils {
     }    
     
     /**
-     * Convenience method to find the first child element with the
-     * specified tagname.
-     *
-     * @param element The {@code Element} to search for the child
-     *     element in.
-     * @param tagName The tag name of the child element to be found.
-     * @return The first child element with the given name.
-     */
-    public static Element getChildElement(Element element, String tagName) {
-        for (Element e : getChildElementList(element)) {
-            if (e.getTagName().equals(tagName)) return e;
-        }
-        return null;
-    }
-
-    /**
      * Extract a child FreeColObject from an element given the
      * expected class.
      *

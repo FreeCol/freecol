@@ -55,17 +55,6 @@ public class UpdateGameOptionsMessage extends DOMMessage {
     }
 
     /**
-     * Internal constructor from element.
-     *
-     * @param element The {@code Element} to read from.
-     */
-    protected UpdateGameOptionsMessage(Element element) {
-        this(new OptionGroup(GameOptions.TAG));
-
-        DOMUtils.readFromElement(this.options, element, true);
-    }
-    
-    /**
      * Create a new {@code UpdateGameOptionsMessage} from a
      * supplied element.
      *
@@ -73,7 +62,7 @@ public class UpdateGameOptionsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateGameOptionsMessage(Game game, Element element) {
-        this(DOMUtils.getChildElement(element, OptionGroup.TAG));
+        this(DOMUtils.getChild(game, element, 0, false, OptionGroup.class));
     }
 
 
