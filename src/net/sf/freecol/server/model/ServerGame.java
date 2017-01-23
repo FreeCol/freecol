@@ -230,7 +230,9 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param players A list of new {@code ServerPlayer}s.
      */
     public void updatePlayers(List<ServerPlayer> players) {
-        sendToAll(new ChangeSet().addPlayers(players));
+        if (!players.isEmpty()) {
+            sendToAll(new ChangeSet().addPlayers(players));
+        }
     }
 
     /**
