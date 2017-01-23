@@ -81,7 +81,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
     private ReadScope readScope;
 
     /** A cache of uninterned objects. */
-    private Map<String, FreeColObject> uninterned = null;
+    private Map<String, FreeColObject> uninterned
+        = new HashMap<String, FreeColObject>();
 
 
     /**
@@ -103,6 +104,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         }
         this.inputStream = bis;
         this.readScope = ReadScope.NORMAL;
+        this.uninterned.clear();
     }
 
     /**
@@ -149,6 +151,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         }
         this.inputStream = null;
         this.readScope = ReadScope.NORMAL;
+        this.uninterned.clear();
     }
 
 
@@ -190,8 +193,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
      */
     public FreeColXMLReader setReadScope(ReadScope readScope) {
         this.readScope = readScope;
-        this.uninterned = (shouldIntern()) ? null
-            : new HashMap<String, FreeColObject>();
         return this;
     }
 
