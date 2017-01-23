@@ -789,6 +789,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     // interaction to complete before leaving UNCONTACTED
                     // state.
                     pending.add(other);
+logger.finest("Debug first contact " + this + " to " + ((settlement == null) ? "" : settlement.toString()) + ((unit == null) ? "" : unit.toString()));
                     if (serverPlayer.isEuropean()) {
                         if (other.isIndian()) {
                             Tile offer = (firstLanding && other.owns(newTile))
