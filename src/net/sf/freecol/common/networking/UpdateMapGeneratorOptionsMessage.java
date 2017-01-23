@@ -62,7 +62,7 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
     protected UpdateMapGeneratorOptionsMessage(Element element) {
         this(new OptionGroup(MapGeneratorOptions.TAG));
 
-        DOMUtils.readFromElement(this.options, element);
+        DOMUtils.readFromElement(this.options, element, true);
     }
     
     /**

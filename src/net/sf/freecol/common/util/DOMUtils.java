@@ -92,12 +92,14 @@ public class DOMUtils {
      * Make a new reader for an element.
      *
      * @param element The {@code Element} to read.
+     * @param intern If true make an interning reader.
      * @return A new {@code FreeColXMLReader} to read from.
      * @exception IOException if the reader can not be created,
      *     and miscellaneous run time exceptions for problems with the
      *     transformer mechanisms.
      */
-    private static FreeColXMLReader makeElementReader(Element element)
+    private static FreeColXMLReader makeElementReader(Element element,
+                                                      boolean intern)
         throws IOException {
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -107,10 +109,24 @@ public class DOMUtils {
                                      new StreamResult(stringWriter));
             String xml = stringWriter.toString();
             StringReader sr = new StringReader(xml);
-            return new FreeColXMLReader(sr);
+            FreeColXMLReader xr = new FreeColXMLReader(sr);
+            xr.setReadScope((intern)
+                ? FreeColXMLReader.ReadScope.NORMAL
+                : FreeColXMLReader.ReadScope.NOINTERN);
+            return xr;
         } catch (TransformerException ex) {
             throw new RuntimeException("Reader creation failure", ex);
         }
+    }
+
+    /**
+     * Get a FreeColObject class corresponding to the element tag.
+     *
+     * @param e The {@code Element} to query.
+     * @return The class, or null if none found.
+     */
+    private static <T extends FreeColObject> Class<T> getElementClass(Element e) {
+        return FreeColObject.getFreeColObjectClass(e.getTagName());
     }
 
     /**
@@ -374,8 +390,7 @@ public class DOMUtils {
     public static <T extends FreeColGameObject> T getChild(Game game,
         Element element, int index, boolean intern, Class<T> returnClass) {
         Element e = getChildElement(element, index);
-        return (e == null) ? null
-            : readGameElement(game, e, intern, returnClass);
+        return (e == null) ? null : readGameElement(game, e, intern, returnClass);
     }
 
     /**
@@ -503,34 +518,6 @@ public class DOMUtils {
     // end @compat
 
     /**
-     * Read a new FreeCol game object from an element.
-     *
-     * @param <T> The actual return type.
-     * @param game The {@code Game} to check for existing objects.
-     * @param element The {@code Element} to read from.
-     * @param intern Whether to intern the instantiated object.
-     * @param returnClass The expected return class.
-     * @return The object found or instantiated, or null on error.
-     */
-    public static <T extends FreeColGameObject> T readGameElement(Game game,
-        Element element, boolean intern, Class<T> returnClass) {
-        if (element == null) return null;
-        T ret = null;
-        try (
-            FreeColXMLReader xr = makeElementReader(element);
-        ) {
-            xr.setReadScope((intern)
-                ? FreeColXMLReader.ReadScope.NORMAL
-                : FreeColXMLReader.ReadScope.NOINTERN);
-            xr.nextTag();
-            ret = xr.readFreeColObject(game, returnClass);
-        } catch (XMLStreamException|IOException ex) {
-            throw new RuntimeException("readGameElement fail", ex);
-        }
-        return ret;
-    }
-
-    /**
      * Update an existing game object from an element.
      *
      * @param game The {@code Game} to update in.
@@ -551,7 +538,7 @@ public class DOMUtils {
     }
 
     /**
-     * Read a new FreeCol object from an element.
+     * Read a new FreeCol game object from an element.
      *
      * @param <T> The actual return type.
      * @param game The {@code Game} to check for existing objects.
@@ -560,65 +547,20 @@ public class DOMUtils {
      * @param returnClass The expected return class.
      * @return The object found or instantiated, or null on error.
      */
-    public static <T extends FreeColObject> T readElement(Game game,
+    public static <T extends FreeColObject> T readGameElement(Game game,
         Element element, boolean intern, Class<T> returnClass) {
-        T ret = game.newInstance(returnClass);
-        if (ret != null) readFromElement(ret, element, intern);
-        return ret;
-    }
-
-    /**
-     * Get a FreeColObject class corresponding to the element tag.
-     *
-     * @param e The {@code Element} to query.
-     * @return The class, or null if none found.
-     */
-    public static <T extends FreeColObject> Class<T> getElementClass(Element e) {
-        return FreeColObject.getFreeColObjectClass(e.getTagName());
-    }
-
-    /**
-     * Read a new FreeCol object from an element.
-     *
-     * @param <T> The actual return type.
-     * @param game The {@code Game} to check for existing objects.
-     * @param element The {@code Element} to read from.
-     * @param intern Whether to intern the instantiated object.
-     * @return The object found or instantiated, or null on error.
-     */
-    public static <T extends FreeColObject> T readElement(Game game,
-        Element element, boolean intern) {
         if (element == null) return null;
-        final Class<T> c = getElementClass(element);
-        if (c == null) return null;
-
         T ret = null;
         try (
-            FreeColXMLReader xr = makeElementReader(element);
+             FreeColXMLReader xr = makeElementReader(element, intern);
         ) {
-            xr.setReadScope((intern) ? FreeColXMLReader.ReadScope.NORMAL
-                : FreeColXMLReader.ReadScope.NOINTERN);
             xr.nextTag();
-            ret = game.newInstance(c);
-            if (ret != null) readFromElement(ret, element);
-        } catch (IOException|XMLStreamException ex) {
-            throw new RuntimeException("XML failure", ex);
+xr.setTracing(true);
+            ret = xr.readFreeColObject(game, returnClass);
+        } catch (XMLStreamException|IOException ex) {
+            throw new RuntimeException("readGameElement fail", ex);
         }
         return ret;
-    }
-
-    /**
-     * Read a new FreeCol object from an element.
-     *
-     * @param <T> The actual return type.
-     * @param game The {@code Game} to check for existing objects.
-     * @param element The {@code Element} to read from.
-     * @param returnClass The expected return class.
-     * @return The object found or instantiated, or null on error.
-     */
-    public static <T extends FreeColObject> T readElement(Game game,
-        Element element, Class<T> returnClass) {
-        return readElement(game, element, true, returnClass);
     }
 
     /**
@@ -632,27 +574,46 @@ public class DOMUtils {
     public static void readFromElement(FreeColObject fco, Element element,
                                        boolean intern) {
         try (
-            FreeColXMLReader xr = makeElementReader(element);
+             FreeColXMLReader xr = makeElementReader(element, intern);
         ) {
-            xr.setReadScope((intern) ? FreeColXMLReader.ReadScope.NORMAL
-                : FreeColXMLReader.ReadScope.NOINTERN);
             xr.nextTag();
             fco.readFromXML(xr);
         } catch (IOException|XMLStreamException ex) {
-            throw new RuntimeException("XML failure", ex);
+            throw new RuntimeException("readFromElement fail", ex);
         }
     }
 
     /**
-     * Initialize a FreeColObject from an Element.
+     * Read a new FreeCol object from an element given its class.
      *
-     * @param fco The {@code FreeColObject} to read into.
-     * @param element An XML-element that will be used to initialize
-     *      the object.
+     * @param <T> The actual return type.
+     * @param game The {@code Game} to check for existing objects.
+     * @param element The {@code Element} to read from.
+     * @param intern Whether to intern the instantiated object.
+     * @param returnClass The expected return class.
+     * @return The object found or instantiated, or null on error.
      */
-    public static void readFromElement(FreeColObject fco, Element element) {
-        readFromElement(fco, element, true);
+    public static <T extends FreeColObject> T readElement(Game game,
+        Element element, boolean intern, Class<T> returnClass) {
+        return readGameElement(game, element, intern, returnClass);
     }
+
+    /**
+     * Read a new FreeCol object from an element without knowing its class.
+     *
+     * @param <T> The actual return type.
+     * @param game The {@code Game} to check for existing objects.
+     * @param element The {@code Element} to read from.
+     * @param intern Whether to intern the instantiated object.
+     * @return The object found or instantiated, or null on error.
+     */
+    public static <T extends FreeColObject> T readElement(Game game,
+        Element element, boolean intern) {
+        if (element == null) return null;
+        final Class<T> c = getElementClass(element);
+        return (c == null) ? null : readElement(game, element, intern, c);
+    }
+
 
     /**
      * This method writes an XML-representation of this object to

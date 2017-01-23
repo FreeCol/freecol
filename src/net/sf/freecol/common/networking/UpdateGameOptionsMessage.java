@@ -62,7 +62,7 @@ public class UpdateGameOptionsMessage extends DOMMessage {
     protected UpdateGameOptionsMessage(Element element) {
         this(new OptionGroup(GameOptions.TAG));
 
-        DOMUtils.readFromElement(this.options, element);
+        DOMUtils.readFromElement(this.options, element, true);
     }
     
     /**
