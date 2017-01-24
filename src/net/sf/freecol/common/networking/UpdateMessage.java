@@ -66,8 +66,7 @@ public class UpdateMessage extends DOMMessage {
     public UpdateMessage(Game game, Element element) {
         this(null);
 
-        for (FreeColObject fco : DOMUtils.mapChildren(element, (e) ->
-                DOMUtils.updateFromElement(game, e))) {
+        for (FreeColObject fco : DOMUtils.getChildren(game, element)) {
             if (fco != null
                 && FreeColGameObject.class.isAssignableFrom(fco.getClass()))
                 this.fcgos.add((FreeColGameObject)fco);

@@ -429,6 +429,24 @@ public class DOMUtils {
     }
 
     /**
+     * Extract all child FreeColObjects from an element without
+     * knowing their class.
+     *
+     * @param <T> The actual list member return type.
+     * @param game The {@code Game} to instantiate within.
+     * @param element The parent {@code Element}.
+     * @return A list of new instances of the return class.
+     */
+    public static List<FreeColObject> getChildren(Game game, Element element) {
+        List<FreeColObject> ret = new ArrayList<>();
+        for (Element e : getChildElementList(element)) {
+            FreeColObject fco = readElement(game, e, true);
+            if (fco != null) ret.add(fco);
+        }
+        return ret;
+    }
+    
+    /**
      * Convenience method to map a function over the children of an Element.
      *
      * @param <T> The actual list member return type.
@@ -482,50 +500,6 @@ public class DOMUtils {
         return result;
     }
 
-
-    // @compat 0.10.x
-    /**
-     * Version of readId(FreeColXMLReader) that reads from an element.
-     *
-     * To be replaced with just:
-     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
-     *
-     * @param element An element to read the id attribute from.
-     * @return The identifier attribute value.
-     */
-    public static String readId(Element element) {
-        String id = element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
-        if (id.isEmpty()) id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
-        return id;
-    }
-    // end @compat
-
-    /**
-     * Update an existing game object from an element.
-     *
-     * @param game The {@code Game} to update in.
-     * @param element The {@code Element} containing the object.
-     * @return The updated {@code FreeColGameObject}.
-     */
-    public static FreeColObject updateFromElement(Game game, Element element) {
-        if (element == null) return null;
-        String id = readId(element);
-        FreeColObject fco = game.getFreeColGameObject(id);
-        if (fco == null) {
-            logger.warning("Update object not present: " + id);
-            return null;
-        }
-        try (
-             FreeColXMLReader xr = makeElementReader(element, true);
-        ) {
-            xr.nextTag();
-            fco.readFromXML(xr);
-        } catch (IOException|XMLStreamException ex) {
-            throw new RuntimeException("readFromElement fail", ex);
-        }
-        return fco;
-    }
-
     /**
      * Read a new FreeCol object from an element given its class.
      *
@@ -547,7 +521,7 @@ public class DOMUtils {
             //xr.setTracing(true);
             ret = xr.readFreeColObject(game, returnClass);
         } catch (XMLStreamException|IOException ex) {
-            throw new RuntimeException("readGameElement fail", ex);
+            throw new RuntimeException("readElement fail", ex);
         }
         return ret;
     }
