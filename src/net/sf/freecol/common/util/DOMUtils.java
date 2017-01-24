@@ -647,7 +647,9 @@ public class DOMUtils {
             DocumentBuilder builder = factory.newDocumentBuilder();
             tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));
             return (Element)document.importNode(tempDocument.getDocumentElement(), true);
-        } catch (IOException|ParserConfigurationException|SAXException ex) {
+        } catch (Exception ex) {
+            // Catch unexpected fail in Java libraries as well as
+            // expected ParserConfigurationException and SAXException
             throw new RuntimeException("Parse fail at " + fco, ex);
         } finally {
             xw.close();
