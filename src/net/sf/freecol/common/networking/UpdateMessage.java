@@ -40,20 +40,32 @@ public class UpdateMessage extends DOMMessage {
 
     public static final String TAG = "update";
 
-    /** The players to add. */
+    /** The player to specialize the objects for. */
+    private final ServerPlayer destination;
+
+    /** The objects to update. */
     private final List<FreeColGameObject> fcgos = new ArrayList<>();
 
 
     /**
      * Create a new {@code UpdateMessage}.
      *
+     * @param destination The destination {@code ServerPlayer}.
      * @param fcgos The list of {@code FreeColGameObject}s to add.
      */
-    public UpdateMessage(List<FreeColGameObject> fcgos) {
+    public UpdateMessage(ServerPlayer destination,
+                         List<FreeColObject> fcos) {
         super(TAG);
 
+        this.destination = destination;
         this.fcgos.clear();
-        if (fcgos != null) this.fcgos.addAll(fcgos);
+        if (fcos != null) {
+            for (FreeColObject fco : fcos) {
+                if (fco != null
+                    && FreeColGameObject.class.isAssignableFrom(fco.getClass()))
+                    this.fcgos.add((FreeColGameObject)fco);
+            }
+        }
     }
 
     /**
@@ -64,13 +76,7 @@ public class UpdateMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateMessage(Game game, Element element) {
-        this(null);
-
-        for (FreeColObject fco : DOMUtils.getChildren(game, element)) {
-            if (fco != null
-                && FreeColGameObject.class.isAssignableFrom(fco.getClass()))
-                this.fcgos.add((FreeColGameObject)fco);
-        }
+        this((ServerPlayer)null, DOMUtils.getChildren(game, element));
     }
 
 
@@ -95,6 +101,6 @@ public class UpdateMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(TAG)
-            .add(this.fcgos).toXMLElement();
+            .add(this.fcgos, this.destination).toXMLElement();
     }
 }

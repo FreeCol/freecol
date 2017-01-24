@@ -799,17 +799,9 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return null; // NYI
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("update");
-            element.appendChild(DOMUtils.toXMLElement(fcgo, doc, serverPlayer));
-            return element;
+            return (!isNotifiable(serverPlayer)) ? null
+                : new UpdateMessage(serverPlayer,
+                    Collections.singletonList(this.fcgo));
         }
 
         /**

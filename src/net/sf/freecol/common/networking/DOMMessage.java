@@ -139,6 +139,10 @@ public class DOMMessage extends Message {
         if (fcos != null) for (FreeColObject fco : fcos) add(fco);
         return this;
     }
+    public DOMMessage add(List<? extends FreeColObject> fcos, Player player) {
+        if (fcos != null) for (FreeColObject fco : fcos) add(fco, player);
+        return this;
+    }
     public DOMMessage add(DOMMessage msg) {
         if (msg != null) add(msg.toXMLElement());
         return this;
