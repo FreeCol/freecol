@@ -949,6 +949,33 @@ public abstract class FreeColObject
     /**
      * Copy a FreeColObject.
      *
+     * @param <T> The actual return type.
+     * @param game The {@code Game} to add the object to.
+     * @return The copied object, or null on error.
+     */
+    public <T extends FreeColObject> T copy(Game game) {
+        @SuppressWarnings("unchecked")
+        Class<T> returnClass = (Class<T>)this.getClass();
+        return this.copy(game, returnClass);
+    }
+
+    /**
+     * Copy a FreeColObject for a player.
+     *
+     * @param <T> The actual return type.
+     * @param game The {@code Game} to add the object to.
+     * @param player The {@code Player} to copy for,
+     * @return The copied object, or null on error.
+     */
+    public <T extends FreeColObject> T copy(Game game, Player player) {
+        @SuppressWarnings("unchecked")
+        Class<T> returnClass = (Class<T>)this.getClass();
+        return this.copy(game, returnClass, player);
+    }
+
+    /**
+     * Copy a FreeColObject.
+     *
      * The copied object and its internal descendents will be
      * identical to the original objects, but not present in the game.
      * Newly created objects will prefer to refer to other newly

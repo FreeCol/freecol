@@ -759,7 +759,7 @@ public class TileTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();
 
-        Tile otherTile = tile.copy(game, tile.getClass());
+        Tile otherTile = tile.copy(game);
         assertNotNull(otherTile);
         assertFalse(otherTile == tile);
         assertEquals(tile.getId(), otherTile.getId());

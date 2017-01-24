@@ -2008,7 +2008,7 @@ outer:  for (Effect effect : effects) {
                             // FreeCol ruleset adds this ability
                             // allowing full visibility of colony,
                             // whereas Col1 showed colonies as size 1.
-                            Tile c = t.copy(game, Tile.class);
+                            Tile c = t.copy(game);
                             c.getColony().setDisplayUnitCount(1);
                             t.setCachedTile(this, c);
                         }

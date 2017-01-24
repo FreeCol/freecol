@@ -3736,7 +3736,7 @@ public class Unit extends GoodsLocation
         final Game game = getGame();
         Unit ret = null;
         if (isOnCarrier()) {
-            Unit carrier = getCarrier().copy(game, Unit.class);
+            Unit carrier = getCarrier().copy(game);
             for (Unit u : carrier.getUnitList()) {
                 if (u.getId().equals(getId())) {
                     ret = u;
@@ -3747,7 +3747,7 @@ public class Unit extends GoodsLocation
             carrier.removeAll(); // Goods!
             carrier.setLocationNoUpdate(tile);
         } else {
-            ret = this.copy(game, Unit.class);
+            ret = this.copy(game);
             ret.setLocationNoUpdate(tile);
             ret.setWorkType(null);
             ret.setState(Unit.UnitState.ACTIVE);            

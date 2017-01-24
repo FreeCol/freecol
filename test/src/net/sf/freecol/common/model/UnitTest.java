@@ -561,7 +561,7 @@ public class UnitTest extends FreeColTestCase {
         Goods goods = new Goods(game, merchantman, cottonType, 44);
         merchantman.add(goods);
         
-        Unit other = merchantman.copy(game, merchantman.getClass());
+        Unit other = merchantman.copy(game);
 
         assertFalse(merchantman == other);
         assertEquals(merchantman.getId(), other.getId());

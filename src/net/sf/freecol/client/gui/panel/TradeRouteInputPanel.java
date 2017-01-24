@@ -537,7 +537,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         final Game game = freeColClient.getGame();
         final Player player = getMyPlayer();
-        final TradeRoute tradeRoute = newRoute.copy(game, TradeRoute.class);
+        final TradeRoute tradeRoute = newRoute.copy(game);
 
         this.newRoute = newRoute;
         this.cargoHandler = new CargoHandler();

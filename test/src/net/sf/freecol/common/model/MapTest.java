@@ -597,7 +597,7 @@ public class MapTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();
 
-        Map otherMap = map.copy(game, map.getClass());
+        Map otherMap = map.copy(game);
         assertNotNull(otherMap);
         assertFalse(otherMap == map);
         assertEquals(otherMap.getId(), map.getId());

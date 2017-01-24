@@ -2349,7 +2349,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public Colony copyColony() {
         final Game game = getGame();
         Tile tile = getTile();
-        Tile tileCopy = tile.copy(game, tile.getClass());
+        Tile tileCopy = tile.copy(game);
         Colony colony = tileCopy.getColony();
         for (ColonyTile ct : colony.getColonyTiles()) {
             Tile wt;
@@ -2357,7 +2357,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 wt = tileCopy;
             } else {
                 wt = ct.getWorkTile();
-                wt = wt.copy(game, wt.getClass());
+                wt = wt.copy(game);
                 if (wt.getOwningSettlement() == this) {
                     wt.setOwningSettlement(colony);
                 }
