@@ -756,11 +756,11 @@ public class FreeColDirectories {
      *     will be removed.
      * @param validDays Only files older than this amount of days will
      *     be removed.
+     * @return A suitable log message, or null if nothing was deleted.
      */
-    public static void removeOutdatedAutosaves(String prefix,
-                                               List<String> excludeSuffixes,
-                                               long validDays) {
-        if (validDays <= 0L) return;
+    public static String removeOutdatedAutosaves(String prefix,
+        List<String> excludeSuffixes, long validDays) {
+        if (validDays <= 0L) return null;
         final long validMS = 1000L * 24L * 60L * 60L * validDays; // days to ms
         final long timeNow = System.currentTimeMillis();
         final Predicate<File> outdatedPred = f -> 
@@ -771,17 +771,31 @@ public class FreeColDirectories {
         final Predicate<File> suffixPred = f ->
             ex.stream().noneMatch(suf -> f.getName().endsWith(suf + extension));
 
-        Utils.deleteFiles(getAutosaveFiles(sanitize(prefix),
-                                           outdatedPred.and(suffixPred)));
+        List<File> files = getAutosaveFiles(sanitize(prefix),
+                                            outdatedPred.and(suffixPred)); 
+        if (files.isEmpty()) return null;
+        Utils.deleteFiles(files);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Deleted outdated (> ").append(validDays)
+            .append(" old) autosave/s: ");
+        for (File f : files) sb.append(" ").append(f.getPath());
+        return sb.toString();        
     }
 
     /**
      * Remove all autosave files.
      *
      * @param prefix The autosave file prefix.
+     * @return A suitable log message, or null if nothing was deleted.
      */
-    public static void removeAutosaves(String prefix) {
-        Utils.deleteFiles(getAutosaveFiles(sanitize(prefix), alwaysTrue()));
+    public static String removeAutosaves(String prefix) {
+        List<File> files = getAutosaveFiles(sanitize(prefix), alwaysTrue());
+        if (files.isEmpty()) return null;
+        Utils.deleteFiles(files);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Deleted autosave/s: ");
+        for (File f : files) sb.append(" ").append(f.getPath());
+        return sb.toString();        
     }
 
     /**

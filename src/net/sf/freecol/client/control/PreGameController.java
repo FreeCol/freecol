@@ -170,7 +170,9 @@ public final class PreGameController extends FreeColClientHolder {
         // Clean up autosaves
         final ClientOptions co = getClientOptions();
         if (player.isAdmin() && co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
-            FreeColDirectories.removeAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX));
+            String logMe = FreeColDirectories
+                .removeAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX));
+            if (logMe != null) logger.info(logMe);
         }
 
         // Sort out the unit initialization
