@@ -402,10 +402,12 @@ public class ServerGame extends Game implements ServerModelObject {
                     cs.add(See.perhaps().always(strongest), is);
                 }
             });
+        Set<Unit> contacts = new HashSet<>();
         for (Colony c : weakest.getColonyList()) {
             updated.addAll(c.getOwnedTiles());
             ((ServerColony)c).csChangeOwner(strongest, false, cs);//-vis(both),-til
             lb.add(" ", c.getName());
+            contacts.add(c.getFirstUnit());
         }
         for (Unit unit : weakest.getUnitList()) {
             lb.add(" ", unit.getId());
@@ -427,9 +429,15 @@ public class ServerGame extends Game implements ServerModelObject {
                     Tile tile = unit.getTile();
                     if (!tiles.contains(tile)) tiles.add(tile);
                 }
+                contacts.add(unit);
             }
         }
-
+        for (Unit u : contacts) {
+            if (u.hasTile()) {
+                ((ServerUnit)u).csNewContactCheck(u.getTile(), false, cs);
+            }
+        }
+        
         StringTemplate loser = weakAI.getNationLabel();
         StringTemplate winner = strongAI.getNationLabel();
         cs.addGlobalMessage(this, null,

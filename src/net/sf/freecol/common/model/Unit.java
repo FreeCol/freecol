@@ -3701,8 +3701,8 @@ public class Unit extends GoodsLocation
             throw new IllegalStateException("Settlement is not on the map: "
                 + settlementId);
         } else if (!getOwner().hasContacted(ret.getOwner())) {
-            throw new IllegalStateException("Player has not contacted: "
-                + ret.getOwner().getId());
+            throw new IllegalStateException("Player " + getOwner().getId()
+                + " has not contacted: " + ret.getOwner().getId());
         }
 
         if (!hasTile()) {

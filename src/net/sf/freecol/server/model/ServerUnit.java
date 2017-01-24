@@ -644,6 +644,91 @@ public class ServerUnit extends Unit implements ServerModelObject {
     }
 
     /**
+     * Check for new contacts at a tile.
+     *
+     * @param newTile The {@code Tile} to check.
+     * @param firstLanding True if this is the special "first landing"
+     * @param cs A {@code ChangeSet} to update.
+     */
+    public void csNewContactCheck(Tile newTile, boolean firstLanding,
+                                  ChangeSet cs) {
+        final ServerPlayer serverPlayer = (ServerPlayer)this.getOwner();
+        Set<ServerPlayer> pending = new HashSet<>();
+        for (Tile t : transform(newTile.getSurroundingTiles(1, 1),
+                                nt -> nt != null && nt.isLand())) {
+            Settlement settlement = t.getSettlement();
+            Unit unit = null;
+            ServerPlayer other = (settlement != null)
+                ? (ServerPlayer)settlement.getOwner()
+                : ((unit = t.getFirstUnit()) != null)
+                ? (ServerPlayer)unit.getOwner()
+                : null;
+            if (other == null
+                || other == serverPlayer
+                || pending.contains(other)) continue; // No contact
+            if (serverPlayer.csContact(other, cs)) {
+                // First contact.  Note contact pending because
+                // European first contact now requires a diplomacy
+                // interaction to complete before leaving UNCONTACTED
+                // state.
+                pending.add(other);
+logger.finest("Debug first contact " + serverPlayer + " to " + ((settlement == null) ? "" : settlement.toString()) + ((unit == null) ? "" : unit.toString()));
+                if (serverPlayer.isEuropean()) {
+                    if (other.isIndian()) {
+                        Tile offer = (firstLanding && other.owns(newTile))
+                            ? newTile
+                            : null;
+                        serverPlayer.csNativeFirstContact(other, offer, cs);
+                    } else {
+                        serverPlayer.csEuropeanFirstContact(this,
+                            settlement, unit, cs);
+                    }
+                } else {
+                    if (other.isIndian()) {
+                        ; // Do nothing
+                    } else {
+                        other.csNativeFirstContact(serverPlayer, null, cs);
+                    }
+                }
+            }
+
+            // Initialize alarm for native settlements or units and
+            // notify of contact.
+            ServerPlayer contactPlayer = serverPlayer;
+            IndianSettlement is = (settlement instanceof IndianSettlement)
+                ? (IndianSettlement)settlement
+                : null;
+            if (is != null
+                || (unit != null
+                    && (is = unit.getHomeIndianSettlement()) != null)
+                || (unit != null
+                    && (contactPlayer = (ServerPlayer)unit.getOwner())
+                    .isEuropean()
+                    && (is = getHomeIndianSettlement()) != null
+                    && is.getTile() != null)) {
+                Tile copied = is.getTile().getTileToCache();
+                if (contactPlayer.hasExplored(is.getTile())
+                    && is.setContacted(contactPlayer)) {//-til
+                    is.getTile().cacheUnseen(copied);//+til
+                    cs.add(See.only(contactPlayer), is);
+                    // First European contact with native settlement.
+                    StringTemplate nation = is.getOwner().getNationLabel();
+                    cs.addMessage(contactPlayer,
+                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                            "model.unit.nativeSettlementContact",
+                            this, is)
+                        .addStringTemplate("%nation%", nation)
+                        .addName("%settlement%", is.getName()));
+                    logger.finest("First contact between "
+                        + contactPlayer.getId()
+                        + " and " + is + " at " + newTile);
+                }                   
+            }
+            csActivateSentries(t, cs);
+        }
+    }
+
+    /**
      * Activate sentried units on a tile.
      *
      * @param tile The {@code Tile} to activate sentries on.
@@ -771,78 +856,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
 
             // Check for new contacts.
-            Set<ServerPlayer> pending = new HashSet<>();
-            for (Tile t : transform(newTile.getSurroundingTiles(1, 1),
-                                    nt -> nt != null && nt.isLand())) {
-                settlement = t.getSettlement();
-                ServerPlayer other = (settlement != null)
-                    ? (ServerPlayer)settlement.getOwner()
-                    : ((unit = t.getFirstUnit()) != null)
-                    ? (ServerPlayer)unit.getOwner()
-                    : null;
-                if (other == null
-                    || other == serverPlayer
-                    || pending.contains(other)) continue; // No contact
-                if (serverPlayer.csContact(other, cs)) {
-                    // First contact.  Note contact pending because
-                    // European first contact now requires a diplomacy
-                    // interaction to complete before leaving UNCONTACTED
-                    // state.
-                    pending.add(other);
-logger.finest("Debug first contact " + this + " to " + ((settlement == null) ? "" : settlement.toString()) + ((unit == null) ? "" : unit.toString()));
-                    if (serverPlayer.isEuropean()) {
-                        if (other.isIndian()) {
-                            Tile offer = (firstLanding && other.owns(newTile))
-                                ? newTile
-                                : null;
-                            serverPlayer.csNativeFirstContact(other, offer, cs);
-                        } else {
-                            serverPlayer.csEuropeanFirstContact(this,
-                                settlement, unit, cs);
-                        }
-                    } else {
-                        if (other.isIndian()) {
-                            ; // Do nothing
-                        } else {
-                            other.csNativeFirstContact(serverPlayer, null, cs);
-                        }
-                    }
-                }
-
-                // Initialize alarm for native settlements or units and
-                // notify of contact.
-                ServerPlayer contactPlayer = serverPlayer;
-                IndianSettlement is = (settlement instanceof IndianSettlement)
-                    ? (IndianSettlement)settlement
-                    : null;
-                if (is != null
-                    || (unit != null
-                        && (is = unit.getHomeIndianSettlement()) != null)
-                    || (unit != null
-                        && (contactPlayer = (ServerPlayer)unit.getOwner())
-                            .isEuropean()
-                        && (is = getHomeIndianSettlement()) != null
-                        && is.getTile() != null)) {
-                    Tile copied = is.getTile().getTileToCache();
-                    if (contactPlayer.hasExplored(is.getTile())
-                        && is.setContacted(contactPlayer)) {//-til
-                        is.getTile().cacheUnseen(copied);//+til
-                        cs.add(See.only(contactPlayer), is);
-                        // First European contact with native settlement.
-                        StringTemplate nation = is.getOwner().getNationLabel();
-                        cs.addMessage(contactPlayer,
-                            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                             "model.unit.nativeSettlementContact",
-                                             this, is)
-                                .addStringTemplate("%nation%", nation)
-                                .addName("%settlement%", is.getName()));
-                        logger.finest("First contact between "
-                            + contactPlayer.getId()
-                            + " and " + is + " at " + newTile);
-                    }                   
-                }
-                csActivateSentries(t, cs);
-            }
+            csNewContactCheck(newTile, firstLanding, cs);
         } else { // water
             for (Tile t : transform(newTile.getSurroundingTiles(1, 1),
                     nt -> (nt != null && !nt.isLand()
