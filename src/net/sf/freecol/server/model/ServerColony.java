@@ -825,18 +825,17 @@ public class ServerColony extends Colony implements ServerModelObject {
         // production probably means we forgot to reset the build
         // queue.  Thus, if hammers are being produced it is worth
         // warning about, but not if producing tools.
-        for (BuildQueue<?> queue : transform(queues, BuildQueue::isEmpty)) {
-            if (none(spec.getGoodsTypeList(), g ->
-                    (g.isBuildingMaterial()
-                        && !g.isRawMaterial()
-                        && !g.isBreedable()
-                        && getAdjustedNetProductionOf(g) > 0
-                        && neededForBuildableType(g)))) {
-                cs.addMessage(owner,
-                    new ModelMessage(MessageType.BUILDING_COMPLETED,
-                        "model.colony.notBuildingAnything", this)
-                        .addName("%colony%", getName()));
-            }
+        if (any(queues, BuildQueue::isEmpty)
+            && any(spec.getGoodsTypeList(), g ->
+                (g.isBuildingMaterial()
+                    && !g.isRawMaterial()
+                    && !g.isBreedable()
+                    && getAdjustedNetProductionOf(g) > 0
+                    && neededForBuildableType(g)))) {
+            cs.addMessage(owner,
+                new ModelMessage(MessageType.BUILDING_COMPLETED,
+                    "model.colony.notBuildingAnything", this)
+                .addName("%colony%", getName()));
         }
 
         // Update SoL.
