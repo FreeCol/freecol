@@ -2615,7 +2615,7 @@ public final class InGameController extends FreeColClientHolder {
         // a chance to confirm.
         final Player player = getMyPlayer();
         if (state == UnitState.FORTIFYING && unit.isOffensiveUnit()
-            && !unit.hasAbility(Ability.PIRACY)) {
+            && !unit.isOwnerHidden()) {
             Tile tile = unit.getTile();
             if (tile != null && tile.getOwningSettlement() != null) {
                 Player enemy = tile.getOwningSettlement().getOwner();

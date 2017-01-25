@@ -279,7 +279,7 @@ public class Unit extends GoodsLocation
      * @return The name of the apparent owner of this {@code Unit}.
      */
     public StringTemplate getApparentOwnerName() {
-        Player own = (hasAbility(Ability.PIRACY)) ? getGame().getUnknownEnemy()
+        Player own = (isOwnerHidden()) ? getGame().getUnknownEnemy()
             : owner;
         return own.getNationLabel();
     }
@@ -520,6 +520,16 @@ public class Unit extends GoodsLocation
      */
     public boolean isNaval() {
         return (this.unitType == null) ? false : this.unitType.isNaval();
+    }
+
+    /**
+     * Is this a unit that hides its ownership?
+     *
+     * @return True if the owner should be hidden from clients.
+     */
+    public boolean isOwnerHidden() {
+        return (this.unitType == null) ? false
+            : this.unitType.hasAbility(Ability.PIRACY);
     }
 
     /**
@@ -3750,7 +3760,8 @@ public class Unit extends GoodsLocation
             ret = this.copy(game);
             ret.setLocationNoUpdate(tile);
             ret.setWorkType(null);
-            ret.setState(Unit.UnitState.ACTIVE);            
+            ret.setState(Unit.UnitState.ACTIVE);
+            if (isOwnerHidden()) ret.setOwner(game.getUnknownEnemy());
         }
         return ret;
     }
@@ -4320,7 +4331,7 @@ public class Unit extends GoodsLocation
 
         xw.writeAttribute(ROLE_COUNT_TAG, roleCount);
 
-        if (!full && hasAbility(Ability.PIRACY)) {
+        if (!full && isOwnerHidden()) {
             // Pirates do not disclose national characteristics.
             xw.writeAttribute(OWNER_TAG, getGame().getUnknownEnemy());
 
