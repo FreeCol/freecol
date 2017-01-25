@@ -395,8 +395,8 @@ public final class InGameInputHandler extends ClientInputHandler {
         final DiplomacyMessage message
             = new DiplomacyMessage(getGame(), element);
         final DiplomaticTrade agreement = message.getAgreement();
-        final FreeColGameObject our = message.getOtherFCGO(game);
-        final FreeColGameObject other = message.getOurFCGO(game);
+        final FreeColGameObject our = message.getOurFCGO(game);
+        final FreeColGameObject other = message.getOtherFCGO(game);
 
         // Note incoming message will have ownership transposed as it
         // is their proposal.
