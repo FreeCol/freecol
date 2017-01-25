@@ -68,6 +68,14 @@ public class AddPlayerMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.NORMAL;
+    }
+
+
     // Public interface
 
     /**

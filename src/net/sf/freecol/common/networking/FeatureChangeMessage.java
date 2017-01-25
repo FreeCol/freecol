@@ -76,6 +76,14 @@ public class FeatureChangeMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.OWNED;
+    }
+
+
     // Public interface
 
     /**

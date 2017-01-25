@@ -80,6 +80,14 @@ public class DeliverGiftMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return MessagePriority.NORMAL;
+    }
+
+
     // Public interface
 
     /**

@@ -56,6 +56,14 @@ public class SetDeadMessage extends AttributeMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.EARLY;
+    }
+
+
     // Public interface
 
     /**

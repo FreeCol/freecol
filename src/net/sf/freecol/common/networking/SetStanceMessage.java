@@ -65,6 +65,14 @@ public class SetStanceMessage extends AttributeMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.STANCE;
+    }
+
+
     // Public interface
 
     /**

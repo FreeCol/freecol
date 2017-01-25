@@ -41,6 +41,32 @@ public abstract class Message {
 
     protected static final Logger logger = Logger.getLogger(Message.class.getName());
 
+    // Convenient way to specify the relative priorities of the messages
+    // types in one place.
+    public static enum MessagePriority {
+        ATTRIBUTE(-1), // N/A
+        ANIMATION(0),  // Do animations first
+        REMOVE(100),   // Do removes last
+        STANCE(5),     // Do stance before updates
+        OWNED(20),     // Do owned changes after updates
+        UPDATE(10),    // There are a lot of updates
+        // Symbolic priorities used by various non-fixed types
+        EARLY(1),
+        NORMAL(15),
+        LATE(90);
+
+        private final int level;
+
+        MessagePriority(int level) {
+            this.level = level;
+        }
+
+        public int getValue() {
+            return this.level;
+        }
+    }
+
+
     /**
      * Deliberately trivial constructor.
      */
@@ -253,4 +279,28 @@ public abstract class Message {
      */
     abstract public void readInputStream(InputStream inputStream)
         throws IOException, SAXException;
+
+
+    /**
+     * Get the priority of this type of message.
+     *
+     * May need to be overridden by specific message types if priority
+     * varies due to the specifics of the message.
+     *
+     * @return The message priority.
+     */
+    public MessagePriority getPriority() {
+        return getMessagePriority();
+    }
+    
+    /**
+     * Get the priority of this type of message.
+     *
+     * To be overridden by specific message types.
+     *
+     * @return The message priority.
+     */
+    public static MessagePriority getMessagePriority() {
+        return MessagePriority.NORMAL;
+    }
 }

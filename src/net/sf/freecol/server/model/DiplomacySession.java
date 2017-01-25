@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.TrivialMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -284,11 +285,9 @@ public class DiplomacySession extends TimedSession {
             this.agreement.setStatus((result) ? TradeStatus.ACCEPT_TRADE
                                               : TradeStatus.REJECT_TRADE);
             ServerPlayer sp = (ServerPlayer)this.agreement.getSender();
-            cs.add(See.only(sp), ChangeSet.ChangePriority.CHANGE_LATE,
-                   getMessage(sp));
+            cs.add(See.only(sp), getMessage(sp));
             sp = (ServerPlayer)this.agreement.getRecipient();
-            cs.add(See.only(sp), ChangeSet.ChangePriority.CHANGE_LATE,
-                   getMessage(sp));
+            cs.add(See.only(sp), getMessage(sp));
         }
         this.unit.setMovesLeft(0);
         cs.add(See.only(getOwner()), this.unit);
@@ -323,11 +322,9 @@ public class DiplomacySession extends TimedSession {
         boolean ret = complete(false, cs);
         if (!ret) { // Withdraw offer
             cs.add(See.only((ServerPlayer)this.agreement.getSender()),
-                ChangeSet.ChangePriority.CHANGE_NORMAL,
-                TrivialMessage.CLOSE_MENUS_MESSAGE);
+                   TrivialMessage.CLOSE_MENUS_MESSAGE);
             cs.add(See.only((ServerPlayer)this.agreement.getRecipient()),
-                ChangeSet.ChangePriority.CHANGE_NORMAL,
-                TrivialMessage.CLOSE_MENUS_MESSAGE);
+                   TrivialMessage.CLOSE_MENUS_MESSAGE);
         }
         getGame().sendToAll(cs);
         return ret;

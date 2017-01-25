@@ -66,6 +66,14 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return MessagePriority.NORMAL;
+    }
+
+
     // Public interface
 
     /**

@@ -86,6 +86,14 @@ public class SpySettlementMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.NORMAL;
+    }
+
+
     // Public interface
 
     public Tile getSpyTile() {

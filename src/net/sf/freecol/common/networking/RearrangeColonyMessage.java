@@ -214,6 +214,13 @@ public class RearrangeColonyMessage extends AttributeMessage {
 
 
     /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.NORMAL;
+    }
+
+    /**
      * Set the attributes consequent to a list of arrangements.
      *
      * @param arrangements The list of {@code Arrangement}.

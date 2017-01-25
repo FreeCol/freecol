@@ -66,6 +66,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
@@ -604,7 +605,7 @@ public final class FreeColServer {
             ServerPlayer sp = (ServerPlayer)p;
             if (sp.isAdmin()) continue;
             sp.send(new ChangeSet()
-                .add(See.only(sp), ChangeSet.ChangePriority.CHANGE_NORMAL,
+                .add(See.only(sp),
                      new LogoutMessage(sp, LogoutReason.QUIT)));
         }
     }

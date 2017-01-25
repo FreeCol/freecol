@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -123,7 +124,6 @@ public class NativeDemandSession extends TimedSession {
         if (!ret) {
             completeInternal(result, cs);
             cs.add(See.only(getColonyOwner()),
-                   ChangeSet.ChangePriority.CHANGE_NORMAL,
                    TrivialMessage.CLOSE_MENUS_MESSAGE);
             getGame().sendToAll(cs);
         }

@@ -92,7 +92,14 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
                                  FoundingFather::getId)));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.EARLY;
+    }
 
+    
     // Public interface
 
     /**

@@ -67,6 +67,14 @@ public class UpdateTradeRouteMessage extends DOMMessage {
     /**
      * {@inheritDoc}
      */
+    public static MessagePriority getMessagePriority() {
+        return MessagePriority.NORMAL;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {

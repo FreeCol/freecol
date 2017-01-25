@@ -60,6 +60,14 @@ public class SetAIMessage extends AttributeMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.NORMAL;
+    }
+
+
     // Public interface
 
     /**

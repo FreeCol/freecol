@@ -92,7 +92,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.ChangeSet;
-import net.sf.freecol.common.networking.ChangeSet.ChangePriority;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -102,7 +101,9 @@ import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -629,7 +630,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csKill(ChangeSet cs) {
         setDead(true);
         cs.addPartial(See.all(), this, "dead");
-        cs.addDead(this);
+        cs.add(See.all(), new SetDeadMessage(this));
 
         // Clean up missions and remove tension/alarm/stance.
         for (Player other : getGame().getLivePlayerList(this)) {
@@ -1740,7 +1741,7 @@ outer:  for (Effect effect : effects) {
                 setOfferedFathers(ffs);
             }
             if (!ffs.isEmpty()) {
-                cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
+                cs.add(See.only(this),
                     new ChooseFoundingFatherMessage(ffs, null));
             }
 
@@ -3416,8 +3417,8 @@ outer:  for (Effect effect : effects) {
         if (!capture.isEmpty() && winner.hasSpaceLeft()) {
             for (Goods g : capture) g.setLocation(null);
             new LootSession(winner, loser, capture);
-            cs.add(See.only(winnerPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
-                new LootCargoMessage(winner, loser.getId(), capture));
+            cs.add(See.only(winnerPlayer),
+                   new LootCargoMessage(winner, loser.getId(), capture));
         }
         loser.getGoodsContainer().removeAll();
         loser.setState(Unit.UnitState.ACTIVE);
@@ -3947,11 +3948,11 @@ outer:  for (Effect effect : effects) {
             // so raise the tax anyway.
             final int extraTax = 3; // FIXME, magic number
             csSetTax(tax + extraTax, cs);
-            cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
-                new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,
-                    StringTemplate.template(Monarch.MonarchAction.FORCE_TAX.getTextKey())
-                    .addAmount("%amount%", tax + extraTax),
-                    monarchKey));
+            cs.add(See.only(this),
+                   new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,
+                       StringTemplate.template(Monarch.MonarchAction.FORCE_TAX.getTextKey())
+                       .addAmount("%amount%", tax + extraTax),
+                       monarchKey));
             logger.info("Forced tax raise to: " + (tax + extraTax));
         } else { // Tea party
             Specification spec = getGame().getSpecification();
@@ -4020,7 +4021,7 @@ outer:  for (Effect effect : effects) {
     }
 
     /**
-     * Add a mercenary offer to the player.
+     * Add an independent (non-monarch) mercenary offer to the player.
      *
      * @param mercenaries A list of mercenary units.
      * @param action The monarch action that caused the offer.
@@ -4033,14 +4034,14 @@ outer:  for (Effect effect : effects) {
         if (mercenaries.isEmpty()) return;
         final int n = NameCache.getMercenaryLeaderIndex(random);
         final int price = priceMercenaries(mercenaries);
-        cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
-            new MonarchActionMessage(action, StringTemplate
-                .template(action.getTextKey())
-                .addName("%leader%", NameCache.getMercenaryLeaderName(n))
-                .addAmount("%gold%", price)
-                .addStringTemplate("%mercenaries%",
-                    AbstractUnit.getListLabel(", ", mercenaries)),
-                "image.flavor.model.mercenaries." + n));
+        cs.add(See.only(this),
+               new MonarchActionMessage(action, StringTemplate
+                   .template(action.getTextKey())
+                   .addName("%leader%", NameCache.getMercenaryLeaderName(n))
+                   .addAmount("%gold%", price)
+                   .addStringTemplate("%mercenaries%",
+                       AbstractUnit.getListLabel(", ", mercenaries)),
+                   "image.flavor.model.mercenaries." + n));
         new MonarchSession(this, action, mercenaries, price);
     }
         
@@ -4095,10 +4096,10 @@ outer:  for (Effect effect : effects) {
             cs.addPartial(See.only(this), this, "gold");
         } else {
             getMonarch().setDispleasure(true);
-            cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
-                new MonarchActionMessage(Monarch.MonarchAction.DISPLEASURE,
-                    StringTemplate.template(Monarch.MonarchAction.DISPLEASURE.getTextKey()),
-                    getMonarchKey()));
+            cs.add(See.only(this),
+                   new MonarchActionMessage(Monarch.MonarchAction.DISPLEASURE,
+                       StringTemplate.template(Monarch.MonarchAction.DISPLEASURE.getTextKey()),
+                       getMonarchKey()));
         }
     }
 
@@ -4145,7 +4146,7 @@ outer:  for (Effect effect : effects) {
      */
     public void csNativeFirstContact(ServerPlayer other, Tile tile,
                                      ChangeSet cs) {
-        cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
+        cs.add(See.only(this),
                new FirstContactMessage(this, other, tile));
         csChangeStance(Stance.PEACE, other, true, cs);
         if (tile != null) {
@@ -4194,8 +4195,7 @@ outer:  for (Effect effect : effects) {
             ? new DiplomacySession(unit, otherUnit, FreeCol.getTimeout(false))
             : new DiplomacySession(unit, settlement, FreeCol.getTimeout(false));
         session.setAgreement(agreement);
-        cs.add(See.only(this), ChangePriority.CHANGE_LATE,
-               session.getMessage(this));
+        cs.add(See.only(this), session.getMessage(this));
         unit.setMovesLeft(0);
         cs.addPartial(See.only(this), unit, "movesLeft");
         logger.info("New European contact for " + unit
@@ -4286,7 +4286,7 @@ outer:  for (Effect effect : effects) {
                                        GoodsType type, int amount,
                                        boolean result, ChangeSet cs) {
         // Always inform the demander of the result.
-        cs.add(See.only(demandPlayer), ChangePriority.CHANGE_NORMAL,
+        cs.add(See.only(demandPlayer),
                    new IndianDemandMessage(unit, colony, type, amount)
                        .setResult(result));
 
@@ -4334,8 +4334,7 @@ outer:  for (Effect effect : effects) {
         case PROPOSE_TRADE:
             session.setAgreement(agreement);
             ServerPlayer otherPlayer = session.getOtherPlayer(this);
-            cs.add(See.only(otherPlayer), ChangePriority.CHANGE_LATE,
-                   session.getMessage(otherPlayer));
+            cs.add(See.only(otherPlayer), session.getMessage(otherPlayer));
             break;
         case ACCEPT_TRADE:
             session.complete(true, cs);

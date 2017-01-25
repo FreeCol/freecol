@@ -66,9 +66,9 @@ import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.networking.ChangeSet;
-import net.sf.freecol.common.networking.ChangeSet.ChangePriority;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NewTurnMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.option.GameOptions;
@@ -321,8 +321,7 @@ public class ServerGame extends Game implements ServerModelObject {
         Session.completeAll(cs);
         setTurn(getTurn().next());
         logger.finest("Turn is now " + getTurn() + duration);
-        cs.add(See.all(), ChangePriority.CHANGE_NORMAL,
-               new NewTurnMessage(getTurn()));
+        cs.add(See.all(), new NewTurnMessage(getTurn()));
     }
 
     /**

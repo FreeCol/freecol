@@ -107,6 +107,14 @@ public class LoginMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return MessagePriority.EARLY;
+    }
+        
+
     // Public interface
 
     public String getUserName() {
@@ -215,7 +223,6 @@ public class LoginMessage extends DOMMessage {
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(conn);
             cs.add(See.only(serverPlayer),
-                   ChangeSet.ChangePriority.CHANGE_EARLY,
                    new LoginMessage(this.userName, this.version,
                                     freeColServer.getServerState(),
                                     freeColServer.getSinglePlayer(),

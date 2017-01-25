@@ -97,6 +97,14 @@ public class TrivialMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.NORMAL;
+    }
+
+
     private InGameController igc(FreeColServer freeColServer) {
         return freeColServer.getInGameController();
     }

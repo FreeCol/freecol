@@ -91,6 +91,14 @@ public class AttributeMessage extends TrivialMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.ATTRIBUTE;
+    }
+
+
     // Public interface
 
     /**

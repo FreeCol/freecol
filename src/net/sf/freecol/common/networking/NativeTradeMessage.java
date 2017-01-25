@@ -87,6 +87,14 @@ public class NativeTradeMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.LATE;
+    }
+
+
     // Public interface
 
     public NativeTradeAction getAction() {

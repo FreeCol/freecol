@@ -102,7 +102,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.networking.ChangeSet;
-import net.sf.freecol.common.networking.ChangeSet.ChangePriority;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -112,6 +111,7 @@ import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
@@ -677,10 +677,9 @@ public final class InGameController extends Controller {
                     randomInt(logger, "Tax act goods", random, 6))
                     .addName("%newWorld%", serverPlayer.getNewLandName());
             }
-            message = new MonarchActionMessage(action, template, monarchKey)
-                .setTax(taxRaise);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
-                   message);
+            cs.add(See.only(serverPlayer), 
+                   new MonarchActionMessage(action, template, monarchKey)
+                       .setTax(taxRaise));
             new MonarchSession(serverPlayer, action, taxRaise, goods);
             break;
         case LOWER_TAX_WAR: case LOWER_TAX_OTHER:
@@ -697,13 +696,13 @@ public final class InGameController extends Controller {
                 template = template.addAmount("%number%",
                     randomInt(logger, "Lower tax reason", random, 5));
             }
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action, template, monarchKey));
+            cs.add(See.only(serverPlayer),
+                   new MonarchActionMessage(action, template, monarchKey));
             break;
         case WAIVE_TAX:
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-                new MonarchActionMessage(action,
-                    StringTemplate.template(messageId), monarchKey));
+            cs.add(See.only(serverPlayer),
+                   new MonarchActionMessage(action,
+                       StringTemplate.template(messageId), monarchKey));
             break;
         case ADD_TO_REF:
             AbstractUnit refAdditions = monarch.chooseForREF(random);
@@ -713,8 +712,8 @@ public final class InGameController extends Controller {
                 .addAmount("%number%", refAdditions.getNumber())
                 .addNamed("%unit%", refAdditions.getType(spec));
             cs.add(See.only(serverPlayer), monarch);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action, template, monarchKey));
+            cs.add(See.only(serverPlayer),
+                   new MonarchActionMessage(action, template, monarchKey));
             break;
         case DECLARE_PEACE:
             List<Player> friends = monarch.collectPotentialFriends();
@@ -723,11 +722,11 @@ public final class InGameController extends Controller {
                                             friends, random);
             serverPlayer.csChangeStance(Stance.PEACE, (ServerPlayer)friend,
                                         true, cs);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action, StringTemplate
-                    .template(messageId)
-                    .addStringTemplate("%nation%", friend.getNationLabel()),
-                    monarchKey));
+            cs.add(See.only(serverPlayer),
+                   new MonarchActionMessage(action, StringTemplate
+                       .template(messageId)
+                       .addStringTemplate("%nation%", friend.getNationLabel()),
+                       monarchKey));
             break;
         case DECLARE_WAR:
             List<Player> enemies = monarch.collectPotentialEnemies();
@@ -752,15 +751,15 @@ public final class InGameController extends Controller {
             }
             serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)enemy,
                                         true, cs);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action, StringTemplate
-                    .template((warSupport.isEmpty()) ? messageId
-                        : "model.monarch.action.declareWarSupported.text")
-                        .addStringTemplate("%nation%", enemy.getNationLabel())
-                        .addStringTemplate("%force%",
-                            AbstractUnit.getListLabel(", ", warSupport))
-                        .addAmount("%gold%", warGold),
-                    monarchKey));
+            cs.add(See.only(serverPlayer),
+                   new MonarchActionMessage(action, StringTemplate
+                       .template((warSupport.isEmpty()) ? messageId
+                           : "model.monarch.action.declareWarSupported.text")
+                       .addStringTemplate("%nation%", enemy.getNationLabel())
+                       .addStringTemplate("%force%",
+                           AbstractUnit.getListLabel(", ", warSupport))
+                       .addAmount("%gold%", warGold),
+                       monarchKey));
             break;
         case SUPPORT_LAND: case SUPPORT_SEA:
             boolean sea = action == MonarchAction.SUPPORT_SEA;
@@ -769,26 +768,25 @@ public final class InGameController extends Controller {
             serverPlayer.createUnits(support,
                 serverPlayer.getEurope());//-vis: safe, Europe
             cs.add(See.only(serverPlayer), serverPlayer.getEurope());
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action, StringTemplate
-                    .template(messageId)
-                    .addStringTemplate("%addition%",
-                        AbstractUnit.getListLabel(", ", support)),
-                    monarchKey));
+            cs.add(See.only(serverPlayer),
+                   new MonarchActionMessage(action, StringTemplate
+                       .template(messageId)
+                       .addStringTemplate("%addition%",
+                           AbstractUnit.getListLabel(", ", support)),
+                       monarchKey));
             break;
         case MONARCH_MERCENARIES:
             final List<AbstractUnit> mercenaries
                 = monarch.getMercenaries(random);
             if (mercenaries.isEmpty()) break;
             final int mercPrice = serverPlayer.priceMercenaries(mercenaries);
-            message = new MonarchActionMessage(action, StringTemplate
-                .template(messageId)
-                .addAmount("%gold%", mercPrice)
-                .addStringTemplate("%mercenaries%",
-                    AbstractUnit.getListLabel(", ", mercenaries)),
-                monarchKey);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
-                   message);
+            cs.add(See.only(serverPlayer),
+                   new MonarchActionMessage(action, StringTemplate
+                       .template(messageId)
+                       .addAmount("%gold%", mercPrice)
+                       .addStringTemplate("%mercenaries%",
+                           AbstractUnit.getListLabel(", ", mercenaries)),
+                       monarchKey));
             new MonarchSession(serverPlayer, action, mercenaries, mercPrice);
             break;
         case HESSIAN_MERCENARIES:
@@ -2001,7 +1999,6 @@ public final class InGameController extends Controller {
                     }
                 }
             }
-System.err.println("NEWTURN0 " + serverPlayer + " " + cs);
 
             if ((current = (ServerPlayer)game.getNextPlayer()) == null) {
                 // "can not happen"
@@ -2044,8 +2041,7 @@ System.err.println("NEWTURN0 " + serverPlayer + " " + cs);
                 }
                 game.setCurrentPlayer(null);
 
-                cs.add(See.all(), ChangePriority.CHANGE_NORMAL,
-                       new GameEndedMessage(winner, false));
+                cs.add(See.all(), new GameEndedMessage(winner, false));
                 game.sendToOthers(serverPlayer, cs);
                 return cs;
             }
@@ -2057,8 +2053,7 @@ System.err.println("NEWTURN0 " + serverPlayer + " " + cs);
                 && !(freeColServer.getSinglePlayer() && winner.isAI())) {
                 boolean highScore = !winner.isAI()
                     && HighScore.newHighScore(winner);
-                cs.add(See.all(), ChangePriority.CHANGE_NORMAL,
-                       new GameEndedMessage(winner, highScore));
+                cs.add(See.all(), new GameEndedMessage(winner, highScore));
             }
 
             // Do "new turn"-like actions that need to wait until right
@@ -2079,8 +2074,7 @@ System.err.println("NEWTURN0 " + serverPlayer + " " + cs);
             }
             current.csStartTurn(random, cs);
 
-            cs.add(See.all(), ChangePriority.CHANGE_LATE,
-                   new SetCurrentPlayerMessage(current));
+            cs.add(See.all(), new SetCurrentPlayerMessage(current));
             if (current.getPlayerType() == PlayerType.COLONIAL) {
                 Monarch monarch = current.getMonarch();
                 MonarchAction action = null;
@@ -2123,7 +2117,6 @@ System.err.println("NEWTURN0 " + serverPlayer + " " + cs);
             // Flush accumulated changes, returning to serverPlayer.
             players.remove(serverPlayer);
             game.sendToList(players, cs);
-System.err.println("NEWTURN " + serverPlayer + " " + cs);
             return cs;
         }
     }
@@ -2180,8 +2173,7 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
 
         // Revenge begins
         game.setCurrentPlayer(serverPlayer);
-        cs.add(See.all(), ChangePriority.CHANGE_LATE,
-               new SetCurrentPlayerMessage(serverPlayer));
+        cs.add(See.all(), new SetCurrentPlayerMessage(serverPlayer));
 
         // Others can tell something has happened to the player,
         // and possibly see the units.
@@ -2378,8 +2370,8 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
 
         // Try to incite?
         if (gold < 0) { // Initial inquiry
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-                new InciteMessage(unit, is, enemy, goldToPay));
+            cs.add(See.only(serverPlayer),
+                   new InciteMessage(unit, is, enemy, goldToPay));
         } else if (gold < goldToPay || !serverPlayer.checkGold(gold)) {
             cs.addMessage(serverPlayer,
                 new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
@@ -2448,7 +2440,7 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
             }
             session = new NativeDemandSession(unit, colony, type, amount,
                                               getTimeout());
-            cs.add(See.only(victim), ChangePriority.CHANGE_NORMAL,
+            cs.add(See.only(victim),
                    new IndianDemandMessage(unit, colony, type, amount));
         } else {
             if (session == null) {
@@ -2641,7 +2633,7 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
         ChangeSet cs = new ChangeSet();
         List<Goods> available = session.getCapture();
         if (loot == null) { // Initial inquiry
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+            cs.add(See.only(serverPlayer),
                    new LootCargoMessage(winner, loserId, available));
         } else {
             for (Goods g : loot) {
@@ -2953,14 +2945,14 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
             nt = new NativeTrade(nt.getUnit(), nt.getIndianSettlement());
             if (nt.getDone()) {
                 // Trade can not happen, just outright NAK as invalid.
-                cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                cs.add(See.only(serverPlayer),
                        new NativeTradeMessage(NativeTradeAction.NAK_INVALID, nt));
             } else {
                 // Trade can proceed.  Register a session and ask the natives
                 // to price the goods.
                 session = new NativeTradeSession(nt);
                 nt.initialize();
-                cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                cs.add(See.only(otherPlayer),
                        new NativeTradeMessage(action, nt));
             }
             break;
@@ -2982,7 +2974,7 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
                     + action + ": " + nt);
             }
             nt.setItem(item);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
 
@@ -2999,7 +2991,7 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
                     + action + ": " + nt);
             }
             nt.setItem(item);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
             
@@ -3016,13 +3008,13 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
                     + action + ": " + nt);
             }
             nt.setItem(item);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
 
         case ACK_OPEN: // Natives are prepared to trade, inform player
             session.getNativeTrade().mergeFrom(nt);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             // Set unit moves to zero to avoid cheating.  If no
             // action is taken, the moves will be restored when
@@ -3033,7 +3025,7 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
 
         case ACK_BUY_HAGGLE: case ACK_SELL_HAGGLE: // Successful haggle
             session.getNativeTrade().mergeFrom(nt);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
             
@@ -3045,7 +3037,7 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
             nt.addToUnit(item);
             session.getNativeTrade().mergeFrom(nt);
             session.getNativeTrade().setBuy(false);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
 
@@ -3057,7 +3049,7 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
             nt.removeFromUnit(item);
             session.getNativeTrade().mergeFrom(nt);
             session.getNativeTrade().setSell(false);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
 
@@ -3069,19 +3061,19 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
             nt.removeFromUnit(item);
             session.getNativeTrade().mergeFrom(nt);
             session.getNativeTrade().setGift(false);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
 
         case NAK_GOODS: // Polite refusal of gift
             session.getNativeTrade().mergeFrom(nt);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
 
         case NAK_INVALID: case NAK_HOSTILE: case NAK_HAGGLE: // Fail, close
             session.getNativeTrade().mergeFrom(nt);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             session.complete(cs);
             if (action == NativeTradeAction.NAK_HAGGLE) {
@@ -3348,9 +3340,9 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
         csVisit(serverPlayer, is, -1, cs);
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
-        cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
-            new NationSummaryMessage(owner)
-                .setNationSummary(new NationSummary(owner, serverPlayer)));
+        cs.add(See.only(serverPlayer),
+               new NationSummaryMessage(owner)
+                   .setNationSummary(new NationSummary(owner, serverPlayer)));
 
         // This is private.
         return cs;
@@ -3445,8 +3437,8 @@ System.err.println("NEWTURN " + serverPlayer + " " + cs);
         }
 
         // Always add result.
-        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-            new ScoutSpeakToChiefMessage(unit, is, result));
+        cs.add(See.only(serverPlayer),
+               new ScoutSpeakToChiefMessage(unit, is, result));
 
         // Other players may be able to see unit disappearing, or
         // learning.

@@ -132,6 +132,14 @@ public class DiplomacyMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.LATE;
+    }
+
+
     // Public interface
 
     /**

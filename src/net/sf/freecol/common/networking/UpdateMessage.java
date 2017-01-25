@@ -80,6 +80,14 @@ public class UpdateMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.UPDATE;
+    }
+
+
     // Public interface
 
     /**

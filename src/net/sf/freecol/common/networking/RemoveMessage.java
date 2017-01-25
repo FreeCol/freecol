@@ -73,6 +73,16 @@ public class RemoveMessage extends AttributeMessage {
 
 
     /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.REMOVE;
+    }
+
+
+    // Public interface
+
+    /**
      * Get the divert object.
      *
      * @param game The {@code Game} to look in.

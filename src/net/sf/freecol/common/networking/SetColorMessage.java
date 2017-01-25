@@ -63,6 +63,14 @@ public class SetColorMessage extends AttributeMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.NORMAL;
+    }
+
+
     // Public interface
 
     /**

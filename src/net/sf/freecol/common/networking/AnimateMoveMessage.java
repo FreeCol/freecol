@@ -79,6 +79,14 @@ public class AnimateMoveMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.ANIMATION;
+    }
+
+
     // Public interface
 
     /**

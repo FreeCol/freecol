@@ -70,6 +70,14 @@ public class LearnSkillMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.NORMAL;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {

@@ -67,9 +67,9 @@ import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChangeSet;
-import net.sf.freecol.common.networking.ChangeSet.ChangePriority;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.FountainOfYouthMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.option.GameOptions;
@@ -623,7 +623,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     // Remember, and ask player to select
                     serverPlayer.setRemainingEmigrants(dx);
                     cs.add(See.only(serverPlayer),
-                           ChangeSet.ChangePriority.CHANGE_LATE,
                            new FountainOfYouthMessage(dx));
                 }
                 cs.addMessage(serverPlayer,
@@ -847,8 +846,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 // Set the default value now to prevent multiple attempts.
                 // The user setNewLandName can override.
                 serverPlayer.setNewLandName(newLand);
-                cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                    new NewLandNameMessage(this, newLand));
+                cs.add(See.only(serverPlayer),
+                       new NewLandNameMessage(this, newLand));
                 logger.finest("First landing for " + serverPlayer
                     + " at " + newTile + " with " + this);
             }
@@ -891,9 +890,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
         Region region = newTile.getDiscoverableRegion();
         if (serverPlayer.isEuropean() && region != null
             && region.getDiscoverer() == null) {
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new NewRegionNameMessage(region, newTile, this,
-                    serverPlayer.getNameForRegion(region)));
+            cs.add(See.only(serverPlayer),
+                   new NewRegionNameMessage(region, newTile, this,
+                       serverPlayer.getNameForRegion(region)));
             region.setDiscoverer(getId());
         }
     }

@@ -71,6 +71,14 @@ public class FirstContactMessage extends AttributeMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.EARLY;
+    }
+
+
     // Public interface
 
     public Player getPlayer(Game game) {

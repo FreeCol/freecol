@@ -63,6 +63,14 @@ public class NewLandNameMessage extends AttributeMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return Message.MessagePriority.LATE;
+    }
+
+
     // Public interface
 
     /**

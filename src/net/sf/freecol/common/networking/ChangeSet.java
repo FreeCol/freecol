@@ -63,31 +63,6 @@ public class ChangeSet {
     private static final Comparator<Change> changeComparator
         = Comparator.comparingInt(Change::getPriority);
 
-    // Convenient way to specify the relative priorities of the fixed
-    // change types in one place.
-    public static enum ChangePriority {
-        CHANGE_ATTRIBUTE(-1), // N/A
-        CHANGE_ANIMATION(0),  // Do animations first
-        CHANGE_REMOVE(100),   // Do removes last
-        CHANGE_STANCE(5),     // Do stance before updates
-        CHANGE_OWNED(20),     // Do owned changes after updates
-        CHANGE_UPDATE(10),    // There are a lot of updates
-        // Symbolic priorities used by various non-fixed types
-        CHANGE_EARLY(1),
-        CHANGE_NORMAL(15),
-        CHANGE_LATE(90);
-
-        private final int level;
-
-        ChangePriority(int level) {
-            this.level = level;
-        }
-
-        public int getPriority() {
-            return level;
-        }
-    }
-
     private final ArrayList<Change> changes;
 
 
@@ -405,7 +380,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         public int getPriority() {
-            return ChangePriority.CHANGE_ANIMATION.getPriority();
+            return AnimateAttackMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -489,7 +464,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return ChangePriority.CHANGE_ATTRIBUTE.getPriority();
+            return AttributeMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -539,20 +514,18 @@ public class ChangeSet {
      * Encapsulate a Message.
      */
     private static class MessageChange extends Change {
-        private final ChangePriority priority;
+
         private final DOMMessage message;
+
 
         /**
          * Build a new MessageChange.
          *
          * @param see The visibility of this change.
-         * @param priority The priority of the change.
          * @param message The {@code Message} to add.
          */
-        public MessageChange(See see, ChangePriority priority,
-                             DOMMessage message) {
+        public MessageChange(See see, DOMMessage message) {
             super(see);
-            this.priority = priority;
             this.message = message;
         }
 
@@ -562,7 +535,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return priority.getPriority();
+            return this.message.getPriority().getValue();
         }
 
         /**
@@ -664,7 +637,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return ChangePriority.CHANGE_ANIMATION.getPriority();
+            return AnimateMoveMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -761,7 +734,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return ChangePriority.CHANGE_UPDATE.getPriority();
+            return UpdateMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -921,7 +894,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return ChangePriority.CHANGE_NORMAL.getPriority();
+            return AddPlayerMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -1028,7 +1001,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return ChangePriority.CHANGE_REMOVE.getPriority();
+            return RemoveMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -1128,7 +1101,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return ChangePriority.CHANGE_OWNED.getPriority();
+            return FeatureChangeMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -1195,7 +1168,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return ChangePriority.CHANGE_NORMAL.getPriority();
+            return SpySettlementMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -1263,7 +1236,7 @@ public class ChangeSet {
          */
         @Override
         public int getPriority() {
-            return ChangePriority.CHANGE_STANCE.getPriority();
+            return SetStanceMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -1437,15 +1410,14 @@ public class ChangeSet {
      * Helper function to add a Message to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param cp The priority of this change.
      * @param message The {@code Message} to add.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet add(See see, ChangePriority cp, DOMMessage message) {
-        changes.add(new MessageChange(see, cp, message));
+    public ChangeSet add(See see, DOMMessage message) {
+        changes.add(new MessageChange(see, message));
         return this;
     }
-
+    
     /**
      * Helper function to add an attack to a ChangeSet.
      *
@@ -1471,19 +1443,6 @@ public class ChangeSet {
      */
     public ChangeSet addAttribute(See see, String key, String value) {
         changes.add(new AttributeChange(see, key, value));
-        return this;
-    }
-
-    /**
-     * Helper function to add a dead player event to a ChangeSet.
-     * Deaths are public knowledge.
-     *
-     * @param serverPlayer The {@code ServerPlayer} that died.
-     * @return The updated {@code ChangeSet}.
-     */
-    public ChangeSet addDead(ServerPlayer serverPlayer) {
-        add(See.all(), ChangePriority.CHANGE_EARLY,
-            new SetDeadMessage(serverPlayer));
         return this;
     }
 
@@ -1748,21 +1707,6 @@ public class ChangeSet {
         return this;
     }
 
-    /**
-     * Helper function to add a trivial element to a ChangeSet.
-     *
-     * @param see The visibility of this change.
-     * @param name The name of the element.
-     * @param cp The {@code ChangePriority} for this change.
-     * @param attributes Attributes to add to this trivial change.
-     * @return The updated {@code ChangeSet}.
-     */
-    public ChangeSet addTrivial(See see, String name, ChangePriority cp,
-                                String... attributes) {
-        changes.add(new TrivialChange(see, name, cp.getPriority(), attributes));
-        return this;
-    }
-
 
     // Conversion of a change set to a corresponding element.
 
@@ -1914,8 +1858,7 @@ public class ChangeSet {
     public static ChangeSet clientError(See see, StringTemplate template) {
         ChangeSet cs = new ChangeSet();
         if (see == null) see = See.all();
-        cs.add(see, ChangeSet.ChangePriority.CHANGE_NORMAL,
-               new ErrorMessage(template));
+        cs.add(see, new ErrorMessage(template));
         return cs;
     }
 
@@ -1945,8 +1888,7 @@ public class ChangeSet {
     public static ChangeSet clientError(See see, String message) {
         ChangeSet cs = new ChangeSet();
         if (see == null) see = See.all();
-        cs.add(see, ChangeSet.ChangePriority.CHANGE_NORMAL,
-               new ErrorMessage(message));
+        cs.add(see, new ErrorMessage(message));
         return cs;
     }
 
@@ -1973,8 +1915,7 @@ public class ChangeSet {
      */
     public static ChangeSet simpleChange(See see, DOMMessage message) {
         ChangeSet cs = new ChangeSet();
-        cs.add((see == null) ? See.all() : see, ChangePriority.CHANGE_NORMAL,
-               message);
+        cs.add((see == null) ? See.all() : see, message);
         return cs;
     }
     

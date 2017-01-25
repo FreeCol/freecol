@@ -66,6 +66,14 @@ public class LogoutMessage extends AttributeMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public static MessagePriority getMessagePriority() {
+        return MessagePriority.NORMAL;
+    }
+
+
     // Public interface
 
     /**
@@ -133,8 +141,7 @@ public class LogoutMessage extends AttributeMessage {
 
         // Confirm the logout with the given reason.
         if (cs == null) cs = new ChangeSet();
-        cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_NORMAL,
-               new LogoutMessage(serverPlayer, reason));
+        cs.add(See.only(serverPlayer), new LogoutMessage(serverPlayer, reason));
 
         // Update the metaserver
         freeColServer.updateMetaServer(false);
