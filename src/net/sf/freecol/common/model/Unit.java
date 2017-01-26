@@ -237,6 +237,8 @@ public class Unit extends GoodsLocation
      */
     protected Unit(Game game) {
         super(game);
+
+        initialize();
     }
 
     /**
@@ -249,9 +251,22 @@ public class Unit extends GoodsLocation
      */
     public Unit(Game game, String id) {
         super(game, id);
+
+        initialize();
     }
 
 
+    /**
+     * Initialize the nationality and ethnicity.
+     */
+    private void initialize() {
+        Player owner = getOwner();
+        if (owner != null && isPerson()) {
+            setNationality(owner.getNationId());
+            setEthnicity(owner.getNationId());
+        }
+    }
+        
     /**
      * Get the individual name of this unit.
      *
@@ -1429,7 +1444,7 @@ public class Unit extends GoodsLocation
      * @return The nationality of this Unit.
      */
     public String getNationality() {
-        return nationality;
+        return this.nationality;
     }
 
     /**
@@ -1441,11 +1456,7 @@ public class Unit extends GoodsLocation
      * @param newNationality The new nationality of this Unit.
      */
     public void setNationality(String newNationality) {
-        if (isPerson()) {
-            nationality = newNationality;
-        } else {
-            throw new UnsupportedOperationException("Can not set the nationality of a Unit which is not a person!");
-        }
+        this.nationality = newNationality;
     }
 
     /**
@@ -1458,7 +1469,7 @@ public class Unit extends GoodsLocation
      * @return The ethnicity of this Unit.
      */
     public String getEthnicity() {
-        return ethnicity;
+        return this.ethnicity;
     }
 
     /**
@@ -4327,15 +4338,12 @@ public class Unit extends GoodsLocation
         } else {
             xw.writeAttribute(OWNER_TAG, getOwner());
 
-            if (isPerson()) {
-                // Do not write out nationality and ethnicity for non-persons.
-                xw.writeAttribute(NATIONALITY_TAG, (nationality != null)
-                    ? nationality
-                    : getOwner().getNationId());
+            if (nationality != null) {
+                xw.writeAttribute(NATIONALITY_TAG, nationality);
+            }
 
-                xw.writeAttribute(ETHNICITY_TAG, (ethnicity != null)
-                    ? ethnicity
-                    : getOwner().getNationId());
+            if (ethnicity != null) {
+                xw.writeAttribute(ETHNICITY_TAG, ethnicity);
             }
         }
 
