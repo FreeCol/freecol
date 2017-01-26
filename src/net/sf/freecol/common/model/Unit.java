@@ -597,19 +597,8 @@ public class Unit extends GoodsLocation
      * @return True if this unit is a person.
      */
     public boolean isPerson() {
-        return hasAbility(Ability.PERSON)
-            // @compat 0.10.0
-            || this.unitType.hasAbility(Ability.BORN_IN_COLONY)
-            || this.unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-            || this.unitType.hasAbility(Ability.FOUND_COLONY)
-            // Nick also had:
-            //     && (!hasAbility("model.ability.carryGoods")
-            //         && !hasAbility("model.ability.carryUnits")
-            //         && !hasAbility("model.ability.carryTreasure")
-            //         && !hasAbility("model.ability.bombard"))
-            // ...but that should be unnecessary.
-            // end @compat
-            ;
+        return (this.unitType == null) ? null
+            : this.unitType.hasAbility(Ability.PERSON);
     }
 
     /**

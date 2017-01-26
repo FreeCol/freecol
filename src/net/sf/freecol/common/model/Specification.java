@@ -2055,6 +2055,23 @@ public final class Specification {
      */
     private void fixSpec() {
         // @compat 0.10.0
+        Ability person = new Ability(Ability.PERSON, true);
+        for (UnitType ut : getUnitTypeList()) {
+            if (!ut.isPerson()
+                && (ut.hasAbility(Ability.BORN_IN_COLONY)
+                    || ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                    || ut.hasAbility(Ability.FOUND_COLONY)
+                    // Nick also had:
+                    //     && (!hasAbility("model.ability.carryGoods")
+                    //         && !hasAbility("model.ability.carryUnits")
+                    //         && !hasAbility("model.ability.carryTreasure")
+                    //         && !hasAbility("model.ability.bombard"))
+                    // ...but that should be unnecessary.
+                    )) {
+                ut.addAbility(person);
+            }
+        }
+
         if (getModifiers(Modifier.SHIP_TRADE_PENALTY) == null) {
             addModifier(new Modifier(Modifier.SHIP_TRADE_PENALTY,
                                      -30.0f, Modifier.ModifierType.PERCENTAGE,
