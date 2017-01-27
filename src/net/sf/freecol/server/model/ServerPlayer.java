@@ -664,9 +664,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         while (!units.isEmpty()) {
             Unit u = units.remove(0);
             if (u.hasTile()) cs.add(See.perhaps(), u.getTile());
-            cs.addRemove(See.perhaps().always(this),
-                         u.getLocation(), u);//-vis(this)
-            u.dispose();
+            ((ServerUnit)u).csRemove(See.perhaps().always(this),
+                u.getLocation(), cs);//-vis(this)
         }
 
         // Remove European stuff
@@ -1579,8 +1578,8 @@ outer:  for (Effect effect : effects) {
                                                       effect.getId(), colony)
                                     .addStringTemplate("%unit%",
                                         unit.getLabel());
-                                cs.addRemove(See.only(this), null, unit);
-                                unit.dispose();//-vis: Safe, entirely within colony
+                                ((ServerUnit)unit).csRemove(See.only(this),
+                                    null, cs);//-vis: Safe, entirely within colony
                                 colonyDirty = true;
                             }
                             break;
@@ -3077,8 +3076,8 @@ outer:  for (Effect effect : effects) {
         }
         for (Unit u : ship.getUnitList()) {
             ship.remove(u);
-            cs.addRemove(See.only(player), null, u);//-vis: safe, within unit
-            u.dispose();
+            ((ServerUnit)u).csRemove(See.only(player),
+                null, cs);//-vis: safe, within unit
         }
 
         // Damage the ship and send it off for repair
@@ -3823,9 +3822,8 @@ outer:  for (Effect effect : effects) {
     private void csSinkShip(Unit ship, ServerPlayer attackerPlayer,
                             ChangeSet cs) {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        cs.addRemove(See.perhaps().always(shipPlayer), ship.getLocation(),
-                     ship);//-vis(shipPlayer)
-        ship.dispose();
+        ((ServerUnit)ship).csRemove(See.perhaps().always(shipPlayer),
+            ship.getLocation(), cs);//-vis(shipPlayer)
         shipPlayer.invalidateCanSeeTiles();//+vis(shipPlayer)
         if (attackerPlayer != null) {
             cs.addAttribute(See.only(attackerPlayer), "sound",
@@ -3878,8 +3876,8 @@ outer:  for (Effect effect : effects) {
             cs.addGlobalHistory(getGame(),
                 new HistoryEvent(getGame().getTurn(),
                     HistoryEvent.HistoryEventType.DESTROY_NATION, winnerPlayer)
-                .addStringTemplate("%nation%", winnerPlayer.getNationLabel())
-                .addStringTemplate("%nativeNation%", nativeNation));
+                    .addStringTemplate("%nation%", winnerPlayer.getNationLabel())
+                    .addStringTemplate("%nativeNation%", nativeNation));
         }
 
         // Destroy unit.  Note See.only visibility used to handle the
@@ -3887,11 +3885,10 @@ outer:  for (Effect effect : effects) {
         // See.perhaps was used there, the settlement will be gone
         // when perhaps() is processed, which would erroneously make
         // the unit visible.
-        cs.addRemove((loserLoc.getSettlement() != null)
+        ((ServerUnit)loser).csRemove((loserLoc.getSettlement() != null)
             ? See.only(loserPlayer)
             : See.perhaps().always(loserPlayer),
-            loserLoc, loser);//-vis(loserPlayer)
-        loser.dispose();
+            loserLoc, cs);//-vis(loserPlayer)
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
     }
 
@@ -4237,8 +4234,8 @@ outer:  for (Effect effect : effects) {
             } else { // Can not have this unit.
                 logger.warning("Change type/owner failed for " + unit
                     + " -> " + newOwner + "(" + change + "/" +  uc + ")");
-                cs.addRemove(See.perhaps().always(this), oldTile, unit);
-                unit.dispose();
+                ((ServerUnit)unit).csRemove(See.perhaps().always(this),
+                    oldTile, cs);
                 return false;
             }
 
@@ -4253,8 +4250,7 @@ outer:  for (Effect effect : effects) {
                 } else {
                     logger.warning("Change type/owner failed for cargo " + u
                         + " -> " + newOwner + "(" + change + "/" + uc + ")");
-                    cs.addRemove(See.only(this), unit, u);
-                    u.dispose();
+                    ((ServerUnit)u).csRemove(See.only(this), unit, cs);
                 }
             }
 

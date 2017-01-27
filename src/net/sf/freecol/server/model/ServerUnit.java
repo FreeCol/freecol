@@ -797,9 +797,8 @@ logger.finest("Debug first contact " + serverPlayer + " to " + ((settlement == n
         setLocation(newTile);//-vis(serverPlayer),-til if in colony
         if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()
             && !csExploreLostCityRumour(random, cs)) {
-            cs.addRemove(See.perhaps().always(serverPlayer), oldLocation,
-                         this);//-vis(serverPlayer)
-            this.dispose();
+            this.csRemove(See.perhaps().always(serverPlayer),
+                oldLocation, cs);//-vis(serverPlayer)
         }
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
@@ -900,6 +899,23 @@ logger.finest("Debug first contact " + serverPlayer + " to " + ((settlement == n
         }
     }
 
+    /**
+     * Remove this unit from the game.
+     *
+     * @param see The visibility of the change.
+     * @param loc The {@code Location} of the change.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    public void csRemove(See see, Location loc, ChangeSet cs) {
+        IndianSettlement is = getHomeIndianSettlement();
+        if (is != null) {
+            is.removeOwnedUnit(this);
+            cs.add(See.only((ServerPlayer)getOwner()), is);
+        }
+        cs.addRemove(see, loc, this);
+        this.dispose();
+    }
+
 
     // Implement ServerModelObject
 
@@ -932,9 +948,8 @@ logger.finest("Debug first contact " + serverPlayer + " to " + ((settlement == n
                         .addStringTemplate("%location%",
                             loc.getLocationLabelFor(owner)));
                 cs.add(See.perhaps(), (Tile)loc);
-                cs.addRemove(See.perhaps().always(owner), loc, 
-                             this);//-vis(owner)
-                this.dispose();
+                this.csRemove(See.perhaps().always(owner),
+                              loc, cs);//-vis(owner)
                 owner.invalidateCanSeeTiles();//+vis(owner)
                 lb.add(", ");
                 return;
