@@ -149,7 +149,8 @@ public final class InGameController extends FreeColClientHolder {
     private MoveMode moveMode = MoveMode.NEXT_ACTIVE_UNIT;
 
     /** A map of messages to be ignored. */
-    private final HashMap<String, Integer> messagesToIgnore = new HashMap<>();
+    private final java.util.Map<String, Integer> messagesToIgnore
+        = Collections.synchronizedMap(new HashMap<>());
 
     /** The messages in the last turn report. */
     private final List<ModelMessage> turnReportMessages = new ArrayList<>();
@@ -613,7 +614,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param key The key for a message to ignore.
      * @param turn The current {@code Turn}.
      */
-    private synchronized void startIgnoringMessage(String key, Turn turn) {
+    private void startIgnoringMessage(String key, Turn turn) {
         messagesToIgnore.put(key, turn.getNumber());
         logger.finer("Ignore message start: " + key);
     }
@@ -623,7 +624,7 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param key The key for a message to stop ignoring.
      */
-    private synchronized void stopIgnoringMessage(String key) {
+    private void stopIgnoringMessage(String key) {
         messagesToIgnore.remove(key);
         logger.finer("Ignore message stop: " + key);
     }
@@ -633,7 +634,7 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param turn The {@code Turn} value to test against.
      */
-    private synchronized void reapIgnoredMessages(Turn turn) {
+    private void reapIgnoredMessages(Turn turn) {
         removeInPlace(messagesToIgnore, e -> e.getValue() < turn.getNumber());
     }
 
@@ -645,16 +646,13 @@ public final class InGameController extends FreeColClientHolder {
      * @param turn The current {@code Turn}.
      * @return True if the message should continue to be ignored.
      */
-    private synchronized boolean continueIgnoreMessage(String key, Turn turn) {
-        Integer value;
-        if (key != null
+    private boolean continueIgnoreMessage(String key, Turn turn) {
+        Integer value = -1;
+        boolean ret = key != null
             && (value = messagesToIgnore.get(key)) != null
-            && value + 1 == turn.getNumber()) {
-            messagesToIgnore.put(key, value + 1);
-            logger.finer("Ignore message continue: " + key);
-            return true;
-        }
-        return false;
+            && value + 1 == turn.getNumber();
+        if (ret) messagesToIgnore.put(key, value + 1);
+        return ret;
     }
 
     /**
@@ -3326,7 +3324,6 @@ public final class InGameController extends FreeColClientHolder {
         String key;
         if (message == null
             || (key = message.getIgnoredMessageKey()) == null) return false;
-
         if (flag) {
             final Turn turn = getGame().getTurn();
             if (!continueIgnoreMessage(key, turn)) {

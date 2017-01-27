@@ -304,21 +304,20 @@ public class ModelMessage extends StringTemplate {
     public String getIgnoredMessageKey() {
         switch (getMessageType()) {
         case WAREHOUSE_CAPACITY:
-            String key = getSourceId();
+            StringBuilder sb = new StringBuilder(64);
+            sb.append(getSourceId());
             switch (getTemplateType()) {
             case TEMPLATE:
-                StringBuilder sb = new StringBuilder(64);
                 for (String k : getKeys()) {
                     if ("%goods%".equals(k)) {
                         sb.append('-').append(getReplacement(k).getId());
                     }
                 }
-                key = sb.toString();
                 break;
             default:
                 break;
             }
-            return key;
+            return sb.toString();
         default:
             break;
         }
@@ -453,12 +452,12 @@ public class ModelMessage extends StringTemplate {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
-        sb.append("ModelMessage<").append(hashCode())
-            .append(", ").append((sourceId == null) ? "null" : sourceId)
-            .append(", ").append((displayId == null) ? "null" : displayId)
-            .append(", ").append(super.toString())
-            .append(", ").append(messageType)
-            .append(" >");
+        sb.append("[ModelMessage ").append(hashCode())
+            .append(' ').append((sourceId == null) ? "null" : sourceId)
+            .append('/').append((displayId == null) ? "null" : displayId)
+            .append(' ').append(messageType)
+            .append(' ').append(super.toString())
+            .append(']');
         return sb.toString();
     }
 }
