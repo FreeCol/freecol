@@ -743,14 +743,14 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         // Throw away goods there is no room for, and warn about
         // levels that will be exceeded next turn
-        int limit = getWarehouseCapacity();
-        int adjustment = limit / GoodsContainer.CARGO_SIZE;
+        final int limit = getWarehouseCapacity();
+        final int adjustment = limit / GoodsContainer.CARGO_SIZE;
         for (Goods goods : transform(getCompactGoods(),
                                      AbstractGoods::isStorable)) {
-            GoodsType type = goods.getType();
-            ExportData exportData = getExportData(type);
-            int low = exportData.getLowLevel() * adjustment;
-            int high = exportData.getHighLevel() * adjustment;
+            final GoodsType type = goods.getType();
+            final ExportData exportData = getExportData(type);
+            final int low = exportData.getLowLevel() * adjustment;
+            final int high = exportData.getHighLevel() * adjustment;
             int amount = goods.getAmount();
             int oldAmount = container.getOldGoodsCount(type);
 
@@ -766,7 +766,6 @@ public class ServerColony extends Colony implements ServerModelObject {
                 continue;
             }
             if (type.limitIgnored()) continue;
-
             String messageId = null;
             int waste = 0;
             if (amount > limit) {
@@ -781,6 +780,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 // high-water-mark has been reached this turn
                 messageId = "model.colony.warehouseFull";
             }
+System.err.println("WL " + getName() + " " + goods + " limit=" + limit + " " + messageId);
             if (messageId != null) {
                 cs.addMessage(owner,
                     new ModelMessage(MessageType.WAREHOUSE_CAPACITY,

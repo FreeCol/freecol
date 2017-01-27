@@ -2001,6 +2001,7 @@ public final class InGameController extends Controller {
                     }
                 }
             }
+System.err.println("NEWTURN0 " + serverPlayer + " " + cs);
 
             if ((current = (ServerPlayer)game.getNextPlayer()) == null) {
                 // "can not happen"
@@ -2119,10 +2120,10 @@ public final class InGameController extends Controller {
                 game.sendToList(players, cs);
                 continue;
             }
-
             // Flush accumulated changes, returning to serverPlayer.
             players.remove(serverPlayer);
             game.sendToList(players, cs);
+System.err.println("NEWTURN " + serverPlayer + " " + cs);
             return cs;
         }
     }
