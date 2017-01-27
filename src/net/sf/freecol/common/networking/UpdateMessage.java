@@ -108,7 +108,9 @@ public class UpdateMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .add(this.fcgos, this.destination).toXMLElement();
+        DOMMessage message = new DOMMessage(TAG);
+        message.setStringAttributes(this.getStringAttributes());
+        if (!this.fcgos.isEmpty()) message.add(this.fcgos, this.destination);
+        return message.toXMLElement();
     }
 }

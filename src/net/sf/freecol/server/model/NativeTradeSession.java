@@ -74,7 +74,7 @@ public class NativeTradeSession extends Session {
             Unit unit = this.nt.getUnit();
             unit.setMovesLeft(this.movesLeft);
             cs.addPartial(See.only((ServerPlayer)unit.getOwner()), unit,
-                          "movesLeft");
+                "movesLeft", String.valueOf(unit.getMovesLeft()));
         }
         this.nt.setDone();
         return ret;

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -511,6 +512,77 @@ public class ChangeSet {
     }
 
     /**
+     * Encapsulate a feature change.
+     */
+    private static class FeatureChange extends Change {
+
+        private final FreeColGameObject parent;
+        private final FreeColObject child;
+        private final boolean add;
+
+
+        /**
+         * Build a new FeatureChange.
+         *
+         * @param see The visibility of this change.
+         * @param parent The {@code FreeColGameObject} to update.
+         * @param child The {@code FreeColObject} value to add or remove.
+         * @param add If true, add the child, if not, remove it.
+         */
+        public FeatureChange(See see, FreeColGameObject parent,
+                             FreeColObject child, boolean add) {
+            super(see);
+            this.parent = parent;
+            this.child = child;
+            this.add = add;
+        }
+
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getPriority() {
+            return FeatureChangeMessage.getMessagePriority().getValue();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+            return (!isNotifiable(serverPlayer)) ? null
+                : new FeatureChangeMessage(this.parent, this.child, this.add);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void attachToElement(Element element) {} // Noop
+
+
+        // Override Object
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder(32);
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
+                .append(" #").append(getPriority())
+                .append(' ').append((this.add) ? "add" : "remove")
+                .append(' ').append(this.child)
+                .append(' ').append((this.add) ? "to" : "from")
+                .append(' ').append(this.parent.getId())
+                .append(']');
+            return sb.toString();
+        }
+    }
+
+    /**
      * Encapsulate a Message.
      */
     private static class MessageChange extends Change {
@@ -707,6 +779,7 @@ public class ChangeSet {
          */
         public ObjectChange(See see, FreeColGameObject fcgo) {
             super(see);
+
             this.fcgo = fcgo;
         }
 
@@ -732,6 +805,7 @@ public class ChangeSet {
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
+            if (fcgo == null) return false;
             if (fcgo instanceof Unit) {
                 // Units have a precise test, use that rather than
                 // the more general interface-based tests.
@@ -785,7 +859,8 @@ public class ChangeSet {
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(' ').append(fcgo.getId())
+                .append(' ').append((this.fcgo == null) ? "<null>"
+                    : this.fcgo.getId())
                 .append(']');
             return sb.toString();
         }
@@ -796,7 +871,7 @@ public class ChangeSet {
      */
     private static class PartialObjectChange extends ObjectChange {
 
-        private final String[] fields;
+        private final List<String> fields;
 
 
         /**
@@ -807,9 +882,14 @@ public class ChangeSet {
          * @param fields The fields to update.
          */
         public PartialObjectChange(See see, FreeColGameObject fcgo,
-                                   String... fields) {
+                                   List<String> fields) {
             super(see, fcgo);
+
             this.fields = fields;
+            this.fields.add(0, fcgo.getId());
+            this.fields.add(0, FreeColObject.ID_ATTRIBUTE_TAG);
+            this.fields.add(0, Boolean.TRUE.toString());
+            this.fields.add(0, FreeColObject.PARTIAL_ATTRIBUTE_TAG);
         }
 
 
@@ -817,8 +897,8 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            return false;
+        public int getPriority() {
+            return UpdateMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -826,17 +906,9 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return null; // NYI
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("update");
-            element.appendChild(DOMUtils.toXMLElementPartial(fcgo, doc, fields));
-            return element;
+            UpdateMessage message = new UpdateMessage((ServerPlayer)null, null);
+            message.setStringAttributes(this.fields);
+            return message;
         }
 
 
@@ -1046,77 +1118,6 @@ public class ChangeSet {
                 sb.append(' ').append(f.getId());
             }
             sb.append(']');
-            return sb.toString();
-        }
-    }
-
-    /**
-     * Encapsulate a feature change.
-     */
-    private static class FeatureChange extends Change {
-
-        private final FreeColGameObject parent;
-        private final FreeColObject child;
-        private final boolean add;
-
-
-        /**
-         * Build a new FeatureChange.
-         *
-         * @param see The visibility of this change.
-         * @param parent The {@code FreeColGameObject} to update.
-         * @param child The {@code FreeColObject} value to add or remove.
-         * @param add If true, add the child, if not, remove it.
-         */
-        public FeatureChange(See see, FreeColGameObject parent,
-                             FreeColObject child, boolean add) {
-            super(see);
-            this.parent = parent;
-            this.child = child;
-            this.add = add;
-        }
-
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getPriority() {
-            return FeatureChangeMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return (!isNotifiable(serverPlayer)) ? null
-                : new FeatureChangeMessage(this.parent, this.child, this.add);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
-
-
-        // Override Object
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder(32);
-            sb.append('[').append(getClass().getName())
-                .append(' ').append(see)
-                .append(" #").append(getPriority())
-                .append(' ').append((this.add) ? "add" : "remove")
-                .append(' ').append(this.child)
-                .append(' ').append((this.add) ? "to" : "from")
-                .append(' ').append(this.parent.getId())
-                .append(']');
             return sb.toString();
         }
     }
@@ -1398,7 +1399,7 @@ public class ChangeSet {
         changes.add(new MessageChange(see, message));
         return this;
     }
-    
+
     /**
      * Helper function to add an attack to a ChangeSet.
      *
@@ -1575,7 +1576,8 @@ public class ChangeSet {
      */
     public ChangeSet addPartial(See see, FreeColGameObject fcgo,
                                 String... fields) {
-        changes.add(new PartialObjectChange(see, fcgo, fields));
+        changes.add(new PartialObjectChange(see, fcgo,
+                new ArrayList<>(Arrays.asList(fields))));
         return this;
     }
 

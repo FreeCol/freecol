@@ -629,7 +629,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void csKill(ChangeSet cs) {
         setDead(true);
-        cs.addPartial(See.all(), this, "dead");
+        cs.addPartial(See.all(), this, "dead", Boolean.TRUE.toString());
         cs.add(See.all(), new SetDeadMessage(this));
 
         // Clean up missions and remove tension/alarm/stance.
@@ -1426,8 +1426,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                      this));
             }
         }
-        if (upkeep > 0) cs.addPartial(See.only(this), this, "gold");
-        if (changed) cs.addPartial(See.only(this), this, "bankrupt");
+        if (upkeep > 0) {
+            cs.addPartial(See.only(this), this,
+                "gold", String.valueOf(this.getGold()));
+        }
+        if (changed) {
+            cs.addPartial(See.only(this), this,
+                "bankrupt", String.valueOf(this.getBankrupt()));
+        }
     }
 
     public void csNaturalDisasters(Random random, ChangeSet cs,
@@ -1531,7 +1537,8 @@ outer:  for (Effect effect : effects) {
                     case Effect.LOSS_OF_MONEY:
                         int plunder = Math.max(1, colony.getPlunder(null, random) / 5);
                         modifyGold(-plunder);
-                        cs.addPartial(See.only(this), this, "gold");
+                        cs.addPartial(See.only(this), this,
+                            "gold", String.valueOf(this.getGold()));
                         mm = new ModelMessage(MessageType.DEFAULT,
                                               effect.getId(), this)
                             .addAmount("%amount%", plunder);
@@ -1746,7 +1753,8 @@ outer:  for (Effect effect : effects) {
             }
 
             if (updateScore()) {
-                cs.addPartial(See.only(this), this, "score");
+                cs.addPartial(See.only(this), this,
+                    "score", String.valueOf(this.getScore()));
             }
 
         } else if (isIndian()) {
@@ -2032,7 +2040,8 @@ outer:  for (Effect effect : effects) {
             case "model.event.movementChange":
                 for (Unit u : transform(getUnits(), u -> u.getMovesLeft() > 0)) {
                     u.setMovesLeft(u.getInitialMovesLeft());
-                    cs.addPartial(See.only(this), u, "movesLeft");
+                    cs.addPartial(See.only(this), u,
+                        "movesLeft", String.valueOf(u.getMovesLeft()));
                 }
                 break;
 
@@ -2081,7 +2090,8 @@ outer:  for (Effect effect : effects) {
         if (price > 0) {
             modifyGold(-price);
             owner.modifyGold(price);
-            cs.addPartial(See.only(this), this, "gold");
+            cs.addPartial(See.only(this), this,
+                "gold", String.valueOf(this.getGold()));
         } else if (price < 0 && owner.isIndian()) {
             ServerIndianSettlement sis = (ServerIndianSettlement)ownerSettlement;
             if (sis == null) {
@@ -2127,14 +2137,16 @@ outer:  for (Effect effect : effects) {
             break;
         case RECRUIT:
             modifyGold(-europe.getRecruitPrice());
-            cs.addPartial(See.only(this), this, "gold");
+            cs.addPartial(See.only(this), this,
+                "gold", String.valueOf(this.getGold()));
             europe.increaseRecruitmentDifficulty();
             // Fall through
         case NORMAL:
             reduceImmigration();
             updateImmigrationRequired();
             cs.addPartial(See.only(this), this,
-                          "immigration", "immigrationRequired");
+                "immigration", String.valueOf(this.getImmigration()),
+                "immigrationRequired", String.valueOf(this.getImmigrationRequired()));
             if (!MigrationType.specificMigrantSlot(slot)) {
                 cs.addMessage(this, getEmigrationMessage(unit));
             }
@@ -2552,7 +2564,7 @@ outer:  for (Effect effect : effects) {
             if (!defenderPlayer.getAttackedByPrivateers()) {
                 defenderPlayer.setAttackedByPrivateers(true);
                 cs.addPartial(See.only(defenderPlayer), defenderPlayer,
-                              "attackedByPrivateers");
+                    "attackedByPrivateers", Boolean.TRUE.toString());
             }
         } else if (defender.hasAbility(Ability.PIRACY)) {
             ; // do nothing
@@ -2628,7 +2640,8 @@ outer:  for (Effect effect : effects) {
                 attackerUnit.setMovesLeft(0);
             }
             if (!attackerTileDirty) {
-                cs.addPartial(See.only(this), attacker, "movesLeft");
+                cs.addPartial(See.only(this), attacker,
+                    "movesLeft", String.valueOf(attackerUnit.getMovesLeft()));
             }
         }
 
@@ -2778,8 +2791,10 @@ outer:  for (Effect effect : effects) {
         if (plunder > 0) {
             attackerPlayer.modifyGold(plunder);
             colonyPlayer.modifyGold(-plunder);
-            cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
-            cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
+            cs.addPartial(See.only(attackerPlayer), attackerPlayer,
+                "gold", String.valueOf(attackerPlayer.getGold()));
+            cs.addPartial(See.only(colonyPlayer), colonyPlayer,
+                "gold", String.valueOf(colonyPlayer.getGold()));
         }
 
         // Remove goods party modifiers as they apply to a different monarch.
@@ -3187,8 +3202,10 @@ outer:  for (Effect effect : effects) {
         if (plunder > 0) {
             attackerPlayer.modifyGold(plunder);
             colonyPlayer.modifyGold(-plunder);
-            cs.addPartial(See.only(attackerPlayer), attackerPlayer, "gold");
-            cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
+            cs.addPartial(See.only(attackerPlayer), attackerPlayer,
+                "gold", String.valueOf(attackerPlayer.getGold()));
+            cs.addPartial(See.only(colonyPlayer), colonyPlayer,
+                "gold", String.valueOf(colonyPlayer.getGold()));
         }
 
         // Dispose of the colony and its contents.
@@ -3627,7 +3644,8 @@ outer:  for (Effect effect : effects) {
             int plunder = Math.max(1, colony.getPlunder(attacker, random) / 5);
             colonyPlayer.modifyGold(-plunder);
             attackerPlayer.modifyGold(plunder);
-            cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
+            cs.addPartial(See.only(colonyPlayer), colonyPlayer,
+                "gold", String.valueOf(colonyPlayer.getGold()));
             cs.addMessage(colonyPlayer,
                 new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                  "combat.raid.plunder", colony)
@@ -4059,7 +4077,8 @@ outer:  for (Effect effect : effects) {
         if (recalculateBellsBonus()) {
             cs.add(See.only(this), this);
         } else {
-            cs.addPartial(See.only(this), this, "tax");
+            cs.addPartial(See.only(this), this,
+                "tax", String.valueOf(this.getTax()));
         }
     }
 
@@ -4093,7 +4112,8 @@ outer:  for (Effect effect : effects) {
                     .addStringTemplate("%location%",
                         dst.up().getLocationLabelFor(this)));
             modifyGold(-price);
-            cs.addPartial(See.only(this), this, "gold");
+            cs.addPartial(See.only(this), this,
+                "gold", String.valueOf(this.getGold()));
         } else {
             getMonarch().setDispleasure(true);
             cs.add(See.only(this),
@@ -4197,7 +4217,8 @@ outer:  for (Effect effect : effects) {
         session.setAgreement(agreement);
         cs.add(See.only(this), session.getMessage(this));
         unit.setMovesLeft(0);
-        cs.addPartial(See.only(this), unit, "movesLeft");
+        cs.addPartial(See.only(this), unit,
+            "movesLeft", String.valueOf(unit.getMovesLeft()));
         logger.info("New European contact for " + unit
             + ", with session: " + session.getKey());
     }
@@ -4294,8 +4315,10 @@ outer:  for (Effect effect : effects) {
             if (type == null) {
                 this.modifyGold(-amount);
                 demandPlayer.modifyGold(amount);
-                cs.addPartial(See.only(this), this, "gold");
-                cs.addPartial(See.only(demandPlayer), demandPlayer, "gold");
+                cs.addPartial(See.only(this), this,
+                    "gold", String.valueOf(this.getGold()));
+                cs.addPartial(See.only(demandPlayer), demandPlayer,
+                    "gold", String.valueOf(demandPlayer.getGold()));
             } else {
                 GoodsContainer colonyContainer = colony.getGoodsContainer(),
                     unitContainer = unit.getGoodsContainer();
@@ -4401,14 +4424,16 @@ outer:  for (Effect effect : effects) {
         if (isEuropean()) { // Update liberty and immigration
             // Auto-emigrate if selection not allowed.
             if (hasAbility(Ability.SELECT_RECRUIT)) {
-                cs.addPartial(See.only(this), this, "immigration");
+                cs.addPartial(See.only(this), this,
+                    "immigration", String.valueOf(this.getImmigration()));
             } else {
                 while (checkEmigrate()) {
                     csEmigrate(MigrationType.getUnspecificSlot(),
                                MigrationType.NORMAL, random, cs);
                 }
             }
-            cs.addPartial(See.only(this), this, "liberty");
+            cs.addPartial(See.only(this), this,
+                "liberty", String.valueOf(this.getLiberty()));
 
             if (getSpecification().getBoolean(GameOptions.ENABLE_UPKEEP)) {
                 csPayUpkeep(random, cs);

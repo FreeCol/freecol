@@ -809,7 +809,7 @@ public abstract class FreeColObject
     public static final String ARRAY_SIZE_TAG = "xLength";
 
     /** XML attribute tag to denote partial updates. */
-    private static final String PARTIAL_ATTRIBUTE_TAG = "partial";
+    public static final String PARTIAL_ATTRIBUTE_TAG = "partial";
     // @compat 0.10.x
     private static final String OLD_PARTIAL_ATTRIBUTE_TAG = "PARTIAL";
     // end @compat

@@ -407,7 +407,8 @@ public final class InGameController extends Controller {
         final Tile tile = sis.getTile();
         tile.updateIndianSettlement(owner);
         cs.add(See.only(owner), tile);
-        cs.addPartial(See.only(owner), owner, "gold");
+        cs.addPartial(See.only(owner), owner,
+            "gold", String.valueOf(owner.getGold()));
         logger.finest(owner.getSuffix() + " " + unit + " buys " + goods
                       + " at " + sis.getName() + " for " + price);
     }
@@ -434,7 +435,8 @@ public final class InGameController extends Controller {
         final Tile tile = sis.getTile();
         tile.updateIndianSettlement(owner);
         cs.add(See.only(owner), tile);
-        cs.addPartial(See.only(owner), owner, "gold");
+        cs.addPartial(See.only(owner), owner,
+            "gold", String.valueOf(owner.getGold()));
         cs.addSale(owner, sis, goods.getType(),
                    Math.round((float)price/goods.getAmount()));
         logger.finest(owner.getSuffix() + " " + unit + " sells " + goods
@@ -598,7 +600,8 @@ public final class InGameController extends Controller {
 
         // Update player type.  Again, a pity to have to do a whole
         // player update, but a partial update works for other players.
-        cs.addPartial(See.all().except(independent), independent, "playerType");
+        cs.addPartial(See.all().except(independent), independent,
+            "playerType", String.valueOf(independent.getPlayerType()));
         cs.addGlobalMessage(game, independent,
             new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "giveIndependence.otherAnnounce", independent)
@@ -744,7 +747,8 @@ public final class InGameController extends Controller {
                                                      random, 5) - 2);
                 serverPlayer.modifyGold(warGold);
                 cs.addPartial(See.only(serverPlayer), serverPlayer,
-                              "gold", "score");
+                    "gold", String.valueOf(serverPlayer.getGold()),
+                    "score", String.valueOf(serverPlayer.getScore()));
                 logger.fine("War support v " + enemy.getNation().getSuffix()
                     + " " + warGold + " gold + " + Messages.message(AbstractUnit
                         .getListLabel(", ", warSupport)));
@@ -852,7 +856,8 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
-        cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+        cs.addPartial(See.only(serverPlayer), unit,
+            "movesLeft", String.valueOf(unit.getMovesLeft()));
 
         // Do not update others, nothing to see yet.
         return cs;
@@ -1049,7 +1054,8 @@ public final class InGameController extends Controller {
         serverPlayer.propagateToEuropeanMarkets(type, -buyAmount, random);
         serverPlayer.csFlushMarket(type, cs);
         carrier.setMovesLeft(0);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        cs.addPartial(See.only(serverPlayer), serverPlayer,
+            "gold", String.valueOf(serverPlayer.getGold()));
         cs.add(See.only(serverPlayer), carrier);
         logger.finest(carrier + " bought " + amount + "(" + buyAmount + ")"
             + " " + type.getSuffix()
@@ -1086,7 +1092,9 @@ public final class InGameController extends Controller {
         }
 
         serverPlayer.modifyGold(cashInAmount);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
+        cs.addPartial(See.only(serverPlayer), serverPlayer,
+            "gold", String.valueOf(serverPlayer.getGold()),
+            "score", String.valueOf(serverPlayer.getScore()));
         cs.addMessage(serverPlayer,
             new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              messageId, serverPlayer, unit)
@@ -1529,7 +1537,9 @@ public final class InGameController extends Controller {
         // REF is hardwired to declare war on rebels so there is no
         // need to adjust its stance or tension.
         cs.addPartial(See.all().except(serverPlayer), serverPlayer,
-                      "playerType", "independentNationName", "newLandName");
+            "playerType", String.valueOf(serverPlayer.getPlayerType()),
+            "independentNationName", serverPlayer.getIndependentNationName(),
+            "newLandName", serverPlayer.getNewLandName());
         cs.addGlobalMessage(game, serverPlayer,
             new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "declareIndependence.announce",
@@ -1699,7 +1709,9 @@ public final class InGameController extends Controller {
         if (gold > 0) {
             indianPlayer.modifyGold(-gold);
             serverPlayer.modifyGold(gold);
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
+            cs.addPartial(See.only(serverPlayer), serverPlayer,
+                "gold", String.valueOf(serverPlayer.getGold()),
+                "score", String.valueOf(serverPlayer.getScore()));
             m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                  "scoutSettlement.tributeAgree",
                                  unit, is)
@@ -1714,7 +1726,8 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
-        cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+        cs.addPartial(See.only(serverPlayer), unit,
+            "movesLeft", String.valueOf(unit.getMovesLeft()));
 
         // Do not update others, this is all private.
         return cs;
@@ -2382,7 +2395,8 @@ public final class InGameController extends Controller {
                     .addAmount("%amount%", goldToPay));
             cs.addAttribute(See.only(serverPlayer), "gold", "0");
             unit.setMovesLeft(0);
-            cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+            cs.addPartial(See.only(serverPlayer), unit,
+                "movesLeft", String.valueOf(unit.getMovesLeft()));
         } else {
             // Success.  Raise the tension for the native player with respect
             // to the European player.  Let resulting stance changes happen
@@ -2401,9 +2415,11 @@ public final class InGameController extends Controller {
                                  nativePlayer)
                 .addStringTemplate("%native%", nativePlayer.getNationLabel())
                     .addStringTemplate("%enemy%", enemy.getNationLabel()));
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            cs.addPartial(See.only(serverPlayer), serverPlayer,
+                "gold", String.valueOf(serverPlayer.getGold()));
             unit.setMovesLeft(0);
-            cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+            cs.addPartial(See.only(serverPlayer), unit,
+                "movesLeft", String.valueOf(unit.getMovesLeft()));
         }
 
         // Others might include enemy.
@@ -2527,7 +2543,8 @@ public final class InGameController extends Controller {
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case ANGRY: // Learn nothing, not even a pet update
-            cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+            cs.addPartial(See.only(serverPlayer), unit,
+                "movesLeft", String.valueOf(unit.getMovesLeft()));
             break;
         default:
             // Teach the unit, and expend the skill if necessary.
@@ -2597,7 +2614,8 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
         if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
             carrier.setMovesLeft(0);
-            cs.addPartial(See.only(serverPlayer), carrier, "movesLeft");
+            cs.addPartial(See.only(serverPlayer), carrier,
+                "movesLeft", String.valueOf(carrier.getMovesLeft()));
         }
 
         // Invisible in settlement
@@ -3020,7 +3038,8 @@ public final class InGameController extends Controller {
             // action is taken, the moves will be restored when
             // closing the session.
             unit.setMovesLeft(0);
-            cs.addPartial(See.only(otherPlayer), unit, "movesLeft");
+            cs.addPartial(See.only(otherPlayer), unit,
+                "movesLeft", String.valueOf(unit.getMovesLeft()));
             break;
 
         case ACK_BUY_HAGGLE: case ACK_SELL_HAGGLE: // Successful haggle
@@ -3078,7 +3097,8 @@ public final class InGameController extends Controller {
             session.complete(cs);
             if (action == NativeTradeAction.NAK_HAGGLE) {
                 unit.setMovesLeft(0); // Clear moves again on hagglers
-                cs.addPartial(See.only(otherPlayer), unit, "movesLeft");
+                cs.addPartial(See.only(otherPlayer), unit,
+                    "movesLeft", String.valueOf(unit.getMovesLeft()));
             }                
             break;
             
@@ -3126,7 +3146,8 @@ public final class InGameController extends Controller {
         Market market = serverPlayer.getMarket();
         serverPlayer.modifyGold(-arrears);
         market.setArrears(type, 0);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        cs.addPartial(See.only(serverPlayer), serverPlayer,
+            "gold", String.valueOf(serverPlayer.getGold()));
         cs.add(See.only(serverPlayer), market.getMarketData(type));
         // Arrears payment is private.
         return cs;
@@ -3186,7 +3207,8 @@ public final class InGameController extends Controller {
 
         // Nothing to see for others, colony internal.
         serverPlayer.setGold(savedGold);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        cs.addPartial(See.only(serverPlayer), serverPlayer,
+            "gold", String.valueOf(serverPlayer.getGold()));
         cs.add(See.only(serverPlayer), container);
         return cs;
     }
@@ -3297,7 +3319,7 @@ public final class InGameController extends Controller {
         }
         object.setName(newName);//-til?
         FreeColGameObject fcgo = (FreeColGameObject)object;
-        cs.addPartial(See.all(), fcgo, "name");
+        cs.addPartial(See.all(), fcgo, "name", newName);
 
         // Others may be able to see the name change.
         getGame().sendToOthers(serverPlayer, cs);
@@ -3407,7 +3429,8 @@ public final class InGameController extends Controller {
                     is.getOwner().modifyGold(-gold);
                     result = Integer.toString(gold);
                     cs.addPartial(See.only(serverPlayer), serverPlayer,
-                                  "gold", "score");
+                        "gold", String.valueOf(serverPlayer.getGold()),
+                        "score", String.valueOf(serverPlayer.getScore()));
                 }
             }
 
@@ -3428,7 +3451,8 @@ public final class InGameController extends Controller {
             if ("expert".equals(result)) {
                 cs.add(See.perhaps(), unit);
             } else {
-                cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+                cs.addPartial(See.only(serverPlayer), unit,
+                    "movesLeft", String.valueOf(unit.getMovesLeft()));
             }
         }
         if (tileDirty) {
@@ -3470,7 +3494,8 @@ public final class InGameController extends Controller {
             }
             serverPlayer.propagateToEuropeanMarkets(type, sellAmount, random);
             serverPlayer.csFlushMarket(type, cs);
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            cs.addPartial(See.only(serverPlayer), serverPlayer,
+                "gold", String.valueOf(serverPlayer.getGold()));
             logger.finest(carrier + " sold " + amount + "(" + sellAmount + ")"
                 + " " + type.getSuffix()
                 + " in Europe for " + (serverPlayer.getGold() - gold));
@@ -3598,7 +3623,8 @@ public final class InGameController extends Controller {
         serverPlayer.setNewLandName(name);
 
         // Update the name and note the history.
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "newLandName");
+        cs.addPartial(See.only(serverPlayer), serverPlayer,
+            "newLandName", name);
         Turn turn = serverPlayer.getGame().getTurn();
         HistoryEvent h = new HistoryEvent(turn,
             HistoryEvent.HistoryEventType.DISCOVER_NEW_WORLD, serverPlayer)
@@ -3650,7 +3676,8 @@ public final class InGameController extends Controller {
 
         cs.addSpy(unit, settlement);
         unit.setMovesLeft(0);
-        cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+        cs.addPartial(See.only(serverPlayer), unit,
+            "movesLeft", String.valueOf(unit.getMovesLeft()));
         return cs;
     }
 
@@ -3691,7 +3718,8 @@ public final class InGameController extends Controller {
 
         // Only visible in Europe
         ChangeSet cs = new ChangeSet();
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        cs.addPartial(See.only(serverPlayer), serverPlayer,
+            "gold", String.valueOf(serverPlayer.getGold()));
         cs.add(See.only(serverPlayer), europe);
         return cs;
     }
@@ -3726,7 +3754,8 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
             if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
                 carrier.setMovesLeft(0);
-                cs.addPartial(See.only(serverPlayer), carrier, "movesLeft");
+                cs.addPartial(See.only(serverPlayer), carrier,
+                    "movesLeft", String.valueOf(carrier.getMovesLeft()));
             }
         } else { // Dump of goods onto a tile
             GoodsLocation.moveGoods(carrier, goodsType, amount, null);

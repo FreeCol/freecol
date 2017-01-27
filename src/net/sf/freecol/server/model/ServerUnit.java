@@ -350,7 +350,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         loc.getLocationLabelFor(owner)));
             setState(UnitState.ACTIVE);
         }
-        cs.addPartial(See.only(owner), this, "hitPoints");
+        cs.addPartial(See.only(owner), this,
+            "hitPoints", String.valueOf(this.getHitPoints()));
     }
 
     /**
@@ -542,7 +543,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                         random, dx * 10) + dx * 5;
             serverPlayer.modifyGold(chiefAmount);
             cs.addPartial(See.only(serverPlayer), serverPlayer,
-                          "gold", "score");
+                "gold", String.valueOf(serverPlayer.getGold()),
+                "score", String.valueOf(serverPlayer.getScore()));
             if (mounds) key = rumour.getAlternateDescriptionKey("mounds");
             cs.addMessage(serverPlayer,
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -591,7 +593,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             if (ruinsAmount < 500) { // FIXME: remove magic number
                 serverPlayer.modifyGold(ruinsAmount);
                 cs.addPartial(See.only(serverPlayer), serverPlayer,
-                              "gold", "score");
+                    "gold", String.valueOf(serverPlayer.getGold()),
+                    "score", String.valueOf(serverPlayer.getScore()));
             } else {
                 unitType = getRandomMember(logger, "Choose train",
                                            treasureUnitTypes, random);
@@ -1098,7 +1101,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
         } else if (unitDirty) {
             cs.add(See.perhaps(), this);
         } else {
-            cs.addPartial(See.only(owner), this, "movesLeft");
+            cs.addPartial(See.only(owner), this,
+                "movesLeft", String.valueOf(this.getMovesLeft()));
         }
         lb.add(", ");
     }

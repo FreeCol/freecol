@@ -450,7 +450,8 @@ public class ServerGame extends Game implements ServerModelObject {
                    .addStringTemplate("%loserNation%", loser)
                    .addStringTemplate("%nation%", winner));
         setSpanishSuccession(true);
-        cs.addPartial(See.all(), this, "spanishSuccession");
+        cs.addPartial(See.all(), this,
+            "spanishSuccession", Boolean.TRUE.toString());
         tiles.removeAll(updated);
         cs.add(See.perhaps(), tiles);
         
@@ -581,8 +582,12 @@ public class ServerGame extends Game implements ServerModelObject {
             if (gold > 0) {
                 source.modifyGold(-gold);
                 dest.modifyGold(gold);
-                cs.addPartial(See.only(source), source, "gold", "score");
-                cs.addPartial(See.only(dest), dest, "gold", "score");
+                cs.addPartial(See.only(source), source,
+                    "gold", String.valueOf(source.getGold()),
+                    "score", String.valueOf(source.getScore()));
+                cs.addPartial(See.only(dest), dest,
+                    "gold", String.valueOf(dest.getGold()),
+                    "score", String.valueOf(dest.getScore()));
             }
             Goods goods = tradeItem.getGoods();
             if (goods != null && settlement != null) {

@@ -555,7 +555,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                             && u.getUnitChange(UnitChangeType.EXPERIENCE,
                                                expert) != null)) {
                         unit.setExperience(unit.getExperience() + experience);
-                        cs.addPartial(See.only(owner), unit, "experience");
+                        cs.addPartial(See.only(owner), unit,
+                            "experience", String.valueOf(unit.getExperience()));
                     }
                 }
             }
@@ -736,7 +737,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                                      "model.colony.customs.sale", this)
                         .addName("%colony%", getName())
                         .addName("%data%", lb2.toString()));
-                cs.addPartial(See.only(owner), owner, "gold");
+                cs.addPartial(See.only(owner), owner,
+                    "gold", String.valueOf(owner.getGold()));
                 lb.add(lb2.toString());
             }
         }

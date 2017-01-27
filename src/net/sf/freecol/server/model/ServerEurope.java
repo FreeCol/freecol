@@ -272,7 +272,8 @@ public class ServerEurope extends Europe implements ServerModelObject {
 
         if (ret) {
             ServerPlayer serverPlayer = (ServerPlayer)getOwner();
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            cs.addPartial(See.only(serverPlayer), serverPlayer,
+                "gold", String.valueOf(serverPlayer.getGold()));
             cs.add(See.only(serverPlayer), unit);
             serverPlayer.flushExtraTrades(random);
             serverPlayer.csFlushMarket(cs);
