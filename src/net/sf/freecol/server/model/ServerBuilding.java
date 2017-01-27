@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -218,8 +219,12 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csCheckMissingInput(ProductionInfo pi, ChangeSet cs) {
-        if (!canAutoProduce() && pi.getProduction().isEmpty()) {
-            for (GoodsType gt : transform(getInputs(), alwaysTrue(),
+        if (canAutoProduce()) return;
+        List<AbstractGoods> production = pi.getProduction();
+        if (!production.isEmpty()
+            && all(production, ag -> ag.getAmount() == 0)) {
+            for (GoodsType gt : transform(getInputs(),
+                                          ag -> ag.getAmount() > 0,
                                           AbstractGoods::getType)) {
                 cs.addMessage(getOwner(),
                     new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
