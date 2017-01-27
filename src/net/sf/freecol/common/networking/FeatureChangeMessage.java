@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -38,7 +41,7 @@ public class FeatureChangeMessage extends DOMMessage {
     private static final String ADD_TAG = "add";
     private static final String ID_TAG = FreeColObject.ID_ATTRIBUTE_TAG;
 
-    private FreeColObject fco = null;
+    private final List<FreeColObject> fcos = new ArrayList<>();
 
 
     /**
@@ -54,7 +57,7 @@ public class FeatureChangeMessage extends DOMMessage {
         super(TAG, ID_TAG, fcgo.getId(),
               ADD_TAG, String.valueOf(add));
 
-        this.fco = fco;
+        this.fcos.add(fco);
     }
 
     /**
@@ -68,7 +71,8 @@ public class FeatureChangeMessage extends DOMMessage {
         super(TAG, ID_TAG, getStringAttribute(element, ID_TAG),
               ADD_TAG, getStringAttribute(element, ADD_TAG));
 
-        this.fco = DOMUtils.getChild(game, element, 0);
+        this.fcos.clear();
+        this.fcos.addAll(DOMUtils.getChildren(game, element));
     }
 
 
@@ -89,8 +93,8 @@ public class FeatureChangeMessage extends DOMMessage {
      *
      * @return The child {@code FreeColObject}.
      */
-    public FreeColObject getChild() {
-        return this.fco;
+    public List<FreeColObject> getChildren() {
+        return this.fcos;
     }
 
     /**
@@ -120,6 +124,6 @@ public class FeatureChangeMessage extends DOMMessage {
         return new DOMMessage(TAG,
             ID_TAG, getStringAttribute(ID_TAG),
             ADD_TAG, getStringAttribute(ADD_TAG))
-            .add(this.fco).toXMLElement();
+            .add(this.fcos).toXMLElement();
     }
 }

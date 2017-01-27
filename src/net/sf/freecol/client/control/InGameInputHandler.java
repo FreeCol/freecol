@@ -437,55 +437,57 @@ public final class InGameInputHandler extends ClientInputHandler {
         final FeatureChangeMessage message
             = new FeatureChangeMessage(game, element);
         final FreeColGameObject parent = message.getParent(game);
-        final FreeColObject child = message.getChild();
+        final List<FreeColObject> children = message.getChildren();
         final boolean add = message.getAdd();
         if (parent == null) {
             logger.warning("featureChange with null parent.");
             return;
         }
-        if (child == null) {
-            logger.warning("featureChange with null child.");
+        if (children.isEmpty()) {
+            logger.warning("featureChange with no children.");
             return;
         }
 
-        if (child instanceof Ability) {
-            if (add) {
-                parent.addAbility((Ability)child);
-            } else {
-                parent.removeAbility((Ability)child);
+        for (FreeColObject fco : children) {
+            if (fco instanceof Ability) {
+                if (add) {
+                    parent.addAbility((Ability)fco);
+                } else {
+                    parent.removeAbility((Ability)fco);
+                }
+            } else if (fco instanceof Modifier) {
+                if (add) {
+                    parent.addModifier((Modifier)fco);
+                } else {
+                    parent.removeModifier((Modifier)fco);
+                }
+            } else if (fco instanceof HistoryEvent) {
+                if (parent instanceof Player && add) {
+                    Player player = (Player)parent;
+                    player.addHistory((HistoryEvent)fco);
+                } else {
+                    logger.warning("Feature change NYI: "
+                        + parent + "/" + add + "/" + fco);
+                }
+            } else if (fco instanceof LastSale) {
+                if (parent instanceof Player && add) {
+                    Player player = (Player)parent;
+                    player.addLastSale((LastSale)fco);
+                } else {
+                    logger.warning("Feature change NYI: "
+                        + parent + "/" + add + "/" + fco);
+                }
+            } else if (fco instanceof ModelMessage) {
+                if (parent instanceof Player && add) {
+                    Player player = (Player)parent;
+                    player.addModelMessage((ModelMessage)fco);
+                } else {
+                    logger.warning("Feature change NYI: "
+                        + parent + "/" + add + "/" + fco);
+                }
+            } else {        
+                logger.warning("featureChange unrecognized: " + fco);
             }
-        } else if (child instanceof Modifier) {
-            if (add) {
-                parent.addModifier((Modifier)child);
-            } else {
-                parent.removeModifier((Modifier)child);
-            }
-        } else if (child instanceof HistoryEvent) {
-            if (parent instanceof Player && add) {
-                Player player = (Player)parent;
-                player.addHistory((HistoryEvent)child);
-            } else {
-                logger.warning("Feature change NYI: "
-                    + parent + "/" + add + "/" + child);
-            }
-        } else if (child instanceof LastSale) {
-            if (parent instanceof Player && add) {
-                Player player = (Player)parent;
-                player.addLastSale((LastSale)child);
-            } else {
-                logger.warning("Feature change NYI: "
-                    + parent + "/" + add + "/" + child);
-            }
-        } else if (child instanceof ModelMessage) {
-            if (parent instanceof Player && add) {
-                Player player = (Player)parent;
-                player.addModelMessage((ModelMessage)child);
-            } else {
-                logger.warning("Feature change NYI: "
-                    + parent + "/" + add + "/" + child);
-            }
-        } else {        
-            logger.warning("featureChange unrecognized: " + child);
         }
     }
 
