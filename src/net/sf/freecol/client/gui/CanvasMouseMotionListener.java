@@ -67,9 +67,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (e.getY() >= AUTO_SCROLL_SPACE) {
-            performAutoScrollIfActive(e);
-        }
+        performAutoScrollIfActive(e, true);
 
         if (canvas.isGotoStarted()) {
             if (canvas.getActiveUnit() == null) {

@@ -63,11 +63,14 @@ public class AbstractCanvasListener extends FreeColClientHolder {
      * Auto-scroll to a mouse position if necessary.
      *
      * @param e The {@code MouseEvent} that initiating the scroll.
+     * @param ignoreTop If the top should be ignored (to avoid scrolling
+     *                  when the mouse is over the top of the map, as the
+     *                  menu bar above is checked already)
      */
-    protected void performAutoScrollIfActive(MouseEvent e) {
+    protected void performAutoScrollIfActive(MouseEvent e, boolean ignoreTop) {
         if (e.getComponent().isEnabled()
             && getClientOptions().getBoolean(ClientOptions.AUTO_SCROLL)) {
-            scroll(e.getX(), e.getY(), AUTO_SCROLL_SPACE);
+            scroll(e.getX(), e.getY(), AUTO_SCROLL_SPACE, ignoreTop);
         } else {
             stopScrollIfScrollIsActive();
         }
@@ -81,7 +84,7 @@ public class AbstractCanvasListener extends FreeColClientHolder {
     protected void performDragScrollIfActive(MouseEvent e) {
         if (e.getComponent().isEnabled()
             && getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
-            scroll(e.getX(), e.getY(), DRAG_SCROLL_SPACE);
+            scroll(e.getX(), e.getY(), DRAG_SCROLL_SPACE, false);
         } else {
             stopScrollIfScrollIsActive();
         }
@@ -103,15 +106,16 @@ public class AbstractCanvasListener extends FreeColClientHolder {
      * @param x The x coordinate.
      * @param y The y coordinate.
      * @param scrollSpace The clearance from the relevant edge
+     * @param ignoreTop If the top should be ignored
      */
-    private void scroll(int x, int y, int scrollSpace) {
+    private void scroll(int x, int y, int scrollSpace, boolean ignoreTop) {
         Direction direction;
         Dimension size = canvas.getSize();
         if (x < scrollSpace && y < scrollSpace) { // Upper-Left
-            direction = Direction.NW;
+            direction = !ignoreTop ? Direction.NW : Direction.W;
         } else if (x >= size.width - scrollSpace
             && y < scrollSpace) { // Upper-Right
-            direction = Direction.NE;
+            direction = !ignoreTop ? Direction.NE : Direction.E;
         } else if (x >= size.width - scrollSpace
             && y >= size.height - scrollSpace) { // Bottom-Right
             direction = Direction.SE;
@@ -119,7 +123,7 @@ public class AbstractCanvasListener extends FreeColClientHolder {
             && y >= size.height - scrollSpace) { // Bottom-Left
             direction = Direction.SW;
         } else if (y < scrollSpace) { // Top
-            direction = Direction.N;
+            direction = !ignoreTop ? Direction.N : null;
         } else if (x >= size.width - scrollSpace) { // Right
             direction = Direction.E;
         } else if (y >= size.height - scrollSpace) { // Bottom

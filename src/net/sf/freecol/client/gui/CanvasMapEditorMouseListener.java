@@ -273,8 +273,8 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (getMap() == null || e.getY() < AUTO_SCROLL_SPACE) return;
+        if (getMap() == null) return;
 
-        performAutoScrollIfActive(e);
+        performAutoScrollIfActive(e, true);
     }
 }
