@@ -148,10 +148,13 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                         String style = canvas.showRiverStyleDialog(tile);
                         if (style == null) {
                             // cancelled
-                        } else if (RiverStyleDialog.DELETE.equals(style)) {
-                            tile.getTileItemContainer().removeTileItem(river);
                         } else {
-                            river.updateRiverConnections(style);
+                            if (RiverStyleDialog.DELETE.equals(style)) {
+                                tile.getTileItemContainer().removeTileItem(river);
+                            } else {
+                                river.updateRiverConnections(style);
+                            }
+                            getGUI().refresh();
                         }
                     }
                     if (tile.getIndianSettlement() != null) {
