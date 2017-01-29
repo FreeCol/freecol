@@ -134,13 +134,13 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                 startPoint = endPoint = null;
 
             } else if (e.getButton() == MouseEvent.BUTTON2) {
-                startPoint = e.getPoint();
+                startPoint = endPoint = e.getPoint();
                 JComponent component = (JComponent)e.getSource();
                 drawBox(component, startPoint, endPoint);
 
             } else if (e.getButton() == MouseEvent.BUTTON3
                 || e.isPopupTrigger()) {
-                startPoint = e.getPoint();
+                startPoint = endPoint = e.getPoint();
                 Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
                     if (tile.hasRiver()) {
