@@ -34,7 +34,7 @@ import net.sf.freecol.common.model.Direction;
 public class AbstractCanvasListener extends FreeColClientHolder {
 
     /** Space to auto-scroll. */
-    protected static final int AUTO_SCROLL_SPACE = 1;
+    protected static final int AUTO_SCROLL_SPACE = 4;
 
     /** Space to drag-scroll. */
     private static final int DRAG_SCROLL_SPACE = 100;
