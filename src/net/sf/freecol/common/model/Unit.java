@@ -4089,6 +4089,11 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      */
+    public void invalidateCache() {}
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getGoodsCapacity() {
         return getCargoCapacity();

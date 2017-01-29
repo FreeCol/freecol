@@ -139,7 +139,10 @@ public abstract class GoodsLocation extends UnitLocation {
      * Remove all the goods.
      */
     public final void removeAll() {
-        if (goodsContainer != null) goodsContainer.removeAll();
+        if (goodsContainer != null) {
+            goodsContainer.removeAll();
+            invalidateCache();
+        }
     }
         
     /**
@@ -176,11 +179,8 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     public static void moveGoods(GoodsLocation src, GoodsType goodsType,
                                  int amount, GoodsLocation dst) {
-        GoodsContainer srcContainer = (src == null) ? null
-            : src.getGoodsContainer();
-        GoodsContainer dstContainer = (dst == null) ? null
-            : dst.getGoodsContainer();
-        GoodsContainer.moveGoods(srcContainer, goodsType, amount, dstContainer);
+        if (src != null) src.removeGoods(goodsType, amount);
+        if (dst != null) dst.addGoods(goodsType, amount);
     }
 
     
@@ -264,6 +264,11 @@ public abstract class GoodsLocation extends UnitLocation {
     // GoodsLocation routines to be implemented/overridden by subclasses
 
     /**
+     * Invalidate any cache dependent on the goods levels.
+     */
+    public abstract void invalidateCache();
+    
+    /**
      * Gets the maximum number of {@code Goods} this Location
      * can hold.
      *
@@ -282,7 +287,9 @@ public abstract class GoodsLocation extends UnitLocation {
         if (goodsContainer == null) {
             goodsContainer = new GoodsContainer(getGame(), this);
         }
-        return goodsContainer.addGoods(type, amount);
+        boolean ret = goodsContainer.addGoods(type, amount);
+        invalidateCache();
+        return ret;
     }
 
     /**
@@ -294,8 +301,10 @@ public abstract class GoodsLocation extends UnitLocation {
      *     requested, or null if none.
      */
     public Goods removeGoods(GoodsType type, int amount) {
-        return (goodsContainer == null) ? null
-            : goodsContainer.removeGoods(type, amount);
+        if (goodsContainer == null) return null;
+        Goods ret = goodsContainer.removeGoods(type, amount);
+        invalidateCache();
+        return ret;
     }
 
 

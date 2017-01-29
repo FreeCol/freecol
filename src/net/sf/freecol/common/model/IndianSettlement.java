@@ -1213,6 +1213,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    public void invalidateCache() {}
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getGoodsCapacity() {
         return getType().getWarehouseCapacity();

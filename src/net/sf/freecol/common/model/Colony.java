@@ -2011,13 +2011,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Invalidates the production cache.
-     */
-    public void invalidateCache() {
-        productionCache.invalidate();
-    }
-
-    /**
      * Update all the production types.
      *
      * Called at initialization, to default to something rational when
@@ -2537,6 +2530,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
 
     // Interface GoodsLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    public void invalidateCache() {
+        this.productionCache.invalidate();
+    }
 
     /**
      * {@inheritDoc}
