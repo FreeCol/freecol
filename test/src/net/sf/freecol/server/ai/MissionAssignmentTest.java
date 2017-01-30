@@ -201,7 +201,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         // so that he may defend the settlement
         Unit braveOutside = new ServerUnit(game, settlementTile, inca, 
                                            braveType);
-        braveOutside.setHomeIndianSettlement(camp);
+        braveOutside.changeHomeIndianSettlement(camp);
 
         // Setup enemy units
         int enemyUnits = camp.getUnitCount() + 1;
@@ -209,7 +209,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
             new ServerUnit(game, adjacentTile, dutch, veteranType);
         }
 
-        for (Unit brave : camp.getOwnedUnits()) {
+        for (Unit brave : camp.getOwnedUnitList()) {
             assertNotNull("Got null while getting the camps units", brave);
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull("Couldnt get the ai object for the brave", aiUnit);

@@ -3216,8 +3216,8 @@ outer:  for (Effect effect : effects) {
         int plunder = is.getPlunder(attacker, random);
 
         // Remaining units lose their home.
-        for (Unit u : is.getOwnedUnits()) {
-            u.setHomeIndianSettlement(null);
+        for (Unit u : is.getOwnedUnitList()) {
+            u.changeHomeIndianSettlement(null);
             cs.add(See.only(nativePlayer), u);
         }
                 

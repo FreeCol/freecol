@@ -191,10 +191,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @param unit The {@code Unit} to be added.
      */
     public void addOwnedUnit(Unit unit) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
-        }
-
         synchronized (this.ownedUnits) {
             if (!this.ownedUnits.contains(unit)) {
                 this.ownedUnits.add(unit);
@@ -207,7 +203,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *
      * @return The list of units native to this settlement.
      */
-    public List<Unit> getOwnedUnits() {
+    public List<Unit> getOwnedUnitList() {
         synchronized (this.ownedUnits) {
             return new ArrayList<>(this.ownedUnits);
         }
@@ -232,9 +228,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return a {@code boolean} value
      */
     public boolean removeOwnedUnit(Unit unit) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
-        }
         synchronized (this.ownedUnits) {
             return this.ownedUnits.remove(unit);
         }
@@ -828,7 +821,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             unitType, spec.getMilitaryRolesList());
 
         if (type.getMilitary()) { // Retain enough goods to fully arm
-            return sum(getOwnedUnits(),
+            return sum(getOwnedUnitList(),
                        u -> !militaryRoles.contains(u.getRole()),
                        u -> AbstractGoods.getCount(type, 
                            u.getGoodsDifference(first(militaryRoles), 1)));
@@ -1134,7 +1127,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     public void disposeResources() {
         // Orphan the units whose home settlement this is.
         while (!ownedUnits.isEmpty()) {
-            ownedUnits.remove(0).setHomeIndianSettlement(null);
+            ownedUnits.remove(0).changeHomeIndianSettlement(null);
         }
         super.disposeResources();
     }
@@ -1173,7 +1166,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             Unit indian = (Unit)locatable;
             if (indian.getHomeIndianSettlement() == null) {
                 // Adopt homeless Indians
-                indian.setHomeIndianSettlement(this);
+                indian.changeHomeIndianSettlement(this);
             }
         }
         return result;
@@ -1685,8 +1678,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append(getName()).append(" at (").append(tile.getX())
-            .append(',').append(tile.getY()).append(')');
+        Tile tile = getTile();
+        sb.append(getName());
+        if (tile != null) sb.append(" at (").append(tile.getX())
+                              .append(',').append(tile.getY()).append(')');
         return sb.toString();
     }
 }

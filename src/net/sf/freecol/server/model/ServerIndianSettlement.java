@@ -215,7 +215,7 @@ public class ServerIndianSettlement extends IndianSettlement
         for (int i = 0; i < count; i++) {
             Unit unit = new ServerUnit(game, this, getOwner(), brave,
                                        brave.getDefaultRole());
-            unit.setHomeIndianSettlement(this);
+            unit.changeHomeIndianSettlement(this);
             unit.setLocation(this);
         }
     }
@@ -565,7 +565,7 @@ public class ServerIndianSettlement extends IndianSettlement
                 consumeGoods(rumType, FOOD_PER_COLONIST/4);
                 // New units quickly go out of their city and start annoying.
                 addOwnedUnit(unit);
-                unit.setHomeIndianSettlement(this);
+                unit.changeHomeIndianSettlement(this);
                 lb.add(" new ", unit);
             }
             // Consume the food anyway

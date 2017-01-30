@@ -1363,7 +1363,7 @@ public class InGameControllerTest extends FreeColTestCase {
                                       dragoonRole);
         Unit brave = new ServerUnit(game, tile2, inca, braveType,
                                     spec().getDefaultRole());
-        brave.setHomeIndianSettlement(settlement1);
+        brave.changeHomeIndianSettlement(settlement1);
 
         // Dragoon loses and brave captures its horses
         List<CombatResult> crs

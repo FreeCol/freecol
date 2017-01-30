@@ -345,7 +345,7 @@ public class ChangeSet {
          * Build a new AttackChange.
          *
          * Note that we must copy attackers and defenders because a
-         * successful attacker can move, any an unsuccessful
+         * successful attacker can move, and an unsuccessful
          * participant can die, and unsuccessful defenders can be
          * captured.  Furthermore for defenders, insufficient
          * information is serialized when a unit is inside a
@@ -429,9 +429,9 @@ public class ChangeSet {
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
             if (!isNotifiable(serverPlayer)) return null;
             Unit a = (serverPlayer.owns(attacker)) ? attacker
-                : attacker.reduceVisibility(attacker.getTile());
+                : attacker.reduceVisibility(attacker.getTile(), serverPlayer);
             Unit d = (serverPlayer.owns(defender)) ? defender
-                : defender.reduceVisibility(defender.getTile());
+                : defender.reduceVisibility(defender.getTile(), serverPlayer);
             return new AnimateAttackMessage(a, d, success,
                 !attackerVisible(serverPlayer), !defenderVisible(serverPlayer));
         }
@@ -697,7 +697,7 @@ public class ChangeSet {
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
             if (!isNotifiable(serverPlayer)) return null;
             Unit u = (serverPlayer.owns(unit)) ? unit
-                : unit.reduceVisibility(oldLocation.getTile());
+                : unit.reduceVisibility(oldLocation.getTile(), serverPlayer);
             return new AnimateMoveMessage(u, oldLocation.getTile(), newTile,
                                           !seeOld(serverPlayer));
         }

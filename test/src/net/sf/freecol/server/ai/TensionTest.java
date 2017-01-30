@@ -79,7 +79,7 @@ public class TensionTest extends FreeColTestCase {
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = spec().getDefaultUnitType(indian);
             Unit unit = new ServerUnit(game, is, indian, unitType);
-            unit.setHomeIndianSettlement(is);
+            unit.changeHomeIndianSettlement(is);
             if (i == 0) {
                 unit.setLocation(tile);
             } else {

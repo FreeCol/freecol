@@ -1509,10 +1509,20 @@ public class Unit extends GoodsLocation
     /**
      * Sets the home {@code IndianSettlement} for this unit.
      *
-     * @param indianSettlement The {@code IndianSettlement} that should
-     *     now own this {@code Unit}.
+     * @param indianSettlement The {@code IndianSettlement} that this unit
+     *     considers to be its home.
      */
     public void setHomeIndianSettlement(IndianSettlement indianSettlement) {
+        this.indianSettlement = indianSettlement;
+    }
+
+    /**
+     * Changes the home {@code IndianSettlement} for this unit.
+     *
+     * @param indianSettlement The {@code IndianSettlement} that should
+     *     now own this {@code Unit} and be considered this unit's home.
+     */
+    public void changeHomeIndianSettlement(IndianSettlement indianSettlement) {
         if (this.indianSettlement != null) {
             this.indianSettlement.removeOwnedUnit(this);
         }
@@ -3740,28 +3750,22 @@ public class Unit extends GoodsLocation
      * on a carrier.
      *
      * @param tile The {@code Tile} the unit appears at.
+     * @param player The {@code Player} the copy is for.
      * @return This {@code Unit} with reduced visibility.
      */
-    public Unit reduceVisibility(Tile tile) {
+    public Unit reduceVisibility(Tile tile, Player player) {
         final Game game = getGame();
-        Unit ret = null;
+        Unit ret = this.copy(game, player);
         if (isOnCarrier()) {
-            Unit carrier = getCarrier().copy(game);
-            for (Unit u : carrier.getUnitList()) {
-                if (u.getId().equals(getId())) {
-                    ret = u;
-                } else {
-                    carrier.remove(u);
-                }
-            }
-            carrier.removeAll(); // Goods!
+            Unit carrier = getCarrier().copy(game, player);
+            carrier.removeAll();
+            carrier.add(ret);
             carrier.setLocationNoUpdate(tile);
+            ret.setLocationNoUpdate(carrier);
         } else {
-            ret = this.copy(game);
             ret.setLocationNoUpdate(tile);
             ret.setWorkType(null);
             ret.setState(Unit.UnitState.ACTIVE);
-            if (isOwnerHidden()) ret.setOwner(game.getUnknownEnemy());
         }
         return ret;
     }
@@ -4126,7 +4130,7 @@ public class Unit extends GoodsLocation
             student = null;
         }
 
-        setHomeIndianSettlement(null);
+        changeHomeIndianSettlement(null);
 
         getOwner().removeUnit(this);
 

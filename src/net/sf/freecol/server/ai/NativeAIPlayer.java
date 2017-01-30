@@ -247,7 +247,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         // Collect native units and defenders
         List<Unit> units = is.getAllUnitsList();
         List<Unit> defenders = new ArrayList<>();
-        for (Unit u : is.getOwnedUnits()) {
+        for (Unit u : is.getOwnedUnitList()) {
             if (!units.contains(u)) units.add(u);
         }
 
@@ -479,7 +479,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
             // enough missions in operation.
             List<Unit> availableUnits = new ArrayList<>();
             int alreadyAssignedUnits = 0;
-            for (Unit ou : is.getOwnedUnits()) {
+            for (Unit ou : is.getOwnedUnitList()) {
                 AIUnit aiu = getAIUnit(ou);
                 if (aiu == null) {
                     continue;
@@ -575,7 +575,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
             // enough missions in operation.
             List<Unit> availableUnits = new ArrayList<>();
             int alreadyAssignedUnits = 0;
-            for (Unit ou : is.getOwnedUnits()) {
+            for (Unit ou : is.getOwnedUnitList()) {
                 AIUnit aiu = getAIUnit(ou);
                 if (Mission.invalidNewMissionReason(aiu) == null) {
                     if (aiu.hasMission(IndianDemandMission.class)) {

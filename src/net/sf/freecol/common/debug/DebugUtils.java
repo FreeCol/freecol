@@ -1184,7 +1184,7 @@ public class DebugUtils {
             lb.add("\n");
         }
         lb.add("\nUnits owned\n");
-        for (Unit u : sis.getOwnedUnits()) {
+        for (Unit u : sis.getOwnedUnitList()) {
             Mission m = aiMain.getAIUnit(u).getMission();
             lb.add(u, " at ", u.getLocation());
             if (m != null) {
