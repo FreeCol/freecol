@@ -750,7 +750,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         } else {
             FreeColObject fco = lookup(game, id);
             if (fco == null) {
-                T ret = game.newInstance(returnClass,
+                T ret = Game.newInstance(game, returnClass,
                                          getReadScope() == ReadScope.SERVER);
                 if (ret == null) {
                     String err = "Failed to create " + returnClass.getName()
@@ -811,7 +811,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     private <T extends FreeColObject> T uninternedRead(Game game,
         Class<T> returnClass) throws XMLStreamException {
 
-        T ret = game.newInstance(returnClass,
+        T ret = Game.newInstance(game, returnClass,
                                  getReadScope() == ReadScope.SERVER);
         if (ret == null) {
             throw new XMLStreamException("Could not create instance of "

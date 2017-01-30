@@ -240,15 +240,16 @@ public class Game extends FreeColGameObject {
 
 
     /**
-     * Instantiate an uninitialized FreeColGameObject within this game.
+     * Instantiate an uninitialized FreeColGameObject within a game.
      *
      * @param <T> The actual return type.
+     * @param game The {@code Game} to instantiate in.
      * @param returnClass The required {@code FreeColObject} class.
      * @param server Create a server object if possible.
      * @return The new uninitialized object, or null on error.
      */
-    public <T extends FreeColObject> T newInstance(Class<T> returnClass,
-                                                   boolean server) {
+    public static <T extends FreeColObject> T newInstance(Game game,
+        Class<T> returnClass, boolean server) {
         // Do not restrict trying the full (Game,String) constructor
         // as there are FCOs that implement it (e.g. Goods).
         if (server) {
@@ -259,16 +260,17 @@ public class Game extends FreeColGameObject {
         try {
             return Introspector.instantiate(returnClass,
                 new Class[] { Game.class, String.class },
-                new Object[] { this, (String)null }); // No intern!
+                new Object[] { game, (String)null }); // No intern!
         } catch (Introspector.IntrospectorException ex) {
             // Allow another try on failure
         }
 
-        if (FreeColSpecObject.class.isAssignableFrom(returnClass)) {
+        if (game != null
+            && FreeColSpecObject.class.isAssignableFrom(returnClass)) {
             try {
                 return Introspector.instantiate(returnClass,
                     new Class[] { Specification.class },
-                    new Object[] { getSpecification() });
+                    new Object[] { game.getSpecification() });
             } catch (Introspector.IntrospectorException ex) {
                 logger.log(Level.WARNING, "newInstance(spec) fail for: "
                     + returnClass.getName(), ex);
@@ -286,6 +288,19 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Instantiate an uninitialized FreeColGameObject within this game.
+     *
+     * @param <T> The actual return type.
+     * @param returnClass The required {@code FreeColObject} class.
+     * @param server Create a server object if possible.
+     * @return The new uninitialized object, or null on error.
+     */
+    public <T extends FreeColObject> T newInstance(Class<T> returnClass,
+                                                   boolean server) {
+        return newInstance(this, returnClass, server);
+    }
+
+    /**
      * Instantiate an uninitialized FreeColGameObject within a game.
      *
      * @param <T> The actual return type.
@@ -293,7 +308,7 @@ public class Game extends FreeColGameObject {
      * @return The new uninitialized object, or null on error.
      */
     public <T extends FreeColObject> T newInstance(Class<T> returnClass) {
-        return newInstance(returnClass, false); // Default to non-server
+        return newInstance(this, returnClass, false); // Default to non-server
     }
     
     /**
