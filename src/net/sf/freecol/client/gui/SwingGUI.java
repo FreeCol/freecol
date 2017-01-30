@@ -1662,6 +1662,10 @@ public class SwingGUI extends GUI {
         canvas.showReportTurnPanel(messages);
     }
 
+    public String showRiverStyleDialog(Tile tile) {
+        return canvas.showRiverStyleDialog(tile);
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -132,6 +132,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", riverSize),
                                   Messages.message("mapEditorTransformPanel.majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("1022", riverSize),
+                                  Messages.message("riverStyleDialog.text"),
+                                  new RiverStyleTransform()));
         listPanel.add(buildButton(ImageLibrary.getMiscImage("image.tileitem."
                     + first(getSpecification().getResourceTypeList()).getId(), 0.75f),
             Messages.message("mapEditorTransformPanel.resource"),
@@ -174,6 +177,11 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     = getFreeColClient().getMapEditorController();
                 MapTransform newMapTransform = null;
                 if (ctlr.getMapTransform() != mt) {
+                    if(mt instanceof RiverStyleTransform) {
+                        String style = getGUI().showRiverStyleDialog(null);
+                        if(style != null)
+                            ((RiverStyleTransform)mt).setStyle(style);
+                    }
                     newMapTransform = mt;
                 }
                 ctlr.setMapTransform(newMapTransform);
@@ -288,20 +296,47 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             TileImprovementType riverType =
                 tile.getSpecification().getTileImprovementType("model.improvement.river");
 
-            if (riverType.isTileTypeAllowed(tile.getType())
-                && !tile.hasRiver()) {
-                StringBuilder sb = new StringBuilder(64);
-                for (Direction direction : Direction.longSides) {
-                    Tile t = tile.getNeighbourOrNull(direction);
-                    TileImprovement otherRiver = (t == null) ? null
-                        : t.getRiver();
-                    if (t == null || (t.isLand() && otherRiver == null)) {
-                        sb.append('0');
-                    } else {
-                        sb.append(magnitude);
+            if (riverType.isTileTypeAllowed(tile.getType())) {
+                if (!tile.hasRiver()) {
+                    StringBuilder sb = new StringBuilder(64);
+                    for (Direction direction : Direction.longSides) {
+                        Tile t = tile.getNeighbourOrNull(direction);
+                        TileImprovement otherRiver = (t == null) ? null
+                            : t.getRiver();
+                        if (t == null || (t.isLand() && otherRiver == null)) {
+                            sb.append('0');
+                        } else {
+                            sb.append(magnitude);
+                        }
                     }
+                    tile.addRiver(magnitude, sb.toString());
+                } else {
+                    TileImprovement river = tile.getRiver();
+                    tile.getTileItemContainer().removeTileItem(river);
                 }
-                tile.addRiver(magnitude, sb.toString());
+            }
+        }
+    }
+
+    private final class RiverStyleTransform extends MapTransform {
+        private String style;
+
+        private RiverStyleTransform() {
+            this.style = null;
+        }
+
+        public void setStyle(String style) {
+            this.style = style;
+        }
+
+        @Override
+        public void transform(Tile tile) {
+            TileImprovementType riverType =
+                tile.getSpecification().getTileImprovementType("model.improvement.river");
+
+            if (riverType.isTileTypeAllowed(tile.getType())
+                && tile.hasRiver()) {
+                tile.getRiver().updateRiverConnections(style);
             }
         }
     }

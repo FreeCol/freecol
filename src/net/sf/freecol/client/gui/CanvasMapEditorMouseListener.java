@@ -143,20 +143,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                 startPoint = endPoint = e.getPoint();
                 Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
-                    if (tile.hasRiver()) {
-                        TileImprovement river = tile.getRiver();
-                        String style = canvas.showRiverStyleDialog(tile);
-                        if (style == null) {
-                            // cancelled
-                        } else {
-                            if (RiverStyleDialog.DELETE.equals(style)) {
-                                tile.getTileItemContainer().removeTileItem(river);
-                            } else {
-                                river.updateRiverConnections(style);
-                            }
-                            getGUI().refresh();
-                        }
-                    }
                     if (tile.getIndianSettlement() != null) {
                         canvas.showEditSettlementDialog(tile.getIndianSettlement());
                     }
