@@ -122,6 +122,12 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="UnitTypeChangeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.unitChange\.([a-zA-Z]+)\.([-a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="UnitTypeId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.unit\.([a-zA-Z])+" />

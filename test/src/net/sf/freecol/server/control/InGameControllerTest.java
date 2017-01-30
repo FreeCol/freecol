@@ -58,7 +58,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -2089,8 +2089,8 @@ public class InGameControllerTest extends FreeColTestCase {
         gardenerType.setSkill(0);
         gardenerType.addAbility(new Ability(Ability.PERSON));
 
-        spec().addUnitChange(UnitChangeType.ENTER_COLONY, gardenerType,
-                             farmerType, 100, -1);
+        addUnitTypeChange(UnitChangeType.ENTER_COLONY, gardenerType, farmerType,
+                          100, -1);
 
         assertEquals(farmerType,
             spec().getUnitChange(UnitChangeType.ENTER_COLONY, gardenerType).to);

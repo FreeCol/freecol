@@ -62,7 +62,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
@@ -460,8 +460,8 @@ public final class QuickActionMenu extends JPopupMenu {
         GoodsType goods = unit.getExperienceType();
         if (experience > 0 && goods != null) {
             UnitType expertType = spec.getExpertForProducing(goods);
-            UnitChange uc = unit.getUnitChange(UnitChangeType.EXPERIENCE,
-                                               expertType);
+            UnitTypeChange uc = unit.getUnitChange(UnitChangeType.EXPERIENCE,
+                                                   expertType);
             if (uc != null) {
                 int maxExperience = unit.getType().getMaximumExperience();
                 double probability = uc.probability * experience
@@ -684,7 +684,7 @@ public final class QuickActionMenu extends JPopupMenu {
             }
         }
 
-        UnitChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
+        UnitTypeChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
         if (uc != null) {
             if (separatorNeeded) this.addSeparator();
             JMenuItem menuItem = Utility.localizedMenuItem("quickActionMenu.clearSpeciality",

@@ -1,0 +1,149 @@
+/**
+ *  Copyright (C) 2002-2017   The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package net.sf.freecol.common.model;
+
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
+
+/**
+ * Simple container for individual type changes.
+ */
+public class UnitTypeChange extends FreeColSpecObjectType {
+
+    public static final String TAG = "unit-type-change";
+    
+    /** The unit type to change from. */
+    public UnitType from;
+
+    /** The unit type to change to. */
+    public UnitType to;
+
+    /** The percentage chance of the change occurring. */
+    public int probability;
+
+    /** The number of turns for the change to take, if not immediate. */
+    public int turns;
+
+
+    /**
+     * Trivial constructor.
+     *
+     * @param id The object identifier.
+     * @param specification The {@code Specification} to use.
+     */
+    public UnitTypeChange(String id, Specification specification) {
+        super(id, specification);
+    }
+
+    /**
+     * Read a unit change from a stream.
+     *
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading
+     *     the stream.
+     */
+    public UnitTypeChange(FreeColXMLReader xr, Specification spec)
+        throws XMLStreamException {
+        this(xr.readId(), spec);
+
+        readFromXML(xr);
+    }
+
+
+    /**
+     * Helper to check if a change is available to a player.
+     * This is useful when the change involves a transfer of ownership.
+     *
+     * @param player The {@code Player} to test.
+     * @return True if the player can use the to-unit-type.
+     */
+    public boolean isAvailableTo(Player player) {
+        return this.to.isAvailableTo(player);
+    }
+
+
+    // Serialization
+
+    private static final String FROM_TAG = "from";
+    private static final String PROBABILITY_TAG = "probability";
+    private static final String TO_TAG = "to";
+    private static final String TURNS_TAG = "turns";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+        
+        xw.writeAttribute(FROM_TAG, this.from);
+
+        xw.writeAttribute(TO_TAG, this.to);
+
+        xw.writeAttribute(PROBABILITY_TAG, this.probability);
+
+        if (this.turns > 0) xw.writeAttribute(TURNS_TAG, this.turns);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        
+        super.readAttributes(xr);
+    
+        this.from = xr.getType(spec, FROM_TAG, UnitType.class, (UnitType)null);
+
+        this.to = xr.getType(spec, TO_TAG, UnitType.class, (UnitType)null);
+
+        this.probability = xr.getAttribute(PROBABILITY_TAG, 0);
+
+        this.turns = xr.getAttribute(TURNS_TAG, -1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(32);
+        sb.append(this.from.getSuffix())
+            .append("->").append(this.to.getSuffix())
+            .append('/').append(this.probability);
+        if (this.turns > 0) sb.append('/').append(this.turns);
+        return sb.toString();
+    }            
+};
+

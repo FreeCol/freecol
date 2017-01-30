@@ -48,7 +48,7 @@ import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.Advantages;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -1322,9 +1322,9 @@ public final class Specification {
      * @param fromType The {@code UnitType} to change.
      * @return A list of {@code UnitChange}s.
      */
-    public List<UnitChange> getUnitChanges(String id, UnitType fromType) {
+    public List<UnitTypeChange> getUnitChanges(String id, UnitType fromType) {
         UnitChangeType uct = getUnitChangeType(id);
-        return (uct == null) ? Collections.<UnitChange>emptyList()
+        return (uct == null) ? Collections.<UnitTypeChange>emptyList()
             : uct.getUnitChanges(fromType);
     }
 
@@ -1339,7 +1339,7 @@ public final class Specification {
      * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
-    public UnitChange getUnitChange(String id, UnitType fromType) {
+    public UnitTypeChange getUnitChange(String id, UnitType fromType) {
         return getUnitChange(id, fromType, null);
     }
 
@@ -1355,8 +1355,8 @@ public final class Specification {
      * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
-    public UnitChange getUnitChange(String id, UnitType fromType,
-                                    UnitType toType) {
+    public UnitTypeChange getUnitChange(String id, UnitType fromType,
+                                        UnitType toType) {
         UnitChangeType uct = getUnitChangeType(id);
         return (uct == null) ? null
             : uct.getUnitChange(fromType, toType);
@@ -1380,28 +1380,7 @@ public final class Specification {
         return getUnitChange(UnitChangeType.EDUCATION, typeStudent, learn).turns;
     }
 
-    /**
-     * Add a unit change.
-     *
-     * Needed by the test suite.
-     *
-     * @param id The id of the {@link UnitType} that can change.
-     * @param from The {@code UnitType} that can change.
-     * @param to The {@code UnitType} to change to.
-     * @param prob The percentage chance of the change occurring.
-     * @param turns The number of turns the change will take, if not
-     *     immediate.
-     */
-    public void addUnitChange(String id, UnitType from, UnitType to,
-                              int prob, int turns) {
-        UnitChangeType uct = getUnitChangeType(id);
-        if (uct == null) {
-            uct = new UnitChangeType(id, this);
-            unitChangeTypeList.add(uct);
-        }
-        if (uct != null) uct.addUnitChange(from, to, prob, turns);
-    }
-        
+      
     // -- Units --
 
     public List<UnitType> getUnitTypeList() {

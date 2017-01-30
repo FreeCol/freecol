@@ -87,7 +87,7 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
@@ -1900,7 +1900,7 @@ outer:  for (Effect effect : effects) {
             = spec.getUnitChangeType(UnitChangeType.FOUNDING_FATHER);
         if (uct != null && uct.appliesTo(this)) {
             for (Unit u : getUnitList()) {
-                for (UnitChange uc : uct.getUnitChanges(u.getType())) {
+                for (UnitTypeChange uc : uct.getUnitChanges(u.getType())) {
                     u.changeType(uc.to);//-vis(this)
                     visibilityChange = true;
                     cs.add(See.perhaps(), u);
@@ -3103,7 +3103,7 @@ outer:  for (Effect effect : effects) {
         final String suffix = loser.getType().getSuffix(); // pre-demotion value
         String key;
         
-        UnitChange uc = loser.getUnitChange(UnitChangeType.DEMOTION);
+        UnitTypeChange uc = loser.getUnitChange(UnitChangeType.DEMOTION);
         if (uc == null || uc.to == loser.getType()) {
             logger.warning("Demotion failed, type="
                 + ((uc == null) ? "null" : "same type: " + uc.to));
@@ -3690,7 +3690,7 @@ outer:  for (Effect effect : effects) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerLabel = winner.getLabel();
 
-        UnitChange uc = winner.getUnitChange(UnitChangeType.PROMOTION);
+        UnitTypeChange uc = winner.getUnitChange(UnitChangeType.PROMOTION);
         if (uc == null || uc.to == winner.getType()) {
             logger.warning("Promotion failed, type="
                 + ((uc == null) ? "null" : "same type: " + uc.to));
@@ -4221,7 +4221,7 @@ outer:  for (Effect effect : effects) {
         final Tile oldTile = unit.getTile();
         if (change != null) {
             UnitType mainType = unit.getType();
-            UnitChange uc;
+            UnitTypeChange uc;
             if ((uc = unit.getUnitChange(change, null, newOwner)) == null) {
                 ; // mainType is unchanged
             } else if (uc.isAvailableTo(newOwner)) {

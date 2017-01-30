@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony.NoBuildReason;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitTypeChange;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -444,7 +444,7 @@ public final class UnitType extends BuildableType implements Consumer {
         // and should be returned at once.  Accumulate other intermediate
         // changes that do not reach the taught type level.
         List<UnitType> todo = new ArrayList<>();
-        for (UnitChange uc : spec.getUnitChanges(UnitChangeType.EDUCATION, this)) {
+        for (UnitTypeChange uc : spec.getUnitChanges(UnitChangeType.EDUCATION, this)) {
             if (uc.to == taught) return taught;
             if (uc.to.getSkill() < taughtLevel) todo.add(uc.to);
         }

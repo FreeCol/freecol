@@ -57,8 +57,8 @@ public class UnitChangeTypeTest extends FreeColTestCase {
         
         assertNull(gardenerType.getTeachingType(farmer));
 
-        spec().addUnitChange(UnitChangeType.EDUCATION, gardenerType, farmer,
-                             100, -1);
+        addUnitTypeChange(UnitChangeType.EDUCATION, gardenerType, farmer,
+                          100, -1);
 
         assertEquals(farmer, gardenerType.getTeachingType(farmer));
 
@@ -88,8 +88,8 @@ public class UnitChangeTypeTest extends FreeColTestCase {
         assertEquals(0, count(spec().getUnitChanges(UnitChangeType.CREATION,
                                                     gardenerType)));
         
-        spec().addUnitChange(UnitChangeType.CREATION, gardenerType, farmer,
-                             100, -1);
+        addUnitTypeChange(UnitChangeType.CREATION, gardenerType, farmer,
+                          100, -1);
 
         assertEquals(1, count(spec().getUnitChanges(UnitChangeType.CREATION,
                                                     gardenerType)));

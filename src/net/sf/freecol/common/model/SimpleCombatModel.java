@@ -28,7 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Modifier.ModifierType;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitTypeChange;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -699,7 +699,7 @@ public class SimpleCombatModel extends CombatModel {
         Player winnerPlayer = winner.getOwner();
         boolean attackerWon = crs.get(0) == CombatResult.WIN;
         boolean loserMustDie = loser.hasAbility(Ability.DISPOSE_ON_COMBAT_LOSS);
-        UnitChange uc;
+        UnitTypeChange uc;
         
         if (loser.isNaval()) {
             // Naval victors get to loot the defenders hold.  Sink the

@@ -42,7 +42,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -1340,7 +1340,7 @@ public class Unit extends GoodsLocation
      * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
-    public UnitChange getUnitChange(String change) {
+    public UnitTypeChange getUnitChange(String change) {
         return getUnitChange(change, null);
     }
     
@@ -1352,7 +1352,7 @@ public class Unit extends GoodsLocation
      * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
-    public UnitChange getUnitChange(String change, UnitType toType) {
+    public UnitTypeChange getUnitChange(String change, UnitType toType) {
         UnitChangeType uct = getSpecification().getUnitChangeType(change);
         if (uct != null && uct.getOwnerChange()) {
             throw new RuntimeException("2-arg getUnitChange of " + this
@@ -1370,8 +1370,8 @@ public class Unit extends GoodsLocation
      * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
-    public UnitChange getUnitChange(String change, UnitType toType,
-                                    Player player) {
+    public UnitTypeChange getUnitChange(String change, UnitType toType,
+                                        Player player) {
         if (player == null) {
             throw new RuntimeException("getUnitChange null player");
         }
@@ -1384,7 +1384,7 @@ public class Unit extends GoodsLocation
                 + " player=" + player.getSuffix()
                 + " owner=" + getOwner().getSuffix());
         }
-        UnitChange uc = (uct == null || !uct.appliesTo(this)) ? null
+        UnitTypeChange uc = (uct == null || !uct.appliesTo(this)) ? null
             : uct.getUnitChange(getType(), toType);
         return (uc == null || !uc.isAvailableTo(player)) ? null : uc;
     }

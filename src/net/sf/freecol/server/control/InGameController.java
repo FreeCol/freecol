@@ -95,7 +95,7 @@ import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
@@ -1266,7 +1266,7 @@ public final class InGameController extends Controller {
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet clearSpeciality(ServerPlayer serverPlayer, Unit unit) {
-        UnitChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
+        UnitTypeChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
         if (uc == null) {
             return serverPlayer.clientError("Can not clear unit speciality: "
                 + unit.getId());
@@ -3840,7 +3840,7 @@ public final class InGameController extends Controller {
         colony.equipForRole(unit, spec.getDefaultRole(), 0);
 
         // Check for upgrade.
-        UnitChange uc = unit.getUnitChange(UnitChangeType.ENTER_COLONY);
+        UnitTypeChange uc = unit.getUnitChange(UnitChangeType.ENTER_COLONY);
         if (uc != null) unit.changeType(uc.to);//-vis: safe in colony
 
         // Change the location.

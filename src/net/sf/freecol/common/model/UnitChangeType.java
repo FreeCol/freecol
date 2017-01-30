@@ -98,68 +98,8 @@ public class UnitChangeType extends FreeColSpecObjectType {
     public static final String UNDEAD
         = "model.unitChange.undead";
 
-
-    /** Simple container for the individual changes. */
-    public static class UnitChange {
-
-        /** The unit type to change from. */
-        public UnitType from;
-
-        /** The unit type to change to. */
-        public UnitType to;
-
-        /** The percentage chance of the change occurring. */
-        public int probability;
-
-        /** The number of turns for the change to take, if not immediate. */
-        public int turns;
-
-
-        /**
-         * Simple constructor for a unit change.
-         *
-         * @param from The {@code UnitType} to change from.
-         * @param to The {@code UnitType} to change to.
-         * @param probability The percentage chance of the change occuring.
-         * @param turns The number of turns the change takes if not immediate.
-         */
-        public UnitChange(UnitType from, UnitType to, int probability, int turns) {
-            this.from = from;
-            this.to = to;
-            this.probability = probability;
-            this.turns = turns;
-        }
-
-        /**
-         * Helper to check if a change is available to a player.
-         * This is useful when the change involves a transfer of ownership.
-         *
-         * @param player The {@code Player} to test.
-         * @return True if the player can use the to-unit-type.
-         */
-        public boolean isAvailableTo(Player player) {
-            return this.to.isAvailableTo(player);
-        }
-
-
-        // Override Object
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder(32);
-            sb.append(this.from.getSuffix())
-                .append("->").append(this.to.getSuffix())
-                .append('/').append(this.probability);
-            if (this.turns > 0) sb.append('/').append(this.turns);
-            return sb.toString();
-        }            
-    };
-
     /** The individual unit changes valid for this change type. */
-    public final Map<UnitType, List<UnitChange>> changes = new HashMap<>();
+    public final Map<UnitType, List<UnitTypeChange>> changes = new HashMap<>();
 
     /** True if this type of change always implies a change of owner. */
     private boolean ownerChange = false;
@@ -187,19 +127,12 @@ public class UnitChangeType extends FreeColSpecObjectType {
     }
 
     /**
-     * Add a new change for the given parameters.
+     * Add a new change.
      *
-     * @param from The {@code UnitType} that can change.
-     * @param to The {@code UnitType} to change to.
-     * @param prob The percentage chance of the change occurring.
-     * @param turns The number of turns the change will take, if not
-     *     immediate.
+     * @param uc The {@code UnitTypeChange} to add.
      */
-    public void addUnitChange(UnitType from, UnitType to, int prob, int turns) {
-        if (from != null && to != null && prob > 0) {
-            appendToMapList(this.changes, from,
-                    new UnitChange(from, to, prob, turns));
-        }
+    public void addUnitTypeChange(UnitTypeChange uc) {
+        appendToMapList(this.changes, uc.from, uc);
     }
 
     /**
@@ -208,9 +141,9 @@ public class UnitChangeType extends FreeColSpecObjectType {
      * @param from The source {@code UnitType}.
      * @return A list of {@code UnitChange}s.
      */
-    public List<UnitChange> getUnitChanges(UnitType from) {
-        List<UnitChange> ret = this.changes.get(from);
-        return (ret == null) ? Collections.<UnitChange>emptyList() : ret;
+    public List<UnitTypeChange> getUnitChanges(UnitType from) {
+        List<UnitTypeChange> ret = this.changes.get(from);
+        return (ret == null) ? Collections.<UnitTypeChange>emptyList() : ret;
     }
 
     /**
@@ -222,7 +155,8 @@ public class UnitChangeType extends FreeColSpecObjectType {
      * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
-    public UnitChange getUnitChange(UnitType fromType, final UnitType toType) {
+    public UnitTypeChange getUnitChange(UnitType fromType,
+                                        final UnitType toType) {
         return find(getUnitChanges(fromType),
             ((toType == null) ? alwaysTrue() : uc -> uc.to == toType));
     }
@@ -236,12 +170,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
 
     // Serialization
 
-    private static final String FROM_TAG = "from";
     private static final String OWNER_CHANGE_TAG = "owner-change";
-    private static final String PROBABILITY_TAG = "probability";
-    private static final String TO_TAG = "to";
-    private static final String TURNS_TAG = "turns";
-    private static final String UNIT_TYPE_CHANGE_TAG = "unit-type-change";
 
 
     /**
@@ -261,22 +190,8 @@ public class UnitChangeType extends FreeColSpecObjectType {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Map.Entry<UnitType, List<UnitChange>> entry
-                 : this.changes.entrySet()) {
-            for (UnitChange uc : entry.getValue()) {
-
-                xw.writeStartElement(UNIT_TYPE_CHANGE_TAG);
-
-                xw.writeAttribute(FROM_TAG, entry.getKey());
-
-                xw.writeAttribute(TO_TAG, uc.to);
-
-                xw.writeAttribute(PROBABILITY_TAG, uc.probability);
-
-                if (uc.turns > 0) xw.writeAttribute(TURNS_TAG, uc.turns);
-
-                xw.writeEndElement();
-            }
+        for (List<UnitTypeChange> utcs : this.changes.values()) {
+            for (UnitTypeChange uc : utcs) uc.toXML(xw);
         }
     }
 
@@ -310,14 +225,10 @@ public class UnitChangeType extends FreeColSpecObjectType {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
-        if (UNIT_TYPE_CHANGE_TAG.equals(tag)) {
-            addUnitChange(xr.getType(spec, FROM_TAG,
-                                     UnitType.class, (UnitType)null),
-                          xr.getType(spec, TO_TAG,
-                                     UnitType.class, (UnitType)null),
-                          xr.getAttribute(PROBABILITY_TAG, 0),
-                          xr.getAttribute(TURNS_TAG, -1));
-            xr.closeTag(tag);
+
+        if (UnitTypeChange.TAG.equals(tag)) {
+            UnitTypeChange utc = new UnitTypeChange(xr, spec);
+            if (utc != null) addUnitTypeChange(utc);
 
         } else {
             super.readChild(xr);
@@ -340,10 +251,10 @@ public class UnitChangeType extends FreeColSpecObjectType {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[').append(getId()).append(' ').append(getSuffix())
             .append(" ownerChange=").append(this.ownerChange);
-        for (Map.Entry<UnitType, List<UnitChange>> entry
+        for (Map.Entry<UnitType, List<UnitTypeChange>> entry
                  : this.changes.entrySet()) {
             sb.append(' ').append(entry.getKey().getSuffix()).append('[');
-            for (UnitChange uc : entry.getValue()) {
+            for (UnitTypeChange uc : entry.getValue()) {
                 sb.append(' ').append(uc);
             }
             sb.append(" ]");

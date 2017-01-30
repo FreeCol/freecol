@@ -97,7 +97,7 @@ import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
@@ -2858,7 +2858,7 @@ public final class InGameController extends FreeColClientHolder {
         if (!requireOurTurn() || unit == null) return false;
 
         UnitType oldType = unit.getType();
-        UnitChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
+        UnitTypeChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
         UnitType newType = (uc == null) ? null : uc.to;
         if (newType == null) {
             getGUI().showInformationMessage(unit, StringTemplate

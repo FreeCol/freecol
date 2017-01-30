@@ -63,7 +63,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitChangeType.UnitChange;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChangeSet;
@@ -199,7 +199,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         this.visibleGoodsCount = -1;
 
         // Check for creation change
-        UnitChange uc = getUnitChange(UnitChangeType.CREATION);
+        UnitTypeChange uc = getUnitChange(UnitChangeType.CREATION);
         if (uc != null) this.unitType = uc.to;
 
         // Fix up role, state and location now other values are present.
@@ -527,7 +527,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             break;
         case LEARN:
             StringTemplate oldName = getLabel();
-            UnitChange uc = getRandomMember(logger, "Choose learn",
+            UnitTypeChange uc = getRandomMember(logger, "Choose learn",
                 spec.getUnitChanges(UnitChangeType.LOST_CITY, getType()),
                 random);
             changeType(uc.to);//-vis(serverPlayer)
@@ -959,7 +959,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         // Check for experience-promotion.
         GoodsType produce;
         UnitType learn;
-        UnitChange uc;
+        UnitTypeChange uc;
         if (isInColony()
             && (produce = getWorkType()) != null
             && (learn = spec.getExpertForProducing(produce)) != null

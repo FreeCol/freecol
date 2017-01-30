@@ -47,7 +47,9 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerGame;
@@ -715,5 +717,21 @@ public class FreeColTestCase extends TestCase {
             check.remove(ag);
         }
         assertTrue(err + " requires more goods", check.isEmpty());
+    }
+
+    public void addUnitTypeChange(String type, UnitType from, UnitType to,
+                                  int probability, int turns) {
+        UnitTypeChange utc = new UnitTypeChange(type + "."
+            + from.getSuffix() + "-" + to.getSuffix(), spec());
+        utc.from = from;
+        utc.to = to;
+        utc.probability = probability;
+        utc.turns = turns;
+        UnitChangeType uct = spec().getUnitChangeType(type);
+        if (uct == null) {
+            uct = new UnitChangeType(type, spec());
+            spec().getUnitChangeTypeList().add(uct);
+        }
+        uct.addUnitTypeChange(utc);
     }
 }
