@@ -19,23 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.FlowLayout;
-import java.awt.LayoutManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.logging.Logger;
-
-import javax.swing.AbstractButton;
-import javax.swing.Action;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
@@ -45,6 +28,22 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
+import java.awt.FlowLayout;
+import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.logging.Logger;
 
 
 /**
@@ -58,6 +57,10 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     protected static final String CANCEL = "CANCEL";
     protected static final String OK = "OK";
     protected static final String HELP = "HELP";
+
+    // Create some constants that can be used for layout contraints
+    protected static final String SPAN_SPLIT_2 = "span, split 2";
+    protected static final String NL_SPAN_SPLIT_2 = "newline, span, split 2";
 
     // The margin to use.
     protected static final int MARGIN = 3;

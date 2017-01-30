@@ -289,7 +289,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             "span 6, center");
         add(single, "newline, span 3");
         add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");
-        add(Utility.localizedLabel("name"), "span, split 2");
+        add(Utility.localizedLabel("name"), SPAN_SPLIT_2);
         add(this.nameBox, "growx");
         add(start, "newline, span 3");
         add(this.advantagesLabel);

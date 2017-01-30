@@ -24,10 +24,11 @@ import java.awt.Font;
 import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.BuildingPanel;
+import net.sf.freecol.client.gui.panel.FreeColProgressBar;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
@@ -61,7 +62,7 @@ public final class ReportReligiousPanel extends ReportPanel {
         for (GoodsType gt : spec.getImmigrationGoodsTypeList()) {
             JLabel crosses = Utility.localizedLabel(gt);
             crosses.setFont(font);
-            reportPanel.add(crosses, "span, split 2");
+            reportPanel.add(crosses, SPAN_SPLIT_2);
             FreeColProgressBar progressBar = new FreeColProgressBar(gt, 0,
                 player.getImmigrationRequired(), player.getImmigration(),
                 player.getTotalImmigrationProduction());

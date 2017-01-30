@@ -52,16 +52,38 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
     }
 
 
-    private boolean reportable(UnitType unitType) {
+    /**
+     * Checks whether a UnitType is reportable
+     *
+     * @param unitType The {@code UnitType} to check
+     * @return true only if the following conditions are met:
+     *              The UnitType is not Naval {@see Ability.NAVAL_UNIT},
+     *              the UnitType is available (to be built) by the player,
+     *              and the UnitType is either an Expert Soldier or an Offensive
+     *              UnitType.
+     *         false otherwise
+     */
+    protected boolean isReportable(UnitType unitType) {
         return !unitType.isNaval()
-            && unitType.isAvailableTo(getMyPlayer())
-            && (unitType.hasAbility(Ability.EXPERT_SOLDIER)
+                && unitType.isAvailableTo(getMyPlayer())
+                && (unitType.hasAbility(Ability.EXPERT_SOLDIER)
                 || unitType.isOffensive());
     }
 
-    private boolean reportable(Unit unit) {
+
+    /**
+     * Checks whether a Unit is reportable
+     *
+     * @param unit The {@code Unit} to check
+     * @return true only if the following conditions are met:
+     *              The Unit is not Naval {@see Ability.NAVAL_UNIT},
+     *              and the Unit is either an Expert Soldier
+     *              or an Offensive Unit.
+     *         false otherwise
+     */
+    protected boolean isReportable(Unit unit) {
         return !unit.isNaval()
-            && (unit.hasAbility(Ability.EXPERT_SOLDIER)
+                && (unit.hasAbility(Ability.EXPERT_SOLDIER)
                 || unit.isOffensiveUnit());
     }
 
@@ -82,7 +104,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
     @Override
     protected void gatherData() {
         for (Unit unit : CollectionUtils.transform(getMyPlayer().getUnits(),
-                                   u -> reportable(u))) {
+                                                   u -> isReportable(u))) {
             addUnit(unit, unit.getRole().getId());
         }
     }
@@ -96,7 +118,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         final Player player = getMyPlayer();
         final Nation refNation = player.getNation().getREFNation();
 
-        reportPanel.add(Utility.localizedLabel(refNation), "span, split 2");
+        reportPanel.add(Utility.localizedLabel(refNation), SPAN_SPLIT_2);
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> refUnits = player.getREFUnits();
@@ -117,15 +139,14 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         final Specification spec = getSpecification();
         final Player player = getMyPlayer();
 
-        reportPanel.add(Utility.localizedLabel(player.getForcesLabel()),
-            "newline, span, split 2");
+        reportPanel.add(Utility.localizedLabel(player.getForcesLabel()), NL_SPAN_SPLIT_2);
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         // Report unit types that are inherently reportable, and units
         // with military roles.
         final List<Role> militaryRoles = spec.getMilitaryRolesList();
         for (UnitType ut : spec.getUnitTypeList()) {
-            if (reportable(ut)) {
+            if (isReportable(ut)) {
                 tryUnitRole(ut, Specification.DEFAULT_ROLE_ID);
             }
             for (Role r : militaryRoles) {

@@ -52,12 +52,12 @@ public final class ReportNavalPanel extends ReportUnitPanel {
     }
 
 
-    private boolean reportable(UnitType unitType) {
+    protected boolean isReportable(UnitType unitType) {
         return unitType.isNaval()
-            && unitType.isAvailableTo(getMyPlayer());
+                && unitType.isAvailableTo(getMyPlayer());
     }
 
-    private boolean reportable(Unit unit) {
+    protected boolean isReportable(Unit unit) {
         return unit.isNaval();
     }
 
@@ -69,7 +69,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
     @Override
     protected void gatherData() {
         for (Unit unit : CollectionUtils.transform(getMyPlayer().getUnits(),
-                                   u -> reportable(u))) {
+                                                   u -> isReportable(u))) {
             addUnit(unit, "naval");
         }
     }
@@ -83,8 +83,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
         final Player player = getMyPlayer();
         final Nation refNation = player.getNation().getREFNation();
 
-        reportPanel.add(new JLabel(Messages.getName(refNation)),
-                        "span, split 2");
+        reportPanel.add(new JLabel(Messages.getName(refNation)), SPAN_SPLIT_2);
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> refUnits = player.getREFUnits();
@@ -104,12 +103,11 @@ public final class ReportNavalPanel extends ReportUnitPanel {
     protected void addOwnUnits() {
         final Player player = getMyPlayer();
 
-        reportPanel.add(Utility.localizedLabel(player.getForcesLabel()),
-            "newline, span, split 2");
+        reportPanel.add(Utility.localizedLabel(player.getForcesLabel()), NL_SPAN_SPLIT_2);
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (!reportable(unitType)) continue;
+            if (!isReportable(unitType)) continue;
             AbstractUnit au = new AbstractUnit(unitType,
                                                Specification.DEFAULT_ROLE_ID,
                                                getCount("naval", unitType));

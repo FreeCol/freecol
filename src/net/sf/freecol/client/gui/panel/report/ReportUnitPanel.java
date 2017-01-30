@@ -175,7 +175,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
             button.addActionListener(this);
             component = button;
         }
-        reportPanel.add(component, "newline, span, split 2");
+        reportPanel.add(component, NL_SPAN_SPLIT_2);
 
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
@@ -192,7 +192,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
                     }
                     for (Unit unitLoaded : u.getUnitList()) {
                         UnitLabel unitLoadedLabel
-                            = new UnitLabel(getFreeColClient(), unitLoaded, true);
+                                = new UnitLabel(getFreeColClient(), unitLoaded, true);
                         reportPanel.add(unitLoadedLabel);
                     }
                 } else {
@@ -207,7 +207,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         JButton button = Utility.getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
         StringTemplate tip = StringTemplate.label("\n")
-            .addStringTemplate(unit.getLabel());
+                                           .addStringTemplate(unit.getLabel());
         if (unit.getDestination() != null) {
             tip.addStringTemplate(unit.getDestinationLabel());
         }
@@ -217,7 +217,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
 
 
     // To be implemented by specific unit panels.
-    
+
     /**
      * Gather the overall unit data, mostly by calling addUnit() above.
      */
@@ -232,4 +232,21 @@ public abstract class ReportUnitPanel extends ReportPanel {
      * Add a section for specific unit types owned by the player.
      */
     protected abstract void addOwnUnits();
+
+    /**
+     * Checks whether a UnitType is reportable
+     *
+     * @param unitType The UnitType to check
+     * @return Defaults to false unless specific conditions are met
+     */
+    protected boolean isReportable(UnitType unitType) { return false; };
+
+    /**
+     * Checks whether a Unit is reportable
+     *
+     * @param unit The Unit to check
+     * @return Defaults to false unless specific conditions are met
+     */
+    protected boolean isReportable(Unit unit) { return false; };
+
 }
