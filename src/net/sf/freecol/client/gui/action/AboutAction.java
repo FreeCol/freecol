@@ -40,8 +40,6 @@ public class AboutAction extends FreeColAction {
      */
     public AboutAction(FreeColClient freeColClient) {
         super(freeColClient, id);
-
-        putValue(NAME, "FreeCol " + FreeCol.getRevision());
     }
 
 

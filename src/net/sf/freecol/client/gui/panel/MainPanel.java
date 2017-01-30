@@ -68,6 +68,7 @@ public final class MainPanel extends FreeColPanel {
         JButton openButton = new JButton(am.getFreeColAction(OpenAction.id));
         JButton mapEditorButton = new JButton(am.getFreeColAction(MapEditorAction.id));
         JButton optionsButton = new JButton(am.getFreeColAction(PreferencesAction.id));
+        JButton aboutButton = new JButton(am.getFreeColAction(AboutAction.id));
         JButton quitButton = new JButton(am.getFreeColAction(QuitAction.id));
 
         setCancelComponent(quitButton);
@@ -86,6 +87,7 @@ public final class MainPanel extends FreeColPanel {
         add(openButton, "width 70%");
         add(mapEditorButton, "width 70%");
         add(optionsButton, "width 70%");
+        add(aboutButton, "width 70%");
         add(quitButton, "width 70%");
 
         setSize(getPreferredSize());
