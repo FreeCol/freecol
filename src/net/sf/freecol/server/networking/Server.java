@@ -227,11 +227,13 @@ public final class Server extends Thread {
         synchronized (this.shutdownLock) {
             while (this.running) {
                 try {
-                    this.freeColServer
-                        .addNewUserConnection(serverSocket.accept());
+                    Socket sock = serverSocket.accept();
+                    if (sock != null) {
+                        // Undocumented null return has been seen
+                        this.freeColServer.addNewUserConnection(sock);
+                    }
                 } catch (Exception e) {
-                    // While we probably only should get IOException,
-                    // catch all exceptions as there have been
+                    // Catch all exceptions.  There have been
                     // sightings of spurious NPEs and other fail in
                     // the Java libraries.
                     if (this.running) {
