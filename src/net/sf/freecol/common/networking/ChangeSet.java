@@ -1024,22 +1024,13 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            return null; // NYI
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
             final String divertId = (tile != null) ? tile.getId()
                 : serverPlayer.getId();
             // The main object may be visible, but the contents are
             // only visible if the deeper ownership test succeeds.
             return new RemoveMessage(divertId,
                 ((fullRemoval(serverPlayer)) ? this.contents
-                    : Collections.singletonList(getMainObject())))
-                .attachToDocument(doc);
+                    : Collections.singletonList(getMainObject())));
         }
 
         /**
