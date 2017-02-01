@@ -550,16 +550,6 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            DOMMessage message = toMessage(serverPlayer);
-            return (message == null) ? null
-                : (Element)doc.importNode(message.toXMLElement(), true);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public void attachToElement(Element element) {} // Noop
 
 
