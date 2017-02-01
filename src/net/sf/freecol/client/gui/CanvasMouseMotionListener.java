@@ -80,12 +80,15 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
                 if (lastTile != tile) {
                     Unit active = canvas.getActiveUnit();
                     lastTile = tile;
-                    if (active != null && active.getTile() != tile) {
-                        PathNode dragPath = active.findPath(tile);
-                        canvas.setGotoPath(dragPath);
-                    } else {
-                        canvas.setGotoPath(null);
+                    PathNode dragPath = null;
+                    // Only call the expensive path finder if there
+                    // are no obvious showstoppers.
+                    if (active != null && active.getTile() != tile
+                        && tile.isExplored()
+                        && active.getSimpleMoveType(tile).isLegal()) {
+                        dragPath = active.findPath(tile);
                     }
+                    canvas.setGotoPath(dragPath);
                 }
             }
         }
