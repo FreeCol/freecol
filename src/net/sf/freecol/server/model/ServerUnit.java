@@ -808,7 +808,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         // make sure the move is always visible even if the unit
         // dies (including the animation).  However, dead units
         // make no discoveries.  Always update the new tile.
-        if (oldLocation instanceof Tile) {
+        if (oldLocation.getTile() != null) {
             cs.addMove(See.perhaps().always(serverPlayer), this,
                        oldLocation, newTile);
             cs.add(See.perhaps().always(serverPlayer),
