@@ -182,7 +182,7 @@ public class CargoPanel extends FreeColPanel
      */
     @Override
     public boolean accepts(Unit unit) {
-        return carrier.canAdd(unit);
+        return carrier != null && carrier.canAdd(unit);
     }
 
     /**
@@ -190,7 +190,7 @@ public class CargoPanel extends FreeColPanel
      */
     @Override
     public boolean accepts(Goods goods) {
-        return carrier.canAdd(goods);
+        return carrier != null && carrier.canAdd(goods);
     }
 
     /**
