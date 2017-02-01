@@ -64,7 +64,7 @@ public class ChangeSet {
     private static final Comparator<Change> changeComparator
         = Comparator.comparingInt(Change::getPriority);
 
-    private final ArrayList<Change> changes;
+    private final List<Change> changes;
 
 
     /**
@@ -196,7 +196,7 @@ public class ChangeSet {
     /**
      * Abstract template for all types of Change.
      */
-    private abstract static class Change {
+    private abstract static class Change<T extends Message> {
 
         /**
          * The visibility of the change.
@@ -282,7 +282,7 @@ public class ChangeSet {
          * @param serverPlayer The {@code ServerPlayer} to update.
          * @return A specialized {@code DOMMessage}.
          */
-        public abstract DOMMessage toMessage(ServerPlayer serverPlayer);
+        public abstract T toMessage(ServerPlayer serverPlayer);
             
         /**
          * Specialize a Change for a particular player.
@@ -292,8 +292,9 @@ public class ChangeSet {
          * @return An {@code Element} encapsulating this change.
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            DOMMessage message = toMessage(serverPlayer);
-            return (message == null) ? null : message.attachToDocument(doc);
+            T message = toMessage(serverPlayer);
+            return (message == null) ? null
+                : ((DOMMessage)message).attachToDocument(doc);
         }
 
         /**
@@ -308,7 +309,7 @@ public class ChangeSet {
     /**
      * Encapsulate an attack.
      */
-    private static class AttackChange extends Change {
+    private static class AttackChange extends Change<AnimateAttackMessage> {
 
         private final Unit attacker;
         private final Unit defender;
@@ -401,7 +402,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public AnimateAttackMessage toMessage(ServerPlayer serverPlayer) {
             if (!isNotifiable(serverPlayer)) return null;
             Unit a = (serverPlayer.owns(attacker)) ? attacker
                 : attacker.reduceVisibility(attacker.getTile(), serverPlayer);
@@ -441,9 +442,11 @@ public class ChangeSet {
     /**
      * Encapsulate an attribute change.
      */
-    private static class AttributeChange extends Change {
+    private static class AttributeChange extends Change<AttributeMessage> {
+
         private final String key;
         private final String value;
+
 
         /**
          * Build a new AttributeChange.
@@ -480,7 +483,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public AttributeMessage toMessage(ServerPlayer serverPlayer) {
             return new AttributeMessage(key, value);
         }
 
@@ -513,7 +516,7 @@ public class ChangeSet {
     /**
      * Encapsulate a feature change.
      */
-    private static class FeatureChange extends Change {
+    private static class FeatureChange extends Change<FeatureChangeMessage> {
 
         private final FreeColGameObject parent;
         private final FreeColObject child;
@@ -549,7 +552,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public FeatureChangeMessage toMessage(ServerPlayer serverPlayer) {
             return (!isNotifiable(serverPlayer)) ? null
                 : new FeatureChangeMessage(this.parent, this.child, this.add);
         }
@@ -584,9 +587,9 @@ public class ChangeSet {
     /**
      * Encapsulate a Message.
      */
-    private static class MessageChange extends Change {
+    private static class MessageChange<T extends Message> extends Change<T> {
 
-        private final DOMMessage message;
+        private final T message;
 
 
         /**
@@ -595,8 +598,9 @@ public class ChangeSet {
          * @param see The visibility of this change.
          * @param message The {@code Message} to add.
          */
-        public MessageChange(See see, DOMMessage message) {
+        public MessageChange(See see, T message) {
             super(see);
+
             this.message = message;
         }
 
@@ -613,7 +617,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public T toMessage(ServerPlayer serverPlayer) {
             return (isNotifiable(serverPlayer)) ? this.message : null;
         }
 
@@ -644,7 +648,7 @@ public class ChangeSet {
     /**
      * Encapsulate a move.
      */
-    private static class MoveChange extends Change {
+    private static class MoveChange extends Change<AnimateMoveMessage> {
 
         private final Unit unit;
         private final Location oldLocation;
@@ -725,7 +729,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public AnimateMoveMessage toMessage(ServerPlayer serverPlayer) {
             if (!isNotifiable(serverPlayer)) return null;
             Unit u = (serverPlayer.owns(unit)) ? unit
                 : unit.reduceVisibility(oldLocation.getTile(), serverPlayer);
@@ -762,7 +766,7 @@ public class ChangeSet {
     /**
      * Encapsulate a FreeColGameObject update.
      */
-    private static class ObjectChange extends Change {
+    private static class ObjectChange extends Change<UpdateMessage> {
 
         protected final FreeColGameObject fcgo;
 
@@ -831,9 +835,10 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public UpdateMessage toMessage(ServerPlayer serverPlayer) {
             return (!isNotifiable(serverPlayer)) ? null
-                : new UpdateMessage(serverPlayer, this.fcgo);
+                : new UpdateMessage(serverPlayer,
+                    Collections.singletonList(this.fcgo));
         }
 
         /**
@@ -896,7 +901,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public UpdateMessage toMessage(ServerPlayer serverPlayer) {
             return new UpdateMessage(serverPlayer, this.fcgo, this.fields);
         }
 
@@ -922,7 +927,7 @@ public class ChangeSet {
     /**
      * Encapsulate a new player change.
      */
-    private static class PlayerChange extends Change {
+    private static class PlayerChange extends Change<AddPlayerMessage> {
 
         private final List<ServerPlayer> serverPlayers = new ArrayList<>();
 
@@ -960,7 +965,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public AddPlayerMessage toMessage(ServerPlayer serverPlayer) {
             if (!isNotifiable(serverPlayer)) return null;
             final Game game = serverPlayer.getGame();
             AddPlayerMessage message = new AddPlayerMessage();
@@ -1003,7 +1008,7 @@ public class ChangeSet {
      *
      * -vis: If removing settlements or units, visibility changes.
      */
-    private static class RemoveChange extends Change {
+    private static class RemoveChange extends Change<RemoveMessage> {
 
         private final Tile tile;
         private final List<? extends FreeColGameObject> contents;
@@ -1074,7 +1079,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public RemoveMessage toMessage(ServerPlayer serverPlayer) {
             final String divertId = (tile != null) ? tile.getId()
                 : serverPlayer.getId();
             // The main object may be visible, but the contents are
@@ -1114,7 +1119,7 @@ public class ChangeSet {
     /**
      * Encapsulates a spying action.
      */
-    private static class SpyChange extends Change {
+    private static class SpyChange extends Change<SpySettlementMessage> {
 
         private final Unit unit;
         private final Settlement settlement;
@@ -1146,7 +1151,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public SpySettlementMessage toMessage(ServerPlayer serverPlayer) {
             return (!isNotifiable(serverPlayer)) ? null
                 : new SpySettlementMessage(unit, settlement);
         }
@@ -1178,7 +1183,7 @@ public class ChangeSet {
     /**
      * Encapsulate a stance change.
      */
-    private static class StanceChange extends Change {
+    private static class StanceChange extends Change<SetStanceMessage> {
 
         private final Player first;
         private final Stance stance;
@@ -1214,7 +1219,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public SetStanceMessage toMessage(ServerPlayer serverPlayer) {
             return (!isNotifiable(serverPlayer)) ? null
                 : new SetStanceMessage(stance, first, second);
         }
@@ -1249,7 +1254,7 @@ public class ChangeSet {
      * Encapsulate trivial element, which will only have attributes apart
      * from its name.
      */
-    private static class TrivialChange extends Change {
+    private static class TrivialChange extends Change<AttributeMessage> {
 
         private final int priority;
         private final String name;
@@ -1288,7 +1293,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public DOMMessage toMessage(ServerPlayer serverPlayer) {
+        public AttributeMessage toMessage(ServerPlayer serverPlayer) {
             if (!isNotifiable(serverPlayer)) return null;
             AttributeMessage ret = new AttributeMessage(this.name);
             ret.setStringAttributes(this.attributes);
@@ -1384,8 +1389,8 @@ public class ChangeSet {
      * @param message The {@code Message} to add.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet add(See see, DOMMessage message) {
-        changes.add(new MessageChange(see, message));
+    public <T extends Message> ChangeSet add(See see, T message) {
+        changes.add(new MessageChange<T>(see, message));
         return this;
     }
 
