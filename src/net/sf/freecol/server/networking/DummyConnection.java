@@ -109,8 +109,8 @@ public final class DummyConnection extends Connection {
         if (request == null) return true;
         final String tag = request.getTagName();
         try {
-            Element reply = getOtherConnection().handleElement(request);
             log(request, true);
+            Element reply = getOtherConnection().handleElement(request);
             log(reply, false);
             return true;
         } catch (FreeColException fce) {

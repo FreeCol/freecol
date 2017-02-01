@@ -387,7 +387,18 @@ public class Connection implements Closeable {
             }
         }
     }
-    
+
+    /**
+     * Log message.
+     *
+     * @param message The {@code DOMMessage} to log.
+     * @param send True if sending (else replying).
+     */
+    protected void log(DOMMessage message, boolean send) {
+        if (message == null) return;
+        log(message.toXMLElement(), send);
+    }
+
     /**
      * Low level routine to send a message over this Connection.
      *
@@ -444,7 +455,7 @@ public class Connection implements Closeable {
 
         // Wait for response
         DOMMessage response = (DOMMessage)nro.getResponse();
-        log((response == null) ? null : response.toXMLElement(), false);
+        log(response, false);
         return response;
     }
     
