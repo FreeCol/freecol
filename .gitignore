@@ -22,6 +22,7 @@ dist/
 a/
 b/
 TESTS-TestSuites.xml
+freecol.jar
 
 ### Java template
 
@@ -167,3 +168,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# debian build outputs
+debian/*.log
+debian/jh_build_stamp
