@@ -414,7 +414,8 @@ public class Connection implements Closeable {
                 StringWriter sw
                     = elementToStringWriter(this.outTransformer, element);
                 if (sw == null) return false;
-                this.out.write(sw.toString().getBytes("UTF-8"));
+                String buf = sw.toString();
+                this.out.write(buf.getBytes("UTF-8"));
                 this.out.flush();
             }
         } catch (IOException ioe) {
