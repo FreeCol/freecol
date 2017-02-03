@@ -875,7 +875,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         river.setTurnsToComplete(0);
         river.setMagnitude(magnitude);
         if (!addTileItem(river)) return null;
-        river.updateRiverConnections(conns);
+        if (river.updateRiverConnections(conns) == null)
+            river.updateStyleFromConnections();
         return river;
     }
 
