@@ -782,7 +782,6 @@ public class ServerColony extends Colony implements ServerModelObject {
                 // high-water-mark has been reached this turn
                 messageId = "model.colony.warehouseFull";
             }
-System.err.println("WL " + getName() + " " + goods + " limit=" + limit + " " + messageId);
             if (messageId != null) {
                 cs.addMessage(owner,
                     new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
