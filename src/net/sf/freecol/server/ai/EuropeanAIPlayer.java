@@ -549,8 +549,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                                 : score / (stockade.getLevel() + 1.5);
                         });
                 target = maximize(flatten(enemies, Player::isEuropean,
-                                          Player::getColonies),
-                                  Colony::isConnectedPort, targetScore);
+                                          Player::getConnectedPorts),
+                                  targetScore);
             }
             // Otherwise attack something near a weak colony
             if (target == null && !colonies.isEmpty()) {
@@ -1842,7 +1842,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
             if (unit.isInEurope() && unit.isPerson() && nPorts > 0) {
                 // Choose a port to add to
-                if (ports == null) ports = player.getPorts();
+                if (ports == null) ports = player.getConnectedPortList();
                 Colony c = ports.remove(0);
                 AIColony aic = aiMain.getAIColony(c);
                 if ((m = getWorkInsideColonyMission(aiUnit, aic)) != null) {

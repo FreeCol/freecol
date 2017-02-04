@@ -4449,7 +4449,7 @@ outer:  for (Effect effect : effects) {
                 interventionBells = Integer.MIN_VALUE;
                 
                 // Enter near a port.
-                List<Colony> ports = getPorts();
+                List<Colony> ports = getConnectedPortList();
                 Colony port = getRandomMember(logger, "Intervention port",
                                               ports, random);
                 Tile portTile = port.getTile();

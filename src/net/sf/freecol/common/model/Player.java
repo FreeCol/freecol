@@ -2215,14 +2215,23 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the port settlements.
+     * Get the connected port settlements.
      *
-     * @return A list of port {@code Colony}s.
+     * @return A list of connected port {@code Colony}s.
      */
-    public List<Colony> getPorts() {
+    public List<Colony> getConnectedPortList() {
         return (!isEuropean())
             ? Collections.<Colony>emptyList()
             : transform(getColonies(), Colony::isConnectedPort);
+    }
+
+    /**
+     * Get a stream of the connected port settlements.
+     *
+     * @return A stream of connected port {@code Colony}s.
+     */
+    public Stream<Colony> getConnectedPorts() {
+        return getConnectedPortList().stream();
     }
 
     /**
