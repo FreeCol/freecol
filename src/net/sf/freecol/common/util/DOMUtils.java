@@ -596,7 +596,7 @@ public class DOMUtils {
      */
     public static Element toXMLElementPartial(FreeColObject fco,
                                               Document document,
-                                              String... fields) {
+                                              List<String> fields) {
         return toXMLElement(fco, document, WriteScope.toServer(), fields);
     }
 
@@ -611,12 +611,13 @@ public class DOMUtils {
      * @param fco The {@code FreeColObject} to write.
      * @param document The {@code Document}.
      * @param writeScope The {@code WriteScope} to apply.
-     * @param fields An array of field names, which if non-null
-     *               indicates this should be a partial write.
+     * @param fields The field names, which if non-null indicates this
+     *     should be a partial write.
      * @return An XML-representation of this object.
      */
     private static Element toXMLElement(FreeColObject fco, Document document,
-                                        WriteScope writeScope, String[] fields) {
+                                        WriteScope writeScope,
+                                        List<String> fields) {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {

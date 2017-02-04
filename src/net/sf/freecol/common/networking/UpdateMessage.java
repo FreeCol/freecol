@@ -46,26 +46,65 @@ public class UpdateMessage extends DOMMessage {
     /** The objects to update. */
     private final List<FreeColGameObject> fcgos = new ArrayList<>();
 
+    /** Limited fields for partial objects. */
+    private final List<List<String>> fields = new ArrayList<>();
+
 
     /**
      * Create a new {@code UpdateMessage}.
      *
      * @param destination The destination {@code ServerPlayer}.
-     * @param fcgos The list of {@code FreeColGameObject}s to add.
      */
-    public UpdateMessage(ServerPlayer destination,
-                         List<FreeColObject> fcos) {
+    private UpdateMessage(ServerPlayer destination) {
         super(TAG);
 
         this.destination = destination;
         this.fcgos.clear();
+        this.fields.clear();
+    }
+    
+    /**
+     * Create a new {@code UpdateMessage}.
+     *
+     * @param destination The destination {@code ServerPlayer}.
+     * @param fco A {@code FreeColObject}s to add (FIXME: currently
+     *     only {@code FreeColGameObject}s are actually allowed).
+     */
+    public UpdateMessage(ServerPlayer destination,
+                         FreeColObject fco) {
+        this(destination);
+
+        append(fco, null);
+    }
+
+    /**
+     * Create a new {@code UpdateMessage}.
+     *
+     * @param destination The destination {@code ServerPlayer}.
+     * @param fcos A list of {@code FreeColObject}s to add.
+     */
+    public UpdateMessage(ServerPlayer destination,
+                         List<FreeColObject> fcos) {
+        this(destination);
+
         if (fcos != null) {
-            for (FreeColObject fco : fcos) {
-                if (fco != null
-                    && FreeColGameObject.class.isAssignableFrom(fco.getClass()))
-                    this.fcgos.add((FreeColGameObject)fco);
-            }
+            for (FreeColObject fco : fcos) append(fco, null);
         }
+    }
+
+    /**
+     * Create a new {@code UpdateMessage}.
+     *
+     * @param destination The destination {@code ServerPlayer}.
+     * @param fco A {@code FreeColObject}s to add (FIXME: currently
+     *     only {@code FreeColGameObject}s are actually allowed).
+     * @param flds A list of fields to update.
+     */
+    public UpdateMessage(ServerPlayer destination,
+                         FreeColObject fco, List<String> flds) {
+        this(destination);
+
+        append(fco, flds);
     }
 
     /**
@@ -87,7 +126,21 @@ public class UpdateMessage extends DOMMessage {
         return Message.MessagePriority.UPDATE;
     }
 
+    /**
+     * Append another object and optional partial fields to update.
+     *
+     * @param fco The {@code FreeColObject} to update.
+     * @param flds An optional list of fields to update.
+     */
+    private void append(FreeColObject fco, List<String> flds) {
+        if (fco != null
+            && FreeColGameObject.class.isAssignableFrom(fco.getClass())) {
+            this.fcgos.add((FreeColGameObject)fco);
+            this.fields.add(flds);
+        }
+    }
 
+            
     // Public interface
 
     /**
@@ -109,8 +162,15 @@ public class UpdateMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage message = new DOMMessage(TAG);
-        message.setStringAttributes(this.getStringAttributes());
-        if (!this.fcgos.isEmpty()) message.add(this.fcgos, this.destination);
+        final int n = this.fcgos.size();
+        for (int i = 0; i < n; i++) {
+            List<String> part = this.fields.get(i);
+            if (part == null) {
+                message.add(this.fcgos.get(i), this.destination);
+            } else {
+                message.add(this.fcgos.get(i), part);
+            }
+        }
         return message.toXMLElement();
     }
 }

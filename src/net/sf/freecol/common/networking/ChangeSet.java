@@ -833,8 +833,7 @@ public class ChangeSet {
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
             return (!isNotifiable(serverPlayer)) ? null
-                : new UpdateMessage(serverPlayer,
-                    Collections.singletonList(this.fcgo));
+                : new UpdateMessage(serverPlayer, this.fcgo);
         }
 
         /**
@@ -882,10 +881,6 @@ public class ChangeSet {
             super(see, fcgo);
 
             this.fields = fields;
-            this.fields.add(0, fcgo.getId());
-            this.fields.add(0, FreeColObject.ID_ATTRIBUTE_TAG);
-            this.fields.add(0, Boolean.TRUE.toString());
-            this.fields.add(0, FreeColObject.PARTIAL_ATTRIBUTE_TAG);
         }
 
 
@@ -902,9 +897,7 @@ public class ChangeSet {
          */
         @Override
         public DOMMessage toMessage(ServerPlayer serverPlayer) {
-            UpdateMessage message = new UpdateMessage((ServerPlayer)null, null);
-            message.setStringAttributes(this.fields);
-            return message;
+            return new UpdateMessage(serverPlayer, this.fcgo, this.fields);
         }
 
 

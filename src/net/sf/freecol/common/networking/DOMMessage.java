@@ -131,6 +131,10 @@ public class DOMMessage extends Message {
         if (fco != null) add(DOMUtils.toXMLElement(fco, this.document, (Player)null));
         return this;
     }
+    public DOMMessage add(FreeColObject fco, List<String> fields) {
+        if (fco != null) add(DOMUtils.toXMLElementPartial(fco, this.document, fields));
+        return this;
+    }
     public DOMMessage add(FreeColObject fco, Player player) {
         if (fco != null) add(DOMUtils.toXMLElement(fco, this.document, player));
         return this;
