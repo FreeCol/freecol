@@ -308,7 +308,8 @@ public class LoginMessage extends DOMMessage {
         case END_GAME: default:
             break;
         }
-        return null; // Bogus, do nothing
+        return ChangeSet.clientError((ServerPlayer)null, StringTemplate
+            .template("server.couldNotLogin"));
     }
 
     /**
