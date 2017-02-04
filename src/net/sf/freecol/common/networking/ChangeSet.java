@@ -261,11 +261,10 @@ public class ChangeSet {
          * Are the secondary changes consequent to this Change?
          *
          * @param serverPlayer The {@code ServerPlayer} to consider.
-         * @return A list of secondary {@code Change}s or the
-         *     empty list if there are none, which is usually the case.
+         * @return The consequent {@code Change}, or null if none.
          */
-        public List<Change> consequences(ServerPlayer serverPlayer) {
-            return Collections.<Change>emptyList();
+        public Change consequences(ServerPlayer serverPlayer) {
+            return null;
         }
 
         /**
@@ -714,15 +713,12 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public List<Change> consequences(ServerPlayer serverPlayer) {
-            if (seeOld(serverPlayer) && !seeNew(serverPlayer)
-                && !unit.isDisposed()) {
-                List<Change> changes = new ArrayList<>();
-                changes.add(new RemoveChange(See.only(serverPlayer),
-                                             unit.getLocation(), Stream.of(unit)));
-                return changes;
-            }
-            return Collections.<Change>emptyList();
+        public Change consequences(ServerPlayer serverPlayer) {
+            return (seeOld(serverPlayer) && !seeNew(serverPlayer)
+                    && !unit.isDisposed())
+                ? new RemoveChange(See.only(serverPlayer),
+                                   unit.getLocation(), Stream.of(unit))
+                : null;
         }
 
         /**
@@ -1785,7 +1781,8 @@ public class ChangeSet {
                 } else {
                     diverted.add(change);
                 }
-                c.addAll(change.consequences(serverPlayer));
+                Change consequent = change.consequences(serverPlayer);
+                if (consequent != null) c.add(consequent);
             }
         }
         elements = collapseElementList(elements);
