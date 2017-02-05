@@ -274,10 +274,6 @@ public class TileImprovement extends TileItem implements Named {
         }
     }
 
-    public void updateStyleFromConnections() {
-        style = TileImprovementStyle.getInstance(encodeConnections());
-    }
-
     /**
      * Encode a style string suitable for TileImprovementStyle.getInstance.
      *
