@@ -86,7 +86,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         setLayout(null);
 
-        tileSize = 4 * (freeColClient.getClientOptions().getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM) + 1);
+        tileSize = 4 * (freeColClient.getClientOptions().getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM));
 
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -173,7 +173,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
 
     private void setZoomOption(int tileSize) {
-        int zoom = tileSize / 4 - 1;
+        int zoom = tileSize / 4;
         freeColClient.getClientOptions()
             .setInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM, zoom);
     }
