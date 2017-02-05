@@ -2365,7 +2365,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private static final String Y_TAG = "y";
     // @compat 0.10.1
     public static final String OLD_UNITS_TAG = "units";
-    // end @compat
+    // end @compat 0.10.1
+    // @compat 0.11.0
+    public static final String OLD_PLAYER_EXPLORED_TILE_TAG = "playerExploredTile";
+    // end @compat 0.11.0
     // @compat 0.11.3
     public static final String OLD_TILE_ITEM_CONTAINER_TAG = "tileitemcontainer";
     // end @compat 0.11.3
@@ -2687,31 +2690,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         } else if (IndianSettlement.TAG.equals(tag)) {
             settlement = xr.readFreeColObject(game, IndianSettlement.class);
 
-        // @compat 0.10.7
-        } else if (PlayerExploredTile.TAG.equals(tag)) {
-            // Only from a saved game.
-            Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
+        // @compat 0.11.0
+        } else if (OLD_PLAYER_EXPLORED_TILE_TAG.equals(tag)) {
+            // Do not process this any more, but at least set a cached tile.
+            Player player = xr.findFreeColGameObject(game, PLAYER_TAG, 
                 Player.class, (Player)null, true);
-
-            if (xr.hasAttribute(IndianSettlement.LEARNABLE_SKILL_TAG)
-                || xr.hasAttribute(IndianSettlement.WANTED_GOODS_TAG + "0")) {
-                UnitType skill = xr.getType(spec,
-                    IndianSettlement.LEARNABLE_SKILL_TAG,
-                    UnitType.class, (UnitType)null);
-                List<GoodsType> wanted
-                    = new ArrayList<GoodsType>(IndianSettlement.WANTED_GOODS_COUNT);
-                for (int i = 0; i < IndianSettlement.WANTED_GOODS_COUNT; i++) {
-                    wanted.add(xr.getType(spec,
-                            IndianSettlement.WANTED_GOODS_TAG + i,
-                            GoodsType.class, (GoodsType)null));
-                }
-                setIndianSettlementInternals(player, skill, wanted);
-            }
-
-            PlayerExploredTile pet = xr.readFreeColObject(game,
-                PlayerExploredTile.class);
-            pet.fixCache();
-        // end @compat 0.10.7
+            while (xr.moreTags() || !tag.equals(xr.getLocalName()));
+            if (player != null) setCachedTile(player, this);
+        // end @compat 0.11.0
 
         } else if (TileItemContainer.TAG.equals(tag)
                    // @compat 0.11.3
