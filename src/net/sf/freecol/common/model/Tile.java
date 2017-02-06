@@ -884,15 +884,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Removes a river from this tile.
      *
      * -til: Changes appearance.
-     *
-     * @return The removed river.
      */
-    public TileImprovement removeRiver() {
+    public void removeRiver() {
         TileImprovement river = getRiver();
-        if (river == null) return null;
-        TileImprovement result = removeTileItem(river);
-        if (result == river) river.updateRiverConnections(null);
-        return result;
+        if (river == null) return;
+        river.updateRiverConnections(null);
+        removeTileItem(river);
     }
 
     /**

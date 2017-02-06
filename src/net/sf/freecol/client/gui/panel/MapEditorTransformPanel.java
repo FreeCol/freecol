@@ -311,8 +311,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     }
                     tile.addRiver(magnitude, sb.toString());
                 } else {
-                    TileImprovement river = tile.getRiver();
-                    tile.getTileItemContainer().removeTileItem(river);
+                    tile.removeRiver();
                 }
             }
         }
