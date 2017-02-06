@@ -808,14 +808,12 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the client player this thread is operating for.  If in the server
-     * there will be none.
+     * Get the client user name.
      *
-     * @return The client {@code Player}.
+     * @return The client user name.
      */
-    public Player getClientPlayer() {
-        return (clientUserName == null) ? null
-            : getPlayerByName(clientUserName);
+    public String getClientUserName() {
+        return this.clientUserName;
     }
 
     /**
@@ -824,7 +822,7 @@ public class Game extends FreeColGameObject {
      * @return True in a client.
      */
     public boolean isInClient() {
-        return clientUserName != null;
+        return this.clientUserName != null;
     }
 
     /**
@@ -833,7 +831,18 @@ public class Game extends FreeColGameObject {
      * @return True in the server.
      */
     public boolean isInServer() {
-        return clientUserName == null;
+        return this.clientUserName == null;
+    }
+
+    /**
+     * Get the client player this thread is operating for.  If in the server
+     * there will be none.
+     *
+     * @return The client {@code Player}.
+     */
+    public Player getClientPlayer() {
+        return (this.clientUserName == null) ? null
+            : getPlayerByName(this.clientUserName);
     }
 
     /**
