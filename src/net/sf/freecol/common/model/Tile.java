@@ -2363,9 +2363,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private static final String TYPE_TAG = "type";
     private static final String X_TAG = "x";
     private static final String Y_TAG = "y";
-    // @compat 0.10.1
-    public static final String OLD_UNITS_TAG = "units";
-    // end @compat 0.10.1
     // @compat 0.11.0
     public static final String OLD_PLAYER_EXPLORED_TILE_TAG = "playerExploredTile";
     // end @compat 0.11.0
@@ -2677,13 +2674,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
             xr.closeTag(CACHED_TILE_TAG);
 
-        // @compat 0.10.1
-        } else if (OLD_UNITS_TAG.equals(tag)) {
-            while (xr.moreTags()) {
-                super.readChild(xr);
-            }
-        // end @compat
-
         } else if (Colony.TAG.equals(tag)) {
             settlement = xr.readFreeColObject(game, Colony.class);
 
@@ -2695,7 +2685,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             // Do not process this any more, but at least set a cached tile.
             Player player = xr.findFreeColGameObject(game, PLAYER_TAG, 
                 Player.class, (Player)null, true);
-            while (xr.moreTags() || !tag.equals(xr.getLocalName()));
+            xr.swallowTag(OLD_PLAYER_EXPLORED_TILE_TAG);
             if (player != null) setCachedTile(player, this);
         // end @compat 0.11.0
 

@@ -1446,9 +1446,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     // for PlayerExploredTile needs to check these.
     public static final String LEARNABLE_SKILL_TAG = "learnableSkill";
     public static final String WANTED_GOODS_TAG = "wantedGoods";
-    // @compat 0.10.1
-    public static final String OLD_UNITS_TAG = "units";
-    // end @compat
 
 
     /**
@@ -1645,13 +1642,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             missionary = xr.readFreeColObject(game, Unit.class);
             missionary.setLocationNoUpdate(this);
             xr.closeTag(MISSIONARY_TAG);
-
-        // @compat 0.10.1
-        } else if (OLD_UNITS_TAG.equals(tag)) {
-            while (xr.moreTags()) {
-                super.readChild(xr);
-            }
-        // end @compat
 
         } else if (OWNED_UNITS_TAG.equals(tag)) {
             Unit unit = xr.makeFreeColObject(game, ID_ATTRIBUTE_TAG,

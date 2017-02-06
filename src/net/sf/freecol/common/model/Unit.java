@@ -4304,9 +4304,6 @@ public class Unit extends GoodsLocation
     private static final String VISIBLE_GOODS_COUNT_TAG = "visibleGoodsCount";
     private static final String WORK_LEFT_TAG = "workLeft";
     private static final String WORK_TYPE_TAG = "workType";
-    // @compat 0.10.5
-    private static final String OLD_UNITS_TAG = "units";
-    // end @compat
     // @compat 0.10.7
     private static final String OLD_HIT_POINTS_TAG = "hitpoints";
     private static final String EQUIPMENT_TAG = "equipment";
@@ -4631,13 +4628,6 @@ public class Unit extends GoodsLocation
                                      xr.getAttribute(COUNT_TAG, 0));
             xr.closeTag(EQUIPMENT_TAG);
         // end @compat 0.10.x
-
-        // @compat 0.10.5
-        } else if (OLD_UNITS_TAG.equals(tag)) {
-            while (xr.moreTags()) {
-                super.readChild(xr);
-            }
-        // end @compat 0.10.5
 
         } else if (TileImprovement.TAG.equals(tag)
                    // @compat 0.11.3
