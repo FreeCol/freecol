@@ -330,12 +330,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
         @Override
         public void transform(Tile tile) {
-            TileImprovementType riverType =
-                tile.getSpecification().getTileImprovementType("model.improvement.river");
+            TileImprovement river = tile.getRiver();
 
-            if (riverType.isTileTypeAllowed(tile.getType())
-                && tile.hasRiver()) {
-                tile.getRiver().updateRiverConnections(style);
+            if (river != null) {
+                river.updateRiverConnections(style);
             }
         }
     }
