@@ -636,9 +636,9 @@ public final class UnitType extends BuildableType implements Consumer {
     private static final String SPACE_TAG = "space";
     private static final String SPACE_TAKEN_TAG = "space-taken";
     private static final String UNIT_TAG = "unit";
-    // @compat 0.10.7
-    private static final String DEFAULT_EQUIPMENT_TAG = "default-equipment";
-    // end @compat
+    // @compat 0.11.0
+    private static final String OLD_DEFAULT_EQUIPMENT_TAG = "default-equipment";
+    // end @compat 0.11.0
     // @compat 0.11.3
     private static final String OLD_DEFAULT_UNIT_TAG = "defaultUnit";
     private static final String OLD_HIT_POINTS_TAG = "hitPoints";
@@ -907,32 +907,21 @@ public final class UnitType extends BuildableType implements Consumer {
                     xr.getAttribute(VALUE_TAG, UNDEFINED));
             xr.closeTag(CONSUMES_TAG);
 
-            // @compat 0.10.7
-        } else if (DEFAULT_EQUIPMENT_TAG.equals(tag)) {
-            String id = xr.getAttribute(ID_ATTRIBUTE_TAG, null);
-            String roleId = ("model.equipment.horses".equals(id))
-                    ? "model.role.scout"
-                    : ("model.equipment.muskets".equals(id))
-                    ? "model.role.soldier"
-                    : ("model.equipment.tools".equals(id))
-                    ? "model.role.pioneer"
-                    : ("model.equipment.missionary".equals(id))
-                    ? "model.role.missionary"
-                    : Specification.DEFAULT_ROLE_ID;
-            defaultRole = spec.getRole(roleId);
-            xr.closeTag(DEFAULT_EQUIPMENT_TAG);
-            // end @compat
+        // @compat 0.11.0
+        } else if (OLD_DEFAULT_EQUIPMENT_TAG.equals(tag)) {
+            xr.swallowTag(OLD_DEFAULT_EQUIPMENT_TAG);
+        // end @compat 0.11.0
 
         } else if (DEFAULT_ROLE_TAG.equals(tag)) {
             defaultRole = xr.getType(spec, ID_ATTRIBUTE_TAG,
                     Role.class, spec.getDefaultRole());
             xr.closeTag(DEFAULT_ROLE_TAG);
 
-            // @compat 0.11.6
+        // @compat 0.11.6
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
             spec.setNeedUnitChangeTypes();
             xr.closeTag(tag, Scope.TAG);
-            // end @compat 0.11.6
+        // end @compat 0.11.6
 
         } else {
             super.readChild(xr);

@@ -403,9 +403,9 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     private static final String TO_TAG = "to";
     private static final String WORKER_TAG = "worker";
     private static final String ZINDEX_TAG = "zIndex";
-    // @compat 0.10.x
-    private static final String EXPENDED_EQUIPMENT_TYPE_TAG = "expended-equipment-type";
-    // end @compat 0.10.x
+    // @compat 0.11.0
+    private static final String OLD_EXPENDED_EQUIPMENT_TYPE_TAG = "expended-equipment-type";
+    // end @compat 0.11.0
     // @compat 0.11.3
     private static final String OLD_EXPOSE_RESOURCE_PERCENT_TAG = "exposeResourcePercent";
     // end @compat 0.11.3
@@ -502,11 +502,11 @@ public final class TileImprovementType extends FreeColSpecObjectType {
 
         requiredRole = xr.getType(spec, REQUIRED_ROLE_TAG,
             Role.class, (Role)null);
-        // @compat 0.10.x
-        if (xr.hasAttribute(EXPENDED_EQUIPMENT_TYPE_TAG)) {
+        // @compat 0.11.x
+        if (xr.hasAttribute(OLD_EXPENDED_EQUIPMENT_TYPE_TAG)) {
             requiredRole = spec.getRole("model.role.pioneer");
         }
-        // end @compat 0.10.x
+        // end @compat 0.11.x
 
         expendedAmount = xr.getAttribute(EXPENDED_AMOUNT_TAG, 0);
 

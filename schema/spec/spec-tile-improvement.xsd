@@ -66,7 +66,6 @@
       <xs:attribute name="required-role" use="optional" type="RoleId"/>
       <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
       <!-- @compat 0.10.x -->
-      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
       <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
       <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
       <!-- end @compat 0.10.x -->
@@ -123,7 +122,6 @@
       <!-- @compat 0.10.x -->
       <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
       <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
-      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
       <!-- end @compat 0.10.x -->
     </xs:complexType>
   </xs:element>

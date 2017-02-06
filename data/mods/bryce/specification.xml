@@ -243,7 +243,8 @@
 
   <tile-improvement-types>
     <tile-improvement-type id="model.improvement.road" add-work-turns="0"
-                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1"
+                           required-role="model.role.pioneer"
+                           expended-amount="1" magnitude="1"
                            movement-cost="1" zIndex="350">
       <scope method-name="isWater" method-value="false" />
       <modifier id="model.goods.lumber" type="additive" value="2"/>

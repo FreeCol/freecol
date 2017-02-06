@@ -21,7 +21,7 @@
 <freecol-specification id="plantForest">
   <tile-improvement-types>
     <tile-improvement-type id="model.improvement.plantForest" add-work-turns="9"
-                           expended-equipment-type="model.equipment.tools"
+                           required-role="model.role.pioneer"
                            expended-amount="4"
                            magnitude="2">
       <scope method-name="isForested"      method-value="false" />

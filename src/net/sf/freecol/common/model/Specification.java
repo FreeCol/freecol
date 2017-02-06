@@ -185,9 +185,6 @@ public final class Specification {
     private final List<BuildingType> buildingTypeList = new ArrayList<>();
     // readerMap("disasters")
     private final List<Disaster> disasters = new ArrayList<>();
-    // @compat 0.10.x readerMap("equipment-types")
-    private final List<EquipmentType> equipmentTypes = new ArrayList<>();
-    // end @compat 0.10.x
     // readerMap("european-nation-types")
     private final List<EuropeanNationType> europeanNationTypes = new ArrayList<>();
     // readerMap("events")
@@ -295,10 +292,6 @@ public final class Specification {
                       new TypeReader<>(BuildingType.class, buildingTypeList));
         readerMap.put(DISASTERS_TAG,
                       new TypeReader<>(Disaster.class, disasters));
-        // @compat 0.10.x
-        readerMap.put(EQUIPMENT_TYPES_TAG,
-                      new TypeReader<>(EquipmentType.class, equipmentTypes));
-        // end @compat 0.10.x
         readerMap.put(EUROPEAN_NATION_TYPES_TAG,
                       new TypeReader<>(EuropeanNationType.class, europeanNationTypes));
         readerMap.put(EVENTS_TAG,
@@ -1737,19 +1730,6 @@ public final class Specification {
     }
 
 
-    // @compat 0.10.x -- EquipmentTypes --
-    /**
-     * Get an equipment type by identifier.
-     * Still needed by backward compatibility code in Unit.readChild.
-     *
-     * @param id The object identifier.
-     * @return The {@code EquipmentType} found.
-     */
-    public EquipmentType getEquipmentType(String id) {
-        return getType(id, EquipmentType.class);
-    }
-    // end @compat 0.10.x
-
     // -- DifficultyLevels --
 
     /**
@@ -2018,7 +1998,7 @@ public final class Specification {
         fixSpec();
     }
 
-    // @compat 0.10.x
+    // @compat 0.11.0
     /**
      * Handle the reworking of roles that landed in 0.11.0.
      *
@@ -2048,7 +2028,7 @@ public final class Specification {
             + transform(getRoles(), alwaysTrue(), Role::getId,
                         Collectors.joining(" ")));
     }
-    // end @compat 0.10.x
+    // end @compat 0.11.0
 
     /**
      * Specification backward compatibility for the spec in general.
@@ -2288,19 +2268,6 @@ public final class Specification {
         goodsType.setMilitary();
         goodsType = getGoodsType("model.goods.muskets");
         goodsType.setMilitary();
-
-        // automaticEquipment scope types are now roles
-        forEach(flatten(flatten(indianNationTypes,
-                                nt -> nt.getAbilities(Ability.AUTOMATIC_EQUIPMENT)),
-                        Ability::getScopes),
-            scope -> {
-                String type = scope.getType();
-                if ("model.equipment.indian.muskets".equals(type)) {
-                    scope.setType("model.role.nativeDragoon");
-                } else if ("model.equipment.indian.horses".equals(type)) {
-                    scope.setType("model.role.armedBrave");
-                }
-            });
 
         // Limit Revere auto-equip of muskets to the soldier role
         {
@@ -2917,13 +2884,13 @@ public final class Specification {
     private static final String UNIT_CHANGE_TYPES_TAG = "unit-change-types";
     private static final String UNIT_TYPES_TAG = "unit-types";
     private static final String VERSION_TAG = "version";
-    // @compat 0.10.x
-    private static final String EQUIPMENT_TYPES_TAG = "equipment-types";
-    // end @compat 0.10.x
     // @compat 0.11.3
     private static final String OLD_DIFFICULTY_LEVEL_TAG = "difficultyLevel";
     private static final String OLD_TILEIMPROVEMENT_TYPES_TAG = "tileimprovement-types";
     // end @compat 0.11.3
+    // @compat 0.11.x
+    private static final String OLD_EQUIPMENT_TYPES_TAG = "equipment-types";
+    // end @compat 0.11.x
 
     /**
      * Write an XML-representation of this object to the given stream.
@@ -3023,17 +2990,12 @@ public final class Specification {
 
         while (xr.moreTags()) {
             String childName = xr.getLocalName();
-            // @compat 0.10.x
-            // Ideally we would handle role backward compatibility in
-            // the type reader triggered by the "roles" section of the
-            // spec.  Alas, specs pre-0.10.6 had no roles section.
-            // The next section after roles in modern specs is
-            // "equipment-types", which is also the first place roles
-            // are referred to directly, and better still is completely
-            // replaced by roles in 0.11.x.  So this is the last chance
-            // to fix any role omissions.
-            if ("equipment-types".equals(childName)) fixRoles();
-            // end @compat 0.10.x
+            // @compat 0.11.0
+            if (childName.equals(OLD_EQUIPMENT_TYPES_TAG)) {
+                xr.swallowTag(OLD_EQUIPMENT_TYPES_TAG);
+                continue;
+            }
+            // end @compat 0.11.0
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
                 logger.warning("No reader found for: " + childName);
@@ -3041,7 +3003,10 @@ public final class Specification {
                 reader.readChildren(xr);
             }
         }
-
+        // @compat 0.11.0
+        if (roles.isEmpty()) fixRoles();
+        // end @compat 0.11.0
+        
         if (this.needUnitChangeTypes) {
             this.needUnitChangeTypes = false;
             File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 

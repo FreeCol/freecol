@@ -4306,11 +4306,10 @@ public class Unit extends GoodsLocation
     private static final String WORK_TYPE_TAG = "workType";
     // @compat 0.10.7
     private static final String OLD_HIT_POINTS_TAG = "hitpoints";
-    private static final String EQUIPMENT_TAG = "equipment";
-    /** The equipment this Unit carries.  Now subsumed into roles. */
-    private final TypeCountMap<EquipmentType> equipment
-        = new TypeCountMap<>();
-    // end @compat 0.10.x
+    // end @compat 0.10.7
+    // @compat 0.11.0
+    private static final String OLD_EQUIPMENT_TAG = "equipment";
+    // end @compat 0.11.0
     // @compat 0.11.3
     private static final String OLD_TILE_IMPROVEMENT_TAG = "tileimprovement";
     // end @compat 0.11.3
@@ -4540,63 +4539,9 @@ public class Unit extends GoodsLocation
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         if (getGoodsContainer() != null) getGoodsContainer().removeAll();
-        equipment.clear();
         workImprovement = null;
 
         super.readChildren(xr);
-
-        // @compat 0.10.x
-        if (roleCount < 0) {
-            // If roleCount was not present, set it from equipment
-            final Specification spec = getSpecification();
-            Role role = spec.getDefaultRole();
-            boolean horses = false, muskets = false;
-            int count = 1;
-            for (EquipmentType type : equipment.keySet()) {
-                if ("model.equipment.horses".equals(type.getId())
-                    || "model.equipment.indian.horses".equals(type.getId())) {
-                    horses = true;
-                } else if ("model.equipment.muskets".equals(type.getId())
-                    || "model.equipment.indian.muskets".equals(type.getId())) {
-                    muskets = true;
-                } else {
-                    role = type.getRole();
-                    if ("model.equipment.tools".equals(type.getId())) {
-                        count = equipment.getCount(type);
-                    }
-                }
-            }
-            if (horses && muskets) {
-                if (owner.isIndian()) {
-                    role = spec.getRole("model.role.nativeDragoon");
-                } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
-                    role = spec.getRole("model.role.cavalry");
-                } else {
-                    role = spec.getRole("model.role.dragoon");
-                }
-            } else if (horses) {
-                if (owner.isIndian()) {
-                    role = spec.getRole("model.role.mountedBrave");
-                } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
-                    logger.warning("Undefined role: REF Scout");
-                } else {
-                    role = spec.getRole("model.role.scout");
-                }
-            } else if (muskets) {
-                if (owner.isIndian()) {
-                    role = spec.getRole("model.role.armedBrave");
-                } else if (owner.isREF() && hasAbility(Ability.REF_UNIT)) {
-                    role = spec.getRole("model.role.infantry");
-                } else {
-                    role = spec.getRole("model.role.soldier");
-                }
-            }
-            setRoleCount(Math.min(role.getMaximumCount(), count));
-        } else {
-            // If roleCount was present, we are now ignoring equipment.
-            equipment.clear();
-        }
-        // end @compat 0.10.x
 
         // @compat 0.10.x
         // There was a bug in 0.10.x that did not clear tile
@@ -4622,12 +4567,11 @@ public class Unit extends GoodsLocation
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
-        // @compat 0.10.x
-        if (EQUIPMENT_TAG.equals(tag)) {
-            equipment.incrementCount(spec.getEquipmentType(xr.readId()),
-                                     xr.getAttribute(COUNT_TAG, 0));
-            xr.closeTag(EQUIPMENT_TAG);
-        // end @compat 0.10.x
+        // @compat 0.11.0
+        if (OLD_EQUIPMENT_TAG.equals(tag)) {
+            while (xr.moreTags()
+                || !OLD_EQUIPMENT_TAG.equals(xr.getLocalName()));
+        // end @compat 0.11.0
 
         } else if (TileImprovement.TAG.equals(tag)
                    // @compat 0.11.3

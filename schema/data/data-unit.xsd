@@ -24,7 +24,6 @@
 
   <xs:include schemaLocation="../spec/spec-model.xsd"/>
   <xs:include schemaLocation="data-goodsContainer.xsd"/>
-  <xs:include schemaLocation="data-equipment.xsd"/>
   <xs:include schemaLocation="data-tileimprovement.xsd"/>
 
   <xs:element name="units">
@@ -62,7 +61,6 @@
   <xs:complexType name="unitElementType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
       <xs:element ref="goodsContainer"/>
-      <xs:element ref="equipment"/>
       <xs:element ref="units"/>
       <xs:element ref="tileImprovement">
         <xs:annotation>

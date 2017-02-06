@@ -27,7 +27,6 @@
   <xs:include schemaLocation="data-building.xsd" />
   <xs:include schemaLocation="data-colony.xsd" />
   <xs:include schemaLocation="data-colonyTile.xsd" />
-  <xs:include schemaLocation="data-equipment.xsd" />
   <xs:include schemaLocation="data-europe.xsd" />
   <xs:include schemaLocation="data-exportData.xsd" />
   <xs:include schemaLocation="data-goods.xsd" />

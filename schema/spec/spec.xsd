@@ -112,15 +112,13 @@
       0.112: Added rebel-factor attribute to building-type.
       0.113: Added competence-factor attribute to building-type.
       0.114: Drop upgrade element from founding-father.
+      0.115: Drop equipment.
     </xs:documentation>
   </xs:annotation>
 
   <xs:include schemaLocation="spec-model.xsd" />
   <xs:include schemaLocation="spec-building-types.xsd"/>
   <xs:include schemaLocation="spec-disasters.xsd"/>
-  <!-- @compat 0.10.x -->
-  <xs:include schemaLocation="spec-equipment-types.xsd"/>
-  <!-- end @compat 0.10.x -->
   <xs:include schemaLocation="spec-events.xsd"/>
   <xs:include schemaLocation="spec-founding-fathers.xsd"/>
   <xs:include schemaLocation="spec-goods-types.xsd"/>
@@ -140,7 +138,6 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="building-types"/>
         <xs:element ref="disasters"/>
-        <xs:element ref="equipment-types"/>
         <xs:element ref="events"/>
         <xs:element ref="founding-fathers"/>
         <xs:element ref="goods-types"/>

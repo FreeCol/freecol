@@ -18,7 +18,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<freecol-specification id="rolesCompat" version="0.110">
+<freecol-specification id="rolesCompat" version="0.115">
 <!--
     A copy of the latest roles section of classic/specification.xml
     to be loaded into the specification of games lacking a roles

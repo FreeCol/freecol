@@ -40,14 +40,6 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <!-- @compat 0.10.x -->
-  <xs:simpleType name="EquipmentTypeId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.equipment(\.indian)?\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-  <!-- end @compat 0.10.x -->
-
   <xs:simpleType name="FoundingFatherId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.foundingFather\.([a-zA-Z]+)" />
