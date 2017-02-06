@@ -677,6 +677,28 @@ public final class FreeColServer {
     }
         
     /**
+     * Wait until the game has been created.
+     *
+     * 2017: This should not be needed, but just occasionally the
+     * client and server threads conspire to race in a way that
+     * causes a hang.  Check this again in due course.
+     *
+     * @return The {@code ServerGame}, or null if the wait times out.
+     */
+    public ServerGame waitForGame() {        
+        final int timeStep = 1000;
+        int timeOut = 20000;
+        ServerGame serverGame = null;
+        while ((serverGame = getGame()) == null) {
+            try {
+                Thread.sleep(timeStep);
+            } catch (InterruptedException e) {}
+            if ((timeOut -= timeStep) <= 0) break;
+        }
+        return serverGame;
+    }
+
+    /**
      * Start the game.
      *
      * Called from PreGameController following a requestLaunch message

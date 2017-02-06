@@ -186,7 +186,7 @@ public class LoginMessage extends DOMMessage {
 
         switch (freeColServer.getServerState()) {
         case PRE_GAME:
-            if ((serverGame = freeColServer.getGame()) == null) {
+            if ((serverGame = freeColServer.waitForGame()) == null) {
                 return ChangeSet.clientError((ServerPlayer)null,
                     StringTemplate.template("server.timeOut"));
             }
