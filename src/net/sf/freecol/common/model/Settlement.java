@@ -118,6 +118,24 @@ public abstract class Settlement extends GoodsLocation
     }
 
     /**
+     * Gets the immigration points.
+     *
+     * @return The current immigration.
+     */
+    public int getImmigration() {
+        return 0;
+    }
+
+    /**
+     * Gets the liberty points.
+     *
+     * @return The current liberty.
+     */
+    public int getLiberty() {
+        return 0;
+    }
+
+    /**
      * Is this settlement landlocked?
      *
      * @return True if no adjacent tiles are water.

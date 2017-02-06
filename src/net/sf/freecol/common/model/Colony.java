@@ -265,15 +265,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Gets the liberty points.
-     *
-     * @return The current liberty.
-     */
-    public int getLiberty() {
-        return liberty;
-    }
-
-    /**
      * Gets the production bonus of the colony.
      *
      * @return The current production bonus of the colony.
@@ -291,15 +282,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public void setProductionBonus(int productionBonus) {
         this.productionBonus = productionBonus;
-    }
-
-    /**
-     * Gets the immigration points.
-     *
-     * @return The current immigration.
-     */
-    public int getImmigration() {
-        return immigration;
     }
 
     /**
@@ -2571,6 +2553,22 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
 
     // Settlement
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getImmigration() {
+        return immigration;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getLiberty() {
+        return liberty;
+    }
 
     /**
      * {@inheritDoc}

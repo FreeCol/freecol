@@ -4382,19 +4382,20 @@ outer:  for (Effect effect : effects) {
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         lb.add("PLAYER ", getName(), ": ");
         final Game game = getGame();
+        final Specification spec = getSpecification();
 
         // Settlements
         List<Settlement> settlements = getSettlementList();
-        int newSoL = 0, newImmigration = getImmigration();
+        int oldImmigration = getImmigration(), oldLiberty = getLiberty(),
+            newSoL = 0;
         for (Settlement settlement : settlements) {
             ((ServerModelObject)settlement).csNewTurn(random, lb, cs);
             newSoL += settlement.getSoL();
         }
-        newImmigration = getImmigration() - newImmigration;
 
-        int numberOfColonies = settlements.size();
-        if (numberOfColonies > 0) {
-            newSoL = newSoL / numberOfColonies;
+        int numberOfSettlements = settlements.size();
+        if (numberOfSettlements > 0) {
+            newSoL = newSoL / numberOfSettlements;
             if (oldSoL / 10 != newSoL / 10) {
                 String key = (newSoL > oldSoL)
                     ? "model.player.soLIncrease"
@@ -4406,6 +4407,8 @@ outer:  for (Effect effect : effects) {
             }
             oldSoL = newSoL; // Remember SoL for check changes at next turn.
         }
+        int newImmigration = getImmigration() - oldImmigration,
+            newLiberty = getLiberty() - oldLiberty;
 
         // Europe.
         if (europe != null) {
@@ -4416,36 +4419,42 @@ outer:  for (Effect effect : effects) {
         for (Unit unit : getUnitList()) {
             try {
                 ((ServerModelObject) unit).csNewTurn(random, lb, cs);
-            } catch (ClassCastException e) {
-                logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(), e);
+            } catch (ClassCastException cce) {
+                logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(),
+                           cce);
             }
         }
 
-        if (isEuropean()) { // Update liberty and immigration
+        if (isEuropean()) {
             // Auto-emigrate if selection not allowed.
-            if (hasAbility(Ability.SELECT_RECRUIT)) {
-                cs.addPartial(See.only(this), this,
-                    "immigration", String.valueOf(this.getImmigration()));
-            } else {
+            if (!hasAbility(Ability.SELECT_RECRUIT)) {
                 while (checkEmigrate()) {
                     csEmigrate(MigrationType.getUnspecificSlot(),
                                MigrationType.NORMAL, random, cs);
                 }
             }
-            cs.addPartial(See.only(this), this,
-                "liberty", String.valueOf(this.getLiberty()));
 
-            if (getSpecification().getBoolean(GameOptions.ENABLE_UPKEEP)) {
+            // Update liberty and immigration
+            if (newImmigration != 0) {
+                cs.addPartial(See.only(this), this,
+                              "immigration", String.valueOf(getImmigration()));
+            }
+            if (newLiberty != 0) {
+                cs.addPartial(See.only(this), this,
+                              "liberty", String.valueOf(getLiberty()));
+            }
+
+            if (spec.getBoolean(GameOptions.ENABLE_UPKEEP)) {
                 csPayUpkeep(random, cs);
             }
 
-            int probability = getSpecification().getInteger(GameOptions.NATURAL_DISASTERS);
+            int probability = spec.getInteger(GameOptions.NATURAL_DISASTERS);
             if (probability > 0) {
                 csNaturalDisasters(random, cs, probability);
             }
 
-            if (isRebel() && interventionBells
-                >= getSpecification().getInteger(GameOptions.INTERVENTION_BELLS)) {
+            if (isRebel()
+                && interventionBells >= spec.getInteger(GameOptions.INTERVENTION_BELLS)) {
                 interventionBells = Integer.MIN_VALUE;
                 
                 // Enter near a port.
