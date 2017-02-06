@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.dialog;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -61,11 +62,14 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
                   "span, align center");
 
         List<ChoiceItem<String>> c = FreeColDialog.choices();
-        for (String key : ResourceManager.getImageKeys(PREFIX)) {
+        List<String> imageKeys = ResourceManager.getImageKeys(PREFIX).stream()
+            .filter(key -> !key.substring(PREFIX.length()).contains("1"))
+            .sorted().collect(Collectors.toList());
+        for (String key : imageKeys) {
             c.add(new ChoiceItem<>(null, key.substring(PREFIX.length()))
                 .setIcon(new ImageIcon(ResourceManager.getImage(key, 0.5f))));
         }
-       
+
         initializeChoiceDialog(frame, true, panel, null, "cancel", c);
     }
 }
