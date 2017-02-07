@@ -105,7 +105,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The current {@code FreeColClient}.
      */
-    protected FreeColClient getFreeColClient() {
+    protected final FreeColClient getFreeColClient() {
         return freeColClient;
     }
 
@@ -114,7 +114,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return True if the panel is editable.
      */
-    protected boolean isEditable() {
+    protected final boolean isEditable() {
         return editable;
     }
 
@@ -123,7 +123,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The current {@code Game}.
      */
-    protected Game getGame() {
+    protected final Game getGame() {
         return freeColClient.getGame();
     }
 
@@ -132,7 +132,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The current {@code GUI}.
      */
-    protected SwingGUI getGUI() {
+    protected final SwingGUI getGUI() {
         return (SwingGUI)freeColClient.getGUI();
     }
 
@@ -141,7 +141,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The {@code ImageLibrary}.
      */
-    protected ImageLibrary getImageLibrary() {
+    protected final ImageLibrary getImageLibrary() {
         return getGUI().getImageLibrary();
     }
 
@@ -159,7 +159,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The client {@code Player}.
      */
-    protected Player getMyPlayer() {
+    protected final Player getMyPlayer() {
         return freeColClient.getMyPlayer();
     }
 
@@ -168,7 +168,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The {@code ClientOptions}.
      */
-    protected ClientOptions getClientOptions() {
+    protected final ClientOptions getClientOptions() {
         return (freeColClient == null) ? null
             : freeColClient.getClientOptions();
     }
@@ -178,7 +178,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The client {@code InGameController}.
      */
-    public InGameController igc() {
+    public final InGameController igc() {
         return freeColClient.getInGameController();
     }
 
