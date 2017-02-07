@@ -4414,6 +4414,7 @@ outer:  for (Effect effect : effects) {
         if (europe != null) {
             ((ServerModelObject) europe).csNewTurn(random, lb, cs);
             modifyImmigration(europe.getImmigration(newImmigration));
+            newImmigration = getImmigration() - oldImmigration;
         }
         // Units.
         for (Unit unit : getUnitList()) {
