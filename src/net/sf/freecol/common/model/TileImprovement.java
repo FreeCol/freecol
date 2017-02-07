@@ -378,7 +378,7 @@ public class TileImprovement extends TileItem implements Named {
             String c = (conns == null) ? "0" : conns.substring(i, i+1);
 
             if ("0".equals(c)) {
-                if (river != null && river.isConnectedTo(dReverse)) {
+                if (river != null) {
                     river.setConnected(dReverse, false);
                 }
                 setConnected(d, false);
