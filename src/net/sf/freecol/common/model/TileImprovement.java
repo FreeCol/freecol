@@ -383,8 +383,12 @@ public class TileImprovement extends TileItem implements Named {
                 }
                 setConnected(d, false);
             } else {
-                if (river != null) river.setConnected(dReverse, true);
-                setConnected(d, true);
+                if (river != null) {
+                    river.setConnected(dReverse, true);
+                    setConnected(d, true);
+                } else if (t != null && t.getType().isWater()) {
+                    setConnected(d, true);
+                }
             }
             i++;
         }
