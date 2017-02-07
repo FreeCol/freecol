@@ -64,41 +64,51 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     private static final Logger logger = Logger.getLogger(FreeColXMLWriter.class.getName());
 
     /** The scope of a FreeCol object write. */
-    public static enum WriteScope {
+    public static enum WriteScopeType {
         CLIENT,  // Only the client-visible information
         SERVER,  // Full server-visible information
-        SAVE;    // Absolutely everything needed to save the game state
+        SAVE     // Absolutely everything needed to save the game state
+    };
 
-        private Player player = null; // The player to write to.
+    public static class WriteScope {
+
+        private final WriteScopeType scopeType;
+        
+        private final Player player;
 
 
+        WriteScope(WriteScopeType scopeType, Player player) {
+            this.scopeType = scopeType;
+            this.player = player;
+        }
+        
         public static WriteScope toClient(Player player) {
             if (player == null) {
                 throw new IllegalArgumentException("Null player.");
             }
-            WriteScope ret = WriteScope.CLIENT;
-            ret.player = player;
-            return ret;
+            return new WriteScope(WriteScopeType.CLIENT, player);
         }            
 
         public static WriteScope toServer() {
-            return WriteScope.SERVER;
+            return new WriteScope(WriteScopeType.SERVER, null);
         }
 
         public static WriteScope toSave() {
-            return WriteScope.SAVE;
+            return new WriteScope(WriteScopeType.SAVE, null);
         }
 
         public boolean isValid() {
-            return (this == WriteScope.CLIENT) == (player != null);
+            return (this.scopeType == WriteScopeType.CLIENT)
+                == (this.player != null);
         }
 
         public boolean validForSave() {
-            return this == WriteScope.SAVE;
+            return this.scopeType == WriteScopeType.SAVE;
         }
 
         public boolean validFor(Player player) {
-            return this != WriteScope.CLIENT || this.player == player;
+            return this.scopeType != WriteScopeType.CLIENT
+                || this.player == player;
         }
 
         public Player getClient() {
@@ -107,7 +117,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
 
         public String toString() {
             String ret = super.toString();
-            if (this == CLIENT) {
+            if (this.scopeType == WriteScopeType.CLIENT) {
                 ret += ":" + ((this.player == null) ? "INVALID"
                     : this.player.getId());
             }
@@ -196,7 +206,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
-        this.writeScope = (scope == null) ? WriteScope.SAVE : scope;
+        this.writeScope = (scope == null) ? WriteScope.toSave() : scope;
     }
 
 
