@@ -31,11 +31,11 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.option.GameOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
+
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -75,9 +75,6 @@ public class TileImprovement extends TileItem implements Named {
      */
     private boolean virtual;
 
-    /** Cached bitmap of connections by direction, derived from style. */
-    private long connected = 0L;
-
 
     /**
      * Creates a standard {@code TileImprovement}-instance.
@@ -104,7 +101,6 @@ public class TileImprovement extends TileItem implements Named {
         }
         this.magnitude = type.getMagnitude();
         this.style = style;
-        this.connected = getConnectionsFromStyle();
     }
 
     /**
@@ -122,7 +118,6 @@ public class TileImprovement extends TileItem implements Named {
         this.magnitude = template.magnitude;
         this.style = template.style;
         this.virtual = template.virtual;
-        this.connected = getConnectionsFromStyle();
     }
 
     /**
@@ -253,7 +248,10 @@ public class TileImprovement extends TileItem implements Named {
      * @return True if this improvement is connected.
      */
     public boolean isConnectedTo(Direction direction) {
-        return (connected & (1 << direction.ordinal())) != 0;
+        int index = isRoad() ? direction.ordinal()
+            : isRiver() ? Direction.longSides.indexOf(direction) : -1;
+        return (index == -1 || style == null) ? false
+            : style.getString().charAt(index) != '0';
     }
 
     /**
@@ -263,34 +261,19 @@ public class TileImprovement extends TileItem implements Named {
      * @param value The new status for the connection.
      */
     public void setConnected(Direction direction, boolean value) {
-        boolean now = isConnectedTo(direction);
-        if (now != value) {
-            if (value) {
-                connected |= 1 << direction.ordinal();
-            } else {
-                connected &= ~(1 << direction.ordinal());
+        if (style == null || isConnectedTo(direction) != value) {
+            String old = (style == null) ? "00000000" : style.getString();
+            List<Direction> directions = getConnectionDirections();
+            int end = directions.size();
+            StringBuilder updated = new StringBuilder();
+            for(int index = 0; index != end; ++index) {
+                if(directions.get(index) == direction)
+                    updated.append(value ? Integer.toString(magnitude) : "0");
+                else
+                    updated.append(old.charAt(index));
             }
-            style = TileImprovementStyle.getInstance(encodeConnections());
+            style = TileImprovementStyle.getInstance(updated.toString());
         }
-    }
-
-    public void updateStyleFromConnections() {
-        style = TileImprovementStyle.getInstance(encodeConnections());
-    }
-
-    /**
-     * Encode a style string suitable for TileImprovementStyle.getInstance.
-     *
-     * @return A style string (may be null).
-     */
-    private String encodeConnections() {
-        List<Direction> dirns = getConnectionDirections();
-        if (dirns == null) return null;
-        StringBuilder sb = new StringBuilder();
-        for (Direction d : dirns) {
-            sb.append((isConnectedTo(d)) ? Integer.toString(magnitude) : "0");
-        }
-        return sb.toString();
     }
 
     /**
@@ -681,7 +664,6 @@ public class TileImprovement extends TileItem implements Named {
                     + "/ at " + tile);
             }
         }
-        connected = getConnectionsFromStyle();
     }
 
     /**
