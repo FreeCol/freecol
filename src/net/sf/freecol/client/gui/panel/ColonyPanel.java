@@ -370,7 +370,7 @@ public final class ColonyPanel extends PortPanel
 
         cargoPanel = new ColonyCargoPanel(freeColClient);
         cargoScroll = new JScrollPane(cargoPanel,
-            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         cargoScroll.setBorder(Utility.ETCHED_BORDER);
 
