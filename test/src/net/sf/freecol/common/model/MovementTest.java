@@ -152,10 +152,12 @@ public class MovementTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
-        Map map = getTestMap(plains);
+        Map map = getTestMap(ocean);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = tile1.getNeighbourOrNull(Direction.NE);
+        tile1.setType(plains);
+        tile2.setType(plains);
         tile1.setExplored(dutch, true);
         tile2.setExplored(dutch, true);
         assertEquals(Direction.NE, map.getDirection(tile1, tile2));
