@@ -881,7 +881,7 @@
     <!-- This is a shortcut for NetBeans, and possibly other IDEs. -->
     <target name="run" depends="package" description="Runs the game">
         <java jar="FreeCol.jar" fork="true">
-            <jvmarg value="-Xmx256M" />
+            <jvmarg value="-Xmx512M" />
         </java>
     </target>
 
