@@ -768,14 +768,8 @@ public final class TileViewer extends FreeColClientHolder {
             if (ti.isRoad()) {
                 rp.displayRoad(g, tile);
             } else if (ti.isRiver()) {
-                if (ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
-                    TileImprovementStyle style = ti.getStyle();
-                    // @compat 0.10.5
-                    // America_large had some bogus rivers in 0.10.5
-                    if (style != null)
-                    // end @compat 0.10.5
-                    g.drawImage(lib.getRiverImage(style), 0, 0, null);
-                }
+                TileImprovementStyle style = ti.getStyle();
+                g.drawImage(lib.getRiverImage(style), 0, 0, null);
             } else {
                 String key = "image.tile." + ti.getType().getId();
                 if (ResourceManager.hasImageResource(key)) {
