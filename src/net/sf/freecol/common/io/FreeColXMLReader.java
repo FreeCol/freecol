@@ -374,7 +374,17 @@ public class FreeColXMLReader extends StreamReaderDelegate
         }
         expectTag(tag);
     }
-            
+
+    /**
+     * Swallow a tag, ignoring anything read until the tag closes.
+     *
+     * @param tag The tag to swallow.
+     * @exception XMLStreamException if a there is an error with the stream.
+     */
+    public void swallowTag(String tag) throws XMLStreamException {
+        while (moreTags() || !tag.equals(getLocalName()));
+    }            
+        
     /**
      * Extract the current tag and its attributes from an input stream.
      * Useful for error messages.
