@@ -144,10 +144,11 @@ public final class FreeColServer {
      *     series.
      * Version 12 was introduced with HighSeas post-0.10.1.
      * Version 13 coincides with the start of the 0.11.x series.
+     * Version 14 coincides with the start of the 0.12.x series.
      *
      * Please add to this comment if you increase the version.
      */
-    public static final int SAVEGAME_VERSION = 13;
+    public static final int SAVEGAME_VERSION = 14;
 
     /**
      * The oldest save game format that can still be loaded.
@@ -156,7 +157,7 @@ public final class FreeColServer {
      * Revisit the numbering scheme and save compatibility promise
      * when 1.0 is released?
      */
-    public static final int MINIMUM_SAVEGAME_VERSION = 11;
+    public static final int MINIMUM_SAVEGAME_VERSION = 12;
 
     /**
      * The ruleset to use when loading old format games where a spec
