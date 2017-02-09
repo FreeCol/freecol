@@ -320,7 +320,10 @@ public final class ImageLibrary {
                                                TileImprovementStyle riverStyle,
                                                Dimension size) {
         if (riverStyle != null) {
-            String key = "image.tileforest." + type.getId() + ".s" + riverStyle.getMask();
+            String mask = riverStyle.getMask();
+            if (mask.equals("0000"))
+                mask = "0100";
+            String key = "image.tileforest." + type.getId() + ".s" + mask;
             // @compat 0.10.6
             // Workaround for BR#3599586.  America_large used to contain
             // tiles with an isolated river (old river style="0"!).
