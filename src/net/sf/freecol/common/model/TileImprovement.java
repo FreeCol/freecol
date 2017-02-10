@@ -641,32 +641,21 @@ public class TileImprovement extends TileItem implements Named {
 
         String str = xr.getAttribute(STYLE_TAG, (String)null);
         List<Direction> dirns = getConnectionDirections();
-        if (dirns == null || str == null || str.isEmpty()) {
+        if (dirns == null) {
             style = null;
-        // @compat 0.10.5
-        } else if (str.length() < 4) {
-            String old = TileImprovementStyle.decodeOldStyle(str, dirns.size());
-            style = (old == null) ? null
-                : TileImprovementStyle.getInstance(old);
-        // end @compat
+            if (str != null && !str.isEmpty())
+                logger.warning("At " + tile
+                    + " ignored superfluous TileImprovementStyle: " + str);
         } else {
             style = TileImprovementStyle.getInstance(str);
-            if (style == null) {
-                logger.warning("At " + tile
-                    + " ignored bogus TileImprovementStyle: " + str);
-            }
-        }
-        if (style != null && style.toString().length() != dirns.size()) {
-            // @compat 0.10.5
-            if ("0000".equals(style.getString())) {
-                // Old virtual roads and fish bonuses have this style!?!
+            if (style == null || style.getString().length() != dirns.size()) {
+                // incomplete roads are expected to have a null style
+                if (style != null || dirns.size() != 8 || isComplete()) {
+                    logger.warning("At " + tile
+                        + " with " + ((dirns.size() == 8) ? "road" : "river")
+                        + " ignored bogus TileImprovementStyle: " + str);
+                }
                 style = null;
-            } else {
-            // end @compat
-
-                throw new XMLStreamException("For " + type 
-                    + ", bogus style: " + str + " -> /" + style
-                    + "/ at " + tile);
             }
         }
     }

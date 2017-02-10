@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -37,67 +36,21 @@ public class TileImprovementTest extends FreeColTestCase {
 
         // has three characters of additional style information
         TileImprovementStyle style = TileImprovementStyle.getInstance("7170_&?");
-        assertEquals("7170_&?", style.getString());
-        assertEquals("1110", style.getMask());
+        assertEquals(null, style);
     }
 
-    public void testAllFrills() {
+    public void testRoadNoExtras() {
 
-        // has three characters of additional style information
-        TileImprovementStyle style = TileImprovementStyle.getInstance("7170110X_&?");
-        assertEquals("7170110X_&?", style.getString());
+        TileImprovementStyle style = TileImprovementStyle.getInstance("11101101");
+        assertEquals("11101101", style.getString());
         assertEquals("11101101", style.getMask());
     }
 
+    public void testRoadWithExtras() {
 
-    public void testOldStyle() {
-        final int pad = Direction.longSides.size();
-        TileImprovementStyle style;
-
-        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("0", pad));
-        assertNull(style);
-        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("1", pad));
-        assertEquals("1000", style.getString());
-        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("3", pad));
-        assertEquals("0100", style.getString());
-        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("9", pad));
-        assertEquals("0010", style.getString());
-        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("27", pad));
-        assertEquals("0001", style.getString());
-        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("54", pad));
-        assertEquals("0002", style.getString());
-        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("67", pad));
-        assertEquals("1112", style.getString());
-        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("80", pad));
-        assertEquals("2222", style.getString());
+        // has three characters of additional style information
+        TileImprovementStyle style = TileImprovementStyle.getInstance("7170110X_&?");
+        assertEquals(null, style);
     }
 
-    public void testEquality() {
-        final int pad = Direction.longSides.size();
-        TileImprovementStyle style1, style2;
-
-        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("0", pad));
-        assertNull(style1);
-        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("1", pad));
-        style2 = TileImprovementStyle.getInstance("1000");
-        assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("3", pad));
-        style2 = TileImprovementStyle.getInstance("0100");
-        assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("9", pad));
-        style2 = TileImprovementStyle.getInstance("0010");
-        assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("27", pad));
-        style2 = TileImprovementStyle.getInstance("0001");
-        assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("54", pad));
-        style2 = TileImprovementStyle.getInstance("0002");
-        assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("67", pad));
-        style2 = TileImprovementStyle.getInstance("1112");
-        assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("80", pad));
-        style2 = TileImprovementStyle.getInstance("2222");
-        assertTrue(style1 == style2);
-    }
 }
