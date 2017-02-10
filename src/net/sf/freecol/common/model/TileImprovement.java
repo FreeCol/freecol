@@ -405,13 +405,14 @@ public class TileImprovement extends TileItem implements Named {
     public String updateRoadConnections(boolean connect) {
         if (!isRoad() || !isComplete()) return null;
         final Tile tile = getTile();
-        String ret = "";
         for (Direction d : Direction.values()) {
             Tile t = tile.getNeighbourOrNull(d);
             TileImprovement road = (t == null) ? null : t.getRoad();
             if (road != null && road.isComplete()) {
                 road.setConnected(d.getReverseDirection(), connect);
-                this.setConnected(d, connect);
+                setConnected(d, connect);
+            } else {
+                setConnected(d, false);
             }
         }
         return (style == null) ? null : style.getString();
