@@ -541,37 +541,67 @@ public class TileImprovement extends TileItem implements Named {
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
-        // @compat 0.10.x
-        // We check only if this improvement is not connected to a
-        // neighbour that *is* connected to this one, and connect this
-        // one.
-        //
-        // FIXME: drop this one day when we never have style
-        // discontinuities.  This alas is not the case in 0.10.x.
-        String curr = (style == null) ? null : style.getString();
-        String found = (isRiver()) ? updateRiverConnections(curr)
-            : (isRoad() && isComplete()) ? updateRoadConnections(true)
-            : null;
-        if ((found == null && curr == null)
-            || (found != null && curr != null && found.equals(curr))) {
-            result = Math.min(1, result);
-        } else if (fix) {
-            this.style = TileImprovementStyle.getInstance(found);
-            if ((this.style != null)
-                != (isRiver() || (isRoad() && isComplete()))) {
-                logger.warning("Bad style for improvement: " + this);
-                result = -1;
-            } else {
-                logger.warning("Fixing improvement style from "
-                    + curr + " to " + found + " at " + tile);
-                result = Math.min(0, result);
+        if (isRiver()) {
+            // @compat 0.11.5 Prevent NPE, TileItemContainer rechecks this.
+            if (style == null) {
+                result = Math.min(-1, result);
+                return result;
             }
-        } else {
-            logger.warning("Broken improvement style " + curr
-                + " should be " + found + " at " + tile);
-            result = -1;
+            // end @compat 0.11.5
+
+            // @compat 0.11.6 There could be broken river connections, without
+            // the neighbouring tile having a corresponding connection or
+            // a water tile.
+            // These could at least be added using the map editor.
+            String conns = style.getString();
+            int i = 0;
+            for (Direction d : Direction.longSides) {
+                Direction dReverse = d.getReverseDirection();
+                Tile t = tile.getNeighbourOrNull(d);
+                TileImprovement river = (t == null) ? null : t.getRiver();
+                if (conns.charAt(i) != '0') {
+                    if (river != null) {
+                        if (!river.isConnectedTo(dReverse)) {
+                            logger.warning("Broken river connection to " + d
+                                + " at " + tile);
+                            if (fix) {
+                                setConnected(d, false);
+                                result = Math.min(0, result);
+                            } else
+                                result = Math.min(-1, result);
+                        }
+                    } else if (t == null || !t.getType().isWater()) {
+                        logger.warning("Broken river connection to " + d
+                            + " at " + tile);
+                        if (fix) {
+                            setConnected(d, false);
+                            result = Math.min(0, result);
+                        } else
+                            result = Math.min(-1, result);
+                    }
+                }
+                i++;
+            }
+            // end @compat 0.11.6
+        } else if (isRoad() && isComplete()) {
+            // @compat 0.11.6 Roads on tiles never having another adjacent
+            // road tile had null styles, because updateRoadConnections
+            // forgot to set one for roads without a connection.
+            if (fix) {
+                TileImprovementStyle oldStyle = style;
+                updateRoadConnections(true);
+                if (style != oldStyle) {
+                    logger.warning("Fixing bad road style from " + oldStyle
+                        + " to " + style + " at " + tile);
+                    result = Math.min(0, result);
+                }
+            }
+            if (style == null) {
+                logger.warning("Broken road having null style at " + tile);
+                result = Math.min(-1, result);
+            }
+            // end @compat
         }
-        // end @compat 0.10.x
         return result;
     }
 
