@@ -30,6 +30,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -123,11 +124,7 @@ final class UnitMoveAnimation extends FreeColClientHolder {
                         int timeTaken = (int)(System.currentTimeMillis() - time);
                         final int waitTime = ANIMATION_DELAY - timeTaken;
                         if (waitTime > 0) {
-                            try {
-                                Thread.sleep(waitTime);
-                            } catch (InterruptedException ex) {
-                                //ignore
-                            }
+                            Utils.delay(waitTime, "Animation interrupted.");
                             dropFrames = 0;
                         } else {
                             dropFrames = timeTaken / ANIMATION_DELAY - 1;

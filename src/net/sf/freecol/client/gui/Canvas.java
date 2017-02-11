@@ -174,8 +174,9 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.metaserver.ServerInfo;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.metaserver.ServerInfo;
 
 
 /**
@@ -233,9 +234,7 @@ public final class Canvas extends JDesktopPane {
                 @Override
                 public void run() {
                     while (!fcd.responded()) {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {}
+                        Utils.delay(500, "Dialog interrupted.");
                     }
                     // ...before handling the result.
                     handler.handle(fcd.getResponse());

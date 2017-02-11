@@ -341,4 +341,23 @@ public class Utils {
         }
         return true;
     }
+
+    /**
+     * Delay by a number of milliseconds.
+     *
+     * @param ms The number of milliseconds to delay.
+     * @param warning If non-null, log this warning message on interrupt,
+     *     otherwise propagate the interrupt.
+     */
+    public static void delay(long ms, String warning) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ie) {
+            if (warning == null) {
+                Thread.currentThread().interrupt();
+            } else {
+                logger.log(Level.WARNING, warning, ie);
+            }
+        }
+    }
 }

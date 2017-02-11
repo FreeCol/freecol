@@ -32,6 +32,7 @@ import net.sf.freecol.common.io.sza.ImageAnimationEvent;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -87,13 +88,7 @@ public final class UnitImageAnimation {
                         
                         time = ievent.getDurationInMs()
                             - (System.nanoTime() - time) / 1000000;
-                        if (time > 0) {
-                            try {
-                                Thread.sleep(time);
-                            } catch (InterruptedException ex) {
-                                //ignore
-                            }
-                        }
+                        if (time > 0) Utils.delay(time, "Animation delayed.");
                     }
                 }
             });

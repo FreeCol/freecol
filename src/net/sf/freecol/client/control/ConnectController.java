@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.metaserver.MetaServerUtils;
 import net.sf.freecol.metaserver.ServerInfo;
 import net.sf.freecol.server.FreeColServer;
@@ -476,9 +477,7 @@ public final class ConnectController extends FreeColClientHolder {
             getGUI().showErrorMessage(err);
             return false;
         }
-        while (fcc.getServerState() == null) {
-            try { Thread.sleep(1000); } catch (InterruptedException ie) {}
-        }
+        while (fcc.getServerState() == null) Utils.delay(1000, null);
         askServer().disconnect();
         
         switch (fcc.getServerState()) {
