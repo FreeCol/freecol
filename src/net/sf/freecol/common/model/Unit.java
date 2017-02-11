@@ -113,10 +113,6 @@ public class Unit extends GoodsLocation
         SENTRY,
         IN_COLONY,
         IMPROVING,
-        // @compat 0.10.0
-        TO_EUROPE,
-        TO_AMERICA,
-        // end @compat
         FORTIFYING,
         SKIPPED;
 

@@ -2079,31 +2079,6 @@ public final class Specification {
      * Specification backward compatibility for the spec in general.
      */
     private void fixSpec() {
-        // @compat 0.10.0
-        Ability person = new Ability(Ability.PERSON, true);
-        for (UnitType ut : getUnitTypeList()) {
-            if (!ut.isPerson()
-                && (ut.hasAbility(Ability.BORN_IN_COLONY)
-                    || ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                    || ut.hasAbility(Ability.FOUND_COLONY)
-                    // Nick also had:
-                    //     && (!hasAbility("model.ability.carryGoods")
-                    //         && !hasAbility("model.ability.carryUnits")
-                    //         && !hasAbility("model.ability.carryTreasure")
-                    //         && !hasAbility("model.ability.bombard"))
-                    // ...but that should be unnecessary.
-                    )) {
-                ut.addAbility(person);
-            }
-        }
-
-        if (getModifiers(Modifier.SHIP_TRADE_PENALTY) == null) {
-            addModifier(new Modifier(Modifier.SHIP_TRADE_PENALTY,
-                                     -30.0f, Modifier.ModifierType.PERCENTAGE,
-                                     Specification.SHIP_TRADE_PENALTY_SOURCE));
-        }
-        // end @compat
-
         // @compat 0.10.7
         // model.ability.missionary was split into distinct parts,
         // which should be fixed by the roles work, but the Brebeuf
@@ -2440,13 +2415,20 @@ public final class Specification {
         lb.mark();
 
         // SAVEGAME_VERSION == 11
+        // SAVEGAME_VERSION == 12
 
+        // @compat 0.10.6/0.11.x
         // For 0.10.6 we moved from a three level structure:
         //   difficultyLevels/<difficulty>/<option>
         // to a four level structure
         //   difficultyLevels/<difficulty>/<group>/<option>
         // so add the groups in, and move the options that could be present
         // in anything up to 0.10.5 into their destination groups.
+        //
+        // Alas, there were weaknesses in the checkDifficulty*() routines
+        // through 0.11.x, so some 0.10.x games were only partially upgraded
+        // to the 0.11.x format.  So keep this around until
+        // SAVEGAME_VERSION == 15.
         ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_IMMIGRATION, lb,
             GameOptions.CROSSES_INCREMENT,
             GameOptions.RECRUIT_PRICE_INCREASE,
@@ -2493,15 +2475,7 @@ public final class Specification {
             GameOptions.LAND_UNIT_CHEAT,
             GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT,
             GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT);
-
-        // @compat 0.10.0
-        // This used to be a game option.
-        ret |= checkDifficultyIntegerOption(GameOptions.SHIP_TRADE_PENALTY,
-                                            GameOptions.DIFFICULTY_NATIVES, lb,
-                                            -30);
-        // end @compat 0.10.0
-
-        // SAVEGAME_VERSION == 12
+        // end @compat 0.10.6
 
         // @compat 0.10.4
         id = GameOptions.REF_FORCE; // Yes, really "refSize"
@@ -2677,6 +2651,7 @@ public final class Specification {
             lb.log(logger, Level.INFO);
         }
 
+        // SAVEGAME_VERSION == 14
         return ret;
     }
 
@@ -2830,51 +2805,7 @@ public final class Specification {
     public boolean fixGameOptions() {
         boolean ret = false;
         // SAVEGAME_VERSION == 11
-
-        // @compat 0.10.0
-        ret |= checkOptionGroup(GameOptions.GAMEOPTIONS_YEARS);
-        String[] years = {
-            GameOptions.STARTING_YEAR,
-            GameOptions.SEASON_YEAR,
-            GameOptions.MANDATORY_COLONY_YEAR,
-            GameOptions.LAST_YEAR,
-            GameOptions.LAST_COLONIAL_YEAR,
-        };
-        int[] values = { 1492, 1600, 1600, 1850, 1800 };
-        for (int index = 0; index < years.length; index++) {
-            ret |= checkIntegerOption(years[index],
-                                      GameOptions.GAMEOPTIONS_YEARS,
-                                      values[index]);
-        }
-        ret |= checkBooleanOption(GameOptions.ENHANCED_MISSIONARIES,
-                                  GameOptions.GAMEOPTIONS_MAP, false);
-        ret |= checkBooleanOption(GameOptions.CONTINUE_FOUNDING_FATHER_RECRUITMENT,
-                                  GameOptions.GAMEOPTIONS_MAP, false);
-        ret |= checkIntegerOption(GameOptions.SETTLEMENT_LIMIT_MODIFIER,
-                                  GameOptions.GAMEOPTIONS_MAP, 0);
-        ret |= checkBooleanOption(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF,
-                                  GameOptions.GAMEOPTIONS_MAP, false);
-        ret |= checkIntegerOption(GameOptions.STARTING_POSITIONS,
-                                  GameOptions.GAMEOPTIONS_MAP, 0);
-        ret |= checkBooleanOption(GameOptions.TELEPORT_REF,
-                                  GameOptions.GAMEOPTIONS_MAP, false);
-        // end @compat 0.10.0
-
         // SAVEGAME_VERSION == 12
-
-        // @compat 0.10.5
-        ret |= checkBooleanOption(GameOptions.ENABLE_UPKEEP,
-                                  GameOptions.GAMEOPTIONS_COLONY, false);
-        ret |= checkIntegerOption(GameOptions.NATURAL_DISASTERS,
-                                  GameOptions.GAMEOPTIONS_COLONY, 0);
-        ret |= checkIntegerOption(GameOptions.GIFT_PROBABILITY,
-                                  GameOptions.GAMEOPTIONS_MAP, 5);
-        ret |= checkIntegerOption(GameOptions.DEMAND_PROBABILITY,
-                                  GameOptions.GAMEOPTIONS_MAP, 10);
-        ret |= checkBooleanOption(GameOptions.EMPTY_TRADERS,
-                                  GameOptions.GAMEOPTIONS_MAP, false);
-        // end @compat 0.10.5
-
         // SAVEGAME_VERSION == 13
 
         // @compat 0.10.7
@@ -2927,6 +2858,7 @@ public final class Specification {
                                   GameOptions.GAMEOPTIONS_MAP, 3);
         // end @compat 0.11.6
 
+        // SAVEGAME_VERSION == 14
         return ret;
     }
 
@@ -2942,19 +2874,9 @@ public final class Specification {
     public boolean fixMapGeneratorOptions() {
         boolean ret = false;
         // SAVEGAME_VERSION == 11
-
-        // @compat 0.10.0
-        ret |= checkIntegerOption(MapGeneratorOptions.MINIMUM_LATITUDE,
-                                  MapGeneratorOptions.MAPGENERATOROPTIONS_TERRAIN_GENERATOR,
-                                  -90);
-        ret |= checkIntegerOption(MapGeneratorOptions.MAXIMUM_LATITUDE,
-                                  MapGeneratorOptions.MAPGENERATOROPTIONS_TERRAIN_GENERATOR,
-                                  90);
-        // end @compat 0.10.0
-
         // SAVEGAME_VERSION == 12
         // SAVEGAME_VERSION == 13
-
+        // SAVEGAME_VERSION == 14
         return ret;
     }
 
