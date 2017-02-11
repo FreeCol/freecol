@@ -28,8 +28,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -1995,9 +1997,51 @@ public final class Specification {
         fixDifficultyOptions();
         fixGameOptions();
         fixMapGeneratorOptions();
+        fixOrphanOptions();
         fixSpec();
     }
 
+    /**
+     * Find and remove orphan options/groups that are not part of the
+     * core tree of options.
+     */
+    private void fixOrphanOptions() {
+        Collection<AbstractOption> allO = new HashSet<>(allOptions.values());
+        Collection<AbstractOption> allG = new HashSet<>(allOptionGroups.values());
+        for (String id : coreOptionGroups) {
+            dropOptions(allOptionGroups.get(id), allO);
+            dropOptions(allOptionGroups.get(id), allG);
+        }
+        for (AbstractOption ao : allO) {
+            // Drop from actual allOptions map
+            dropOptions(ao, allOptions.values());
+            if (ao instanceof OptionGroup) allOptionGroups.remove(ao.getId());
+            logger.warning("Dropping orphan option: " + ao);
+        }
+        for (AbstractOption ao : allG) {
+            allOptionGroups.remove(ao.getId());
+            logger.warning("Dropping orphan option group: " + ao);
+        }            
+    }
+
+    /**
+     * Drop an option and its descendents from a collection.
+     *
+     * @param o The {@code AbstractOption} to drop.
+     * @param all The collection of options to drop from.
+     */
+    private void dropOptions(AbstractOption o, Collection<AbstractOption> all) {
+        all.remove(o);
+        if (o instanceof OptionGroup) {
+            OptionGroup og = (OptionGroup)o;
+            for (Option op : og.getOptions()) {
+                if (op instanceof AbstractOption) {
+                    dropOptions((AbstractOption)op, all);
+                }
+            }
+        }
+    }
+    
     // @compat 0.11.0
     /**
      * Handle the reworking of roles that landed in 0.11.0.
