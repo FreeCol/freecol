@@ -61,6 +61,7 @@ import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -2435,6 +2436,9 @@ public final class Specification {
         OptionGroup og;
         UnitListOption ulo;
 
+        LogBuilder lb = new LogBuilder(64);
+        lb.mark();
+
         // SAVEGAME_VERSION == 11
 
         // For 0.10.6 we moved from a three level structure:
@@ -2443,7 +2447,7 @@ public final class Specification {
         //   difficultyLevels/<difficulty>/<group>/<option>
         // so add the groups in, and move the options that could be present
         // in anything up to 0.10.5 into their destination groups.
-        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_IMMIGRATION,
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_IMMIGRATION, lb,
             GameOptions.CROSSES_INCREMENT,
             GameOptions.RECRUIT_PRICE_INCREASE,
             GameOptions.LOWER_CAP_INCREASE,
@@ -2451,7 +2455,7 @@ public final class Specification {
             GameOptions.PRICE_INCREASE_PER_TYPE,
             GameOptions.EXPERT_STARTING_UNITS,
             GameOptions.IMMIGRANTS);
-        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_NATIVES,
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_NATIVES, lb,
             GameOptions.LAND_PRICE_FACTOR,
             GameOptions.NATIVE_CONVERT_PROBABILITY,
             GameOptions.BURN_PROBABILITY,
@@ -2460,7 +2464,7 @@ public final class Specification {
             GameOptions.SHIP_TRADE_PENALTY,
             GameOptions.BUILD_ON_NATIVE_LAND,
             GameOptions.SETTLEMENT_NUMBER);
-        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_MONARCH,
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_MONARCH, lb,
             GameOptions.MONARCH_MEDDLING,
             GameOptions.TAX_ADJUSTMENT,
             GameOptions.MERCENARY_PRICE,
@@ -2472,18 +2476,18 @@ public final class Specification {
             GameOptions.INTERVENTION_TURNS,
             GameOptions.INTERVENTION_FORCE,
             GameOptions.MERCENARY_FORCE);
-        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_GOVERNMENT,
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_GOVERNMENT, lb,
             GameOptions.BAD_GOVERNMENT_LIMIT,
             GameOptions.VERY_BAD_GOVERNMENT_LIMIT,
             GameOptions.GOOD_GOVERNMENT_LIMIT,
             GameOptions.VERY_GOOD_GOVERNMENT_LIMIT);
-        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_OTHER,
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_OTHER, lb,
             GameOptions.STARTING_MONEY,
             GameOptions.FOUNDING_FATHER_FACTOR,
             GameOptions.ARREARS_FACTOR,
             GameOptions.UNITS_THAT_USE_NO_BELLS,
             GameOptions.TILE_PRODUCTION);
-        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_CHEAT,
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_CHEAT, lb,
             GameOptions.LIFT_BOYCOTT_CHEAT,
             GameOptions.EQUIP_SCOUT_CHEAT,
             GameOptions.LAND_UNIT_CHEAT,
@@ -2493,7 +2497,7 @@ public final class Specification {
         // @compat 0.10.0
         // This used to be a game option.
         ret |= checkDifficultyIntegerOption(GameOptions.SHIP_TRADE_PENALTY,
-                                            GameOptions.DIFFICULTY_NATIVES,
+                                            GameOptions.DIFFICULTY_NATIVES, lb,
                                             -30);
         // end @compat 0.10.0
 
@@ -2501,7 +2505,7 @@ public final class Specification {
 
         // @compat 0.10.4
         id = GameOptions.REF_FORCE; // Yes, really "refSize"
-        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH);
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH, lb);
         if (ulo != null) {
             AbstractUnitOption regulars
                 = new AbstractUnitOption(id + ".regulars", this);
@@ -2526,7 +2530,7 @@ public final class Specification {
             ret = true;
         }
         id = GameOptions.IMMIGRANTS;
-        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_IMMIGRATION);
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_IMMIGRATION, lb);
         if (ulo != null) {
             AbstractUnitOption i1
                 = new AbstractUnitOption(id + ".1", this);
@@ -2539,13 +2543,13 @@ public final class Specification {
 
         // @compat 0.10.5
         ret |= checkDifficultyIntegerOption(GameOptions.INTERVENTION_BELLS,
-                                            GameOptions.DIFFICULTY_MONARCH,
+                                            GameOptions.DIFFICULTY_MONARCH, lb,
                                             5000);
         ret |= checkDifficultyIntegerOption(GameOptions.INTERVENTION_TURNS,
-                                            GameOptions.DIFFICULTY_MONARCH,
+                                            GameOptions.DIFFICULTY_MONARCH, lb,
                                             52);
         id = GameOptions.INTERVENTION_FORCE;
-        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH);
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH, lb);
         if (ulo != null) {
             AbstractUnitOption regulars
                 = new AbstractUnitOption(id + ".regulars", this);
@@ -2570,7 +2574,7 @@ public final class Specification {
             ret = true;
         }
         id = GameOptions.MERCENARY_FORCE;
-        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH);
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH, lb);
         if (ulo != null) {
             AbstractUnitOption regulars
                 = new AbstractUnitOption(id + ".regulars", this);
@@ -2595,51 +2599,51 @@ public final class Specification {
             ret = true;
         }
         ret |= checkDifficultyIntegerOption(GameOptions.GOOD_GOVERNMENT_LIMIT,
-                                            GameOptions.DIFFICULTY_GOVERNMENT,
+                                            GameOptions.DIFFICULTY_GOVERNMENT, lb,
                                             50);
         ret |= checkDifficultyIntegerOption(GameOptions.VERY_GOOD_GOVERNMENT_LIMIT,
-                                            GameOptions.DIFFICULTY_GOVERNMENT,
+                                            GameOptions.DIFFICULTY_GOVERNMENT, lb,
                                             100);
         ret |= checkDifficultyIntegerOption(GameOptions.LIFT_BOYCOTT_CHEAT,
-                                            GameOptions.DIFFICULTY_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT, lb,
                                             10);
         ret |= checkDifficultyIntegerOption(GameOptions.EQUIP_SCOUT_CHEAT,
-                                            GameOptions.DIFFICULTY_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT, lb,
                                             10);
         ret |= checkDifficultyIntegerOption(GameOptions.LAND_UNIT_CHEAT,
-                                            GameOptions.DIFFICULTY_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT, lb,
                                             10);
         ret |= checkDifficultyIntegerOption(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT,
-                                            GameOptions.DIFFICULTY_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT, lb,
                                             10);
         ret |= checkDifficultyIntegerOption(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT,
-                                            GameOptions.DIFFICULTY_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT, lb,
                                             10);
         // end @compat 0.10.5
 
         // SAVEGAME_VERSION == 13
 
-        // @compat 0.10.7
+        // @compat 0.11.0
         ret |= checkDifficultyIntegerOption(GameOptions.DESTROY_SETTLEMENT_SCORE,
-                                            GameOptions.DIFFICULTY_NATIVES,
+                                            GameOptions.DIFFICULTY_NATIVES, lb,
                                             -5);
         ret |= checkDifficultyIntegerOption(GameOptions.BAD_RUMOUR,
-                                            GameOptions.DIFFICULTY_OTHER,
+                                            GameOptions.DIFFICULTY_OTHER, lb,
                                             23);
         ret |= checkDifficultyIntegerOption(GameOptions.GOOD_RUMOUR,
-                                            GameOptions.DIFFICULTY_OTHER,
+                                            GameOptions.DIFFICULTY_OTHER, lb,
                                             48);
         ret |= checkDifficultyIntegerOption(GameOptions.OFFENSIVE_LAND_UNIT_CHEAT,
-                                            GameOptions.DIFFICULTY_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT, lb,
                                             4);
         ret |= checkDifficultyIntegerOption(GameOptions.EQUIP_PIONEER_CHEAT,
-                                            GameOptions.DIFFICULTY_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT, lb,
                                             10);
-        // end @compat 0.10.7
+        // end @compat 0.11.0
 
         // @compat 0.11.3
         id = GameOptions.WAR_SUPPORT_FORCE;
-        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH);
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH, lb);
         if (ulo != null) {
             AbstractUnitOption support = new AbstractUnitOption(id, this);
             support.setValue(new AbstractUnit("model.unit.veteranSoldier",
@@ -2648,34 +2652,69 @@ public final class Specification {
             ret = true;
         }
         ret |= checkDifficultyIntegerOption(GameOptions.WAR_SUPPORT_GOLD,
-                                            GameOptions.DIFFICULTY_MONARCH,
+                                            GameOptions.DIFFICULTY_MONARCH, lb,
                                             1500);
         // end @compat 0.11.3
+
+        // Ensure 2 levels of groups, then leaves only
+        for (OptionGroup level : getDifficultyLevels()) {
+            for (Option o : level.getOptions()) {
+                if (o instanceof OptionGroup) {
+                    og = (OptionGroup)o;
+                    for (Option o2 : og.getOptions()) {
+                        if (o2 instanceof OptionGroup) {
+                            lb.add("?-group ", level.getId() + "/" + og.getId()
+                                + "/" + o2.getId());
+                        }
+                    }
+                } else {
+                    lb.add("? ", level.getId() + "/" + o.getId());
+                }
+            }
+        }
+
+        if (lb.grew("Check difficulty options:")) {
+            lb.log(logger, Level.INFO);
+        }
 
         return ret;
     }
 
-    private boolean checkDifficultyOptionGroup(String gr, String... ids) {
-        logger.info("Check group " + gr);
+    private boolean checkDifficultyOptionGroup(String gr, LogBuilder lb,
+                                               String... ids) {
         boolean ret = false;
         for (OptionGroup level : getDifficultyLevels()) {
-            Option op = level.getOption(gr);
-            OptionGroup og;
-            if (op instanceof OptionGroup) {
-                og = (OptionGroup)op;
-            } else {
+            OptionGroup og = null;
+            for (Option o : level.getOptions()) {
+                if (o.getId().equals(gr) && o instanceof OptionGroup) {
+                    og = (OptionGroup)o;
+                    break;
+                }
+            }
+            if (og == null) {
+                level.remove(gr);
                 og = new OptionGroup(gr, this);
                 level.add(og);
                 og.setGroup(level.getId());
+                lb.add("\n  +", level.getId(), "/", gr);
                 ret = true;
             }
             for (String id : ids) {
-                op = level.remove(id);
+                Option op = null;
+                for (Option o : level.getOptions()) {
+                    if (o.getId().equals(id) && !(o instanceof OptionGroup)) {
+                        op = o;
+                        break;
+                    }
+                }
                 if (op != null) {
+                    level.remove(op.getId());
                     if (op instanceof AbstractOption) {
                         ((AbstractOption)op).setGroup(og.getId());
                     }
                     og.add(op);
+                    lb.add("\n  ~", level.getId(), "/", id, " -> ",
+                        level.getId(), "/" + og.getId());
                     ret = true;
                 }
             }
@@ -2684,39 +2723,97 @@ public final class Specification {
     }
 
     private boolean checkDifficultyIntegerOption(String id, String gr,
+                                                 LogBuilder lb,
                                                  int defaultValue) {
         boolean ret = false;
         for (OptionGroup level : getDifficultyLevels()) {
-            Option op = level.getOption(gr);
-            if (op instanceof OptionGroup) {
-                OptionGroup og = (OptionGroup)op;
-                if ((op = og.getOption(id)) != null) continue;
+            OptionGroup og = null;
+            for (Option o : level.getOptions()) {
+                if (o.getId().equals(gr) && o instanceof OptionGroup) {
+                    og = (OptionGroup)o;
+                    break;
+                }
+            }
+            if (og == null) continue;
+            Option op = null;
+            for (Option o : level.getOptions()) {
+                if (o.getId().equals(id) && !(o instanceof OptionGroup)) {
+                    op = o;
+                    break;
+                }
+            }
+            if (op != null) {
+                level.remove(op.getId());
+                if (op instanceof AbstractOption) {
+                    ((AbstractOption)op).setGroup(og.getId());
+                }
+                og.add(op);
+                lb.add("\n  ~", level.getId(), "/", id, " -> ",
+                    level.getId(), "/" + og.getId());
+            } else {
+                op = null;
+                for (Option o : og.getOptions()) {
+                    if (o.getId().equals(id)) {
+                        op = o;
+                        break;
+                    }
+                }
+                if (op instanceof IntegerOption) continue;
+                if (op != null) og.remove(id);
                 IntegerOption iop = new IntegerOption(id, this);
                 iop.setGroup(gr);
                 iop.setValue(defaultValue);
                 og.add(iop);
-                ret = true;
+                lb.add("\n  +", level.getId(), "/", og.getId(),
+                    "/", id, "=", defaultValue);
             }
-        }
-        if (ret) {
-            logger.info("Added difficulty integer option: " + id);
+            ret = true;
         }
         return ret;
     }
         
-    private UnitListOption checkDifficultyUnitListOption(String id, String gr) {
+    private UnitListOption checkDifficultyUnitListOption(String id, String gr,
+                                                         LogBuilder lb) {
         UnitListOption ulo = null;
         for (OptionGroup level : getDifficultyLevels()) {
-            Option op = level.getOption(gr);
-            if (op instanceof OptionGroup) {
-                OptionGroup og = (OptionGroup)op;
-                if (og.getOption(id) instanceof UnitListOption) continue;
+            OptionGroup og = null;
+            for (Option o : level.getOptions()) {
+                if (o.getId().equals(gr) && o instanceof OptionGroup) {
+                    og = (OptionGroup)o;
+                    break;
+                }
+            }
+            if (og == null) continue;
+            Option op = null;
+            for (Option o : level.getOptions()) {
+                if (o.getId().equals(id) && !(o instanceof OptionGroup)) {
+                    op = o;
+                    break;
+                }
+            }
+            if (op != null) {
+                level.remove(op.getId());
+                if (op instanceof AbstractOption) {
+                    ((AbstractOption)op).setGroup(og.getId());
+                }
+                og.add(op);
+                lb.add("\n  ~", level.getId(), "/", id, " -> ",
+                    level.getId(), "/" + og.getId());
+            } else {
+                op = null;
+                for (Option o : og.getOptions()) {
+                    if (o.getId().equals(id)) {
+                        op = o;
+                        break;
+                    }
+                }
+                if (op instanceof UnitListOption) continue;
+                if (op != null) og.remove(id);
                 if (ulo == null) ulo = new UnitListOption(id, this);
                 og.add(ulo);
+                lb.add("\n  +", level.getId(), "/", og.getId(),
+                    "/[", id, "]");
             }
-        }
-        if (ulo != null) {
-            logger.info("Added difficulty unit list option: " + id);
         }
         return ulo;
     }
