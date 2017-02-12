@@ -3781,6 +3781,7 @@
                          value="true"/>
           <booleanOption id="model.option.expertStartingUnits"
                          value="false" />
+          <unitListOption id="model.option.immigrants"/>
         </optionGroup>
         <optionGroup id="model.difficulty.natives" editable="false">
           <integerOption id="model.option.landPriceFactor"
@@ -3959,6 +3960,7 @@
                          value="true"/>
           <booleanOption id="model.option.expertStartingUnits"
                          value="false" />
+          <unitListOption id="model.option.immigrants"/>
         </optionGroup>
         <optionGroup id="model.difficulty.natives" editable="false">
           <integerOption id="model.option.landPriceFactor"
