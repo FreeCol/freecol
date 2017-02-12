@@ -216,7 +216,7 @@ public class ServerGame extends Game implements ServerModelObject {
      */
     public List<ServerModelObject> getServerModelObjects() {
         List<ServerModelObject> objs = new ArrayList<>();
-        for (FreeColGameObject fcgo : getFreeColGameObjects()) {
+        for (FreeColGameObject fcgo : getFreeColGameObjectList()) {
             if (fcgo instanceof ServerModelObject) {
                 objs.add((ServerModelObject)fcgo);
             }
@@ -457,15 +457,6 @@ public class ServerGame extends Game implements ServerModelObject {
         
         weakest.csKill(cs);//+vis(weakest)
         strongest.invalidateCanSeeTiles();//+vis(strongest)
-
-        // Trace fail where not all units are transferred
-        for (FreeColGameObject fcgo : getFreeColGameObjects()) {
-            if (fcgo instanceof Ownable
-                && ((Ownable)fcgo).getOwner() == weakest) {
-                throw new RuntimeException("Lurking " + weakest.getId()
-                    + " fcgo: " + fcgo);
-            }
-        }
 
         return weakest;
     }

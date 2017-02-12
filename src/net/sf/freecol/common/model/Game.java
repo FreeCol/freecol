@@ -375,7 +375,10 @@ public class Game extends FreeColGameObject {
      */
     public FreeColGameObject getFreeColGameObject(String id) {
         if (id == null || id.isEmpty()) return null;
-        final WeakReference<FreeColGameObject> ro = freeColGameObjects.get(id);
+        final WeakReference<FreeColGameObject> ro;
+        synchronized (freeColGameObjects) {
+            ro = freeColGameObjects.get(id);
+        }
         if (ro == null) return null;
         final FreeColGameObject o = ro.get();
         if (o == null) {
@@ -431,7 +434,9 @@ public class Game extends FreeColGameObject {
         //logger.finest("Added FCGO: " + id);
         final WeakReference<FreeColGameObject> wr
             = new WeakReference<>(fcgo);
-        freeColGameObjects.put(id, wr);
+        synchronized (freeColGameObjects) {
+            freeColGameObjects.put(id, wr);
+        }
         notifySetFreeColGameObject(id, fcgo);
     }
 
@@ -448,12 +453,17 @@ public class Game extends FreeColGameObject {
         if (id.isEmpty()) throw new IllegalArgumentException("Empty identifier.");
 
         logger.finest("removeFCGO/" + reason + ": " + id);
-        freeColGameObjects.remove(id);
+        synchronized (freeColGameObjects) {
+            freeColGameObjects.remove(id);
+        }
         notifyRemoveFreeColGameObject(id);
 
         // Garbage collect the FCGOs if enough have been removed.
         if (++removeCount > REMOVE_GC_THRESHOLD) {
-            for (FreeColGameObject fcgo : getFreeColGameObjects());
+            synchronized (freeColGameObjects) {
+                Iterator<FreeColGameObject> iter = getFreeColGameObjectIterator();
+                while (iter.hasNext()) iter.next();
+            }
             removeCount = 0;
             System.gc(); // Probably a good opportunity.
         }
@@ -484,10 +494,12 @@ public class Game extends FreeColGameObject {
      * in removeFreeColGameObject to ensure the cache is still
      * cleaned.  Reconsider this if the situation changes.
      *
+     * Lock freeColGameObjects when using this.
+     *
      * @return An {@code Iterator} containing every registered
      *     {@code FreeColGameObject}.
      */
-    public Iterator<FreeColGameObject> getFreeColGameObjectIterator() {
+    private Iterator<FreeColGameObject> getFreeColGameObjectIterator() {
         return new Iterator<FreeColGameObject>() {
 
             /** An iterator over the freeColGameObjects map. */
@@ -541,17 +553,17 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get an {@code Iterable} over the {@code FreeColGameObjects}.
+     * Get a list of all the {@code FreeColGameObjects}.
      *
-     * @return A suitable {@code Iterable}.
+     * @return A suitable list.
      */
-    public Iterable<FreeColGameObject> getFreeColGameObjects() {
-        return new Iterable<FreeColGameObject>() {
-            @Override
-            public Iterator<FreeColGameObject> iterator() {
-                return getFreeColGameObjectIterator();
-            }
-        };
+    public List<FreeColGameObject> getFreeColGameObjectList() {
+        List<FreeColGameObject> ret = new ArrayList<>();
+        synchronized (freeColGameObjects) {
+            Iterator<FreeColGameObject> iter = getFreeColGameObjectIterator();
+            while (iter.hasNext()) ret.add(iter.next());
+        }
+        return ret;
     }
 
     /**
@@ -1192,7 +1204,7 @@ public class Game extends FreeColGameObject {
         // Game objects
         java.util.Map<String, Long> objStats = new HashMap<>();
         long disposed = 0;
-        for (FreeColGameObject fcgo : getFreeColGameObjects()) {
+        for (FreeColGameObject fcgo : getFreeColGameObjectList()) {
             String className = fcgo.getClass().getSimpleName();
             if (objStats.containsKey(className)) {
                 Long count = objStats.get(className);
@@ -1257,22 +1269,24 @@ public class Game extends FreeColGameObject {
         LogBuilder lb = new LogBuilder(512);
         lb.add("Uninitialized game ids: ");
         lb.mark();
-        Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
-        while (iterator.hasNext()) {
-            FreeColGameObject fcgo = iterator.next();
-            if (fcgo == null) {
-                lb.add(" null-fcgo");
-            } else if (!fcgo.isInitialized()) {
-                lb.add(" ", fcgo.getId(),
-                    "(", lastPart(fcgo.getClass().getName(), "."), ")");
-            } else {
-                continue;
-            }
-            if (fix) {
-                iterator.remove();
-                result = Math.min(result, 0);
-            } else {
-                result = -1;
+        synchronized (freeColGameObjects) {
+            Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
+            while (iterator.hasNext()) {
+                FreeColGameObject fcgo = iterator.next();
+                if (fcgo == null) {
+                    lb.add(" null-fcgo");
+                } else if (!fcgo.isInitialized()) {
+                    lb.add(" ", fcgo.getId(),
+                        "(", lastPart(fcgo.getClass().getName(), "."), ")");
+                } else {
+                    continue;
+                }
+                if (fix) {
+                    iterator.remove();
+                    result = Math.min(result, 0);
+                } else {
+                    result = -1;
+                }
             }
         }
         if (lb.grew()) {

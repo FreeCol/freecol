@@ -171,7 +171,7 @@ public class AIMain extends FreeColObject
      */
     public void findNewObjects(boolean overwrite) {
         for (FreeColGameObject fcgo : freeColServer.getGame()
-                 .getFreeColGameObjects()) {
+                 .getFreeColGameObjectList()) {
             if (!shouldHaveAIObject(fcgo)) continue;
             if (overwrite || getAIObject(fcgo) == null) {
                 setFreeColGameObject(fcgo.getId(), fcgo);
@@ -373,7 +373,7 @@ public class AIMain extends FreeColObject
             result = Math.min(result, integ);
         }
 
-        for (FreeColGameObject fcgo : getGame().getFreeColGameObjects()) {
+        for (FreeColGameObject fcgo : getGame().getFreeColGameObjectList()) {
             if (shouldHaveAIObject(fcgo)
                 && getAIObject(fcgo.getId()) == null) {
                 if (fix) {
