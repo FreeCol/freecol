@@ -105,12 +105,13 @@ public final class DummyConnection extends Connection {
      */
     @Override
     public boolean sendAndWaitElement(Element request) {
-        if (!isAlive()) return false;
+        DummyConnection other = getOtherConnection();
+        if (other == null) return false;
         if (request == null) return true;
         final String tag = request.getTagName();
         try {
             log(request, true);
-            Element reply = getOtherConnection().handleElement(request);
+            Element reply = other.handleElement(request);
             log(reply, false);
             return true;
         } catch (FreeColException fce) {
