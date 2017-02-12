@@ -94,7 +94,6 @@ import net.sf.freecol.server.generator.SimpleMapGenerator;
 import net.sf.freecol.server.generator.TerrainGenerator;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
-import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.Session;
 import net.sf.freecol.server.networking.DummyConnection;

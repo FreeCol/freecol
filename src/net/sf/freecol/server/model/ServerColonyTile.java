@@ -39,13 +39,13 @@ import net.sf.freecol.common.util.LogBuilder;
 /**
  * The server version of a colony tile.
  */
-public class ServerColonyTile extends ColonyTile implements ServerModelObject {
+public class ServerColonyTile extends ColonyTile implements TurnTaker {
 
     private static final Logger logger = Logger.getLogger(ServerColonyTile.class.getName());
 
 
     /**
-     * Trivial constructor required for all ServerModelObjects.
+     * Trivial constructor for Game.newInstance.
      *
      * @param game The {@code Game} this object belongs to.
      * @param id The object identifier.
@@ -95,7 +95,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
     }
 
 
-    // Implement ServerModelObject
+    // Implement TurnTaker
 
     /**
      * New turn for this colony tile.

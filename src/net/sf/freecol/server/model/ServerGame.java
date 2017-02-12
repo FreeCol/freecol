@@ -80,7 +80,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 /**
  * The server representation of the game.
  */
-public class ServerGame extends Game implements ServerModelObject {
+public class ServerGame extends Game implements TurnTaker {
 
     private static final Logger logger = Logger.getLogger(ServerGame.class.getName());
 
@@ -207,21 +207,6 @@ public class ServerGame extends Game implements ServerModelObject {
         Class<?> c = Class.forName(type);
         return c.getConstructor(Game.class, String.class)
             .newInstance(this, id);
-    }
-
-    /**
-     * Collects a list of all the ServerModelObjects in this game.
-     *
-     * @return A list of all the ServerModelObjects in this game.
-     */
-    public List<ServerModelObject> getServerModelObjects() {
-        List<ServerModelObject> objs = new ArrayList<>();
-        for (FreeColGameObject fcgo : getFreeColGameObjectList()) {
-            if (fcgo instanceof ServerModelObject) {
-                objs.add((ServerModelObject)fcgo);
-            }
-        }
-        return objs;
     }
 
     /**
@@ -458,6 +443,15 @@ public class ServerGame extends Game implements ServerModelObject {
         weakest.csKill(cs);//+vis(weakest)
         strongest.invalidateCanSeeTiles();//+vis(strongest)
 
+        // Trace fail where not all units are transferred
+        for (FreeColGameObject fcgo : getFreeColGameObjectList()) {
+            if (fcgo instanceof Ownable
+                && ((Ownable)fcgo).getOwner() == weakest) {
+                throw new RuntimeException("Lurking " + weakest.getId()
+                    + " fcgo: " + fcgo);
+            }
+        }
+
         return weakest;
     }
 
@@ -647,7 +641,7 @@ public class ServerGame extends Game implements ServerModelObject {
     }
 
 
-    // Implement ServerModelObject
+    // Implement TurnTaker
 
     /**
      * Build the updates for a new turn for all the players in this game.

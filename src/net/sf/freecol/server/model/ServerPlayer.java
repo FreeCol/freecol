@@ -115,7 +115,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
  * A {@code Player} with additional (server specific) information, notably
  * this player's {@link Connection}.
  */
-public class ServerPlayer extends Player implements ServerModelObject {
+public class ServerPlayer extends Player implements TurnTaker {
 
     private static final Logger logger = Logger.getLogger(ServerPlayer.class.getName());
 
@@ -162,7 +162,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
 
     /**
-     * Trivial constructor required for all ServerModelObjects.
+     * Trivial constructor for Game.newInstance.
      *
      * @param game The {@code Game} this object belongs to.
      * @param id The object identifier.
@@ -4369,7 +4369,7 @@ outer:  for (Effect effect : effects) {
     }
 
 
-    // Implement ServerModelObject
+    // Implement TurnTaker
 
     /**
      * New turn for this player.
@@ -4389,7 +4389,7 @@ outer:  for (Effect effect : effects) {
         int oldImmigration = getImmigration(), oldLiberty = getLiberty(),
             newSoL = 0;
         for (Settlement settlement : settlements) {
-            ((ServerModelObject)settlement).csNewTurn(random, lb, cs);
+            ((TurnTaker)settlement).csNewTurn(random, lb, cs);
             newSoL += settlement.getSoL();
         }
 
@@ -4412,14 +4412,14 @@ outer:  for (Effect effect : effects) {
 
         // Europe.
         if (europe != null) {
-            ((ServerModelObject) europe).csNewTurn(random, lb, cs);
+            ((TurnTaker)europe).csNewTurn(random, lb, cs);
             modifyImmigration(europe.getImmigration(newImmigration));
             newImmigration = getImmigration() - oldImmigration;
         }
         // Units.
         for (Unit unit : getUnitList()) {
             try {
-                ((ServerModelObject) unit).csNewTurn(random, lb, cs);
+                ((TurnTaker)unit).csNewTurn(random, lb, cs);
             } catch (ClassCastException cce) {
                 logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(),
                            cce);

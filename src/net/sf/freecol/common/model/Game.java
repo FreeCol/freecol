@@ -251,7 +251,8 @@ public class Game extends FreeColGameObject {
     public static <T extends FreeColObject> T newInstance(Game game,
         Class<T> returnClass, boolean server) {
         // Do not restrict trying the full (Game,String) constructor
-        // as there are FCOs that implement it (e.g. Goods).
+        // to just server objects as there are simpler FCOs that
+        // implement it (e.g. Goods).
         if (server) {
             @SuppressWarnings("unchecked")
             Class<T> sc = (Class<T>)serverClasses.get(returnClass);

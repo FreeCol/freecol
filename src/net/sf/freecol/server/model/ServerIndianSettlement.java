@@ -54,7 +54,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
  * The server version of an Indian Settlement.
  */
 public class ServerIndianSettlement extends IndianSettlement
-    implements ServerModelObject {
+    implements TurnTaker {
 
     private static final Logger logger = Logger.getLogger(ServerIndianSettlement.class.getName());
 
@@ -68,7 +68,7 @@ public class ServerIndianSettlement extends IndianSettlement
 
 
     /**
-     * Trivial constructor for all ServerModelObjects.
+     * Trivial constructor for Game.newInstance.
      *
      * @param game The {@code Game} in which this object belong.
      * @param id The object identifier.
@@ -499,8 +499,7 @@ public class ServerIndianSettlement extends IndianSettlement
                 .addName("%settlement%", getName()));
     }
         
-
-    // Implement ServerModelObject
+    // Implement TurnTaker
 
     /**
      * New turn for this native settlement.

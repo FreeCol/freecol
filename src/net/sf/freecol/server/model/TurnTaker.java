@@ -26,27 +26,9 @@ import net.sf.freecol.common.networking.ChangeSet;
 
 
 /**
- * Interface for server-side objects which needs to store
- * extra information to a save game.
+ * Interface for server-side objects which need to update every turn.
  */
-public interface ServerModelObject {
-
-    /*
-      All ServerModelObjects must also implement a trivial constructor
-      (ServerGame does not but it is special, being the Game itself)
-      of the form:
-
-      public <constructor>(Game game, String id) {
-          super(game, id);
-      }
-    */
-
-    /**
-     * Get the object identifier.
-     *
-     * @return The object identifier.
-     */
-    public String getId();
+public interface TurnTaker {
 
     /**
      * Executes new-turn actions for this server object.
