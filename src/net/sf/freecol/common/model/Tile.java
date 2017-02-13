@@ -2378,15 +2378,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public void toXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
         // Special override of tile output serialization that handles
         // the tile caching.
-        // 1. If not writing to a player, just write this tile.
-        // 2. If there is no cached tile then it is unexplored, so
-        //    write the minimal tile (id, x, y).
-        // 3. Otherwise write the cached tile, which will either be a
-        //    copy or {@code this}.
         Player player = xw.getClientPlayer();
-        Tile tile = (player == null) ? this : getCachedTile(player);
+        Tile tile;
 
-        if (tile == null) {
+        if (player == null) {
+            // 1. If not writing to a player, just write this tile.
+            this.internalToXML(xw, tag);
+
+        } else if ((tile = getCachedTile(player)) == null) {
+            // 2. If there is no cached tile, then it is unexplored, so
+            //    write the minimal tile (id, x, y).
             xw.writeStartElement(tag);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
@@ -2396,7 +2397,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             xw.writeAttribute(Y_TAG, this.y);
 
             xw.writeEndElement();
+
         } else {
+            // 3. Otherwise write the cached tile, which will either
+            //    be a copy or {@code this}.
             tile.internalToXML(xw, tag);
         }
     }
