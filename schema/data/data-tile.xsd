@@ -23,6 +23,7 @@
   </xs:annotation>
 
   <xs:include schemaLocation="../spec/spec-model.xsd" />
+  <xs:include schemaLocation="data-cachedTile.xsd" />
   <xs:include schemaLocation="data-colony.xsd" />
   <xs:include schemaLocation="data-indianSettlement.xsd" />
   <xs:include schemaLocation="data-tileitemcontainer.xsd" />
@@ -32,11 +33,15 @@
   <xs:element name="tile">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cachedTile" />
         <xs:element ref="colony" />
         <xs:element ref="indianSettlement" />
         <xs:element ref="tileItemContainer" />
+        <xs:element ref="unit" />
+        <!-- @compat 0.10.x -->
         <xs:element ref="playerExploredTile" />
         <xs:element ref="units" />
+        <!-- end @compat 0.10.x -->
         <!-- @compat 0.11.3 -->
         <xs:element ref="tileitemcontainer" />
         <!-- end @compat 0.11.3 -->

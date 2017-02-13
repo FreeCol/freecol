@@ -68,6 +68,8 @@
       <!-- @compat 0.10.x -->
       <xs:attribute name="nextID" type="xs:int" use="optional"/>
       <!-- end @compat -->
+
+      <xs:attribute name="initialActiveUnitId" type="UnitId" use="optional"/>
     </xs:complexType>
   </xs:element>
 

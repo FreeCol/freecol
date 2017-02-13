@@ -29,13 +29,7 @@
   <xs:element name="europe">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="units">
-          <xs:complexType>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-              <xs:element ref="unit"></xs:element>
-            </xs:choice>
-          </xs:complexType>
-        </xs:element>
+        <xs:element ref="unit"/>
         <xs:element name="unitPrice">
           <xs:complexType>
             <xs:attribute name="unitType" type="xs:string" use="required"/>
@@ -49,6 +43,15 @@
             <xs:attribute name="id" type="UnitTypeId" />
           </xs:complexType>
         </xs:element>
+        <!-- @compat 0.10.x -->
+        <xs:element name="units">
+          <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element ref="unit"></xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+        <!-- end @compat 0.10.x -->
       </xs:choice>
       <xs:attribute name="id" type="EuropeId" use="required"/>
       <!-- @compat 0.10.x -->

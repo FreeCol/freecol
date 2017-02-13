@@ -31,17 +31,19 @@
         <xs:extension base="StringTemplateType" >
           <!-- TODO: remove compatibility code -->
           <xs:choice minOccurs="0" maxOccurs="unbounded">
-	    <xs:element name="strings">
-	      <xs:complexType>
-	        <xs:attribute name="xLength" type="xs:int" use="required"/>
-	        <xs:anyAttribute namespace="##local" processContents="skip"/>
-	      </xs:complexType>
-	    </xs:element>
+	          <xs:element name="strings">
+	            <xs:complexType>
+	              <xs:attribute name="xLength" type="xs:int" use="required"/>
+	              <xs:anyAttribute namespace="##local" processContents="skip"/>
+	            </xs:complexType>
+	          </xs:element>
           </xs:choice>
           <xs:attribute name="turn" type="xs:int" use="required"/>
           <!-- TODO: remove old attribute and make eventType required -->
           <xs:attribute name="type" type="HistoryEventType" use="optional"/>
           <xs:attribute name="eventType" type="HistoryEventType" use="optional"/>
+          <xs:attribute name="playerId" type="PlayerId" use="optional"/>
+          <xs:attribute name="score" type="xs:int" use="required"/>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -62,6 +64,7 @@
       <xs:enumeration value="founding_father" />
       <xs:enumeration value="found_colony" />
       <xs:enumeration value="independence" />
+      <xs:enumeration value="make_peace" />
       <xs:enumeration value="meet_nation" />
       <!-- @compat 0.10.7 -->
       <xs:enumeration value="ABANDON_COLONY" />

@@ -79,7 +79,7 @@
 
   <xs:simpleType name="LocationId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="(tile|unit|colony|europe|colonyTile|building|indianSettlement):([0-9])+" />
+      <xs:pattern value="(tile|unit|colony|europe|colonyTile|building|indianSettlement|highSeas):([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -165,7 +165,7 @@
 
   <xs:simpleType name="TileImprovementPlanId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="tileImprovementPlan:([0-9])+" />
+      <xs:pattern value="tileImprovementPlan:(am|)([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 

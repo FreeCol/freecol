@@ -55,16 +55,19 @@
           </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="key" type="xs:string" use="optional"/>
       <!-- @compat 0.10.x -->
       <xs:attribute name="ID" type="RegionId" use="optional"/>
       <!-- end @compat -->
-      <xs:attribute name="nameKey" type="xs:string" use="required">
+      <!-- @compat 0.11.x -->
+      <xs:attribute name="nameKey" type="xs:string" use="optional">
 	      <xs:annotation>
 	        <xs:documentation>
 	          Key used to retrieve description from Messages
 	        </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>
+      <!-- end @compat 0.11.x -->
       <xs:attribute name="claimable" type="xs:boolean" use="optional"
 		                default="false">
 	      <xs:annotation>

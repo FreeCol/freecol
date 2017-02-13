@@ -25,6 +25,7 @@
   <xs:include schemaLocation="../spec/spec.xsd" />
 
   <xs:include schemaLocation="data-building.xsd" />
+  <xs:include schemaLocation="data-cachedTile.xsd" />
   <xs:include schemaLocation="data-colony.xsd" />
   <xs:include schemaLocation="data-colonyTile.xsd" />
   <xs:include schemaLocation="data-europe.xsd" />

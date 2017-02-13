@@ -23,6 +23,7 @@
   </xs:annotation>
 
   <xs:include schemaLocation="../spec/spec-model.xsd" />
+  <xs:include schemaLocation="data-common.xsd" />
 
   <xs:element name="serverObjects">
     <xs:annotation>
@@ -33,13 +34,57 @@
     <xs:complexType>
 
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	      <xs:element ref="serverPlayer" />
-        <xs:element ref="serverUnit" />
+	      <xs:element ref="serverBuilding" />
+        <xs:element ref="serverColonyTile" />
+        <xs:element ref="serverColony" />
+        <xs:element ref="serverEurope" />
+        <xs:element ref="serverGame" />
         <xs:element ref="serverIndianSettlement" />
+        <xs:element ref="serverPlayer" />
+        <xs:element ref="serverUnit" />
       </xs:choice>
     </xs:complexType>
   </xs:element>
   
+  <xs:element name="serverBuilding">
+    <xs:complexType>
+      <xs:attribute name="id" type="BuildingId" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="serverColony">
+    <xs:complexType>
+      <xs:attribute name="id" type="ColonyId" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="serverColonyTile">
+    <xs:complexType>
+      <xs:attribute name="id" type="ColonyTileId" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="serverEurope">
+    <xs:complexType>
+      <xs:attribute name="id" type="EuropeId" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="serverGame">
+    <xs:complexType>
+      <xs:attribute name="id" type="GameId" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="serverIndianSettlement">
+    <xs:complexType>
+      <xs:attribute name="id" type="IndianSettlementId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="IndianSettlementId" use="optional"/>
+      <!-- end @compat -->
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="serverPlayer">
     <xs:complexType>
       <xs:attribute name="id" type="PlayerId" use="required"/>
@@ -54,15 +99,6 @@
       <xs:attribute name="id" type="UnitId" use="required"/>
       <!-- @compat 0.10.x -->
       <xs:attribute name="ID" type="UnitId" use="optional"/>
-      <!-- end @compat -->
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="serverIndianSettlement">
-    <xs:complexType>
-      <xs:attribute name="id" type="IndianSettlementId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="IndianSettlementId" use="optional"/>
       <!-- end @compat -->
     </xs:complexType>
   </xs:element>

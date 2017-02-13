@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
-
+      
       Copyright (C) 2002-2017  The FreeCol Team
 
       This file is part of FreeCol.
@@ -22,32 +22,17 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="data-serverObjects.xsd" />
-  <xs:include schemaLocation="data-game.xsd" />
-  <xs:include schemaLocation="data-aiMain.xsd" />
+  <xs:include schemaLocation="../spec/spec-model.xsd" />
+  <xs:include schemaLocation="data-tile.xsd" />
 
-  <xs:element name="savedGame">
-    <xs:annotation>
-      <xs:documentation>
-	      This class contains server objects.
-      </xs:documentation>
-    </xs:annotation>
+  <xs:element name="cachedTile">
     <xs:complexType>
-
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <!-- @compat 0.11.x -->
-	      <xs:element ref="serverObjects" />
-        <!-- end @compat 0.11.x -->
-	      <xs:element ref="game" />
-	      <xs:element ref="aiMain" />
+      <xs:choice minOccurs="0" maxOccurs="1">
+        <xs:element ref="tile" />
       </xs:choice>
 
-      <xs:attribute name="debug" type="xs:string" use="optional" />
-      <xs:attribute name="owner" type="xs:string" use="required" />
-      <xs:attribute name="publicServer" type="xs:boolean" use="required" />
-      <xs:attribute name="singleplayer" type="xs:boolean" use="required" />
-      <xs:attribute name="version" type="xs:int" use="required" />
-      <xs:attribute name="randomState" type="xs:string" use="required" />
+      <xs:attribute name="copied" type="xs:boolean" use="required"/>
+      <xs:attribute name="player" type="PlayerId" use="required"/>
     </xs:complexType>
   </xs:element>
 
