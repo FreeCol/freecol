@@ -26,40 +26,27 @@
   <xs:include schemaLocation="data-cachedTile.xsd" />
   <xs:include schemaLocation="data-colony.xsd" />
   <xs:include schemaLocation="data-indianSettlement.xsd" />
-  <xs:include schemaLocation="data-tileitemcontainer.xsd" />
-  <xs:include schemaLocation="data-playerExploredTile.xsd" />
+  <xs:include schemaLocation="data-tileItemContainer.xsd" />
   <xs:include schemaLocation="data-unit.xsd" />
 
   <xs:element name="tile">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="cachedTile" />
-        <xs:element ref="colony" />
-        <xs:element ref="indianSettlement" />
-        <xs:element ref="tileItemContainer" />
-        <xs:element ref="unit" />
-        <!-- @compat 0.10.x -->
-        <xs:element ref="playerExploredTile" />
-        <xs:element ref="units" />
-        <!-- end @compat 0.10.x -->
+        <xs:element ref="cachedTile" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="colony" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="indianSettlement" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="tileItemContainer" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="unit"/>
         <!-- @compat 0.11.3 -->
-        <xs:element ref="tileitemcontainer" />
+        <xs:element ref="tileitemcontainer"/>
         <!-- end @compat 0.11.3 -->
       </xs:choice>
 
       <xs:attribute name="id" type="TileId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="TileId" use="optional"/>
-      <!-- end @compat -->
+
       <xs:attribute name="x" type="xs:int" use="required" />
       <xs:attribute name="y" type="xs:int" use="required" />
-      <xs:attribute name="type" type="TileTypeId" use="required">
-        <xs:annotation>
-          <xs:documentation>
-            Tile type
-          </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
+      <xs:attribute name="type" type="TileTypeId" use="required"/>
 
       <xs:attribute name="region" type="RegionId" use="optional">
         <xs:annotation>
@@ -68,17 +55,14 @@
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="fishBonus" type="xs:int" default="0"
-                    use="optional" />
-      <xs:attribute name="lostCityRumour" type="xs:boolean"
-                    default="false" use="optional" />
+      <xs:attribute name="contiguity" type="xs:int" use="optional" />
+      <xs:attribute name="lostCityRumour" type="xs:boolean" use="optional"
+                    default="false"/>
       <xs:attribute name="connected" type="xs:int" use="optional" />
       <xs:attribute name="moveToEurope" type="xs:boolean" use="optional" />
       <xs:attribute name="owner" type="xs:string" use="optional" />
-      <xs:attribute name="owningSettlement" type="xs:string"
-                    use="optional" />
+      <xs:attribute name="owningSettlement" type="xs:string" use="optional" />
       <xs:attribute name="style" type="xs:int" use="optional" />
-      <xs:attribute name="contiguity" type="xs:int" use="optional" />
     </xs:complexType>
   </xs:element>
 

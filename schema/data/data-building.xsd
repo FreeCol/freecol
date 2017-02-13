@@ -33,23 +33,17 @@
 	      Represents a building in a colony.
       </xs:documentation>
     </xs:annotation>
+
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
 	      <xs:element ref="unit" />
         <xs:element ref="production" />
       </xs:choice>
+
       <xs:attribute name="id" type="BuildingId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="BuildingId" use="optional"/>
-      <!-- end @compat -->
-      <xs:attribute name="colony" type="ColonyId" use="required">
-	      <xs:annotation>
-	        <xs:documentation>
-	          The colony containing this building.
-	        </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
+
       <xs:attribute name="buildingType" type="xs:string" use="required"/>
+      <xs:attribute name="colony" type="ColonyId" use="required"/>
     </xs:complexType>
   </xs:element>
 

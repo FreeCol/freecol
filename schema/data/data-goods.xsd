@@ -26,15 +26,9 @@
 
   <xs:element name="goods">
     <xs:complexType>
-      <xs:attribute name="type" type="GoodsTypeId" use="required" />
-      <xs:attribute name="amount" type="xs:int" use="required" />
-      <xs:attribute name="location" type="LocationId" use="optional">
-        <xs:annotation>
-          <xs:documentation>
-            Optional location (carrier, colony etc) for the goods.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
+      <xs:attribute name="type" type="GoodsTypeId" use="required"/>
+      <xs:attribute name="amount" type="xs:int" use="required"/>
+      <xs:attribute name="location" type="LocationId" use="optional"/>
     </xs:complexType>
   </xs:element>
 

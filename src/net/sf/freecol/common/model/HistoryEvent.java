@@ -43,13 +43,11 @@ public class HistoryEvent extends StringTemplate {
         CITY_OF_GOLD,
         FOUND_COLONY,
         ABANDON_COLONY,
-        CONQUER_COLONY,
+        CONQUER_COLONY,       // You conquer a colony
         COLONY_DESTROYED,
-        COLONY_CONQUERED,
+        COLONY_CONQUERED,     // Your colony is conquered
         DESTROY_SETTLEMENT,
-        // FIXME: when exactly is a European nation destroyed?
-        DESTROY_NATION,
-        NATION_DESTROYED,
+        DESTROY_NATION,       // Native nation that is
         FOUNDING_FATHER,
         DECLARE_INDEPENDENCE,
         INDEPENDENCE,
@@ -57,7 +55,11 @@ public class HistoryEvent extends StringTemplate {
         DECLARE_WAR,
         CEASE_FIRE,
         MAKE_PEACE,
-        FORM_ALLIANCE;
+        FORM_ALLIANCE,
+        // FIXME: This is badly named, it should be NATION_WITHDRAWN
+        // as it is used when a European nation permanently leaves the
+        // New World
+        NATION_DESTROYED;
 
         /**
          * Get the stem key.
@@ -239,7 +241,6 @@ public class HistoryEvent extends StringTemplate {
 
         eventType = xr.getAttribute(EVENT_TYPE_TAG,
                                     HistoryEventType.class, (HistoryEventType)null);
-
         playerId = xr.getAttribute(PLAYER_ID_TAG, (String)null);
 
         score = xr.getAttribute(SCORE_TAG, 0);

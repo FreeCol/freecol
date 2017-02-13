@@ -38,6 +38,7 @@
         <xs:element ref="textOption"/>
         <xs:element ref="unitListOption"/>
       </xs:choice>
+
       <xs:attribute name="id" use="required" type="xs:string"/>
 
       <xs:attribute name="editable" use="optional" type="xs:boolean"/>
@@ -66,6 +67,8 @@
   <xs:element name="fileOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="value" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -193,7 +196,11 @@
             <xs:sequence>
               <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
                 <xs:complexType>
-                  <xs:attribute name="value" type="RoleId" />
+                  <!-- @compat 0.11.x -->
+                  <xs:attribute name="value" type="RoleIdCompat" />
+                  <!-- end @compat 0.11.x -->
+                  <!-- Replace the above with:
+                       <xs:attribute name="value" type="RoleId" /> -->
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
@@ -205,6 +212,7 @@
         </xs:element>
         <xs:element ref="unitType"/>
       </xs:choice>
+
       <xs:attribute name="id" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
@@ -229,14 +237,6 @@
             <xs:enumeration value="land_units" />
             <xs:enumeration value="naval_units" />
             <xs:enumeration value="units" />
-            <!-- @compat 0.10.7 -->
-            <xs:enumeration value="BUILDINGS" />
-            <xs:enumeration value="FOUNDING_FATHERS" />
-            <xs:enumeration value="IMMIGRANTS" />
-            <xs:enumeration value="LAND_UNITS" />
-            <xs:enumeration value="NAVAL_UNITS" />
-            <xs:enumeration value="UNITS" />
-            <!-- end @compat -->
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

@@ -41,19 +41,12 @@
 	            </xs:complexType>
 	          </xs:element>
           </xs:choice>
-          <!-- @compat 0.10.x -->
-          <xs:attribute name="ID" type="xs:string" use="optional"/>
-          <!-- end @compat -->
           <xs:attribute name="owner" type="PlayerId" use="required" />
           <xs:attribute name="source" type="SourceId" use="optional" />
           <xs:attribute name="display" type="xs:string" use="optional" />
-          <xs:attribute name="hasBeenDisplayed" type="xs:boolean"
-                        use="optional" default="false" />
-          <xs:attribute name="messageType" type="ModelMessageType"
-                        use="optional" />
-          <!-- TODO: remove support for old format and make
-               messageType required -->
-          <xs:attribute name="type" type="ModelMessageType" use="optional" />
+          <xs:attribute name="hasBeenDisplayed" type="xs:boolean" use="optional"
+                        default="false" />
+          <xs:attribute name="messageType" type="ModelMessageType" use="optional" />
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -80,27 +73,6 @@
       <xs:enumeration value="unit_lost" />
       <xs:enumeration value="warehouse_capacity" />
       <xs:enumeration value="warning" />
-      <!-- @compat 0.10.7 -->
-      <xs:enumeration value="ACCEPTED_DEMANDS" />
-      <xs:enumeration value="BUILDING_COMPLETED" />
-      <xs:enumeration value="COMBAT_RESULT" />
-      <xs:enumeration value="DEFAULT" />
-      <xs:enumeration value="FOREIGN_DIPLOMACY" />
-      <xs:enumeration value="GIFT_GOODS" />
-      <xs:enumeration value="GOVERNMENT_EFFICIENCY" />
-      <xs:enumeration value="LOST_CITY_RUMOUR" />
-      <xs:enumeration value="MARKET_PRICES" />
-      <xs:enumeration value="MISSING_GOODS" />
-      <xs:enumeration value="REJECTED_DEMANDS" />
-      <xs:enumeration value="SONS_OF_LIBERTY" />
-      <xs:enumeration value="TUTORIAL" />
-      <xs:enumeration value="UNIT_ADDED" />
-      <xs:enumeration value="UNIT_DEMOTED" />
-      <xs:enumeration value="UNIT_IMPROVED" />
-      <xs:enumeration value="UNIT_LOST" />
-      <xs:enumeration value="WAREHOUSE_CAPACITY" />
-      <xs:enumeration value="WARNING" />
-      <!-- end @compat 0.10.7 -->
     </xs:restriction>
   </xs:simpleType>
 

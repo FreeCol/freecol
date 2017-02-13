@@ -40,6 +40,14 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <!-- @compat 0.11.x Gone in 0.12.x -->
+  <xs:simpleType name="EquipmentTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.equipment(\.indian)?\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- end @compat 0.11.x -->
+
   <xs:simpleType name="FoundingFatherId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.foundingFather\.([a-zA-Z]+)" />
@@ -81,6 +89,14 @@
       <xs:pattern value="model\.role\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
+
+  <!-- @compat 0.11.0 -->
+  <xs:simpleType name="RoleIdCompat">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(DEFAULT|DRAGOON|SOLDIER|model\.role\.([a-zA-Z]+))" />
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- end @compat 0.11.0 -->
 
   <xs:simpleType name="SettlementTypeId">
     <xs:restriction base="xs:string">

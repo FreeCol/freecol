@@ -24,7 +24,8 @@
 
   <xs:include schemaLocation="../spec/spec-model.xsd"/>
   <xs:include schemaLocation="data-goodsContainer.xsd"/>
-  <xs:include schemaLocation="data-tileimprovement.xsd"/>
+  <xs:include schemaLocation="data-equipment.xsd"/>
+  <xs:include schemaLocation="data-tileImprovement.xsd"/>
 
   <xs:element name="units">
     <xs:complexType>
@@ -61,61 +62,51 @@
   <xs:complexType name="unitElementType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
       <xs:element ref="goodsContainer"/>
-      <xs:element ref="units"/>
-      <xs:element ref="tileImprovement">
-        <xs:annotation>
-          <xs:documentation>
-            The TileImprovement this Unit is working on.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
+      <xs:element ref="tileImprovement"/>
+      <xs:element ref="unit"/>
+
       <!-- @compat 0.11.3 -->
       <xs:element ref="tileimprovement"/>
       <!-- end @compat 0.11.3 -->
+      <!-- @compat 0.11.x -->
+      <xs:element ref="equipment"/>
+      <!-- end @compat 0.11.x -->
     </xs:choice>
 
     <xs:attribute name="id" type="UnitId" use="required" />
-    <!-- @compat 0.10.x -->
-    <xs:attribute name="ID" type="UnitId" use="optional"/>
-    <!-- end @compat -->
+
     <xs:attribute name="name" type="xs:string" use="optional"/>
     <xs:attribute name="unitType" type="xs:string" use="required"/>
     <xs:attribute name="movesLeft" type="xs:int" use="required"/>
     <xs:attribute name="state" type="UnitState" use="required"/>
-    <!-- 
-       Should be:
-         <xs:attribute name="role" type="RoleId" use="required"/>
-         <xs:attribute name="roleCount" type="xs:int" use="required"/>
-       However, @compat 0.10.7 -->
-    <xs:attribute name="role" type="xs:string" use="required"/>
+    <xs:attribute name="role" type="RoleId" use="required"/>
+    <!-- @compat 0.11.x To Become Required -->
     <xs:attribute name="roleCount" type="xs:int" use="optional"/>
-    <!-- end @compat -->
+    <!-- end @compat 0.11.x -->
+
     <xs:attribute name="owner" type="PlayerId" use="required"/>
-    <xs:attribute name="turnsOfTraining" type="xs:int" use="required"/>
+    <xs:attribute name="ethnicity" type="NationId" use="optional"/>
+    <xs:attribute name="nationality" type="NationId" use="optional"/>
+
+    <xs:attribute name="location" type="LocationId" use="optional"/>
+    <xs:attribute name="treasureAmount" type="xs:int" use="required"/>
+
+    <!-- Privileged information -->
+    <xs:attribute name="entryLocation" type="TileId" use="optional"/>
+    <xs:attribute name="turnsOfTraining" type="xs:int" use="optional"/>
     <xs:attribute name="workType" type="xs:string" use="optional"/>
     <xs:attribute name="experienceType" type="xs:string" use="optional"/>
-    <xs:attribute name="experience" type="xs:int" use="required"/>
-    <xs:attribute name="treasureAmount" type="xs:int" use="required"/>
-    <xs:attribute name="hitPoints" type="xs:int" use="required"/>
-    <!-- @compat 0.10.7 -->
-    <xs:attribute name="hitpoints" type="xs:int" use="optional"/>
-    <!-- end @compat -->
-    <xs:attribute name="attrition" type="xs:int" use="required"/>
+    <xs:attribute name="experience" type="xs:int" use="optional"/>
+    <xs:attribute name="indianSettlement" type="xs:string" use="optional"/>
+    <xs:attribute name="workLeft" type="xs:integer" use="optional"/>
+    <xs:attribute name="hitPoints" type="xs:int" use="optional"/>
+    <xs:attribute name="attrition" type="xs:int" use="optional"/>
     <xs:attribute name="student" type="UnitId" use="optional"/>
     <xs:attribute name="teacher" type="UnitId" use="optional"/>
-    <xs:attribute name="nationality" type="NationId" use="optional"/>
-    <xs:attribute name="ethnicity" type="NationId" use="optional"/>
-
-    <xs:attribute name="indianSettlement" type="xs:string" use="optional"/>
-    <xs:attribute name="workLeft" type="xs:integer" use="required"/>
-
-    <xs:attribute name="entryLocation" type="TileId" use="optional"/>
-    <xs:attribute name="location" type="LocationId" use="optional"/>
     <xs:attribute name="destination" type="LocationId" use="optional"/>
-
     <xs:attribute name="tradeRoute" type="TradeRouteId" use="optional"/>
     <xs:attribute name="currentStop" type="xs:int" use="optional"/>
-
+    <!-- Visible to other players when a carrier -->
     <xs:attribute name="visibleGoodsCount" type="xs:int" use="optional"/>
   </xs:complexType>
 
@@ -132,18 +123,6 @@
       <xs:enumeration value="to_america" />
       <xs:enumeration value="fortifying" />
       <xs:enumeration value="skipped" />
-      <!-- @compat 0.10.x -->
-      <xs:enumeration value="ACTIVE" />
-      <xs:enumeration value="FORTIFIED" />
-      <xs:enumeration value="SENTRY" />
-      <xs:enumeration value="IN_COLONY" />
-      <xs:enumeration value="IMPROVING" />
-      <xs:enumeration value="TO_EUROPE" />
-      <xs:enumeration value="IN_EUROPE" />
-      <xs:enumeration value="TO_AMERICA" />
-      <xs:enumeration value="FORTIFYING" />
-      <xs:enumeration value="SKIPPED" />
-      <!-- end @compat 0.10.x -->
     </xs:restriction>
   </xs:simpleType>
 

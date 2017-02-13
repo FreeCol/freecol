@@ -24,46 +24,16 @@
 
   <xs:include schemaLocation="../spec/spec-model.xsd"/>
 
-  <!-- @compat 0.11.3 -->
-  <xs:simpleType name="tileimprovementId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="tileimprovement:([0-9])+" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:element name="tileimprovement">
-    <xs:annotation>
-      <xs:documentation>
-	      Represents a tile improvement, such as a river or road.
-      </xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="id" type="tileimprovementId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="tileimprovementId" use="optional"/>
-      <!-- end @compat -->
-      <xs:attribute name="tile" type="TileId" use="required" />
-      <xs:attribute name="type" type="TileImprovementTypeId" use="required" />
-      <xs:attribute name="turns" type="xs:int" use="required" />
-      <xs:attribute name="magnitude" type="xs:int" use="required" />
-      <xs:attribute name="style" type="xs:int" use="optional" />
-      <xs:attribute name="virtual" type="xs:boolean" use="optional"
-		    default="false" />
-    </xs:complexType>
-  </xs:element>
-  <!-- end @compat 0.11.3 -->
-
   <xs:element name="tileImprovement">
     <xs:annotation>
       <xs:documentation>
 	      Represents a tile improvement, such as a river or	road.
       </xs:documentation>
     </xs:annotation>
+
     <xs:complexType>
       <xs:attribute name="id" type="TileImprovementId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="TileImprovementId" use="optional"/>
-      <!-- end @compat -->
+
       <xs:attribute name="tile" type="TileId" use="required" />
       <xs:attribute name="type" type="TileImprovementTypeId" use="required" />
       <xs:attribute name="turns" type="xs:int" use="required" />
@@ -74,5 +44,26 @@
     </xs:complexType>
   </xs:element>
 
+  <!-- @compat 0.11.3 -->
+  <xs:simpleType name="tileimprovementId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="tileimprovement:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="tileimprovement">
+    <xs:complexType>
+      <xs:attribute name="id" type="tileimprovementId" use="required"/>
+
+      <xs:attribute name="tile" type="TileId" use="required" />
+      <xs:attribute name="type" type="TileImprovementTypeId" use="required" />
+      <xs:attribute name="turns" type="xs:int" use="required" />
+      <xs:attribute name="magnitude" type="xs:int" use="required" />
+      <xs:attribute name="style" type="xs:int" use="optional" />
+      <xs:attribute name="virtual" type="xs:boolean" use="optional"
+		                default="false" />
+    </xs:complexType>
+  </xs:element>
+  <!-- end @compat 0.11.3 -->
 
 </xs:schema>

@@ -49,28 +49,16 @@
         <xs:element name="ownedUnits">
           <xs:complexType>
             <xs:attribute name="id" type="UnitId"/>
-            <!-- @compat 0.10.x -->
-            <xs:attribute name="ID" type="UnitId" use="optional"/>
-            <!-- end @compat -->
           </xs:complexType>
         </xs:element>
         <xs:element ref="goodsContainer"/>
         <xs:element ref="unit" />
-        <!-- @compat 0.10.x -->
-        <xs:element name="units">
-          <xs:complexType>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-              <xs:element ref="unit"/>
-            </xs:choice>
-          </xs:complexType>
-        </xs:element>
-        <!-- end @compat 0.10.x -->
+        <!-- @compat 0.11.0 -->
+        <xs:element ref="modifier"/>
+        <!-- end @compat 0.11.0 -->
       </xs:choice>
 
       <xs:attribute name="id" type="IndianSettlementId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="IndianSettlementId" use="optional"/>
-      <!-- end @compat -->
 
       <xs:attribute name="name" type="xs:string" use="optional"/>
       <xs:attribute name="owner" type="PlayerId" use="required"/>
@@ -78,17 +66,15 @@
       <xs:attribute name="settlementType" type="xs:string"/>
 
       <xs:attribute name="convertProgress" type="xs:int" use="optional"
-		    default="0"/>
+		                default="0"/>
       <xs:attribute name="lastTribute" type="xs:int" use="optional"
-		    default="0"/>
+		                default="0"/>
       <xs:attribute name="isCapital" type="xs:boolean" use="optional"
-		    default="false"/>
-
+		                default="false"/>
       <xs:attribute name="learnableSkill" type="UnitTypeId"
-		    use="optional"/>
-
+		                use="optional"/>
       <xs:attribute name="mostHated" type="PlayerId" use="optional"/>
-      
+     
       <xs:attribute name="wantedGoods0" type="GoodsTypeId" use="optional"/>
       <xs:attribute name="wantedGoods1" type="GoodsTypeId" use="optional"/>
       <xs:attribute name="wantedGoods2" type="GoodsTypeId" use="optional"/>

@@ -28,6 +28,9 @@
   <xs:include schemaLocation="data-cachedTile.xsd" />
   <xs:include schemaLocation="data-colony.xsd" />
   <xs:include schemaLocation="data-colonyTile.xsd" />
+  <!-- @compat 0.11.x -->
+  <xs:include schemaLocation="data-equipment.xsd" />
+  <!-- end @compat 0.11.x -->
   <xs:include schemaLocation="data-europe.xsd" />
   <xs:include schemaLocation="data-exportData.xsd" />
   <xs:include schemaLocation="data-goods.xsd" />
@@ -37,16 +40,12 @@
   <xs:include schemaLocation="data-market.xsd" />
   <xs:include schemaLocation="data-monarch.xsd" />
   <xs:include schemaLocation="data-player.xsd" />
-  <!-- @compat 0.10.x -->
-  <xs:include schemaLocation="data-playerExploredTile.xsd" />
-  <!-- end @compat 0.10.x -->
   <xs:include schemaLocation="data-region.xsd" />
   <xs:include schemaLocation="data-resource.xsd" />
   <xs:include schemaLocation="data-savedGame.xsd" />
-  <xs:include schemaLocation="data-template.xsd" />
   <xs:include schemaLocation="data-tile.xsd" />
-  <xs:include schemaLocation="data-tileimprovement.xsd" />
-  <xs:include schemaLocation="data-tileitemcontainer.xsd" />
+  <xs:include schemaLocation="data-tileImprovement.xsd" />
+  <xs:include schemaLocation="data-tileItemContainer.xsd" />
   <xs:include schemaLocation="data-tradeRoute.xsd" />
   <xs:include schemaLocation="data-unit.xsd" />
 

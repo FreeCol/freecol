@@ -65,10 +65,12 @@
       <xs:attribute name="occupation-string" type="xs:string"/>
       <xs:attribute name="required-role" use="optional" type="RoleId"/>
       <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
-      <!-- @compat 0.10.x -->
+
+      <!-- @compat 0.11.x -->
+      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
       <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
       <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
-      <!-- end @compat 0.10.x -->
+      <!-- end @compat 0.11.x -->
     </xs:complexType>
   </xs:element>
   <!-- end @compat 0.11.3 -->
@@ -119,10 +121,12 @@
       <!-- @compat 0.11.3 -->
       <xs:attribute name="exposeResourcePercent" type="xs:nonNegativeInteger"/>
       <!-- end @compat 0.11.3 -->
-      <!-- @compat 0.10.x -->
+
+      <!-- @compat 0.11.x -->
       <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
       <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
-      <!-- end @compat 0.10.x -->
+      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
+      <!-- end @compat 0.11.x -->
     </xs:complexType>
   </xs:element>
 
@@ -130,7 +134,7 @@
        Replace the non-specific "change" with tile-type-change. -->
   <xs:element name="change">
     <xs:complexType>
-      <xs:sequence>
+      <xs:sequence minOccurs="0" maxOccurs="1">
         <xs:element name="production" type="AbstractGoodsType"/>
       </xs:sequence>
       <xs:attribute name="from" use="required" type="TileTypeId"/>
@@ -141,7 +145,7 @@
 
   <xs:element name="tile-type-change">
     <xs:complexType>
-      <xs:sequence>
+      <xs:sequence minOccurs="0" maxOccurs="1">
         <xs:element name="production" type="AbstractGoodsType"/>
       </xs:sequence>
       <xs:attribute name="from" use="required" type="TileTypeId"/>
