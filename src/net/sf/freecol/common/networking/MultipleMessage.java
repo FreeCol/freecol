@@ -44,13 +44,21 @@ public class MultipleMessage extends DOMMessage {
 
     /**
      * Create a new {@code MultipleMessage}.
+     */
+    public MultipleMessage() {
+        super(TAG);
+
+        this.elements.clear();
+    }
+
+    /**
+     * Create a new {@code MultipleMessage}.
      *
      * @param elements A list of sub-{@code Element}s.
      */
     public MultipleMessage(List<Element> elements) {
-        super(TAG);
+        this();
 
-        this.elements.clear();
         if (elements != null) this.elements.addAll(elements);
     }
 
@@ -71,13 +79,22 @@ public class MultipleMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public MultipleMessage(Game game, Element element) {
-        this((List<Element>)null);
+        this();
 
         this.elements.addAll(DOMUtils.mapChildren(element, Function.identity()));
     }
 
 
     // Public interface
+
+    /**
+     * Add another message.
+     *
+     * @param message The {@code DOMMessage} to add.
+     */
+    public void addMessage(DOMMessage message) {
+        this.elements.add(message.toXMLElement());
+    }
 
     /**
      * Apply a handler to this message.

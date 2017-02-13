@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import net.sf.freecol.common.model.Ability;
@@ -60,10 +61,7 @@ import org.w3c.dom.NamedNodeMap;
  */
 public class ChangeSet {
 
-    /** Compare changes by ascending priority. */
-    private static final Comparator<Change> changeComparator
-        = Comparator.comparingInt(Change::getPriority);
-
+    /** The changes to send. */
     private final List<Change> changes;
 
 
@@ -196,7 +194,7 @@ public class ChangeSet {
     /**
      * Abstract template for all types of Change.
      */
-    private abstract static class Change<T extends Message> {
+    public abstract static class Change<T extends Message> {
 
         /**
          * The visibility of the change.
@@ -223,14 +221,6 @@ public class ChangeSet {
         public boolean matches(FreeColGameObject fcgo) {
             return false;
         }
-
-        /**
-         * Gets the sort priority of a change, to be used by the
-         * changeComparator.
-         *
-         * @return The sort priority.
-         */
-        public abstract int getPriority();
 
         /**
          * Should a player be notified of this Change?
@@ -263,17 +253,8 @@ public class ChangeSet {
          * @param serverPlayer The {@code ServerPlayer} to consider.
          * @return The consequent {@code Change}, or null if none.
          */
-        public Change consequences(ServerPlayer serverPlayer) {
+        public Change consequence(ServerPlayer serverPlayer) {
             return null;
-        }
-
-        /**
-         * Can this Change be directly converted to an Element?
-         *
-         * @return True if this change can be directly converted to an Element.
-         */
-        public boolean convertsToElement() {
-            return true;
         }
 
         /**
@@ -296,14 +277,6 @@ public class ChangeSet {
             return (message == null) ? null
                 : ((DOMMessage)message).attachToDocument(doc);
         }
-
-        /**
-         * Some changes can not be directly specialized, but need to be
-         * directly attached to an element.
-         *
-         * @param element The {@code Element} to attach to.
-         */
-        public abstract void attachToElement(Element element);
     }
 
     /**
@@ -380,13 +353,6 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
-        public int getPriority() {
-            return AnimateAttackMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             // Should a player perhaps be notified of this attack?  Do
@@ -412,11 +378,6 @@ public class ChangeSet {
                 !attackerVisible(serverPlayer), !defenderVisible(serverPlayer));
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        public void attachToElement(Element element) {} // Noop
-
 
         // Override Object
 
@@ -428,7 +389,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(64);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append(attacker.getId())
                 .append('@').append(attacker.getTile().getId())
                 .append(' ').append(success)
@@ -465,33 +425,9 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
-        @Override
-        public int getPriority() {
-            return AttributeMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean convertsToElement() {
-            // AttributeChanges are tacked onto the final Element, not
-            // converted directly.
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
         public AttributeMessage toMessage(ServerPlayer serverPlayer) {
-            return new AttributeMessage(key, value);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void attachToElement(Element element) {
-            element.setAttribute(key, value);
+            return new AttributeMessage(AttributeMessage.TAG,
+                                        key, value).setMergeable(true);
         }
 
 
@@ -505,7 +441,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append(key)
                 .append('=').append(value)
                 .append(']');
@@ -544,24 +479,10 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public int getPriority() {
-            return FeatureChangeMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public FeatureChangeMessage toMessage(ServerPlayer serverPlayer) {
             return (!isNotifiable(serverPlayer)) ? null
                 : new FeatureChangeMessage(this.parent, this.child, this.add);
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
 
 
         // Override Object
@@ -574,7 +495,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append((this.add) ? "add" : "remove")
                 .append(' ').append(this.child)
                 .append(' ').append((this.add) ? "to" : "from")
@@ -609,23 +529,9 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public int getPriority() {
-            return this.message.getPriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public T toMessage(ServerPlayer serverPlayer) {
             return (isNotifiable(serverPlayer)) ? this.message : null;
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
 
 
         // Override Object
@@ -638,7 +544,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append(message)
                 .append(']');
             return sb.toString();
@@ -701,14 +606,6 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public int getPriority() {
-            return AnimateMoveMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             return seeOld(serverPlayer) || seeNew(serverPlayer);
         }
@@ -717,7 +614,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public Change consequences(ServerPlayer serverPlayer) {
+        public Change consequence(ServerPlayer serverPlayer) {
             return (seeOld(serverPlayer) && !seeNew(serverPlayer)
                     && !unit.isDisposed())
                 ? new RemoveChange(See.only(serverPlayer),
@@ -737,12 +634,6 @@ public class ChangeSet {
                                           !seeOld(serverPlayer));
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
-
 
         // Override Object
 
@@ -754,7 +645,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append(unit.getId())
                 .append(' ').append(oldLocation.getId())
                 .append(' ').append(newTile.getId())
@@ -790,14 +680,6 @@ public class ChangeSet {
         @Override
         public boolean matches(FreeColGameObject fcgo) {
             return this.fcgo == fcgo;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getPriority() {
-            return UpdateMessage.getMessagePriority().getValue();
         }
 
         /**
@@ -841,12 +723,6 @@ public class ChangeSet {
                     Collections.singletonList(this.fcgo));
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
-
 
         // Override Object
 
@@ -858,7 +734,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append((this.fcgo == null) ? "<null>"
                     : this.fcgo.getId())
                 .append(']');
@@ -893,14 +768,6 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public int getPriority() {
-            return UpdateMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public UpdateMessage toMessage(ServerPlayer serverPlayer) {
             return new UpdateMessage(serverPlayer, this.fcgo, this.fields);
         }
@@ -916,7 +783,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append(fcgo.getId());
             for (String f : fields) sb.append(' ').append(f);
             sb.append(']');
@@ -949,14 +815,6 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public int getPriority() {
-            return AddPlayerMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public boolean isNotifiable(ServerPlayer serverPlayer) {
             return true;
         }
@@ -977,12 +835,6 @@ public class ChangeSet {
             return message;
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
-
 
         // Override Object
 
@@ -993,8 +845,7 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
-                .append(' ').append(see)
-                .append(" #").append(getPriority());
+                .append(' ').append(see);
             for (ServerPlayer sp : this.serverPlayers) {
                 sb.append(' ').append(sp.getId());
             }
@@ -1056,14 +907,6 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public int getPriority() {
-            return RemoveMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             // Notifiable if the player can see the tile, and there is no
             // other-player settlement present.
@@ -1089,12 +932,6 @@ public class ChangeSet {
                     : Collections.singletonList(getMainObject())));
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
-
 
         // Override Object
 
@@ -1106,7 +943,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append(((tile == null) ? "<null>" : tile.getId()));
             for (FreeColGameObject f : contents) {
                 sb.append(' ').append(f.getId());
@@ -1143,24 +979,10 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public int getPriority() {
-            return SpySettlementMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public SpySettlementMessage toMessage(ServerPlayer serverPlayer) {
             return (!isNotifiable(serverPlayer)) ? null
                 : new SpySettlementMessage(unit, settlement);
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
 
 
         // Override Object
@@ -1173,7 +995,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append(settlement.getId())
                 .append(']');
             return sb.toString();
@@ -1211,24 +1032,10 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public int getPriority() {
-            return SetStanceMessage.getMessagePriority().getValue();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public SetStanceMessage toMessage(ServerPlayer serverPlayer) {
             return (!isNotifiable(serverPlayer)) ? null
                 : new SetStanceMessage(stance, first, second);
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
 
 
         // Override Object
@@ -1241,7 +1048,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append(first.getId())
                 .append(' ').append(stance)
                 .append(' ').append(second.getId())
@@ -1285,26 +1091,12 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public int getPriority() {
-            return this.priority;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public AttributeMessage toMessage(ServerPlayer serverPlayer) {
             if (!isNotifiable(serverPlayer)) return null;
             AttributeMessage ret = new AttributeMessage(this.name);
             ret.setStringAttributes(this.attributes);
             return ret;
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void attachToElement(Element element) {} // Noop
 
 
         // Override Object
@@ -1317,7 +1109,6 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(64);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(getPriority())
                 .append(' ').append(name);
             for (String a : attributes) sb.append(' ').append(a);
             sb.append(']');
@@ -1410,7 +1201,7 @@ public class ChangeSet {
     }
 
     /**
-     * Helper function to add an attribute setting to a ChangeSet.
+     * Helper function to add a mergeable attribute setting to a ChangeSet.
      *
      * @param see The visibility of this change.
      * @param key A key {@code String}.
@@ -1752,6 +1543,74 @@ public class ChangeSet {
 
     /**
      * Build a generalized update.
+     *
+     * @param serverPlayer The {@code ServerPlayer} to send the update to.
+     * @return A {@code Message} encapsulating an update of the objects to
+     *     consider, or null if there is nothing to report.
+     */
+    public Message buildMessage(ServerPlayer serverPlayer) {
+        if (this.changes.isEmpty()) return null;
+
+        // Convert eligible changes to messages and sort by priority,
+        // splitting out trivial mergeable attribute changes.
+        List<Message> messages = new ArrayList<>();
+        List<Message> diverted = new ArrayList<>();
+        for (Change c : this.changes) {
+            if (!c.isNotifiable(serverPlayer)) continue;
+            Message m = c.toMessage(serverPlayer);
+            List<Message> onto = (m.canMergeAttributes()) ? diverted : messages;
+            onto.add(m);
+            if ((c = c.consequence(serverPlayer)) != null) {
+                m = c.toMessage(serverPlayer);
+                onto = (m.canMergeAttributes()) ? diverted : messages;
+                onto.add(m);
+            }
+        }
+        messages.sort(Message.messagePriorityComparator);
+        diverted.sort(Message.messagePriorityComparator);
+
+        // Merge the messages where possible
+        if (messages.size() > 1) {
+            List<Message> more = new ArrayList<>();
+            Message head = messages.remove(0);
+            while (!messages.isEmpty()) {
+                Message m = messages.remove(0);
+                if (!head.merge(m)) {
+                    more.add(head);
+                    head = m;
+                }
+            }
+            more.add(head);
+            messages = more;
+        }
+
+        // Collapse to one message
+        Message ret;
+        switch (messages.size()) {
+        case 0:
+            ret = null;
+            break;
+        case 1:
+            ret = messages.get(0);
+            break;
+        default:
+            MultipleMessage mm = new MultipleMessage();
+            for (Message m : messages) mm.addMessage((DOMMessage)m);
+            ret = mm;
+            break;
+        }
+            
+        // Merge in the diverted messages.
+        if (!diverted.isEmpty()) {
+            if (ret == null) ret = new UpdateMessage(null, (FreeColObject)null);
+            for (Message m : diverted) ret.merge(m);
+        }
+
+        return ret;
+    }
+        
+    /**
+     * Build a generalized update.
      * Beware that removing an object does not necessarily update
      * its tile correctly on the client side--- if a tile update
      * is needed the tile should be supplied in the objects list.
@@ -1762,49 +1621,8 @@ public class ChangeSet {
      *         consider, or null if there is nothing to report.
      */
     public Element build(ServerPlayer serverPlayer) {
-        List<Change> c = sort(changes, changeComparator);
-        List<Element> elements = new ArrayList<>();
-        List<Change> diverted = new ArrayList<>();
-        Document doc = DOMUtils.createNewDocument();
-
-        // For all sorted changes, if it is notifiable to the target
-        // player then convert it to an Element, or divert for later
-        // attachment.  Then add all consequence changes to the list.
-        while (!c.isEmpty()) {
-            Change change = c.remove(0);
-            if (change.isNotifiable(serverPlayer)) {
-                if (change.convertsToElement()) {
-                    Element e = change.toElement(serverPlayer, doc);
-                    if (e != null) elements.add(e);
-                } else {
-                    diverted.add(change);
-                }
-                Change consequent = change.consequences(serverPlayer);
-                if (consequent != null) c.add(consequent);
-            }
-        }
-        elements = collapseElementList(elements);
-
-        // Decide what to return.  If there are several parts with
-        // children then return multiple, if there is one viable part,
-        // return that, if there is none return null unless there are
-        // attributes in which case they become viable as an update.
-        Element result;
-        switch (elements.size()) {
-        case 0:
-            if (diverted.isEmpty()) return null;
-            result = doc.createElement("update");
-            break;
-        case 1:
-            result = elements.get(0);
-            break;
-        default:
-            result = new MultipleMessage(elements).toXMLElement();
-            break;
-        }
-        result = (Element)doc.importNode(result, true);
-        for (Change change : diverted) change.attachToElement(result);
-        return result;
+        DOMMessage m = (DOMMessage)buildMessage(serverPlayer);
+        return (m == null) ? null : m.toXMLElement();
     }
 
 
@@ -1916,7 +1734,7 @@ public class ChangeSet {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Change c : sort(changes, changeComparator)) {
+        for (Change c : this.changes) {
             sb.append(c).append('\n');
         }
         return sb.toString();

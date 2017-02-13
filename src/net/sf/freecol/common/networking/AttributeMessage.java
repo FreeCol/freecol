@@ -38,8 +38,13 @@ import org.w3c.dom.Element;
  */
 public class AttributeMessage extends TrivialMessage {
 
+    public static final String TAG = "attribute";
+
     /** The key,value pairs. */
     private final Map<String,String> attributes = new HashMap<>();
+
+    /** Whether this message is trivially mergeable. */
+    private boolean mergeable = false;
 
 
     /**
@@ -98,8 +103,26 @@ public class AttributeMessage extends TrivialMessage {
         return Message.MessagePriority.ATTRIBUTE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canMergeAttributes() {
+        return mergeable;
+    }
 
     // Public interface
+
+    /**
+     * Set the mergeable state of this message.
+     *
+     * @param mergeable The new mergeable state.
+     * @return This message.
+     */
+    public AttributeMessage setMergeable(boolean mergeable) {
+        this.mergeable = mergeable;
+        return this;
+    }
 
     /**
      * Check if an attribute is present.
