@@ -314,19 +314,9 @@ final class ReceivingThread extends Thread {
     }
 
     // Individual parts of listen().  Work in progress
-    private String peek(FreeColXMLReader xr) {
-        try {
-            xr.nextTag();
-            return xr.getLocalName();
-        } catch (XMLStreamException xse) {
-            // Expected to fail at EOS
-        }
-        return TrivialMessage.DISCONNECT_TAG;
-    }
-
     private DOMMessage reader(BufferedInputStream bis)
         throws IOException, SAXException {
-        bis.reset();
+        //bis.reset();
         return new DOMMessage(bis);
     }
 
@@ -391,6 +381,14 @@ final class ReceivingThread extends Thread {
         DOMMessage msg;
         switch (tag) {
 
+        case TrivialMessage.DISCONNECT_TAG:
+            // Do not actually read the message, it might be a fake one
+            // due to end-of-stream.
+            msg = TrivialMessage.DISCONNECT_MESSAGE;
+            t = update(msg);
+            askToStop();
+            break;
+
         case Connection.REPLY_TAG:
             // A reply.  Always respond, even when failing, so as to
             // unblock the waiting thread.
@@ -430,30 +428,27 @@ final class ReceivingThread extends Thread {
      * @throws XMLStreamException if a problem occured during parsing.
      */
     private void listen() throws IOException, SAXException, XMLStreamException {
-        in.enable();
-
-        // Open a rewindable stream
-        final int LOOK_AHEAD = Connection.BUFFER_SIZE;
-        BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
+        this.in.enable();
+        this.in.mark(Connection.BUFFER_SIZE);
 
         // Start using FreeColXMLReader.  This must grow.
+        String tag = null;
+        int replyId = -1;
         FreeColXMLReader xr = null;
-        bis.mark(LOOK_AHEAD);
         try {
-            xr = new FreeColXMLReader(bis); //.setTracing(true);
-            String tag = peek(xr);
-            int replyId = -1;
-            if (TrivialMessage.DISCONNECT_TAG.equals(tag)) {
-                // Could not read tag, or real disconnect.
-                // Signal stop, and do *not* try to read reply id, it will fail
-                askToStop();
-            } else {
-                replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
-            }
-            handle(bis, tag, replyId);
+            xr = new FreeColXMLReader(this.in); //.setTracing(true);
+            xr.nextTag();
+            tag = xr.getLocalName();
+            replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
+        } catch (XMLStreamException xse) {
+            tag = TrivialMessage.DISCONNECT_TAG;
         } finally {
             if (xr != null) xr.close();
         }
+            
+        this.in.reset();
+        this.in.enable();
+        handle(this.in, tag, replyId);
     }
 
 
