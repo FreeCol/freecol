@@ -33,9 +33,9 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.option.GameOptions;
-import net.sf.freecol.common.util.RandomChoice;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.common.util.RandomChoice;
 
 
 /**
@@ -604,13 +604,14 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
+        final Tile tile = getTile();
         if (isRiver()) {
             // @compat 0.11.5 Prevent NPE, TileItemContainer rechecks this.
             if (style == null) {
-                result = Math.min(-1, result);
-                return result;
+                lb.add("\n  Broken null style river at ", tile);
+                return -1;
             }
             // end @compat 0.11.5
 
@@ -627,22 +628,28 @@ public class TileImprovement extends TileItem implements Named {
                 if (conns.charAt(i) != '0') {
                     if (river != null) {
                         if (!river.isConnectedTo(dReverse)) {
-                            logger.warning("Broken river connection to " + d
-                                + " at " + tile);
                             if (fix) {
                                 setConnected(d, false);
+                                lb.add("\n  Removed broken river connection to ",
+                                    d, " at ", tile);
                                 result = Math.min(0, result);
-                            } else
-                                result = Math.min(-1, result);
+                            } else {
+                                lb.add("\n  Broken river connection to ", d,
+                                    " at ", tile);
+                                result = -1;
+                            }
                         }
                     } else if (t == null || !t.getType().isWater()) {
-                        logger.warning("Broken river connection to " + d
-                            + " at " + tile);
                         if (fix) {
                             setConnected(d, false);
+                            lb.add("\n  Removed broken river connection to ",
+                                d, " at ", tile);
                             result = Math.min(0, result);
-                        } else
-                            result = Math.min(-1, result);
+                        } else {
+                            lb.add("\n  Broken river connection to ", d,
+                                " at ", tile);
+                            result = -1;
+                        }
                     }
                 }
                 i++;
@@ -656,16 +663,16 @@ public class TileImprovement extends TileItem implements Named {
                 TileImprovementStyle oldStyle = style;
                 updateRoadConnections(true);
                 if (style != oldStyle) {
-                    logger.warning("Fixing bad road style from " + oldStyle
-                        + " to " + style + " at " + tile);
+                    lb.add("\n  Bad road style from ", oldStyle,
+                        " to ", style, " fixed at ", tile);
                     result = Math.min(0, result);
                 }
             }
             if (style == null) {
-                logger.warning("Broken road having null style at " + tile);
-                result = Math.min(-1, result);
+                lb.add("\n  Broken road with null style at ", tile);
+                result = -1;
             }
-            // end @compat
+            // end @compat 0.11.6
         }
         return result;
     }

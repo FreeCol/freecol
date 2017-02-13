@@ -224,13 +224,13 @@ public abstract class FreeColGameObject extends FreeColObject {
      * Checks the integrity of this game object.
      *
      * @param fix If true, fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return -1 if there are problems remaining, zero if problems
+     *     were fixed, +1 if no problems found at all.
      */
-    public int checkIntegrity(boolean fix) {
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
         return 1;
     }
-
 
     // Override FreeColObject
 

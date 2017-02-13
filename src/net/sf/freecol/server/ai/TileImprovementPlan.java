@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -268,19 +269,21 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
-     * Checks the integrity of a this TileImprovementPlan.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         if (pioneer != null) {
-            result = Math.min(result, pioneer.checkIntegrity(fix));
+            result = Math.min(result, pioneer.checkIntegrity(fix, lb));
         }
-        if (type == null || target == null) result = -1;
+        if (type == null) {
+            lb.add("\n  Tile improvement plan without type: ", getId());
+            result = -1;
+        } else if (target == null) {
+            lb.add("\n  Tile improvement plan without target: ", getId());
+            result = -1;
+        }
         return result;
     }
 

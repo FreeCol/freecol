@@ -351,37 +351,41 @@ public class AIMain extends FreeColObject
     }
     
     /**
-     * Checks the integrity of this {@code AIMain} by checking if
-     * there are any invalid objects.
+     * Check the AI integrity too.
      *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * @param fix If true, fix problems if possible.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return -1 if there are problems remaining, zero if problems
+     *     were fixed, +1 if no problems found at all.
      */
-    public int checkIntegrity(boolean fix) {
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
         int result = 1;
         for (AIObject aio : getAIObjects()) {
-            int integ = aio.checkIntegrity(fix);
-            if (integ < 0 && fix) {
-                logger.warning("Invalid AIObject: " + aio.getId()
-                    + " (" + lastPart(aio.getClass().getName(), ".")
-                    + "), dropping.");
-                removeAIObject(aio.getId());
-                aio.dispose();
-                integ = 0;
+            int integ = aio.checkIntegrity(fix, lb);
+            if (integ < 0) {
+                if (fix) {
+                    lb.add("\n  Invalid AIObject dropped: ", aio.getId(),
+                        "(", lastPart(aio.getClass().getName(), "."), ")");
+                    removeAIObject(aio.getId());
+                    aio.dispose();
+                    result = Math.min(result, 0);
+                } else {
+                    lb.add("\n  Invalid AIObject: ", aio.getId(),
+                        "(", lastPart(aio.getClass().getName(), "."), ")");
+                    result = -1;
+                }
             }
-            result = Math.min(result, integ);
         }
 
         for (FreeColGameObject fcgo : getGame().getFreeColGameObjectList()) {
             if (shouldHaveAIObject(fcgo)
                 && getAIObject(fcgo.getId()) == null) {
                 if (fix) {
-                    logger.warning("Added missing AIObject for: " + fcgo.getId());
+                    lb.add("\n  Missing AIObject added: ", fcgo.getId());
                     setFreeColGameObject(fcgo.getId(), fcgo);
-                    result = 0;
+                    result = Math.min(result, 0);
                 } else {
-                    logger.warning("Missing AIObject for: " + fcgo.getId());
+                    lb.add("\n  Missing AIObject: ", fcgo.getId());
                     result = -1;
                 }
             }

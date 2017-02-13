@@ -42,6 +42,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
@@ -2323,14 +2324,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         Settlement settlement = getSettlement();
         if (settlement != null) {
-            result = Math.min(result, settlement.checkIntegrity(fix));
+            result = Math.min(result, settlement.checkIntegrity(fix, lb));
         }
         if (tileItemContainer != null) {
-            result = Math.min(result, tileItemContainer.checkIntegrity(fix));
+            result = Math.min(result, tileItemContainer.checkIntegrity(fix, lb));
         }
         return result;
     }

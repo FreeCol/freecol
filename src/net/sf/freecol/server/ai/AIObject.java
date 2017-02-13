@@ -27,6 +27,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -141,15 +142,30 @@ public abstract class AIObject extends FreeColObject {
     // Other low level
 
     /**
-     * Checks the integrity of this AI object.
-     * Subclasses should extend.
+     * AIObjects need integrity checking too.
+     *
+     * @param fix If true, fix problems if possible.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return -1 if there are problems remaining, zero if problems
+     *     were fixed, +1 if no problems found at all.
+     */
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        if (isUninitialized()) {
+            lb.add("\n  Uninitialized AI Object: ", getId());
+            return -1;
+        }
+        return 1;
+    }
+
+    /**
+     * Just do the check, short cut the logging.
      *
      * @param fix Fix problems if possible.
      * @return Negative if there are problems remaining, zero if
      *     problems were fixed, positive if no problems found at all.
      */
     public int checkIntegrity(boolean fix) {
-        return (isUninitialized()) ? -1 : 1;
+        return checkIntegrity(fix, new LogBuilder(-1));
     }
 
 

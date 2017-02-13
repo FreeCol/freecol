@@ -176,16 +176,18 @@ public class GoodsWish extends Wish {
     }
 
     /**
-     * Checks the integrity of this AI object.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
-        if (goodsType == null || amountRequested <= 0) result = -1;
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
+        if (goodsType == null) {
+            lb.add("\n  GoodsWish without type: ", getId());
+            result = -1;
+        } else if (amountRequested <= 0) {
+            lb.add("\n  GoodsWish with non-positive requested: ", getId());
+            result = -1;
+        }            
         return result;
     }
 

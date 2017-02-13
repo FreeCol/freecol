@@ -150,16 +150,15 @@ public class WorkerWish extends Wish {
     // Override AIObject
 
     /**
-     * Checks the integrity of this AI object.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
-        if (unitType == null) result = -1;
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
+        if (unitType == null) {
+            lb.add("\n  Wish unit without type: ", getId());
+            result = -1;
+        }
         return result;
     }
 

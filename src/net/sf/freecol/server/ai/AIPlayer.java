@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -244,16 +245,16 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Checks the integrity of this AIPlayer.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
-        if (player == null || player.isDisposed() || !player.isAI()) {
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
+        if (player == null || player.isDisposed()) {
+            lb.add("\n  AIPlayer without underlying player: ", getId());
+            result = -1;
+        } else if (!player.isAI()) {
+            lb.add("\n  AIPlayer that is not an AI: ", getId());
             result = -1;
         }
         return result;

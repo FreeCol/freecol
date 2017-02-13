@@ -48,6 +48,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -3744,23 +3745,23 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         for (Unit unit : getUnitList()) {
             if (unit.getOwner() == null) {
                 if (fix) {
                     unit.setOwner(this);
-                    logger.warning("Fixed missing owner for: " + unit.getId());
-                    result = 0;
+                    lb.add("\n  Unit without owner assigned: ", unit.getId());
+                    result = Math.min(result, 0);
                 } else {
-                    logger.warning("Missing owner for: " + unit.getId());
+                    lb.add("\n  Unit without owner: ", unit.getId());
                     result = -1;
                 }
             }
-            result = Math.min(result, unit.checkIntegrity(fix));
+            result = Math.min(result, unit.checkIntegrity(fix, lb));
         }
         if (monarch != null) {
-            result = Math.min(result, monarch.checkIntegrity(fix));
+            result = Math.min(result, monarch.checkIntegrity(fix, lb));
         }
         return result;
     }

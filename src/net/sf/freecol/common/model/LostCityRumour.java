@@ -34,9 +34,10 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import static net.sf.freecol.common.util.StringUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -372,8 +373,13 @@ public class LostCityRumour extends TileItem {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        return (type == RumourType.NO_SUCH_RUMOUR) ? -1 : 1;
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
+        if (type == RumourType.NO_SUCH_RUMOUR) {
+            lb.add("\n  Rumour with null type: ", getId());
+            result = -1;
+        }
+        return result;
     }
 
 

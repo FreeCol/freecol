@@ -28,6 +28,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -145,20 +146,14 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Checks the integrity of a {@code Wish}.
-     * The destination must be neither null nor disposed, the
-     * transportable may be null but must otherwise be intact.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         if (transportable != null) {
             result = Math.min(result, 
-                              transportable.checkIntegrity(fix));
+                              transportable.checkIntegrity(fix, lb));
         }
         if (destination == null
             || ((FreeColGameObject)destination).isDisposed()) {

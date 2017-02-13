@@ -414,7 +414,7 @@ public class ServerColony extends Colony implements TurnTaker {
         if (canBuild(type)) {
             final ServerPlayer owner = (ServerPlayer)getOwner();
             buildBuilding(new ServerBuilding(getGame(), this, type));//-til
-            checkBuildQueueIntegrity(true);
+            checkBuildQueueIntegrity(true, null);
             cs.add(See.only(owner), this);
             if (owner.isAI()) {
                 firePropertyChange(Colony.REARRANGE_COLONY, true, false);
@@ -502,7 +502,7 @@ public class ServerColony extends Colony implements TurnTaker {
         if (!removeBuilding(building)) return false;
         getTile().cacheUnseen(copied);
         invalidateCache();
-        checkBuildQueueIntegrity(true);
+        checkBuildQueueIntegrity(true, null);
         return true;
     }
 
@@ -818,7 +818,7 @@ public class ServerColony extends Colony implements TurnTaker {
             buildBuilding(new ServerBuilding(getGame(), this,
                                              buildingType));//-til
         }
-        checkBuildQueueIntegrity(true);
+        checkBuildQueueIntegrity(true, null);
 
         // If a build queue is empty, check that we are not producing
         // any goods types useful for BuildableTypes, except if that

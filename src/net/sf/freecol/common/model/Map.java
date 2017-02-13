@@ -2503,13 +2503,13 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         final int hgt = getHeight(), wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
                 Tile t = this.tiles[x][y];
-                result = Math.min(result, t.checkIntegrity(fix));
+                result = Math.min(result, t.checkIntegrity(fix, lb));
             }
         }
         return result;

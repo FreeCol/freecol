@@ -757,16 +757,13 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
     }
 
     /**
-     * Checks the integrity of this AIUnit.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         if (unit == null || unit.isDisposed()) {
+            lb.add("\n  AIUnit without underlying unit: ", getId());
             result = -1;
         }
         return result;

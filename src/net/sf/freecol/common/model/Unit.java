@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -4144,15 +4145,15 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         if (this.role == null) {
             if (fix) {
                 this.role = getSpecification().getDefaultRole();
-                logger.warning("Fixed missing role for: " + getId());
-                result = 0;
+                lb.add("\n  Missing role set to default for: ", getId());
+                result = Math.min(result, 0);
             } else {
-                logger.warning("Missing role for: " + getId());
+                lb.add("\n  Missing role for: ", getId());
                 result = -1;
             }
         }
@@ -4160,12 +4161,11 @@ public class Unit extends GoodsLocation
             if (!((FreeColGameObject)this.destination).isInitialized()) {
                 if (fix) {
                     this.destination = null;
-                    logger.warning("Cleared uninitialized destination for: "
-                        + getId());
+                    lb.add("\n  Uninitialized destination cleared for: ",
+                        getId());
                     result = Math.min(result, 0);
                 } else {
-                    logger.warning("Uninitialized destination for: "
-                        + getId());
+                    lb.add("\n  Uninitialized destination for: ", getId());
                     result = -1;
                 }
             }
@@ -4176,11 +4176,11 @@ public class Unit extends GoodsLocation
             // improvement.
             if (fix) {
                 this.state = UnitState.ACTIVE;
-                logger.warning("Made improving unit active: " + getId());
+                lb.add("\n  Improving unit without improvement made active: ",
+                    getId());
                 result = Math.min(result, 0);
             } else {
-                logger.warning("Improving unit with no improvement: "
-                    + getId());
+                lb.add("\n  Improving unit without improvement: ", getId());
                 result = -1;
             }
         }

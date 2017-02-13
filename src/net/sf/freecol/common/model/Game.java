@@ -1279,10 +1279,8 @@ public class Game extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
-        LogBuilder lb = new LogBuilder(512);
-        lb.add("Uninitialized game ids: ");
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         lb.mark();
         synchronized (freeColGameObjects) {
             Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
@@ -1304,17 +1302,16 @@ public class Game extends FreeColGameObject {
                 }
             }
         }
-        if (lb.grew()) {
+        if (lb.grew("\n  Uninitialized game ids: ")) {
             if (fix) lb.add(" (dropped)");
-            lb.log(logger, Level.WARNING);
         }
 
         Map map = getMap();
         if (map != null) {
-            result = Math.min(result, getMap().checkIntegrity(fix));
+            result = Math.min(result, getMap().checkIntegrity(fix, lb));
         }
         for (Player player : getPlayerList()) {
-            result = Math.min(result, player.checkIntegrity(fix));
+            result = Math.min(result, player.checkIntegrity(fix, lb));
         }
         return result;
     }

@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Map.Layer;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -270,8 +271,13 @@ public class Resource extends TileItem {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        return (type == null) ? -1 : 1;
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
+        if (type == null) {
+            lb.add("\n  Resource without type: ", getId());
+            result = -1;
+        }
+        return result;
     }
 
 

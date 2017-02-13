@@ -348,15 +348,11 @@ public class AIGoods extends TransportableAIObject {
     }
 
     /**
-     * Checks the integrity of a this AIGoods.
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         String why = (result < 0) ? "super"
             : (goods == null) ? "null-goods"
             : (goods.getType() == null) ? "null-goods-type"
@@ -367,15 +363,15 @@ public class AIGoods extends TransportableAIObject {
         if (destination != null
             && ((FreeColGameObject)destination).isDisposed()) {
             if (fix) {
-                logger.warning("Fixing disposed destination for " + this);
+                lb.add("\n  Fixing disposed destination for: ", getId());
                 destination = null;
-                if (result > 0) result = 0;
+                result = Math.min(result, 0);
             } else {
                 why = "disposed-destination";
             }
         }
         if (why != null) {
-            logger.finest("checkIntegrity(" + this + ") = " + why);
+            lb.add("\n  AIGoods with ", why, ": ", getId());
             result = -1;
         }
         return result;

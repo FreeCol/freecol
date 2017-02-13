@@ -32,6 +32,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Layer;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -530,10 +531,10 @@ public class TileItemContainer extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         for (TileItem ti : getTileItems()) {
-            int integ = ti.checkIntegrity(fix);
+            int integ = ti.checkIntegrity(fix, lb);
             if (fix) {
                 // There might still be maps floating around with
                 // rivers that go nowhere.

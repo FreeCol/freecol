@@ -1375,16 +1375,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Checks the integrity of a this AIColony
-     *
-     * @param fix Fix problems if possible.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
-        if (colony == null || colony.isDisposed()) result = -1;
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
+        if (colony == null || colony.isDisposed()) {
+            lb.add("\n  Null colony: ", getId());
+            result = -1;
+        }
         return result;
     }
 

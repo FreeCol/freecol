@@ -1039,12 +1039,19 @@ public final class FreeColServer {
         throws FreeColException, IOException, XMLStreamException {
         changeServerState(ServerState.LOAD_GAME);
         ServerGame serverGame = readGame(fis, specification, this);
-        this.integrity = serverGame.checkIntegrity(true);
-        if (integrity < 0) {
-            logger.warning("Game integrity test failed.");
-        } else {
-            logger.info("Game integrity test "
-                + ((integrity > 0) ? "succeeded." : "failed, but fixed."));
+        LogBuilder lb = new LogBuilder(512);
+        this.integrity = serverGame.checkIntegrity(true, lb);
+        switch (integrity) {
+        case 1:
+            logger.info("Game integrity test succeeded.");
+            break;
+        case 0:
+            logger.info("Game integrity test failed, but fixed."
+                + lb.toString());
+            break;
+        default:
+            logger.warning("Game integrity test failed." + lb.toString());
+            break;
         }
 
         int savegameVersion = fis.getSavegameVersion();
@@ -1058,15 +1065,29 @@ public final class FreeColServer {
 
         // AI initialization.
         AIMain aiMain = getAIMain();
-        int aiIntegrity = (aiMain == null) ? -1 : aiMain.checkIntegrity(true);
-        if (aiIntegrity < 0) {
+        lb.truncate(0);
+        int aiIntegrity;
+        if (aiMain == null) {
+            aiIntegrity = -1;
+            lb.add("\n  AIMain missing.");
+        } else {
+            aiIntegrity = aiMain.checkIntegrity(true, lb);
+        }
+        switch (aiIntegrity) {
+        case 1:
+            logger.info("AI integrity test succeeded.");
+            break;
+        case 0:
+            logger.info("AI integrity test failed, but fixed."
+                + lb.toString());
+            break;
+        default:
             aiMain = new AIMain(this);
             aiMain.findNewObjects(true);
             setAIMain(aiMain);
-            logger.warning("AI integrity test failed, replaced AIMain.");
-        } else {
-            logger.info("AI integrity test "
-                + ((aiIntegrity > 0) ? "succeeded" : "failed, but fixed"));
+            logger.warning("AI integrity test failed, replaced AIMain."
+                + lb.toString());
+            break;
         }
         serverGame.setFreeColGameObjectListener(aiMain);
 

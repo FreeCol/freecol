@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Map.Layer;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -213,10 +214,10 @@ public abstract class TileItem extends FreeColGameObject
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
+    public int checkIntegrity(boolean fix, LogBuilder lb) {
+        int result = super.checkIntegrity(fix, lb);
         if (this.tile == null) {
-            logger.warning("Tile item with no tile: " + this.getId());
+            lb.add("\n  Tile item with no tile: ", this.getId());
             return -1;
         }
         return result;
