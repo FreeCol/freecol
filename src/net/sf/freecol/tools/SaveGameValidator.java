@@ -61,8 +61,9 @@ public class SaveGameValidator {
             }
         }
 
+        int ret = 0;
         for (File file : allFiles) {
-            System.out.println("Processing file " + file.getPath());
+            //System.out.println("Processing file " + file.getPath());
             try {
                 FreeColSavegameFile mapFile = new FreeColSavegameFile(file);
                 saveGameValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
@@ -71,10 +72,13 @@ public class SaveGameValidator {
                 System.out.println(e.getMessage() 
                                    + " at line=" + e.getLineNumber() 
                                    + " column=" + e.getColumnNumber());
+                ret = Math.max(ret, 1);
             } catch (IOException | SAXException e) {
                 System.out.println("Failed to read " + file.getName());
+                ret = 2;
             }
         }
+        System.exit(ret);
     }
 
 }
