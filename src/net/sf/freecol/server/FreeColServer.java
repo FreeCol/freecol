@@ -264,13 +264,8 @@ public final class FreeColServer {
                 ret = new Server(this, host, port);
                 ret.start();
                 break;
-            } catch (BindException be) {
-                if (i == 1) {
-                    throw new IOException("Bind exception starting server at: "
-                        + host + ":" + port, be);
-                }
             } catch (IOException ie) {
-                if (i == 1) throw ie;
+                if (i <= 1) throw ie; // Give up at last try
             }
             port++;
         }
