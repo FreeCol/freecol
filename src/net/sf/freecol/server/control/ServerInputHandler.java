@@ -32,8 +32,9 @@ import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
+import net.sf.freecol.common.networking.LogoutMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -120,16 +121,16 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     }
 
     /**
-     * Wrapper for new message handling.
+     * Internal wrapper for new message handling.
      *
      * @param current If true, insist the message is from the current player
      *     in the game.
      * @param connection The {@code Connection} the message arrived on.
      * @param message The {@code DOMMessage} to handle.
-     * @return The resulting reply {@code Element}.
+     * @return The resulting reply {@code Message}.
      */
-    protected Element handler(boolean current, Connection connection,
-                              DOMMessage message) {
+    private Message internalHandler(boolean current, Connection connection,
+                                    DOMMessage message) {
         final FreeColServer freeColServer = getFreeColServer();
         final ServerPlayer serverPlayer = freeColServer.getPlayer(connection);
         final Game game = freeColServer.getGame();
@@ -141,6 +142,20 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         return (cs == null) ? null : cs.build(serverPlayer);
     }
 
+    /**
+     * Wrapper for new message handling.
+     *
+     * @param current If true, insist the message is from the current player
+     *     in the game.
+     * @param connection The {@code Connection} the message arrived on.
+     * @param message The {@code DOMMessage} to handle.
+     * @return The resulting reply {@code Element}.
+     */
+    protected Element handler(boolean current, Connection connection,
+                              DOMMessage message) {
+        Message m = internalHandler(current, connection, message);
+        return (m == null) ? null : ((DOMMessage)m).toXMLElement();
+    }
 
     // Implement DOMMessageHandler
 

@@ -48,12 +48,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.server.model.ServerPlayer;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 
 
 /**
@@ -270,19 +265,6 @@ public class ChangeSet {
          * @return A specialized {@code DOMMessage}.
          */
         public abstract T toMessage(ServerPlayer serverPlayer);
-            
-        /**
-         * Specialize a Change for a particular player.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to update.
-         * @param doc The owner {@code Document} to build the element in.
-         * @return An {@code Element} encapsulating this change.
-         */
-        public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            T message = toMessage(serverPlayer);
-            return (message == null) ? null
-                : ((DOMMessage)message).attachToDocument(doc);
-        }
     }
 
     /**
@@ -1509,79 +1491,17 @@ public class ChangeSet {
     }
 
 
-    // Conversion of a change set to a corresponding element.
+    // Conversion of a change set to a corresponding message to a
+    // specific plater.
 
     /**
-     * Collapse one element into another.
-     *
-     * @param head The {@code Element} to collapse into.
-     * @param tail The {@code Element} to extract nodes from.
-     */
-    private static void collapseElements(Element head, Element tail) {
-        while (tail.hasChildNodes()) {
-            head.appendChild(tail.removeChild(tail.getFirstChild()));
-        }
-    }
-
-    /**
-     * Can two elements be collapsed?
-     * They need to have the same name and attributes.
-     *
-     * @param e1 The first {@code Element}.
-     * @param e2 The second {@code Element}.
-     * @return True if they can be collapsed.
-     */
-    private static boolean collapseOK(Element e1, Element e2) {
-        if (!e1.getTagName().equals(e2.getTagName())) return false;
-        NamedNodeMap nnm1 = e1.getAttributes();
-        NamedNodeMap nnm2 = e2.getAttributes();
-        if (nnm1.getLength() != nnm2.getLength()) return false;
-        for (int i = 0; i < nnm1.getLength(); i++) {
-            if (nnm1.item(i).getNodeType() != nnm2.item(i).getNodeType()) {
-                return false;
-            }
-            if (!nnm1.item(i).getNodeName().equals(nnm2.item(i).getNodeName())) {
-                return false;
-            }
-            if (!nnm1.item(i).getNodeValue().equals(nnm2.item(i).getNodeValue())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Collapse adjacent elements in a list with the same tag.
-     *
-     * @param elements The list of {@code Element}s to consider.
-     * @return A collapsed list of elements.
-     */
-    private static List<Element> collapseElementList(List<Element> elements) {
-        List<Element> results = new ArrayList<>();
-        if (!elements.isEmpty()) {
-            Element head = elements.remove(0);
-            while (!elements.isEmpty()) {
-                Element e = elements.remove(0);
-                if (collapseOK(head, e)) {
-                    collapseElements(head, e);
-                } else {
-                    results.add(head);
-                    head = e;
-                }
-            }
-            results.add(head);
-        }
-        return results;
-    }
-
-    /**
-     * Build a generalized update.
+     * Build an update message.
      *
      * @param serverPlayer The {@code ServerPlayer} to send the update to.
      * @return A {@code Message} encapsulating an update of the objects to
      *     consider, or null if there is nothing to report.
      */
-    public Message buildMessage(ServerPlayer serverPlayer) {
+    public Message build(ServerPlayer serverPlayer) {
         if (this.changes.isEmpty()) return null;
 
         // Convert eligible changes to messages and sort by priority,
@@ -1640,22 +1560,6 @@ public class ChangeSet {
         }
 
         return ret;
-    }
-        
-    /**
-     * Build a generalized update.
-     * Beware that removing an object does not necessarily update
-     * its tile correctly on the client side--- if a tile update
-     * is needed the tile should be supplied in the objects list.
-     *
-     * @param serverPlayer The {@code ServerPlayer} to send the
-     *            update to.
-     * @return An element encapsulating an update of the objects to
-     *         consider, or null if there is nothing to report.
-     */
-    public Element build(ServerPlayer serverPlayer) {
-        DOMMessage m = (DOMMessage)buildMessage(serverPlayer);
-        return (m == null) ? null : m.toXMLElement();
     }
 
 
