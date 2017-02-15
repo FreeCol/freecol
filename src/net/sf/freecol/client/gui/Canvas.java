@@ -913,14 +913,7 @@ public final class Canvas extends JDesktopPane {
                 return null;
             }
         } catch (Exception e) {}
-
-        String className = comp.getClass().getName();
-        try {
-            return new Point(co.getInteger(className + ".x"),
-                             co.getInteger(className + ".y"));
-        } catch (Exception e) {
-            return null;
-        }
+        return co.getPanelPosition(comp.getClass().getName());
     }
 
     /**
@@ -938,14 +931,7 @@ public final class Canvas extends JDesktopPane {
                 return null;
             }
         } catch (Exception e) {}
-
-        String className = comp.getClass().getName();
-        try {
-            return new Dimension(co.getInteger(className + ".w"),
-                                 co.getInteger(className + ".h"));
-        } catch (Exception e) {
-            return null;
-        }
+        return co.getPanelSize(comp.getClass().getName());
     }
 
     /**

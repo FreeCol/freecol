@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client;
 
+import java.awt.Dimension;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -772,6 +774,40 @@ public class ClientOptions extends OptionGroup {
             op.setValue(val);
             add(op);
         }
+    }
+
+    /**
+     * Extract the panel position options for a given panel class name
+     * as a point.
+     *
+     * @param className The panel class name.
+     * @return A {@code Point} for the position if found, else null.
+     */
+    public Point getPanelPosition(String className) {
+        OptionGroup etc = getOptionGroup(ETC);
+        if (etc == null) return null;
+        try {
+            return new Point(etc.getInteger(className + ".x"),
+                             etc.getInteger(className + ".y"));
+        } catch (Exception e) {}
+        return null;
+    }
+
+    /**
+     * Extract the panel size options for a given panel class name as
+     * a dimension.
+     *
+     * @param className The panel class name.
+     * @return A {@code Dimension} for the size if found, else null.
+     */
+    public Dimension getPanelSize(String className) {
+        OptionGroup etc = getOptionGroup(ETC);
+        if (etc == null) return null;
+        try {
+            return new Dimension(etc.getInteger(className + ".w"),
+                                 etc.getInteger(className + ".h"));
+        } catch (Exception e) {}
+        return null;
     }
 
 
