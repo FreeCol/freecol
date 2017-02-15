@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 /**
  * Handle network messages sent to the meta-server.
  */
-public final class NetworkHandler implements MessageHandler {
+public final class NetworkHandler implements DOMMessageHandler {
     private static final Logger logger = Logger.getLogger(NetworkHandler.class.getName());
 
     /** The encapsulated meta-server. */

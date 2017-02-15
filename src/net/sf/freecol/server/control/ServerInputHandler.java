@@ -33,7 +33,7 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
-import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -48,14 +48,14 @@ import org.w3c.dom.Element;
  * @see Controller
  */
 public abstract class ServerInputHandler extends FreeColServerHolder
-    implements MessageHandler {
+    implements DOMMessageHandler {
 
     private static final Logger logger = Logger.getLogger(ServerInputHandler.class.getName());
 
     /**
      * A network request handler knows how to handle in a given request type.
      */
-    public interface NetworkRequestHandler {
+    public interface DOMNetworkRequestHandler {
 
         /**
          * Handle a request represented by an {@link Element} and
@@ -72,8 +72,8 @@ public abstract class ServerInputHandler extends FreeColServerHolder
      * The handler map provides named handlers for network
      * requests.  Each handler deals with a given request type.
      */
-    private final Map<String, NetworkRequestHandler> handlerMap
-        = Collections.synchronizedMap(new HashMap<String, NetworkRequestHandler>());
+    private final Map<String, DOMNetworkRequestHandler> handlerMap
+        = Collections.synchronizedMap(new HashMap<String, DOMNetworkRequestHandler>());
 
 
     /**
@@ -102,9 +102,9 @@ public abstract class ServerInputHandler extends FreeColServerHolder
      * Register a network request handler.
      * 
      * @param name The handler name.
-     * @param handler The {@code NetworkRequestHandler} to register.
+     * @param handler The {@code DOMNetworkRequestHandler} to register.
      */
-    protected final void register(String name, NetworkRequestHandler handler) {
+    protected final void register(String name, DOMNetworkRequestHandler handler) {
         this.handlerMap.put(name, handler);
     }
 
@@ -112,10 +112,10 @@ public abstract class ServerInputHandler extends FreeColServerHolder
      * Unregister a network request handler.
      * 
      * @param name The handler name.
-     * @param handler The {@code NetworkRequestHandler} to unregister.
+     * @param handler The {@code DOMNetworkRequestHandler} to unregister.
      * @return True if the supplied handler was actually removed.
      */
-    protected final boolean unregister(String name, NetworkRequestHandler handler) {
+    protected final boolean unregister(String name, DOMNetworkRequestHandler handler) {
         return this.handlerMap.remove(name, handler);
     }
 
@@ -142,7 +142,7 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     }
 
 
-    // Implement MessageHandler
+    // Implement DOMMessageHandler
 
     /**
      * {@inheritDoc}
@@ -151,7 +151,7 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         if (element == null) return null;
         final FreeColServer freeColServer = getFreeColServer();
         final String tag = element.getTagName();
-        final NetworkRequestHandler handler = handlerMap.get(tag);
+        final DOMNetworkRequestHandler handler = handlerMap.get(tag);
         Element ret = null;
 
         if (handler == null) {

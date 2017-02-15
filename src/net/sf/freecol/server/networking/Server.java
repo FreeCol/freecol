@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.DOMMessageHandler;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 
@@ -160,13 +160,13 @@ public final class Server extends Thread {
     }
 
     /**
-     * Sets the specified {@code MessageHandler} to all connections.
+     * Sets the specified {@code DOMMessageHandler} to all connections.
      *
-     * @param mh The {@code MessageHandler} to use.
+     * @param mh The {@code DOMMessageHandler} to use.
      */
-    public void setMessageHandlerToAllConnections(MessageHandler mh) {
+    public void setDOMMessageHandlerToAllConnections(DOMMessageHandler mh) {
         for (Connection c : this.connections.values()) {
-            c.setMessageHandler(mh);
+            c.setDOMMessageHandler(mh);
         }
     }
 

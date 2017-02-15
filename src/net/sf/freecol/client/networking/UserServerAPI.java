@@ -24,7 +24,7 @@ import java.io.IOException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
 
 
@@ -50,7 +50,7 @@ public class UserServerAPI extends ServerAPI {
     private int port = -1;
 
     /** The last message handler specified. */
-    private MessageHandler messageHandler = null;
+    private DOMMessageHandler domMessageHandler = null;
 
 
     /**
@@ -82,7 +82,7 @@ public class UserServerAPI extends ServerAPI {
         for (int i = tries; i > 0; i--) {
             try {
                 this.connection = new Connection(host, port,
-                                                 this.messageHandler, name);
+                                                 this.domMessageHandler, name);
                 if (this.connection != null) {
                     // Connected, save the connection information
                     this.name = name;
@@ -126,8 +126,8 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     @Override
-    public void setMessageHandler(MessageHandler mh) {
-        super.setMessageHandler(mh);
-        this.messageHandler = mh;
+    public void setDOMMessageHandler(DOMMessageHandler mh) {
+        super.setDOMMessageHandler(mh);
+        this.domMessageHandler = mh;
     }
 }
