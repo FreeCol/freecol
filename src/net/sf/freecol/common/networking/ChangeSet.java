@@ -61,6 +61,13 @@ import org.w3c.dom.NamedNodeMap;
  */
 public class ChangeSet {
 
+    /** Result of a visibility check. */
+    private enum SeeCheck {
+        VISIBLE,
+        INVISIBLE,
+        SPECIAL;
+    }
+    
     /** The changes to send. */
     private final List<Change> changes;
 
@@ -87,16 +94,18 @@ public class ChangeSet {
          *
          * @param player The {@code ServerPlayer} to consider.
          * @param perhapsResult The result if the visibility is ambiguous.
-         * @return True if the player satisfies the visibility test.
+         * @return If the player satisfies the visibility test return VISIBLE,
+         *     or INVISIBLE on failure, or SPECIAL if indeterminate.
          */
-        public boolean check(ServerPlayer player, boolean perhapsResult) {
-            return (player == null) ? (type == ALL)
-                : (seeNever == player) ? false
-                : (seeAlways == player) ? true
-                : (seePerhaps == player) ? perhapsResult
-                : (type == ALL) ? true
-                : (type == ONLY) ? false
-                : perhapsResult;
+        public SeeCheck check(ServerPlayer player) {
+            return (player == null)
+                ? ((type == ALL) ? SeeCheck.VISIBLE : SeeCheck.INVISIBLE)
+                : (player == seeNever) ? SeeCheck.INVISIBLE
+                : (player == seeAlways) ? SeeCheck.VISIBLE
+                : (player == seePerhaps) ? SeeCheck.SPECIAL
+                : (type == ALL) ? SeeCheck.VISIBLE
+                : (type == ONLY) ? SeeCheck.INVISIBLE
+                : SeeCheck.SPECIAL;
         }
 
         // Use these public constructor-like functions to define the
@@ -213,6 +222,16 @@ public class ChangeSet {
 
 
         /**
+         * Check this changes visibility to a given player.
+         *
+         * @param serverPlayer The {@code ServerPlayer} to check.
+         * @return The visibility result.
+         */
+        protected SeeCheck check(ServerPlayer serverPlayer) {
+            return this.see.check(serverPlayer);
+        }
+
+        /**
          * Does this Change operate on the given object?
          *
          * @param fcgo The {@code FreeColGameObject} to check.
@@ -225,26 +244,13 @@ public class ChangeSet {
         /**
          * Should a player be notified of this Change?
          *
+         * Override in subclasses with special cases.
+         *
          * @param serverPlayer The {@code ServerPlayer} to consider.
          * @return True if this {@code Change} should be sent.
          */
         public boolean isNotifiable(ServerPlayer serverPlayer) {
-            return see.check(serverPlayer, isPerhapsNotifiable(serverPlayer));
-        }
-
-        /**
-         * Should a player be notified of a Change for which the
-         * visibility is delegated to the change type, allowing
-         * special change-specific overrides.
-         *
-         * This is false by default, subclasses should override when
-         * special case handling is required.
-         *
-         * @param serverPlayer The {@code ServerPlayer} to consider.
-         * @return False.
-         */
-        public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            return false;
+            return check(serverPlayer) == SeeCheck.VISIBLE;
         }
 
         /**
@@ -354,13 +360,17 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            // Should a player perhaps be notified of this attack?  Do
-            // not just use canSeeUnit because that gives a false
+        public boolean isNotifiable(ServerPlayer serverPlayer) {
+            switch (check(serverPlayer)) {
+            case VISIBLE: return true;
+            case INVISIBLE: return false;
+            case SPECIAL: break;
+            }
+            // Do not just use canSeeUnit because that gives a false
             // negative for units in settlements, which should be
             // animated.
-            return serverPlayer == attacker.getOwner()
-                || serverPlayer == defender.getOwner()
+            return serverPlayer.owns(attacker)
+                || serverPlayer.owns(defender)
                 || (serverPlayer.canSee(attacker.getTile())
                     && serverPlayer.canSee(defender.getTile()));
         }
@@ -474,6 +484,14 @@ public class ChangeSet {
             this.add = add;
         }
 
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isNotifiable(ServerPlayer serverPlayer) {
+            return check(serverPlayer) == SeeCheck.VISIBLE;
+        }
 
         /**
          * {@inheritDoc}
@@ -606,7 +624,12 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
+        public boolean isNotifiable(ServerPlayer serverPlayer) {
+            switch (check(serverPlayer)) {
+            case VISIBLE: return true;
+            case INVISIBLE: return false;
+            case SPECIAL: break;
+            }
             return seeOld(serverPlayer) || seeNew(serverPlayer);
         }
 
@@ -686,7 +709,12 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
+        public boolean isNotifiable(ServerPlayer serverPlayer) {
+            switch (check(serverPlayer)) {
+            case VISIBLE: return true;
+            case INVISIBLE: return false;
+            case SPECIAL: break;
+            }
             if (fcgo == null) return false;
             if (fcgo instanceof Unit) {
                 // Units have a precise test, use that rather than
@@ -907,7 +935,12 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
+        public boolean isNotifiable(ServerPlayer serverPlayer) {
+            switch (check(serverPlayer)) {
+            case VISIBLE: return true;
+            case INVISIBLE: return false;
+            case SPECIAL: break;
+            }
             // Notifiable if the player can see the tile, and there is no
             // other-player settlement present.
             Settlement settlement;
