@@ -1148,6 +1148,23 @@ public class ChangeSet {
     }
 
 
+    /**
+     * Are there changes present?
+     *
+     * @return True if there is no changes present.
+     */
+    public boolean isEmpty() {
+        return this.changes.isEmpty();
+    }
+
+    /**
+     * Clear the current changes.
+     */
+    public void clear() {
+        this.changes.clear();
+    }
+
+
     // Helper routines that should be used to construct a change set.
 
     /**
