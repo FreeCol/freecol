@@ -309,7 +309,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      */
     public boolean send(ChangeSet cs) {
         return (isConnected())
-            ? this.connection.sendAndWaitElement(cs.build(this))
+            ? this.connection.sendAndWaitMessage(cs.buildMessage(this))
             : false;
     }
 

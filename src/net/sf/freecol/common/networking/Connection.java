@@ -549,6 +549,20 @@ public class Connection implements Closeable {
     }
 
     /**
+     * Sends the given message over this connection and waits for
+     * confirmation of reception before returning.
+     *
+     * @param message The {@code Message} to send.
+     * @return True if the message was sent or was null.
+     */
+    public boolean sendAndWaitMessage(Message message) {
+        if (message == null) return true;
+        boolean ret = sendAndWaitElement(((DOMMessage)message).toXMLElement());
+        logger.fine("SendAndWait: " + message.getType());
+        return ret;
+    }
+
+    /**
      * Sends a message to the peer and returns a message in reply.
      *
      * @param game The {@code Game} to create the reply message in.
