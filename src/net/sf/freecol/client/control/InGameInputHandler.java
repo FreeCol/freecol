@@ -136,75 +136,110 @@ public final class InGameInputHandler extends ClientInputHandler {
         super(freeColClient);
 
         register(AddPlayerMessage.TAG,
-            (Connection c, Element e) -> addPlayer(e));
+            (Connection c, Element e) ->
+                addPlayer(new AddPlayerMessage(getGame(), e)));
         register(AnimateAttackMessage.TAG,
-            (Connection c, Element e) -> animateAttack(e));
+            (Connection c, Element e) ->
+                animateAttack(new AnimateAttackMessage(getGame(), e)));
         register(AnimateMoveMessage.TAG,
-            (Connection c, Element e) -> animateMove(e));
+            (Connection c, Element e) ->
+                animateMove(new AnimateMoveMessage(getGame(), e)));
         register(ChatMessage.TAG,
-            (Connection c, Element e) -> chat(e));
+            (Connection c, Element e) ->
+                chat(new ChatMessage(getGame(), e)));
         register(ChooseFoundingFatherMessage.TAG,
-            (Connection c, Element e) -> chooseFoundingFather(e));
+            (Connection c, Element e) ->
+                chooseFoundingFather(new ChooseFoundingFatherMessage(getGame(), e)));
         register(TrivialMessage.CLOSE_MENUS_TAG,
-            (Connection c, Element e) -> closeMenus());
+            (Connection c, Element e) ->
+                closeMenus());
         register(DiplomacyMessage.TAG,
-            (Connection c, Element e) -> diplomacy(e));
+            (Connection c, Element e) ->
+                diplomacy(new DiplomacyMessage(getGame(), e)));
         register(TrivialMessage.DISCONNECT_TAG,
-            (Connection c, Element e) -> disconnect(e));
+            (Connection c, Element e) ->
+                disconnect(TrivialMessage.DISCONNECT_MESSAGE));
         register(ErrorMessage.TAG,
-            (Connection c, Element e) -> error(e));
+            (Connection c, Element e) ->
+                error(new ErrorMessage(getGame(), e)));
         register(FeatureChangeMessage.TAG,
-            (Connection c, Element e) -> featureChange(e));
+            (Connection c, Element e) ->
+                featureChange(new FeatureChangeMessage(getGame(), e)));
         register(FirstContactMessage.TAG,
-            (Connection c, Element e) -> firstContact(e));
+            (Connection c, Element e) ->
+                firstContact(new FirstContactMessage(getGame(), e)));
         register(FountainOfYouthMessage.TAG,
-            (Connection c, Element e) -> fountainOfYouth(e));
+            (Connection c, Element e) ->
+                fountainOfYouth(new FountainOfYouthMessage(getGame(), e)));
         register(GameEndedMessage.TAG,
-            (Connection c, Element e) -> gameEnded(e));
+            (Connection c, Element e) ->
+                gameEnded(new GameEndedMessage(getGame(), e)));
         register(HighScoreMessage.TAG,
-            (Connection c, Element e) -> highScore(e));
+            (Connection c, Element e) ->
+                highScore(new HighScoreMessage(getGame(), e)));
         register(InciteMessage.TAG,
-            (Connection c, Element e) -> incite(e));
+            (Connection c, Element e) ->
+                incite(new InciteMessage(getGame(), e)));
         register(IndianDemandMessage.TAG,
-            (Connection c, Element e) -> indianDemand(e));
+            (Connection c, Element e) ->
+                indianDemand(new IndianDemandMessage(getGame(), e)));
         register(LogoutMessage.TAG,
-            (Connection c, Element e) -> logout(e));
+            (Connection c, Element e) ->
+                logout(new LogoutMessage(getGame(), e)));
         register(LootCargoMessage.TAG,
-            (Connection c, Element e) -> lootCargo(e));
+            (Connection c, Element e) ->
+                lootCargo(new LootCargoMessage(getGame(), e)));
         register(MonarchActionMessage.TAG,
-            (Connection c, Element e) -> monarchAction(e));
+            (Connection c, Element e) ->
+                monarchAction(new MonarchActionMessage(getGame(), e)));
         register(MultipleMessage.TAG,
-            (Connection c, Element e) -> multiple(c, e));
+            (Connection c, Element e) ->
+                multiple(c, e));
         register(NationSummaryMessage.TAG,
-            (Connection c, Element e) -> nationSummary(e));
+            (Connection c, Element e) ->
+                nationSummary(new NationSummaryMessage(getGame(), e)));
         register(NativeTradeMessage.TAG,
-            (Connection c, Element e) -> nativeTrade(e));
+            (Connection c, Element e) ->
+                nativeTrade(new NativeTradeMessage(getGame(), e)));
         register(NewLandNameMessage.TAG,
-            (Connection c, Element e) -> newLandName(e));
+            (Connection c, Element e) ->
+                newLandName(new NewLandNameMessage(getGame(), e)));
         register(NewRegionNameMessage.TAG,
-            (Connection c, Element e) -> newRegionName(e));
+            (Connection c, Element e) ->
+                newRegionName(new NewRegionNameMessage(getGame(), e)));
         register(NewTurnMessage.TAG,
-            (Connection c, Element e) -> newTurn(e));
+            (Connection c, Element e) ->
+                newTurn(new NewTurnMessage(getGame(), e)));
         register(NewTradeRouteMessage.TAG,
-            (Connection c, Element e) -> newTradeRoute(e));
+            (Connection c, Element e) ->
+                newTradeRoute(new NewTradeRouteMessage(getGame(), e)));
         register(TrivialMessage.RECONNECT_TAG,
-            (Connection c, Element e) -> reconnect());
+            (Connection c, Element e) ->
+                reconnect());
         register(RemoveMessage.TAG,
-            (Connection c, Element e) -> remove(e));
+            (Connection c, Element e) ->
+                remove(new RemoveMessage(getGame(), e)));
         register(ScoutSpeakToChiefMessage.TAG,
-            (Connection c, Element e) -> scoutSpeakToChief(e));
+            (Connection c, Element e) ->
+                scoutSpeakToChief(new ScoutSpeakToChiefMessage(getGame(), e)));
         register(SetAIMessage.TAG,
-            (Connection c, Element e) -> setAI(e));
+            (Connection c, Element e) ->
+                setAI(new SetAIMessage(getGame(), e)));
         register(SetCurrentPlayerMessage.TAG,
-            (Connection c, Element e) -> setCurrentPlayer(e));
+            (Connection c, Element e) ->
+                setCurrentPlayer(new SetCurrentPlayerMessage(getGame(), e)));
         register(SetDeadMessage.TAG,
-            (Connection c, Element e) -> setDead(e));
+            (Connection c, Element e) ->
+                setDead(new SetDeadMessage(getGame(), e)));
         register(SetStanceMessage.TAG,
-            (Connection c, Element e) -> setStance(e));
+            (Connection c, Element e) ->
+                setStance(new SetStanceMessage(getGame(), e)));
         register(SpySettlementMessage.TAG,
-            (Connection c, Element e) -> spySettlement(e));
+            (Connection c, Element e) ->
+                spySettlement(new SpySettlementMessage(getGame(), e)));
         register(UpdateMessage.TAG,
-            (Connection c, Element e) -> update(e));
+            (Connection c, Element e) ->
+                update(new UpdateMessage(getGame(), e)));
     }
 
 
@@ -258,23 +293,21 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "addPlayer"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code AddPlayerMessage} to process.
      */
-    private void addPlayer(Element element) {
-        new AddPlayerMessage(getGame(), element);
+    private void addPlayer(AddPlayerMessage message) {
+        // Do not need to do anything, reading the player in does
+        // enough for now.
     }
 
     /**
-     * Handle an "animateAttack"-message.  This only performs animation, if
-     * required.  It does not actually perform any attacks.
+     * Handle an "animateAttack"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code AnimateAttackMessage} to process.
      */
-    private void animateAttack(Element element) {
+    private void animateAttack(AnimateAttackMessage message) {
         final Game game = getGame();
         final Player player = getMyPlayer();
-        final AnimateAttackMessage message
-            = new AnimateAttackMessage(game, element);
         final Unit attacker = message.getAttacker(game);
         final Unit defender = message.getDefender(game);
         final Tile attackerTile = message.getAttackerTile(game);
@@ -282,39 +315,37 @@ public final class InGameInputHandler extends ClientInputHandler {
         final boolean result = message.getResult();
 
         if (attacker == null) {
-            throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " missing attacker.");
+            logger.warning("Attack animation for: " + player.getId()
+                + " missing attacker.");
         }
         if (defender == null) {
-            throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " omitted defender.");
+            logger.warning("Attack animation for: " + player.getId()
+                + " omitted defender.");
         }
         if (attackerTile == null) {
-            throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " omitted attacker tile.");
+            logger.warning("Attack animation for: " + player.getId()
+                + " omitted attacker tile.");
         }
         if (defenderTile == null) {
-            throw new IllegalStateException("Attack animation for: "
-                + player.getId() + " omitted defender tile.");
+            logger.warning("Attack animation for: " + player.getId()
+                + " omitted defender tile.");
         }
 
+        // This only performs animation, if required.  It does not
+        // actually perform an attack.
         invokeAndWait(() ->
             igc().animateAttack(attacker, defender,
                                 attackerTile, defenderTile, result));
     }
 
     /**
-     * Handle an "animateMove"-message.  This only performs
-     * animation, if required.  It does not actually change unit
-     * positions, which happens in an "update".
+     * Handle an "animateMove"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code AnimateMoveMessage} to process.
      */
-    private void animateMove(Element element) {
+    private void animateMove(AnimateMoveMessage message) {
         final Game game = getGame();
         final Player player = getMyPlayer();
-        final AnimateMoveMessage message
-            = new AnimateMoveMessage(game, element);
         final Unit unit = message.getUnit(game);
         final Tile oldTile = message.getOldTile(game);
         final Tile newTile = message.getNewTile(game);
@@ -335,6 +366,8 @@ public final class InGameInputHandler extends ClientInputHandler {
             return;
         }
 
+        // This only performs animation, if required.  It does not
+        // actually change unit positions, which happens in an "update".
         invokeAndWait(() ->
             igc().animateMove(unit, oldTile, newTile));
     }
@@ -342,11 +375,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "chat"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code ChatMessage} to process.
      */
-    private void chat(Element element) {
+    private void chat(ChatMessage message) {
         final Game game = getGame();
-        final ChatMessage message = new ChatMessage(game, element);
         final Player player = message.getPlayer(game);
         final String text = message.getMessage();
         final boolean isPrivate = message.isPrivate();
@@ -358,12 +390,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "chooseFoundingFather"-request.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code ChooseFoundingFatherMessage} to process.
      */
-    private void chooseFoundingFather(Element element) {
+    private void chooseFoundingFather(ChooseFoundingFatherMessage message) {
         final Game game = getGame();
-        final ChooseFoundingFatherMessage message
-            = new ChooseFoundingFatherMessage(game, element);
         final List<FoundingFather> fathers = message.getFathers(game);
         
         invokeLater(() ->
@@ -371,35 +401,29 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Trivial handler to allow the server to signal to the client
-     * that an offer that caused a popup (for example, a native demand
-     * or diplomacy proposal) has not been answered quickly enough and
-     * that the offering player has assumed this player has
-     * refused-by-inaction, and therefore, the popup needs to be
-     * closed.
+     * Handle the "closeMenus"-message.
      */
     private void closeMenus() {
+        // This is a trivial handler to allow the server to signal to
+        // the client that an offer that caused a popup (for example,
+        // a native demand or diplomacy proposal) has not been
+        // answered quickly enough and that the offering player has
+        // assumed this player has refused-by-inaction, and therefore,
+        // the popup needs to be closed.
         invokeAndWait(closeMenusRunnable);
     }
 
     /**
-     * Handle a "diplomacy"-request.  If the message informs of an
-     * acceptance or rejection then display the result and return
-     * null.  If the message is a proposal, then ask the user about
-     * it and return the response with appropriate response set.
+     * Handle a "diplomacy"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code DiplomacyMessage} to process.
      */
-    private void diplomacy(Element element) {
+    private void diplomacy(DiplomacyMessage message) {
         final Game game = getGame();
-        final DiplomacyMessage message
-            = new DiplomacyMessage(getGame(), element);
         final DiplomaticTrade agreement = message.getAgreement();
         final FreeColGameObject our = message.getOurFCGO(game);
         final FreeColGameObject other = message.getOtherFCGO(game);
 
-        // Note incoming message will have ownership transposed as it
-        // is their proposal.
         if (our == null) {
             logger.warning("Our FCGO omitted from diplomacy message.");
             return;
@@ -414,31 +438,37 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle an "error"-message.
+     * Handle a "disconnect"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The disconnect message.
      */
-    private void error(Element element) {
-        final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
-
-        invokeLater(() ->
-            igc().error(errorMessage.getTemplate(),
-                        errorMessage.getMessage()));
+    private void disconnect(TrivialMessage message) {
+        // Clients do not need to do anything on disconnect, closing
+        // the server end suffices.
     }
 
     /**
-     * Adds a feature to or removes a feature from a FreeColGameObject.
+     * Handle an "error"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code ErrorMessage} to process.
      */
-    private void featureChange(Element element) {
+    private void error(ErrorMessage message) {
+        invokeLater(() ->
+            igc().error(message.getTemplate(), message.getMessage()));
+    }
+
+    /**
+     * Handle a "featureChange"-message.
+     *
+     * @param message The {@code FeatureChangeMessage} to process.
+     */
+    private void featureChange(FeatureChangeMessage message) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        final FeatureChangeMessage message
-            = new FeatureChangeMessage(game, element);
         final FreeColGameObject parent = message.getParent(game);
         final List<FreeColObject> children = message.getChildren();
         final boolean add = message.getAdd();
+
         if (parent == null) {
             logger.warning("featureChange with null parent.");
             return;
@@ -448,6 +478,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             return;
         }
 
+        // Add or remove a feature from a FreeColGameObject
         for (FreeColObject fco : children) {
             if (fco instanceof Ability) {
                 if (add) {
@@ -492,14 +523,12 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle a first contact with a native nation.
+     * Handle "firstContact"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code FirstContactMessage} to process.
      */
-    private void firstContact(Element element) {
+    private void firstContact(FirstContactMessage message) {
         final Game game = getGame();
-        final FirstContactMessage message
-            = new FirstContactMessage(game, element);
         final Player player = message.getPlayer(game);
         final Player other = message.getOtherPlayer(game);
         final Tile tile = message.getTile(game);
@@ -523,14 +552,12 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Ask the player to choose migrants from a fountain of youth event.
+     * Handle a "fountainOfYouth"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code FountainOfYouthMessage} to process.
      */
-    private void fountainOfYouth(Element element) {
+    private void fountainOfYouth(FountainOfYouthMessage message) {
         final Game game = getGame();
-        final FountainOfYouthMessage message
-            = new FountainOfYouthMessage(game, element);
         final int n = message.getMigrants();
 
         if (n <= 0) {
@@ -545,11 +572,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "gameEnded"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code GameEndedMessage} to process.
      */
-    private void gameEnded(Element element) {
+    private void gameEnded(GameEndedMessage message) {
         final Game game = getGame();
-        final GameEndedMessage message = new GameEndedMessage(game, element);
         final Player winner = message.getWinner(game);
         final String highScore = message.getScore();
 
@@ -565,28 +591,25 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle a "highScore" message.
+     * Handle a "highScore"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code HighScoreMessage} to process.
      */
-    private void highScore(Element element) {
+    private void highScore(HighScoreMessage message) {
         final Game game = getGame();
-        final HighScoreMessage message
-            = new HighScoreMessage(game, element);
 
         invokeLater(() ->
             igc().displayHighScores(message.getKey(), message.getScores()));
     }
         
     /**
-     * Handle an "incite" message.
+     * Handle an "incite"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code InciteMessage} to process.
      */
-    private void incite(Element element) {
+    private void incite(InciteMessage message) {
         final Game game = getGame();
         final Player player = getMyPlayer();
-        final InciteMessage message = new InciteMessage(game, element);
         final Unit unit = message.getUnit(player);
         final IndianSettlement is = message.getSettlement(unit);
         final Player enemy = message.getEnemy(game);
@@ -597,15 +620,13 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
     
     /**
-     * Handle an "indianDemand"-request.
+     * Handle an "indianDemand"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code IndianDemandMessage} to process.
      */
-    private void indianDemand(Element element) {
+    private void indianDemand(IndianDemandMessage message) {
         final Game game = getGame();
         final Player player = getMyPlayer();
-        final IndianDemandMessage message
-            = new IndianDemandMessage(game, element);
         final Unit unit = message.getUnit(game);
         final Colony colony = message.getColony(game);
         final GoodsType goodsType = message.getType(game);
@@ -627,13 +648,12 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle a logout message.
+     * Handle a "logout"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code LogoutMessage} to process.
      */
-    private void logout(Element element) {
+    private void logout(LogoutMessage message) {
         final Game game = getGame();
-        final LogoutMessage message = new LogoutMessage(game, element);
         final Player player = message.getPlayer(game);
         final LogoutReason reason = message.getReason();
         if (player == null) return;
@@ -643,13 +663,12 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Ask the player to choose something to loot.
+     * Handle a "lootCargo"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code LootCargoMessage} to process.
      */
-    private void lootCargo(Element element) {
+    private void lootCargo(LootCargoMessage message) {
         final Game game = getGame();
-        final LootCargoMessage message = new LootCargoMessage(game, element);
         final Unit unit = message.getUnit(game);
         final String defenderId = message.getDefenderId();
         final List<Goods> goods = message.getGoods();
@@ -661,14 +680,12 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle a "monarchAction"-request.
+     * Handle a "monarchAction"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code MonarchActionMessage} to process.
      */
-    private void monarchAction(Element element) {
+    private void monarchAction(MonarchActionMessage message) {
         final Game game = getGame();
-        final MonarchActionMessage message
-            = new MonarchActionMessage(game, element);
         final StringTemplate template = message.getTemplate();
         final String key = message.getMonarchKey();
         
@@ -677,7 +694,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle all the children of this element.
+     * Handle a "multiple"-message.
      *
      * @param connection The {@code Connection} the element arrived on.
      * @param element The {@code Element} to process.
@@ -690,15 +707,13 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle an incoming nation summary.
+     * Handle a "nationSummary"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code NationSummaryMessage} to process.
      */
-    private void nationSummary(Element element) {
+    private void nationSummary(NationSummaryMessage message) {
         final Game game = getGame();
         final Player player = getMyPlayer();
-        final NationSummaryMessage message
-            = new NationSummaryMessage(game, element);
         final Player other = message.getPlayer(game);
         final NationSummary ns = message.getNationSummary();
 
@@ -708,14 +723,12 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle a native trade update.
+     * Handle a "nativeTrade"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code NativeTradeMessage} to process.
      */
-    private void nativeTrade(Element element) {
+    private void nativeTrade(NativeTradeMessage message) {
         final Game game = getGame();
-        final NativeTradeMessage message
-            = new NativeTradeMessage(game, element);
         final NativeTradeAction action = message.getAction();
         final NativeTrade nt = message.getNativeTrade();
 
@@ -724,13 +737,12 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Ask the player to name the new land.
+     * Handle a "newLandName"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code NewLandNameMessage} to process.
      */
-    private void newLandName(Element element) {
+    private void newLandName(NewLandNameMessage message) {
         final Game game = getGame();
-        NewLandNameMessage message = new NewLandNameMessage(game, element);
         final Unit unit = message.getUnit(getMyPlayer());
         final String defaultName = message.getNewLandName();
 
@@ -741,13 +753,12 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Ask the player to name a new region.
+     * Handle a "newRegionName"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code NewRegionNameMessage} to process.
      */
-    private void newRegionName(Element element) {
+    private void newRegionName(NewRegionNameMessage message) {
         final Game game = getGame();
-        NewRegionNameMessage message = new NewRegionNameMessage(game, element);
         final Tile tile = message.getTile(game);
         final Unit unit = message.getUnit(getMyPlayer());
         final Region region = message.getRegion(game);
@@ -760,14 +771,12 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle a "newTradeRoute" message.
+     * Handle a "newTradeRoute"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code NewTradeRouteMessage} to process.
      */
-    private void newTradeRoute(Element element) {
+    private void newTradeRoute(NewTradeRouteMessage message) {
         final Game game = getGame();
-        final NewTradeRouteMessage message
-            = new NewTradeRouteMessage(game, element);
         final Player player = getMyPlayer();
         final TradeRoute tr = message.getTradeRoute();
 
@@ -777,11 +786,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "newTurn"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code NewTurnMessage} to process.
      */
-    private void newTurn(Element element) {
+    private void newTurn(NewTurnMessage message) {
         final Game game = getGame();
-        final NewTurnMessage message = new NewTurnMessage(game, element);
         final int n = message.getTurnNumber();
 
         if (n < 0) {
@@ -807,11 +815,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "remove"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code RemoveMessage} to process.
      */
-    private void remove(Element element) {
+    private void remove(RemoveMessage message) {
         final Game game = getGame();
-        final RemoveMessage message = new RemoveMessage(game, element);
         final FreeColGameObject divert = message.getDivertObject(game);
         final List<FreeColGameObject> objects = message.getRemovals(game);
 
@@ -823,12 +830,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "scoutSpeakToChief"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code ScoutSpeakToChiefMessage} to process.
      */
-    private void scoutSpeakToChief(Element element) {
+    private void scoutSpeakToChief(ScoutSpeakToChiefMessage message) {
         final Game game = getGame();
-        final ScoutSpeakToChiefMessage message
-            = new ScoutSpeakToChiefMessage(game, element);
         final Unit unit = message.getUnit(game);
         final IndianSettlement is = message.getSettlement(game);
         final String result = message.getResult();
@@ -840,11 +845,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "setAI"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code SetAIMessage} to process.
      */
-    private void setAI(Element element) {
+    private void setAI(SetAIMessage message) {
         final Game game = getGame();
-        final SetAIMessage message = new SetAIMessage(game, element);
         final Player p = message.getPlayer(game);
         final boolean ai = message.getAI();
 
@@ -854,12 +858,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "setCurrentPlayer"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code SetCurrentPlayerMessage} to process.
      */
-    private void setCurrentPlayer(Element element) {
+    private void setCurrentPlayer(SetCurrentPlayerMessage message) {
         final Game game = getGame();
-        final SetCurrentPlayerMessage message
-            = new SetCurrentPlayerMessage(game, element);
         final Player player = message.getPlayer(game);
 
         if (player == null) {
@@ -873,11 +875,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "setDead"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code SetDeadMessage} to process.
      */
-    private void setDead(Element element) {
+    private void setDead(SetDeadMessage message) {
         final Game game = getGame();
-        final SetDeadMessage message = new SetDeadMessage(game, element);
         final Player player = message.getPlayer(game);
 
         if (player == null) {
@@ -892,11 +893,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "setStance"-request.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code SetStanceMessage} to process.
      */
-    private void setStance(Element element) {
+    private void setStance(SetStanceMessage message) {
         final Game game = getGame();
-        final SetStanceMessage message = new SetStanceMessage(game, element);
         final Stance stance = message.getStance();
         final Player p1 = message.getFirstPlayer(game);
         final Player p2 = message.getSecondPlayer(game);
@@ -917,12 +917,10 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "spyResult" message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code SpySettlementMessage} to process.
      */
-    private void spySettlement(Element element) {
+    private void spySettlement(SpySettlementMessage message) {
         final Game game = getGame();
-        final SpySettlementMessage message
-            = new SpySettlementMessage(game, element);
         final Tile spyTile = message.getSpyTile();
 
         invokeLater(() ->
@@ -932,12 +930,11 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "update"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code UpdateMessage} to process.
      */
-    private void update(Element element) {
+    private void update(UpdateMessage message) {
         final Player player = getMyPlayer();
         final Game game = getGame();
-        final UpdateMessage message = new UpdateMessage(game, element);
 
         boolean visibilityChange = false;
         for (FreeColGameObject fcgo : message.getObjects()) {
