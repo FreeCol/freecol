@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.lang.reflect.Constructor;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
@@ -354,6 +355,16 @@ public abstract class Message {
         }
         return false;             
     }
+
+    /**
+     * Client-side handler for this message.
+     *
+     * FIXME: Will become abstract in due course.
+     * Client handlers always return null.
+     *
+     * @param freeColClient The {@code FreeColClient} to handle this message.
+     */
+    public void clientHandler(FreeColClient fcc) {}
 
     /**
      * Read a new message from a stream.

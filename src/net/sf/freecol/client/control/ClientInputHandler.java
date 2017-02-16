@@ -29,15 +29,18 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
+import net.sf.freecol.common.util.Introspector;
 
 import org.w3c.dom.Element;
 
@@ -46,23 +49,18 @@ import org.w3c.dom.Element;
  * Provides common methods for input handlers on the client side.
  */
 public abstract class ClientInputHandler extends FreeColClientHolder
-    implements DOMMessageHandler {
+    implements MessageHandler, DOMMessageHandler {
 
     private static final Logger logger = Logger.getLogger(ClientInputHandler.class.getName());
 
     /**
-     * Handle a request to a client.
-     *
+     * Handle a DOM request to a client.
      */
     public interface DOMClientNetworkRequestHandler {
         void handle(Connection connection, Element element) throws FreeColException;
     }
-        
-    /**
-     * The handler map provides named handlers for network
-     * requests.  Each handler deals with a given request type.
-     */
-    private final Map<String, DOMClientNetworkRequestHandler> handlerMap
+
+    private final Map<String, DOMClientNetworkRequestHandler> domHandlerMap
         = Collections.synchronizedMap(new HashMap<String, DOMClientNetworkRequestHandler>());
 
 
@@ -92,7 +90,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * @param handler The {@code DOMClientNetworkRequestHandler} to register.
      */
     protected final void register(String name, DOMClientNetworkRequestHandler handler) {
-        this.handlerMap.put(name, handler);
+        this.domHandlerMap.put(name, handler);
     }
 
     /**
@@ -103,7 +101,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * @return True if the supplied handler was actually removed.
      */
     protected final boolean unregister(String name, DOMClientNetworkRequestHandler handler) {
-        return this.handlerMap.remove(name, handler);
+        return this.domHandlerMap.remove(name, handler);
     }
 
 
@@ -163,7 +161,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
         throws FreeColException {
         if (element == null) return null;
         final String tag = element.getTagName();
-        DOMClientNetworkRequestHandler handler = handlerMap.get(tag);
+        DOMClientNetworkRequestHandler handler = domHandlerMap.get(tag);
         try {
             if (handler == null) {
                 logger.warning("Client ignored: " + tag);
@@ -175,5 +173,23 @@ public abstract class ClientInputHandler extends FreeColClientHolder
             logger.log(Level.WARNING, "Client failed: " + tag, ex);
         }
         return null;
+    }
+
+
+    // Implement MessageHandler
+
+    /**
+     * {@inheritDoc}
+     */
+    public Message handle(Message message) throws FreeColException {
+        message.clientHandler(getFreeColClient());
+        return null; 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Message read(FreeColXMLReader xr) throws FreeColException {
+        return Message.read(getGame(), xr);
     }
 }
