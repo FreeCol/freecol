@@ -591,9 +591,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @return True if this REF player has been defeated.
      */
     public boolean checkForREFDefeat() {
-        if (!isREF()) {
-            throw new RuntimeException("Not a REF player: " + this.getId());
-        }
+        if (!isREF()) return false;
 
         // No one to fight?  Either the rebels are dead, or the REF
         // was already defeated and the rebels are independent.
@@ -614,9 +612,9 @@ public class ServerPlayer extends Player implements TurnTaker {
         }
         if (naval && land >= landREFUnitsRequired) return false;
 
-        // Surrender if a rebel has a stronger land army.
+        // Surrender if all rebels have a stronger land army
         final double power = calculateStrength(false);
-        return none(getRebels(), r -> power < r.calculateStrength(false));
+        return all(getRebels(), r -> r.calculateStrength(false) > power);
     }
 
     /**
