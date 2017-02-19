@@ -2057,8 +2057,8 @@ public final class InGameController extends Controller {
                 serverGame.setCurrentPlayer(null);
 
                 cs.add(See.all(), new GameEndedMessage(winner, false));
-                serverGame.sendToOthers(serverPlayer, cs);
-                return cs;
+                serverGame.sendToAll(cs);
+                cs.clear();
             }
 
             // Has the current player won?
@@ -2069,8 +2069,8 @@ public final class InGameController extends Controller {
                 boolean highScore = !winner.isAI()
                     && HighScore.newHighScore(winner);
                 cs.add(See.all(), new GameEndedMessage(winner, highScore));
-                serverGame.sendToOthers(serverPlayer, cs);
-                return cs;
+                serverGame.sendToAll(cs);
+                cs.clear();
             }
 
             // Do "new turn"-like actions that need to wait until right
