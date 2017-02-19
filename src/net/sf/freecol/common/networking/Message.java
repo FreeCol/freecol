@@ -22,15 +22,22 @@ package net.sf.freecol.common.networking;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.lang.reflect.Constructor;
 
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Game;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Introspector;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 import org.xml.sax.SAXException;
 
@@ -41,6 +48,14 @@ import org.xml.sax.SAXException;
 public abstract class Message {
 
     protected static final Logger logger = Logger.getLogger(Message.class.getName());
+
+    /**
+     * A map of message name to message constructors, built on the fly
+     * as new messages are encountered and suitable constructors found.
+     */
+    private final static Map<String, Constructor<? extends Message>> builders
+        = Collections.synchronizedMap(new HashMap<String,
+            Constructor<? extends Message>>());
 
     // Convenient way to specify the relative priorities of the messages
     // types in one place.
@@ -343,5 +358,32 @@ public abstract class Message {
      */
     public static MessagePriority getMessagePriority() {
         return MessagePriority.NORMAL;
+    }
+
+    /**
+     * Read a new message from a stream.
+     *
+     * @param game The {@code Game} within which to construct the message.
+     * @param xr A {@code FreeColXMLReader} to read from.
+     * @exception FreeColException if there is problem reading the message.
+     */
+    public static Message read(Game game, FreeColXMLReader xr)
+        throws FreeColException {
+        final String tag = xr.getLocalName();
+        Constructor<? extends Message> mb = builders.get(tag);
+        if (mb == null) {
+            final String className = "net.sf.freecol.common.networking."
+                + capitalize(tag) + "Message";
+            @SuppressWarnings("unchecked")
+            final Class<? extends Message> cl
+                = (Class<? extends Message>)Introspector.getClassByName(className);
+            if (cl == null) throw new FreeColException("No class for: " + tag);
+
+            final Class[] types = { Game.class, FreeColXMLReader.class };
+            mb = Introspector.getConstructor(cl, types);
+            if (mb == null) throw new FreeColException("No constructor for: " + tag);
+            builders.put(tag, mb);
+        }
+        return Introspector.construct(mb, new Object[] { game, xr });
     }
 }

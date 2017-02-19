@@ -305,6 +305,43 @@ public class Introspector {
     }       
 
     /**
+     * Get a constructor for a given class and arguments.
+     *
+     * @param T The type to construct.
+     * @param cl The base class.
+     * @param types The types of the constructor arguments.
+     * @return The constructor found, or null on error.
+     */
+    public static <T> Constructor<T> getConstructor(Class<T> cl, Class[] types) {
+        Constructor<T> constructor;
+        try {
+            constructor = cl.getDeclaredConstructor(types);
+        } catch (NoSuchMethodException | SecurityException ex) {
+            constructor = null;
+        }
+        return constructor;
+    }
+
+    /**
+     * Construct a new instance.
+     *
+     * @param T The type to construct.
+     * @param constructor The {@code Constructor} to use.
+     * @param params The constructor parameters.
+     * @return The instance created, or null on error.
+     */
+    public static <T> T construct(Constructor<T> constructor, Object[] params) {
+        T instance;
+        try {
+            instance = constructor.newInstance(params);
+        } catch (IllegalAccessException | InstantiationException
+                 | InvocationTargetException ex) {
+            instance = null;
+        }
+        return instance;
+    }
+
+    /**
      * Constructs a new instance of an object of a class specified by name,
      * with supplied parameters.
      *
