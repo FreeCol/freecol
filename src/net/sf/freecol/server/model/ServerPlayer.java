@@ -1692,6 +1692,7 @@ outer:  for (Effect effect : effects) {
         final List<GoodsType> goodsTypes = game.getSpecification()
             .getStorableGoodsTypeList();
         final Market market = getMarket();
+        if (market == null) return;
 
         // Pick a random type of storable goods to add/remove an extra
         // amount of.
