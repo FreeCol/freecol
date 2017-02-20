@@ -368,58 +368,6 @@ final class ReceivingThread extends Thread {
     }
 
     /**
-     * Respond to an incoming message according to it tag
-     * optionally starting a handler thread.
-     *
-     * @param bis The {@code BufferedInputStream} to read the message from.
-     * @param tag The message tag.
-     * @param replyId The replyId, if any.
-     */
-    private void handle(BufferedInputStream bis, String tag, int replyId)
-        throws IOException, SAXException {
-        Thread t = null;
-        DOMMessage msg;
-        switch (tag) {
-
-        case TrivialMessage.DISCONNECT_TAG:
-            // Do not actually read the message, it might be a fake one
-            // due to end-of-stream.
-            msg = TrivialMessage.DISCONNECT_MESSAGE;
-            t = update(msg);
-            askToStop();
-            break;
-
-        case Connection.REPLY_TAG:
-            // A reply.  Always respond, even when failing, so as to
-            // unblock the waiting thread.
-            try {
-                msg = reader(bis);
-                reply(msg, replyId);
-            } catch (IOException|SAXException ex) {
-                reply(null, replyId);
-                throw ex;
-            }
-            return;
-
-        case Connection.QUESTION_TAG:
-            // A query.  Build a thread to handle it and send a reply.
-            msg = reader(bis);
-            t = query(msg, replyId);
-            break;
-            
-        default:
-            // An ordinary update message.  Build a thread to handle
-            // it and possibly respond.
-            msg = reader(bis);
-            t = update(msg);
-            break;
-        }
-
-        // Start the thread
-        t.start();
-    }
-
-    /**
      * Listens to the InputStream and calls the MessageHandler for
      * each message received.
      * 
@@ -442,13 +390,57 @@ final class ReceivingThread extends Thread {
             replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
         } catch (XMLStreamException xse) {
             tag = TrivialMessage.DISCONNECT_TAG;
-        } finally {
-            if (xr != null) xr.close();
         }
+
+        // Read the message, optionally create a thread to handle it
+        Thread t = null;
+        DOMMessage msg = null;
+        switch (tag) {
+        case TrivialMessage.DISCONNECT_TAG:
+            // Do not actually read the message, it might be a fake one
+            // due to end-of-stream.
+            msg = TrivialMessage.DISCONNECT_MESSAGE;
+            t = update(msg);
+            askToStop();
+            break;
+
+        case Connection.REPLY_TAG:
+            // A reply.  Always respond, even when failing, so as to
+            // unblock the waiting thread.
+            try {
+                this.in.enable();
+                this.in.reset();
+                msg = reader(this.in);
+                reply(msg, replyId);
+            } catch (IOException|SAXException ex) {
+                reply(null, replyId);
+                throw ex;
+            }
+            break;
+
+        case Connection.QUESTION_TAG:
+            // A query.  Build a thread to handle it and send a reply.
+            this.in.enable();
+            this.in.reset();
+            msg = reader(this.in);
+            t = query(msg, replyId);
+            break;
             
-        this.in.reset();
-        this.in.enable();
-        handle(this.in, tag, replyId);
+        default:
+            // An ordinary update message.
+            // Build a thread to handle it and possibly respond.
+            this.in.enable();
+            this.in.reset();
+            msg = reader(this.in);
+            t = update(msg);
+            break;
+        }
+
+        // Start the thread
+        if (t != null) t.start();
+
+        // Clean up open stream
+        if (xr != null) xr.close();
     }
 
 
