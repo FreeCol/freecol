@@ -193,8 +193,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                             .map(key -> key.substring(
                                 RiverStyleDialog.PREFIX.length()))
                             .filter(style ->
-                                type != RiverStyleTransform.CHANGE_CONNECTIONS
-                                || !style.contains("1"))
+                                (type != RiverStyleTransform.CHANGE_CONNECTIONS
+                                    || !style.contains("1"))
+                                && !style.equals("0000"))
                             .sorted().collect(Collectors.toList());
                         String style = getGUI().showRiverStyleDialog(styles);
                         if(style != null)
