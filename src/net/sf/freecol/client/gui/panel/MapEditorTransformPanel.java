@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -42,6 +43,7 @@ import net.sf.freecol.client.control.MapEditorController.IMapTransform;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.dialog.RiverStyleDialog;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.IndianNationType;
@@ -58,7 +60,10 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.resources.ResourceManager;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
+
 import net.sf.freecol.server.model.ServerIndianSettlement;
 
 
@@ -178,7 +183,12 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 MapTransform newMapTransform = null;
                 if (ctlr.getMapTransform() != mt) {
                     if(mt instanceof RiverStyleTransform) {
-                        String style = getGUI().showRiverStyleDialog();
+                        List<String> styles = ResourceManager
+                            .getImageKeys(RiverStyleDialog.PREFIX).stream()
+                            .map(key -> key.substring(RiverStyleDialog.PREFIX.length()))
+                            .filter(style -> !style.contains("1"))
+                            .sorted().collect(Collectors.toList());
+                        String style = getGUI().showRiverStyleDialog(styles);
                         if(style != null)
                             ((RiverStyleTransform)mt).setStyle(style);
                     }
