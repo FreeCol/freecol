@@ -138,10 +138,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                   Messages.message("mapEditorTransformPanel.majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getRiverImage("2022", riverSize),
-                                  Messages.message("riverStyleDialog.text"),
+                                  Messages.message("mapEditorTransformPanel.changeRiverConnections"),
                                   new RiverStyleTransform(RiverStyleTransform.CHANGE_CONNECTIONS)));
         listPanel.add(buildButton(ImageLibrary.getRiverImage("1022", riverSize),
-                                  Messages.message("riverStyleDialog.text"),
+                                  Messages.message("mapEditorTransformPanel.setRiverStyle"),
                                   new RiverStyleTransform(RiverStyleTransform.SET_STYLE)));
         listPanel.add(buildButton(ImageLibrary.getMiscImage("image.tileitem."
                     + first(getSpecification().getResourceTypeList()).getId(), 0.75f),
