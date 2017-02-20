@@ -137,9 +137,12 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", riverSize),
                                   Messages.message("mapEditorTransformPanel.majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("2022", riverSize),
+                                  Messages.message("riverStyleDialog.text"),
+                                  new RiverStyleTransform(RiverStyleTransform.CHANGE_CONNECTIONS)));
         listPanel.add(buildButton(ImageLibrary.getRiverImage("1022", riverSize),
                                   Messages.message("riverStyleDialog.text"),
-                                  new RiverStyleTransform()));
+                                  new RiverStyleTransform(RiverStyleTransform.SET_STYLE)));
         listPanel.add(buildButton(ImageLibrary.getMiscImage("image.tileitem."
                     + first(getSpecification().getResourceTypeList()).getId(), 0.75f),
             Messages.message("mapEditorTransformPanel.resource"),
@@ -183,14 +186,19 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 MapTransform newMapTransform = null;
                 if (ctlr.getMapTransform() != mt) {
                     if(mt instanceof RiverStyleTransform) {
+                        RiverStyleTransform rst = (RiverStyleTransform)mt;
+                        int type = rst.getType();
                         List<String> styles = ResourceManager
                             .getImageKeys(RiverStyleDialog.PREFIX).stream()
-                            .map(key -> key.substring(RiverStyleDialog.PREFIX.length()))
-                            .filter(style -> !style.contains("1"))
+                            .map(key -> key.substring(
+                                RiverStyleDialog.PREFIX.length()))
+                            .filter(style ->
+                                type != RiverStyleTransform.CHANGE_CONNECTIONS
+                                || !style.contains("1"))
                             .sorted().collect(Collectors.toList());
                         String style = getGUI().showRiverStyleDialog(styles);
                         if(style != null)
-                            ((RiverStyleTransform)mt).setStyle(style);
+                            rst.setStyle(style);
                     }
                     newMapTransform = mt;
                 }
@@ -328,14 +336,24 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     }
 
     private final class RiverStyleTransform extends MapTransform {
-        private String style;
 
-        private RiverStyleTransform() {
+        public static final int CHANGE_CONNECTIONS = 0;
+        public static final int SET_STYLE = 1;
+
+        private String style;
+        private int type;
+
+        private RiverStyleTransform(int type) {
             this.style = null;
+            this.type = type;
         }
 
         public void setStyle(String style) {
             this.style = style;
+        }
+
+        public int getType() {
+            return type;
         }
 
         @Override
