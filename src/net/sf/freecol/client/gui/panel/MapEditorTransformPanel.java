@@ -362,7 +362,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             TileImprovement river = tile.getRiver();
 
             if (river != null) {
-                river.updateRiverConnections(style);
+                if (type == CHANGE_CONNECTIONS)
+                    river.updateRiverConnections(style);
+                else
+                    river.setRiverStyle(style);
             }
         }
     }

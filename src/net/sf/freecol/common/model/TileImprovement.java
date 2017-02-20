@@ -255,25 +255,29 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Sets the connection status in a given direction.
+     * Internal helper method to set the connection status in a given direction.
+     * There is no check for backwards connections on neighbouring tiles!
      *
      * @param direction The {@code Direction} to set.
      * @param value The new status for the connection.
      */
-    public void setConnected(Direction direction, boolean value) {
-        if (style == null || isConnectedTo(direction) != value) {
-            String old = (style == null) ? "00000000" : style.getString();
-            List<Direction> directions = getConnectionDirections();
-            int end = directions.size();
-            StringBuilder updated = new StringBuilder();
-            for(int index = 0; index != end; ++index) {
-                if(directions.get(index) == direction)
-                    updated.append(value ? Integer.toString(magnitude) : "0");
-                else
-                    updated.append(old.charAt(index));
-            }
-            style = TileImprovementStyle.getInstance(updated.toString());
+    private void setConnected(Direction direction, boolean value) {
+        if (style == null || isConnectedTo(direction) != value)
+            setConnected(direction, value, Integer.toString(magnitude));
+    }
+
+    private void setConnected(Direction direction, boolean value, String magnitude) {
+        String old = (style == null) ? "00000000" : style.getString();
+        List<Direction> directions = getConnectionDirections();
+        int end = directions.size();
+        StringBuilder updated = new StringBuilder();
+        for(int index = 0; index != end; ++index) {
+            if(directions.get(index) == direction)
+                updated.append(value ? magnitude : "0");
+            else
+                updated.append(old.charAt(index));
         }
+        style = TileImprovementStyle.getInstance(updated.toString());
     }
 
     /**
@@ -359,8 +363,54 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
+     * Sets the river style to be as close as possible to the requested
+     * style, even when it has to create neighbouring rivers to prevent
+     * broken connections or change the magnitude.
+     *
+     * @param conns The river style to set.
+     */
+    public void setRiverStyle(String conns) {
+        if (!isRiver()) return;
+        final Tile tile = getTile();
+        int i = 0;
+        int[] counts = {0, 0};
+        for (Direction d : Direction.longSides) {
+            Direction dReverse = d.getReverseDirection();
+            Tile t = tile.getNeighbourOrNull(d);
+            TileImprovement river = (t == null) ? null : t.getRiver();
+            String c = (conns == null) ? "0" : conns.substring(i, i+1);
+
+            if ("0".equals(c)) {
+                if (river != null) {
+                    river.setConnected(dReverse, false);
+                }
+                setConnected(d, false);
+            } else {
+                int mag = Integer.parseInt(c);
+                if (river != null) {
+                    river.setConnected(dReverse, true);
+                    setConnected(d, true, c);
+                    counts[mag-1]++;
+                } else if (t != null) {
+                    if (!t.getType().isWater()) {
+                        t.addRiver(mag, "0000");
+                        t.getRiver().setConnected(dReverse, true);
+                    }
+                    setConnected(d, true, c);
+                    counts[mag-1]++;
+                }
+            }
+            i++;
+        }
+        magnitude = counts[1] >= counts[0] ? 2 : 1;
+    }
+
+    /**
      * Updates the connections from/to this river improvement on the basis
-     * of the expected encoded river style.
+     * of the expected encoded river style, as long as this would not
+     * create broken connections.
+     * Uses magnitude, not the connection strengths inside conns, when
+     * adding new connections.
      *
      * @param conns The encoded river connections, or null to disconnect.
      * @return The actual encoded connections found.
