@@ -66,13 +66,13 @@ import net.sf.freecol.server.model.ServerPlayer;
 /**
  * The server version of a colony.
  */
-public class ServerColony extends Colony implements ServerModelObject {
+public class ServerColony extends Colony implements TurnTaker {
 
     private static final Logger logger = Logger.getLogger(ServerColony.class.getName());
 
 
     /**
-     * Trivial constructor required for all ServerModelObjects.
+     * Trivial constructor for Game.newInstance.
      *
      * @param game The {@code Game} in which this object belongs.
      * @param id The object identifier.
@@ -507,7 +507,7 @@ public class ServerColony extends Colony implements ServerModelObject {
     }
 
 
-    // Implement ServerModelObject
+    // Implement TurnTaker
 
     /**
      * New turn for this colony.
@@ -542,15 +542,17 @@ public class ServerColony extends Colony implements ServerModelObject {
         container.saveState();
 
         // Check for learning by experience
-        for (WorkLocation workLocation : getCurrentWorkLocationsList()) {
-            ((ServerModelObject)workLocation).csNewTurn(random, lb, cs);
-            ProductionInfo productionInfo = getProductionInfo(workLocation);
+        for (WorkLocation wl : getCurrentWorkLocationsList()) {
+            if (wl instanceof TurnTaker) {
+                ((TurnTaker)wl).csNewTurn(random, lb, cs);
+            }
+            ProductionInfo productionInfo = getProductionInfo(wl);
             if (productionInfo == null) continue;
-            if (!workLocation.isEmpty()) {
+            if (!wl.isEmpty()) {
                 for (AbstractGoods goods : productionInfo.getProduction()) {
                     UnitType expert = spec.getExpertForProducing(goods.getType());
-                    int experience = goods.getAmount() / workLocation.getUnitCount();
-                    for (Unit unit : transform(workLocation.getUnits(),
+                    int experience = goods.getAmount() / wl.getUnitCount();
+                    for (Unit unit : transform(wl.getUnits(),
                             u -> u.getExperienceType() == goods.getType()
                             && u.getUnitChange(UnitChangeType.EXPERIENCE,
                                                expert) != null)) {
@@ -560,9 +562,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                 }
             }
-            if (workLocation instanceof ServerBuilding) {
+            if (wl instanceof ServerBuilding) {
                 // FIXME: generalize to other WorkLocations?
-                ((ServerBuilding)workLocation).csCheckMissingInput(productionInfo, cs);
+                ((ServerBuilding)wl).csCheckMissingInput(productionInfo, cs);
             }
         }
 
@@ -862,9 +864,9 @@ public class ServerColony extends Colony implements ServerModelObject {
         // before checking for completion of training.  This is a rare
         // case so it is not worth reordering the work location calls
         // to csNewTurn.
-        for (WorkLocation workLocation : transform(getCurrentWorkLocations(),
+        for (WorkLocation wl : transform(getCurrentWorkLocations(),
                                                    WorkLocation::canTeach)) {
-            ServerBuilding building = (ServerBuilding)workLocation;
+            ServerBuilding building = (ServerBuilding)wl;
             for (Unit teacher : building.getUnitList()) {
                 building.csCheckTeach(teacher, cs);
             }

@@ -1851,13 +1851,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * A change is about to occur on this tile.  Cache it if unseen.
-     */
-    public void cacheUnseen() {
-        cacheUnseen(null, null);
-    }
-
-    /**
      * Get a copy of this tile suitable for caching (lacking units).
      *
      * @return An uninterned copy of this {@code Tile}.
@@ -1865,14 +1858,23 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Tile getTileToCache() {
         Tile tile = this.copy(getGame());
         tile.clearUnitList();
-        // Set the unit count for a copied colony
+        // Set the unit count for a copied colony.
+        // Beware though, we may be caching a tile with a colony that is
+        // being destroyed, where the unit count has already gone to zero.
         Colony colony = getColony();
         if (colony != null) {
-            tile.getColony().setDisplayUnitCount(colony.getUnitCount());
+            tile.getColony()
+                .setDisplayUnitCount(Math.min(1, colony.getUnitCount()));
         }
         return tile;
     }
 
+    /**
+     * A change is about to occur on this tile.  Cache it if unseen.
+     */
+    public void cacheUnseen() {
+        cacheUnseen(null, null);
+    }
 
     /**
      * A change is about to occur on this tile.  Cache it if unseen.
@@ -2378,15 +2380,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public void toXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
         // Special override of tile output serialization that handles
         // the tile caching.
-        // 1. If not writing to a player, just write this tile.
-        // 2. If there is no cached tile then it is unexplored, so
-        //    write the minimal tile (id, x, y).
-        // 3. Otherwise write the cached tile, which will either be a
-        //    copy or {@code this}.
         Player player = xw.getClientPlayer();
-        Tile tile = (player == null) ? this : getCachedTile(player);
+        Tile tile;
 
-        if (tile == null) {
+        if (player == null) {
+            // 1. If not writing to a player, just write this tile.
+            this.internalToXML(xw, tag);
+
+        } else if ((tile = getCachedTile(player)) == null) {
+            // 2. If there is no cached tile, then it is unexplored, so
+            //    write the minimal tile (id, x, y).
             xw.writeStartElement(tag);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
@@ -2396,7 +2399,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             xw.writeAttribute(Y_TAG, this.y);
 
             xw.writeEndElement();
+
         } else {
+            // 3. Otherwise write the cached tile, which will either
+            //    be a copy or {@code this}.
             tile.internalToXML(xw, tag);
         }
     }

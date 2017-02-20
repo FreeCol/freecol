@@ -23,9 +23,11 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LoginMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -81,6 +83,8 @@ public final class UserConnectionHandler extends ServerInputHandler {
         // player ignored.  Find the real player associated with the name
         // in the login message.  That is the one that needs to see the
         // response.
-        return cs.build(message.getPlayerByName(freeColServer.getGame()));
+        ServerPlayer real = message.getPlayerByName(freeColServer.getGame());
+        Message m = cs.build(real);
+        return (m == null) ? null : ((DOMMessage)m).toXMLElement();
     }
 }

@@ -33,101 +33,45 @@
   <xs:element name="colony">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	      <xs:element ref="colonyTile" minOccurs="9" maxOccurs="9" />
-	      <xs:element ref="goodsContainer" minOccurs="0" maxOccurs="1" />
-        <xs:element ref="buildQueueItem" minOccurs="0" maxOccurs="unbounded" />
-        <xs:element ref="populationQueueItem" minOccurs="0" maxOccurs="unbounded" />
 	      <xs:element ref="building" />
+        <xs:element ref="buildQueueItem" minOccurs="0" maxOccurs="unbounded" />
+	      <xs:element ref="colonyTile" minOccurs="3" maxOccurs="9" />
 	      <xs:element ref="exportData" />
+	      <xs:element ref="goodsContainer" minOccurs="0" maxOccurs="1" />
+        <xs:element ref="populationQueueItem" minOccurs="0" maxOccurs="unbounded" />
 	      <xs:element ref="ability" />
 	      <xs:element ref="modifier" />
       </xs:choice>
       
       <xs:attribute name="id" type="ColonyId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="ColonyId" use="optional"/>
-      <!-- end @compat -->
-      <xs:attribute name="name" type="xs:string" use="required"/>
-      <xs:attribute name="owner" type="PlayerId" use="required"/>
-      <xs:attribute name="tile" type="TileId" use="required"/>
-      <xs:attribute name="liberty" type="xs:int" use="optional" default="0" />
-      <xs:attribute name="immigration" type="xs:int" use="optional" default="0" />
-      <xs:attribute name="established" type="xs:int" use="optional" default="1" />
-      <xs:attribute name="settlementType" type="xs:string" />
 
-      <xs:attribute name="sonsOfLiberty" type="xs:int" use="optional"
-		                default="0">
-        <xs:annotation>
-          <xs:documentation>
-            The SoL membership this turn. 
-          </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="oldSonsOfLiberty" type="xs:int" use="optional"
-		                default="0">
-        <xs:annotation>
-          <xs:documentation>
-            The SoL membership last turn. 
-          </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="tories" type="xs:int" use="optional"
-		                default="0">
-	      <xs:annotation>
-	        <xs:documentation>
-	          The number of tories this turn. 
-          </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="oldTories" type="xs:int" use="optional"
-		                default="0">
-	      <xs:annotation>
-	        <xs:documentation>
-	          The number of tories last turn.
-	        </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="productionBonus" type="xs:int" use="optional"
-		                default="0">
-	      <xs:annotation>
-	        <xs:documentation>
-	          The current production bonus.
-          </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="currentlyBuilding" type="xs:string"
-		                use="optional">
-	      <xs:annotation>
-	        <xs:documentation>
-	          Currently building element from the build queue
-          </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
+      <xs:attribute name="currentlyBuilding" type="xs:string" use="optional"/>
+      <xs:attribute name="established" type="xs:int" use="optional"
+                    default="1"/>
+      <xs:attribute name="immigration" type="xs:int" use="optional"
+                    default="0"/>
       <xs:attribute name="landLocked" type="xs:boolean" use="optional"
-		                default="true">
-	      <xs:annotation>
-	        <xs:documentation>
-	          Whether this colony is landlocked
-	        </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
+                    default="true"/>
+      <xs:attribute name="liberty" type="xs:int" use="optional"
+                    default="0"/>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="oldSonsOfLiberty" type="xs:int" use="optional"
+                    default="0"/>
+      <xs:attribute name="oldTories" type="xs:int" use="optional"
+                    default="0"/>
+      <xs:attribute name="owner" type="PlayerId" use="required"/>
+      <xs:attribute name="productionBonus" type="xs:int" use="optional"
+                    default="0"/>
+      <xs:attribute name="settlementType" type="xs:string"/>
+      <xs:attribute name="sonsOfLiberty" type="xs:int" use="optional"
+                    default="0"/>
       <xs:attribute name="stockadeLevel" type="xs:int" use="optional"
-                    default="0">
-        <xs:annotation>
-          <xs:documentation>
-            Level of the stockade-type building in the colony
-          </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
+                    default="0"/>
+      <xs:attribute name="tile" type="TileId" use="required"/>
+      <xs:attribute name="tories" type="xs:int" use="optional"
+                    default="0"/>
       <xs:attribute name="unitCount" type="xs:int" use="optional"
-		                default="-1">
-	      <xs:annotation>
-	        <xs:documentation>
-	          Used on rival colonies
-          </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
-
+                    default="-1"/>
     </xs:complexType>
   </xs:element>
 

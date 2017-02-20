@@ -266,7 +266,7 @@ public class DiplomacySession extends TimedSession {
                     && ((DiplomacySession)s).getOtherPlayer() == s2)
                 || (((DiplomacySession)s).getOwner() == s2
                     && ((DiplomacySession)s).getOtherPlayer() == s1));
-        return (DiplomacySession)find(allSessions.values(), pred);
+        return (DiplomacySession)findSession(pred);
     }
 
     /**

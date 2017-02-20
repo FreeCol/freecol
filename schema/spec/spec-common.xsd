@@ -32,6 +32,8 @@
     <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
 
     <xs:attribute name="duration" type="xs:int"/>
+    <xs:attribute name="firstTurn" type="xs:int" use="optional"/>
+    <xs:attribute name="lastTurn" type="xs:int" use="optional"/>
     <xs:attribute name="source" type="xs:string"/>
     <xs:attribute name="temporary" type="xs:boolean"/>
   </xs:complexType>
@@ -56,7 +58,7 @@
           <xs:attribute name="type" type="ModifierType"/>
           <xs:attribute name="value" type="xs:float"/>
           <!-- @compat 0.11.3 -->
-          <xs:attribute name="incrementType" type="ModifierType"/>
+          <xs:attribute name="incrementType" type="ModifierType" use="optional"/>
           <!-- @compat 0.11.3 -->
         </xs:extension>
       </xs:complexContent>
@@ -188,6 +190,21 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:attribute>
+        <!-- @compat 0.11.3 -->
+        <xs:attribute name="operandType">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="UNITS" />
+              <xs:enumeration value="BUILDINGS" />
+              <xs:enumeration value="SETTLEMENTS" />
+              <xs:enumeration value="FOUNDING_FATHERS" />
+              <xs:enumeration value="YEAR" />
+              <xs:enumeration value="OPTION" />
+              <xs:enumeration value="NONE" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <!-- end @compat 0.11.3 -->
         <xs:attribute name="scope-level">
           <xs:simpleType>
             <xs:restriction base="xs:token">
@@ -204,6 +221,18 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:attribute>
+        <!-- @compat 0.11.3 -->
+        <xs:attribute name="scopeLevel">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="SETTLEMENT" />
+              <xs:enumeration value="PLAYER" />
+              <xs:enumeration value="GAME" />
+              <xs:enumeration value="NONE" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <!-- end @compat 0.11.3 -->
         <xs:attribute name="value" type="xs:integer" />
       </xs:extension>
     </xs:complexContent>
@@ -239,38 +268,5 @@
     <xs:attribute name="matchNegated" type="xs:boolean"/>
     <!-- end @compat 0.11.3 -->
   </xs:complexType>
-
-
-  <!-- Dead in 0.11.6.  TODO: remove in due course.
-  <xs:element name="action">
-    <xs:complexType>
-      <xs:attribute name="tileimprovement-type" use="required" type="TileImprovementTypeId"/>
-      <xs:attribute name="name" use="required" type="xs:string"/>
-      <xs:attribute name="image-id" use="required" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="limits">
-    <xs:complexType>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="limit"/>
-      </xs:choice>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:complexType name="PlunderType">
-    <xs:attribute name="probability" type="PercentageType"/>
-    <xs:attribute name="minimum" type="xs:int"/>
-    <xs:attribute name="maximum" type="xs:int"/>
-    <xs:attribute name="factor" type="xs:int"/>
-  </xs:complexType>
-
-  <xs:element name="skirmish">
-    <xs:complexType>
-      <xs:attribute name="defence-factor" use="required" type="xs:int"/>
-    </xs:complexType>
-  </xs:element>
-
-  -->
 
 </xs:schema>

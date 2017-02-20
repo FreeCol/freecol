@@ -30,28 +30,21 @@
 	      <xs:element name="marketData">
 	        <xs:complexType>
             <xs:attribute name="id" type="MarketDataId" use="required" />
-            <!-- @compat 0.10.x -->
-            <xs:attribute name="ID" type="MarketDataId" use="optional" />
-            <!-- end @compat -->
 	          <xs:attribute name="goods-type" type="GoodsTypeId" use="required" />
 	          <xs:attribute name="amount" type="xs:string" use="required" />
 	          <xs:attribute name="initialPrice" type="xs:int" use="optional"
 			                    default="-1" />
 	          <xs:attribute name="arrears" type="xs:int" use="required" />
 	          <xs:attribute name="sales" type="xs:int" use="required" />
-	          <xs:attribute name="incomeBeforeTaxes" type="xs:int"
-			                    use="required" />
-	          <xs:attribute name="incomeAfterTaxes" type="xs:int"
-			                    use="required" />
+	          <xs:attribute name="incomeBeforeTaxes" type="xs:int" use="required" />
+	          <xs:attribute name="incomeAfterTaxes" type="xs:int" use="required" />
 	          <xs:attribute name="traded" type="xs:boolean" use="optional" />
 	        </xs:complexType>
 	      </xs:element>
       </xs:choice>
       
       <xs:attribute name="id" type="MarketId" use="required" />
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="MarketId" use="optional" />
-      <!-- end @compat -->
+
       <xs:attribute name="owner" type="PlayerId" use="required" />
     </xs:complexType>
   </xs:element>

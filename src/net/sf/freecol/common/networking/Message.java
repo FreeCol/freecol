@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,11 @@ public abstract class Message {
         }
     }
 
+    /** Comparator comparing by message priority. */
+    public static final Comparator<Message> messagePriorityComparator
+        = Comparator.comparingInt(m -> m.getPriority().ordinal());
 
+                
     /**
      * Deliberately trivial constructor.
      */
@@ -240,7 +245,7 @@ public abstract class Message {
     }
 
     /**
-     * Get the array attrubutes of this message.
+     * Get the array attributes of this message.
      *
      * @return A list of the array attributes found.
      */
@@ -305,7 +310,30 @@ public abstract class Message {
     public MessagePriority getPriority() {
         return getMessagePriority();
     }
-    
+
+    /**
+     * Does this message consist only of mergeable attributes?
+     *
+     * @return True if this message is trivially mergeable.
+     */
+    public boolean canMergeAttributes() {
+        return false;
+    }
+
+    /**
+     * Merge another message into this message if possible.
+     *
+     * @param message The {@code Message} to merge.
+     * @return True if the other message was merged.
+     */
+    public boolean merge(Message message) {
+        if (message.canMergeAttributes()) {
+            this.setStringAttributes(message.getStringAttributes());
+            return true;
+        }
+        return false;             
+    }
+
     /**
      * Get the priority of this type of message.
      *

@@ -53,7 +53,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.MultipleMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -336,12 +336,12 @@ public class DOMUtils {
     /**
      * Handle a list of messages.
      *
-     * @param mh The {@code MessageHandler} to handle the messages.
+     * @param mh The {@code DOMMessageHandler} to handle the messages.
      * @param connection The {@code Connection} the messages arrived on.
      * @param elements The list of {@code Element}s to process.
      * @return An {@code Element} containing the response/s.
      */
-    public static final Element handleList(MessageHandler mh,
+    public static final Element handleList(DOMMessageHandler mh,
         Connection connection, List<Element> elements) {
         List<Element> results = new ArrayList<>();
         int i = 0;

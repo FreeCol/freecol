@@ -127,6 +127,20 @@ public class UpdateMessage extends DOMMessage {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean merge(Message message) {
+        if (message instanceof UpdateMessage) {
+            UpdateMessage other = (UpdateMessage)message;
+            this.fcgos.addAll(other.getObjects());
+            this.fields.addAll(other.getFields());
+            return true;
+        }
+        return false;
+    }
+              
+    /**
      * Append another object and optional partial fields to update.
      *
      * @param fco The {@code FreeColObject} to update.
@@ -150,6 +164,15 @@ public class UpdateMessage extends DOMMessage {
      */
     public List<FreeColGameObject> getObjects() {
         return this.fcgos;
+    }
+
+    /**
+     * Get the attribute fields attached to this message.
+     *
+     * @return The list of fields lists.
+     */
+    public List<List<String>> getFields() {
+        return this.fields;
     }
 
     

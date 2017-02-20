@@ -235,28 +235,50 @@ public class FreeColXMLReader extends StreamReaderDelegate
         }
     }
 
-    // @compat 0.10.x
+    // @compat 0.11.x
     /**
      * Reads the identifier attribute.
      *
-     * Normally a simple getAttribute() would be sufficient, but
-     * while we are allowing both the obsolete ID_ATTRIBUTE and the correct
-     * ID_ATTRIBUTE_TAG, this routine is useful.
-     *
-     * When 0.10.x is obsolete, remove this routine and replace its
-     * uses with just getAttribute(in, ID_ATTRIBUTE_TAG, (String)null)
+     * When all the compatibility code is obsolete, remove this
+     * routine and replace its uses with just:
+     *     getAttribute(in, ID_ATTRIBUTE_TAG, (String)null)
      * or equivalent.
      *
      * @return The identifier found, or null if none present.
      */
     public String readId() {
         String id = getAttribute(FreeColObject.ID_ATTRIBUTE_TAG, (String)null);
+
+        // @compat 0.10.x
+        // Normally a simple getAttribute() would be sufficient, but
+        // while we are allowing both the obsolete ID_ATTRIBUTE and
+        // the correct ID_ATTRIBUTE_TAG, this routine is useful.
         if (id == null) {
             id = getAttribute(FreeColObject.ID_ATTRIBUTE, (String)null);
         }
+        // end @compat 0.10.x
+
+        if (id == null) return null;
+
+        // @compat 0.11.x, but really 0.10.x
+        // Upgrade some old ids.  0.11.x never generated them, but
+        // games upgraded from 0.10.x could still contain them.  We
+        // should have done this earlier, but that fell through the
+        // cracks...
+        int idx = id.indexOf(":");
+        if (idx > 10) {
+            String prefix = id.substring(0, idx);
+            if ("tileitemcontainer".equals(prefix)) {
+                id = "tileItemContainer" + id.substring(idx);
+            } else if ("tileimprovement".equals(prefix)) {
+                id = "tileImprovement" + id.substring(idx);
+            }
+        }
+        // @compat 0.11.x
+        
         return id;
     }
-    // end @compat 0.10.x
+    // end @compat 0.11.x
 
     /** Map for the XMLStreamConstants. */
     private static final Map<Integer, String> tagStrings

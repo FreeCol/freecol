@@ -29,6 +29,7 @@ import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -68,11 +69,10 @@ public class SoundTest extends FreeColTestCase {
         assertNotNull("No sound resource: " + id, file);
         try {
             soundPlayer.playOnce(file);
-            try { // Just play the beginning of the sound to check it works
-                Thread.sleep(100);
-                soundPlayer.stop();
-                Thread.sleep(50);
-            } catch (InterruptedException e) {}
+            // Just play the beginning of the sound to check it works
+            Utils.delay(100, null);
+            soundPlayer.stop();
+            Utils.delay(50, null);
         } catch (Exception e) {
             fail("Could not play " + id + ": " + e.getMessage());
         }

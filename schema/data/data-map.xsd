@@ -34,12 +34,9 @@
         <xs:element ref="tile"/>
       </xs:choice>
       <xs:attribute name="id" type="MapId" use="required" />
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="MapId" use="optional" />
-      <!-- end @compat -->
       <xs:attribute name="width" type="xs:int" use="required" />
       <xs:attribute name="height" type="xs:int" use="required" />
-      <xs:attribute name="layer" type="MapLayerType" />
+      <xs:attribute name="layer" type="MapLayerType" use="required"/>
       <xs:attribute name="minimumLatitude" type="xs:int" use="optional" />
       <xs:attribute name="maximumLatitude" type="xs:int" use="optional" />
      </xs:complexType>
@@ -55,15 +52,6 @@
       <xs:enumeration value="rumours"/>
       <xs:enumeration value="natives"/>
       <xs:enumeration value="all"/>
-      <!-- @compat 0.10.x -->
-      <xs:enumeration value="NONE"/>
-      <xs:enumeration value="LAND"/>
-      <xs:enumeration value="TERRAIN"/>
-      <xs:enumeration value="RIVERS"/>
-      <xs:enumeration value="RESOURCES"/>
-      <xs:enumeration value="NATIVES"/>
-      <xs:enumeration value="ALL"/>
-      <!-- end @compat -->
     </xs:restriction>
   </xs:simpleType>
 

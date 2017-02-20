@@ -29,7 +29,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.GameStateMessage;
-import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 
@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
  * Provides common methods for input handlers on the client side.
  */
 public abstract class ClientInputHandler extends FreeColClientHolder
-    implements MessageHandler {
+    implements DOMMessageHandler {
 
     private static final Logger logger = Logger.getLogger(ClientInputHandler.class.getName());
 
@@ -48,7 +48,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * Handle a request to a client.
      *
      */
-    public interface ClientNetworkRequestHandler {
+    public interface DOMClientNetworkRequestHandler {
         void handle(Connection connection, Element element);
     }
         
@@ -56,8 +56,8 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * The handler map provides named handlers for network
      * requests.  Each handler deals with a given request type.
      */
-    private final Map<String, ClientNetworkRequestHandler> handlerMap
-        = Collections.synchronizedMap(new HashMap<String, ClientNetworkRequestHandler>());
+    private final Map<String, DOMClientNetworkRequestHandler> handlerMap
+        = Collections.synchronizedMap(new HashMap<String, DOMClientNetworkRequestHandler>());
 
 
     /**
@@ -81,9 +81,9 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * Register a network request handler.
      * 
      * @param name The handler name.
-     * @param handler The {@code ClientNetworkRequestHandler} to register.
+     * @param handler The {@code DOMClientNetworkRequestHandler} to register.
      */
-    protected final void register(String name, ClientNetworkRequestHandler handler) {
+    protected final void register(String name, DOMClientNetworkRequestHandler handler) {
         this.handlerMap.put(name, handler);
     }
 
@@ -94,7 +94,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * @param handler The {@code ClienNetworkRequestHandler} to unregister.
      * @return True if the supplied handler was actually removed.
      */
-    protected final boolean unregister(String name, ClientNetworkRequestHandler handler) {
+    protected final boolean unregister(String name, DOMClientNetworkRequestHandler handler) {
         return this.handlerMap.remove(name, handler);
     }
 
@@ -146,7 +146,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     public Element handle(Connection connection, Element element) {
         if (element == null) return null;
         final String tag = element.getTagName();
-        ClientNetworkRequestHandler handler = handlerMap.get(tag);
+        DOMClientNetworkRequestHandler handler = handlerMap.get(tag);
         try {
             if (handler == null) {
                 logger.warning("Client ignored: " + tag);

@@ -47,13 +47,13 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 /**
  * The server version of Europe.
  */
-public class ServerEurope extends Europe implements ServerModelObject {
+public class ServerEurope extends Europe implements TurnTaker {
 
     private static final Logger logger = Logger.getLogger(ServerEurope.class.getName());
 
 
     /**
-     * Trivial constructor required for all ServerModelObjects.
+     * Trivial constructor for Game.newInstance.
      *
      * @param game The {@code Game} this object belongs to.
      * @param id The object identifier.
@@ -282,7 +282,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
     }
 
 
-    // Implement ServerModelObject
+    // Implement TurnTaker
 
     /**
      * New turn for this colony tile.

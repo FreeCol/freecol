@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.DOMMessageHandler;
 
 import org.w3c.dom.Element;
 
@@ -42,16 +42,17 @@ public final class DummyConnection extends Connection {
 
 
     /**
-     * Sets up a dummy connection using the specified {@link MessageHandler}s.
+     * Sets up a dummy connection using the specified message handler.
      *
      * @param name A name for this connection.
-     * @param incomingMessageHandler The {@code MessageHandler}
+     * @param incomingMessageHandler The {@code DOMMessageHandler}
      *     to call for each message received.
      */
-    public DummyConnection(String name, MessageHandler incomingMessageHandler) {
+    public DummyConnection(String name,
+                           DOMMessageHandler incomingMessageHandler) {
         super(name);
         
-        setMessageHandler(incomingMessageHandler);
+        setDOMMessageHandler(incomingMessageHandler);
     }
 
 
@@ -105,12 +106,13 @@ public final class DummyConnection extends Connection {
      */
     @Override
     public boolean sendAndWaitElement(Element request) {
-        if (!isAlive()) return false;
+        DummyConnection other = getOtherConnection();
+        if (other == null) return false;
         if (request == null) return true;
         final String tag = request.getTagName();
         try {
             log(request, true);
-            Element reply = getOtherConnection().handleElement(request);
+            Element reply = other.handleElement(request);
             log(reply, false);
             return true;
         } catch (FreeColException fce) {

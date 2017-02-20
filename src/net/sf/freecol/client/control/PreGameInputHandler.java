@@ -54,6 +54,7 @@ import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer.ServerState;
 
 import org.w3c.dom.Element;
@@ -316,11 +317,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                     for (;;) {
                         game = getGame();
                         if (game != null && game.getMap() != null) break;
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException ie) {
-                            logger.log(Level.SEVERE, "Thread used for starting a game has been interupted.", ie);
-                        }
+                        Utils.delay(200, "Starting a game has been interupted.");
                     }
                     
                     SwingUtilities.invokeLater(() -> {

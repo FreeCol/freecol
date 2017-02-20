@@ -174,8 +174,9 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.metaserver.ServerInfo;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.metaserver.ServerInfo;
 
 
 /**
@@ -233,9 +234,7 @@ public final class Canvas extends JDesktopPane {
                 @Override
                 public void run() {
                     while (!fcd.responded()) {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {}
+                        Utils.delay(500, "Dialog interrupted.");
                     }
                     // ...before handling the result.
                     handler.handle(fcd.getResponse());
@@ -914,14 +913,7 @@ public final class Canvas extends JDesktopPane {
                 return null;
             }
         } catch (Exception e) {}
-
-        String className = comp.getClass().getName();
-        try {
-            return new Point(co.getInteger(className + ".x"),
-                             co.getInteger(className + ".y"));
-        } catch (Exception e) {
-            return null;
-        }
+        return co.getPanelPosition(comp.getClass().getName());
     }
 
     /**
@@ -939,14 +931,7 @@ public final class Canvas extends JDesktopPane {
                 return null;
             }
         } catch (Exception e) {}
-
-        String className = comp.getClass().getName();
-        try {
-            return new Dimension(co.getInteger(className + ".w"),
-                                 co.getInteger(className + ".h"));
-        } catch (Exception e) {
-            return null;
-        }
+        return co.getPanelSize(comp.getClass().getName());
     }
 
     /**
@@ -2423,11 +2408,10 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display the river style dialog.
      *
-     * @param tile An optional tile to make visible (not under the dialog).
      * @return The response returned by the dialog.
      */
-    public String showRiverStyleDialog(Tile tile) {
-        return showFreeColDialog(new RiverStyleDialog(freeColClient, frame), tile);
+    public String showRiverStyleDialog() {
+        return showFreeColDialog(new RiverStyleDialog(freeColClient, frame), null);
     }
 
     /**

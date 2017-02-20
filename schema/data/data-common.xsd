@@ -23,6 +23,12 @@
     </xs:documentation>
   </xs:annotation>
 
+  <xs:simpleType name="AIGoodsId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="aiGoods:(|am)([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="BuildingId">
     <xs:restriction base="xs:string">
       <xs:pattern value="building:([0-9])+" />
@@ -79,7 +85,7 @@
 
   <xs:simpleType name="LocationId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="(tile|unit|colony|europe|colonyTile|building|indianSettlement):([0-9])+" />
+      <xs:pattern value="(tile|unit|colony|europe|colonyTile|building|indianSettlement|highSeas|map):([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -112,14 +118,6 @@
       <xs:pattern value="monarch:([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
-
-  <!-- @compat 0.10.x -->
-  <xs:simpleType name="PlayerExploredTileId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="playerExploredTile:([0-9])+" />
-    </xs:restriction>
-  </xs:simpleType>
-  <!-- end @compat 0.10.x -->
 
   <xs:simpleType name="PlayerId">
     <xs:restriction base="xs:string">
@@ -159,19 +157,27 @@
 
   <xs:simpleType name="TileImprovementId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="tileImprovement:([0-9])+" />
+      <!-- @compat 0.11.x
+           To Become: <xs:pattern value="tileImprovement:([0-9])+" />
+      -->
+      <xs:pattern value="(tileimprovement|tileImprovement):([0-9])+" />
+      <!-- end @compat 0.11.x -->
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="TileImprovementPlanId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="tileImprovementPlan:([0-9])+" />
+      <xs:pattern value="tileImprovementPlan:(|am)([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="TileItemContainerId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="tileItemContainer:([0-9])+" />
+      <!-- @compat 0.11.x
+           To Become: <xs:pattern value="tileItemContainer:([0-9])+" />
+      -->
+      <xs:pattern value="(tileitemcontainer|tileItemContainer):([0-9])+" />
+      <!-- end @compat 0.11.x -->
     </xs:restriction>
   </xs:simpleType>
 
@@ -183,7 +189,7 @@
 
   <xs:simpleType name="TransportableId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="(aiGoods:am|unit:)([0-9])+" />
+      <xs:pattern value="(aiGoods:|aiGoods:am|unit:)([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -195,7 +201,7 @@
 
   <xs:simpleType name="WishId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="(goods|worker)Wish:am([0-9])+" />
+      <xs:pattern value="(goods|worker)Wish:(|am)([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 

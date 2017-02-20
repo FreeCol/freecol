@@ -48,23 +48,14 @@
           </xs:complexType>
         </xs:element>
       </xs:choice>
-      <xs:attribute name="id" type="RegionId" use="required">
-	      <xs:annotation>
-	        <xs:documentation>
-	          Object ID
-          </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="RegionId" use="optional"/>
-      <!-- end @compat -->
-      <xs:attribute name="nameKey" type="xs:string" use="required">
-	      <xs:annotation>
-	        <xs:documentation>
-	          Key used to retrieve description from Messages
-	        </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
+
+      <xs:attribute name="id" type="RegionId" use="required"/>
+      <!-- @compat 0.11.x key replaced nameKey -->
+      <xs:attribute name="key" type="xs:string" use="optional"/>
+      <xs:attribute name="nameKey" type="xs:string" use="optional"/>
+      <!-- end @compat 0.11.x -->
+
+      <xs:attribute name="name" type="xs:string" use="optional" />
       <xs:attribute name="claimable" type="xs:boolean" use="optional"
 		                default="false">
 	      <xs:annotation>
@@ -104,13 +95,7 @@
 	        </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="type" type="RegionType" use="required">
-	      <xs:annotation>
-	        <xs:documentation>
-	          Object ID
-          </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
+      <xs:attribute name="type" type="RegionType" use="required"/>
       <xs:attribute name="discoveredIn" type="xs:int" use="optional"
 		                default="-1">
 	      <xs:annotation>
@@ -126,14 +111,13 @@
 	        </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="parent" type="xs:string" use="optional">
+      <xs:attribute name="parent" type="RegionId" use="optional">
 	      <xs:annotation>
 	        <xs:documentation>
 	          The parent Region of this Region.
 	        </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="name" type="xs:string" use="optional" />
     </xs:complexType>
   </xs:element>
 
@@ -147,15 +131,6 @@
       <xs:enumeration value="land" />
       <xs:enumeration value="mountain" />
       <xs:enumeration value="desert" />
-      <!-- @compat 0.10.7 -->
-      <xs:enumeration value="OCEAN" />
-      <xs:enumeration value="COAST" />
-      <xs:enumeration value="LAKE" />
-      <xs:enumeration value="RIVER" />
-      <xs:enumeration value="LAND" />
-      <xs:enumeration value="MOUNTAIN" />
-      <xs:enumeration value="DESERT" />
-      <!-- end @compat 0.10.7 -->
     </xs:restriction>
   </xs:simpleType>
 

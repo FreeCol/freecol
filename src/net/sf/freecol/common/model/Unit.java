@@ -113,10 +113,6 @@ public class Unit extends GoodsLocation
         SENTRY,
         IN_COLONY,
         IMPROVING,
-        // @compat 0.10.0
-        TO_EUROPE,
-        TO_AMERICA,
-        // end @compat
         FORTIFYING,
         SKIPPED;
 
@@ -4322,8 +4318,6 @@ public class Unit extends GoodsLocation
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        boolean full = xw.validFor(getOwner());
-
         if (name != null) xw.writeAttribute(NAME_TAG, name);
 
         xw.writeAttribute(UNIT_TYPE_TAG, unitType);
@@ -4336,7 +4330,7 @@ public class Unit extends GoodsLocation
 
         xw.writeAttribute(ROLE_COUNT_TAG, roleCount);
 
-        if (!full && isOwnerHidden()) {
+        if (!xw.validFor(getOwner()) && isOwnerHidden()) {
             // Pirates do not disclose national characteristics.
             xw.writeAttribute(OWNER_TAG, getGame().getUnknownEnemy());
 
@@ -4358,7 +4352,7 @@ public class Unit extends GoodsLocation
 
         xw.writeAttribute(TREASURE_AMOUNT_TAG, treasureAmount);
 
-        if (full) {
+        if (xw.validFor(getOwner())) {
             if (entryLocation != null) {
                 xw.writeLocationAttribute(ENTRY_LOCATION_TAG, entryLocation);
             }
@@ -4394,6 +4388,11 @@ public class Unit extends GoodsLocation
 
                 xw.writeAttribute(CURRENT_STOP_TAG, currentStop);
             }
+
+        } else {
+            if (getType().canCarryGoods()) {
+                xw.writeAttribute(VISIBLE_GOODS_COUNT_TAG, getVisibleGoodsCount());
+            }
         }
     }
 
@@ -4409,8 +4408,6 @@ public class Unit extends GoodsLocation
 
             if (workImprovement != null) workImprovement.toXML(xw);
 
-        } else if (getType().canCarryGoods()) {
-            xw.writeAttribute(VISIBLE_GOODS_COUNT_TAG, getVisibleGoodsCount());
         }
     }
 

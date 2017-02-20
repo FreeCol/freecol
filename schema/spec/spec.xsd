@@ -20,7 +20,7 @@
       You should have received a copy of the GNU General Public License
       along with FreeCol. If not, see http://www.gnu.org/licenses
 
-      XSD for specification version 0.114
+      XSD for specification version 0.116
       CHANGELOG:
       0.26:  add capture-equipment
       0.27:  add limits
@@ -113,12 +113,16 @@
       0.113: Added competence-factor attribute to building-type.
       0.114: Drop upgrade element from founding-father.
       0.115: Drop equipment.
+      0.116: Mass update to fix neglect of saved game format.
     </xs:documentation>
   </xs:annotation>
 
   <xs:include schemaLocation="spec-model.xsd" />
   <xs:include schemaLocation="spec-building-types.xsd"/>
   <xs:include schemaLocation="spec-disasters.xsd"/>
+  <!-- @compat 0.11.x -->
+  <xs:include schemaLocation="spec-equipment-types.xsd"/>
+  <!-- end @compat 0.11.x -->
   <xs:include schemaLocation="spec-events.xsd"/>
   <xs:include schemaLocation="spec-founding-fathers.xsd"/>
   <xs:include schemaLocation="spec-goods-types.xsd"/>
@@ -155,6 +159,9 @@
         <!-- @compat 0.11.3 -->
         <xs:element ref="tileimprovement-types"/>
         <!-- end @compat 0.11.3 -->
+        <!-- @compat 0.11.x -->
+        <xs:element ref="equipment-types"/>
+        <!-- end @compat 0.11.x -->
       </xs:choice>
 
       <xs:attribute name="id" type="xs:ID"/>

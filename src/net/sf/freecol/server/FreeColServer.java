@@ -94,7 +94,6 @@ import net.sf.freecol.server.generator.SimpleMapGenerator;
 import net.sf.freecol.server.generator.TerrainGenerator;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
-import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.Session;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -265,13 +264,8 @@ public final class FreeColServer {
                 ret = new Server(this, host, port);
                 ret.start();
                 break;
-            } catch (BindException be) {
-                if (i == 1) {
-                    throw new IOException("Bind exception starting server at: "
-                        + host + ":" + port, be);
-                }
             } catch (IOException ie) {
-                if (i == 1) throw ie;
+                if (i <= 1) throw ie; // Give up at last try
             }
             port++;
         }
@@ -496,13 +490,13 @@ public final class FreeColServer {
         ServerState ret = this.serverState;
         switch (this.serverState = serverState) {
         case PRE_GAME: case LOAD_GAME:
-            getServer().setMessageHandlerToAllConnections(this.preGameInputHandler);
+            getServer().setDOMMessageHandlerToAllConnections(this.preGameInputHandler);
             break;
         case IN_GAME:
-            getServer().setMessageHandlerToAllConnections(this.inGameInputHandler);
+            getServer().setDOMMessageHandlerToAllConnections(this.inGameInputHandler);
             break;
         case END_GAME: default:
-            getServer().setMessageHandlerToAllConnections(null);
+            getServer().setDOMMessageHandlerToAllConnections(null);
             break;
         }
         return ret;
@@ -623,6 +617,8 @@ public final class FreeColServer {
         Connection c = new Connection(socket, this.userConnectionHandler,
                                       FreeCol.SERVER_THREAD + name);
         getServer().addConnection(c);
+        // Short delay here improves reliability
+        Utils.delay(100, "New connection delay interrupted");
         c.send(new GameStateMessage(this.serverState));
         if (this.serverState == ServerState.IN_GAME) {
             c.send(new VacantPlayersMessage().setVacantPlayers(getGame()));
@@ -639,10 +635,10 @@ public final class FreeColServer {
     public void addPlayerConnection(Connection connection) {
         switch (this.serverState) {
         case PRE_GAME: case LOAD_GAME:
-            connection.setMessageHandler(this.preGameInputHandler);
+            connection.setDOMMessageHandler(this.preGameInputHandler);
             break;
         case IN_GAME:
-            connection.setMessageHandler(this.inGameInputHandler);
+            connection.setDOMMessageHandler(this.inGameInputHandler);
             break;
         case END_GAME: default:
             return;
@@ -1024,10 +1020,10 @@ public final class FreeColServer {
                                       FreeColServer freeColServer)
         throws IOException, FreeColException, XMLStreamException {
         final int savegameVersion = fis.getSavegameVersion();
+        logger.info("Found savegame version " + savegameVersion);
         if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
             throw new FreeColException("server.incompatibleVersions");
         }
-        logger.info("Found savegame version " + savegameVersion);
 
         ServerGame serverGame = null;
         try (
@@ -1119,44 +1115,6 @@ public final class FreeColServer {
         }
 
         int savegameVersion = fis.getSavegameVersion();
-        // @compat 0.10.x
-        if (savegameVersion < 12) {
-            for (Player p : serverGame.getPlayerList()) {
-                p.setReady(true); // Players in running game must be ready
-                // @compat 0.10.5
-                if (p.isIndian()) {
-                    for (IndianSettlement is : p.getIndianSettlementList()) {
-                        ((ServerIndianSettlement)is).updateMostHated();
-                    }
-                }
-                // end @compat 0.10.5
-
-                if (!p.isIndian() && p.getEurope() != null) {
-                    p.initializeHighSeas();
-
-                    for (Unit u : p.getEurope().getUnitList()) {
-                        // Move units to high seas.  Use setLocation()
-                        // so that units are removed from Europe, and
-                        // appear in correct panes in the EuropePanel
-                        // do not set the UnitState, as this clears
-                        // workLeft.
-                        if (u.getState() == Unit.UnitState.TO_EUROPE) {
-                            logger.info("Found unit on way to europe: " + u);
-                            u.setLocation(p.getHighSeas());//-vis: safe!map
-                            u.setDestination(p.getEurope());
-                        } else if (u.getState() == Unit.UnitState.TO_AMERICA) {
-                            logger.info("Found unit on way to new world: " + u);
-                            u.setLocation(p.getHighSeas());//-vis: safe!map
-                            u.setDestination(serverGame.getMap());
-                        }
-                    }
-                }
-            }
-
-            serverGame.getMap()
-                .forEachTile(t -> TerrainGenerator.encodeStyle(t));
-        }
-        // end @compat 0.10.x
 
         // @compat 0.10.x
         serverGame.getMap().resetContiguity();

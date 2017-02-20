@@ -1977,30 +1977,28 @@ public final class InGameController extends Controller {
      */
     public ChangeSet endTurn(ServerPlayer serverPlayer) {
         final FreeColServer freeColServer = getFreeColServer();
-        final ServerGame game = getGame();
-        ServerPlayer winner = (ServerPlayer)game.checkForWinner();
-        ServerPlayer current = (ServerPlayer)game.getCurrentPlayer();
+        final ServerGame serverGame = getGame();
+        ServerPlayer winner = (ServerPlayer)serverGame.checkForWinner();
+        ServerPlayer current = (ServerPlayer)serverGame.getCurrentPlayer();
 
         if (serverPlayer != current) {
-            throw new IllegalArgumentException("It is not "
-                + serverPlayer.getName() + "'s turn, it is "
-                + ((current == null) ? "noone" : current.getName()) + "'s!");
+            throw new RuntimeException("It is not " + serverPlayer.getName()
+                + "'s turn, it is " + ((current == null) ? "noone"
+                    : current.getName()) + "'s!");
         }
 
+        ChangeSet cs = new ChangeSet();
         for (;;) {
             logger.finest("Ending turn for " + current.getName());
             current.clearModelMessages();
 
             // Check for new turn
-            ChangeSet cs = new ChangeSet();
-            if (game.isNextPlayerInNewTurn()) {
-                ChangeSet next = new ChangeSet();
-                game.csNextTurn(next);
-                game.sendToAll(next);
+            if (serverGame.isNextPlayerInNewTurn()) {
+                serverGame.csNextTurn(cs);
 
                 LogBuilder lb = new LogBuilder(512);
-                lb.add("New turn ", game.getTurn(), " for ");
-                game.csNewTurn(random, lb, cs);
+                lb.add("New turn ", serverGame.getTurn(), " for ");
+                serverGame.csNewTurn(random, lb, cs);
                 lb.shrink(", ");
                 lb.log(logger, Level.FINEST);
                 if (debugOnlyAITurns > 0) {
@@ -2011,9 +2009,11 @@ public final class InGameController extends Controller {
                         FreeColDebugger.signalEndDebugRun();
                     }
                 }
+                serverGame.sendToAll(cs); // Flush changes
+                cs.clear();
             }
 
-            if ((current = (ServerPlayer)game.getNextPlayer()) == null) {
+            if ((current = (ServerPlayer)serverGame.getNextPlayer()) == null) {
                 // "can not happen"
                 return serverPlayer.clientError("Can not get next player");
             }
@@ -2024,8 +2024,7 @@ public final class InGameController extends Controller {
                 current.csWithdraw(cs);
                 logger.info("For " + serverPlayer.getSuffix()
                     + ", " + current.getNation() + " is dead.");
-                game.sendToAll(cs, current);
-                continue;
+                break;
             case ServerPlayer.IS_ALIVE:
                 if (current.isREF() && current.checkForREFDefeat()) {
                     for (Player p : current.getRebels()) {
@@ -2033,33 +2032,36 @@ public final class InGameController extends Controller {
                     }
                     current.csWithdraw(cs);
                     logger.info(current.getNation() + " is defeated.");
-                    game.sendToAll(cs, current);
-                    continue;
                 }
                 break;
             default: // Need to autorecruit a unit to keep alive.
                 current.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
                 break;
             }
+            if (!cs.isEmpty()) { // Flush changes
+                serverGame.sendToAll(cs);
+                cs.clear();
+            }
+
             // Are there humans left?
             // FIXME: see if this can be relaxed so we can run large
             // AI-only simulations.
-            boolean onlyAI = all(game.getConnectedPlayers(), Player::isAI);
+            boolean onlyAI = all(serverGame.getConnectedPlayers(), Player::isAI);
             if (onlyAI) {
-                winner = first(sort(game.getConnectedPlayers(),
+                winner = first(sort(serverGame.getConnectedPlayers(),
                         Comparator.comparingInt(Player::getScore).reversed()));
                 logger.info("No human player left, winner is: " + winner);
                 if (debugOnlyAITurns > 0) { // Complete debug runs
                     FreeColDebugger.signalEndDebugRun();
                 }
-                game.setCurrentPlayer(null);
+                serverGame.setCurrentPlayer(null);
 
                 cs.add(See.all(), new GameEndedMessage(winner, false));
-                game.sendToOthers(serverPlayer, cs);
+                serverGame.sendToOthers(serverPlayer, cs);
                 return cs;
             }
 
-            // Has the player won?
+            // Has the current player won?
             // Do not end single player games where an AI has won,
             // that would stop revenge mode.
             if (winner == current
@@ -2067,17 +2069,19 @@ public final class InGameController extends Controller {
                 boolean highScore = !winner.isAI()
                     && HighScore.newHighScore(winner);
                 cs.add(See.all(), new GameEndedMessage(winner, highScore));
+                serverGame.sendToOthers(serverPlayer, cs);
+                return cs;
             }
 
             // Do "new turn"-like actions that need to wait until right
             // before the player is about to move.
-            game.setCurrentPlayer(current);
+            serverGame.setCurrentPlayer(current);
             if (current.isREF() && current.getEntryLocation() == null) {
                 // Initialize this newly created REF
                 // If the teleportREF option is enabled, teleport it in.
                 REFAIPlayer refAIPlayer = (REFAIPlayer)freeColServer
                     .getAIPlayer(current);
-                boolean teleport = game.getSpecification()
+                boolean teleport = serverGame.getSpecification()
                     .getBoolean(GameOptions.TELEPORT_REF);
                 if (refAIPlayer.initialize(teleport)) {
                     csLaunchREF(current, teleport, cs);
@@ -2116,7 +2120,7 @@ public final class InGameController extends Controller {
             // Prepare to update, with current player last so that it
             // does not immediately start moving and cause further
             // changes which conflict with these updates.
-            List<ServerPlayer> players = game.getConnectedPlayers(current);
+            List<ServerPlayer> players = serverGame.getConnectedPlayers(current);
             players.add(current);
 
             // If this is a debug run, update everyone and continue.
@@ -2124,12 +2128,13 @@ public final class InGameController extends Controller {
                 && freeColServer.getSinglePlayer()
                 && debugOnlyAITurns > 0;
             if (debugSkip) {
-                game.sendToList(players, cs);
+                serverGame.sendToList(players, cs);
+                cs.clear();
                 continue;
             }
             // Flush accumulated changes, returning to serverPlayer.
             players.remove(serverPlayer);
-            game.sendToList(players, cs);
+            serverGame.sendToList(players, cs);
             return cs;
         }
     }

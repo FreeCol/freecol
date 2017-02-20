@@ -82,13 +82,13 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 /**
  * Server version of a unit.
  */
-public class ServerUnit extends Unit implements ServerModelObject {
+public class ServerUnit extends Unit implements TurnTaker {
 
     private static final Logger logger = Logger.getLogger(ServerUnit.class.getName());
 
 
     /**
-     * Trivial constructor required for all ServerModelObjects.
+     * Trivial constructor for Game.newInstance.
      *
      * @param game The {@code Game} in which this unit belongs.
      * @param id The object identifier.
@@ -918,7 +918,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
     }
 
 
-    // Implement ServerModelObject
+    // Implement TurnTaker
 
     /**
      * New turn for this unit.

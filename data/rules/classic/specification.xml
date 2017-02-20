@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.115">
+<freecol-specification id="classic" version="0.116">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -3781,6 +3781,7 @@
                          value="true"/>
           <booleanOption id="model.option.expertStartingUnits"
                          value="false" />
+          <unitListOption id="model.option.immigrants"/>
         </optionGroup>
         <optionGroup id="model.difficulty.natives" editable="false">
           <integerOption id="model.option.landPriceFactor"
@@ -3959,6 +3960,7 @@
                          value="true"/>
           <booleanOption id="model.option.expertStartingUnits"
                          value="false" />
+          <unitListOption id="model.option.immigrants"/>
         </optionGroup>
         <optionGroup id="model.difficulty.natives" editable="false">
           <integerOption id="model.option.landPriceFactor"

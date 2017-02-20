@@ -32,19 +32,23 @@
 	      This class contains server objects.
       </xs:documentation>
     </xs:annotation>
-    <xs:complexType>
 
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-	      <xs:element ref="serverObjects" />
-	      <xs:element ref="game" />
-	      <xs:element ref="aiMain" />
+    <xs:complexType>
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+	      <xs:element ref="game" minOccurs="1" maxOccurs="1"/>
+	      <xs:element ref="aiMain" minOccurs="0" maxOccurs="1"/>
+        <!-- @compat 0.11.x Dropped for 0.12.0 -->
+	      <xs:element ref="serverObjects" minOccurs="0" maxOccurs="1"/>
+        <!-- end @compat 0.11.x -->
       </xs:choice>
 
+      <xs:attribute name="activeUnit" type="UnitId" use="optional" />
+      <xs:attribute name="debug" type="xs:string" use="optional" />
       <xs:attribute name="owner" type="xs:string" use="required" />
       <xs:attribute name="publicServer" type="xs:boolean" use="required" />
+      <xs:attribute name="randomState" type="xs:string" use="required" />
       <xs:attribute name="singleplayer" type="xs:boolean" use="required" />
       <xs:attribute name="version" type="xs:int" use="required" />
-      <xs:attribute name="randomState" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
 

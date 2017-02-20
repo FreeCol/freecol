@@ -44,13 +44,13 @@ import net.sf.freecol.common.util.LogBuilder;
 /**
  * The server version of a building.
  */
-public class ServerBuilding extends Building implements ServerModelObject {
+public class ServerBuilding extends Building implements TurnTaker {
 
     private static final Logger logger = Logger.getLogger(ServerBuilding.class.getName());
 
 
     /**
-     * Trivial constructor required for all ServerModelObjects.
+     * Trivial constructor for Game.newInstance.
      *
      * @param game The {@code Game} this object belongs to.
      * @param id The object identifier.
@@ -238,7 +238,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
     }
 
 
-    // Implement ServerModelObject
+    // Implement TurnTaker
 
     /**
      * New turn for this building.

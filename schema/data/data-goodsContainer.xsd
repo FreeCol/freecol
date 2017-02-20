@@ -44,10 +44,8 @@
           </xs:complexType>
         </xs:element>
       </xs:sequence>
+
       <xs:attribute name="id" type="GoodsContainerId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="GoodsContainerId" use="optional"/>
-      <!-- end @compat -->
     </xs:complexType>
   </xs:element>
 

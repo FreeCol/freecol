@@ -28,31 +28,13 @@
   <xs:element name="monarch">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <!-- @compat 0.10.5 -->
-        <xs:element name="navalUnits">
-          <xs:complexType>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-              <xs:element ref="abstractUnit"></xs:element>
-            </xs:choice>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="landUnits">
-          <xs:complexType>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-              <xs:element ref="abstractUnit"></xs:element>
-            </xs:choice>
-          </xs:complexType>
-        </xs:element>
-        <!-- end @compat -->
         <xs:element name="expeditionaryForce" type="ForceType" />
         <xs:element name="interventionForce" type="ForceType" />
         <xs:element name="mercenaryForce" type="ForceType" />
       </xs:choice>
 
       <xs:attribute name="id" type="MonarchId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="MonarchId" use="optional"/>
-      <!-- end @compat -->
+
       <xs:attribute name="player" type="PlayerId" use="required"/>
       <!-- @compat 0.11.1 -->
       <xs:attribute name="name" type="xs:string" use="optional"/>
@@ -60,11 +42,10 @@
       <!-- @compat 0.11.2 -->
       <xs:attribute name="nameKey" type="xs:string" use="optional"/>
       <!-- end @compat 0.11.2 -->
-      <xs:attribute name="supportSea" type="xs:boolean"
-                    use="optional" default="false"/>
-      <xs:attribute name="displeasure" type="xs:boolean"
-                    use="optional" default="false"/>
-
+      <xs:attribute name="supportSea" type="xs:boolean" use="optional"
+                    default="false"/>
+      <xs:attribute name="displeasure" type="xs:boolean" use="optional"
+                    default="false"/>
     </xs:complexType>
   </xs:element>
 
@@ -79,14 +60,14 @@
 
   <xs:complexType name="ForceType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="navalUnits">
+      <xs:element name="landUnits">
         <xs:complexType>
           <xs:choice minOccurs="0" maxOccurs="unbounded">
             <xs:element ref="abstractUnit" />
           </xs:choice>
         </xs:complexType>
       </xs:element>
-      <xs:element name="landUnits">
+      <xs:element name="navalUnits">
         <xs:complexType>
           <xs:choice minOccurs="0" maxOccurs="unbounded">
             <xs:element ref="abstractUnit" />

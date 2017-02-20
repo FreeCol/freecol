@@ -34,13 +34,8 @@
   <xs:element name="player">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="tension">
-          <xs:complexType>
-            <xs:attribute name="player" type="xs:string" use="required"/>
-            <xs:attribute name="value" type="xs:int" use="optional"
-                          default="0"/>
-          </xs:complexType>
-        </xs:element>
+
+        <xs:element ref="europe"/>
 
         <xs:element name="foundingFathers">
           <xs:complexType>
@@ -58,6 +53,20 @@
             </xs:anyAttribute>
           </xs:complexType>
         </xs:element>
+
+        <xs:element ref="highSeas" />
+        <xs:element ref="historyEvent" />
+
+        <xs:element name="lastSale">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="price" type="xs:int" use="required"/>
+            <xs:attribute name="when" type="xs:int" use="required"/>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element ref="market" />
+        <xs:element ref="monarch" />
 
         <xs:element name="offeredFathers">
           <xs:complexType>
@@ -83,25 +92,24 @@
           </xs:complexType>
         </xs:element>
 
-        <xs:element ref="europe"/>
-        <xs:element ref="monarch" />
-        <xs:element ref="historyEvent" />
+        <xs:element name="tension">
+          <xs:complexType>
+            <xs:attribute name="player" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="xs:int" use="optional"
+                          default="0"/>
+          </xs:complexType>
+        </xs:element>
+
         <xs:element ref="tradeRoute"/>
-        <xs:element ref="market" />
-        <xs:element ref="highSeas" />
+
         <xs:element ref="ability" />
         <xs:element ref="modifier" />
       </xs:choice>
 
       <xs:attribute name="id" type="PlayerId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="PlayerId" use="optional"/>
-      <!-- end @compat -->
+
       <xs:attribute name="username" type="xs:string" use="required"/>
       <xs:attribute name="nationId" type="NationId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="nationID" type="NationId" use="optional"/>
-      <!-- end @compat -->
       <xs:attribute name="nationType" type="NationTypeId" use="optional"/>
       <xs:attribute name="admin" type="xs:boolean" use="optional"
                     default="false"/>
@@ -132,9 +140,13 @@
       <xs:attribute name="entryLocation" type="xs:string" use="optional"/>
       <xs:attribute name="currentFather" type="xs:string" use="optional"/>
 
+      <!-- @compat 0.11.0 Briefly existed by mistake in this release only -->
+      <xs:attribute name="index.land" type="xs:string" use="optional"/>
+      <xs:attribute name="index.mountain" type="xs:string" use="optional"/>
+      <xs:attribute name="index.river" type="xs:string" use="optional"/>
+      <!-- end @compat 0.11.0 -->
     </xs:complexType>
   </xs:element>
-
 
   <xs:simpleType name="PlayerType">
     <xs:restriction base="xs:NMTOKEN">
@@ -144,14 +156,6 @@
       <xs:enumeration value="independent" />
       <xs:enumeration value="royal" />
       <xs:enumeration value="undead" />
-      <!-- @compat 0.10.x -->
-      <xs:enumeration value="NATIVE" />
-      <xs:enumeration value="COLONIAL" />
-      <xs:enumeration value="REBEL" />
-      <xs:enumeration value="INDEPENDENT" />
-      <xs:enumeration value="ROYAL" />
-      <xs:enumeration value="UNDEAD" />
-      <!-- end @compat 0.10.x -->
     </xs:restriction>
   </xs:simpleType>
 
@@ -161,12 +165,6 @@
       <xs:enumeration value="cease_fire" />
       <xs:enumeration value="peace" />
       <xs:enumeration value="alliance" />
-      <!-- @compat 0.10.x -->
-      <xs:enumeration value="WAR" />
-      <xs:enumeration value="CEASE_FIRE" />
-      <xs:enumeration value="PEACE" />
-      <xs:enumeration value="ALLIANCE" />
-      <!-- end @compat 0.10.x -->
     </xs:restriction>
   </xs:simpleType>
 
@@ -177,18 +175,12 @@
         <xs:element name="destination">
           <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
-            <!-- @compat 0.10.x -->
-            <xs:attribute name="ID" type="xs:string" use="optional"/>
-            <!-- end @compat -->
           </xs:complexType>
         </xs:element>
       </xs:choice>
+
       <xs:attribute name="id" type="xs:string" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="xs:string" use="optional"/>
-      <!-- end @compat -->
     </xs:complexType>
   </xs:element>
-
 
 </xs:schema>

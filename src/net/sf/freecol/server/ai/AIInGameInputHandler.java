@@ -51,6 +51,7 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FeatureChangeMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
@@ -59,7 +60,6 @@ import net.sf.freecol.common.networking.GameEndedMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
-import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NativeGiftMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
@@ -87,7 +87,7 @@ import org.w3c.dom.Element;
 /**
  * Handles the network messages that arrives while in the game.
  */
-public final class AIInGameInputHandler implements MessageHandler {
+public final class AIInGameInputHandler implements DOMMessageHandler {
 
     private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
 

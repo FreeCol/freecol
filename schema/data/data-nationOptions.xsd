@@ -37,9 +37,8 @@
         <xs:element ref="Nations" minOccurs="0" maxOccurs="unbounded"/>
         <!-- end @compat 0.11.3 -->
       </xs:sequence>
+      <xs:attribute name="nationalAdvantages" type="NationalAdvantageType" use="required" />
       <xs:attribute name="selectColors" type="xs:boolean" use="optional" />
-      <xs:attribute name="nationalAdvantages"
-                    type="NationalAdvantageType" use="required" />
     </xs:complexType>
   </xs:element>
 
@@ -70,11 +69,6 @@
       <xs:enumeration value="none" />
       <xs:enumeration value="fixed" />
       <xs:enumeration value="selectable" />
-      <!-- @compat 0.10.7 -->
-      <xs:enumeration value="NONE" />
-      <xs:enumeration value="FIXED" />
-      <xs:enumeration value="SELECTABLE" />
-      <!-- end @compat -->
     </xs:restriction>
   </xs:simpleType>
 
@@ -83,11 +77,6 @@
       <xs:enumeration value="available" />
       <xs:enumeration value="ai_only" />
       <xs:enumeration value="not_available" />
-      <!-- @compat 0.10.7 -->
-      <xs:enumeration value="AVAILABLE" />
-      <xs:enumeration value="AI_ONLY" />
-      <xs:enumeration value="NOT_AVAILABLE" />
-      <!-- end @compat -->
     </xs:restriction>
   </xs:simpleType>
 

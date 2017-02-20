@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2017  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+
+    In case of incompatible changes, please update version number and
+    XSD schema for validation.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Equipment Types, to go away -->
+  <xs:element name="equipment-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="delete" minOccurs="0" maxOccurs="unbounded" 
+                    type="EquipmentTypeId" />
+
+        <xs:element ref="equipment-type" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="equipment-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element ref="capture-equipment"/>
+        <xs:element ref="compatible-equipment"/>
+        <xs:element ref="limit"/>
+        <xs:element ref="modifier"/>
+        <xs:element ref="required-ability"/>
+        <xs:element ref="required-location-ability"/>
+        <xs:element ref="required-goods"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="extends" use="optional" type="xs:string" />
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+
+      <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="combat-loss-priority" type="xs:int"/>
+      <xs:attribute name="maximum-count" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="role" type="RoleId"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="compatible-equipment">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="EquipmentTypeId"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="capture-equipment">
+    <xs:complexType>
+      <xs:attribute name="id" type="EquipmentTypeId"/>
+
+      <xs:attribute name="by-indians" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

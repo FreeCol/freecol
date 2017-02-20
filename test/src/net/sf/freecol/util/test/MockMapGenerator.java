@@ -49,10 +49,8 @@ public class MockMapGenerator implements MapGenerator {
         // For all map descendents in the old game, move them to the
         // new game.
         Game oldGame = map.getGame();
-        Iterator<FreeColGameObject> fcgoi = oldGame.getFreeColGameObjectIterator();
         game.setMap(map);
-        while (fcgoi.hasNext()) {
-            FreeColGameObject fcgo = fcgoi.next();
+        for (FreeColGameObject fcgo : oldGame.getFreeColGameObjectList()) {
             if (fcgo instanceof Europe
                 || fcgo instanceof HighSeas
                 || fcgo instanceof Market

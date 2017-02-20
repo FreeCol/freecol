@@ -102,10 +102,11 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -1542,9 +1543,7 @@ public final class InGameController extends FreeColClientHolder {
         if (unit.getMovesLeft() <= 0
             && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
             getGUI().paintImmediatelyCanvasInItsBounds();
-            try {
-                Thread.sleep(UNIT_LAST_MOVE_DELAY);
-            } catch (InterruptedException e) {} // Ignore
+            Utils.delay(UNIT_LAST_MOVE_DELAY, "Last unit move delay interrupted.");
         }
 
         // Update the active unit and GUI.

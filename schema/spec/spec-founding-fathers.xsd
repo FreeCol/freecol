@@ -56,6 +56,12 @@
             <xs:attribute name="id" use="required" type="UnitTypeId"/>
           </xs:complexType>
         </xs:element>
+        <xs:element name="upgrade">
+          <xs:complexType>
+            <xs:attribute name="from-id" type="xs:string" use="required"/>
+            <xs:attribute name="to-id" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
 
       <xs:attribute name="id" use="required" type="xs:ID"/>

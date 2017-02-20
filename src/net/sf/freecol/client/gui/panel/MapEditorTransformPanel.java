@@ -178,7 +178,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 MapTransform newMapTransform = null;
                 if (ctlr.getMapTransform() != mt) {
                     if(mt instanceof RiverStyleTransform) {
-                        String style = getGUI().showRiverStyleDialog(null);
+                        String style = getGUI().showRiverStyleDialog();
                         if(style != null)
                             ((RiverStyleTransform)mt).setStyle(style);
                     }

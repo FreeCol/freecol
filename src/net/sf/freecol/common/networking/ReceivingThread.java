@@ -52,11 +52,9 @@ final class ReceivingThread extends Thread {
      * has to be called.  Calls to {@code close()} have no
      * effect, the underlying input stream has to be closed directly.
      */
-    private static class FreeColNetworkInputStream extends InputStream {
+    private static class FreeColNetworkInputStream extends BufferedInputStream {
 
         private static final int EOS_RESULT = -1;
-
-        private final InputStream in;
 
         private final byte[] buffer = new byte[Connection.BUFFER_SIZE];
 
@@ -66,17 +64,31 @@ final class ReceivingThread extends Thread {
 
         private int bSize = 0;
 
+        private int markStart = -1;
+
+        private int markSize = -1;
+
         private boolean wait = false;
 
 
         /**
          * Creates a new {@code FreeColNetworkInputStream}.
          * 
-         * @param in The input stream in which this object should get the data
-         *            from.
+         * @param in The input stream in which this object should get
+         *     the data from.
          */
         public FreeColNetworkInputStream(InputStream in) {
-            this.in = in;
+            super(in);
+        }
+
+
+        /**
+         * Really close this stream.
+         */
+        public void reallyClose() {
+            try {
+                super.close();
+            } catch (IOException ioe) {}
         }
 
         /**
@@ -90,6 +102,14 @@ final class ReceivingThread extends Thread {
         }
 
         /**
+         * Invalidate the mark.
+         */
+        private void unmark() {
+            this.markStart = -1;
+            this.markSize = -1;
+        }
+
+        /**
          * Fills the buffer with data.
          * 
          * @return True if a non-zero amount of data was read into the buffer.
@@ -99,7 +119,7 @@ final class ReceivingThread extends Thread {
         private boolean fill() throws IOException {
             if (this.bSize != 0) throw new IllegalStateException("Not empty.");
 
-            int r = this.in.read(buffer, 0, buffer.length);
+            int r = super.read(buffer, 0, buffer.length);
             if (r <= 0) return false;
 
             this.bStart = 0;
@@ -135,9 +155,13 @@ final class ReceivingThread extends Thread {
 
             int n = 0;
             for (; n < len; n++) {
-                if (this.bSize == 0 && !fill()) {
-                    this.wait = true;
-                    break;
+                if (this.bSize == 0) {
+                    if (fill()) {
+                        unmark();
+                    } else {
+                        this.wait = true;
+                        break;
+                    }
                 }
 
                 byte value = buffer[this.bStart];
@@ -151,6 +175,49 @@ final class ReceivingThread extends Thread {
             }
 
             return (n > 0 || !this.wait) ? n : EOS_RESULT;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void reset() throws IOException {
+            if (this.markStart < 0) {
+                throw new IOException("reset of unmarked stream");
+            }
+            this.bStart = this.markStart;
+            this.bSize = this.markSize;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void mark(int readLimit) {
+            if (this.bSize == 0) { // Make sure there is something to mark
+                try {
+                    fill();
+                } catch (IOException ioe) {}
+            }
+                
+            this.markStart = this.bStart;
+            this.markSize = this.bSize;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean markSupported() {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void close() {
+            ; // Do nothing
         }
     }
 
@@ -247,19 +314,9 @@ final class ReceivingThread extends Thread {
     }
 
     // Individual parts of listen().  Work in progress
-    private String peek(FreeColXMLReader xr) {
-        try {
-            xr.nextTag();
-            return xr.getLocalName();
-        } catch (XMLStreamException xse) {
-            // Expected to fail at EOS
-        }
-        return TrivialMessage.DISCONNECT_TAG;
-    }
-
     private DOMMessage reader(BufferedInputStream bis)
         throws IOException, SAXException {
-        bis.reset();
+        //bis.reset();
         return new DOMMessage(bis);
     }
 
@@ -324,6 +381,14 @@ final class ReceivingThread extends Thread {
         DOMMessage msg;
         switch (tag) {
 
+        case TrivialMessage.DISCONNECT_TAG:
+            // Do not actually read the message, it might be a fake one
+            // due to end-of-stream.
+            msg = TrivialMessage.DISCONNECT_MESSAGE;
+            t = update(msg);
+            askToStop();
+            break;
+
         case Connection.REPLY_TAG:
             // A reply.  Always respond, even when failing, so as to
             // unblock the waiting thread.
@@ -363,30 +428,27 @@ final class ReceivingThread extends Thread {
      * @throws XMLStreamException if a problem occured during parsing.
      */
     private void listen() throws IOException, SAXException, XMLStreamException {
-        in.enable();
-
-        // Open a rewindable stream
-        final int LOOK_AHEAD = Connection.BUFFER_SIZE;
-        BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
+        this.in.enable();
+        this.in.mark(Connection.BUFFER_SIZE);
 
         // Start using FreeColXMLReader.  This must grow.
+        String tag = null;
+        int replyId = -1;
         FreeColXMLReader xr = null;
-        bis.mark(LOOK_AHEAD);
         try {
-            xr = new FreeColXMLReader(bis); //.setTracing(true);
-            String tag = peek(xr);
-            int replyId = -1;
-            if (TrivialMessage.DISCONNECT_TAG.equals(tag)) {
-                // Could not read tag, or real disconnect.
-                // Signal stop, and do *not* try to read reply id, it will fail
-                askToStop();
-            } else {
-                replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
-            }
-            handle(bis, tag, replyId);
+            xr = new FreeColXMLReader(this.in); //.setTracing(true);
+            xr.nextTag();
+            tag = xr.getLocalName();
+            replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
+        } catch (XMLStreamException xse) {
+            tag = TrivialMessage.DISCONNECT_TAG;
         } finally {
             if (xr != null) xr.close();
         }
+            
+        this.in.reset();
+        this.in.enable();
+        handle(this.in, tag, replyId);
     }
 
 

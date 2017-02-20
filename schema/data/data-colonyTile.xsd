@@ -35,23 +35,9 @@
       </xs:choice>
       
       <xs:attribute name="id" type="ColonyTileId" use="required"/>
-      <!-- @compat 0.10.x -->
-      <xs:attribute name="ID" type="ColonyTileId" use="optional"/>
-      <!-- end @compat -->
-      <xs:attribute name="colony" type="ColonyId" use="required">
-	      <xs:annotation>
-	        <xs:documentation>
-	          Parent colony
-	        </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="workTile" type="TileId" use="required">
-	      <xs:annotation>
-	        <xs:documentation>
-	          Identifier for the tile on the map
-	        </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
+
+      <xs:attribute name="colony" type="ColonyId" use="required"/>
+      <xs:attribute name="workTile" type="TileId" use="required"/>
     </xs:complexType>
   </xs:element>
 </xs:schema>

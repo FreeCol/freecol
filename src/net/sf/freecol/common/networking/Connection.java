@@ -86,7 +86,7 @@ public class Connection implements Closeable {
 
     private ReceivingThread receivingThread;
 
-    private MessageHandler messageHandler;
+    private DOMMessageHandler domMessageHandler;
 
     private String name;
 
@@ -109,7 +109,7 @@ public class Connection implements Closeable {
         this.in = null;
         this.out = null;
         this.receivingThread = null;
-        this.messageHandler = null;
+        this.domMessageHandler = null;
 
         // Make a (pretty printing) transformer, but only make the log
         // writer in COMMS-debug mode.
@@ -127,12 +127,12 @@ public class Connection implements Closeable {
      * {@code Socket} and {@link MessageHandler}.
      *
      * @param socket The socket to the client.
-     * @param messageHandler The MessageHandler to call for each message
-     *     received.
+     * @param domMessageHandler The {@code DOMMessageHandler} to call
+     *     for each message received.
      * @param name The connection name.
      * @exception IOException if streams can not be derived from the socket.
      */
-    public Connection(Socket socket, MessageHandler messageHandler,
+    public Connection(Socket socket, DOMMessageHandler domMessageHandler,
                       String name) throws IOException {
         this(name);
 
@@ -140,7 +140,7 @@ public class Connection implements Closeable {
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
         this.receivingThread = new ReceivingThread(this, this.in, name);
-        this.messageHandler = messageHandler;
+        this.domMessageHandler = domMessageHandler;
 
         this.receivingThread.start();
     }
@@ -151,14 +151,14 @@ public class Connection implements Closeable {
      *
      * @param host The host to connect to.
      * @param port The port to connect to.
-     * @param messageHandler The MessageHandler to call for each message
-     *     received.
+     * @param domMessageHandler The {@code DOMMessageHandler} to call
+     *     for each message received.
      * @param name The name for the connection.
      * @exception IOException if the socket creation is problematic.
      */
-    public Connection(String host, int port, MessageHandler messageHandler,
+    public Connection(String host, int port, DOMMessageHandler domMessageHandler,
                       String name) throws IOException {
-        this(createSocket(host, port), messageHandler, name);
+        this(createSocket(host, port), domMessageHandler, name);
     }
 
 
@@ -289,21 +289,21 @@ public class Connection implements Closeable {
     }
     
     /**
-     * Gets the MessageHandler for this Connection.
+     * Gets the message handler for this connection.
      *
-     * @return The MessageHandler for this Connection.
+     * @return The {@code DOMMessageHandler} for this Connection.
      */
-    public MessageHandler getMessageHandler() {
-        return this.messageHandler;
+    public DOMMessageHandler getDOMMessageHandler() {
+        return this.domMessageHandler;
     }
 
     /**
-     * Sets the MessageHandler for this Connection.
+     * Sets the message handler for this connection.
      *
-     * @param mh The new MessageHandler for this Connection.
+     * @param mh The new {@code DOMMessageHandler} for this Connection.
      */
-    public void setMessageHandler(MessageHandler mh) {
-        this.messageHandler = mh;
+    public void setDOMMessageHandler(DOMMessageHandler mh) {
+        this.domMessageHandler = mh;
     }
 
     /**
@@ -531,8 +531,8 @@ public class Connection implements Closeable {
      * @exception FreeColException if there is a handler problem.
      */
     public Element handleElement(Element request) throws FreeColException {
-        return (this.messageHandler == null) ? null
-            : this.messageHandler.handle(this, request);
+        return (this.domMessageHandler == null) ? null
+            : this.domMessageHandler.handle(this, request);
     }
 
 
@@ -546,6 +546,20 @@ public class Connection implements Closeable {
             logger.log(Level.WARNING, "Unexpected exception", e);
         }
         return null;
+    }
+
+    /**
+     * Sends the given message over this connection and waits for
+     * confirmation of reception before returning.
+     *
+     * @param message The {@code Message} to send.
+     * @return True if the message was sent or was null.
+     */
+    public boolean sendAndWaitMessage(Message message) {
+        if (message == null) return true;
+        boolean ret = sendAndWaitElement(((DOMMessage)message).toXMLElement());
+        logger.fine("SendAndWait: " + message.getType());
+        return ret;
     }
 
     /**
