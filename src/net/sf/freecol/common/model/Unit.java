@@ -602,13 +602,11 @@ public class Unit extends GoodsLocation
 
     /**
      * Checks if this unit is a person, that is not a ship or wagon.
-     * Surprisingly difficult without explicit enumeration because
-     * model.ability.person only arrived in 0.10.1.
      *
      * @return True if this unit is a person.
      */
     public boolean isPerson() {
-        return (this.unitType == null) ? null
+        return (this.unitType == null) ? false
             : this.unitType.hasAbility(Ability.PERSON);
     }
 
@@ -983,12 +981,7 @@ public class Unit extends GoodsLocation
      */
     public boolean isInMission() {
         return hasAbility(Ability.ESTABLISH_MISSION)
-            && (getLocation() instanceof IndianSettlement
-                // @compat 0.10.x
-                // Remove this when PET missionary serialization is retired
-                || getLocation() == null
-                // end @compat 0.10.x
-                );
+            && getLocation() instanceof IndianSettlement;
     }
 
     /**
@@ -4236,21 +4229,11 @@ public class Unit extends GoodsLocation
         if (settlement != null) {
             return settlement.getAbilities(id, unitType, turn);
         }
-        if (!isInEurope()) return Stream.<Ability>empty();
-        
-        // @compat 0.10.x
-        // Europe is special.  It makes sense here to do:
-        //   Europe europe = owner.getEurope();
-        // However while there is fixup code in readChildren that
-        // calls getAbilities() we can not rely on owner.europe being
-        // initialized yet.  Hence the following:
-        Location loc = getLocation();
-        Europe europe = (loc instanceof Europe) ? (Europe)loc
-            : (loc instanceof Unit) ? (Europe)((Unit)loc).getLocation()
-            : null;
-        // end @compat 0.10.x
-        return (europe == null) ? Stream.<Ability>empty()
-            : europe.getAbilities(id, getType(), turn);
+        if (isInEurope()) {
+            Europe europe = owner.getEurope();
+            if (europe != null) return europe.getAbilities(id, getType(), turn);
+        }
+        return Stream.<Ability>empty();
     }
 
     /**
@@ -4300,9 +4283,6 @@ public class Unit extends GoodsLocation
     private static final String VISIBLE_GOODS_COUNT_TAG = "visibleGoodsCount";
     private static final String WORK_LEFT_TAG = "workLeft";
     private static final String WORK_TYPE_TAG = "workType";
-    // @compat 0.10.7
-    private static final String OLD_HIT_POINTS_TAG = "hitpoints";
-    // end @compat 0.10.7
     // @compat 0.11.0
     private static final String OLD_EQUIPMENT_TAG = "equipment";
     // end @compat 0.11.0
@@ -4494,9 +4474,6 @@ public class Unit extends GoodsLocation
         turnsOfTraining = xr.getAttribute(TURNS_OF_TRAINING_TAG, 0);
 
         hitPoints = xr.getAttribute(HIT_POINTS_TAG, -1);
-        // @compat 0.10.7
-        if (hitPoints < 0) hitPoints = xr.getAttribute(OLD_HIT_POINTS_TAG, -1);
-        // end @compat
 
         teacher = xr.makeFreeColObject(game, TEACHER_TAG, Unit.class, false);
 
@@ -4539,20 +4516,6 @@ public class Unit extends GoodsLocation
         workImprovement = null;
 
         super.readChildren(xr);
-
-        // @compat 0.10.x
-        // There was a bug in 0.10.x that did not clear tile
-        // improvements after they were complete, leading to units
-        // that still had a tile improvement after they had moved
-        // away.  Consequently when reading such bogus improvements,
-        // there is no guarantee that the tile is defined so
-        // compatibility code in TileImprovement.readAttributes
-        // tolerates null tile references.  These are obviously bogus,
-        // so drop them.
-        if (workImprovement != null && workImprovement.getTile() == null) {
-            workImprovement = null;
-        }
-        // end @compat 0.10.x
     }
 
     /**
@@ -4566,8 +4529,7 @@ public class Unit extends GoodsLocation
 
         // @compat 0.11.0
         if (OLD_EQUIPMENT_TAG.equals(tag)) {
-            while (xr.moreTags()
-                || !OLD_EQUIPMENT_TAG.equals(xr.getLocalName()));
+            xr.swallowTag(OLD_EQUIPMENT_TAG);
         // end @compat 0.11.0
 
         } else if (TileImprovement.TAG.equals(tag)
