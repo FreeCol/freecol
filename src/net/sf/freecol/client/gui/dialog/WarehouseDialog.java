@@ -153,7 +153,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             GoodsLabel goodsLabel = new GoodsLabel(
                 freeColClient.getGUI(), goods);
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
-            add(goodsLabel, "span 1 3");
+            add(goodsLabel, "span 1 2");
 
             // low level settings
             String str;
