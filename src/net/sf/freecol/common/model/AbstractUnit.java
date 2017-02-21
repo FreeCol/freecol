@@ -241,9 +241,6 @@ public class AbstractUnit extends FreeColObject {
         super.readAttributes(xr);
 
         roleId = xr.getAttribute(ROLE_TAG, Specification.DEFAULT_ROLE_ID);
-        // @compat 0.10.7
-        roleId = Role.fixRoleId(roleId);
-        // end @compat
 
         number = xr.getAttribute(NUMBER_TAG, 1);
     }

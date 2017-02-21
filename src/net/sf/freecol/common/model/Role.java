@@ -142,21 +142,6 @@ public class Role extends BuildableType {
         return lastPart(roleId, ".");
     }
 
-    // @compat 0.10.7
-    /**
-     * Fix a role id.
-     *
-     * @param roleId The role id to fix.
-     * @return The fixed role id.
-     */
-    public static String fixRoleId(String roleId) {
-        if (roleId.indexOf('.') < 0) {
-            roleId = "model.role." + roleId.toLowerCase(Locale.US);
-        }
-        return roleId;
-    }
-    // end @compat
-
     /**
      * Get the downgraded role from this one.
      *

@@ -251,10 +251,6 @@ public class EuropeanNationType extends NationType {
             String roleId = xr.getAttribute(ROLE_TAG,
                                             Specification.DEFAULT_ROLE_ID);
 
-            // @compat 0.10.7
-            roleId = Role.fixRoleId(roleId);
-            // end @compat
-
             boolean ex = xr.getAttribute(EXPERT_STARTING_UNITS_TAG, false);
 
             addStartingUnit(id, new AbstractUnit(type, roleId, 1), ex);

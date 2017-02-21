@@ -220,29 +220,6 @@ public class Force extends FreeColSpecObject {
             (naval) ? this.navalUnits : this.landUnits);
     }
 
-    // @compat 0.10.x
-    public void fixOldREFRoles() {
-        Iterator<AbstractUnit> aui = landUnits.iterator();
-        List<AbstractUnit> todo = new ArrayList<>();
-        while (aui.hasNext()) {
-            AbstractUnit au = aui.next();
-            if ("SOLDIER".equals(au.getRoleId())
-                || "model.role.soldier".equals(au.getRoleId())) {
-                au.setRoleId("model.role.infantry");
-                aui.remove();
-                todo.add(au);
-            } else if ("DRAGOON".equals(au.getRoleId())
-                || "model.role.dragoon".equals(au.getRoleId())) {
-                au.setRoleId("model.role.cavalry");
-                aui.remove();
-                todo.add(au);
-            }
-        }
-        while (!todo.isEmpty()) add(todo.remove(0));
-        updateSpaceAndCapacity();
-    }
-    // end @compat 0.10.x
-
                     
     // Serialization
 

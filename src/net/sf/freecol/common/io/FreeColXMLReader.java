@@ -999,22 +999,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
             : spec.getType(attrib, returnClass);
     }
 
-    // @compat 0.10.7
-    public <T extends FreeColSpecObjectType> T getRole(Specification spec,
-        String attributeName, Class<T> returnClass, T defaultValue) {
-
-        String attrib =
-            (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
-            getAttribute(attributeName, (String)null);
-
-        if (attrib == null) {
-            return defaultValue;
-        }
-        attrib = Role.fixRoleId(attrib);
-        return spec.getType(attrib, returnClass);
-    }
-    // end @compat
-
     /**
      * Copy a FreeColObject by serializing it and reading back the result
      * with a non-interning stream.

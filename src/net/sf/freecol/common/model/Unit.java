@@ -4414,47 +4414,9 @@ public class Unit extends GoodsLocation
 
         state = xr.getAttribute(STATE_TAG, UnitState.class, UnitState.ACTIVE);
 
-        role = xr.getRole(spec, ROLE_TAG, Role.class,
-                          spec.getDefaultRole());
-        // @compat 0.10.x
-        // Fix roles
-        if (owner.isIndian()) {
-            if ("model.role.scout".equals(role.getId())) {
-                role = spec.getRole("model.role.mountedBrave");
-            } else if ("model.role.soldier".equals(role.getId())) {
-                role = spec.getRole("model.role.armedBrave");
-            } else if ("model.role.dragoon".equals(role.getId())) {
-                role = spec.getRole("model.role.nativeDragoon");
-            }
-        } else if (owner.isREF()) {
-            if ("model.role.soldier".equals(role.getId())
-                && unitType.hasAbility(Ability.REF_UNIT)) {
-                role = spec.getRole("model.role.infantry");
-            } else if ("model.role.dragoon".equals(role.getId())
-                && unitType.hasAbility(Ability.REF_UNIT)) {
-                role = spec.getRole("model.role.cavalry");
-            } else if ("model.role.infantry".equals(role.getId())
-                && !unitType.hasAbility(Ability.REF_UNIT)) {
-                role = spec.getRole("model.role.soldier");
-            } else if ("model.role.cavalry".equals(role.getId())
-                && !unitType.hasAbility(Ability.REF_UNIT)) {
-                role = spec.getRole("model.role.dragoon");
-            }
-        } else {
-            if ("model.role.infantry".equals(role.getId())) {
-                role = spec.getRole("model.role.soldier");
-            } else if ("model.role.cavalry".equals(role.getId())) {
-                role = spec.getRole("model.role.dragoon");
-            }
-        }            
-        // end @compat 0.10.x
+        role = xr.getType(spec, ROLE_TAG, Role.class, spec.getDefaultRole());
 
-        roleCount = xr.getAttribute(ROLE_COUNT_TAG,
-            // @compat 0.10.x
-            -1
-            // Should be role.getMaximumCount()
-            // end @compat 0.10.x
-            );
+        roleCount = xr.getAttribute(ROLE_COUNT_TAG, role.getMaximumCount());
 
         setLocationNoUpdate(xr.getLocationAttribute(game, LOCATION_TAG, true));
 

@@ -774,48 +774,6 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
 
-    // Override FreeColGameObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
-        // @compat 0.10.x
-        // Detects/fixes bogus expeditionary force roles
-        List<AbstractUnit> todo = new ArrayList<>();
-        Force ref = getExpeditionaryForce();
-        Iterator<AbstractUnit> it = ref.getLandUnitsList().iterator();
-        while (it.hasNext()) {
-            AbstractUnit au = it.next();
-            if ("model.role.soldier".equals(au.getRoleId())) {
-                if (fix) {
-                    au.setRoleId("model.role.infantry");
-                    result = 0;
-                    it.remove();
-                    todo.add(au);
-                } else {
-                    return -1;
-                }
-            }
-            if ("model.role.dragoon".equals(au.getRoleId())) {
-                if (fix) {
-                    au.setRoleId("model.role.cavalry");
-                    result = 0;
-                    it.remove();
-                    todo.add(au);
-                } else {
-                    return -1;
-                }
-            }
-        }
-        for (AbstractUnit au : todo) ref.add(au);
-        // end @compat 0.10.x
-        return result;
-    }
-
-
     // Serialization
 
     private static final String DISPLEASURE_TAG = "displeasure";
@@ -900,9 +858,6 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         if (EXPEDITIONARY_FORCE_TAG.equals(tag)) {
             expeditionaryForce.readFromXML(xr);
-            // @compat 0.11.3
-            expeditionaryForce.fixOldREFRoles();
-            // end @compat 0.11.3
 
         } else if (INTERVENTION_FORCE_TAG.equals(tag)) {
             interventionForce.readFromXML(xr);
