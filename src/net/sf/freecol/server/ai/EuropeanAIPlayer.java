@@ -287,6 +287,63 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAIObject(AIObject ao) {
+        if (ao instanceof AIColony) {
+            removeAIColony((AIColony)ao);
+        } else {
+            super.removeAIObject(ao);
+        }
+    }
+
+    /**
+     * Remove one of our colonies.
+     *
+     * @param aic The {@code AIColony} to remove.
+     */
+    private void removeAIColony(AIColony aic) {
+        final Colony colony = aic.getColony();
+        
+        Set<TileImprovementPlan> tips = new HashSet<>();
+        for (Tile t : colony.getOwnedTiles()) {
+            TileImprovementPlan tip = tipMap.remove(t);
+            if (tip != null) tips.add(tip);
+        }
+
+        for (AIGoods aig : aic.getExportGoods()) {
+            if (Map.isSameLocation(aig.getLocation(), colony)) {
+                aig.changeTransport(null);
+                aig.dispose();
+            }
+        }
+
+        transportDemand.remove(colony);
+
+        Set<Wish> wishes = new HashSet<>(aic.getWishes());
+        for (AIUnit aiu : getAIUnits()) {
+            PioneeringMission pm = aiu.getMission(PioneeringMission.class);
+            if (pm != null) {
+                if (tips.contains(pm.getTileImprovementPlan())) {
+                    logger.info(pm + " collapses with loss of " + colony);
+                    aiu.changeMission(null);
+                }
+                continue;
+            }
+            WishRealizationMission
+                wm = aiu.getMission(WishRealizationMission.class);
+            if (wm != null) {
+                if (wishes.contains(wm.getWish())) {
+                    logger.info(wm + " collapses with loss of " + colony);
+                    aiu.changeMission(null);
+                }
+                continue;
+            }
+        }
+    }
+
+    /**
      * Initialize the static fields that would be final but for
      * needing the specification.
      *
@@ -2188,50 +2245,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     : super.determineStance(other)))
             // Use normal stance determination for non-REF nations.
             : super.determineStance(other);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeAIColony(AIColony aic) {
-        final Colony colony = aic.getColony();
-        
-        Set<TileImprovementPlan> tips = new HashSet<>();
-        for (Tile t : colony.getOwnedTiles()) {
-            TileImprovementPlan tip = tipMap.remove(t);
-            if (tip != null) tips.add(tip);
-        }
-
-        for (AIGoods aig : aic.getExportGoods()) {
-            if (Map.isSameLocation(aig.getLocation(), colony)) {
-                aig.changeTransport(null);
-                aig.dispose();
-            }
-        }
-
-        transportDemand.remove(colony);
-
-        Set<Wish> wishes = new HashSet<>(aic.getWishes());
-        for (AIUnit aiu : getAIUnits()) {
-            PioneeringMission pm = aiu.getMission(PioneeringMission.class);
-            if (pm != null) {
-                if (tips.contains(pm.getTileImprovementPlan())) {
-                    logger.info(pm + " collapses with loss of " + colony);
-                    aiu.changeMission(null);
-                }
-                continue;
-            }
-            WishRealizationMission
-                wm = aiu.getMission(WishRealizationMission.class);
-            if (wm != null) {
-                if (wishes.contains(wm.getWish())) {
-                    logger.info(wm + " collapses with loss of " + colony);
-                    aiu.changeMission(null);
-                }
-                continue;
-            }
-        }
     }
 
     /**

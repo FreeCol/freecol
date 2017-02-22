@@ -314,6 +314,8 @@ public abstract class Settlement extends GoodsLocation
         if (newOwner.isIndian() != oldOwner.isIndian()) {
             throw new IllegalArgumentException("Can not transfer settlements between native and European players.");
         }
+        getGame().notifyOwnerChanged(this, oldOwner, newOwner);
+
         setOwner(newOwner);//-til,-vis
 
         getGame().checkOwners(this, oldOwner);
@@ -321,8 +323,6 @@ public abstract class Settlement extends GoodsLocation
         for (Tile t : getOwnedTiles()) {
             t.changeOwnership(newOwner, this);//-til
         }
-
-        getGame().notifyOwnerChanged(this, oldOwner, newOwner);
     }
 
     /**

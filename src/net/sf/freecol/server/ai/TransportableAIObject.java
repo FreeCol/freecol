@@ -176,7 +176,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     /**
      * Drop the current transport, keeping the transport mission consistent.
      *
-     * Public so AIPlayer.removeAIUnit can drop its responsibilities.
+     * Public so removeAIObject can drop its responsibilities.
      *
      * @return True if the unit has no allocated transport.
      */

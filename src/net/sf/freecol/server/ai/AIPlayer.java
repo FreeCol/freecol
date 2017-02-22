@@ -124,16 +124,6 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Sets the ServerPlayer this AIPlayer is controlling.
-     * Used by implementing subclasses.
-     *
-     * @param p The new {@code Player}.
-    protected void setPlayer(ServerPlayer p) {
-        player = p;
-    }
-     */
-
-    /**
      * Gets the PRNG to use for this player.
      *
      * @return A {@code Random} to use for this player.
@@ -174,7 +164,16 @@ public abstract class AIPlayer extends AIObject {
     public AIServerAPI askServer() {
         return this.serverAPI;
     }
-        
+
+    /**
+     * Remove one of our owned objects.
+     *
+     * Subclasses to override.
+     *
+     * @param ao The {@code AIObject} to remove.
+     */
+    public void removeAIObject(AIObject ao) {}
+
     /**
      * Gets the AI colony corresponding to a given colony, if any.
      *
@@ -195,14 +194,6 @@ public abstract class AIPlayer extends AIObject {
         return transform(getPlayer().getColonies(), alwaysTrue(),
                          c -> aiMain.getAIColony(c), toListNoNulls());
     }
-
-    /**
-     * Remove an AI colony.
-     * Do nothing here, but European player classes will be more active.
-     *
-     * @param aic The {@code AIColony} to remove.
-     */
-    public void removeAIColony(AIColony aic) {}
 
     /**
      * Gets the AI unit corresponding to a given unit, if any.
@@ -240,13 +231,6 @@ public abstract class AIPlayer extends AIObject {
         }
         return aiUnits;
     }
-
-    /**
-     * Removes an AI unit owned by this player.
-     *
-     * @param aiUnit The {@code AIUnit} to remove.
-     */
-    public void removeAIUnit(AIUnit aiUnit) {}
 
     /**
      * Standard stance change determination.

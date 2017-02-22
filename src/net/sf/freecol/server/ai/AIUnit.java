@@ -771,10 +771,10 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
         dropTransport();
         AIPlayer aiOwner = getAIOwner();
         if (aiOwner != null) {
-            aiOwner.removeAIUnit(this);
+            aiOwner.removeAIObject(this);
         } else {
-            // This happens with missionaries, and legitimately when a unit
-            // changes owner.  FIXME: cleanup.
+            // FIXME: cleanup.  Used to happen when changing owner.
+            // Reported to happen for missionaries?
             logger.warning("Disposing of " + getId() + " but owner is null!");
         }
         if (mission != null) {

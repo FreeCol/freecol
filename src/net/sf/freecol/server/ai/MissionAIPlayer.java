@@ -114,6 +114,18 @@ public abstract class MissionAIPlayer extends AIPlayer {
 
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAIObject(AIObject ao) {
+        if (ao instanceof AIUnit) {
+            removeAIUnit((AIUnit)ao);
+        } else {
+            super.removeAIObject(ao);
+        }
+    }
+        
+    /**
      * Clears the cache of AI units.
      */
     protected void clearAIUnits() {
@@ -130,15 +142,14 @@ public abstract class MissionAIPlayer extends AIPlayer {
     }
 
     /**
-     * Removes an AI unit owned by this player.
+     * Remove an AI unit.
      *
-     * @param aiUnit The {@code AIUnit} to remove.
+     * @param aiu The {@code AIUnit} to remove.
      */
-    @Override
-    public void removeAIUnit(AIUnit aiUnit) {
-        aiUnit.dropTransport();
-        aiUnit.changeMission(null);
-        aiUnits.remove(aiUnit);
+    private void removeAIUnit(AIUnit aiu) {
+        aiu.dropTransport();
+        aiu.changeMission(null);
+        aiUnits.remove(aiu);
     }
 
     /**

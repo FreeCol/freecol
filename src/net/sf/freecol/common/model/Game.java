@@ -454,10 +454,10 @@ public class Game extends FreeColGameObject {
         if (id.isEmpty()) throw new IllegalArgumentException("Empty identifier.");
 
         logger.finest("removeFCGO/" + reason + ": " + id);
+        notifyRemoveFreeColGameObject(id);
         synchronized (freeColGameObjects) {
             freeColGameObjects.remove(id);
         }
-        notifyRemoveFreeColGameObject(id);
 
         // Garbage collect the FCGOs if enough have been removed.
         if (++removeCount > REMOVE_GC_THRESHOLD) {
