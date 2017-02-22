@@ -249,15 +249,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
     public String readId() {
         String id = getAttribute(FreeColObject.ID_ATTRIBUTE_TAG, (String)null);
 
-        // @compat 0.10.x
-        // Normally a simple getAttribute() would be sufficient, but
-        // while we are allowing both the obsolete ID_ATTRIBUTE and
-        // the correct ID_ATTRIBUTE_TAG, this routine is useful.
-        if (id == null) {
-            id = getAttribute(FreeColObject.ID_ATTRIBUTE, (String)null);
-        }
-        // end @compat 0.10.x
-
         if (id == null) return null;
 
         // @compat 0.11.x, but really 0.10.x
@@ -569,9 +560,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
         T defaultValue) throws XMLStreamException {
 
         final String attrib =
-        // @compat 0.10.7
+        // @compat 0.11.x
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
-        // end @compat
+        // end @compat 0.11.x
             getAttribute(attributeName, (String)null);
 
         if (attrib == null) return defaultValue;
@@ -596,9 +587,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
     public <T extends AIObject> T getAttribute(AIMain aiMain,
         String attributeName, Class<T> returnClass, T defaultValue) {
         final String attrib =
-        // @compat 0.10.7
+        // @compat 0.11.x
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
-        // end @compat
+        // end @compat 0.11.x
             getAttribute(attributeName, (String)null);
 
         return (attrib == null) ? defaultValue
@@ -622,9 +613,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
         if (attributeName == null) return null;
 
         final String attrib =
-        // @compat 0.10.7
+        // @compat 0.11.x
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
-        // end @compat
+        // end @compat 0.11.x
             getAttribute(attributeName, (String)null);
 
         if (attrib != null) {
@@ -769,9 +760,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
         String attributeName, Class<T> returnClass,
         boolean required) throws XMLStreamException {
         final String id =
-            // @compat 0.10.7
+            // @compat 0.11.x
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
-            // end @compat
+            // end @compat 0.11.x
             getAttribute(attributeName, (String)null);
 
         if (id == null) {
@@ -929,9 +920,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
         boolean required) throws XMLStreamException {
 
         final String id =
-            // @compat 0.10.7
+            // @compat 0.11.x
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
-            // end @compat
+            // end @compat 0.11.x
             getAttribute(attributeName, (String)null);
 
         T ret = null;
@@ -999,9 +990,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
         String attributeName, Class<T> returnClass, T defaultValue) {
 
         final String attrib =
-        // @compat 0.10.7
+        // @compat 0.11.x
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
-        // end @compat
+        // end @compat 0.11.x
             getAttribute(attributeName, (String)null);
 
         return (attrib == null) ? defaultValue

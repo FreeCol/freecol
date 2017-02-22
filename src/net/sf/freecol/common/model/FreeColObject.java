@@ -800,11 +800,6 @@ public abstract class FreeColObject
     /** XML tag name for identifier attribute. */
     public static final String ID_ATTRIBUTE_TAG = "id";
 
-    // @compat 0.10.x
-    /** Obsolete identifier attribute. */
-    public static final String ID_ATTRIBUTE = "ID";
-    // end @compat
-
     /** XML tag name for array elements. */
     public static final String ARRAY_SIZE_TAG = "xLength";
 
@@ -1262,9 +1257,6 @@ public abstract class FreeColObject
             String name = xr.getAttributeLocalName(i);
 
             if (ID_ATTRIBUTE_TAG.equals(name)
-                // @compat 0.10.x
-                || ID_ATTRIBUTE.equals(name)
-                // end @compat
                 || PARTIAL_ATTRIBUTE_TAG.equals(name)) continue;
 
             try {

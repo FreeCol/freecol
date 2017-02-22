@@ -139,13 +139,14 @@ public final class FreeColServer {
      * The save game format used for saving games.
      *
      * Version 7-10 were used in 0.9.x.
-     * Version 11 made a lot of changes and was introduced for the 0.10.0
-     *     series.
+     * Version 11 made a lot of changes and was introduced for 0.10.0.
      * Version 12 was introduced with HighSeas post-0.10.1.
      * Version 13 coincides with the start of the 0.11.x series.
      * Version 14 coincides with the start of the 0.12.x series.
      *
      * Please add to this comment if you increase the version.
+     * These days we *try* to change this only for (semi-)major
+     * releases (i.e. when x changes in 0.x.y).
      */
     public static final int SAVEGAME_VERSION = 14;
 
