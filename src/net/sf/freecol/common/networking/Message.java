@@ -84,7 +84,7 @@ public abstract class Message {
 
     /** Comparator comparing by message priority. */
     public static final Comparator<Message> messagePriorityComparator
-        = Comparator.comparingInt(m -> m.getPriority().ordinal());
+        = Comparator.comparingInt(m -> m.getPriority().getValue());
 
                 
     /**
