@@ -2042,6 +2042,8 @@ public final class InGameController extends Controller {
                 serverGame.sendToAll(cs);
                 cs.clear();
             }
+            // Do not proceed with a dead players turn
+            if (current.isDead()) continue;
 
             // Are there humans left?
             // FIXME: see if this can be relaxed so we can run large
@@ -2101,7 +2103,7 @@ public final class InGameController extends Controller {
                     debugMonarchAction = null;
                     debugMonarchPlayer = null;
                     logger.finest("Debug monarch action: " + action);
-                } else {
+                } else if (monarch != null) {
                     action = RandomChoice.getWeightedRandom(logger,
                             "Choose monarch action",
                         monarch.getActionChoices(), random);
