@@ -1512,17 +1512,20 @@ public class Unit extends GoodsLocation
      *
      * @param indianSettlement The {@code IndianSettlement} that should
      *     now own this {@code Unit} and be considered this unit's home.
+     * @return The old {@code IndianSettlement}.
      */
-    public void changeHomeIndianSettlement(IndianSettlement indianSettlement) {
+    public IndianSettlement changeHomeIndianSettlement(IndianSettlement indianSettlement) {
         if (this.indianSettlement != null) {
             this.indianSettlement.removeOwnedUnit(this);
         }
 
+        IndianSettlement ret = this.indianSettlement;
         this.indianSettlement = indianSettlement;
 
         if (indianSettlement != null) {
             indianSettlement.addOwnedUnit(this);
         }
+        return ret;
     }
 
     /**

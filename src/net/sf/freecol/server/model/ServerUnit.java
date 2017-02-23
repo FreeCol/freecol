@@ -908,11 +908,8 @@ public class ServerUnit extends Unit implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csRemove(See see, Location loc, ChangeSet cs) {
-        IndianSettlement is = getHomeIndianSettlement();
-        if (is != null) {
-            is.removeOwnedUnit(this);
-            cs.add(See.only((ServerPlayer)getOwner()), is);
-        }
+        IndianSettlement is = changeHomeIndianSettlement(null);
+        if (is != null) cs.add(See.only((ServerPlayer)getOwner()), is);
         cs.addRemove(see, loc, this);
         this.dispose();
     }
