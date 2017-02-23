@@ -20,9 +20,13 @@
 package net.sf.freecol.client.control;
 
 import java.awt.Color;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import javax.swing.SwingUtilities;
+
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -52,6 +56,8 @@ import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer.ServerState;
 
 import org.w3c.dom.Element;
@@ -74,31 +80,47 @@ public final class PreGameInputHandler extends ClientInputHandler {
         super(freeColClient);
 
         register(AddPlayerMessage.TAG,
-            (Connection c, Element e) -> addPlayer(e));
+            (Connection c, Element e) ->
+                addPlayer(new AddPlayerMessage(getGame(), e)));
         register(ChatMessage.TAG,
-            (Connection c, Element e) -> chat(e));
+            (Connection c, Element e) ->
+                chat(new ChatMessage(getGame(), e)));
         register(ErrorMessage.TAG,
-            (Connection c, Element e) -> error(e));
+            (Connection c, Element e) ->
+                error(new ErrorMessage(getGame(), e)));
         register(LoginMessage.TAG,
-            (Connection c, Element e) -> login(e));
+            (Connection c, Element e) ->
+                login(new LoginMessage(new Game(), e)));
         register(LogoutMessage.TAG,
-            (Connection c, Element e) -> logout(e));
+            (Connection c, Element e) ->
+                logout(new LogoutMessage(getGame(), e)));
         register(ReadyMessage.TAG,
-            (Connection c, Element e) -> ready(e));
+            (Connection c, Element e) ->
+                ready(new ReadyMessage(getGame(), e)));
         register(SetAvailableMessage.TAG,
-            (Connection c, Element e) -> setAvailable(e));
+            (Connection c, Element e) ->
+                setAvailable(new SetAvailableMessage(getGame(), e)));
         register(SetColorMessage.TAG,
-            (Connection c, Element e) -> setColor(e));
+            (Connection c, Element e) ->
+                setColor(new SetColorMessage(getGame(), e)));
         register(SetNationMessage.TAG,
-            (Connection c, Element e) -> setNation(e));
+            (Connection c, Element e) ->
+                setNation(new SetNationMessage(getGame(), e)));
+        register(SetNationTypeMessage.TAG,
+            (Connection c, Element e) ->
+                setNationType(new SetNationTypeMessage(getGame(), e)));
         register(StartGameMessage.TAG,
-            (Connection c, Element e) -> startGame(e));
+            (Connection c, Element e) ->
+                startGame()); // Does not need a message
         register(UpdateMessage.TAG,
-            (Connection c, Element e) -> update(e));
+            (Connection c, Element e) ->
+                update(new UpdateMessage(getGame(), e)));
         register(UpdateGameOptionsMessage.TAG,
-            (Connection c, Element e) -> updateGameOptions(e));
+            (Connection c, Element e) ->
+                updateGameOptions(new UpdateGameOptionsMessage(getGame(), e)));
         register(UpdateMapGeneratorOptionsMessage.TAG,
-            (Connection c, Element e) -> updateMapGeneratorOptions(e));
+            (Connection c, Element e) ->
+                updateMapGeneratorOptions(new UpdateMapGeneratorOptionsMessage(getGame(), e)));
     }
 
 
@@ -107,53 +129,46 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * Handles an "addPlayer"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code AddPlayerMessage} to process.
      */
-    private void addPlayer(Element element) {
-        final Game game = getGame();
+    private void addPlayer(AddPlayerMessage message) {
+        // Reading the player in does most of the work.
 
-        // The message constructor interns the new players directly.
-        new AddPlayerMessage(game, element);
         getGUI().refreshPlayersTable();
     }
 
     /**
-     * Handles a "chat"-message.
+     * Handle a "chat"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code ChatMessage} to process.
      */
-    private void chat(Element element)  {
+    private void chat(ChatMessage message) {
         final Game game = getGame();
-        final ChatMessage chatMessage = new ChatMessage(game, element);
+        final Player player = message.getPlayer(game);
+        final String text = message.getMessage();
+        final boolean isPrivate = message.isPrivate();
 
-        getGUI().displayChatMessage(chatMessage.getPlayer(game),
-                                    chatMessage.getMessage(),
-                                    chatMessage.isPrivate());
+        getGUI().displayChatMessage(player, text, isPrivate);
     }
 
     /**
-     * Handles an "error"-message.
+     * Handle an "error"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code ErrorMessage} to process.
      */
-    private void error(Element element)  {
-        final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
+    private void error(ErrorMessage message) {
+        final StringTemplate template = message.getTemplate();
+        final String text = message.getMessage();
 
-        getGUI().showErrorMessage(errorMessage.getTemplate(),
-                                  errorMessage.getMessage());
+        getGUI().showErrorMessage(template, text);
     }
 
     /**
      * Handle a "login"-request.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code LoginMessage} to process.
      */
-    private void login(Element element) {
-        final LoginMessage message = new LoginMessage(new Game(), element);
+    private void login(LoginMessage message) {
         final String user = message.getUserName();
         final boolean single = message.getSinglePlayer();
         final boolean current = message.getCurrentPlayer();
@@ -167,12 +182,10 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * Handles an "logout"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code LogoutMessage} to process.
      */
-    private void logout(Element element) {
+    private void logout(LogoutMessage message) {
         final Game game = getGame();
-        final LogoutMessage message = new LogoutMessage(game, element);
         final Player player = message.getPlayer(game);
         final LogoutReason reason = message.getReason();
 
@@ -187,15 +200,13 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * Handles a "ready"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code ReadyMessage} to process.
      */
-    private void ready(Element element) {
+    private void ready(ReadyMessage message) {
         final Game game = getGame();
-        final ReadyMessage message = new ReadyMessage(game, element);
+        final Player player = message.getPlayer(game);
+        final boolean ready = message.getValue();
 
-        Player player = message.getPlayer(game);
-        boolean ready = message.getValue();
         if (player != null) {
             player.setReady(ready);
             getGUI().refreshPlayersTable();
@@ -205,34 +216,30 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * Handles a "setAvailable"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code SetAvailableMessage} to process.
      */
-    private void setAvailable(Element element) {
+    private void setAvailable(SetAvailableMessage message) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        final SetAvailableMessage message
-            = new SetAvailableMessage(game, element);
+        final Nation nation = message.getNation(spec);
+        final NationState nationState = message.getNationState();
 
-        game.getNationOptions().setNationState(message.getNation(spec),
-                                               message.getNationState());
+        game.getNationOptions().setNationState(nation, nationState);
         getGUI().refreshPlayersTable();
     }
 
     /**
      * Handles an "setColor"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code SetColorMessage} to process.
      */
-    private void setColor(Element element) {
+    private void setColor(SetColorMessage message) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        final SetColorMessage message = new SetColorMessage(game, element);
-            
-        Nation nation = message.getNation(spec);
+        final Nation nation = message.getNation(spec);
+        final Color color = message.getColor();
+      
         if (nation != null) {
-            Color color = message.getColor();
             if (color != null) {
                 nation.setColor(color);
                 getGUI().refreshPlayersTable();
@@ -247,15 +254,13 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * Handles a "setNation"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code SetNationMessage} to process.
      */
-    private void setNation(Element element) {
+    private void setNation(SetNationMessage message) {
         final Game game = getGame();
-        final SetNationMessage message = new SetNationMessage(game, element);
+        final Player player = message.getPlayer(game);
+        final Nation nation = message.getValue(getSpecification());
 
-        Player player = message.getPlayer(game);
-        Nation nation = message.getValue(getSpecification());
         if (player != null && nation != null) {
             player.setNation(nation);
             getGUI().refreshPlayersTable();
@@ -265,16 +270,13 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * Handles a "setNationType"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code SetNationTypeMessage} to process.
      */
-    private void setNationType(Element element) {
+    private void setNationType(SetNationTypeMessage message) {
         final Game game = getGame();
-        final SetNationTypeMessage message
-            = new SetNationTypeMessage(game, element);
-
-        Player player = message.getPlayer(game);
-        NationType nationType = message.getValue(getSpecification());
+        final Player player = message.getPlayer(game);
+        final NationType nationType = message.getValue(getSpecification());
+        
         if (player != null && nationType != null) {
             player.changeNationType(nationType);
             getGUI().refreshPlayersTable();
@@ -287,28 +289,38 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * Wait until map is received from server, sometimes this
      * message arrives when map is still null. Wait in other
      * thread in order not to block and it can receive the map.
-     *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
      */
-    private void startGame(@SuppressWarnings("unused") Element element) {
-        pgc().startGame();
+    private void startGame() {
+        new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
+                @Override
+                public void run() {
+                    Game game;
+                    for (;;) {
+                        game = getGame();
+                        if (game != null && game.getMap() != null) break;
+                        Utils.delay(200, "Starting a game has been interupted.");
+                    }
+                    
+                    SwingUtilities.invokeLater(() -> {
+                            pgc().startGame();
+                        });
+                }
+            }.start();
     }
 
     /**
      * Handles an "update"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code UpdateMessage} to process.
      */
-    private void update(Element element) {
+    private void update(UpdateMessage message) {
+        final FreeColClient fcc = getFreeColClient();
         final Game game = getGame();
-        final UpdateMessage message = new UpdateMessage(game, element);
-
-        for (FreeColGameObject fcgo : message.getObjects()) {
+        final List<FreeColGameObject> objects = message.getObjects();
+        
+        for (FreeColGameObject fcgo : objects) {
             if (fcgo instanceof Game) {
-                getFreeColClient()
-                    .addSpecificationActions(((Game)fcgo).getSpecification());
+                fcc.addSpecificationActions(((Game)fcgo).getSpecification());
             } else {
                 logger.warning("Game node expected: " + fcgo.getId());
             }
@@ -318,16 +330,14 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * Handles an "updateGameOptions"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code UpdateGameOptionsMessage} to process.
      */
-    private void updateGameOptions(Element element) {
+    private void updateGameOptions(UpdateGameOptionsMessage message) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        final UpdateGameOptionsMessage message
-            = new UpdateGameOptionsMessage(game, element);
-
-        if (!spec.mergeGameOptions(message.getGameOptions(), "client")) {
+        final OptionGroup gameOptions = message.getGameOptions();
+        
+        if (!spec.mergeGameOptions(gameOptions, "client")) {
             logger.warning("Game option update failed");
         }
     }
@@ -335,17 +345,14 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * Handles an "updateMapGeneratorOptions"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param message The {@code UpdateMapOptionsMessage} to process.
      */
-    private void updateMapGeneratorOptions(Element element) {
+    private void updateMapGeneratorOptions(UpdateMapGeneratorOptionsMessage message) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        final UpdateMapGeneratorOptionsMessage message
-            = new UpdateMapGeneratorOptionsMessage(game, element);
+        final OptionGroup mapOptions = message.getMapGeneratorOptions();
 
-        if (!spec.mergeMapGeneratorOptions(message.getMapGeneratorOptions(),
-                                           "client")) {
+        if (!spec.mergeMapGeneratorOptions(mapOptions, "client")) {
             logger.warning("Map generator option update failed");
         }
     }

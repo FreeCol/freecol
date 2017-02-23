@@ -115,7 +115,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      *
      * @param message The {@code MultipleMessage} to process.
      */
-    private void multiple(MultipleMessage message) {
+    protected void multiple(MultipleMessage message) {
         // Using null Connection, it should go away completely soon
         Message result = message.applyHandler(this, null);
         if (result != null) {
@@ -128,7 +128,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      *
      * @param message The {@code VacantPlayersMessage} to process.
      */
-    private void vacantPlayers(VacantPlayersMessage message) {
+    protected void vacantPlayers(VacantPlayersMessage message) {
         final FreeColClient fcc = getFreeColClient();
         final List<String> vacant = message.getVacantPlayers();
 
