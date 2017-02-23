@@ -38,6 +38,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.util.DOMUtils;
@@ -288,6 +289,22 @@ public class Connection implements Closeable {
         return (isAlive()) ? getHostAddress() + ":" + getPort() : "";
     }
     
+    /**
+     * Gets the message handler for this connection.
+     *
+     * Work in progress: we are cutting over the implementers of
+     * the DOMMessageHandler interface to also implement the
+     * MessageHandler interface.  In due course this.domMessageHandler
+     * will become a MessageHandler.
+     *
+     * @return The {@code MessageHandler} for this Connection.
+     */
+    private MessageHandler getMessageHandler() {
+        return (this.domMessageHandler instanceof MessageHandler)
+            ? (MessageHandler)this.domMessageHandler
+            : null;
+    }
+
     /**
      * Gets the message handler for this connection.
      *
@@ -626,7 +643,19 @@ public class Connection implements Closeable {
         return handleElement(element);
     }
 
+    /**
+     * Read a message using the MessageHandler.
+     *
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @return The {@code Message} found, if any.
+     * @exception FreeColException there is a problem reading the stream.
+     */
+    public Message reader(FreeColXMLReader xr) throws FreeColException {
+        MessageHandler mh = getMessageHandler();
+        return (mh == null) ? null : mh.read(xr);
+    }
 
+    
     // Client handling
 
     /**

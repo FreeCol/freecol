@@ -368,7 +368,7 @@ final class ReceivingThread extends Thread {
     }
 
     /**
-     * Listens to the InputStream and calls the MessageHandler for
+     * Listens to the InputStream and calls the message handler for
      * each message received.
      * 
      * @throws IOException If thrown by the {@link FreeColNetworkInputStream}.
@@ -429,9 +429,19 @@ final class ReceivingThread extends Thread {
         default:
             // An ordinary update message.
             // Build a thread to handle it and possibly respond.
-            this.in.enable();
-            this.in.reset();
-            msg = reader(this.in);
+            try {
+                Message m = this.connection.reader(xr);
+                if (m != null) msg = (DOMMessage)m;
+            } catch (FreeColException fce) {
+                // Just log for now, fall through to DOM-based code
+                logger.log(Level.FINEST, "ReceivingThread: " + fce.getMessage());
+            }
+
+            if (msg == null) {
+                this.in.enable();
+                this.in.reset();
+                msg = reader(this.in);
+            }
             t = update(msg);
             break;
         }
