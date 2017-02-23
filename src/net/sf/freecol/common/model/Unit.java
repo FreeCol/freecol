@@ -770,26 +770,28 @@ public class Unit extends GoodsLocation
                 + " had no owner, when changing owner to " + owner.getId());
         }
 
+        // Notify the AI before actually changing the owner so the AI
+        // can find the owning AIPlayer
+        getGame().notifyOwnerChanged(this, oldOwner, owner);
+
         // This need to be set right away.
         setOwner(owner);
 
-        // Clear trade route and goto orders if changing owner.
-        if (getTradeRoute() != null) setTradeRoute(null);
-        if (getDestination() != null) setDestination(null);
-
         // If its a carrier, we need to update the units it has loaded
-        // before finishing with it
         for (Unit u : getUnitList()) u.changeOwner(owner);
 
+        // Clear education, trade route/orders and home settlement
         if (getTeacher() != null && !canBeStudent(getTeacher())) {
             getTeacher().setStudent(null);
             setTeacher(null);
         }
+        if (getTradeRoute() != null) setTradeRoute(null);
+        if (getDestination() != null) setDestination(null);
+        changeHomeIndianSettlement(null);
 
+        // Update owner unit lists
         if (oldOwner != null) oldOwner.removeUnit(this);
         if (owner != null) owner.addUnit(this);
-
-        getGame().notifyOwnerChanged(this, oldOwner, owner);
     }
 
     /**
