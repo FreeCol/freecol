@@ -54,6 +54,7 @@ import net.sf.freecol.common.networking.AttributeMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MultipleMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -314,26 +315,6 @@ public class DOMUtils {
     }
 
     /**
-     * Collapses a list of elements into a "multiple" element
-     * with the original elements added as child nodes.
-     *
-     * @param elements A list of {@code Element}s to collapse.
-     * @return A new "multiple" element, or the singleton element of the list,
-     *     or null if the list is empty.
-     */
-    public static Element collapseElements(List<Element> elements) {
-        switch (elements.size()) {
-        case 0:
-            return null;
-        case 1:
-            return elements.get(0);
-        default:
-            break;
-        }
-        return new MultipleMessage(elements).toXMLElement();
-    }
-
-    /**
      * Handle a list of messages.
      *
      * @param mh The {@code DOMMessageHandler} to handle the messages.
@@ -341,7 +322,7 @@ public class DOMUtils {
      * @param elements The list of {@code Element}s to process.
      * @return An {@code Element} containing the response/s.
      */
-    public static final Element handleList(DOMMessageHandler mh,
+    public static final Message handleList(DOMMessageHandler mh,
         Connection connection, List<Element> elements) {
         List<Element> results = new ArrayList<>();
         int i = 0;
@@ -356,7 +337,7 @@ public class DOMUtils {
             }
             i++;
         }
-        return collapseElements(results);
+        return (results.isEmpty()) ? null : new MultipleMessage(results);
     }    
     
     /**

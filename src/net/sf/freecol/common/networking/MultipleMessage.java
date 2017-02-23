@@ -103,7 +103,7 @@ public class MultipleMessage extends DOMMessage {
      * @param connection The {@code Connection} message was received on.
      * @return A collapsed resolution of the submessages.
      */
-    public Element applyHandler(DOMMessageHandler handler,
+    public Message applyHandler(DOMMessageHandler handler,
                                 Connection connection) {
         return DOMUtils.handleList(handler, connection, this.elements);
     }
@@ -113,7 +113,8 @@ public class MultipleMessage extends DOMMessage {
      * About to go away.
      */
     public Element handle(FreeColServer freeColServer, Connection connection) {
-        return applyHandler(connection.getDOMMessageHandler(), connection);
+        Message m = applyHandler(connection.getDOMMessageHandler(), connection);
+        return (m == null) ? null : ((DOMMessage)m).toXMLElement();
     }
 
 

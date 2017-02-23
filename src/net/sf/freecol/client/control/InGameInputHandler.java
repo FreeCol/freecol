@@ -71,6 +71,7 @@ import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
@@ -700,9 +701,10 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @param element The {@code Element} to process.
      */
     private void multiple(Connection connection, Element element) {
-        Element result = new MultipleMessage(element).applyHandler(this, connection);
+        Message result = new MultipleMessage(element)
+            .applyHandler(this, connection);
         if (result != null) {
-            logger.warning("Multiple message -> " + result.getTagName());
+            logger.warning("Multiple message -> " + result.getType());
         }
     }
 

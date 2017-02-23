@@ -44,6 +44,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.ReadyMessage;
 import net.sf.freecol.common.networking.SetAvailableMessage;
@@ -197,7 +198,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *     tree) that holds all the information.
      */
     public void multiple(Connection connection, Element element) {
-        Element result = new MultipleMessage(element)
+        Message result = new MultipleMessage(element)
             .applyHandler(this, connection);
         assert result == null;
     }
