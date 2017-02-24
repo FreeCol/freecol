@@ -28,9 +28,12 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
+import net.sf.freecol.common.networking.GameStateMessage;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.server.FreeColServer;
@@ -52,7 +55,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      *
      */
     public interface DOMClientNetworkRequestHandler {
-        void handle(Connection connection, Element element);
+        void handle(Connection connection, Element element) throws FreeColException;
     }
         
     /**
@@ -71,15 +74,14 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     public ClientInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
 
-        register(TrivialMessage.DISCONNECT_TAG,
-            (Connection c, Element e) ->
-                disconnect());
-        register(GameStateMessage.TAG,
-            (Connection c, Element e) ->
-                gameState(new GameStateMessage(getGame(), e)));
-        register(VacantPlayersMessage.TAG,
-            (Connection c, Element e) ->
-                vacantPlayers(new VacantPlayersMessage(getGame(), e)));
+        register(TrivialMessage.DISCONNECT_TAG, (Connection c, Element e) ->
+            disconnect());
+        register(GameStateMessage.TAG, (Connection c, Element e) ->
+            gameState(new GameStateMessage(getGame(), e)));
+        register(MultipleMessage.TAG, (Connection c, Element e) ->
+            multiple(new MultipleMessage(getGame(), e)));
+        register(VacantPlayersMessage.TAG, (Connection c, Element e) ->
+            vacantPlayers(new VacantPlayersMessage(getGame(), e)));
     }
 
 
@@ -127,6 +129,19 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     }
 
     /**
+     * Handle a "multiple"-message.
+     *
+     * @param message The {@code MultipleMessage} to process.
+     */
+    private void multiple(MultipleMessage message) {
+        // Using null Connection, it should go away completely soon
+        Message result = message.applyHandler(this, null);
+        if (result != null) {
+            logger.warning("Multiple message -> " + result.getType());
+        }
+    }
+
+    /**
      * Handle a "vacantPlayers"-message.
      *
      * @param message The {@code VacantPlayersMessage} to process.
@@ -139,12 +154,13 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     }
 
 
-    // Implement MessageHandler
+    // Implement DOMMessageHandler
 
     /**
      * {@inheritDoc}
      */
-    public Element handle(Connection connection, Element element) {
+    public Element handle(Connection connection, Element element)
+        throws FreeColException {
         if (element == null) return null;
         final String tag = element.getTagName();
         DOMClientNetworkRequestHandler handler = handlerMap.get(tag);

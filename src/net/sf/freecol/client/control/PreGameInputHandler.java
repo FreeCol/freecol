@@ -45,7 +45,6 @@ import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.ReadyMessage;
 import net.sf.freecol.common.networking.SetAvailableMessage;
 import net.sf.freecol.common.networking.SetColorMessage;
@@ -87,8 +86,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> login(e));
         register(LogoutMessage.TAG,
             (Connection c, Element e) -> logout(e));
-        register(MultipleMessage.TAG,
-            (Connection c, Element e) -> multiple(c, e));
         register(ReadyMessage.TAG,
             (Connection c, Element e) -> ready(e));
         register(SetAvailableMessage.TAG,
@@ -188,19 +185,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             getFreeColClient().getConnectController()
                 .logout(reason);
         }
-    }
-
-    /**
-     * Handle all the children of this element.
-     *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
-     */
-    public void multiple(Connection connection, Element element) {
-        Message result = new MultipleMessage(element)
-            .applyHandler(this, connection);
-        assert result == null;
     }
 
     /**

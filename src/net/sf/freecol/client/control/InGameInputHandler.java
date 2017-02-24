@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -73,7 +74,6 @@ import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MonarchActionMessage;
-import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
@@ -193,9 +193,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         register(MonarchActionMessage.TAG,
             (Connection c, Element e) ->
                 monarchAction(new MonarchActionMessage(getGame(), e)));
-        register(MultipleMessage.TAG,
-            (Connection c, Element e) ->
-                multiple(c, e));
         register(NationSummaryMessage.TAG,
             (Connection c, Element e) ->
                 nationSummary(new NationSummaryMessage(getGame(), e)));
@@ -269,7 +266,8 @@ public final class InGameInputHandler extends ClientInputHandler {
      * {@inheritDoc}
      */
     @Override
-    public Element handle(Connection connection, Element element) {
+    public Element handle(Connection connection, Element element)
+        throws FreeColException {
         if (element == null) return null;
         Element reply = super.handle(connection, element);
 
@@ -692,20 +690,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         
         invokeLater(() ->
             igc().monarch(message.getAction(), template, key));
-    }
-
-    /**
-     * Handle a "multiple"-message.
-     *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
-     */
-    private void multiple(Connection connection, Element element) {
-        Message result = new MultipleMessage(element)
-            .applyHandler(this, connection);
-        if (result != null) {
-            logger.warning("Multiple message -> " + result.getType());
-        }
     }
 
     /**
