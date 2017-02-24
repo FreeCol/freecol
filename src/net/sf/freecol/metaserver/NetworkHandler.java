@@ -73,19 +73,23 @@ public final class NetworkHandler implements DOMMessageHandler {
         final String tag = element.getTagName();
         switch (tag) {
         case TrivialMessage.DISCONNECT_TAG:
-            reply = disconnect(connection, element);
+            disconnect(connection);
             break;
         case RegisterServerMessage.TAG:
-            reply = register(connection, element);
+            RegisterServerMessage rsm = new RegisterServerMessage(null, element);
+            rsm.setAddress(connection.getHostAddress()); // Trust the connection
+            register(rsm);
             break;
         case RemoveServerMessage.TAG:
-            reply = remove(connection, element);
+            remove(new RemoveServerMessage(null, element));
             break;
         case ServerListMessage.TAG:
             reply = serverList();
             break;
         case UpdateServerMessage.TAG:
-            reply = update(connection, element);
+            UpdateServerMessage usm = new UpdateServerMessage(null, element);
+            usm.setAddress(connection.getHostAddress()); // Trust the connection
+            update(usm);
             break;
         default:
             logger.warning("Unknown request: " + tag);
@@ -93,28 +97,43 @@ public final class NetworkHandler implements DOMMessageHandler {
         }
         return (reply == null) ? null : reply.toXMLElement();
     }
+  
 
-    
     /**
-     * Handles a "register"-request.
+     * Handle a "disconnect"-request.
      * 
-     * @param connection The connection the message was received on.
-     * @param element The element containing the request.
-     * @return Null.
+     * @param connection The {@code Connection} the message came from.
      */
-    private DOMMessage register(Connection connection, Element element) {
-        final RegisterServerMessage message
-            = new RegisterServerMessage(null, element);
-        message.setAddress(connection.getHostAddress()); // Trust the connection
-
-        metaRegister.addServer(message.getServerInfo());
-
-        return null;
+    private void disconnect(Connection connection) {
+        metaServer.removeConnection(connection);
+        connection.close();
     }
 
+    /**
+     * Handle a "register"-request.
+     * 
+     * @param message The {@code RegisterServerMessage} to process.
+     */
+    private void register(RegisterServerMessage message) {
+        final ServerInfo si = message.getServerInfo(); 
+
+        metaRegister.addServer(si);
+    }
 
     /**
-     * Handles a "serverList"-request.
+     * Handle a "remove"-request.
+     * 
+     * @param message The {@code RemoveServerMessage} to process.
+     */
+    private void remove(RemoveServerMessage message) {
+        final String address = message.getAddress();
+        final int port = message.getPort();
+
+        metaRegister.removeServer(address, port);
+    }
+
+    /**
+     * Handle a "serverList"-request.
      *
      * @return A {@code ServerListMessage} with attached {@code ServerInfo}
      *     for each current server known to the meta-register.
@@ -127,55 +146,15 @@ public final class NetworkHandler implements DOMMessageHandler {
         }
         return message;
     }
-        
 
     /**
-     * Handles an "update"-request.
+     * Handle an "update"-request.
      * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @return Null.
+     * @param message The {@code UpdateServerMessage} to process.
      */
-    private DOMMessage update(Connection connection, Element element) {
-        final UpdateServerMessage message
-            = new UpdateServerMessage(null, element);
-        message.setAddress(connection.getHostAddress());
+    private void update(UpdateServerMessage message) {
+        final ServerInfo si = message.getServerInfo();
 
-        metaRegister.updateServer(message.getServerInfo());
-
-        return null;
-    }
-
-
-    /**
-     * Handles a "remove"-request.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @return Null.
-     */
-    private DOMMessage remove(Connection connection, Element element) {
-        final RemoveServerMessage message
-            = new RemoveServerMessage(null, element);
-        message.setAddress(connection.getHostAddress());
-
-        metaRegister.removeServer(message.getAddress(), message.getPort());
-
-        return null;
-    }
-
-
-    /**
-     * Handles a "disconnect"-request.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @return Null.
-     */
-    private DOMMessage disconnect(Connection connection, Element element) {
-        metaServer.removeConnection(connection);
-        connection.close();
-
-        return null;
+        metaRegister.updateServer(si);
     }
 }
