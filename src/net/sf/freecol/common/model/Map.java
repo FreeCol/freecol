@@ -51,9 +51,6 @@ import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
-// @compat 0.10.x
-import net.sf.freecol.server.generator.TerrainGenerator;
-// end @compat 0.10.x
 
 
 /**
@@ -2526,9 +2523,6 @@ public class Map extends FreeColGameObject implements Location {
     private static final String MAXIMUM_LATITUDE_TAG = "maximumLatitude";
     private static final String MINIMUM_LATITUDE_TAG = "minimumLatitude";
     private static final String WIDTH_TAG = "width";
-    // @compat 0.10.x, region remediation
-    private final List<Tile> missingRegions = new ArrayList<>();
-    // end @compat
     // @compat 0.10.5, nasty I/O hack
     private boolean fixupHighSeas = false;
     // end @compat
@@ -2611,17 +2605,7 @@ public class Map extends FreeColGameObject implements Location {
         fixupHighSeas = false;
         // end @compat
 
-        // @compat 0.10.x
-        missingRegions.clear();
-        // end @compat
-
         super.readChildren(xr);
-
-        // @compat 0.10.x
-        if (getGame().isInServer() && !missingRegions.isEmpty()) {
-            TerrainGenerator.makeLakes(this, missingRegions);
-        }
-        // end @compat
 
         // @compat 0.10.5
         if (fixupHighSeas) resetHighSeasCount();
@@ -2654,12 +2638,6 @@ public class Map extends FreeColGameObject implements Location {
         } else if (Tile.TAG.equals(tag)) {
             Tile t = xr.readFreeColObject(game, Tile.class);
             setTile(t, t.getX(), t.getY());
-
-            // @compat 0.10.x
-            if (t.getType() != null
-                && "model.tile.lake".equals(t.getType().getId())
-                && t.getRegion() == null) missingRegions.add(t);
-            // end @compat
 
             // @compat 0.10.5
             if (t.getHighSeasCount() == Tile.FLAG_RECALCULATE) {

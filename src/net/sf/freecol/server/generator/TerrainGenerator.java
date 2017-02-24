@@ -670,15 +670,11 @@ public class TerrainGenerator {
     /**
      * Make lake regions from unassigned lake tiles.
      *
-     * // @compat 0.10.x
-     * // Public/static to allow Map to remediate missing lake regions
-     * // end @compat 0.10.x
-     *
      * @param map The {@code Map} to add to.
      * @param lakes A list of lake {@code Tile}s.
      * @return A list of new {@code ServerRegion}s.
      */
-    public static List<ServerRegion> makeLakes(Map map, List<Tile> lakes) {
+    private List<ServerRegion> makeLakes(Map map, List<Tile> lakes) {
         Game game = map.getGame();
         final TileType lakeType = map.getSpecification()
             .getTileType("model.tile.lake");
