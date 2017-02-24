@@ -45,7 +45,7 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RiverStyleDialog.class.getName());
 
-    private static final String PREFIX = "image.tile.model.improvement.river.s";
+    public static final String PREFIX = "image.tile.model.improvement.river.s";
 
 
     /**
@@ -53,8 +53,10 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
+     * @param styles The river styles a choice is made from.
      */
-    public RiverStyleDialog(FreeColClient freeColClient, JFrame frame) {
+    public RiverStyleDialog(FreeColClient freeColClient, JFrame frame,
+                            List<String> styles) {
         super(freeColClient, frame);
 
         JPanel panel = new JPanel();
@@ -62,12 +64,9 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
                   "span, align center");
 
         List<ChoiceItem<String>> c = FreeColDialog.choices();
-        List<String> imageKeys = ResourceManager.getImageKeys(PREFIX).stream()
-            .filter(key -> !key.substring(PREFIX.length()).contains("1"))
-            .sorted().collect(Collectors.toList());
-        for (String key : imageKeys) {
-            c.add(new ChoiceItem<>(null, key.substring(PREFIX.length()))
-                .setIcon(new ImageIcon(ResourceManager.getImage(key, 0.5f))));
+        for (String style : styles) {
+            c.add(new ChoiceItem<>(null, style).setIcon(new ImageIcon(
+                ResourceManager.getImage(PREFIX + style, 0.5f))));
         }
 
         initializeChoiceDialog(frame, true, panel, null, "cancel", c);

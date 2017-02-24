@@ -1662,8 +1662,8 @@ public class SwingGUI extends GUI {
         canvas.showReportTurnPanel(messages);
     }
 
-    public String showRiverStyleDialog() {
-        return canvas.showRiverStyleDialog();
+    public String showRiverStyleDialog(List<String> styles) {
+        return canvas.showRiverStyleDialog(styles);
     }
 
     /**

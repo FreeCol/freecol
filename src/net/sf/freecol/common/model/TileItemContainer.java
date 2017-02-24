@@ -544,18 +544,33 @@ public class TileItemContainer extends FreeColGameObject {
                     ti.setLocation(tile);
                     integ = Math.min(integ, 0);
                 }
-                // There are also still maps floating around with
+                // end @compat
+
+                // There might still be maps floating around with
                 // rivers that go nowhere.
                 if (ti instanceof TileImprovement) {
                     TileImprovement tim = (TileImprovement)ti;
-                    if (tim.isRiver()
-                        && (tim.getStyle() == null
-                            || "0000".equals(tim.getStyle().toString()))) {
-                        logger.warning("Style 0000 river: " + tim);
-                        integ = -1;
+                    if (tim.isRiver()) {
+                        // @compat 0.11.5 Its not sure if these could ever
+                        // exist in broken maps from before 0.10.5 which later
+                        // got upgraded with 0.11.x (x<6), so better be safe.
+                        if (tim.getStyle() == null) {
+                            logger.warning("Style null river: " + tim);
+                            integ = -1;
+                        } else
+                        // end @compat
+
+                        // The map editor can not ensure these are not
+                        // put into the map, else it would be impossible
+                        // to add any rivers, unless code for map saving
+                        // would be changed to filter these out.
+                        if ("0000".equals(tim.getStyle().toString())) {
+                            logger.warning("Style 0000 river: " + tim);
+                            integ = -1;
+                        }
                     }
                 }
-                // end @compat
+
                 if (integ < 0) {
                     logger.warning("Removing broken improvement at: " + tile
                                    + " / " + ti.getId());

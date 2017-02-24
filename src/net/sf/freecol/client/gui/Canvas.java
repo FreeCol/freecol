@@ -2408,10 +2408,12 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display the river style dialog.
      *
+     * @param styles The river styles a choice is made from.
      * @return The response returned by the dialog.
      */
-    public String showRiverStyleDialog() {
-        return showFreeColDialog(new RiverStyleDialog(freeColClient, frame), null);
+    public String showRiverStyleDialog(List<String> styles) {
+        return showFreeColDialog(
+            new RiverStyleDialog(freeColClient, frame, styles), null);
     }
 
     /**

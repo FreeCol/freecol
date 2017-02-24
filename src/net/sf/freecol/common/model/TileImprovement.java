@@ -255,25 +255,29 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Sets the connection status in a given direction.
+     * Internal helper method to set the connection status in a given direction.
+     * There is no check for backwards connections on neighbouring tiles!
      *
      * @param direction The {@code Direction} to set.
      * @param value The new status for the connection.
      */
-    public void setConnected(Direction direction, boolean value) {
-        if (style == null || isConnectedTo(direction) != value) {
-            String old = (style == null) ? "00000000" : style.getString();
-            List<Direction> directions = getConnectionDirections();
-            int end = directions.size();
-            StringBuilder updated = new StringBuilder();
-            for(int index = 0; index != end; ++index) {
-                if(directions.get(index) == direction)
-                    updated.append(value ? Integer.toString(magnitude) : "0");
-                else
-                    updated.append(old.charAt(index));
-            }
-            style = TileImprovementStyle.getInstance(updated.toString());
+    private void setConnected(Direction direction, boolean value) {
+        if (style == null || isConnectedTo(direction) != value)
+            setConnected(direction, value, Integer.toString(magnitude));
+    }
+
+    private void setConnected(Direction direction, boolean value, String magnitude) {
+        String old = (style == null) ? "00000000" : style.getString();
+        List<Direction> directions = getConnectionDirections();
+        int end = directions.size();
+        StringBuilder updated = new StringBuilder();
+        for(int index = 0; index != end; ++index) {
+            if(directions.get(index) == direction)
+                updated.append(value ? magnitude : "0");
+            else
+                updated.append(old.charAt(index));
         }
+        style = TileImprovementStyle.getInstance(updated.toString());
     }
 
     /**
@@ -359,8 +363,54 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
+     * Sets the river style to be as close as possible to the requested
+     * style, even when it has to create neighbouring rivers to prevent
+     * broken connections or change the magnitude.
+     *
+     * @param conns The river style to set.
+     */
+    public void setRiverStyle(String conns) {
+        if (!isRiver()) return;
+        final Tile tile = getTile();
+        int i = 0;
+        int[] counts = {0, 0};
+        for (Direction d : Direction.longSides) {
+            Direction dReverse = d.getReverseDirection();
+            Tile t = tile.getNeighbourOrNull(d);
+            TileImprovement river = (t == null) ? null : t.getRiver();
+            String c = (conns == null) ? "0" : conns.substring(i, i+1);
+
+            if ("0".equals(c)) {
+                if (river != null) {
+                    river.setConnected(dReverse, false);
+                }
+                setConnected(d, false);
+            } else {
+                int mag = Integer.parseInt(c);
+                if (river != null) {
+                    river.setConnected(dReverse, true);
+                    setConnected(d, true, c);
+                    counts[mag-1]++;
+                } else if (t != null) {
+                    if (!t.getType().isWater()) {
+                        t.addRiver(mag, "0000");
+                        t.getRiver().setConnected(dReverse, true);
+                    }
+                    setConnected(d, true, c);
+                    counts[mag-1]++;
+                }
+            }
+            i++;
+        }
+        magnitude = counts[1] >= counts[0] ? 2 : 1;
+    }
+
+    /**
      * Updates the connections from/to this river improvement on the basis
-     * of the expected encoded river style.
+     * of the expected encoded river style, as long as this would not
+     * create broken connections.
+     * Uses magnitude, not the connection strengths inside conns, when
+     * adding new connections.
      *
      * @param conns The encoded river connections, or null to disconnect.
      * @return The actual encoded connections found.
@@ -541,37 +591,67 @@ public class TileImprovement extends TileItem implements Named {
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
-        // @compat 0.10.x
-        // We check only if this improvement is not connected to a
-        // neighbour that *is* connected to this one, and connect this
-        // one.
-        //
-        // FIXME: drop this one day when we never have style
-        // discontinuities.  This alas is not the case in 0.10.x.
-        String curr = (style == null) ? null : style.getString();
-        String found = (isRiver()) ? updateRiverConnections(curr)
-            : (isRoad() && isComplete()) ? updateRoadConnections(true)
-            : null;
-        if ((found == null && curr == null)
-            || (found != null && curr != null && found.equals(curr))) {
-            result = Math.min(1, result);
-        } else if (fix) {
-            this.style = TileImprovementStyle.getInstance(found);
-            if ((this.style != null)
-                != (isRiver() || (isRoad() && isComplete()))) {
-                logger.warning("Bad style for improvement: " + this);
-                result = -1;
-            } else {
-                logger.warning("Fixing improvement style from "
-                    + curr + " to " + found + " at " + tile);
-                result = Math.min(0, result);
+        if (isRiver()) {
+            // @compat 0.11.5 Prevent NPE, TileItemContainer rechecks this.
+            if (style == null) {
+                result = Math.min(-1, result);
+                return result;
             }
-        } else {
-            logger.warning("Broken improvement style " + curr
-                + " should be " + found + " at " + tile);
-            result = -1;
+            // end @compat 0.11.5
+
+            // @compat 0.11.6 There could be broken river connections, without
+            // the neighbouring tile having a corresponding connection or
+            // a water tile.
+            // These could at least be added using the map editor.
+            String conns = style.getString();
+            int i = 0;
+            for (Direction d : Direction.longSides) {
+                Direction dReverse = d.getReverseDirection();
+                Tile t = tile.getNeighbourOrNull(d);
+                TileImprovement river = (t == null) ? null : t.getRiver();
+                if (conns.charAt(i) != '0') {
+                    if (river != null) {
+                        if (!river.isConnectedTo(dReverse)) {
+                            logger.warning("Broken river connection to " + d
+                                + " at " + tile);
+                            if (fix) {
+                                setConnected(d, false);
+                                result = Math.min(0, result);
+                            } else
+                                result = Math.min(-1, result);
+                        }
+                    } else if (t == null || !t.getType().isWater()) {
+                        logger.warning("Broken river connection to " + d
+                            + " at " + tile);
+                        if (fix) {
+                            setConnected(d, false);
+                            result = Math.min(0, result);
+                        } else
+                            result = Math.min(-1, result);
+                    }
+                }
+                i++;
+            }
+            // end @compat 0.11.6
+        } else if (isRoad() && isComplete()) {
+            // @compat 0.11.6 Roads on tiles never having another adjacent
+            // road tile had null styles, because updateRoadConnections
+            // forgot to set one for roads without a connection.
+            if (fix) {
+                TileImprovementStyle oldStyle = style;
+                updateRoadConnections(true);
+                if (style != oldStyle) {
+                    logger.warning("Fixing bad road style from " + oldStyle
+                        + " to " + style + " at " + tile);
+                    result = Math.min(0, result);
+                }
+            }
+            if (style == null) {
+                logger.warning("Broken road having null style at " + tile);
+                result = Math.min(-1, result);
+            }
+            // end @compat
         }
-        // end @compat 0.10.x
         return result;
     }
 
@@ -641,32 +721,21 @@ public class TileImprovement extends TileItem implements Named {
 
         String str = xr.getAttribute(STYLE_TAG, (String)null);
         List<Direction> dirns = getConnectionDirections();
-        if (dirns == null || str == null || str.isEmpty()) {
+        if (dirns == null) {
             style = null;
-        // @compat 0.10.5
-        } else if (str.length() < 4) {
-            String old = TileImprovementStyle.decodeOldStyle(str, dirns.size());
-            style = (old == null) ? null
-                : TileImprovementStyle.getInstance(old);
-        // end @compat
+            if (str != null && !str.isEmpty())
+                logger.warning("At " + tile
+                    + " ignored superfluous TileImprovementStyle: " + str);
         } else {
             style = TileImprovementStyle.getInstance(str);
-            if (style == null) {
-                logger.warning("At " + tile
-                    + " ignored bogus TileImprovementStyle: " + str);
-            }
-        }
-        if (style != null && style.toString().length() != dirns.size()) {
-            // @compat 0.10.5
-            if ("0000".equals(style.getString())) {
-                // Old virtual roads and fish bonuses have this style!?!
+            if (style == null || style.getString().length() != dirns.size()) {
+                // incomplete roads are expected to have a null style
+                if (style != null || dirns.size() != 8 || isComplete()) {
+                    logger.warning("At " + tile
+                        + " with " + ((dirns.size() == 8) ? "road" : "river")
+                        + " ignored bogus TileImprovementStyle: " + str);
+                }
                 style = null;
-            } else {
-            // end @compat
-
-                throw new XMLStreamException("For " + type 
-                    + ", bogus style: " + str + " -> /" + style
-                    + "/ at " + tile);
             }
         }
     }

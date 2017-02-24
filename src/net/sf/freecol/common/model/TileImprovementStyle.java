@@ -28,19 +28,8 @@ import java.util.Map;
  * road. Since TileImprovementStyles are immutable and some styles are
  * far more common than others (e.g. rivers with two branches are far
  * more common than rivers with a single branch, or three or four
- * branches), the class caches all styles actually used. This should
- * also speed up reading maps with old base-three styles.
+ * branches), the class caches all styles actually used.
  *
- * This is the documentation for the old style (&le; 0.10.5):
- *   Tile improvement styles should be encoded as a string of base-36
- *   values, one for each of the directions the improvement might be
- *   connected to (counting clockwise from N). In the case of rivers,
- *   which can only be connected via the "long sides" (NE, SE, SW, NW),
- *   possible values range from "0000" to "zzzz". Improvement styles
- *   that use only four directions can add up to three characters of
- *   arbitrary style information (such as "%$#", for example).
- *   Improvement styles that use eight directions can add an arbitrary
- *   amount of style information.
  * As of 0.10.6 we use:
  *   - Four character encoded strings for rivers: a "0" for no connection,
  *     otherwise the string value of the integer magnitude of the river
@@ -99,37 +88,6 @@ public class TileImprovementStyle {
         return mask;
     }
 
-    // @compat 0.10.5
-    /**
-     * Decode the old base-3 encoded style format.
-     *
-     * @param input An old style string.
-     * @param pad Pad the result to this length.
-     * @return The style in the new format.
-     */
-    public static String decodeOldStyle(String input, int pad) {
-        if (pad <= 0) return null;
-        boolean isZero = true;
-        StringBuilder sb = new StringBuilder();
-        try {
-            int value = Integer.parseInt(input);
-            for (int index = 0; index < 4; index++) {
-                int magnitude = value % 3;
-                isZero &= magnitude == 0;
-                sb.append(Integer.toString(magnitude, Character.MAX_RADIX));
-                value /= 3;
-            }
-        } catch (NumberFormatException nfe) {
-            return null;
-        }
-        if (isZero) return null;
-        while (sb.length() < pad) {
-            sb.append('0');
-        }
-        return sb.toString();
-    }
-    // end @compat
-
     /**
      * Gets the style corresponding to the given string.
      *
@@ -137,7 +95,8 @@ public class TileImprovementStyle {
      * @return The corresponding {@code TileImprovementStyle}.
      */
     public static TileImprovementStyle getInstance(String key) {
-        if (key == null || key.isEmpty() || "0".equals(key)) return null;
+        if (key == null || (key.length() != 4 && key.length() != 8))
+            return null;
 
         TileImprovementStyle result = cache.get(key);
         if (result == null) {
