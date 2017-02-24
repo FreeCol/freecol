@@ -272,28 +272,27 @@ public class NameCache {
         synchronized (settlementNameLock) {
             if (settlementNames.get(player) == null) {
                 List<String> names = new ArrayList<>();
-                // @compat 0.10.x
-                // Try the base names
-                collectNames(player.getNationId() + ".settlementName.", names);
-                // end @compat 0.10.x
-
-                // Try the spec-qualified version.
-                if (names.isEmpty()) {
+                if (player.isEuropean()) {
+                    // European settlement names are spec-qualified
+                    // and in chronological order
                     collectNames(player.getNationId() + ".settlementName."
                         + player.getSpecification().getId() + ".", names);
-                }
-
-                // If still empty use the "freecol" names.
-                if (names.isEmpty()) {
-                    collectNames(player.getNationId() + ".settlementName.freecol.",
+                    // If still empty default to using the "freecol" names
+                    if (names.isEmpty()) {
+                        collectNames(player.getNationId() + ".settlementName.freecol.",
+                                     names);
+                    }
+                } else {
+                    // Native settlement names are not spec qualified,
+                    // but have capitals and need randomization
+                    collectNames(player.getNationId() + ".settlementName.",
                                  names);
-                }
-
-                // Indians have capitals and need randomization
-                if (player.isIndian()) {
-                    capitalNames.put(player, names.remove(0));
-                    if (random != null) {
-                        randomShuffle(logger, "Settlement names", names, random);
+                    if (!names.isEmpty()) {
+                        capitalNames.put(player, names.remove(0));
+                        if (random != null) {
+                            randomShuffle(logger, "Native settlement names",
+                                          names, random);
+                        }
                     }
                 }
                 settlementNames.put(player, names);
@@ -304,7 +303,7 @@ public class NameCache {
     }
 
     /**
-     * Initialize the shipNames for a player.
+     * Initialize the ship names for a player.
      *
      * @param player The {@code Player} to install names for.
      * @param random A pseudo-random number source.
