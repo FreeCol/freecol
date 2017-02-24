@@ -21,6 +21,7 @@ package net.sf.freecol.client.control;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +33,8 @@ import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.FreeColServer.ServerState;
 
 import org.w3c.dom.Element;
 
@@ -69,11 +72,14 @@ public abstract class ClientInputHandler extends FreeColClientHolder
         super(freeColClient);
 
         register(TrivialMessage.DISCONNECT_TAG,
-            (Connection c, Element e) -> disconnect(e));
+            (Connection c, Element e) ->
+                disconnect());
         register(GameStateMessage.TAG,
-            (Connection c, Element e) -> gameState(e));
+            (Connection c, Element e) ->
+                gameState(new GameStateMessage(getGame(), e)));
         register(VacantPlayersMessage.TAG,
-            (Connection c, Element e) -> vacantPlayers(e));
+            (Connection c, Element e) ->
+                vacantPlayers(new VacantPlayersMessage(getGame(), e)));
     }
 
 
@@ -103,38 +109,33 @@ public abstract class ClientInputHandler extends FreeColClientHolder
 
     /**
      * Handle a "disconnect"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
      */
-    protected void disconnect(Element element) {
+    protected void disconnect() {
         ; // Do nothing
     }
 
     /**
      * Handle a "gameState"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code GameStateMessage} to process.
      */
-    private void gameState(Element element) {
+    private void gameState(GameStateMessage message) {
         final FreeColClient fcc = getFreeColClient();
-        final GameStateMessage message
-            = new GameStateMessage(fcc.getGame(), element);
+        final ServerState gameState = message.getState();
 
-        fcc.setServerState(message.getState());
+        fcc.setServerState(gameState);
     }
 
     /**
      * Handle a "vacantPlayers"-message.
      *
-     * @param element The {@code Element} to process.
+     * @param message The {@code VacantPlayersMessage} to process.
      */
-    private void vacantPlayers(Element element) {
+    private void vacantPlayers(VacantPlayersMessage message) {
         final FreeColClient fcc = getFreeColClient();
-        final VacantPlayersMessage message
-            = new VacantPlayersMessage(fcc.getGame(), element);
+        final List<String> vacant = message.getVacantPlayers();
 
-        fcc.setVacantPlayerNames(message.getVacantPlayers());
+        fcc.setVacantPlayerNames(vacant);
     }
 
 
