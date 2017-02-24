@@ -69,7 +69,8 @@ public class AttackMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
-    public static MessagePriority getMessagePriority() {
+    @Override
+    public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
 

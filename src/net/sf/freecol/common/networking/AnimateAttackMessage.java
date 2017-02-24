@@ -105,7 +105,8 @@ public class AnimateAttackMessage extends DOMMessage {
     /**
      * {@inheritDoc}
      */
-    public static MessagePriority getMessagePriority() {
+    @Override
+    public MessagePriority getPriority() {
         return Message.MessagePriority.ANIMATION;
     }
 

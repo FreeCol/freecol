@@ -65,7 +65,7 @@ public class JoinColonyMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
-    public static MessagePriority getMessagePriority() {
+    public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
 

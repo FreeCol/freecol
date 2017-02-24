@@ -83,7 +83,8 @@ public class DeliverGiftMessage extends DOMMessage {
     /**
      * {@inheritDoc}
      */
-    public static MessagePriority getMessagePriority() {
+    @Override
+    public MessagePriority getPriority() {
         return MessagePriority.NORMAL;
     }
 

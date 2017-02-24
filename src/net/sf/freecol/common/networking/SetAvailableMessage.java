@@ -64,7 +64,7 @@ public class SetAvailableMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
-    public static MessagePriority getMessagePriority() {
+    public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
 

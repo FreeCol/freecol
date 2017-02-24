@@ -84,7 +84,7 @@ public abstract class Message {
 
     /** Comparator comparing by message priority. */
     public static final Comparator<Message> messagePriorityComparator
-        = Comparator.comparingInt(m -> m.getPriority().getValue());
+        = Comparator.comparingInt(Message::getPriorityLevel);
 
                 
     /**
@@ -317,13 +317,19 @@ public abstract class Message {
     /**
      * Get the priority of this type of message.
      *
-     * May need to be overridden by specific message types if priority
-     * varies due to the specifics of the message.
-     *
      * @return The message priority.
      */
     public MessagePriority getPriority() {
-        return getMessagePriority();
+        return MessagePriority.NORMAL;
+    }
+
+    /**
+     * Get the priority level of this type of message.
+     *
+     * @return The message priority level.
+     */
+    public final int getPriorityLevel() {
+        return getPriority().getValue();
     }
 
     /**
@@ -347,17 +353,6 @@ public abstract class Message {
             return true;
         }
         return false;             
-    }
-
-    /**
-     * Get the priority of this type of message.
-     *
-     * To be overridden by specific message types.
-     *
-     * @return The message priority.
-     */
-    public static MessagePriority getMessagePriority() {
-        return MessagePriority.NORMAL;
     }
 
     /**

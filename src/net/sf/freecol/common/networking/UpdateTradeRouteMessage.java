@@ -67,7 +67,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
     /**
      * {@inheritDoc}
      */
-    public static MessagePriority getMessagePriority() {
+    public MessagePriority getPriority() {
         return MessagePriority.NORMAL;
     }
 

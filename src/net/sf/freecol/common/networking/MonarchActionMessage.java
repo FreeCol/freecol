@@ -99,8 +99,6 @@ public class MonarchActionMessage extends DOMMessage {
      */
     @Override
     public MessagePriority getPriority() {
-        // No static getMessagePriority version possible, as priority
-        // varies with action.
         MessagePriority mp = null;
         switch (this.action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:

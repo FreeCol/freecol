@@ -70,7 +70,8 @@ public class LearnSkillMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
-    public static MessagePriority getMessagePriority() {
+    @Override
+    public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
 

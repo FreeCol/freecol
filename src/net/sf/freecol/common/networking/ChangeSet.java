@@ -1538,7 +1538,7 @@ public class ChangeSet {
         }
         messages.sort(Message.messagePriorityComparator);
         diverted.sort(Message.messagePriorityComparator);
-dump("M", messages);
+            
         // Merge the messages where possible
         if (messages.size() > 1) {
             List<Message> more = new ArrayList<>();

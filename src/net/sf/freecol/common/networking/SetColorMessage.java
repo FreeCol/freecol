@@ -66,7 +66,8 @@ public class SetColorMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
-    public static MessagePriority getMessagePriority() {
+    @Override
+    public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
 
