@@ -45,7 +45,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.server.ai.goal.Goal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -87,9 +86,6 @@ public class AIUnit extends TransportableAIObject {
     /** The mission to which this AI unit has been assigned. */
     private Mission mission;
 
-    /** The goal.  Currently unused. */
-    private Goal goal = null;
-
 
     /**
      * Creates a new uninitialized {@code AIUnit}.
@@ -102,7 +98,6 @@ public class AIUnit extends TransportableAIObject {
 
         this.unit = null;
         this.mission = null;
-        this.goal = null;
     }
 
     /**
@@ -116,7 +111,6 @@ public class AIUnit extends TransportableAIObject {
 
         this.unit = unit;
         this.mission = null;
-        this.goal = null;
 
         uninitialized = unit == null;
     }
@@ -172,24 +166,6 @@ public class AIUnit extends TransportableAIObject {
      */
     public final void setMission(Mission mission) {
         this.mission = mission;
-    }
-
-    /**
-     * Gets the goal of this AI unit.
-     *
-     * @return The goal of this AI unit.
-     */
-    public final Goal getGoal() {
-        return this.goal;
-    }
-
-    /**
-     * Sets the goal of this AI unit.
-     *
-     * @param goal The new {@code Goal}.
-     */
-    public final void setGoal(Goal goal) {
-        this.goal = goal;
     }
 
 
