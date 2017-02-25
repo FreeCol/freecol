@@ -1850,7 +1850,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Show the compat labour report for the specified unit data.
+     * Show the compact labour report for the specified unit data.
      *
      * @param unitData The {@code UnitData} to display.
      */
