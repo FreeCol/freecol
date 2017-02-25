@@ -321,18 +321,12 @@ public final class ImageLibrary {
                                                Dimension size) {
         if (riverStyle != null) {
             String mask = riverStyle.getMask();
+            // Ensure unconnected river tiles are visible in map editor
             if (mask.equals("0000"))
                 mask = "0100";
             String key = "image.tileforest." + type.getId() + ".s" + mask;
-            // @compat 0.10.6
-            // Workaround for BR#3599586.  America_large used to contain
-            // tiles with an isolated river (old river style="0"!).
-            // There will never be an image for these, so just drop the
-            // river style.  The map is now fixed, this is just for the
-            // the saved games.
-            // Consider keeping the fallback, as its safer to have one.
+            // Safety check providing fallback for incomplete mods
             if (ResourceManager.hasImageResource(key))
-            // end @compat
                 return ResourceManager.getImage(key, size);
         }
         return ResourceManager.getImage("image.tileforest." + type.getId(), size);
