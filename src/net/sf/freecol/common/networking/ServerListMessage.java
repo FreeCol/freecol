@@ -22,8 +22,6 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.metaserver.ServerInfo;
 import net.sf.freecol.server.FreeColServer;
@@ -33,7 +31,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent when to get a list of servers.
+ * The message sent to query and list the available servers.
  */
 public class ServerListMessage extends DOMMessage {
 
@@ -57,10 +55,9 @@ public class ServerListMessage extends DOMMessage {
      * Create a new {@code ServerListMessage} from a
      * supplied element.  Used to read the reply.
      *
-     * @param game The {@code Game} this message belongs to.
      * @param element The {@code Element} to use to create the message.
      */
-    public ServerListMessage(Game game, Element element) {
+    public ServerListMessage(Element element) {
         this();
 
         this.servers.addAll(DOMUtils.mapChildren(element,

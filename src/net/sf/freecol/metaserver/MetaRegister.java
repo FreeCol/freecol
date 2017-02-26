@@ -135,8 +135,6 @@ public final class MetaRegister {
 
     /**
      * Adds a new server with the given attributes.
-     * <p>
-     * The Exception subclass {@link IOException} causes a {@link Logger} call if the connection fails.
      *
      * @param newSi The new {@code ServerInfo} to add.
      */

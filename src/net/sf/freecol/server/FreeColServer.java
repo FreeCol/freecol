@@ -810,7 +810,7 @@ public final class FreeColServer {
     public boolean updateMetaServer(boolean firstTime) {
         if (!this.publicServer) return false;
 
-        Connection mc = MetaServerUtils.getMetaServerConnection();
+        Connection mc = MetaServerUtils.getMetaServerConnection(null);
         if (mc == null) return cancelPublicServer();
 
         ServerInfo si = getServerInfo(mc);
@@ -842,7 +842,7 @@ public final class FreeColServer {
     public boolean removeFromMetaServer() {
         if (!this.publicServer) return false;
 
-        Connection mc = MetaServerUtils.getMetaServerConnection();
+        Connection mc = MetaServerUtils.getMetaServerConnection(null);
         if (mc != null) {
             mc.send(new RemoveServerMessage(mc));
             mc.close();
