@@ -48,8 +48,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.metaserver.MetaServerUtils;
-import net.sf.freecol.metaserver.ServerInfo;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
 

@@ -22,7 +22,11 @@ package net.sf.freecol.metaserver;
 import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -33,8 +37,12 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
+import net.sf.freecol.common.networking.RegisterServerMessage;
+import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
+import net.sf.freecol.common.networking.UpdateServerMessage;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
@@ -103,37 +111,110 @@ public class MetaServerUtils {
         }            
     }
 
+    /** Client timer update interval. */
+    private static final int UPDATE_INTERVAL = 60000;
+
     /** Sentinel server info to allow check for activity. */
     private static final ServerInfo sentinel = new ServerInfo(null,
         null, -1, -1, -1, false, null, -1);
 
-    /** Error message type. */
-    public static final String NO_ROUTE_TO_SERVER = "noRouteToServer";
+    /** Type of message to send. */
+    private static enum MetaMessageType {
+        REGISTER,
+        REMOVE,
+        SERVERLIST,
+        UPDATE,
+    };
     
-    /** Client timer update interval. */
-    private static final int UPDATE_INTERVAL = 60000;
+    private static Map<Timer, ServerInfo> updaters
+        = Collections.synchronizedMap(new HashMap<>());
 
+
+    // Internal utilities
+
+    /**
+     * Find a timer for the given server.
+     *
+     * @param si The new {@code ServerInfo} to look for.
+     * @return The {@code Timer} found if any.
+     */
+    private static Timer findTimer(final ServerInfo si) {
+        Entry<Timer, ServerInfo> entry = find(updaters.entrySet(),
+            matchKeyEquals(si.getName(),
+                (Entry<Timer,ServerInfo> e) -> e.getValue().getName()));
+        return (entry == null) ? null : entry.getKey();
+    }
+
+    /**
+     * Utility to start an update timer for a given server.
+     *
+     * @param si The new {@code ServerInfo} to update with.
+     * @return True if the timer was started.
+     */
+    private static boolean startTimer(final ServerInfo si) {
+        // This update is really a "Hi! I am still here!"-message,
+        // since an additional update should be sent when a new
+        // player is added to/removed from this server etc.
+        Timer t = new Timer(true);
+        if (t == null) return false;
+        updaters.put(t, si);
+        t.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    ServerInfo si = updaters.get(this);
+                    if (si == null || !updateServer(si)) cancel();
+                }
+            }, UPDATE_INTERVAL, UPDATE_INTERVAL);
+        return true;
+    }
+
+    /**
+     * Update a currently running timer with new server info.
+     *
+     * @param si The new {@code ServerInfo} to update with.
+     * @return True if the timer was updated.
+     */
+    private static boolean updateTimer(final ServerInfo si) {
+        Timer t = findTimer(si);
+        if (t == null) return false;
+        updaters.put(t, si);
+        return true;
+    }
+
+    /**
+     * Stop a currently running timer.
+     *
+     * @param si The new {@code ServerInfo} to update with.
+     * @return True if the timer was remove.
+     */
+    private static boolean stopTimer(final ServerInfo si) {
+        Timer t = findTimer(si);
+        if (t == null) return false;
+        t.cancel();
+        updaters.remove(t);
+        return true;
+    }
 
     /**
      * Utility to get a connection to the meta-server and handle the
      * server list it returns.
      *
-     * @param si A list of {@code ServerInfo} records, to be filled in
+     * @param lsi A list of {@code ServerInfo} records, to be filled in
      *     by the meta-server.     
      * @return A {@code Connection}, or null on failure.
      */
-    public static Connection getMetaServerConnection(List<ServerInfo> si) {
+    private static Connection getMetaServerConnection(List<ServerInfo> lsi) {
         // Create a consumer for the response to meta-server
         // "serverList" messages.  Most of the time we do not care, so
         // the default is to do nothing, however if we have a non-null
         // server info list, arrange to fill it.
-        Consumer<List<ServerInfo>> consumer = (List<ServerInfo> lsi) -> {};
-        if (si != null) {
-            si.clear();
-            si.add(sentinel);
-            consumer = (lsi) -> {
-                si.clear();
-                if (lsi != null) si.addAll(lsi);
+        Consumer<List<ServerInfo>> consumer = (List<ServerInfo> l) -> {};
+        if (lsi != null) {
+            lsi.clear();
+            lsi.add(sentinel);
+            consumer = (l) -> {
+                lsi.clear();
+                if (lsi != null) lsi.addAll(l);
             };
         }
 
@@ -150,46 +231,88 @@ public class MetaServerUtils {
     }
 
     /**
+     * Send a message to the meta-server.
+     *
+     * @param type The {@code MetaMessageType} to send.
+     * @param si The associated {@code ServerInfo}.
+     * @param lsi A list of {@code ServerInfo} records, to be filled
+     *     in by the meta-server.
+     * @return True if the operation succeeds.
+     */
+    private static boolean metaMessage(MetaMessageType type, ServerInfo si,
+                                       List<ServerInfo> lsi) {
+        Connection mc = getMetaServerConnection(lsi);
+        if (mc == null) return false;
+        si.setConnection(mc.getName(), mc.getHostAddress(), mc.getPort());
+
+        try {
+            switch (type) {
+            case REGISTER:
+                mc.sendAndWait(new RegisterServerMessage(si));
+                return startTimer(si);
+            case REMOVE:
+                mc.sendAndWait(new RemoveServerMessage(si));
+                return stopTimer(si);
+            case SERVERLIST:
+                mc.sendAndWait(new ServerListMessage());
+                break; 
+            case UPDATE:
+                mc.sendAndWait(new UpdateServerMessage(si));
+                return updateTimer(si);
+            }
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Meta-server " + type.toString()
+                + " failed: " + FreeCol.getMetaServerAddress()
+                + ":" + FreeCol.getMetaServerPort(), ioe);
+            return false;
+        } finally {
+            mc.close();
+        }
+        return true;
+    }
+
+
+    // Public interface
+
+    /**
      * Gets a list of servers from the meta server.
      *
      * @return A list of {@link ServerInfo} objects, or null on error.
      */
     public static List<ServerInfo> getServerList() {
-        List<ServerInfo> si = new ArrayList<>();
-        Connection mc = getMetaServerConnection(si);
-        if (mc == null) return null;
-        try {
-            mc.ask(new ServerListMessage());
-            return (si.size() == 1 && si.get(0) == sentinel) ? null : si;
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Meta-server did not list servers: "
-                + FreeCol.getMetaServerAddress()
-                + ":" + FreeCol.getMetaServerPort(), ioe);
-        } finally {
-            mc.close();
-        }
-        return null;
+        List<ServerInfo> lsi = new ArrayList<>();
+        return (metaMessage(MetaMessageType.SERVERLIST, null, lsi)
+            && !(lsi.size() == 1 && lsi.get(0) == sentinel)) ? lsi
+            : null;
     }
 
     /**
-     * Utility to start an update timer for a given server.
+     * Register a public server.
      *
-     * @param freeColServer The {@code FreeColServer} to send update messages
-     *     to the meta-server.
-     * @return The {@code Timer} that was started, so that it can be cancelled
-     *     if no longer needed.
+     * If successful, an update timer will be returned, which will
+     * continually send update messages to the meta-server until cancelled.
+     *
+     * @return True if the server was registered.
      */
-    public static Timer startUpdateTimer(FreeColServer freeColServer) {
-        // This update is really a "Hi! I am still here!"-message,
-        // since an additional update should be sent when a new
-        // player is added to/removed from this server etc.
-        Timer t = new Timer(true);
-        t.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    if (!freeColServer.updateMetaServer(false)) cancel();
-                }
-            }, UPDATE_INTERVAL, UPDATE_INTERVAL);
-        return t;
+    public static boolean registerServer(ServerInfo si) {
+        return metaMessage(MetaMessageType.REGISTER, si, null);
+    }
+
+    /**
+     * Remove a public server.
+     *
+     * @return True if the server was removed.
+     */
+    public static boolean removeServer(ServerInfo si) {
+        return metaMessage(MetaMessageType.REMOVE, si, null);
+    }
+
+    /**
+     * Update a public server.
+     *
+     * @return True if the server was updated.
+     */
+    public static boolean updateServer(ServerInfo si) {
+        return metaMessage(MetaMessageType.UPDATE, si, null);
     }
 }

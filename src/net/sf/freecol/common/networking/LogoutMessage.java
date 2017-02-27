@@ -144,7 +144,7 @@ public class LogoutMessage extends AttributeMessage {
         cs.add(See.only(serverPlayer), new LogoutMessage(serverPlayer, reason));
 
         // Update the metaserver
-        freeColServer.updateMetaServer(false);
+        freeColServer.updateMetaServer();
 
         return cs;
     }

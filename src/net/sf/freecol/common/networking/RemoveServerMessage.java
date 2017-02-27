@@ -39,10 +39,8 @@ public class RemoveServerMessage extends ServerInfoMessage {
      *
      * @param conn A {@code Connection} to the meta-server.
      */
-    public RemoveServerMessage(Connection conn) {
-        super(TAG, new ServerInfo(null,
-                                  conn.getHostAddress(), conn.getPort(),
-                                  0, 0, false, null, 0));
+    public RemoveServerMessage(ServerInfo si) {
+        super(TAG, si);
     }
 
     /**

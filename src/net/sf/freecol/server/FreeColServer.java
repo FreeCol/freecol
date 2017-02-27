@@ -67,10 +67,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.RegisterServerMessage;
-import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
-import net.sf.freecol.common.networking.UpdateServerMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.GameOptions;
@@ -214,9 +211,6 @@ public final class FreeColServer {
     /** The game integrity state. */
     private int integrity = 1;
 
-    /** Meta-server update timer. */
-    private Timer metaServerUpdateTimer = null;
-
 
     /**
      * Base constructor common to the following new-game and
@@ -296,7 +290,7 @@ public final class FreeColServer {
         this.serverGame.randomize(this.random);
         this.inGameController.setRandom(this.random);
         this.mapGenerator = new SimpleMapGenerator(this.serverGame, this.random);
-        this.publicServer = updateMetaServer(true);
+        this.publicServer = registerWithMetaServer();
     }
 
     /**
@@ -331,7 +325,7 @@ public final class FreeColServer {
         }
         this.inGameController.setRandom(random);
         this.mapGenerator = null;
-        this.publicServer = updateMetaServer(true);
+        this.publicServer = registerWithMetaServer();
     }
 
 
@@ -645,7 +639,7 @@ public final class FreeColServer {
             return;
         }            
         getServer().addConnection(connection);
-        updateMetaServer(false);
+        updateMetaServer();
     }
 
     /**
@@ -740,7 +734,7 @@ public final class FreeColServer {
 
         changeServerState(ServerState.IN_GAME);
         sendToAll(TrivialMessage.START_GAME_MESSAGE, (ServerPlayer)null);
-        updateMetaServer(false);
+        updateMetaServer();
     }
 
     /**
@@ -764,92 +758,8 @@ public final class FreeColServer {
             : serverPlayer.getConnection());
     }
 
-    /**
-     * Create a {@code ServerInfo} record for this server and connection.
-     *
-     * @param mc A {@code Connection} to the meta-server.
-     * @return A suitable record.
-     */
-    private ServerInfo getServerInfo(Connection mc) {
-        if (getName() == null) setName(mc.getSocketName());
-        int slots = count(getGame().getLiveEuropeanPlayers(),
-            p -> !p.isREF() && ((ServerPlayer)p).isAI()
-                && !((ServerPlayer)p).isConnected());
-        int players = count(getGame().getLivePlayers(),
-            p -> !((ServerPlayer)p).isAI()
-                && ((ServerPlayer)p).isConnected());
-        return new ServerInfo(getName(), mc.getHostAddress(), mc.getPort(),
-                              slots, players,
-                              this.serverState == ServerState.IN_GAME,
-                              FreeCol.getVersion(),
-                              getServerState().ordinal());
-    }
 
-    /**
-     * Cancel public availablity through the meta-server.
-     *
-     * @return False.
-     */
-    private boolean cancelPublicServer() {
-        if (this.metaServerUpdateTimer != null) {
-            this.metaServerUpdateTimer.cancel();
-            this.metaServerUpdateTimer = null;
-        }
-        return this.publicServer = false;
-    }
-     
-    /**
-     * Sends information about this server to the meta-server.
-     *
-     * This is the master routine with private `firstTime' access
-     * when called from the constructors.
-     *
-     * @param firstTime Must be true when called for the first time.
-     * @return True if the MetaServer was updated.
-     */
-    public boolean updateMetaServer(boolean firstTime) {
-        if (!this.publicServer) return false;
-
-        Connection mc = MetaServerUtils.getMetaServerConnection(null);
-        if (mc == null) return cancelPublicServer();
-
-        ServerInfo si = getServerInfo(mc);
-        try {
-            DOMMessage reply = mc.ask((Game)null,
-                ((firstTime) ? new RegisterServerMessage(si)
-                    : new UpdateServerMessage(si)));
-            if (reply != null
-                && reply.isType(MetaServerUtils.NO_ROUTE_TO_SERVER)) {
-                logger.warning("Could not connect to meta-server.");
-                return cancelPublicServer();
-            }
-        } finally {
-            mc.close();
-        }
-        if (firstTime) { // Start the metaserver update thread
-            this.metaServerUpdateTimer = MetaServerUtils.startUpdateTimer(this);
-        }
-        return true;
-    }
-
-    /**
-     * Removes this server from the meta-server.
-     *
-     * Only relevant for public servers.
-     *
-     * @return True if the meta-server was updated.
-     */
-    public boolean removeFromMetaServer() {
-        if (!this.publicServer) return false;
-
-        Connection mc = MetaServerUtils.getMetaServerConnection(null);
-        if (mc != null) {
-            mc.send(new RemoveServerMessage(mc));
-            mc.close();
-            return true;
-        }
-        return cancelPublicServer();
-    }
+    // Game save/load
 
     /**
      * Saves a normal (non-map-editor) game.
@@ -1356,5 +1266,64 @@ public final class FreeColServer {
      */
     public AIPlayer getAIPlayer(Player player) {
         return getAIMain().getAIPlayer(player);
+    }
+
+
+    // MetaServer handling
+
+    /**
+     * Create a {@code ServerInfo} record for this server and connection.
+     *
+     * @return A suitable record.
+     */
+    private ServerInfo getServerInfo() {
+        int slots = count(getGame().getLiveEuropeanPlayers(),
+            p -> !p.isREF() && ((ServerPlayer)p).isAI()
+                && !((ServerPlayer)p).isConnected());
+        int players = count(getGame().getLivePlayers(),
+            p -> !((ServerPlayer)p).isAI()
+                && ((ServerPlayer)p).isConnected());
+        return new ServerInfo(getName(),
+                              null, -1, // Missing these at this point
+                              slots, players,
+                              this.serverState == ServerState.IN_GAME,
+                              FreeCol.getVersion(),
+                              getServerState().ordinal());
+    }
+
+    /**
+     * Register this FreeColServer with the meta-server.
+     *
+     * @return True if the meta-server was updated.
+     */
+    public synchronized boolean registerWithMetaServer() {
+        if (!this.publicServer) return false;
+        boolean ret = MetaServerUtils.registerServer(getServerInfo());
+        if (!ret) this.publicServer = false;
+        return ret;
+    }
+
+    /**
+     * Removes this server from the meta-server.
+     *
+     * @return True if the meta-server was updated.
+     */
+    public synchronized boolean removeFromMetaServer() {
+        if (!this.publicServer) return false;
+        boolean ret = MetaServerUtils.removeServer(getServerInfo());
+        if (!ret) this.publicServer = false;
+        return ret;
+    }
+
+    /**
+     * Update this FreeColServer with the meta-server.
+     *
+     * @return True if the meta-server was updated.
+     */
+    public synchronized boolean updateMetaServer() {
+        if (!this.publicServer) return false;
+        boolean ret = MetaServerUtils.updateServer(getServerInfo());
+        if (!ret) this.publicServer = false;
+        return ret;
     }
 }
