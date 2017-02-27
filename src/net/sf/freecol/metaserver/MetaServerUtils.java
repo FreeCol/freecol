@@ -137,15 +137,14 @@ public class MetaServerUtils {
             };
         }
 
+        String host = FreeCol.getMetaServerAddress();
+        int port = FreeCol.getMetaServerPort();
         try {
-            return new Connection(FreeCol.META_SERVER_ADDRESS,
-                                  FreeCol.META_SERVER_PORT,
-                                  new MetaInputHandler(consumer),
+            return new Connection(host, port, new MetaInputHandler(consumer),
                                   FreeCol.SERVER_THREAD);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not connect to meta-server: "
-                + FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT,
-                ioe);
+                + host + ":" + port, ioe);
         }
         return null;
     }
@@ -164,8 +163,8 @@ public class MetaServerUtils {
             return (si.size() == 1 && si.get(0) == sentinel) ? null : si;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Meta-server did not list servers: "
-                + FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT,
-                ioe);
+                + FreeCol.getMetaServerAddress()
+                + ":" + FreeCol.getMetaServerPort(), ioe);
         } finally {
             mc.close();
         }

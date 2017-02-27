@@ -104,15 +104,11 @@ public final class FreeCol {
     public static final String  SERVER_THREAD = "FreeColServer:";
     public static final String  METASERVER_THREAD = "FreeColMetaServer:";
 
-    public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
-    public static final int     META_SERVER_PORT = 3540;
-
     /** Specific revision number (currently the git tag of trunk at release) */
     private static String       freeColRevision = null;
 
     /** The locale, either default or command-line specified. */
     private static Locale       locale = null;
-
 
     // Cli defaults.
     private static final Advantages ADVANTAGES_DEFAULT = Advantages.SELECTABLE;
@@ -129,6 +125,8 @@ public final class FreeCol {
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
     private static final String JAVA_VERSION_MIN = "1.8";
     private static final int    MEMORY_MIN = 128; // Mbytes
+    private static final String META_SERVER_ADDRESS = "meta.freecol.org";
+    private static final int    META_SERVER_PORT = 3540;
     private static final int    PORT_DEFAULT = 3541;
     private static final String SPLASH_DEFAULT = "splash.jpg";
     private static final String TC_DEFAULT = "freecol";
@@ -188,6 +186,10 @@ public final class FreeCol {
     static {
         logLevels.add(new LogLevel("", LOGLEVEL_DEFAULT));
     }
+
+    /** Meta-server location. */
+    private static String metaServerAddress = META_SERVER_ADDRESS;
+    private static int metaServerPort = META_SERVER_PORT;
 
     /** The client player name. */
     private static String name = null;
@@ -575,6 +577,11 @@ public final class FreeCol {
                           .argName(Messages.message("cli.arg.loglevel"))
                           .hasArgs()
                           .build());
+        options.addOption(Option.builder().longOpt("meta-server")
+                          .desc(Messages.message("cli.meta-server"))
+                          .argName(Messages.message("cli.arg.metaServer"))
+                          .hasArg()
+                          .build());
         options.addOption(Option.builder().longOpt("name")
                           .desc(Messages.message("cli.name"))
                           .argName(Messages.message("cli.arg.name"))
@@ -791,6 +798,14 @@ public final class FreeCol {
                     logLevels.add((s.length == 1)
                         ? new LogLevel("", Level.parse(s[0].toUpperCase()))
                         : new LogLevel(s[0], Level.parse(s[1].toUpperCase())));
+                }
+            }
+
+            if (line.hasOption("meta-server")) {
+                String arg = line.getOptionValue("meta-server");
+                if (!setMetaServer(arg)) {
+                    gripe(StringTemplate.template("cli.error.meta-server")
+                        .addName("%arg%", arg));
                 }
             }
 
@@ -1132,6 +1147,42 @@ public final class FreeCol {
         return -1;
     }
 
+    /**
+     * Get the meta-server address.
+     *
+     * @return The current meta-server address.
+     */
+    public static String getMetaServerAddress() {
+        return metaServerAddress;
+    }
+
+    /**
+     * Get the meta-server port.
+     *
+     * @return The current meta-server port.
+     */
+    public static int getMetaServerPort() {
+        return metaServerPort;
+    }
+
+    /**
+     * Set the meta-server location.
+     *
+     * @param arg The new meta-server location in HOST:PORT format.
+     */
+    private static boolean setMetaServer(String arg) {
+        String[] s = arg.split(":");
+        int port = -1;
+        try {
+            port = (s.length == 2) ? Integer.parseInt(s[1]) : -1;
+        } catch (NumberFormatException nfe) {}
+        if (s.length != 2 || s[0] == null || "".equals(s[0])) return false;
+
+        metaServerAddress = s[0];
+        metaServerPort = port;
+        return true;
+    }
+        
     /**
      * Gets the user name.
      *

@@ -184,7 +184,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             start = new JRadioButton(Messages.message("newPanel.startMultiplayerGame"),
                                      false),
             meta = new JRadioButton(Messages.message("newPanel.getServerList")
-                + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
+                + " (" + FreeCol.getMetaServerAddress() + ")", false);
         this.buttonGroup.add(single);
         single.setActionCommand(String.valueOf(NewPanelAction.SINGLE));
         single.addActionListener(ae -> enableComponents());
