@@ -146,6 +146,7 @@ import net.sf.freecol.client.gui.dialog.VictoryDialog;
 import net.sf.freecol.client.gui.dialog.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Direction;
@@ -176,7 +177,6 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.metaserver.ServerInfo;
 
 
 /**

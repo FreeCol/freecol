@@ -22,6 +22,7 @@ package net.sf.freecol.metaserver;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;

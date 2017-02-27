@@ -20,7 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.metaserver.ServerInfo;
+import net.sf.freecol.common.metaserver.ServerInfo;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;

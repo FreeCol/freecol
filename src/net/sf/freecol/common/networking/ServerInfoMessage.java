@@ -19,10 +19,10 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.AttributeMessage;
-import net.sf.freecol.metaserver.ServerInfo;
 
 import org.w3c.dom.Element;
 

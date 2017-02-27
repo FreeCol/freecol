@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.metaserver;
+package net.sf.freecol.common.metaserver;
 
 import java.io.IOException;
 import java.util.function.Consumer;

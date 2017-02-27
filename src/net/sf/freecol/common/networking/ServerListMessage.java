@@ -22,11 +22,11 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.freecol.common.metaserver.ServerInfo;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.metaserver.ServerInfo;
+import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.server.FreeColServer;
 
-import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
 
 

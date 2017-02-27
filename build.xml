@@ -183,7 +183,7 @@
              basedir="${freecol.build.dir}"
              manifest="${basedir}/src/MANIFEST.MF"
              includes="net/**, splash.jpg"
-             excludes="**/metaserver/MetaServer.java"/>
+             excludes="net/sf/freecol/metaserver/**"/>
     </target>
 
     <!-- Compiles the metaserver and creates a JAR-file. -->
@@ -191,7 +191,9 @@
         <jar jarfile="${freecol.metaserver.jar.file}"
              basedir="${freecol.build.dir}"
              manifest="${basedir}/src/MANIFEST.MF"
-             includes="net/**, org/**"/>
+             includes="net/sf/freecol/metaserver/**,
+                       net/sf/freecol/common/**,
+                       org/**"/>
     </target>
 
     <target name="mydist" depends="mydistWindows,mydistMac,mydistJava"
