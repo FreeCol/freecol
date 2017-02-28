@@ -118,27 +118,12 @@ public class ServerEurope extends Europe implements TurnTaker {
      */
     public void initializeMigration(Random random) {
         final Specification spec = getGame().getSpecification();
+        UnitListOption option
+            = (UnitListOption)spec.getOption(GameOptions.IMMIGRANTS);
         UnitType unitType;
-
-        if (spec.hasOption(GameOptions.IMMIGRANTS)) {
-            UnitListOption option
-                = (UnitListOption)spec.getOption(GameOptions.IMMIGRANTS);
-            for (AbstractUnit au : option.getOptionValues()) {
-                unitType = au.getType(spec);
-                addRecruitable(au.getType(spec));
-            }
-        } else {
-            // @compat 0.10.3
-            for (int index = 0;; index++) {
-                String optionId = "model.option.recruitable.slot" + index;
-                String unitTypeId;
-                if (spec.hasOption(optionId)
-                    && (unitTypeId = spec.getString(optionId)) != null
-                    && (unitType = spec.getUnitType(unitTypeId)) != null
-                    && addRecruitable(unitType)) continue;
-                break; // Failed
-            }
-            // end @compat
+        for (AbstractUnit au : option.getOptionValues()) {
+            unitType = au.getType(spec);
+            addRecruitable(au.getType(spec));
         }
 
         // Fill out to the full amount of recruits if the above failed
