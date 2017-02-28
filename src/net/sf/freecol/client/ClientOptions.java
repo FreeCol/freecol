@@ -686,20 +686,6 @@ public class ClientOptions extends OptionGroup {
      * can clean these up as they become standard.
      */
     public void fixClientOptions() {
-        // @compat 0.10.1
-        addIntegerOption(COLONY_REPORT,
-            "clientOptions.messages", 0);
-        addBooleanOption(USE_PIXMAPS,
-            "clientOptions.gui", true);
-        // end @compat 0.10.1
-        // @compat 0.10.7
-        addBooleanOption(CONFIRM_SAVE_OVERWRITE,
-            "clientOptions.savegames", false);
-        addBooleanOption(DISABLE_GRAY_LAYER,
-            "clientOptions.gui", false);
-        addBooleanOption(REMEMBER_PANEL_SIZES,
-            "clientOptions.gui", true);
-        // end @compat 0.10.7
         // @compact 0.11.0
         addBooleanOption(MINIMAP_TOGGLE_BORDERS,
             "clientOptions.gui", true);    
