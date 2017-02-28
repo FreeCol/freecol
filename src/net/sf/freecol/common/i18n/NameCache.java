@@ -273,14 +273,21 @@ public class NameCache {
             if (settlementNames.get(player) == null) {
                 List<String> names = new ArrayList<>();
                 if (player.isEuropean()) {
-                    // European settlement names are spec-qualified
-                    // and in chronological order
-                    collectNames(player.getNationId() + ".settlementName."
-                        + player.getSpecification().getId() + ".", names);
-                    // If still empty default to using the "freecol" names
-                    if (names.isEmpty()) {
-                        collectNames(player.getNationId() + ".settlementName.freecol.",
-                                     names);
+                    String specId = player.getSpecification().getId();
+                    // The older European nation settlement names are
+                    // spec-qualified and in chronological order
+                    String cacheId = player.getNationId() + ".settlementName."
+                        + specId + ".";
+                    collectNames(cacheId, names);
+
+                    // Newer European settlement names are not spec-qualified
+                    cacheId = player.getNationId() + ".settlementName.";
+                    collectNames(cacheId, names);
+                    
+                    // If still none found fall back to the "freecol" names
+                    if (names.isEmpty() && !"freecol".equals(specId)) {
+                        cacheId = player.getNationId() + ".settlementName.freecol.";
+                        collectNames(cacheId, names);
                     }
                 } else {
                     // Native settlement names are not spec qualified,
