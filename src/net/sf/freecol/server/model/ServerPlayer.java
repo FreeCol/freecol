@@ -1066,42 +1066,17 @@ public class ServerPlayer extends Player implements TurnTaker {
         for (AbstractUnit au : abstractUnits) {
             UnitType type = au.getType(spec);
             Role role = au.getRole(spec);
-            // @compat 0.10.x
-            // The REF always had an exemption from the availability
-            // rules.  We are transitioning to it being subject to the
-            // normal rules, which requires REF nations to have the
-            // INDEPENDENT_NATION ability (or they do not get
-            // man-o-war).  We are also handling the role transition.
-            //
-            // Drop the isREF() branch when the compatibility code
-            // goes away.
-            if (isREF()) {
-                if (!role.isAvailableTo(this, type) && null != role.getId()) {
-                    switch (role.getId()) {
-                    case "model.role.soldier":
-                        role = spec.getRole("model.role.infantry");
-                        break;
-                    case "model.role.dragoon":
-                        role = spec.getRole("model.role.cavalry");
-                        break;
-                    default:
-                        break;
-                    }
-                }
-            } else {
-                if (!type.isAvailableTo(this)) {
-                    logger.warning("Ignoring abstract unit " + au
-                        + " unavailable to: " + getId());
-                    continue;
-                }
-                if (!role.isAvailableTo(this, type)) {
-                    logger.warning("Ignoring abstract unit " + au
-                        + " with role " + role
-                        + " unavailable to: " + getId());
-                    continue;
-                }
+            if (!type.isAvailableTo(this)) {
+                logger.warning("Ignoring abstract unit " + au
+                    + " unavailable to: " + getId());
+                continue;
             }
-            // end @compat 0.10.x
+            if (!role.isAvailableTo(this, type)) {
+                logger.warning("Ignoring abstract unit " + au
+                    + " with role " + role
+                    + " unavailable to: " + getId());
+                continue;
+            }
             for (int i = 0; i < au.getNumber(); i++) {
                 ServerUnit su = new ServerUnit(game, location, this, type,
                                                role);//-vis(this)
