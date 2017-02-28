@@ -366,17 +366,13 @@ public final class InGameController extends Controller {
 
         // Instantiate the REF in Europe
         Force exf = monarch.getExpeditionaryForce();
-        // @compat 0.10.5
-        // There was a bug that seriously under provisioned the navy back
-        // around 0.10.5, the game in BR#2435 has it.  For now, just add
-        // enough ships to carry all the units.
+        // Defend against underprovisioned navies
         UnitType ut = monarch.getNavalREFUnitType();
         while (exf.getSpaceRequired() > exf.getCapacity()) {
             AbstractUnit au
                 = new AbstractUnit(ut, Specification.DEFAULT_ROLE_ID, 1);
             exf.add(au);
         }
-        // end @compat 0.10.5
         List<Unit> landUnits = refPlayer.createUnits(exf.getLandUnitsList(),
                                                      europe);//-vis: safe!map
         List<Unit> navalUnits = refPlayer.createUnits(exf.getNavalUnitsList(),
