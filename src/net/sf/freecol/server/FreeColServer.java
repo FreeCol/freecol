@@ -1048,19 +1048,9 @@ public final class FreeColServer {
         }
 
         int savegameVersion = fis.getSavegameVersion();
-
-        // @compat 0.10.x
         serverGame.getMap().resetContiguity();
-        // end @compat
-
-        // @compat 0.10.x
         Player unknown = serverGame.getUnknownEnemy();
-        if (unknown == null) {
-            establishUnknownEnemy(serverGame);
-        } else {
-            unknown.setName(Nation.UNKNOWN_NATION_ID);
-        }
-        // end @compat
+        if (unknown == null) establishUnknownEnemy(serverGame);
 
         // Ensure that critical option groups can not be edited.
         specification = getSpecification();
