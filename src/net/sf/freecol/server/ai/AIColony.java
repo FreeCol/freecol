@@ -1399,14 +1399,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         = TileImprovementPlan.TAG + LIST_ELEMENT;
     private static final String WORKER_WISH_LIST_TAG
         = WorkerWish.TAG + LIST_ELEMENT;
-    // @compat 0.10.3
-    private static final String OLD_GOODS_WISH_TAG
-        = GoodsWish.TAG + "Wish" + LIST_ELEMENT;
+    // @compat 0.11.3
     private static final String OLD_TILE_IMPROVEMENT_PLAN_LIST_TAG
         = "tileimprovementplan" + LIST_ELEMENT;
-    private static final String OLD_WORKER_WISH_TAG
-        = WorkerWish.TAG + "Wish" + LIST_ELEMENT;
-    // end @compat
+    // end @compat 0.11.3
 
 
     /**
@@ -1492,32 +1488,24 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                            AIGoods.class, (AIGoods)null, true));
             xr.closeTag(AI_GOODS_LIST_TAG);
 
-        } else if (GOODS_WISH_LIST_TAG.equals(tag)
-            // @compat 0.10.3
-            || OLD_GOODS_WISH_TAG.equals(tag)
-            // end @compat
-                   ) {
+        } else if (GOODS_WISH_LIST_TAG.equals(tag)) {
             wishes.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
                                        GoodsWish.class, (GoodsWish)null, true));
-            xr.closeTag(tag);// FIXME: tag -> GOODS_WISH_LIST_TAG
+            xr.closeTag(GOODS_WISH_LIST_TAG);
 
         } else if (TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
-            // @compat 0.10.3
+            // @compat 0.11.3
             || OLD_TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
-            // end @compat
+            // end @compat 0.11.3
                    ) {
             tileImprovementPlans.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
                     TileImprovementPlan.class, (TileImprovementPlan)null, true));
             xr.closeTag(tag);// FIXME: tag -> TILE_IMPROVEMENT_PLAN_LIST_TAG
 
-        } else if (WORKER_WISH_LIST_TAG.equals(tag)
-            // @compat 0.10.3
-            || OLD_WORKER_WISH_TAG.equals(tag)
-            // end @compat
-                   ) {
+        } else if (WORKER_WISH_LIST_TAG.equals(tag)) {
             wishes.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
                                        WorkerWish.class, (WorkerWish)null, true));
-            xr.closeTag(tag);// FIXME: tag -> WORKER_WISH_LIST_TAG
+            xr.closeTag(WORKER_WISH_LIST_TAG);
 
         } else {
             super.readChild(xr);
