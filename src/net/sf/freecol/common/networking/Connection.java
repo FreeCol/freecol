@@ -31,6 +31,7 @@ import java.net.SocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
@@ -648,9 +649,13 @@ public class Connection implements Closeable {
      *
      * @param xr The {@code FreeColXMLReader} to read from.
      * @return The {@code Message} found, if any.
-     * @exception FreeColException there is a problem reading the stream.
+     * @exception FreeColException there is a problem instantiating
+     *     the message.
+     * @exception XMLStreamException if there is a problem reading the
+     *     stream.
      */
-    public Message reader(FreeColXMLReader xr) throws FreeColException {
+    public Message reader(FreeColXMLReader xr)
+        throws FreeColException, XMLStreamException {
         MessageHandler mh = getMessageHandler();
         return (mh == null) ? null : mh.read(xr);
     }

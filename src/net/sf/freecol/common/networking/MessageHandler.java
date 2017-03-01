@@ -20,6 +20,8 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
@@ -44,8 +46,10 @@ public interface MessageHandler {
      *
      * @param xr The {@code FreeColXMLReader} to read from.
      * @return The {@code Message} found, or null if none.
-     * @exception FreeColException if the message can not be read or
-     *     constructed.
+     * @exception FreeColException if the message can not be instantiated.
+     * @exception XMLStreamException if there is a problem reading the
+     *     message.
      */
-    public Message read(FreeColXMLReader xr) throws FreeColException;
+    public Message read(FreeColXMLReader xr)
+        throws FreeColException, XMLStreamException;
 }

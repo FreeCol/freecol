@@ -432,9 +432,9 @@ final class ReceivingThread extends Thread {
             try {
                 Message m = this.connection.reader(xr);
                 if (m != null) msg = (DOMMessage)m;
-            } catch (FreeColException fce) {
+            } catch (FreeColException|XMLStreamException ex) {
                 // Just log for now, fall through to DOM-based code
-                logger.log(Level.FINEST, "ReceivingThread: " + fce.getMessage());
+                logger.log(Level.FINEST, "ReceivingThread: " + ex.getMessage());
             }
 
             if (msg == null) {

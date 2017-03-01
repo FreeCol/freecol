@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.FreeColException;
@@ -189,7 +191,8 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
-    public Message read(FreeColXMLReader xr) throws FreeColException {
+    public Message read(FreeColXMLReader xr)
+        throws FreeColException, XMLStreamException {
         return Message.read(getGame(), xr);
     }
 }

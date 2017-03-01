@@ -318,6 +318,8 @@ public abstract class Message {
     /**
      * Get the priority of this type of message.
      *
+     * To be overridden in the subclasses.
+     *
      * @return The message priority.
      */
     public MessagePriority getPriority() {
@@ -364,7 +366,7 @@ public abstract class Message {
      *
      * @param freeColClient The {@code FreeColClient} to handle this message.
      */
-    public void clientHandler(FreeColClient fcc) {}
+    public void clientHandler(FreeColClient freeColClient) {}
 
     /**
      * Read a new message from a stream.
