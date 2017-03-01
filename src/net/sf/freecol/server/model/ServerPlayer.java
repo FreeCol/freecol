@@ -4442,39 +4442,30 @@ outer:  for (Effect effect : effects) {
                     portTile.getHighSeasCount()+1).getSafeTile(this, random);
                 
                 // Create the force.
-                // @compat 0.10.5
-                // We used to nullify the monarch when declaring independence.
-                // There are saved games out there where this happened
-                // (see BR#2435).  Defend against NPE.
-                Force ivf = null;
-                if (getMonarch() != null
-                // end @compat 0.10.5
-                    && (ivf = getMonarch().getInterventionForce()) != null) {
-                    List<Unit> land = createUnits(ivf.getLandUnitsList(),
-                                                  entry);//-vis(this)
-                    List<Unit> naval = createUnits(ivf.getNavalUnitsList(),
-                                                   entry);//-vis(this)
-                    List<Unit> leftOver = loadShips(land, naval, random);//-vis(this)
-                    for (Unit unit : leftOver) {
-                        // no use for left over units
-                        logger.warning("Disposing of left over unit " + unit);
-                        unit.setLocationNoUpdate(null);//-vis: safe, off map
-                        unit.dispose();//-vis: safe, never sighted
-                    }
-                    Set<Tile> tiles = exploreForUnit(naval.get(0));
-                    if (!tiles.contains(entry)) tiles.add(entry);
-                    invalidateCanSeeTiles();//+vis(this)
-                    cs.add(See.perhaps(), tiles);
-                    cs.addMessage(this,
-                        new ModelMessage(MessageType.DEFAULT,
-                                         "model.player.interventionForceArrives",
-                                         this));
-                    logger.info("Intervention force ("
-                        + naval.size() + " naval, "
-                        + land.size() + " land, "
-                        + leftOver.size() + " left over) arrives at " + entry
-                        + "(for " + port.getName() + ")");
+                Force ivf = getMonarch().getInterventionForce();
+                List<Unit> land = createUnits(ivf.getLandUnitsList(),
+                                              entry);//-vis(this)
+                List<Unit> naval = createUnits(ivf.getNavalUnitsList(),
+                                               entry);//-vis(this)
+                List<Unit> leftOver = loadShips(land, naval, random);//-vis(this)
+                for (Unit unit : leftOver) {
+                    // no use for left over units
+                    logger.warning("Disposing of left over unit " + unit);
+                    unit.setLocationNoUpdate(null);//-vis: safe, off map
+                    unit.dispose();//-vis: safe, never sighted
                 }
+                Set<Tile> tiles = exploreForUnit(naval.get(0));
+                if (!tiles.contains(entry)) tiles.add(entry);
+                invalidateCanSeeTiles();//+vis(this)
+                cs.add(See.perhaps(), tiles);
+                cs.addMessage(this,
+                    new ModelMessage(MessageType.DEFAULT,
+                                     "model.player.interventionForceArrives",
+                                     this));
+                logger.info("Intervention force (" + naval.size() + " naval, "
+                    + land.size() + " land, "
+                    + leftOver.size() + " left over) arrives at " + entry
+                    + "(for " + port.getName() + ")");
             }
         }
 
