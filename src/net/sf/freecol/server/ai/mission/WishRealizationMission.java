@@ -236,9 +236,6 @@ public class WishRealizationMission extends Mission {
     // Serialization
 
     private static final String WISH_TAG = "wish";
-    // @compat 0.10.3
-    private static final String OLD_GOODS_WISH_TAG = "GoodsWish";
-    // end @compat
 
 
     /**
@@ -263,11 +260,7 @@ public class WishRealizationMission extends Mission {
         final String wid = xr.getAttribute(WISH_TAG, (String)null);
         wish = xr.getAttribute(aiMain, WISH_TAG, Wish.class, (Wish)null);
         if (wish == null) {
-            if (wid.startsWith(GoodsWish.TAG)
-                // @compat 0.10.3
-                || wid.startsWith(OLD_GOODS_WISH_TAG)
-                // end @compat
-                ) {
+            if (wid.startsWith(GoodsWish.TAG)) {
                 wish = new GoodsWish(aiMain, wid);
 
             } else if (wid.startsWith(WorkerWish.TAG)) {
