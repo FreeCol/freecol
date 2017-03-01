@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation>
+
+      Copyright (C) 2002-2017  The FreeCol Team
+
+      This file is part of FreeCol.
+
+      FreeCol is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 2 of the License, or
+      (at your option) any later version.
+
+      FreeCol is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with FreeCol. If not, see http://www.gnu.org/licenses
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="aiUnit">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="1">
+
+        <xs:element name="buildColonyMission" >
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="SimpleMissionType">
+                <!-- @compat 0.11.x -->
+                <xs:attribute name="doNotGiveUp" type="xs:boolean" use="optional" />
+                <xs:attribute name="colonyBuilt" type="xs:boolean" use="optional" />
+                <xs:attribute name="value" type="xs:int" use="optional" />
+                <!-- end @compat 0.11.x -->
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="cashInTreasureTrainMission"
+                    type="SimpleMissionType" />
+
+        <xs:element name="defendSettlementMission">
+          <xs:complexType>
+            <xs:attribute name="settlement" type="SettlementId" use="required" />
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="idleAtSettlementMission"
+                    type="SimpleMissionType" />
+
+        <xs:element name="indianBringGiftMission">
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="SimpleMissionType">
+                <xs:attribute name="collected" type="xs:boolean" use="optional" />
+                <xs:attribute name="colony" type="ColonyId" use="optional" />
+                <!-- @compat 0.11.x -->
+                <xs:attribute name="completed" type="xs:boolean" use="optional" />
+                <xs:attribute name="giftDelivered" type="xs:boolean" use="optional" />
+                <!-- end @compat 0.11.x -->
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="indianDemandMission">
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="SimpleMissionType">
+                <xs:attribute name="colony" type="ColonyId" use="optional"/>
+                <xs:attribute name="demanded" type="xs:boolean" use="optional" />
+                <xs:attribute name="succeeded" type="xs:boolean" use="optional" />
+                <!-- @compat 0.11.x -->
+                <xs:attribute name="completed" type="xs:boolean" use="optional" />
+                <!-- end @compat 0.11.x -->
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="missionaryMission"
+                    type="SimpleMissionType"/>
+
+        <xs:element name="pioneeringMission">
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="SimpleMissionType">
+                <xs:attribute name="tileImprovementPlan" type="TileImprovementPlanId" use="optional" />
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="privateerMission"
+                    type="SimpleMissionType"/>
+
+        <xs:element name="scoutingMission"
+                    type="SimpleMissionType"/>
+
+        <xs:element name="transportMission">
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="SimpleMissionType">
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element name="cargo">
+                    <xs:complexType>
+                      <xs:attribute name="id" type="TransportableId" use="required"/>
+                      <xs:attribute name="mode" type="CargoMode" use="required"/>
+                      <xs:attribute name="tries" type="xs:int" use="required"/>
+                      <xs:attribute name="turns" type="xs:int" use="required"/>
+
+                      <!-- @compat 0.11.x To Be Required -->
+                      <xs:attribute name="carrier" type="UnitId" use="optional"/>
+                      <xs:attribute name="cdst" type="LocationId" use="optional"/>
+                      <xs:attribute name="cwait" type="LocationId" use="optional"/>
+                      <xs:attribute name="fallback" type="xs:boolean" use="optional"/>
+                      <xs:attribute name="space" type="xs:int" use="optional"/>
+                      <xs:attribute name="tdst" type="LocationId" use="optional"/>
+                      <xs:attribute name="twait" type="LocationId" use="optional"/>
+                      <!-- end @compat 0.11.x -->
+                      <!-- @compat 0.11.x: Obsolete -->
+                      <xs:attribute name="target" type="LocationId" use="optional"/>
+                      <!-- @compat 0.11.x -->
+                    </xs:complexType>
+                  </xs:element>
+                </xs:choice>
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="unitSeekAndDestroyMission"
+                    type="SimpleMissionType"/>
+
+        <xs:element name="unitWanderHostileMission"
+                    type="SimpleMissionType" />
+
+        <xs:element name="unitWanderMission"
+                    type="SimpleMissionType" />
+
+        <xs:element name="wishRealizationMission">
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="SimpleMissionType">
+                <xs:attribute name="wish" type="WishId" use="required" />
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="workInsideColonyMission">
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="SimpleMissionType">
+                <xs:attribute name="colony" type="ColonyId" use="required" />
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+
+      <xs:attribute name="id" type="UnitId" use="required"/>
+      <!-- AIUnit is a TransportableAIObject -->
+      <xs:attribute name="transport" type="UnitId" use="optional"/>
+      <!-- AIUnit is a ValuedAIObject -->
+      <xs:attribute name="value" type="xs:int" use="optional" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

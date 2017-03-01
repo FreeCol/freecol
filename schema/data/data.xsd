@@ -49,4 +49,6 @@
   <xs:include schemaLocation="data-tradeRoute.xsd" />
   <xs:include schemaLocation="data-unit.xsd" />
 
+  <xs:include schemaLocation="data-aiMain.xsd" />
+  <xs:include schemaLocation="data-aiUnit.xsd" />
 </xs:schema>

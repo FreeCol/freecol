@@ -779,13 +779,6 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
 
     // Serialization
 
-    // @compat 0.10.3
-    private static final String TILE_IMPROVEMENT_PLAN_MISSION_TAG = "tileImprovementPlanMission";
-    // end @compat
-    // @compat 0.10.5
-    private static final String IDLE_AT_COLONY_MISSION_TAG = "idleAtColonyMission";
-    // end @compat
-
 
     /**
      * {@inheritDoc}
@@ -845,11 +838,7 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
         } else if (DefendSettlementMission.TAG.equals(tag)) {
             mission = new DefendSettlementMission(aiMain, this, xr);
 
-        } else if (IdleAtSettlementMission.TAG.equals(tag)
-            // @compat 0.10.5
-            || IDLE_AT_COLONY_MISSION_TAG.equals(tag)
-            // end @compat
-                   ) {
+        } else if (IdleAtSettlementMission.TAG.equals(tag)) {
             mission = new IdleAtSettlementMission(aiMain, this, xr);
 
         } else if (IndianBringGiftMission.TAG.equals(tag)) {
@@ -861,11 +850,7 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
         } else if (MissionaryMission.TAG.equals(tag)) {
             mission = new MissionaryMission(aiMain, this, xr);
 
-        } else if (PioneeringMission.TAG.equals(tag)
-            // @compat 0.10.3
-            || TILE_IMPROVEMENT_PLAN_MISSION_TAG.equals(tag)
-            // end @compat
-                   ) {
+        } else if (PioneeringMission.TAG.equals(tag)) {
             mission = new PioneeringMission(aiMain, this, xr);
 
         } else if (PrivateerMission.TAG.equals(tag)) {
