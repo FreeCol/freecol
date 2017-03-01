@@ -484,14 +484,8 @@ public class AIMain extends FreeColObject
     // Serialization
 
     private static final String NEXT_ID_TAG = "nextId";
-    // @compat 0.10.3
-    private static final String COLONIAL_AI_PLAYER_TAG = "colonialAIPlayer";
-    private static final String GOODS_WISH_TAG = "GoodsWish";
-    // end @compat
-    // @compat 0.10.7
-    private static final String OLD_NEXT_ID_TAG = "nextID";
-    // end @compat
     // @compat 0.11.3
+    private static final String OLD_GOODS_WISH_TAG = "GoodsWish";
     private static final String OLD_TILE_IMPROVEMENT_PLAN_TAG = "tileimprovementplan";
     // end @compat 0.11.3
 
@@ -550,9 +544,6 @@ public class AIMain extends FreeColObject
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         nextId = xr.getAttribute(NEXT_ID_TAG, -1);
-        // @compat 0.10.x
-        if (nextId < 0) nextId = xr.getAttribute(OLD_NEXT_ID_TAG, 0);
-        // end @compat
     }
 
     /**
@@ -586,11 +577,6 @@ public class AIMain extends FreeColObject
             if (oid != null && (aio = getAIObject(oid)) != null) {
                 aio.readFromXML(xr);
 
-            // @compat 0.10.1
-            } else if (COLONIAL_AI_PLAYER_TAG.equals(tag)) {
-                new EuropeanAIPlayer(this, xr);
-            // end @compat
-
             } else if (AIColony.TAG.equals(tag)) {
                 new AIColony(this, xr);
 
@@ -615,14 +601,14 @@ public class AIMain extends FreeColObject
                 new AIUnit(this, xr);
 
             } else if (GoodsWish.TAG.equals(tag)
-                // @compat 0.10.3
-                || GOODS_WISH_TAG.equals(tag)
-                // end @compat
+                // @compat 0.11.3
+                || OLD_GOODS_WISH_TAG.equals(tag)
+                // end @compat 0.11.3
                        ) {
                 wish = new GoodsWish(this, xr);
 
             } else if (TileImprovementPlan.TAG.equals(tag)
-                // @compat 0.10.3
+                // @compat 0.11.3
                 || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
                 // end @compat
                        ) {
