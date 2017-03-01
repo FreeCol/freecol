@@ -1475,9 +1475,6 @@ public class TransportMission extends Mission {
     // Serialization
 
     private static final String TARGET_TAG = "target";
-    // @compat 0.10.5
-    private static final String OLD_TRANSPORTABLE_TAG = "transportable";
-    // end @compat
 
 
     /**
@@ -1540,12 +1537,6 @@ public class TransportMission extends Mission {
 
         if (Cargo.TAG.equals(tag)) {
             tAdd(new Cargo(getAIMain(), xr), -1);
-
-        // @compat 0.10.5
-        } else if (OLD_TRANSPORTABLE_TAG.equals(tag)) {
-            // Ignore the old format, let checkCargoes sort it out
-            xr.closeTag(OLD_TRANSPORTABLE_TAG);
-        // end @compat
 
         } else {
             super.readChild(xr);
