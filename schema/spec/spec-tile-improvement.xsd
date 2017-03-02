@@ -68,8 +68,6 @@
 
       <!-- @compat 0.11.x -->
       <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
-      <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
-      <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
       <!-- end @compat 0.11.x -->
     </xs:complexType>
   </xs:element>

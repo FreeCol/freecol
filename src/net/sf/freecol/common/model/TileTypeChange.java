@@ -78,17 +78,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
         return from;
     }
 
-    // @compat 0.10.4
-    /**
-     * Set the original tile type.
-     *
-     * @param from The new original tile type.
-     */
-    public final void setFrom(final TileType from) {
-        this.from = from;
-    }
-    // end @compat 0.10.4
-
     /**
      * Gets the destination tile type.
      *
@@ -98,17 +87,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
         return to;
     }
 
-    // @compat 0.10.4
-    /**
-     * Set the destination tile type.
-     *
-     * @param to The new destination tile type.
-     */
-    public final void setTo(final TileType to) {
-        this.to = to;
-    }
-    // end @compat 0.10.4
-
     /**
      * Gets the production consequent to the type change.
      *
@@ -117,17 +95,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
     public final AbstractGoods getProduction() {
         return production;
     }
-
-    // @compat 0.10.4
-    /**
-     * Set the production consequent to the type change.
-     *
-     * @param production The new consequent production.
-     */
-    public final void setProduction(final AbstractGoods production) {
-        this.production = production;
-    }
-    // end @compat 0.10.4
 
 
     // Serialization
