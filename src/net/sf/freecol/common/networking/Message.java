@@ -39,6 +39,8 @@ import net.sf.freecol.common.model.Game;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.xml.sax.SAXException;
 
@@ -367,6 +369,18 @@ public abstract class Message {
      * @param freeColClient The {@code FreeColClient} to handle this message.
      */
     public void clientHandler(FreeColClient freeColClient) {}
+
+    /**
+     * Server-side handler for this message.
+     *
+     * @param freeColServer The {@code FreeColServer} handling the request.
+     * @param serverPlayer The {@code ServerPlayer} that sent the request.
+     * @return A {@code ChangeSet} defining the response.
+     */
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return serverPlayer.clientError("Invalid message type: " + getType());
+    }
 
     /**
      * Read a new message from a stream.

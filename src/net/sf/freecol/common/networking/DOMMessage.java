@@ -39,7 +39,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.DOMUtils;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Introspector;
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
     
 import org.w3c.dom.Document;
@@ -182,18 +181,6 @@ public class DOMMessage extends Message {
      */
     public Element attachToDocument(Document doc) {
         return (Element)doc.adoptNode(this.toXMLElement());
-    }
-
-    /**
-     * Server-side handler for this message.
-     *
-     * @param freeColServer The {@code FreeColServer} handling the request.
-     * @param serverPlayer The {@code ServerPlayer} that sent the request.
-     * @return A {@code ChangeSet} defining the response.
-     */
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        return serverPlayer.clientError("Invalid message type: " + getType());
     }
 
 
