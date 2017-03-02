@@ -466,12 +466,16 @@ public final class TileViewer extends FreeColClientHolder {
                                     borderingTileType.getIndex());
                                 imageBorders.add(si);
                                 TileImprovement river = borderingTile.getRiver();
-                                if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
-                                    si = new SortableImage(
-                                        lib.getRiverMouthImage(direction,
-                                            borderingTile.getRiver().getMagnitude(), x, y),
-                                        -1);
+                                if (river != null) {
+                                    int magnitude = river.getRiverConnection(
+                                        direction.getReverseDirection());
+                                    if (magnitude > 0) {
+                                        si = new SortableImage(
+                                            lib.getRiverMouthImage(direction,
+                                                magnitude, x, y),
+                                            -1);
                                     imageBorders.add(si);
+                                    }
                                 }
                             } else if (!tile.isLand() || borderingTile.isLand()) {
                                 if (borderingTileType.getIndex() < tileType.getIndex() &&

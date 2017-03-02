@@ -241,6 +241,21 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
+     * Get the magnitude of the river branch in the given direction.
+     * Precondition: This tile improvement is a river!
+     *
+     * @param direction The {@code Direction} to check.
+     * @return The magnitude of the river branch or 0 if there is none.
+     */
+    public int getRiverConnection(Direction direction) {
+        int index = Direction.longSides.indexOf(direction);
+        if (index == -1 || style == null)
+            return 0;
+        int mag = Character.digit(style.getString().charAt(index), 10);
+        return (mag == -1) ? 0 : mag;
+    }
+
+    /**
      * Is this tile improvement connected to a similar improvement on
      * a neighbouring tile?
      *
