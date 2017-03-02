@@ -77,7 +77,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
         register(TrivialMessage.DISCONNECT_TAG, (Connection c, Element e) ->
             disconnect());
         register(GameStateMessage.TAG, (Connection c, Element e) ->
-            gameState(new GameStateMessage(getGame(), e)));
+            new GameStateMessage(getGame(), e).clientHandler(freeColClient));
         register(MultipleMessage.TAG, (Connection c, Element e) ->
             multiple(new MultipleMessage(getGame(), e)));
         register(VacantPlayersMessage.TAG, (Connection c, Element e) ->
@@ -114,18 +114,6 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      */
     protected void disconnect() {
         ; // Do nothing
-    }
-
-    /**
-     * Handle a "gameState"-message.
-     *
-     * @param message The {@code GameStateMessage} to process.
-     */
-    private void gameState(GameStateMessage message) {
-        final FreeColClient fcc = getFreeColClient();
-        final ServerState gameState = message.getState();
-
-        fcc.setServerState(gameState);
     }
 
     /**

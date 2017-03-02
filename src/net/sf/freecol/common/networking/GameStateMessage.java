@@ -19,6 +19,10 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
@@ -57,6 +61,19 @@ public class GameStateMessage extends AttributeMessage {
     }
 
     /**
+     * Create a new {@code GameStateMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within (unused, no game
+     *     exists at this point).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public GameStateMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        this(xr.getAttribute(STATE_TAG, ServerState.class, (ServerState)null));
+    }
+        
+    /**
      * Create a new {@code GameStateMessage} from a
      * supplied element.
      *
@@ -75,6 +92,14 @@ public class GameStateMessage extends AttributeMessage {
     @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        freeColClient.setServerState(getState());
     }
 
 
