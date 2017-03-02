@@ -474,7 +474,7 @@ public final class TileViewer extends FreeColClientHolder {
                                             lib.getRiverMouthImage(direction,
                                                 magnitude, x, y),
                                             -1);
-                                    imageBorders.add(si);
+                                        imageBorders.add(si);
                                     }
                                 }
                             } else if (!tile.isLand() || borderingTile.isLand()) {
