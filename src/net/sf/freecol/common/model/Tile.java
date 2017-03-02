@@ -2566,26 +2566,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         String str = xr.getAttribute(CONNECTED_TAG, (String)null);
         if (str == null || str.isEmpty()) {
             highSeasCount = -1;
-            // @compat 0.10.5
-            // High seas should have connected==0.  If it does not, this
-            // is probably an old save file, so flag a recalculation.
-            String typeStr = xr.getAttribute(TYPE_TAG, (String)null);
-            if ("model.tile.highSeas".equals(typeStr)) {
-                highSeasCount = Tile.FLAG_RECALCULATE;
-            }
-            // @end compatibility code
         } else {
             try {
                 highSeasCount = Integer.parseInt(str);
             } catch (NumberFormatException nfe) {
                 highSeasCount = -1;
-                // @compat 0.10.5
-                // < 0.10.6 used to have a simple boolean connected
-                // attribute, but it is now highSeasCount, the number of
-                // tiles to get to a tile where a unit can move
-                // directly to the high seas.
-                highSeasCount = Tile.FLAG_RECALCULATE;
-                // @end compatibility code
             }
         }
 
