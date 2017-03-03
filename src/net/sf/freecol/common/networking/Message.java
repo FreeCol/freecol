@@ -183,6 +183,31 @@ public abstract class Message {
     }
 
     /**
+     * Gets an enum attribute value.
+     *
+     * @param <T> The expected enum type.
+     * @param key The attribute name.
+     * @param returnClass The class of the return value.
+     * @param defaultValue The default value.
+     * @return The enum attribute value, or the default value if none found.
+     */
+    public <T extends Enum<T>> T getEnumAttribute(String key,
+                                                  Class<T> returnClass,
+                                                  T defaultValue) {
+        T result = defaultValue;
+        if (hasAttribute(key)) {
+            String kv = getStringAttribute(key);
+            try {
+                result = Enum.valueOf(returnClass, kv);
+            } catch (Exception e) {
+                logger.warning("Not a " + defaultValue.getClass().getName()
+                    + ": " + kv);
+            }
+        }
+        return result;
+    }
+            
+    /**
      * Get a string attribute value.
      *
      * @param key The attribute to look for.

@@ -102,14 +102,6 @@ public class GameStateMessage extends AttributeMessage {
         freeColClient.setServerState(getState());
     }
 
-
-    // Public interface
-
-    public ServerState getState() {
-        return Enum.valueOf(ServerState.class, getStringAttribute(STATE_TAG));
-    }
-
-
     /**
      * {@inheritDoc}
      */
@@ -119,5 +111,13 @@ public class GameStateMessage extends AttributeMessage {
         // Called from UserConnectionHandler, without serverPlayer being defined
         return ChangeSet.simpleChange((ServerPlayer)null,
             new GameStateMessage(freeColServer.getServerState()));
+    }
+
+
+    // Public interface
+
+    public ServerState getState() {
+        return getEnumAttribute(STATE_TAG, ServerState.class,
+                                (ServerState)null);
     }
 }
