@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
@@ -98,8 +99,14 @@ public class GameStateMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
-    public void clientHandler(FreeColClient freeColClient) {
-        freeColClient.setServerState(getState());
+    public void clientHandler(FreeColClient freeColClient)
+        throws FreeColException {
+        final ServerState state = getState();
+        if (state == null) {
+            throw new FreeColException("Invalid state: "
+                + getStringAttribute(STATE_TAG));
+        }
+        freeColClient.setServerState(state);
     }
 
     /**

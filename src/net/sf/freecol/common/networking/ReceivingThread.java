@@ -429,6 +429,10 @@ final class ReceivingThread extends Thread {
         default:
             // An ordinary update message.
             // Build a thread to handle it and possibly respond.
+
+            // XMLStreamException if the XML broke
+            // FreeColException if the contents were not valid XML but not
+            // missing in terms of FreeCol game logic.
             try {
                 Message m = this.connection.reader(xr);
                 if (m != null) msg = (DOMMessage)m;
