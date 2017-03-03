@@ -19,6 +19,11 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -46,6 +51,18 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
     }
 
     /**
+     * Create a new {@code SetCurrentPlayerMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public SetCurrentPlayerMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, PLAYER_TAG, xr.getAttribute(PLAYER_TAG, (String)null));
+    }
+        
+    /**
      * Create a new {@code SetCurrentPlayerMessage} from a supplied element.
      *
      * @param game The {@code Game} this message belongs to.
@@ -64,6 +81,28 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
         return Message.MessagePriority.LATE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient)
+        throws FreeColException {
+        final Game game = freeColClient.getGame();
+        final Player player = getPlayer(game);
+
+        if (player == null) {
+            throw new FreeColException("Invalid player: "
+                + getStringAttribute(PLAYER_TAG));
+        }
+
+        // It is safe to call this directly
+        freeColClient.getInGameController()
+            .setCurrentPlayer(player);
+    }
+
+    // No server handler required.
+    // This message is only sent to clients.
+
 
     // Public interface
 
@@ -76,7 +115,4 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
     public Player getPlayer(Game game) {
         return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
     }
-
-    // No server handler required.
-    // This message is only sent to clients.
 }

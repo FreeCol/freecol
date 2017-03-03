@@ -225,7 +225,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 setAI(new SetAIMessage(getGame(), e)));
         register(SetCurrentPlayerMessage.TAG,
             (Connection c, Element e) ->
-                setCurrentPlayer(new SetCurrentPlayerMessage(getGame(), e)));
+                new SetCurrentPlayerMessage(getGame(), e).clientHandler(freeColClient));
         register(SetDeadMessage.TAG,
             (Connection c, Element e) ->
                 setDead(new SetDeadMessage(getGame(), e)));
@@ -839,23 +839,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         final boolean ai = message.getAI();
 
         if (p != null) p.setAI(ai);
-    }
-
-    /**
-     * Handle a "setCurrentPlayer"-message.
-     *
-     * @param message The {@code SetCurrentPlayerMessage} to process.
-     */
-    private void setCurrentPlayer(SetCurrentPlayerMessage message) {
-        final Game game = getGame();
-        final Player player = message.getPlayer(game);
-
-        if (player == null) {
-            logger.warning("Invalid player for setCurrentPlayer");
-            return;
-        }
-
-        igc().setCurrentPlayer(player); // It is safe to call this one directly
     }
 
     /**
