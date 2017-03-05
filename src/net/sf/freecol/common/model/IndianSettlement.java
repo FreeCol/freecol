@@ -1602,13 +1602,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         if (ALARM_TAG.equals(tag)) {
             Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
                 Player.class, (Player)null, true);
-            // @compat 0.10.5
-            if (getName() != null) {
-                // Alarm used to imply contact, but only set contacted if
-                // we also have a valid name for the settlement.
-                setContacted(player);
-            }
-            // end @compat
             setAlarm(player, new Tension(xr.getAttribute(VALUE_TAG, 0)));
             xr.closeTag(ALARM_TAG);
 
