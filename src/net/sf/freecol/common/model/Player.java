@@ -3810,9 +3810,6 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final String TAX_TAG = "tax";
     private static final String TENSION_TAG = "tension";
     private static final String USERNAME_TAG = "username";
-    // @compat 0.10.7
-    private static final String OLD_NATION_ID_TAG = "nationID";
-    // end @compat
 
 
     /**
@@ -4006,15 +4003,8 @@ public class Player extends FreeColGameObject implements Nameable {
         final Game game = getGame();
 
         name = xr.getAttribute(USERNAME_TAG, (String)null);
-        // @compat 0.11.5
-        if (name.startsWith("model.nation.")) name = Messages.message(name);
-        // end @compat 0.11.5
 
-        nationId = xr.getAttribute(NATION_ID_TAG,
-            // @compat 0.10.7
-            xr.getAttribute(OLD_NATION_ID_TAG,
-            // end @compat 0.10.7
-                (String)null));
+        nationId = xr.getAttribute(NATION_ID_TAG, (String)null);
 
         if (isUnknownEnemy()) {
             nationType = null;
