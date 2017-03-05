@@ -41,7 +41,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.common.util.Utils;
 
@@ -588,15 +587,11 @@ public class Connection implements Closeable {
      * @return A {@code DOMMessage} created from the reply.
      */
     public <T extends DOMMessage> DOMMessage ask(Game game, T message) {
-        Element reply;
         try {
-            reply = ask(message);
-        } catch (IOException e) {
-            return new ErrorMessage(StringTemplate
-                .template("connection.io")
-                .addName("%extra%", e.getMessage()));
+            return DOMUtils.createMessage(game, ask(message));
+        } catch (IOException ioe) {
+            return new ErrorMessage("connection.io", ioe);
         }
-        return DOMUtils.createMessage(game, reply);
     }
 
     /**
@@ -683,9 +678,7 @@ public class Connection implements Closeable {
         try {
             reply = ask(message);
         } catch (IOException ioe) {
-            reply = new ErrorMessage(StringTemplate
-                .template("connection.io")
-                .addName("%extra%", ioe.getMessage())).toXMLElement();
+            reply = new ErrorMessage("connection.io", ioe).toXMLElement();
         }
         if (reply == null) return true;
         final String tag = reply.getTagName();

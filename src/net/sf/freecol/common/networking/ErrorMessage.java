@@ -88,6 +88,19 @@ public class ErrorMessage extends DOMMessage {
     }
 
     /**
+     * Create a new {@code ErrorMessage} from an exception using a 
+     * template key that expects a %message% parameter.
+     *
+     * @param key The template key.
+     * @param ex The {@code Exception} to extract a message from.
+     */
+    public ErrorMessage(String key, Exception ex) {
+        this(StringTemplate.template(key)
+                           .addName("%message%", ex.getMessage()),
+             null);
+    }
+
+    /**
      * Create a new {@code ErrorMessage} from a
      * supplied element.
      *
