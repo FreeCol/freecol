@@ -2603,20 +2603,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         settlement = null;
 
         super.readChildren(xr);
-
-        // @compat 0.10.1
-        // Old settlements were prone to not owning their tiles.
-        if (getSettlement() != null) {
-            Settlement settlement = getSettlement();
-            Player owner = settlement.getOwner();
-            if (owner != null && getOwner() != owner) {
-                this.owner = owner;
-            }
-            if (this.owningSettlement != settlement) {
-                this.owningSettlement = settlement;
-            }
-        }
-        // end @compat 0.10.1
     }
 
     /**
