@@ -1589,15 +1589,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         clearOwnedUnits();
 
         super.readChildren(xr);
-
-        // @compat 0.10.1
-        for (Unit u : transform(getUnits(), u -> u.getLocation() != this)) {
-            u.setLocationNoUpdate(this);
-            logger.warning("Fixing unit location"
-                + " from " + u.getLocation()
-                + " to " + this.getId());
-        }
-        // end @compat
     }
 
     /**
