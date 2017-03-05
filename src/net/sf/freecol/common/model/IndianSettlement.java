@@ -1434,7 +1434,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     private static final String ALARM_TAG = "alarm";
     private static final String CONTACT_LEVEL_TAG = "contactLevel";
     private static final String CONVERT_PROGRESS_TAG = "convertProgress";
-    private static final String IS_VISITED_TAG = "isVisited";
     private static final String LAST_TRIBUTE_TAG = "lastTribute";
     private static final String LEVEL_TAG = "level";
     private static final String MISSIONARY_TAG = "missionary";
@@ -1612,14 +1611,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 Player.class, (Player)null, true);
             contactLevels.put(player, cl);
             xr.closeTag(CONTACT_LEVEL_TAG);
-
-        // @compat 0.10.5
-        } else if (IS_VISITED_TAG.equals(tag)) {
-            Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
-                Player.class, (Player)null, true);
-            setScouted(player);
-            xr.closeTag(IS_VISITED_TAG);
-        // end @compat
 
         } else if (MISSIONARY_TAG.equals(tag)) {
             xr.nextTag();

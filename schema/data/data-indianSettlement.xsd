@@ -28,11 +28,6 @@
   <xs:element name="indianSettlement">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="isVisited">
-          <xs:complexType>
-            <xs:attribute name="player" type="xs:string" use="required"/>
-          </xs:complexType>
-        </xs:element>
         <xs:element name="alarm">
           <xs:complexType>
             <xs:attribute name="player" type="xs:string" use="required"/>
