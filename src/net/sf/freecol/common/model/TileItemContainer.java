@@ -535,17 +535,6 @@ public class TileItemContainer extends FreeColGameObject {
         for (TileItem ti : getTileItems()) {
             int integ = ti.checkIntegrity(fix);
             if (fix) {
-                // @compat 0.10.5
-                // Somewhere around 0.10.5 there were maps with LCRs
-                // that reference the wrong tile.
-                if (ti.getTile() != tile) {
-                    logger.warning("Fixing improvement tile at: " + tile
-                                   + " / " + ti.getId());
-                    ti.setLocation(tile);
-                    integ = Math.min(integ, 0);
-                }
-                // end @compat
-
                 // There might still be maps floating around with
                 // rivers that go nowhere.
                 if (ti instanceof TileImprovement) {
