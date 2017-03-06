@@ -398,11 +398,6 @@ public final class TileType extends FreeColSpecObjectType
     private static final String TEMPERATURE_MIN_TAG = "temperature-minimum";
     private static final String TEMPERATURE_MAX_TAG = "temperature-maximum";
     private static final String TYPE_TAG = "type";
-    // @compat 0.10.x
-    private static final String PRIMARY_PRODUCTION_TAG = "primary-production";
-    private static final String SECONDARY_PRODUCTION_TAG = "secondary-production";
-    private static final String TILE_PRODUCTION_TAG = "tile-production";
-    // end @compat 0.10.x
     // @compat 0.11.3
     private static final String OLD_ALTITUDE_MIN_TAG = "altitudeMin";
     private static final String OLD_ALTITUDE_MAX_TAG = "altitudeMax";
@@ -571,43 +566,8 @@ public final class TileType extends FreeColSpecObjectType
             productionTypes.clear();
             xr.closeTag(PRODUCTION_TAG);
 
-        } else if (PRODUCTION_TAG.equals(tag)
-                   // @compat 0.10.6
-                   && xr.getAttribute(GOODS_TYPE_TAG, (String)null) == null
-                   // end @compat 0.10.6
-                   ) {
+        } else if (PRODUCTION_TAG.equals(tag)) {
             productionTypes.add(new ProductionType(xr, spec));
-
-        // @compat 0.10.6
-        } else if (PRODUCTION_TAG.equals(tag)
-            || PRIMARY_PRODUCTION_TAG.equals(tag)
-            || SECONDARY_PRODUCTION_TAG.equals(tag)) {
-            GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
-                                        GoodsType.class, (GoodsType)null);
-            int amount = xr.getAttribute(VALUE_TAG, 0);
-            AbstractGoods goods = new AbstractGoods(type, amount);
-            String tileProduction = xr.getAttribute(TILE_PRODUCTION_TAG,
-                                                    (String)null);
-            // CAUTION: this only works if the primary production is
-            // defined before the secondary production
-            if (PRIMARY_PRODUCTION_TAG.equals(tag)) {
-                productionTypes.add(new ProductionType(goods, true,
-                                                       tileProduction));
-            } else if (SECONDARY_PRODUCTION_TAG.equals(tag)) {
-                String level = spec.getDifficultyLevel();
-                List<ProductionType> unattendedTypes
-                    = getAvailableProductionTypes(true, level);
-                for (ProductionType productionType : transform(unattendedTypes,
-                        pt -> (tileProduction == null
-                            || tileProduction.equals(pt.getProductionLevel())))) {
-                    productionType.addOutput(goods);
-                }
-            } else {
-                productionTypes.add(new ProductionType(goods, false,
-                                                       tileProduction));
-            }
-            xr.closeTag(tag);
-            // end @compat 0.10.6
 
         } else if (RESOURCE_TAG.equals(tag)) {
             addResourceType(xr.getType(spec, TYPE_TAG, ResourceType.class,
@@ -615,16 +575,6 @@ public final class TileType extends FreeColSpecObjectType
                             xr.getAttribute(PROBABILITY_TAG, 100));
             xr.closeTag(RESOURCE_TAG);
 
-        } else if (Modifier.TAG.equals(tag)) {
-            // @compat 0.10.7
-            // the tile type no longer contains the base production modifier
-            String id = xr.getAttribute(ID_ATTRIBUTE_TAG, null);
-            if (id.startsWith("model.goods.")) {
-                xr.closeTag(Modifier.TAG);
-            } else {
-                super.readChild(xr);
-            }
-            // end @compat
         } else {
             super.readChild(xr);
         }
