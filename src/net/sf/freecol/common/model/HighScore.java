@@ -461,10 +461,6 @@ public class HighScore extends FreeColObject {
     private static final String RETIREMENT_TURN_TAG = "retirementTurn";
     private static final String SCORE_TAG = "score";
     private static final String UNITS_TAG = "units";
-    // @compat 0.10.7
-    private static final String OLD_NATION_ID_TAG = "nationID";
-    private static final String OLD_NATION_TYPE_ID_TAG = "nationTypeID";
-    // end @compat
 
 
     /**
@@ -520,7 +516,8 @@ public class HighScore extends FreeColObject {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Bad long date", e);
         }
-        // Early 0.11.x had a bug that wrote date as a float
+        // @compat 0.11.0
+        // There was a bug that wrote date as a float
         if (date == null) {
             try {
                 float f = xr.getAttribute(DATE_TAG, -1.0f);
@@ -530,19 +527,9 @@ public class HighScore extends FreeColObject {
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Bad float date", e);
             }
-        } 
-        // @compat 0.10.x
-        // Serializing the long as of 0.11.x
-        if (date == null) {
-            String str = xr.getAttribute(DATE_TAG, "2014-07-01 00:00:00+0000");
-            try {
-                date = dateFormat.parse(str);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Bad date: " + str, e);
-            }
         }
-        // end @compat
-        if (date == null) date = new Date(); // Give up
+        // end @compat 0.11.0
+        if (date == null) date = new Date(); // Give up and override
         
         retirementTurn = xr.getAttribute(RETIREMENT_TURN_TAG, 0);
 
@@ -550,17 +537,9 @@ public class HighScore extends FreeColObject {
 
         playerName = xr.getAttribute(PLAYER_NAME_TAG, "anonymous");
 
-        nationId = xr.getAttribute(NATION_ID_TAG,
-            // @compat 0.10.7
-            xr.getAttribute(OLD_NATION_ID_TAG,
-            // end @compat
-                "model.nation.dutch"));
+        nationId = xr.getAttribute(NATION_ID_TAG, (String)null);
 
-        nationTypeId = xr.getAttribute(NATION_TYPE_ID_TAG,
-            // @compat 0.10.7
-            xr.getAttribute(OLD_NATION_TYPE_ID_TAG,
-            // end @compat
-                "model.nationType.trade"));
+        nationTypeId = xr.getAttribute(NATION_TYPE_ID_TAG, (String)null);
 
         score = xr.getAttribute(SCORE_TAG, 0);
 
