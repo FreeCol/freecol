@@ -869,28 +869,6 @@ public final class UnitType extends BuildableType implements Consumer {
         }
 
         super.readChildren(xr);
-
-        // @compat 0.10.6
-        if (hasAbility(Ability.PERSON)) {
-            Modifier m;
-            if (!containsModifierKey(Modifier.CONVERSION_SKILL)) {
-                m = new Modifier(Modifier.CONVERSION_SKILL, 8.0f,
-                        Modifier.ModifierType.ADDITIVE);
-                addModifier(m);
-
-                if (hasAbility(Ability.EXPERT_MISSIONARY)) {
-                    m = new Modifier(Modifier.CONVERSION_SKILL, 5.0f,
-                            Modifier.ModifierType.ADDITIVE);
-                    addModifier(m);
-                }
-            }
-            if (!containsModifierKey(Modifier.CONVERSION_ALARM_RATE)) {
-                m = new Modifier(Modifier.CONVERSION_ALARM_RATE, 2.0f,
-                        Modifier.ModifierType.PERCENTAGE);
-                addModifier(m);
-            }
-        }
-        // end @compat
     }
 
     /**
