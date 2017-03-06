@@ -628,14 +628,6 @@ public class Europe extends UnitLocation
         // end @compat
 
         super.readChildren(xr);
-
-        // @compat 0.10.1
-        // Sometimes units in a Europe element have a missing
-        // location.  It should always be this Europe instance.
-        for (Unit u : transform(getUnits(), isNull(Unit::getLocation))) {
-            u.setLocationNoUpdate(this);
-        }
-        // end @compat
     }
 
     /**
