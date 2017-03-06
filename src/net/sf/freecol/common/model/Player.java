@@ -963,8 +963,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Color getNationColor() {
         final Nation nation = getNation();
-        Color color = nation.getColor();
-        return (color != null) ? color : nation.forceDefaultColor();
+        return (nation == null) ? null : nation.getColor();
     }
 
     /**
