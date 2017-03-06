@@ -578,9 +578,6 @@ public class Europe extends UnitLocation
         }
     }
 
-    // @compat 0.10.7
-    private boolean clearRecruitables = true;
-
     /**
      * {@inheritDoc}
      */
@@ -589,17 +586,6 @@ public class Europe extends UnitLocation
         super.readAttributes(xr);
 
         final Specification spec = getSpecification();
-
-        // @compat 0.10.7
-        for (int index = 0; index < 3; index++) {
-            UnitType unitType = xr.getType(spec, RECRUIT_TAG + index,
-                                           UnitType.class, (UnitType)null);
-            if (unitType != null) {
-                addRecruitable(unitType);
-                clearRecruitables = false;
-            }
-        }
-        // end @compat
 
         owner = xr.findFreeColGameObject(getGame(), OWNER_TAG,
                                          Player.class, (Player)null, true);
@@ -619,13 +605,7 @@ public class Europe extends UnitLocation
         // Clear containers.
         unitPrices.clear();
         featureContainer.clear();
-
-        // @compat 0.10.7
-        if (clearRecruitables) {
-            // in future, always clear
-            recruitables.clear();
-        }
-        // end @compat
+        recruitables.clear();
 
         super.readChildren(xr);
     }
