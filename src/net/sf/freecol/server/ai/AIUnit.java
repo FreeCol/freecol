@@ -746,13 +746,9 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
     public void dispose() {
         dropTransport();
         AIPlayer aiOwner = getAIOwner();
-        if (aiOwner != null) {
-            aiOwner.removeAIObject(this);
-        } else {
-            // FIXME: cleanup.  Used to happen when changing owner.
-            // Reported to happen for missionaries?
-            logger.warning("Disposing of " + getId() + " but owner is null!");
-        }
+        // Might not be owned by an AI
+        if (aiOwner != null) aiOwner.removeAIObject(this);
+
         if (mission != null) {
             this.mission.dispose();
             this.mission = null;
