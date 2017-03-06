@@ -378,7 +378,7 @@ public final class InGameController extends FreeColClientHolder {
 
         EuropeWas europeWas = new EuropeWas(europe);
         Unit newUnit = null;
-        if (askServer().emigrate(getGame(), slot)
+        if (askServer().emigrate(slot)
             && (newUnit = europeWas.getNewUnit()) != null) {
             europeWas.fireChanges();
         }
@@ -819,7 +819,7 @@ public final class InGameController extends FreeColClientHolder {
         turnReportMessages.clear();
 
         // Inform the server of end of turn.
-        return askServer().endTurn(getGame());
+        return askServer().endTurn();
     }
 
     /**
@@ -2932,8 +2932,7 @@ public final class InGameController extends FreeColClientHolder {
         }
 
         // Ask server.
-        boolean ret = askServer()
-            .declareIndependence(getGame(), names.get(0), names.get(1))
+        boolean ret = askServer().declareIndependence(names.get(0), names.get(1))
             && player.isRebel();
         if (ret) {
             getGUI().showDeclarationPanel();
@@ -3049,11 +3048,8 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if the server interaction succeeded.
      */
     public boolean displayHighScores(Boolean high) {
-        final Game game = getGame();
-        return askServer().getHighScores(game,
-            (high == null) ? null
-            : (high) ? "highscores.yes"
-            : "highscores.no");
+        return askServer().getHighScores((high == null) ? null
+            : ((high) ? "highscores.yes" : "highscores.no"));
     }
 
     /**
@@ -3660,7 +3656,7 @@ public final class InGameController extends FreeColClientHolder {
         switch (action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
-            ret = askServer().answerMonarch(getGame(), action, accept);
+            ret = askServer().answerMonarch(action, accept);
             break;
         default:
             break;
@@ -4068,7 +4064,7 @@ public final class InGameController extends FreeColClientHolder {
         if (player == null) return null;
 
         final int n = player.getTradeRouteCount();
-        return (askServer().newTradeRoute(getGame())
+        return (askServer().newTradeRoute()
             && player.getTradeRouteCount() == n + 1)
             ? player.getNewestTradeRoute()
             : null;
@@ -4162,8 +4158,7 @@ public final class InGameController extends FreeColClientHolder {
             .addAmount("%amount%", arrears);
         if (!getGUI().confirm(null, t, type, "ok", "cancel")) return false;
 
-        boolean ret = askServer().payArrears(getGame(), type)
-            && player.canTrade(type);
+        boolean ret = askServer().payArrears(type) && player.canTrade(type);
         if (ret) {
             updateGUI(null);
         }
@@ -4645,7 +4640,7 @@ public final class InGameController extends FreeColClientHolder {
                 } else if (player.getPlayerType() != Player.PlayerType.UNDEAD
                     && getGUI().confirm("defeatedSinglePlayer.text",
                                         "defeatedSinglePlayer.yes", "quit")) {
-                    askServer().enterRevengeMode(getGame());
+                    askServer().enterRevengeMode();
                 } else {
                     fcc.getConnectController()
                         .requestLogout(LogoutReason.DEFEATED);
@@ -4765,7 +4760,7 @@ public final class InGameController extends FreeColClientHolder {
 
         EuropeWas europeWas = new EuropeWas(europe);
         Unit newUnit = null;
-        boolean ret = askServer().trainUnitInEurope(getGame(), unitType)
+        boolean ret = askServer().trainUnitInEurope(unitType)
             && (newUnit = europeWas.getNewUnit()) != null;
         if (ret) {
             europeWas.fireChanges();

@@ -40,7 +40,6 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.common.util.Utils;
 
@@ -580,21 +579,6 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Sends a message to the peer and returns a message in reply.
-     *
-     * @param game The {@code Game} to create the reply message in.
-     * @param message The {@code DOMMessage} to send.
-     * @return A {@code DOMMessage} created from the reply.
-     */
-    public <T extends DOMMessage> DOMMessage ask(Game game, T message) {
-        try {
-            return DOMUtils.createMessage(game, ask(message));
-        } catch (IOException ioe) {
-            return new ErrorMessage("connection.io", ioe);
-        }
-    }
-
-    /**
      * Handle a query (has QUESTION_TAG), with given reply identifier,
      * and send a reply (has REPLY_TAG and the given reply identifier).
      * 
@@ -662,12 +646,11 @@ public class Connection implements Closeable {
      * Client request.
      *
      * @param T The message type.
-     * @param game The enclosing {@code Game}.
      * @param message A {@code DOMMessage} to process.
      * @return True if the message was sent, the reply handled, and the
      *     reply was not an error message.
      */
-    public <T extends DOMMessage> boolean request(Game game, T message) {
+    public <T extends DOMMessage> boolean request(T message) {
         // Better if we could do this, but it fails for now.
         //
         // DOMMessage reply = ask(game, message);

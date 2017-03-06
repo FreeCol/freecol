@@ -237,7 +237,7 @@ public class AIMessage {
      */
     public static boolean askEmigrate(AIPlayer aiPlayer, int slot) {
         return aiPlayer.askServer()
-            .emigrate(aiPlayer.getGame(), slot);
+            .emigrate(slot);
     }
 
     /**
@@ -248,7 +248,7 @@ public class AIMessage {
      */
     public static boolean askEndTurn(AIPlayer aiPlayer) {
         return aiPlayer.askServer()
-            .endTurn(aiPlayer.getGame());
+            .endTurn();
     }
 
     /**
@@ -358,7 +358,7 @@ public class AIMessage {
                                            MonarchAction action,
                                            boolean accept) {
         return aiPlayer.askServer()
-            .answerMonarch(aiPlayer.getGame(), action, accept);
+            .answerMonarch(action, accept);
     }
 
     /**
@@ -516,7 +516,7 @@ public class AIMessage {
     public static boolean askTrainUnitInEurope(AIPlayer aiPlayer,
                                                UnitType type) {
         return aiPlayer.askServer()
-            .trainUnitInEurope(aiPlayer.getGame(), type);
+            .trainUnitInEurope(type);
     }
 
 

@@ -172,15 +172,14 @@ public abstract class ServerAPI {
      * request was allowed (e.g. a move may result in the death of a
      * unit rather than actually moving).
      *
-     * @param game The current {@code Game}.
      * @param message A {@code DOMMessage} to send.
      * @return True if the server interaction succeeded, that is, there was
      *     no I/O problem and the reply was not an error message.
      */
-    private boolean ask(Game game, DOMMessage message) {
+    private boolean ask(DOMMessage message) {
         if (message == null) return true;
         final Connection c = check("ask", message.getType());
-        return (c == null) ? false : c.request(game, message);
+        return (c == null) ? false : c.request(message);
     }
 
 
@@ -193,22 +192,18 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean abandonColony(Colony colony) {
-        return ask(colony.getGame(),
-                   new AbandonColonyMessage(colony));
+        return ask(new AbandonColonyMessage(colony));
     }
 
     /**
      * Server query-response to respond to a monarch offer.
      *
-     * @param game The {@code Game} to construct a reply message in.
      * @param action The monarch action responded to.
      * @param accept Accept or reject the offer.
      * @return True if the server interaction succeeded.
      */
-    public boolean answerMonarch(Game game, MonarchAction action,
-                                 boolean accept) {
-        return ask(game,
-                   new MonarchActionMessage(action, null, "")
+    public boolean answerMonarch(MonarchAction action, boolean accept) {
+        return ask(new MonarchActionMessage(action, null, "")
                        .setResult(accept));
     }
 
@@ -220,8 +215,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean askSkill(Unit unit, Direction direction) {
-        return ask(unit.getGame(),
-                   new AskSkillMessage(unit, direction));
+        return ask(new AskSkillMessage(unit, direction));
     }
 
     /**
@@ -232,8 +226,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean assignTeacher(Unit student, Unit teacher) {
-        return ask(student.getGame(),
-                   new AssignTeacherMessage(student, teacher));
+        return ask(new AssignTeacherMessage(student, teacher));
     }
 
     /**
@@ -244,8 +237,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
-        return ask(unit.getGame(),
-                   new AssignTradeRouteMessage(unit, tradeRoute));
+        return ask(new AssignTradeRouteMessage(unit, tradeRoute));
     }
 
     /**
@@ -256,8 +248,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean attack(Unit unit, Direction direction) {
-        return ask(unit.getGame(),
-                   new AttackMessage(unit, direction));
+        return ask(new AttackMessage(unit, direction));
     }
 
     /**
@@ -268,8 +259,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean buildColony(String name, Unit unit) {
-        return ask(unit.getGame(),
-                   new BuildColonyMessage(name, unit));
+        return ask(new BuildColonyMessage(name, unit));
     }
 
     /**
@@ -279,8 +269,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean cashInTreasureTrain(Unit unit) {
-        return ask(unit.getGame(),
-                   new CashInTreasureTrainMessage(unit));
+        return ask(new CashInTreasureTrainMessage(unit));
     }
 
     /**
@@ -291,8 +280,7 @@ public abstract class ServerAPI {
      * @return boolean <b>true</b> if the server interaction succeeded.
      */
     public boolean changeState(Unit unit, UnitState state) {
-        return ask(unit.getGame(),
-                   new ChangeStateMessage(unit, state));
+        return ask(new ChangeStateMessage(unit, state));
     }
 
     /**
@@ -304,8 +292,7 @@ public abstract class ServerAPI {
      */
     public boolean changeWorkImprovementType(Unit unit,
                                              TileImprovementType type) {
-        return ask(unit.getGame(),
-                   new ChangeWorkImprovementTypeMessage(unit, type));
+        return ask(new ChangeWorkImprovementTypeMessage(unit, type));
     }
 
     /**
@@ -316,8 +303,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean changeWorkType(Unit unit, GoodsType workType) {
-        return ask(unit.getGame(),
-                   new ChangeWorkTypeMessage(unit, workType));
+        return ask(new ChangeWorkTypeMessage(unit, workType));
     }
 
     /**
@@ -340,7 +326,7 @@ public abstract class ServerAPI {
      */
     public boolean chooseFoundingFather(List<FoundingFather> ffs,
                                         FoundingFather ff) {
-        return send(new ChooseFoundingFatherMessage(ffs, ff));
+        return ask(new ChooseFoundingFatherMessage(ffs, ff));
     }
 
     /**
@@ -353,8 +339,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean claimTile(Tile tile, FreeColGameObject claimant, int price) {
-        return ask(tile.getGame(),
-                   new ClaimLandMessage(tile, claimant, price));
+        return ask(new ClaimLandMessage(tile, claimant, price));
     }
 
     /**
@@ -364,8 +349,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean clearSpeciality(Unit unit) {
-        return ask(unit.getGame(),
-                   new ClearSpecialityMessage(unit));
+        return ask(new ClearSpecialityMessage(unit));
     }
 
     /**
@@ -380,14 +364,12 @@ public abstract class ServerAPI {
     /**
      * Server query-response for declaring independence.
      *
-     * @param game The {@code Game} to construct a reply message in.
      * @param nation The name for the new nation.
      * @param country The name for the new country.
      * @return True if the server interaction succeeded.
      */
-    public boolean declareIndependence(Game game, String nation, String country) {
-        return ask(game,
-                   new DeclareIndependenceMessage(nation, country));
+    public boolean declareIndependence(String nation, String country) {
+        return ask(new DeclareIndependenceMessage(nation, country));
     }
 
     /**
@@ -400,8 +382,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean declineMounds(Unit unit, Direction direction) {
-        return ask(unit.getGame(),
-                   new DeclineMoundsMessage(unit, direction));
+        return ask(new DeclineMoundsMessage(unit, direction));
     }
 
     /**
@@ -411,8 +392,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean deleteTradeRoute(TradeRoute tradeRoute) {
-        return ask(tradeRoute.getGame(),
-                   new DeleteTradeRouteMessage(tradeRoute));
+        return ask(new DeleteTradeRouteMessage(tradeRoute));
     }
 
     /**
@@ -425,8 +405,7 @@ public abstract class ServerAPI {
      */
     public boolean deliverGiftToSettlement(Unit unit, IndianSettlement is,
                                            Goods goods) {
-        return ask(unit.getGame(),
-                   new DeliverGiftMessage(unit, is, goods));
+        return ask(new DeliverGiftMessage(unit, is, goods));
     }
 
     /**
@@ -438,8 +417,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean demandTribute(Unit unit, Direction direction) {
-        return ask(unit.getGame(),
-                   new DemandTributeMessage(unit, direction));
+        return ask(new DemandTributeMessage(unit, direction));
     }
 
     /**
@@ -454,8 +432,7 @@ public abstract class ServerAPI {
      */
     public boolean diplomacy(FreeColGameObject our, FreeColGameObject other, 
                              DiplomaticTrade dt) {
-        return ask(our.getGame(),
-                   new DiplomacyMessage(our, other, dt));
+        return ask(new DiplomacyMessage(our, other, dt));
     }
 
     /**
@@ -465,8 +442,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean disbandUnit(Unit unit) {
-        return ask(unit.getGame(),
-                   new DisbandUnitMessage(unit));
+        return ask(new DisbandUnitMessage(unit));
     }
 
     /**
@@ -476,8 +452,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean disembark(Unit unit) {
-        return ask(unit.getGame(),
-                   new DisembarkMessage(unit));
+        return ask(new DisembarkMessage(unit));
     }
 
     /**
@@ -490,43 +465,36 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean embark(Unit unit, Unit carrier, Direction direction) {
-        return ask(unit.getGame(),
-                   new EmbarkMessage(unit, carrier, direction));
+        return ask(new EmbarkMessage(unit, carrier, direction));
     }
 
     /**
      * Server query-response for emigration.
      *
-     * @param game The {@code Game} to construct a reply message in.
      * @param slot The slot from which the unit migrates, 1-3 selects
      *             a specific one, otherwise the server will choose one.
      * @return True if the client-server interaction succeeded.
      */
-    public boolean emigrate(Game game, int slot) {
-        return ask(game,
-                   new EmigrateUnitMessage(slot));
+    public boolean emigrate(int slot) {
+        return ask(new EmigrateUnitMessage(slot));
     }
 
     /**
      * Server query-response for asking for the turn to end.
      *
-     * @param game The {@code Game} to construct a reply message in.
      * @return True if the server interaction succeeded.
      */
-    public boolean endTurn(Game game) {
-        return ask(game,
-                   TrivialMessage.END_TURN_MESSAGE);
+    public boolean endTurn() {
+        return ask(TrivialMessage.END_TURN_MESSAGE);
     }
 
     /**
      * Server query-response for asking to enter revenge mode (post-game).
      *
-     * @param game The {@code Game} to construct a reply message in.
      * @return True if the server interaction succeeded.
      */
-    public boolean enterRevengeMode(Game game) {
-        return ask(game,
-                   TrivialMessage.ENTER_REVENGE_MODE_MESSAGE);
+    public boolean enterRevengeMode() {
+        return ask(TrivialMessage.ENTER_REVENGE_MODE_MESSAGE);
     }
 
     /**
@@ -538,8 +506,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean equipUnitForRole(Unit unit, Role role, int roleCount) {
-        return ask(unit.getGame(),
-                   new EquipForRoleMessage(unit, role, roleCount));
+        return ask(new EquipForRoleMessage(unit, role, roleCount));
     }
 
     /**
@@ -554,21 +521,18 @@ public abstract class ServerAPI {
      */
     public boolean firstContact(Player player, Player other, Tile tile,
                                 boolean result) {
-        return ask(player.getGame(),
-                   new FirstContactMessage(player, other, tile)
+        return ask(new FirstContactMessage(player, other, tile)
                        .setResult(result));
     }
 
     /**
      * Server query-response for asking for the high scores list.
      *
-     * @param game The {@code Game} to extract scores from.
      * @param key The high score key to query.
      * @return True if the server interaction succeeded.
      */
-    public boolean getHighScores(Game game, String key) {
-        return ask(game,
-                   new HighScoreMessage(key));
+    public boolean getHighScores(String key) {
+        return ask(new HighScoreMessage(key));
     }
 
     /**
@@ -579,8 +543,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean nationSummary(Player self, Player player) {
-        return ask(self.getGame(),
-                   new NationSummaryMessage(player));
+        return ask(new NationSummaryMessage(player));
     }
 
     /**
@@ -594,8 +557,7 @@ public abstract class ServerAPI {
      */
     public boolean incite(Unit unit, IndianSettlement is, Player enemy,
                           int gold) {
-        return ask(unit.getGame(),
-                   new InciteMessage(unit, is, enemy, gold));
+        return ask(new InciteMessage(unit, is, enemy, gold));
     }
 
     /**
@@ -610,8 +572,7 @@ public abstract class ServerAPI {
      */
     public boolean indianDemand(Unit unit, Colony colony,
                                 GoodsType type, int amount, Boolean result) {
-        return ask(unit.getGame(),
-                   new IndianDemandMessage(unit, colony, type, amount)
+        return ask(new IndianDemandMessage(unit, colony, type, amount)
                        .setResult(result));
     }
             
@@ -623,8 +584,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean joinColony(Unit unit, Colony colony) {
-        return ask(unit.getGame(),
-                   new JoinColonyMessage(colony, unit));
+        return ask(new JoinColonyMessage(colony, unit));
     }
 
     /**
@@ -635,8 +595,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean learnSkill(Unit unit, Direction direction) {
-        return ask(unit.getGame(),
-                   new LearnSkillMessage(unit, direction));
+        return ask(new LearnSkillMessage(unit, direction));
     }
 
     /**
@@ -650,8 +609,7 @@ public abstract class ServerAPI {
      */
     public boolean loadGoods(Location loc, GoodsType type, int amount,
                              Unit carrier) {
-        return ask(carrier.getGame(),
-                   new LoadGoodsMessage(loc, type, amount, carrier));
+        return ask(new LoadGoodsMessage(loc, type, amount, carrier));
     }
 
     /**
@@ -666,8 +624,8 @@ public abstract class ServerAPI {
      */
     public boolean login(String userName, String version,
                          boolean single, boolean current) {
-        return ask(null,
-            new LoginMessage(userName, version, null, single, current, null));
+        return ask(new LoginMessage(userName, version, null,
+                                    single, current, null));
     }
 
     /**
@@ -678,8 +636,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean logout(Player player, LogoutReason reason) {
-        return ask(player.getGame(),
-                   new LogoutMessage(player, reason));
+        return ask(new LogoutMessage(player, reason));
     }
 
     /**
@@ -694,8 +651,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean loot(Unit winner, String defenderId, List<Goods> goods) {
-        return ask(winner.getGame(),
-                   new LootCargoMessage(winner, defenderId, goods));
+        return ask(new LootCargoMessage(winner, defenderId, goods));
     }
 
     /**
@@ -708,8 +664,7 @@ public abstract class ServerAPI {
      */
     public boolean missionary(Unit unit, Direction direction,
                               boolean denounce) {
-        return ask(unit.getGame(),
-                   new MissionaryMessage(unit, direction, denounce));
+        return ask(new MissionaryMessage(unit, direction, denounce));
     }
 
     /**
@@ -720,8 +675,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean move(Unit unit, Direction direction) {
-        return ask(unit.getGame(),
-                   new MoveMessage(unit, direction));
+        return ask(new MoveMessage(unit, direction));
     }
 
     /**
@@ -732,8 +686,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean moveTo(Unit unit, Location destination) {
-        return ask(unit.getGame(),
-                   new MoveToMessage(unit, destination));
+        return ask(new MoveToMessage(unit, destination));
     }
 
     /**
@@ -744,8 +697,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean nativeGift(Unit unit, Colony colony) {
-        return ask(unit.getGame(),
-                   new NativeGiftMessage(unit, colony));
+        return ask(new NativeGiftMessage(unit, colony));
     }
 
     /**
@@ -756,8 +708,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean newLandName(Unit unit, String name) {
-        return ask(unit.getGame(),
-                   new NewLandNameMessage(unit, name));
+        return ask(new NewLandNameMessage(unit, name));
     }
 
     /**
@@ -768,8 +719,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean nativeTrade(NativeTradeAction action, NativeTrade nt) {
-        return ask(nt.getUnit().getGame(),
-                   new NativeTradeMessage(action, nt));
+        return ask(new NativeTradeMessage(action, nt));
     }
 
     /**
@@ -780,8 +730,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean newNativeTradeSession(Unit unit, IndianSettlement is) {
-        return ask(unit.getGame(),
-                   new NativeTradeMessage(unit, is));
+        return ask(new NativeTradeMessage(unit, is));
     }
 
     /**
@@ -795,31 +744,26 @@ public abstract class ServerAPI {
      */
     public boolean newRegionName(Region region, Tile tile, Unit unit, 
                                  String name) {
-        return ask(unit.getGame(),
-                   new NewRegionNameMessage(region, tile, unit, name));
+        return ask(new NewRegionNameMessage(region, tile, unit, name));
     }
 
     /**
      * Server query-response for creating a new trade route.
      *
-     * @param game The {@code Game} to construct a reply message in.
      * @return True if the server interaction succeeded.
      */
-    public boolean newTradeRoute(Game game) {
-        return ask(game,
-                   new NewTradeRouteMessage());
+    public boolean newTradeRoute() {
+        return ask(new NewTradeRouteMessage());
     }
 
     /**
      * Server query-response for tax paying arrears.
      *
-     * @param game The current {@code Game}.
      * @param type The {@code GoodsType} to pay the arrears for.
      * @return True if the server interaction succeeded.
      */
-    public boolean payArrears(Game game, GoodsType type) {
-        return ask(game,
-                   new PayArrearsMessage(type));
+    public boolean payArrears(GoodsType type) {
+        return ask(new PayArrearsMessage(type));
     }
 
     /**
@@ -829,8 +773,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean payForBuilding(Colony colony) {
-        return ask(colony.getGame(),
-                   new PayForBuildingMessage(colony));
+        return ask(new PayForBuildingMessage(colony));
     }
 
     /**
@@ -840,8 +783,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean putOutsideColony(Unit unit) {
-        return ask(unit.getGame(),
-                   new PutOutsideColonyMessage(unit));
+        return ask(new PutOutsideColonyMessage(unit));
     }
 
     /**
@@ -857,8 +799,7 @@ public abstract class ServerAPI {
                                    Colony scratch) {
         RearrangeColonyMessage message
             = new RearrangeColonyMessage(colony, workers, scratch);
-        return (message.isEmpty()) ? true
-            : ask(colony.getGame(), message);
+        return (message.isEmpty()) ? true : ask(message);
     }
 
     /**
@@ -869,8 +810,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean rename(FreeColGameObject object, String name) {
-        return ask(object.getGame(),
-                   new RenameMessage(object, name));
+        return ask(new RenameMessage(object, name));
     }
 
     /**
@@ -885,12 +825,10 @@ public abstract class ServerAPI {
     /**
      * Server query-response to retire the player from the game.
      *
-     * @param game The {@code Game} to construct a reply message in.
      * @return True if the server interaction succeeded.
      */
-    public boolean retire(Game game) {
-        return ask(game,
-                   TrivialMessage.RETIRE_MESSAGE);
+    public boolean retire() {
+        return ask(TrivialMessage.RETIRE_MESSAGE);
     }
 
     /**
@@ -903,8 +841,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean scoutSettlement(Unit unit, Direction direction) {
-        return ask(unit.getGame(),
-                   new ScoutIndianSettlementMessage(unit, direction));
+        return ask(new ScoutIndianSettlementMessage(unit, direction));
     }
    
     /**
@@ -915,8 +852,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean scoutSpeakToChief(Unit unit, IndianSettlement is) {
-        return ask(unit.getGame(),
-                   new ScoutSpeakToChiefMessage(unit, is, null));
+        return ask(new ScoutSpeakToChiefMessage(unit, is, null));
     }
 
     /**
@@ -927,8 +863,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setAvailable(Nation nation, NationState state) {
-        return ask(null,
-                   new SetAvailableMessage(nation, state));
+        return ask(new SetAvailableMessage(nation, state));
     }
 
     /**
@@ -940,8 +875,7 @@ public abstract class ServerAPI {
      */
     public boolean setBuildQueue(Colony colony,
                                  List<BuildableType> buildQueue) {
-        return ask(colony.getGame(),
-                   new SetBuildQueueMessage(colony, buildQueue));
+        return ask(new SetBuildQueueMessage(colony, buildQueue));
     }
 
     /**
@@ -953,8 +887,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setColor(Nation nation, Color color) {
-        return ask(null,
-                   new SetColorMessage(nation, color));
+        return ask(new SetColorMessage(nation, color));
     }
 
     /**
@@ -965,8 +898,7 @@ public abstract class ServerAPI {
      * @return True if the query-response succeeds.
      */
     public boolean setCurrentStop(Unit unit, int index) {
-        return ask(unit.getGame(),
-                   new SetCurrentStopMessage(unit, index));
+        return ask(new SetCurrentStopMessage(unit, index));
     }
 
     /**
@@ -978,8 +910,7 @@ public abstract class ServerAPI {
      * @see Unit#setDestination(Location)
      */
     public boolean setDestination(Unit unit, Location destination) {
-        return ask(unit.getGame(),
-                   new SetDestinationMessage(unit, destination));
+        return ask(new SetDestinationMessage(unit, destination));
     }
 
     /**
@@ -990,8 +921,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setGoodsLevels(Colony colony, ExportData data) {
-        return ask(colony.getGame(),
-                   new SetGoodsLevelsMessage(colony, data));
+        return ask(new SetGoodsLevelsMessage(colony, data));
     }
 
     /**
@@ -1002,8 +932,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setNation(Nation nation) {
-        return ask(null, /* Passing a null player, the server fills it in. */
-                   new SetNationMessage(null, nation));
+        return ask(new SetNationMessage(null, nation));
     }
 
     /**
@@ -1014,8 +943,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setNationType(NationType nationType) {
-        return ask(null, /* Passing a null player, the server fills it in. */
-                   new SetNationTypeMessage(null, nationType));
+        return ask(new SetNationTypeMessage(null, nationType));
     }
 
     /**
@@ -1037,8 +965,7 @@ public abstract class ServerAPI {
      * @return True if the client/server interaction succeeded.
      */
     public boolean spy(Unit unit, Settlement settlement) {
-        return ask(unit.getGame(),
-                   new SpySettlementMessage(unit, settlement));
+        return ask(new SpySettlementMessage(unit, settlement));
     }
 
     /**
@@ -1053,13 +980,11 @@ public abstract class ServerAPI {
     /**
      * Server query-response for training a unit in Europe.
      *
-     * @param game The {@code Game} to construct a reply message in.
      * @param type The {@code UnitType} to train.
      * @return True if the server interaction succeeded.
      */
-    public boolean trainUnitInEurope(Game game, UnitType type) {
-        return ask(game,
-                   new TrainUnitInEuropeMessage(type));
+    public boolean trainUnitInEurope(UnitType type) {
+        return ask(new TrainUnitInEuropeMessage(type));
     }
 
     /**
@@ -1071,8 +996,7 @@ public abstract class ServerAPI {
      * @return True if the query-response succeeds.
      */
     public boolean unloadGoods(GoodsType type, int amount, Unit carrier) {
-        return ask(carrier.getGame(),
-                   new UnloadGoodsMessage(type, amount, carrier));
+        return ask(new UnloadGoodsMessage(type, amount, carrier));
     }
 
     /**
@@ -1106,8 +1030,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean updateTradeRoute(TradeRoute route) {
-        return ask(route.getGame(),
-                   new UpdateTradeRouteMessage(route));
+        return ask(new UpdateTradeRouteMessage(route));
     }
 
     /**
@@ -1118,7 +1041,6 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean work(Unit unit, WorkLocation workLocation) {
-        return ask(unit.getGame(),
-                   new WorkMessage(unit, workLocation));
+        return ask(new WorkMessage(unit, workLocation));
     }
 }
