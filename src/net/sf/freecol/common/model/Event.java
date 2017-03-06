@@ -212,13 +212,7 @@ public class Event extends FreeColSpecObjectType {
 
         if (Limit.TAG.equals(tag)) {
             Limit limit = new Limit(xr, spec);
-            // @compat 0.10.5
-            if ("model.limit.independence.colonies".equals(limit.getId())) {
-                limit.setId("model.limit.independence.coastalColonies");
-                limit.getLeftHandSide().setMethodName("isConnectedPort");
-            }
-            // end @compat
-            addLimit(limit);
+            if (limit != null) addLimit(limit);
 
         } else {
             super.readChild(xr);
