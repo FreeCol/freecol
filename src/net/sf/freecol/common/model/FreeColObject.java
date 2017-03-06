@@ -805,9 +805,6 @@ public abstract class FreeColObject
 
     /** XML attribute tag to denote partial updates. */
     public static final String PARTIAL_ATTRIBUTE_TAG = "partial";
-    // @compat 0.10.x
-    private static final String OLD_PARTIAL_ATTRIBUTE_TAG = "PARTIAL";
-    // end @compat
 
     /** XML tag name for value attributes, used in many places. */
     protected static final String VALUE_TAG = "value";
@@ -1172,11 +1169,7 @@ public abstract class FreeColObject
      *     the stream.
      */
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-        if (xr.hasAttribute(PARTIAL_ATTRIBUTE_TAG)
-            // @compat 0.10.x
-            || xr.hasAttribute(OLD_PARTIAL_ATTRIBUTE_TAG)
-            // end @compat
-            ) {
+        if (xr.hasAttribute(PARTIAL_ATTRIBUTE_TAG)) {
             readFromXMLPartial(xr);
         } else {
             readAttributes(xr);
