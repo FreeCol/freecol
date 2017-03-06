@@ -2101,20 +2101,6 @@ public final class Specification {
                                             coronado, true));
         }
 
-        // Require the scopes added to founding fathers in git.8971674
-        fatherGoodsFixMap.clear();
-        fatherGoodsFixMap.put("model.foundingFather.thomasJefferson",
-                              "model.goods.bells");
-        fatherGoodsFixMap.put("model.foundingFather.thomasPaine",
-                              "model.goods.bells");
-        fatherGoodsFixMap.put("model.foundingFather.williamPenn",
-                              "model.goods.crosses");
-        forEachMapEntry(fatherGoodsFixMap, e -> {
-                FoundingFather father = getFoundingFather(e.getKey());
-                forEach(father.getModifiers(e.getValue()),
-                        Modifier::requireNegatedPersonScope);
-            });
-
         // Nation FOUND_COLONY -> FOUNDS_COLONIES
         for (EuropeanNationType ent : transform(europeanNationTypes,
                 nt -> nt.hasAbility(Ability.FOUND_COLONY))) {
