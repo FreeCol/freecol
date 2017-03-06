@@ -163,13 +163,6 @@ public class LostCityRumour extends TileItem {
         return name;
     }
 
-    // @compat 0.10.4
-    // See readAttributes and TileItemContainer.readChild
-    public void setTile(Tile tile) {
-        this.tile = tile;
-    }
-    // end @compat 0.10.4
-
     /**
      * Chooses a type of Lost City Rumour.  The type of rumour depends
      * on the exploring unit, as well as player settings.
@@ -417,13 +410,7 @@ public class LostCityRumour extends TileItem {
         super.readAttributes(xr);
 
         tile = xr.findFreeColGameObject(getGame(), TILE_TAG,
-                                        Tile.class, (Tile)null,
-        // @compat 0.10.4
-        // Around 0.10.4 we had LCRs with no tile attribute.
-        // Tolerate this for now and fix up upstream.
-            false);
-        // Replace with "true);" in due course.
-        // end @compat 0.10.4
+                                        Tile.class, (Tile)null, true);
 
         type = xr.getAttribute(TYPE_TAG, RumourType.class, (RumourType)null);
 

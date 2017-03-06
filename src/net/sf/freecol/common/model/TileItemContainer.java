@@ -635,13 +635,7 @@ public class TileItemContainer extends FreeColGameObject {
 
         if (LostCityRumour.TAG.equals(tag)) {
             LostCityRumour lcr = xr.readFreeColObject(game, LostCityRumour.class);
-            if (lcr != null) {
-                // @compat 0.10.4
-                // Fix LCR tile, see LostCityRumour.readAttributes
-                lcr.setTile(tile);
-                // end @compat 0.10.4
-                addTileItem(lcr);
-            }
+            if (lcr != null) addTileItem(lcr);
 
         } else if (Resource.TAG.equals(tag)) {
             addTileItem(xr.readFreeColObject(game, Resource.class));
