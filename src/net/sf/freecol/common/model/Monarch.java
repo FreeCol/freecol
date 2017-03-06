@@ -488,9 +488,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         return Math.max(oldTax - adjust, Monarch.MINIMUM_TAX_RATE);
     }
 
-    // @compat 0.10.5
     /**
-     * Get a unit type for the REF navy.  Bugfix workaround.
+     * Get a unit type for the REF navy.
      *
      * @return A naval REF unit type.
      */
@@ -498,7 +497,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         initializeCaches();
         return first(navalREFUnitTypes);
     }
-    // end @compat 0.10.5
 
     /**
      * Gets units to be added to the Royal Expeditionary Force.
@@ -862,15 +860,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         } else if (INTERVENTION_FORCE_TAG.equals(tag)) {
             interventionForce.readFromXML(xr);
 
-        // @compat 0.10.5
-        } else if (Force.LAND_UNITS_TAG.equals(tag)) {
-            expeditionaryForce.clearLandUnits();
-            while (xr.moreTags()) {
-                AbstractUnit newUnit = new AbstractUnit(xr);
-                expeditionaryForce.add(newUnit);
-            }
-        // end @compat
-
         // @compat 0.11.5
         // Mercenary force is never updated, and lives in the spec now, so
         // just read and discard it.
@@ -878,15 +867,6 @@ public final class Monarch extends FreeColGameObject implements Named {
             new Force(getSpecification()).readFromXML(xr);
         // end @compat 0.11.5
             
-        // @compat 0.10.5
-        } else if (Force.NAVAL_UNITS_TAG.equals(tag)) {
-            expeditionaryForce.clearNavalUnits();
-            while (xr.moreTags()) {
-                AbstractUnit newUnit = new AbstractUnit(xr);
-                expeditionaryForce.add(newUnit);
-            }
-        // end @compat
-
         } else {
             super.readChild(xr);
         }
