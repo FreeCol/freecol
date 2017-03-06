@@ -2523,9 +2523,6 @@ public class Map extends FreeColGameObject implements Location {
     private static final String MAXIMUM_LATITUDE_TAG = "maximumLatitude";
     private static final String MINIMUM_LATITUDE_TAG = "minimumLatitude";
     private static final String WIDTH_TAG = "width";
-    // @compat 0.10.5, nasty I/O hack
-    private boolean fixupHighSeas = false;
-    // end @compat
 
 
     /**
@@ -2601,15 +2598,7 @@ public class Map extends FreeColGameObject implements Location {
         // The tiles structure is large, and individually
         // overwriteable, so we do not clear it unlike most other containers.
 
-        // @compat 0.10.5
-        fixupHighSeas = false;
-        // end @compat
-
         super.readChildren(xr);
-
-        // @compat 0.10.5
-        if (fixupHighSeas) resetHighSeasCount();
-        // end @compat
 
         // Fix up settlement tile ownership in one hit here, avoiding
         // complications with cached tiles within the Tile serialization.
@@ -2638,12 +2627,6 @@ public class Map extends FreeColGameObject implements Location {
         } else if (Tile.TAG.equals(tag)) {
             Tile t = xr.readFreeColObject(game, Tile.class);
             setTile(t, t.getX(), t.getY());
-
-            // @compat 0.10.5
-            if (t.getHighSeasCount() == Tile.FLAG_RECALCULATE) {
-                fixupHighSeas = true;
-            }
-            // end @compat
 
         } else {
             super.readChild(xr);
