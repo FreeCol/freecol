@@ -2791,21 +2791,6 @@ public final class Specification {
         // SAVEGAME_VERSION == 12
         // SAVEGAME_VERSION == 13
 
-        // @compat 0.10.7
-        ret |= checkBooleanOption(GameOptions.ONLY_NATURAL_IMPROVEMENTS,
-                                  GameOptions.GAMEOPTIONS_COLONY, true);
-        ret |= checkIntegerOption(GameOptions.PEACE_PROBABILITY,
-                                  GameOptions.GAMEOPTIONS_MAP, 90);
-        ret |= checkIntegerOption(GameOptions.INITIAL_IMMIGRATION,
-                                  GameOptions.GAMEOPTIONS_MAP, 15);
-        ret |= checkIntegerOption(GameOptions.EUROPEAN_UNIT_IMMIGRATION_PENALTY,
-                                  GameOptions.GAMEOPTIONS_MAP, -4);
-        ret |= checkIntegerOption(GameOptions.PLAYER_IMMIGRATION_BONUS,
-                                  GameOptions.GAMEOPTIONS_MAP, 2);
-        ret |= checkBooleanOption(GameOptions.FOUND_COLONY_DURING_REBELLION,
-                                  GameOptions.GAMEOPTIONS_COLONY, true);
-        // end @compat 0.10.7
-
         // @compat 0.11.0
         ret |= checkBooleanOption(GameOptions.BELL_ACCUMULATION_CAPPED,
                                   GameOptions.GAMEOPTIONS_COLONY, false);
