@@ -2850,30 +2850,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
 
-    // Override FreeColGameObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int checkIntegrity(boolean fix) {
-        int result = super.checkIntegrity(fix);
-
-        // @compat 0.10.x
-        if (!isLandLocked() && !hasAbility(Ability.HAS_PORT)) {
-            if (fix) {
-                addPortAbility();
-                result = Math.min(result, 0);
-            } else {
-                result = -1;
-            }
-        }
-        // end @compat 0.10.x
-
-        return Math.min(result, checkBuildQueueIntegrity(fix));
-    }
-
-
     // Serialization
 
     private static final String BUILD_QUEUE_TAG = "buildQueueItem";
