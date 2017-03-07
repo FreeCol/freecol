@@ -2213,46 +2213,6 @@ public final class Specification {
             ent.addAbility(new Ability(Ability.INDEPENDENT_NATION));
         }
 
-        // Resource type modifiers had the wrong priority
-        forEach(flatten(resourceTypeList, ResourceType::getModifiers), m -> {
-                m.setModifierIndex(Modifier.RESOURCE_PRODUCTION_INDEX);
-            });
-
-        // Unit type indexes moved into the spec
-        final Predicate<Modifier> goodsPred = m ->
-            allTypes.get(m.getId()) instanceof GoodsType;
-        for (Modifier mod : transform(flatten(unitTypeList,
-                    UnitType::getModifiers), goodsPred)) {
-            mod.setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
-        }
-
-        // Father production modifiers have moved to the spec
-        for (Modifier mod : transform(flatten(foundingFathers,
-                    FoundingFather::getModifiers), goodsPred)) {
-            mod.setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
-        }
-
-        // Tile improvement type modifier index has moved to the spec
-        for (Modifier mod : transform(flatten(tileImprovementTypeList,
-                    TileImprovementType::getModifiers), goodsPred)) {
-            mod.setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
-        }
-
-        // Building type modifier indexes have moved to the spec
-        for (BuildingType bt : buildingTypeList) {
-            for (Modifier mod : transform(bt.getModifiers(), goodsPred)) {
-                mod.setModifierIndex((bt.hasAbility(Ability.AUTO_PRODUCTION))
-                    ? Modifier.AUTO_PRODUCTION_INDEX
-                    : Modifier.BUILDING_PRODUCTION_INDEX);
-            }
-        }
-
-        // European nation type production modifier indexes moved to the spec
-        for (Modifier mod : transform(flatten(europeanNationTypes,
-                    EuropeanNationType::getModifiers), goodsPred)) {
-            mod.setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
-        }
-
         // TownHall, Chapel et al now have unattended production types
         // (replacing modifiers).
         BuildingType townHallType = getBuildingType("model.building.townHall");

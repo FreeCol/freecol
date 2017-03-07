@@ -136,9 +136,11 @@ public class Modifier extends Feature {
 
     public static final int DEFAULT_MODIFIER_INDEX = 0;
 
-    // @compat 0.10.x
-    // These are now attached to modifiers in the spec, but
-    // Specification.fixup010x() still needs them for now.
+    // These are now attached to modifiers in the spec and mostly
+    // should not be needed any more.  However the dynamic modifiers
+    // (e.g. disaster, goods party related) do still need to be built
+    // explicitly with the right index.  So we might as well leave
+    // them all visible here for clarity.
     public static final int RESOURCE_PRODUCTION_INDEX = 10;
     public static final int COLONY_PRODUCTION_INDEX = 20;
     public static final int EXPERT_PRODUCTION_INDEX = 30;
@@ -149,7 +151,6 @@ public class Modifier extends Feature {
     public static final int NATION_PRODUCTION_INDEX = 80;
     public static final int PARTY_PRODUCTION_INDEX = 90;
     public static final int DISASTER_PRODUCTION_INDEX = 100;
-    // end @compat 0.10.x
     public static final int DEFAULT_PRODUCTION_INDEX = 100;
 
     // Specific combat indicies
