@@ -1226,13 +1226,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     protected boolean updateProductionBonus() {
         final Specification spec = getSpecification();
         final int veryBadGovernment
-                = spec.getInteger("model.option.veryBadGovernmentLimit");
+            = spec.getInteger(GameOptions.VERY_BAD_GOVERNMENT_LIMIT);
         final int badGovernment
-                = spec.getInteger("model.option.badGovernmentLimit");
+            = spec.getInteger(GameOptions.BAD_GOVERNMENT_LIMIT);
         final int veryGoodGovernment
-                = spec.getInteger("model.option.veryGoodGovernmentLimit");
+            = spec.getInteger(GameOptions.VERY_GOOD_GOVERNMENT_LIMIT);
         final int goodGovernment
-                = spec.getInteger("model.option.goodGovernmentLimit");
+            = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
         int newBonus = (sonsOfLiberty >= veryGoodGovernment) ? 2
                 : (sonsOfLiberty >= goodGovernment) ? 1
                 : (tories > veryBadGovernment) ? -2
@@ -1864,7 +1864,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         final Specification spec = getSpecification();
         int result = super.getConsumptionOf(goodsType);
         if (spec.getGoodsType("model.goods.bells").equals(goodsType)) {
-            result -= spec.getInteger("model.option.unitsThatUseNoBells");
+            result -= spec.getInteger(GameOptions.UNITS_THAT_USE_NO_BELLS);
         }
         return Math.max(0, result);
     }

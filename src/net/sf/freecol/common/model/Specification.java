@@ -253,10 +253,6 @@ public final class Specification {
 
     /* Other containers. */
 
-    // @compat 0.10.7
-    public final Map<String, String> fatherGoodsFixMap = new HashMap<>();
-    // end @compat 0.10.7
-
     private final Map<String, FreeColSpecObjectType> allTypes = new HashMap<>();
 
     private final Map<String, List<Ability>> allAbilities = new HashMap<>();
@@ -2403,7 +2399,7 @@ public final class Specification {
         // SAVEGAME_VERSION == 11
         // SAVEGAME_VERSION == 12
 
-        // @compat 0.10.6/0.11.x
+        // @compat 0.10.x/0.11.x
         // For 0.10.6 we moved from a three level structure:
         //   difficultyLevels/<difficulty>/<option>
         // to a four level structure
@@ -2411,10 +2407,11 @@ public final class Specification {
         // so add the groups in, and move the options that could be present
         // in anything up to 0.10.5 into their destination groups.
         //
-        // Alas, there were weaknesses in the checkDifficulty*() routines
-        // through 0.11.x, so some 0.10.x games were only partially upgraded
-        // to the 0.11.x format.  So keep this around until
-        // SAVEGAME_VERSION == 15.
+        // Alas, there were weaknesses in the checkDifficulty*()
+        // routines that were not fixed through 0.11.x, so some 0.10.x
+        // games were only partially upgraded to the 0.11.x format.
+        //
+        // So keep this around until SAVEGAME_VERSION == 15.
         ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_IMMIGRATION, lb,
             GameOptions.CROSSES_INCREMENT,
             GameOptions.RECRUIT_PRICE_INCREASE,
@@ -2461,9 +2458,7 @@ public final class Specification {
             GameOptions.LAND_UNIT_CHEAT,
             GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT,
             GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT);
-        // end @compat 0.10.6
 
-        // @compat 0.10.4
         id = GameOptions.REF_FORCE; // Yes, really "refSize"
         ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH, lb);
         if (ulo != null) {
@@ -2499,9 +2494,7 @@ public final class Specification {
             ulo.getValue().add(i1);
             ret = true;
         }
-        // end @compat 0.10.4
 
-        // @compat 0.10.5
         ret |= checkDifficultyIntegerOption(GameOptions.INTERVENTION_BELLS,
                                             GameOptions.DIFFICULTY_MONARCH, lb,
                                             5000);
@@ -2579,7 +2572,7 @@ public final class Specification {
         ret |= checkDifficultyIntegerOption(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT,
                                             GameOptions.DIFFICULTY_CHEAT, lb,
                                             10);
-        // end @compat 0.10.5
+        // end @compat 0.10.x/0.11.x
 
         // SAVEGAME_VERSION == 13
 
@@ -2616,7 +2609,8 @@ public final class Specification {
                                             1500);
         // end @compat 0.11.3
 
-        // Ensure 2 levels of groups, then leaves only
+        
+        // Ensure 2 levels of groups, and one level of leaves
         for (OptionGroup level : getDifficultyLevels()) {
             for (Option o : level.getOptions()) {
                 if (o instanceof OptionGroup) {

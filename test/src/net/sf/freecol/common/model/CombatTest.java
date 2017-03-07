@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.IntegerOption;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
@@ -564,7 +565,7 @@ public class CombatTest extends FreeColTestCase {
             .settlementTile(tile1).skillToTeach(null).capital(true)
             .initialBravesInCamp(8).missionary(missionary).build();
 
-        IntegerOption io = spec().getIntegerOption("model.option.nativeConvertProbability");
+        IntegerOption io = spec().getIntegerOption(GameOptions.NATIVE_CONVERT_PROBABILITY);
         assertNotNull(io);
         io.setValue(100);
 
