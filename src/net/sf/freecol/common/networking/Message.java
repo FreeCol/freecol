@@ -435,6 +435,10 @@ public abstract class Message {
             if (mb == null) throw new FreeColException("No constructor for: " + tag);
             builders.put(tag, mb);
         }
-        return Introspector.construct(mb, new Object[] { game, xr });
+        try {
+            return Introspector.construct(mb, new Object[] { game, xr });
+        } catch (Introspector.IntrospectorException ie) {
+            throw new FreeColException(ie.getMessage(), ie.getCause());
+        }
     }
 }

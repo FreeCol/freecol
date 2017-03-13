@@ -329,13 +329,16 @@ public class Introspector {
      * @param constructor The {@code Constructor} to use.
      * @param params The constructor parameters.
      * @return The instance created, or null on error.
+     * @exception FreeColException if there is a FreeCol failure.
      */
-    public static <T> T construct(Constructor<T> constructor, Object[] params) {
+    public static <T> T construct(Constructor<T> constructor, Object[] params)
+        throws IntrospectorException {
         T instance;
         try {
             instance = constructor.newInstance(params);
-        } catch (IllegalAccessException | InstantiationException
-                 | InvocationTargetException ex) {
+        } catch (InvocationTargetException ite) {
+            throw new IntrospectorException("construct fail", ite.getCause());
+        } catch (IllegalAccessException | InstantiationException ex) {
             instance = null;
         }
         return instance;
