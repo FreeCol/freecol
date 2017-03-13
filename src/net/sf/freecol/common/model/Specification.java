@@ -306,10 +306,12 @@ public final class Specification {
     /** The turn number for the game ages for FF recruitment. */
     private final int[] ages = new int[NUMBER_OF_AGES];
 
+    // @compat 0.11.6
     /**
      * Do we need to load the unit-change-types backward
      * compatibility fragment. */
     private boolean needUnitChangeTypes = false;
+    // end @compat 0.11.6
 
 
     /**
@@ -556,10 +558,9 @@ public final class Specification {
         europeanNations.clear();
         indianNations.clear();
         for (Nation nation : nations) {
+            if (nation.isUnknownEnemy()) continue;
             if (nation.getType().isEuropean()) {
-                if (nation.isUnknownEnemy()) {
-                    continue;
-                } else if (nation.getType().isREF()) {
+                if (nation.getType().isREF()) {
                     REFNations.add(nation);
                 } else {
                     europeanNations.add(nation);
@@ -776,7 +777,8 @@ public final class Specification {
         clean("merged map options (" + who + ")");
         return true;
     }
-        
+
+    // @compat 0.11.6
     /**
      * Call this when old style unit changes are seen, so the spec can
      * load the backward compatiblity fragment.
@@ -784,6 +786,7 @@ public final class Specification {
     public void setNeedUnitChangeTypes() {
         this.needUnitChangeTypes = true;
     }
+    // end @compat 0.11.6
 
     private interface ChildReader {
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
@@ -1627,6 +1630,15 @@ public final class Specification {
     }
 
     /**
+     * Get the special unknown enemy nation.
+     *
+     * @return The unknown enemy {@code Nation}.
+     */
+    public Nation getUnknownEnemyNation() {
+        return getNation(Nation.UNKNOWN_NATION_ID);
+    }
+                          
+    /**
      * Clear all European advantages.  Implements the Advantages==NONE setting.
      */
     public void clearEuropeanNationalAdvantages() {
@@ -2104,47 +2116,37 @@ public final class Specification {
     // end @compat 0.11.0
 
     /**
-     * Specification backward compatibility for the spec in general.
+     * Backward compatibility for the Specification in general.
      */
     private void fixSpec() {
         // @compat 0.10.x/0.11.x
+        // This section contains a bunch of things that were
+        // discovered and fixed post 0.11.0.
+        //
+        // We need to keep these fixes for now as they are still
+        // needed for games validly upgraded by 0.11.x series FreeCol.
+              
+        // 0.10.x had no unknown enemy nation, just an unknown enemy
+        // player, and the type was poorly established.        
+        Nation ue = getUnknownEnemyNation();
+        ue.setType(getNationType("model.nationType.default"));
+        if (!nations.contains(ue)) nations.add(ue);
+
         // Nation colour moved (back) into the spec in 0.11.0, but the fixup
         // code was just a wrapper, and did not modify the underlying spec.
-        // So we still need this.
         for (Nation nation : nations) {
             if (nation.getColor() == null) {
                 nation.setColor(defaultColors.get(nation.getId()));
             }
         }
-        // end @compat 0.10.x/0.11.x        
 
-        // @compat 0.10.7
-        // model.ability.missionary was split into distinct parts,
-        // which should be fixed by the roles work, but the Brebeuf
-        // scope was left hanging.
-        FoundingFather brebeuf
-            = getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
-        for (Scope scope : transform(flatten(brebeuf.getAbilities(),
-                                             Ability::getScopes),
-                                     matchKeyEquals("model.ability.missionary",
-                                                    Scope::getAbilityId))) {
-            scope.setAbilityId(Ability.ESTABLISH_MISSION);
-        }
-
-        // Coronado gained an ability in freecol
+        // Coronado gained an ability in the freecol ruleset
         FoundingFather coronado
             = getFoundingFather("model.foundingFather.franciscoDeCoronado");
         if ("freecol".equals(getId())
             && !coronado.hasAbility(Ability.SEE_ALL_COLONIES)) {
             coronado.addAbility(new Ability(Ability.SEE_ALL_COLONIES,
                                             coronado, true));
-        }
-
-        // Nation FOUND_COLONY -> FOUNDS_COLONIES
-        for (EuropeanNationType ent : transform(europeanNationTypes,
-                nt -> nt.hasAbility(Ability.FOUND_COLONY))) {
-            ent.removeAbilities(Ability.FOUND_COLONY);
-            ent.addAbility(new Ability(Ability.FOUNDS_COLONIES, ent, true));
         }
 
         // Fix REF roles, soldier -> infantry, dragoon -> cavalry
@@ -2191,8 +2193,6 @@ public final class Specification {
                         au.setRoleId("model.role.missionary");
                     } else if ("PIONEER".equals(au.getRoleId())) {
                         au.setRoleId("model.role.pioneer");
-                    } else if ("MISSIONARY".equals(au.getRoleId())) {
-                        au.setRoleId("model.role.missionary");
                     } else if ("SCOUT".equals(au.getRoleId())) {
                         au.setRoleId("model.role.scout");
                     } else if ("SOLDIER".equals(au.getRoleId())) {
@@ -2204,88 +2204,12 @@ public final class Specification {
             }
         }
 
-        // The REF is also an independent nation, which is a required
-        // ability to have man-o-war.  Older specs used
-        // INDEPENDENCE_DECLARED but we can not directly use that or
-        // the REF gets access to colonialRegulars.
-        for (NationType ent : transform(europeanNationTypes,
-                nt -> nt.isREF() && !nt.hasAbility(Ability.INDEPENDENT_NATION))) {
-            ent.addAbility(new Ability(Ability.INDEPENDENT_NATION));
-        }
-
-        // TownHall, Chapel et al now have unattended production types
-        // (replacing modifiers).
-        BuildingType townHallType = getBuildingType("model.building.townHall");
-        if (townHallType.hasModifier("model.goods.bells")) {
-            GoodsType bellsType = getGoodsType("model.goods.bells");
-            AbstractGoods ag = new AbstractGoods(bellsType, 1);
-            ProductionType pt = new ProductionType(ag, true, null);
-            townHallType.addProductionType(pt);
-            townHallType.removeModifiers("model.goods.bells");
-            logger.info("Added backward compatibility production " + pt
-                + " to " + townHallType);
-        }
-        GoodsType crossesType = getGoodsType("model.goods.crosses");
-        int a = 1;
-        for (BuildingType bt : transform(new BuildingType[] {
-                    getBuildingType("model.building.chapel"),
-                    getBuildingType("model.building.church"),
-                    getBuildingType("model.building.cathedral") },
-                bt -> bt.hasModifier("model.goods.crosses"))) {
-            AbstractGoods ag = new AbstractGoods(crossesType, a);
-            a++;
-            ProductionType pt = new ProductionType(ag, true, null);
-            bt.addProductionType(pt);
-            bt.removeModifiers("model.goods.crosses");
-            logger.info("Added backward compatibility production " + pt
-                + " to " + bt);
-        }
-        // Country and stables production is now defined as unattended.
-        for (BuildingType bt : new BuildingType[] {
-                getBuildingType("model.building.country"),
-                getBuildingType("model.building.stables") }) {
-            for (ProductionType pt : bt.getAvailableProductionTypes(false)) {
-                pt.setUnattended(true);
-                logger.info("Switched production " + pt
-                    + " to unattended at " + bt);
-            }
-        }
-
-        // 0.10.x had no unknown enemy nation, just an unknown enemy player
-        if (getNation(Nation.UNKNOWN_NATION_ID) == null) {
-            Nation ue = new Nation(Nation.UNKNOWN_NATION_ID, this);
-            ue.setColor(Nation.UNKNOWN_NATION_COLOR);
-        }
-
-        // Ambush terrain ability not present in older specs.
-        if (first(getAbilities(Ability.AMBUSH_TERRAIN)) == null){
-            Ability ambush = new Ability(Ability.AMBUSH_TERRAIN, null, true);
-            addAbility(ambush);
-            for (TileType tt : transform(getTileTypeList(), tt ->
-                    ((tt.isElevation() || tt.isForested())
-                        && !tt.hasAbility(Ability.AMBUSH_TERRAIN)))) {
-                tt.addAbility(new Ability(Ability.AMBUSH_TERRAIN, tt, true));
-            }
-        }
-
         // is-military was added to goods type
         GoodsType goodsType = getGoodsType("model.goods.horses");
         goodsType.setMilitary();
         goodsType = getGoodsType("model.goods.muskets");
         goodsType.setMilitary();
-
-        // Limit Revere auto-equip of muskets to the soldier role
-        {
-            FoundingFather revere
-                = getFoundingFather("model.foundingFather.paulRevere");
-            for (Scope scope : transform(flatten(revere.getAbilities(Ability.AUTOMATIC_EQUIPMENT),
-                                                 Ability::getScopes),
-                                         matchKeyEquals("model.equipment.muskets",
-                                                        Scope::getType))) {
-                scope.setType("model.role.soldier");
-            }
-        }
-        // end @compat 0.10.7
+        // end @compat 0.10.x/0.11.x        
 
         // @compat 0.11.0
         // Bolivar changed from being an event, then to a liberty modifier,
@@ -3037,7 +2961,8 @@ public final class Specification {
         // @compat 0.11.0
         if (roles.isEmpty()) fixRoles();
         // end @compat 0.11.0
-        
+
+        // @compat 0.11.6
         if (this.needUnitChangeTypes) {
             this.needUnitChangeTypes = false;
             File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
@@ -3055,6 +2980,7 @@ public final class Specification {
                 + transform(getUnitChangeTypeList(), alwaysTrue(),
                             UnitChangeType::getId, Collectors.joining(" ")));
         }
+        // end @compat 0.11.6
     }
 
     /**

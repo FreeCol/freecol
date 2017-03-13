@@ -1098,7 +1098,7 @@ public final class FreeColServer {
         final Specification spec = game.getSpecification();
 
         ServerPlayer enemy = new ServerPlayer(game, false,
-            spec.getNation(Nation.UNKNOWN_NATION_ID));
+            spec.getUnknownEnemyNation());
         game.setUnknownEnemy(enemy);
         return enemy;
     }
