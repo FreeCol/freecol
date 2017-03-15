@@ -337,7 +337,12 @@ public class Introspector {
         try {
             instance = constructor.newInstance(params);
         } catch (InvocationTargetException ite) {
-            throw new IntrospectorException("construct fail", ite.getCause());
+            Throwable thr = ite.getCause();
+            String msg = ite.getMessage();
+            if (msg == null && thr instanceof Exception) {
+                msg = ((Exception)thr).getMessage();
+            }
+            throw new IntrospectorException(msg, thr);
         } catch (IllegalAccessException | InstantiationException ex) {
             instance = null;
         }
