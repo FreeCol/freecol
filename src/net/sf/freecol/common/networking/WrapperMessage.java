@@ -45,11 +45,12 @@ public abstract class WrapperMessage extends AttributeMessage {
     /**
      * Create a new {@code WrapperMessage} of a given type.
      *
+     * @param tag The actual message tag.
      * @param replyId The reply id.
      * @param message The {@code Message} to encapsulate.
      */
-    public WrapperMessage(int replyId, Message message) {
-        super(TAG, REPLY_ID_TAG, String.valueOf(replyId));
+    protected WrapperMessage(String tag, int replyId, Message message) {
+        super(tag, REPLY_ID_TAG, String.valueOf(replyId));
 
         this.message = message;
     }
@@ -57,17 +58,19 @@ public abstract class WrapperMessage extends AttributeMessage {
     /**
      * Create a new {@code WrapperMessage} from a stream.
      *
+     * @param tag The actual message tag.
      * @param game The {@code Game} to read within.
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      * @exception FreeColException if the internal message can not be read.
      */
-    public WrapperMessage(Game game, FreeColXMLReader xr)
+    protected WrapperMessage(String tag, Game game, FreeColXMLReader xr)
         throws XMLStreamException, FreeColException {
-        super(TAG, REPLY_ID_TAG, xr.getAttribute(REPLY_ID_TAG, (String)null));
+        super(tag, REPLY_ID_TAG, xr.getAttribute(REPLY_ID_TAG, (String)null));
 
         xr.nextTag();
         this.message = Message.read(game, xr);
+        xr.closeTag(tag);
     }
         
 

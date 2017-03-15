@@ -41,7 +41,7 @@ public class ReplyMessage extends WrapperMessage {
      * @param message The {@code Message} to encapsulate.
      */
     public ReplyMessage(int replyId, Message message) {
-        super(replyId, message);
+        super(TAG, replyId, message);
     }
 
     /**
@@ -54,6 +54,6 @@ public class ReplyMessage extends WrapperMessage {
      */
     public ReplyMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException, FreeColException {
-        super(game, xr);
+        super(TAG, game, xr);
     }
 }
