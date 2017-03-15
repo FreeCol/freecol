@@ -445,12 +445,12 @@ public class Connection implements Closeable {
     /**
      * Low level routine to sends a message and return the reply.
      *
-     * @param element The question for the other peer.
-     * @return The reply {@code DOMMessage} from the other peer.
+     * @param element The element to wrap as a question for the peer.
+     * @return The {@code Element} unwrapped from the reply from the peer.
      * @exception IOException if an error occur while sending the message.
      * @see #sendInternal(Element)
      */
-    private DOMMessage askInternal(Element element) throws IOException {
+    private Element askInternal(Element element) throws IOException {
         if (element == null) return null;
         final String tag = element.getTagName();
         int networkReplyId = this.receivingThread.getNextNetworkReplyId();
@@ -471,9 +471,10 @@ public class Connection implements Closeable {
         log(question, true);
 
         // Wait for response
-        DOMMessage response = (DOMMessage)nro.getResponse();
+        DOMMessage msg = (DOMMessage)nro.getResponse();
+        Element response = (msg == null) ? null : msg.toXMLElement();
         log(response, false);
-        return response;
+        return (response == null) ? null : (Element)response.getFirstChild();
     }
     
     /**
@@ -532,11 +533,10 @@ public class Connection implements Closeable {
      * @see #sendAndWait(Element)
      */
     public Element askElement(Element element) throws IOException {
-        DOMMessage reply = askInternal(element);
+        Element reply = askInternal(element);
         logger.fine("Ask: " + element.getTagName()
-            + ", reply: " + ((reply == null) ? "null" : reply.getType()));
-        return (reply == null) ? null
-            : (Element)reply.toXMLElement().getFirstChild();
+            + ", reply: " + ((reply == null) ? "null" : reply.getTagName()));
+        return reply;
     }
 
     /**
