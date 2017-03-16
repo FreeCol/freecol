@@ -97,7 +97,7 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    public boolean sendElement(Element element) {
+    protected boolean sendElement(Element element) {
         return sendAndWaitElement(element);
     }
 
@@ -105,7 +105,7 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    public boolean sendAndWaitElement(Element request) {
+    protected boolean sendAndWaitElement(Element request) {
         DummyConnection other = getOtherConnection();
         if (other == null) return false;
         if (request == null) return true;
@@ -131,7 +131,7 @@ public final class DummyConnection extends Connection {
      * @see #sendAndWait
      */
     @Override
-    public Element askElement(Element request) throws IOException {
+    protected Element askElement(Element request) throws IOException {
         if (!isAlive() || request == null) return null;
         final String tag = request.getTagName();
         Element reply;

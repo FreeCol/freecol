@@ -486,7 +486,7 @@ public class Connection implements Closeable {
      * @see #sendAndWait(Element)
      * @see #ask(Element)
      */
-    public boolean sendElement(Element element) {
+    protected boolean sendElement(Element element) {
         if (element == null) return true;
         final String tag = element.getTagName();
         try {
@@ -510,7 +510,7 @@ public class Connection implements Closeable {
      * @see #send(Element)
      * @see #ask(Element)
      */
-    public boolean sendAndWaitElement(Element element) {
+    protected boolean sendAndWaitElement(Element element) {
         if (element == null) return true;
         final String tag = element.getTagName();
         try {
@@ -532,7 +532,7 @@ public class Connection implements Closeable {
      * @see #send(Element)
      * @see #sendAndWait(Element)
      */
-    public Element askElement(Element element) throws IOException {
+    protected Element askElement(Element element) throws IOException {
         Element reply = askInternal(element);
         logger.fine("Ask: " + element.getTagName()
             + ", reply: " + ((reply == null) ? "null" : reply.getTagName()));
