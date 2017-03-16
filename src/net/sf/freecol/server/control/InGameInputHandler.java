@@ -33,6 +33,7 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.ContinueMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeclineMoundsMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
@@ -44,6 +45,8 @@ import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
+import net.sf.freecol.common.networking.EndTurnMessage;
+import net.sf.freecol.common.networking.EnterRevengeModeMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
@@ -70,6 +73,7 @@ import net.sf.freecol.common.networking.PayForBuildingMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RenameMessage;
+import net.sf.freecol.common.networking.RetireMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
@@ -145,9 +149,9 @@ public final class InGameInputHandler extends ServerInputHandler {
         register(ClearSpecialityMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
                 new ClearSpecialityMessage(getGame(), e)));
-        register(TrivialMessage.CONTINUE_TAG,
+        register(ContinueMessage.TAG,
             (Connection conn, Element e) -> handler(false, conn,
-                TrivialMessage.CONTINUE_MESSAGE));
+                TrivialMessage.continueMessage));
         register(DeclareIndependenceMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
                 new DeclareIndependenceMessage(getGame(), e)));
@@ -178,12 +182,12 @@ public final class InGameInputHandler extends ServerInputHandler {
         register(EmigrateUnitMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
                 new EmigrateUnitMessage(getGame(), e)));
-        register(TrivialMessage.END_TURN_TAG,
+        register(EndTurnMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
-                TrivialMessage.END_TURN_MESSAGE));
-        register(TrivialMessage.ENTER_REVENGE_MODE_TAG,
+                TrivialMessage.endTurnMessage));
+        register(EnterRevengeModeMessage.TAG,
             (Connection conn, Element e) -> handler(false, conn,
-                TrivialMessage.ENTER_REVENGE_MODE_MESSAGE));
+                TrivialMessage.enterRevengeModeMessage));
         register(EquipForRoleMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
                 new EquipForRoleMessage(getGame(), e)));
@@ -259,9 +263,9 @@ public final class InGameInputHandler extends ServerInputHandler {
         register(RenameMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
                 new RenameMessage(getGame(), e)));
-        register(TrivialMessage.RETIRE_TAG,
+        register(RetireMessage.TAG,
             (Connection conn, Element e) -> handler(false, conn,
-                TrivialMessage.RETIRE_MESSAGE));
+                TrivialMessage.retireMessage));
         register(ScoutIndianSettlementMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
                 new ScoutIndianSettlementMessage(getGame(), e)));

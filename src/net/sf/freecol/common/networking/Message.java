@@ -395,8 +395,8 @@ public abstract class Message {
      * @exception FreeColException if there is a problem handling the message.
      */
     public void clientHandler(FreeColClient freeColClient)
-        throws FreeColException
-    { // Do nothing, overriding routines do the real work
+        throws FreeColException {
+        ; // Do nothing, overriding routines do the real work
     }
 
     /**

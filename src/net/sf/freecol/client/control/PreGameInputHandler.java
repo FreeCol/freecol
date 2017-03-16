@@ -23,9 +23,6 @@ import java.awt.Color;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-import javax.swing.SwingUtilities;
-
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -50,11 +47,11 @@ import net.sf.freecol.common.networking.SetAvailableMessage;
 import net.sf.freecol.common.networking.SetColorMessage;
 import net.sf.freecol.common.networking.SetNationMessage;
 import net.sf.freecol.common.networking.SetNationTypeMessage;
+import net.sf.freecol.common.networking.StartGameMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
-import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer.ServerState;
 
 import org.w3c.dom.Element;
@@ -94,7 +91,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> setColor(e));
         register(SetNationMessage.TAG,
             (Connection c, Element e) -> setNation(e));
-        register(TrivialMessage.START_GAME_TAG,
+        register(StartGameMessage.TAG,
             (Connection c, Element e) -> startGame(e));
         register(UpdateMessage.TAG,
             (Connection c, Element e) -> update(e));
@@ -295,21 +292,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
      *     tree) that holds all the information.
      */
     private void startGame(@SuppressWarnings("unused") Element element) {
-        new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
-                @Override
-                public void run() {
-                    Game game;
-                    for (;;) {
-                        game = getGame();
-                        if (game != null && game.getMap() != null) break;
-                        Utils.delay(200, "Starting a game has been interupted.");
-                    }
-                    
-                    SwingUtilities.invokeLater(() -> {
-                            pgc().startGame();
-                        });
-                }
-            }.start();
+        pgc().startGame();
     }
 
     /**

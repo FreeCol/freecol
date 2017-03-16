@@ -1875,6 +1875,19 @@ public final class InGameController extends Controller {
         return cs;
     }
 
+    /**
+     * Disconnect the client.
+     *
+     * @param serverPlayer The {@code ServerPlayer} to disconnect.
+     * @return Null, we never reply to a disconnect.
+     */
+    public ChangeSet disconnect(ServerPlayer serverPlayer) {
+        final FreeColServer freeColServer = getFreeColServer();
+        if (serverPlayer != null) {
+            freeColServer.removePlayerConnection(serverPlayer);
+        }
+        return null;
+    }
 
     /**
      * Disembark unit from a carrier.

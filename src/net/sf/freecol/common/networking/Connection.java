@@ -335,14 +335,14 @@ public class Connection implements Closeable {
      * Signal that this connection is disconnecting.
      */
     public void sendDisconnect() {
-        send(TrivialMessage.DISCONNECT_MESSAGE);
+        send(TrivialMessage.disconnectMessage);
     }
 
     /**
      * Send a reconnect message.
      */
     public void sendReconnect() {
-        send(TrivialMessage.RECONNECT_MESSAGE);
+        send(TrivialMessage.reconnectMessage);
     }
 
     /**

@@ -59,9 +59,11 @@ import net.sf.freecol.common.networking.AnimateAttackMessage;
 import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
+import net.sf.freecol.common.networking.CloseMenusMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FeatureChangeMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
@@ -80,6 +82,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.NewTurnMessage;
+import net.sf.freecol.common.networking.ReconnectMessage;
 import net.sf.freecol.common.networking.RemoveMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
@@ -116,15 +119,8 @@ public final class InGameInputHandler extends ClientInputHandler {
 
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
-    // A bunch of predefined non-closure runnables.
-    private final Runnable closeMenusRunnable = () -> {
-        igc().closeMenus();
-    };
     private final Runnable displayModelMessagesRunnable = () -> {
         igc().displayModelMessages(false);
-    };
-    private final Runnable reconnectRunnable = () -> {
-        igc().reconnect();
     };
 
 
@@ -151,15 +147,15 @@ public final class InGameInputHandler extends ClientInputHandler {
         register(ChooseFoundingFatherMessage.TAG,
             (Connection c, Element e) ->
                 chooseFoundingFather(new ChooseFoundingFatherMessage(getGame(), e)));
-        register(TrivialMessage.CLOSE_MENUS_TAG,
+        register(CloseMenusMessage.TAG,
             (Connection c, Element e) ->
-                closeMenus());
+                TrivialMessage.closeMenusMessage.clientHandler(freeColClient));
         register(DiplomacyMessage.TAG,
             (Connection c, Element e) ->
                 diplomacy(new DiplomacyMessage(getGame(), e)));
-        register(TrivialMessage.DISCONNECT_TAG,
+        register(DisconnectMessage.TAG,
             (Connection c, Element e) ->
-                disconnect(TrivialMessage.DISCONNECT_MESSAGE));
+                TrivialMessage.disconnectMessage.clientHandler(freeColClient));
         register(ErrorMessage.TAG,
             (Connection c, Element e) ->
                 error(new ErrorMessage(getGame(), e)));
@@ -211,9 +207,9 @@ public final class InGameInputHandler extends ClientInputHandler {
         register(NewTradeRouteMessage.TAG,
             (Connection c, Element e) ->
                 newTradeRoute(new NewTradeRouteMessage(getGame(), e)));
-        register(TrivialMessage.RECONNECT_TAG,
+        register(ReconnectMessage.TAG,
             (Connection c, Element e) ->
-                reconnect());
+                TrivialMessage.reconnectMessage.clientHandler(freeColClient));
         register(RemoveMessage.TAG,
             (Connection c, Element e) ->
                 remove(new RemoveMessage(getGame(), e)));
@@ -400,19 +396,6 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle the "closeMenus"-message.
-     */
-    private void closeMenus() {
-        // This is a trivial handler to allow the server to signal to
-        // the client that an offer that caused a popup (for example,
-        // a native demand or diplomacy proposal) has not been
-        // answered quickly enough and that the offering player has
-        // assumed this player has refused-by-inaction, and therefore,
-        // the popup needs to be closed.
-        invokeAndWait(closeMenusRunnable);
-    }
-
-    /**
      * Handle a "diplomacy"-message.
      *
      * @param message The {@code DiplomacyMessage} to process.
@@ -434,16 +417,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().diplomacy(our, other, agreement));
-    }
-
-    /**
-     * Handle a "disconnect"-message.
-     *
-     * @param message The disconnect message.
-     */
-    private void disconnect(TrivialMessage message) {
-        // Clients do not need to do anything on disconnect, closing
-        // the server end suffices.
     }
 
     /**
@@ -785,17 +758,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().newTurn(n));
-    }
-
-    /**
-     * Handle an "reconnect"-message.
-     */
-    private void reconnect() {
-        // "reconnect" is sent when the server finds a severe problem that
-        // is likely to be localized to this client.  Call the controller
-        // reconnect dialog that gives the user the option to reload itself
-        // or quit.
-        invokeLater(reconnectRunnable);
     }
 
     /**

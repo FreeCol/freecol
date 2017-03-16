@@ -33,6 +33,7 @@ import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.Message;
@@ -74,8 +75,8 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     public ClientInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
 
-        register(TrivialMessage.DISCONNECT_TAG, (Connection c, Element e) ->
-            disconnect());
+        register(DisconnectMessage.TAG, (Connection c, Element e) ->
+            TrivialMessage.disconnectMessage.clientHandler(freeColClient));
         register(GameStateMessage.TAG, (Connection c, Element e) ->
             new GameStateMessage(getGame(), e).clientHandler(freeColClient));
         register(MultipleMessage.TAG, (Connection c, Element e) ->
@@ -108,13 +109,6 @@ public abstract class ClientInputHandler extends FreeColClientHolder
 
 
     // Useful handlers
-
-    /**
-     * Handle a "disconnect"-message.
-     */
-    protected void disconnect() {
-        ; // Do nothing
-    }
 
     /**
      * Handle a "multiple"-message.

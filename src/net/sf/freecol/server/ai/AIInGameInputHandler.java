@@ -48,8 +48,10 @@ import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
+import net.sf.freecol.common.networking.CloseMenusMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
+import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.ErrorMessage;
@@ -69,12 +71,14 @@ import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
+import net.sf.freecol.common.networking.ReconnectMessage;
 import net.sf.freecol.common.networking.RemoveMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
 import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.networking.SetStanceMessage;
+import net.sf.freecol.common.networking.StartGameMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.server.FreeColServer;
@@ -215,7 +219,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
             case NewRegionNameMessage.TAG:
                 newRegionName(new NewRegionNameMessage(game, element));
                 break;
-            case TrivialMessage.RECONNECT_TAG:
+            case ReconnectMessage.TAG:
                 logger.info("Reconnect on illegal operation.");
                 break;
             case SetAIMessage.TAG:
@@ -233,9 +237,9 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
             case AnimateMoveMessage.TAG:
             case AssignTradeRouteMessage.TAG:
             case ChatMessage.TAG:
-            case TrivialMessage.CLOSE_MENUS_TAG:
+            case CloseMenusMessage.TAG:
             case DeleteTradeRouteMessage.TAG:
-            case TrivialMessage.DISCONNECT_TAG:
+            case DisconnectMessage.TAG:
             case ErrorMessage.TAG:
             case FeatureChangeMessage.TAG:
             case GameEndedMessage.TAG:
@@ -247,7 +251,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
             case ScoutSpeakToChiefMessage.TAG:
             case SetDeadMessage.TAG:
             case SetStanceMessage.TAG:
-            case TrivialMessage.START_GAME_TAG:
+            case StartGameMessage.TAG:
             case UpdateMessage.TAG:
                 break;
             default:

@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.RegisterServerMessage;
@@ -85,7 +86,7 @@ public class MetaServerUtils {
             if (element == null) return null;
             final String tag = element.getTagName();
             switch (tag) {
-            case TrivialMessage.DISCONNECT_TAG:
+            case DisconnectMessage.TAG:
                 disconnect();
                 break;
             case ServerListMessage.TAG:

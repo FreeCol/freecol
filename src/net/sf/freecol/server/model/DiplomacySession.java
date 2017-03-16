@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
+import net.sf.freecol.common.networking.CloseMenusMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.TrivialMessage;
@@ -322,9 +323,9 @@ public class DiplomacySession extends TimedSession {
         boolean ret = complete(false, cs);
         if (!ret) { // Withdraw offer
             cs.add(See.only((ServerPlayer)this.agreement.getSender()),
-                   TrivialMessage.CLOSE_MENUS_MESSAGE);
+                   TrivialMessage.closeMenusMessage);
             cs.add(See.only((ServerPlayer)this.agreement.getRecipient()),
-                   TrivialMessage.CLOSE_MENUS_MESSAGE);
+                   TrivialMessage.closeMenusMessage);
         }
         getGame().sendToAll(cs);
         return ret;

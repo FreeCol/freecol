@@ -31,57 +31,40 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
- * A wrapper message.  That is a message with just a reply identifier
- * attribute to be matched, and the underlying real message.
+ * A trivial message to indicate disconnection.
  */
-public abstract class WrapperMessage extends AttributeMessage {
+public class DisconnectMessage extends TrivialMessage {
 
-    public static final String REPLY_ID_TAG = "networkReplyId";
-
-    /** The encapsulated message. */
-    protected Message message = null;
-
+    public static final String TAG = "disconnect";
+    
 
     /**
-     * Create a new {@code WrapperMessage} of a given type.
-     *
-     * @param tag The actual message tag.
-     * @param replyId The reply id.
-     * @param message The {@code Message} to encapsulate.
+     * Create a new {@code DisconnectMessage}.
      */
-    protected WrapperMessage(String tag, int replyId, Message message) {
-        super(tag, REPLY_ID_TAG, String.valueOf(replyId));
-
-        this.message = message;
+    public DisconnectMessage() {
+        super(TAG);
     }
 
     /**
-     * Create a new {@code WrapperMessage} from a stream.
+     * Create a new {@code DisconnectMessage} from a stream.
      *
-     * @param tag The actual message tag.
-     * @param game The {@code Game} to read within.
+     * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      * @exception FreeColException if the internal message can not be read.
      */
-    protected WrapperMessage(String tag, Game game, FreeColXMLReader xr)
-        throws XMLStreamException, FreeColException {
-        super(tag, REPLY_ID_TAG, xr.getAttribute(REPLY_ID_TAG, (String)null));
-
-        xr.nextTag();
-        this.message = Message.read(game, xr);
-        xr.closeTag(tag);
+    public DisconnectMessage(Game game, FreeColXMLReader xr)
+        throws FreeColException, XMLStreamException {
+        super(TAG, game, xr);
     }
-        
+
 
     /**
      * {@inheritDoc}
      */
-    public void clientHandler(FreeColClient freeColClient)
-        throws FreeColException {
-        if (this.message != null) {
-            this.message.clientHandler(freeColClient);
-        }
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        ; // Do nothing on the client side
     }
 
     /**
@@ -90,14 +73,6 @@ public abstract class WrapperMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        return (this.message == null) ? null
-            : this.message.serverHandler(freeColServer, serverPlayer);
-    }
-
-
-    // Public interface
-
-    public int getReplyId() {
-        return getIntegerAttribute(REPLY_ID_TAG, -1);
+        return igc(freeColServer).disconnect(serverPlayer);
     }
 }

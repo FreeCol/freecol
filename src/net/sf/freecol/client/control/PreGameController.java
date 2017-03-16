@@ -23,6 +23,9 @@ import java.awt.Color;
 
 import java.util.logging.Logger;
 
+import javax.swing.SwingUtilities;
+
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
@@ -41,6 +44,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -144,29 +148,49 @@ public final class PreGameController extends FreeColClientHolder {
     }
 
     /**
-     * Starts the game.
+     * Start the game.
+     */
+    public void startGame() {
+        Game game;
+        for (;;) {
+            game = getGame();
+            if (game != null && game.getMap() != null) break;
+            Utils.delay(200, "Starting a game has been interupted.");
+        }
+
+        new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
+                @Override
+                public void run() {
+                    SwingUtilities.invokeLater(() -> {
+                            startGameInternal();
+                        });
+                }
+        }.start();
+    }
+    
+    /**
+     * Internal start of the game.
      *
      * @return True if the player should continue, false if we are in
      *     a debug run and should be skipping turns.
      */
-    public boolean startGame() {
+    private boolean startGameInternal() {
         final FreeColClient fcc = getFreeColClient();
         final Player player = getMyPlayer();
         final GUI gui = getGUI();
-
         // Clear the main display
         gui.closeMainPanel();
         gui.closeMenus();
         gui.closeStatusPanel();
-
+        
         // Stop the long introduction sound and play the player intro
         getSoundController().playSound(null);
         getSoundController().playSound("sound.intro." + player.getNationId());
-
+        
         // Switch to InGame mode
         fcc.changeClientState(true);
         gui.initializeInGame();
-
+        
         // Clean up autosaves
         final ClientOptions co = getClientOptions();
         if (player.isAdmin() && co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
@@ -174,19 +198,19 @@ public final class PreGameController extends FreeColClientHolder {
                 .removeAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX));
             if (logMe != null) logger.info(logMe);
         }
-
+        
         // Sort out the unit initialization
         final Game game = getGame();
         fcc.restoreGUI(player);
         game.setInitialActiveUnitId(null);
-
+        
         // Check for debug skipping
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && FreeColDebugger.getDebugRunTurns() > 0) {
             fcc.skipTurns(FreeColDebugger.getDebugRunTurns());
             return false;
         }
-
+        
         // Tutorial message if needed
         if (game.getTurn().getNumber() == 1) {
             player.addStartGameMessage();

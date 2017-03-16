@@ -389,17 +389,17 @@ final class ReceivingThread extends Thread {
             tag = xr.getLocalName();
             replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
         } catch (XMLStreamException xse) {
-            tag = TrivialMessage.DISCONNECT_TAG;
+            tag = DisconnectMessage.TAG;
         }
 
         // Read the message, optionally create a thread to handle it
         Thread t = null;
         DOMMessage msg = null;
         switch (tag) {
-        case TrivialMessage.DISCONNECT_TAG:
+        case DisconnectMessage.TAG:
             // Do not actually read the message, it might be a fake one
             // due to end-of-stream.
-            msg = TrivialMessage.DISCONNECT_MESSAGE;
+            msg = TrivialMessage.disconnectMessage;
             t = update(msg);
             askToStop();
             break;

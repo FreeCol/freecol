@@ -19,9 +19,13 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
@@ -31,43 +35,32 @@ import org.w3c.dom.Element;
 
 
 /**
- * The basic trivial message, with just a name and possibly some attributes.
+ * The basic trivial message, with just a name.
  */
-public class TrivialMessage extends DOMMessage {
-
-    private static final String TRIVIAL_TAG = "trivial";
+public abstract class TrivialMessage extends DOMMessage {
 
     /*
      * True trivial messages have no distinguishing parts, so we might
      * as well just use some explicit constants.
      */
-    public static final String CLOSE_MENUS_TAG = "closeMenus";
-    public static final TrivialMessage CLOSE_MENUS_MESSAGE
-        = new TrivialMessage(CLOSE_MENUS_TAG);
-    public static final String CONTINUE_TAG = "continuePlaying";
-    public static final TrivialMessage CONTINUE_MESSAGE
-        = new TrivialMessage(CONTINUE_TAG);
-    public static final String DISCONNECT_TAG = "disconnect";
-    public static final TrivialMessage DISCONNECT_MESSAGE
-        = new TrivialMessage(DISCONNECT_TAG);
-    public static final String END_TURN_TAG = "endTurn";
-    public static final TrivialMessage END_TURN_MESSAGE
-        = new TrivialMessage(END_TURN_TAG);
-    public static final String ENTER_REVENGE_MODE_TAG = "enterRevengeMode";
-    public static final TrivialMessage ENTER_REVENGE_MODE_MESSAGE
-        = new TrivialMessage(ENTER_REVENGE_MODE_TAG);
-    public static final String RECONNECT_TAG = "reconnect";
-    public static final TrivialMessage RECONNECT_MESSAGE
-        = new TrivialMessage(RECONNECT_TAG);
-    public static final String REQUEST_LAUNCH_TAG = "requestLaunch";
-    public static final TrivialMessage REQUEST_LAUNCH_MESSAGE
-        = new TrivialMessage(REQUEST_LAUNCH_TAG);
-    public static final String RETIRE_TAG = "retire";
-    public static final TrivialMessage RETIRE_MESSAGE
-        = new TrivialMessage(RETIRE_TAG);
-    public static final String START_GAME_TAG = "startGame";
-    public static final TrivialMessage START_GAME_MESSAGE
-        = new TrivialMessage(START_GAME_TAG);
+    public static final CloseMenusMessage closeMenusMessage
+        = new CloseMenusMessage();
+    public static final ContinueMessage continueMessage
+        = new ContinueMessage();
+    public static final DisconnectMessage disconnectMessage
+        = new DisconnectMessage();
+    public static final EndTurnMessage endTurnMessage
+        = new EndTurnMessage();
+    public static final EnterRevengeModeMessage enterRevengeModeMessage
+        = new EnterRevengeModeMessage();
+    public static final ReconnectMessage reconnectMessage
+        = new ReconnectMessage();
+    public static final RequestLaunchMessage requestLaunchMessage
+        = new RequestLaunchMessage();
+    public static final RetireMessage retireMessage
+        = new RetireMessage();
+    public static final StartGameMessage startGameMessage
+        = new StartGameMessage();
 
     /** The actual message type. */
     private final String type;
@@ -85,17 +78,35 @@ public class TrivialMessage extends DOMMessage {
     }
 
     /**
-     * Create a new {@code TrivialMessage} from a
-     * supplied element.
+     * Create a new {@code TrivialMessage} from a supplied element.
      *
+     * @param tag The message tag.
      * @param game The {@code Game} this message belongs to.
      * @param element The {@code Element} to use to create the message.
      */
-    public TrivialMessage(@SuppressWarnings("unused") Game game,
-                          Element element) {
-        this(element.getTagName());
+    protected TrivialMessage(String tag, @SuppressWarnings("unused") Game game,
+                             Element element) {
+        this(tag);
     }
 
+    /**
+     * Create a new {@code TrivialMessage} from a stream.
+     *
+     * @param tag The message tag.
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
+     * @exception FreeColException if the internal message can not be read.
+     */
+    protected TrivialMessage(String tag, @SuppressWarnings("unused") Game game,
+                             FreeColXMLReader xr)
+        throws FreeColException, XMLStreamException {
+        this(tag);
+
+        xr.nextTag();
+        xr.closeTag(tag);
+    }
+    
 
     /**
      * {@inheritDoc}
@@ -105,22 +116,8 @@ public class TrivialMessage extends DOMMessage {
         return Message.MessagePriority.NORMAL;
     }
 
-
-    private InGameController igc(FreeColServer freeColServer) {
-        return freeColServer.getInGameController();
-    }
-
-    private PreGameController pgc(FreeColServer freeColServer) {
-        return freeColServer.getPreGameController();
-    }
-
-
-    // Public interface
-
     /**
-     * Get the type of the message.
-     *
-     * @return The type name.
+     * {@inheritDoc}
      */
     @Override
     public String getType() {
@@ -128,32 +125,35 @@ public class TrivialMessage extends DOMMessage {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        switch (this.type) {
-        case CONTINUE_TAG:
-            return igc(freeColServer).continuePlaying(serverPlayer);
-        case DISCONNECT_TAG:
-            if (serverPlayer != null) {
-                freeColServer.removePlayerConnection(serverPlayer);
-            }
-            return null; // Never reply to disconnect
-        case END_TURN_TAG:
-            return igc(freeColServer).endTurn(serverPlayer);
-        case ENTER_REVENGE_MODE_TAG:
-            return igc(freeColServer).enterRevengeMode(serverPlayer);
-        case REQUEST_LAUNCH_TAG:
-            return pgc(freeColServer).requestLaunch(serverPlayer);
-        case RETIRE_TAG:
-            return igc(freeColServer).retire(serverPlayer);
-        // Only sent to client
-        case CLOSE_MENUS_TAG: case RECONNECT_TAG: case START_GAME_TAG:
-        default:
-            return super.serverHandler(freeColServer, serverPlayer);
-        }
-    }        
+    // Convenience methods for the subclasses
+
+    protected net.sf.freecol.client.control.InGameController
+        igc(FreeColClient freeColClient) {
+        return freeColClient.getInGameController();
+    }
+
+    protected net.sf.freecol.server.control.InGameController
+        igc(FreeColServer freeColServer) {
+        return freeColServer.getInGameController();
+    }
+
+    protected void invokeAndWait(FreeColClient freeColClient,
+                                 Runnable runnable) {
+        freeColClient.getGUI().invokeNowOrWait(runnable);
+    }
+
+    protected void invokeLater(FreeColClient freeColClient,
+                               Runnable runnable) {
+        freeColClient.getGUI().invokeNowOrLater(runnable);
+    }
+
+    protected net.sf.freecol.client.control.PreGameController
+        pgc(FreeColClient freeColClient) {
+        return freeColClient.getPreGameController();
+    }
+
+    protected net.sf.freecol.server.control.PreGameController
+        pgc(FreeColServer freeColServer) {
+        return freeColServer.getPreGameController();
+    }
 }

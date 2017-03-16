@@ -124,7 +124,7 @@ public class NativeDemandSession extends TimedSession {
         if (!ret) {
             completeInternal(result, cs);
             cs.add(See.only(getColonyOwner()),
-                   TrivialMessage.CLOSE_MENUS_MESSAGE);
+                   TrivialMessage.closeMenusMessage);
             getGame().sendToAll(cs);
         }
         return ret;

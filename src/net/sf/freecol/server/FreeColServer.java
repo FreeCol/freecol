@@ -733,7 +733,7 @@ public final class FreeColServer {
         }
 
         changeServerState(ServerState.IN_GAME);
-        sendToAll(TrivialMessage.START_GAME_MESSAGE, (ServerPlayer)null);
+        sendToAll(TrivialMessage.startGameMessage, (ServerPlayer)null);
         updateMetaServer();
     }
 

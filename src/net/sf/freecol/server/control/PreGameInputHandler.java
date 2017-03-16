@@ -22,6 +22,7 @@ package net.sf.freecol.server.control;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.ReadyMessage;
+import net.sf.freecol.common.networking.RequestLaunchMessage;
 import net.sf.freecol.common.networking.SetAvailableMessage;
 import net.sf.freecol.common.networking.SetColorMessage;
 import net.sf.freecol.common.networking.SetNationMessage;
@@ -53,9 +54,9 @@ public final class PreGameInputHandler extends ServerInputHandler {
         register(ReadyMessage.TAG,
             (Connection conn, Element e) -> handler(false, conn,
                 new ReadyMessage(getGame(), e)));
-        register(TrivialMessage.REQUEST_LAUNCH_TAG,
+        register(RequestLaunchMessage.TAG,
             (Connection conn, Element e) -> handler(false, conn,
-                TrivialMessage.REQUEST_LAUNCH_MESSAGE));
+                TrivialMessage.requestLaunchMessage));
         register(SetAvailableMessage.TAG,
             (Connection conn, Element e) -> handler(false, conn,
                 new SetAvailableMessage(getGame(), e)));
