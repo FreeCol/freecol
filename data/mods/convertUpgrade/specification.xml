@@ -22,7 +22,8 @@
   <unit-change-types>
     <unit-change-type id="model.unitChange.enterColony">
       <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
-      <unit-type-change from="model.unit.indianConvert"
+      <unit-type-change id="model.unitChange.enterColony.indianConvert"
+                        from="model.unit.indianConvert"
                         to="model.unit.freeColonist" probability="100"/>
     </unit-change-type>
   </unit-change-types>
