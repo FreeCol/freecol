@@ -254,7 +254,9 @@
     <unit-change-type id="model.unitChange.foundingFather">
       <unit-type-change id="model.unitChange.foundingFather.indianConvert"
                         from="model.unit.indianConvert"
-                        to="model.unit.freeColonist" probability="100"/>
+                        to="model.unit.freeColonist" probability="100">
+        <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
     </unit-change-type>
     <unit-change-type id="model.unitChange.independence">
       <unit-type-change id="model.unitChange.independence.veteranSoldier"
