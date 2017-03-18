@@ -45,6 +45,10 @@ public class UnitTypeChange extends FreeColSpecObjectType {
     /** The number of turns for the change to take, if not immediate. */
     public int turns;
 
+    // @compat 0.11.6
+    static int fakeIdIndex = 1;
+    // end @compat 0.11.6
+
 
     /**
      * Trivial constructor.
@@ -123,6 +127,21 @@ public class UnitTypeChange extends FreeColSpecObjectType {
         this.probability = xr.getAttribute(PROBABILITY_TAG, 0);
 
         this.turns = xr.getAttribute(TURNS_TAG, -1);
+
+        // @compat 0.11.6
+
+        // UnitTypeChange became a FreeColSpecObjectType in 0.11.6, and
+        // thus gained an identifier.  Make sure we provide one,
+        // even if is fake.  This is mostly fixed by the compatibility
+        // fragment load in Specification.fixUnitChanges, but that does not
+        // handle mods.
+        String id = getId();
+        if (id == null || "".equals(id)) {
+            id = "model.unitChange.faked." + fakeIdIndex++;
+System.err.println("FAKED ID " + id);
+            setId(id);
+        }
+        // end @compat 0.11.6
     }
 
     /**
@@ -145,5 +164,4 @@ public class UnitTypeChange extends FreeColSpecObjectType {
         if (this.turns > 0) sb.append('/').append(this.turns);
         return sb.toString();
     }            
-};
-
+}

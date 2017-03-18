@@ -306,13 +306,6 @@ public final class Specification {
     /** The turn number for the game ages for FF recruitment. */
     private final int[] ages = new int[NUMBER_OF_AGES];
 
-    // @compat 0.11.6
-    /**
-     * Do we need to load the unit-change-types backward
-     * compatibility fragment. */
-    private boolean needUnitChangeTypes = false;
-    // end @compat 0.11.6
-
 
     /**
      * Creates a new Specification object.
@@ -777,16 +770,6 @@ public final class Specification {
         clean("merged map options (" + who + ")");
         return true;
     }
-
-    // @compat 0.11.6
-    /**
-     * Call this when old style unit changes are seen, so the spec can
-     * load the backward compatiblity fragment.
-     */
-    public void setNeedUnitChangeTypes() {
-        this.needUnitChangeTypes = true;
-    }
-    // end @compat 0.11.6
 
     private interface ChildReader {
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
@@ -2070,6 +2053,8 @@ public final class Specification {
      * which can most accurately determine whether it is needed.
      */
     private void fixRoles() {
+        if (!roles.isEmpty()) return; // Trust what is there
+
         boolean zero10X;
         try {
             zero10X = Double.parseDouble(version) < 0.86;
@@ -2077,6 +2062,7 @@ public final class Specification {
             zero10X = true;
         }
         if (!zero10X) return;
+
         File rolf = FreeColDirectories.getCompatibilityFile(ROLES_COMPAT_FILE_NAME);
         try (
             FileInputStream fis = new FileInputStream(rolf);
@@ -2093,6 +2079,37 @@ public final class Specification {
                         Collectors.joining(" ")));
     }
     // end @compat 0.11.0
+
+    // @compat 0.11.6
+    private void fixUnitChanges() {
+        // Unlike roles, we can not trust what is already there, as the changes
+        // are deeper.
+
+        boolean zero116;
+        try {
+            zero116 = Double.parseDouble(version) < 0.117;
+        } catch (Exception e) {
+            zero116 = true;
+        }
+        if (!zero116) return;
+
+        unitChangeTypeList.clear();
+        File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
+        try (
+             FileInputStream fis = new FileInputStream(uctf);
+             ) {
+            load(fis);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to load unit changes.", e);
+            return;
+        }
+
+        logger.info("Loading unit-changes backward compatibility fragment: "
+            + UNIT_CHANGE_TYPES_COMPAT_FILE_NAME + " with changes: "
+            + transform(getUnitChangeTypeList(), alwaysTrue(),
+                UnitChangeType::getId, Collectors.joining(" ")));
+    }
+    // end @compat 0.11.6
 
     /**
      * Backward compatibility for the Specification in general.
@@ -2938,27 +2955,11 @@ public final class Specification {
             }
         }
         // @compat 0.11.0
-        if (roles.isEmpty()) fixRoles();
+        fixRoles();
         // end @compat 0.11.0
 
         // @compat 0.11.6
-        if (this.needUnitChangeTypes) {
-            this.needUnitChangeTypes = false;
-            File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
-            try (
-                 FileInputStream fis = new FileInputStream(uctf);
-                 ) {
-                load(fis);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to load unit-change-types.", e);
-                return;
-            }
-
-            logger.info("Loading unit-change-types backward compatibility fragment: "
-                + UNIT_CHANGE_TYPES_COMPAT_FILE_NAME + " with changes: "
-                + transform(getUnitChangeTypeList(), alwaysTrue(),
-                            UnitChangeType::getId, Collectors.joining(" ")));
-        }
+        fixUnitChanges();
         // end @compat 0.11.6
     }
 
