@@ -314,6 +314,13 @@ final class ReceivingThread extends Thread {
     }
 
     // Individual parts of listen().  Work in progress
+    private DOMMessage domReader()
+        throws IOException, SAXException {
+        this.in.enable();
+        this.in.reset();
+        return new DOMMessage(this.in);
+    }
+
     private DOMMessage reader(BufferedInputStream bis)
         throws IOException, SAXException {
         //bis.reset();
@@ -408,9 +415,7 @@ final class ReceivingThread extends Thread {
             // A reply.  Always respond, even when failing, so as to
             // unblock the waiting thread.
             try {
-                this.in.enable();
-                this.in.reset();
-                msg = reader(this.in);
+                msg = domReader();
                 reply(msg, replyId);
             } catch (IOException|SAXException ex) {
                 reply(null, replyId);
@@ -420,9 +425,7 @@ final class ReceivingThread extends Thread {
 
         case Connection.QUESTION_TAG:
             // A query.  Build a thread to handle it and send a reply.
-            this.in.enable();
-            this.in.reset();
-            msg = reader(this.in);
+            msg = domReader();
             t = query(msg, replyId);
             break;
             
@@ -441,11 +444,7 @@ final class ReceivingThread extends Thread {
                 logger.log(Level.FINEST, "ReceivingThread: " + ex.getMessage());
             }
 
-            if (msg == null) {
-                this.in.enable();
-                this.in.reset();
-                msg = reader(this.in);
-            }
+            if (msg == null) msg = domReader();
             t = update(msg);
             break;
         }
