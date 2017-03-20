@@ -97,7 +97,21 @@ public abstract class WrapperMessage extends AttributeMessage {
 
     // Public interface
 
+    /**
+     * Get the reply identifier.
+     *
+     * @return The reply identifier.
+     */
     public int getReplyId() {
         return getIntegerAttribute(REPLY_ID_TAG, -1);
+    }
+
+    /**
+     * Get the wrapped message.
+     *
+     * @return The {@code Message}.
+     */
+    public Message getMessage() {
+        return this.message;
     }
 }

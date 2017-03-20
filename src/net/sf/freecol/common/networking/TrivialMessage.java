@@ -106,7 +106,7 @@ public abstract class TrivialMessage extends DOMMessage {
         xr.nextTag();
         xr.closeTag(tag);
     }
-    
+
 
     /**
      * {@inheritDoc}
