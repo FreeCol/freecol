@@ -655,12 +655,6 @@ public final class GoodsType extends FreeColSpecObjectType {
 
         productionWeight = xr.getAttribute(PRODUCTION_WEIGHT_TAG,
             DEFAULT_PRODUCTION_WEIGHT);
-        // @compat 0.10.7
-        if (!xr.hasAttribute(PRODUCTION_WEIGHT_TAG) && isFarmed) {
-            // Use something a bit more than the default for old games
-            productionWeight = 3.0f;
-        }
-        // end @compat 0.10.7
 
         lowProductionThreshold = xr.getAttribute(LOW_PRODUCTION_THRESHOLD_TAG,
             DEFAULT_LOW_PRODUCTION_THRESHOLD);
