@@ -223,12 +223,8 @@ public class Force extends FreeColSpecObject {
                     
     // Serialization
 
-    // @compat 0.10.5
-    // do not delete! just revert to private, public for now because of
-    // back compatibility code in Monarch
-    public static final String LAND_UNITS_TAG = "landUnits";
-    public static final String NAVAL_UNITS_TAG = "navalUnits";
-    // end @compat
+    private static final String LAND_UNITS_TAG = "landUnits";
+    private static final String NAVAL_UNITS_TAG = "navalUnits";
 
 
     /**
