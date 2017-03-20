@@ -40,6 +40,7 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.common.util.Utils;
 
@@ -90,11 +91,16 @@ public class Connection implements Closeable {
 
     private String name;
 
+    /** Main message writer. */
+    private FreeColXMLWriter xw;
+    
     /** The transformer for logging, also used as a lock for logWriter. */
     private final Transformer logTransformer;
     /** The Writer to write logging messages to. */
     private final Writer logWriter;
-
+    /** The FreeColXMLWriter to write logging messages to. */
+    private final FreeColXMLWriter lw;
+    
 
     /**
      * Trivial constructor.
@@ -110,15 +116,25 @@ public class Connection implements Closeable {
         this.out = null;
         this.receivingThread = null;
         this.domMessageHandler = null;
+        this.xw = null;
 
         // Make a (pretty printing) transformer, but only make the log
         // writer in COMMS-debug mode.
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
             this.logWriter = Utils.getUTF8Writer(System.err);
             this.logTransformer = Utils.makeTransformer(true, true);
+            FreeColXMLWriter lw;
+            try {
+                lw = new FreeColXMLWriter(this.logWriter,
+                    FreeColXMLWriter.WriteScope.toSave(), true);
+            } catch (IOException ioe) {
+                lw = null;
+            }
+            this.lw = lw;
         } else {
             this.logWriter = null;
             this.logTransformer = null;
+            this.lw = null;
         }
     }
 
@@ -141,6 +157,8 @@ public class Connection implements Closeable {
         this.out = socket.getOutputStream();
         this.receivingThread = new ReceivingThread(this, this.in, name);
         this.domMessageHandler = domMessageHandler;
+        this.xw = new FreeColXMLWriter(this.out,
+            FreeColXMLWriter.WriteScope.toSave(), false);
 
         this.receivingThread.start();
     }
@@ -223,6 +241,10 @@ public class Connection implements Closeable {
     private void closeOutputStream() {
         synchronized (this.outputLock) {
             if (this.out == null) return;
+            if (this.xw != null) {
+                this.xw.close();
+                this.xw = null;
+            }
             try {
                 this.out.close();
             } catch (IOException ioe) {
@@ -416,6 +438,26 @@ public class Connection implements Closeable {
     }
 
     /**
+     * Log message.
+     *
+     * @param message The {@code Message} to log.
+     * @param send True if sending (else replying).
+     */
+    protected void log(Message message, boolean send) {
+        if (message == null) return;
+        try {
+            synchronized (this.logWriter) {
+                this.lw.writeComment(this.name
+                    + ((send) ? SEND_SUFFIX : REPLY_SUFFIX));
+                message.toXML(this.lw);
+                this.lw.flush();
+            }
+        } catch (XMLStreamException xse) {
+            ; // Ignore logging failure
+        }
+    }
+
+    /**
      * Low level routine to send a message over this Connection.
      *
      * @param element The {@code Element} (root element in a
@@ -437,7 +479,26 @@ public class Connection implements Closeable {
         } catch (IOException ioe) {
             throw ioe;
         } catch (Exception ex) {
-            throw new IOException("sendInternal internal fail", ex);
+            throw new IOException("sendInternal fail", ex);
+        }
+        return true;
+    }
+
+    /**
+     * Low level routine to send a Message over this Connection.
+     *
+     * @param message The {@code Message} to send.
+     * @return True if the message was sent.
+     * @exception IOException If an error occur while sending the message.
+     */
+    private boolean sendMessageInternal(Message message) throws IOException {
+        try {
+            synchronized (this.outputLock) {
+                if (this.xw == null) return false;
+                message.toXML(xw);
+            }
+        } catch (Exception ex) {
+            throw new IOException("sendMessageInternal fail", ex);
         }
         return true;
     }
@@ -492,6 +553,25 @@ public class Connection implements Closeable {
         try {
             sendInternal(element);
             log(element, true);
+            logger.fine("Send: " + tag);
+            return true;
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Send fail: " + tag, ioe);
+        }
+        return false;
+    }
+
+    /**
+     * Send a message.
+     *
+     * @param message The {@code Message} to send.
+     */
+    public boolean sendMessage(Message message) {
+        if (message == null) return true;
+        final String tag = message.getType();
+        try {
+            sendMessageInternal(message);
+            log(message, true);
             logger.fine("Send: " + tag);
             return true;
         } catch (IOException ioe) {

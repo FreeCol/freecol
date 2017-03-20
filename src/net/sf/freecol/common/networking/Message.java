@@ -31,9 +31,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.lang.reflect.Constructor;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -411,6 +414,18 @@ public abstract class Message {
         return serverPlayer.clientError("Invalid message type: " + getType());
     }
 
+    /**
+     * Write this message as XML.
+     *
+     * @param xw The {@code FreeColXMLWriter} to write with.
+     * @exception XMLStreamException if there is a problem writing to
+     *     the stream.
+     */
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Do not implement here, yet.
+        throw new XMLStreamException(getType() + ".toXML NYI");
+    }
+        
     /**
      * Read a new message from a stream.
      *
