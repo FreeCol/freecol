@@ -623,15 +623,35 @@ public class Connection implements Closeable {
         return handleElement(element);
     }
 
+
+    // MessageHandler support
+
+    /**
+     * Handle a message using the MessageHandler.
+     *
+     * @param message The {@code Message} to handle.
+     * @return The result of the handler.
+     * @exception FreeColException if the message is corrupt.
+     */
+    public Message handle(Message message) throws FreeColException {
+        if (message == null) return null;
+        final MessageHandler mh = getMessageHandler();
+
+        // FIXME: Temporary hack
+        if (mh == null) {
+            throw new FreeColException("No handler for " + message.getType());
+        }
+
+        return mh.handle(message);
+    }
+
     /**
      * Read a message using the MessageHandler.
      *
      * @param xr The {@code FreeColXMLReader} to read from.
      * @return The {@code Message} found, if any.
-     * @exception FreeColException there is a problem instantiating
-     *     the message.
-     * @exception XMLStreamException if there is a problem reading the
-     *     stream.
+     * @exception FreeColException there is a problem instantiating the message.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
     public Message reader(FreeColXMLReader xr)
         throws FreeColException, XMLStreamException {
@@ -639,7 +659,7 @@ public class Connection implements Closeable {
         return (mh == null) ? null : mh.read(xr);
     }
 
-    
+
     // Client handling
 
     /**
