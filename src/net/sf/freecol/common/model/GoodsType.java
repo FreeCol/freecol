@@ -167,12 +167,12 @@ public final class GoodsType extends FreeColSpecObjectType {
         return this.isMilitary;
     }
 
-    // @compat 0.10.x
-    // Needed by Specification fixup010x()
+    // @compat 0.10.x/0.11.x
+    // Needed by Specification.fixSpec()
     public void setMilitary() {
         this.isMilitary = true;
     }
-    // end @compat 0.10.x
+    // end @compat 0.10.x/0.11.x
 
     /**
      * Do warehouse storage limits not apply to this goods type?
