@@ -276,19 +276,6 @@ public final class BuildingType extends BuildableType
                         && pt.appliesTo(level));
     }
 
-    // @compat 0.10.6
-    /**
-     * Get the type of goods consumed by this BuildingType.
-     *
-     * @return The consumed {@code GoodsType}.
-     */
-    private GoodsType getConsumedGoodsType() {
-        if (productionTypes.isEmpty()) return null;
-        AbstractGoods ag = first(first(productionTypes).getInputs());
-        return (ag == null) ? null : ag.getType();
-    }
-    // end @compat
-
     /**
      * Gets the type of goods produced by this BuildingType.
      *
@@ -468,11 +455,6 @@ public final class BuildingType extends BuildableType
     private static final String UPGRADES_FROM_TAG = "upgrades-from";
     private static final String UPKEEP_TAG = "upkeep";
     private static final String WORKPLACES_TAG = "workplaces";
-    // @compat 0.10.6
-    private static final String BASIC_PRODUCTION_TAG = "basicProduction";
-    private static final String CONSUMES_TAG = "consumes";
-    private static final String PRODUCES_TAG = "produces";
-    // end @compat 0.10.6
     // @compat 0.11.3
     private static final String OLD_MAX_SKILL_TAG = "maxSkill";
     private static final String OLD_MIN_SKILL_TAG = "minSkill";
@@ -547,9 +529,9 @@ public final class BuildingType extends BuildableType
             upgradesFrom = xr.getType(spec, OLD_UPGRADES_FROM_TAG,
                     BuildingType.class, (BuildingType)null);
         } else
-            // end @compat 0.11.3
+        // end @compat 0.11.3
             upgradesFrom = xr.getType(spec, UPGRADES_FROM_TAG,
-                    BuildingType.class, (BuildingType)null);
+                                      BuildingType.class, (BuildingType)null);
         if (upgradesFrom == null) {
             level = 1;
         } else {
@@ -563,14 +545,14 @@ public final class BuildingType extends BuildableType
         if (xr.hasAttribute(OLD_MIN_SKILL_TAG)) {
             minSkill = xr.getAttribute(OLD_MIN_SKILL_TAG, parent.minSkill);
         } else
-            // end @compat 0.11.3
+        // end @compat 0.11.3
             minSkill = xr.getAttribute(MINIMUM_SKILL_TAG, parent.minSkill);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_MAX_SKILL_TAG)) {
             maxSkill = xr.getAttribute(OLD_MAX_SKILL_TAG, parent.maxSkill);
         } else
-            // end @compat 0.11.3
+        // end @compat 0.11.3
             maxSkill = xr.getAttribute(MAXIMUM_SKILL_TAG, parent.maxSkill);
 
         upkeep = xr.getAttribute(UPKEEP_TAG, parent.upkeep);
@@ -586,18 +568,6 @@ public final class BuildingType extends BuildableType
 
         this.rebelFactor = xr.getAttribute(REBEL_FACTOR_TAG,
                 parent.rebelFactor);
-
-        // @compat 0.10.6
-        int basicProduction = xr.getAttribute(BASIC_PRODUCTION_TAG, -1);
-        if (basicProduction > 0) {
-            GoodsType consumes = xr.getType(spec, CONSUMES_TAG, GoodsType.class,
-                    parent.getConsumedGoodsType());
-            GoodsType produces = xr.getType(spec, PRODUCES_TAG, GoodsType.class,
-                    parent.getProducedGoodsType());
-            productionTypes.add(new ProductionType(consumes, produces,
-                    basicProduction));
-        }
-        // end @compat
 
         if (parent != this) { // Handle "extends" for super-type fields
             if (!xr.hasAttribute(REQUIRED_POPULATION_TAG)) {
