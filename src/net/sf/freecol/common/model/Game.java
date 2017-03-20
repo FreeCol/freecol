@@ -1357,9 +1357,6 @@ public class Game extends FreeColGameObject {
     private static final String SPANISH_SUCCESSION_TAG = "spanishSuccession";
     private static final String TURN_TAG = "turn";
     private static final String UUID_TAG = "UUID";
-    // @compat 0.10.x
-    private static final String OLD_NEXT_ID_TAG = "nextID";
-    // end @compat 0.10.x
 
 
     /**
@@ -1432,9 +1429,6 @@ public class Game extends FreeColGameObject {
         super.readAttributes(xr);
 
         nextId = xr.getAttribute(NEXT_ID_TAG, -1);
-        // @compat 0.10.x
-        if (nextId < 0) nextId = xr.getAttribute(OLD_NEXT_ID_TAG, 0);
-        // end @compat
 
         this.clientUserName = xr.getAttribute(CLIENT_USER_NAME_TAG,
                                               (String)null);
