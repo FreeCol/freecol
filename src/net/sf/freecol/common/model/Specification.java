@@ -771,6 +771,34 @@ public final class Specification {
         return true;
     }
 
+    /**
+     * Compare a spec version number with the current one.
+     *
+     * @param other The other spec version number.
+     * @return Positive if the current version is greater than the other,
+     *     negative if the current version is lower than the other,
+     *     zero if they are equal.
+     */
+    private int compareVersion(String other) {
+        String version = getVersion();
+        if (version == null) return 0;
+
+        final String rex = "\\.";
+        String[] sv = version.split(rex, 2);
+        String[] so = other.split(rex, 2);
+        if (sv.length == 2 && so.length == 2) {
+            int cmp;
+            try {
+                cmp = Integer.compare(Integer.parseInt(sv[0]),
+                                      Integer.parseInt(so[0]));
+                if (cmp != 0) return cmp;
+                return Integer.compare(Integer.parseInt(sv[1]),
+                                       Integer.parseInt(so[1]));
+            } catch (NumberFormatException nfe) {}
+        }
+        throw new RuntimeException("Bad version: " + other);
+    }
+
     private interface ChildReader {
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
     }
@@ -2061,13 +2089,7 @@ public final class Specification {
     private void fixRoles() {
         if (!roles.isEmpty()) return; // Trust what is there
 
-        boolean zero10X;
-        try {
-            zero10X = Double.parseDouble(version) < 0.86;
-        } catch (Exception e) {
-            zero10X = true;
-        }
-        if (!zero10X) return;
+        if (compareVersion("0.86") >= 0) return;
 
         File rolf = FreeColDirectories.getCompatibilityFile(ROLES_COMPAT_FILE_NAME);
         try (
@@ -2091,13 +2113,7 @@ public final class Specification {
         // Unlike roles, we can not trust what is already there, as the changes
         // are deeper.
 
-        boolean zero116;
-        try {
-            zero116 = Double.parseDouble(version) < 0.117;
-        } catch (Exception e) {
-            zero116 = true;
-        }
-        if (!zero116) return;
+        if (compareVersion("0.117") >= 0) return;
 
         unitChangeTypeList.clear();
         File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
