@@ -2913,8 +2913,13 @@ public final class Specification {
      *     the stream.
      */
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
+        // Beware!  We load mods onto an existing specification, but
+        // we do not want to overwrite its main attributes (id,
+        // difficulty, version) So only set those variables if they
+        // are currently null, as will be the case when we load the
+        // root specification.
         String newId = xr.readId();
-        if (id == null) id = newId; // don't overwrite id with parent id!
+        if (id == null) id = newId;
 
         if (difficultyLevel == null) {
             difficultyLevel = xr.getAttribute(DIFFICULTY_LEVEL_TAG,
@@ -2927,7 +2932,9 @@ public final class Specification {
             // end @compat 0.11.3
         }
 
-        version = xr.getAttribute(VERSION_TAG, (String)null);
+        if (version == null) {
+            version = xr.getAttribute(VERSION_TAG, (String)null);
+        }
 
         logger.fine("Reading specification " + newId
             + " difficulty=" + difficultyLevel
