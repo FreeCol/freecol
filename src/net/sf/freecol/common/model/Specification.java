@@ -2001,6 +2001,12 @@ public final class Specification {
         fixGameOptions();
         fixMapGeneratorOptions();
         fixOrphanOptions();
+        // @compat 0.11.0
+        fixRoles();
+        // end @compat 0.11.0
+        // @compat 0.11.6
+        fixUnitChanges();
+        // end @compat 0.11.6
         fixSpec();
     }
 
@@ -2954,13 +2960,6 @@ public final class Specification {
                 reader.readChildren(xr);
             }
         }
-        // @compat 0.11.0
-        fixRoles();
-        // end @compat 0.11.0
-
-        // @compat 0.11.6
-        fixUnitChanges();
-        // end @compat 0.11.6
     }
 
     /**
