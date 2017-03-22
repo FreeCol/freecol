@@ -21,10 +21,11 @@
 <freecol-specification id="convertUpgrade">
   <unit-change-types>
     <unit-change-type id="model.unitChange.enterColony">
-      <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
       <unit-type-change id="model.unitChange.enterColony.indianConvert"
                         from="model.unit.indianConvert"
-                        to="model.unit.freeColonist" probability="100"/>
+                        to="model.unit.freeColonist" probability="100">
+         <scope ability-id="model.ability.upgradeConvert" ability-value="true"/>
+      </unit-type-change>
     </unit-change-type>
   </unit-change-types>
 </freecol-specification>
