@@ -188,7 +188,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     // Serialization
 
     private static final String MAXIMUM_NUMBER_TAG = "maximumNumber";
-    private static final String OPTION_VALUE_TAG = "optionValue";
     private static final String TEMPLATE_TAG = "template";
 
 
@@ -248,37 +247,22 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (null != tag) // @compat 0.10.4
-            switch (tag) {
-            case OPTION_VALUE_TAG:
-                String modId = xr.readId();
-                logger.log(Level.FINEST, "Found old-style mod value: {0}",
-                        modId);
-                if (modId != null) {
-                    FreeColModFile fcmf = FreeColModFile.getFreeColModFile(modId);
-                    if (fcmf != null) {
-                        ModOption modOption = new ModOption(getSpecification());
-                        modOption.setValue(fcmf);
-                        addMember((AbstractOption<T>)modOption);
-                    }
-                }
-                // end @compat
-                break;
-            case TEMPLATE_TAG:
-                xr.nextTag();
-                template = (AbstractOption<T>)readOption(xr);
-                xr.closeTag(TEMPLATE_TAG);
-                break;
-            default:
-                AbstractOption<T> op = null;
-                try {
-                    op = (AbstractOption<T>)readOption(xr);
-                } catch (XMLStreamException xse) {
-                    logger.log(Level.WARNING, "Invalid option at: " + tag, xse);
-                    xr.closeTag(tag);
-                }
-                if (op != null) addMember(op);
-                break;
+        switch (tag) {
+        case TEMPLATE_TAG:
+            xr.nextTag();
+            template = (AbstractOption<T>)readOption(xr);
+            xr.closeTag(TEMPLATE_TAG);
+            break;
+        default:
+            AbstractOption<T> op = null;
+            try {
+                op = (AbstractOption<T>)readOption(xr);
+            } catch (XMLStreamException xse) {
+                logger.log(Level.WARNING, "Invalid option at: " + tag, xse);
+                xr.closeTag(tag);
+            }
+            if (op != null) addMember(op);
+            break;
         }
     }
 
