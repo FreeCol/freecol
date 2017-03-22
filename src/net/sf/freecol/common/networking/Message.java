@@ -27,6 +27,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.lang.reflect.Constructor;
@@ -418,14 +420,45 @@ public abstract class Message {
      * Write this message as XML.
      *
      * @param xw The {@code FreeColXMLWriter} to write with.
-     * @exception XMLStreamException if there is a problem writing to
-     *     the stream.
+     * @exception XMLStreamException if there is a problem writing the stream.
      */
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         // Do not implement here, yet.
         throw new XMLStreamException(getType() + ".toXML NYI");
+
+        // Should become:
+        //xw.writeStartElement(getType());
+        //
+        //writeAttributes(xw);
+        //
+        //writeChildren(xw);
+        //
+        //xw.writeEndElement();
     }
         
+    /**
+     * Write any attributes of this message.
+     *
+     * @param xw The {@code FreeColXMLWriter} to write to.
+     * @exception XMLStreamException if there is a problem writing the stream.
+     */
+    protected void writeAttributes(FreeColXMLWriter xw)
+        throws XMLStreamException {
+        for (Entry<String,String> e : getStringAttributes().entrySet()) {
+            xw.writeAttribute(e.getKey(), e.getValue());
+        }
+    }
+
+    /**
+     * Write any children of this message.
+     *
+     * @param xw The {@code FreeColXMLWriter} to write to.
+     * @exception XMLStreamException if there is a problem writing the stream.
+     */
+    protected void writeChildren(FreeColXMLWriter xw)
+        throws XMLStreamException {
+    }
+
     /**
      * Read a new message from a stream.
      *
