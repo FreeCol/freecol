@@ -793,10 +793,6 @@ public class TerrainGenerator {
         return new Resource(game, tile, resourceType, quantity);
     }
 
-    // @compat 0.10.x
-    // Only still public to allow reencoding tile styles when loading
-    // pre-save-v-12 savegames.
-    // end @compat 0.10.x
     /**
      * Sets the style of the tiles.
      * Only relevant to water tiles for now.
