@@ -40,7 +40,7 @@ public class AttributeMessage extends TrivialMessage {
 
     public static final String TAG = "attribute";
 
-    /** The key,value pairs. */
+    /** The key,value attribute pairs. */
     private final Map<String,String> attributes = new HashMap<>();
 
     /** Whether this message is trivially mergeable. */
@@ -100,6 +100,38 @@ public class AttributeMessage extends TrivialMessage {
      * {@inheritDoc}
      */
     @Override
+    public boolean hasAttribute(String key) {
+        return this.attributes.containsKey(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getStringAttribute(String key) {
+        return this.attributes.get(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setStringAttribute(String key, String value) {
+        if (value != null) this.attributes.put(key, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String,String> getStringAttributes() {
+        return this.attributes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.ATTRIBUTE;
     }
@@ -109,8 +141,17 @@ public class AttributeMessage extends TrivialMessage {
      */
     @Override
     public boolean canMergeAttributes() {
-        return mergeable;
+        return this.mergeable;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Element toXMLElement() {
+        return DOMUtils.createElement(getType(), this.attributes);
+    }
+
 
     // Public interface
 
@@ -123,47 +164,5 @@ public class AttributeMessage extends TrivialMessage {
     public AttributeMessage setMergeable(boolean mergeable) {
         this.mergeable = mergeable;
         return this;
-    }
-
-    /**
-     * Check if an attribute is present.
-     *
-     * @param key The {@code key} to look up.
-     * @return True if key is present.
-     */
-    @Override
-    public boolean hasAttribute(String key) {
-        return this.attributes.containsKey(key);
-    }
-
-    /**
-     * Get an attribute value.
-     *
-     * @param key The {@code key} to look up.
-     * @return The value found.
-     */
-    @Override
-    public String getStringAttribute(String key) {
-        return this.attributes.get(key);
-    }
-
-    /**
-     * Set an attribute value.
-     *
-     * @param key The {@code key} to look up.
-     * @param value The value to set.
-     */
-    @Override
-    public void setStringAttribute(String key, String value) {
-        if (value != null) this.attributes.put(key, value);
-    }
-
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return DOMUtils.createElement(getType(), this.attributes);
     }
 }
