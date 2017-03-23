@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.Collections;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
@@ -112,17 +115,57 @@ public abstract class TrivialMessage extends DOMMessage {
      * {@inheritDoc}
      */
     @Override
-    public MessagePriority getPriority() {
-        return Message.MessagePriority.NORMAL;
+    public String getType() {
+        return this.type;
+    }
+
+    // Do not override DOMMessage.setType, yet
+    ///**
+    // * {@inheritDoc}
+    // */
+    //@Override
+    //public void setType(String type) {
+    //    throw new RuntimeException("Reset of type: " + type);
+    //}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasAttribute(String key) {
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getType() {
-        return this.type;
+    public String getStringAttribute(String key) {
+        return null;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setStringAttribute(String key, String value) {}
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String,String> getStringAttributes() {
+        return Collections.<String,String>emptyMap();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MessagePriority getPriority() {
+        return Message.MessagePriority.NORMAL;
+    }
+
 
 
     // Convenience methods for the subclasses
