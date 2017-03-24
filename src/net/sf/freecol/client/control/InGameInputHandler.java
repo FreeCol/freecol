@@ -182,7 +182,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 indianDemand(new IndianDemandMessage(getGame(), e)));
         register(LogoutMessage.TAG,
             (Connection c, Element e) ->
-                logout(new LogoutMessage(getGame(), e)));
+                new LogoutMessage(getGame(), e).clientHandler(freeColClient));
         register(LootCargoMessage.TAG,
             (Connection c, Element e) ->
                 lootCargo(new LootCargoMessage(getGame(), e)));
@@ -617,21 +617,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().indianDemand(unit, colony, goodsType, amount));
-    }
-
-    /**
-     * Handle a "logout"-message.
-     *
-     * @param message The {@code LogoutMessage} to process.
-     */
-    private void logout(LogoutMessage message) {
-        final Game game = getGame();
-        final Player player = message.getPlayer(game);
-        final LogoutReason reason = message.getReason();
-        if (player == null) return;
-
-        invokeLater(() ->
-            igc().logout(player, reason));
     }
 
     /**

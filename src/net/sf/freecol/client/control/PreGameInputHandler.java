@@ -93,7 +93,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 new LoginMessage(new Game(), e).clientHandler(freeColClient));
         register(LogoutMessage.TAG,
             (Connection c, Element e) ->
-                logout(new LogoutMessage(getGame(), e)));
+                new LogoutMessage(getGame(), e).clientHandler(freeColClient));
         register(ReadyMessage.TAG,
             (Connection c, Element e) ->
                 ready(new ReadyMessage(getGame(), e)));
@@ -161,24 +161,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final String text = message.getMessage();
 
         getGUI().showErrorMessage(template, text);
-    }
-
-    /**
-     * Handles an "logout"-message.
-     *
-     * @param message The {@code LogoutMessage} to process.
-     */
-    private void logout(LogoutMessage message) {
-        final Game game = getGame();
-        final Player player = message.getPlayer(game);
-        final LogoutReason reason = message.getReason();
-
-        game.removePlayer(player);
-        getGUI().refreshPlayersTable();
-        if (player == getMyPlayer()) {
-            getFreeColClient().getConnectController()
-                .logout(reason);
-        }
     }
 
     /**

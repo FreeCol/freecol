@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Player;
@@ -73,28 +74,28 @@ public class LogoutMessage extends AttributeMessage {
         return MessagePriority.NORMAL;
     }
 
-
-    // Public interface
-
     /**
-     * Get the player logging out.
-     *
-     * @param game A {@code Game} to find the player in.
-     * @return The player found.
+     * {@inheritDoc}
      */
-    public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
-    }
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = getPlayer(game);
+        final LogoutReason reason = getReason();
+        if (player == null) return;
 
-    /**
-     * Get the reason for logging out.
-     *
-     * @return The {@code LogoutReason}.
-     */
-    public LogoutReason getReason() {
-        return Enum.valueOf(LogoutReason.class, getStringAttribute(REASON_TAG));
-    }
+        if (freeColClient.isInGame()) {
+            invokeLater(freeColClient, () ->
+                igc(freeColClient).logout(player, reason));
 
+        } else {
+            game.removePlayer(player);
+            freeColClient.getGUI().refreshPlayersTable();
+            if (player == freeColClient.getMyPlayer()) {
+                freeColClient.getConnectController().logout(reason);
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -147,5 +148,26 @@ public class LogoutMessage extends AttributeMessage {
         freeColServer.updateMetaServer();
 
         return cs;
+    }
+
+    // Public interface
+
+    /**
+     * Get the player logging out.
+     *
+     * @param game A {@code Game} to find the player in.
+     * @return The player found.
+     */
+    public Player getPlayer(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
+    }
+
+    /**
+     * Get the reason for logging out.
+     *
+     * @return The {@code LogoutReason}.
+     */
+    public LogoutReason getReason() {
+        return Enum.valueOf(LogoutReason.class, getStringAttribute(REASON_TAG));
     }
 }
