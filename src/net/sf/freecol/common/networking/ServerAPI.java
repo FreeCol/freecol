@@ -151,12 +151,12 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Sends a DOMMessage to the server.
+     * Sends a message to the server.
      *
-     * @param message The {@code DOMMessage} to send.
+     * @param message The {@code Message} to send.
      * @return True if the send succeeded.
      */
-    private boolean send(DOMMessage message) {
+    private boolean send(Message message) {
         if (message == null) return true;
         final Connection c = check("send", message.getType());
         return (c == null) ? false : c.send(message);
@@ -172,11 +172,11 @@ public abstract class ServerAPI {
      * request was allowed (e.g. a move may result in the death of a
      * unit rather than actually moving).
      *
-     * @param message A {@code DOMMessage} to send.
+     * @param message A {@code Message} to send.
      * @return True if the server interaction succeeded, that is, there was
      *     no I/O problem and the reply was not an error message.
      */
-    private boolean ask(DOMMessage message) {
+    private boolean ask(Message message) {
         if (message == null) return true;
         final Connection c = check("ask", message.getType());
         return (c == null) ? false : c.request(message);

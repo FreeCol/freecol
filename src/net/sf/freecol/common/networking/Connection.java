@@ -742,30 +742,16 @@ public class Connection implements Closeable {
 
     // Client handling
 
-    /**
-     * Client request.
-     *
-     * @param T The message type.
-     * @param message A {@code DOMMessage} to process.
-     * @return True if the message was sent, the reply handled, and the
-     *     reply was not an error message.
-     */
-    public <T extends DOMMessage> boolean request(T message) {
-        // Better if we could do this, but it fails for now.
-        //
-        // DOMMessage reply = ask(game, message);
-        // if (reply == null) return true;
-        // final String tag = reply.getType();
-
+    private boolean requestElement(Element request) {
         Element reply = null;
         try {
-            reply = ask(message);
+            reply = askElement(request);
         } catch (IOException ioe) {
             reply = new ErrorMessage("connection.io", ioe).toXMLElement();
         }
         if (reply == null) return true;
+
         final String tag = reply.getTagName();
-        
         try {
             Element e = handleElement(reply);
             assert e == null; // client handlers now all return null
@@ -775,16 +761,55 @@ public class Connection implements Closeable {
         }
         return !ErrorMessage.TAG.equals(tag);
     }
+
+    /**
+     * Client request.
+     *
+     * @param message A {@code Message} to process.
+     * @return True if the message was sent, the reply handled, and the
+     *     reply was not an error message.
+     */
+    public boolean request(Message message) {
+        if (message == null) return true;
+        boolean ret;
+
+        // Try Message-based routine
+        // String tag = message.getType();
+        // try {
+        //     return requestMessage(message);
+        // } catch (IOException ioe) {
+        //     logger.log(Level.FINEST, "client request(" + tag + ") fail", ioe);
+        // }
+        
+        // Temporary fall back to using DOMMessage
+        if (message instanceof DOMMessage) {
+            return requestElement(((DOMMessage)message).toXMLElement());
+        }
+        return false;
+    }
         
     /**
      * Client send.
      *
-     * @param T The message type.
      * @param message A {@code DOMMessage} to send.
      * @return True if the message was sent.
      */
-    public <T extends DOMMessage> boolean send(T message) {
-        return sendElement(message.toXMLElement());
+    public boolean send(Message message) {
+        if (message == null) return true;
+
+        // Try Message-based routine
+        // final String tag = message.getType();
+        // try {
+        //     return sendMessage(message);
+        // } catch (IOException ioe) {
+        //     logger.log(Level.FINEST, "client send(" + tag + ") fail", ioe);
+        // }
+
+        // Temporary fall back to using DOMMessage
+        if (message instanceof DOMMessage) {
+            return sendElement(((DOMMessage)message).toXMLElement());
+        }
+        return false;
     }
     
 
