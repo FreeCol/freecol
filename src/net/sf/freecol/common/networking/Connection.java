@@ -438,26 +438,6 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Log message.
-     *
-     * @param message The {@code Message} to log.
-     * @param send True if sending (else replying).
-     */
-    protected void log(Message message, boolean send) {
-        if (message == null) return;
-        try {
-            synchronized (this.logWriter) {
-                this.lw.writeComment(this.name
-                    + ((send) ? SEND_SUFFIX : REPLY_SUFFIX));
-                message.toXML(this.lw);
-                this.lw.flush();
-            }
-        } catch (XMLStreamException xse) {
-            ; // Ignore logging failure
-        }
-    }
-
-    /**
      * Low level routine to send a message over this Connection.
      *
      * @param element The {@code Element} (root element in a
@@ -480,25 +460,6 @@ public class Connection implements Closeable {
             throw ioe;
         } catch (Exception ex) {
             throw new IOException("sendInternal fail", ex);
-        }
-        return true;
-    }
-
-    /**
-     * Low level routine to send a Message over this Connection.
-     *
-     * @param message The {@code Message} to send.
-     * @return True if the message was sent.
-     * @exception IOException If an error occur while sending the message.
-     */
-    private boolean sendMessageInternal(Message message) throws IOException {
-        try {
-            synchronized (this.outputLock) {
-                if (this.xw == null) return false;
-                message.toXML(xw);
-            }
-        } catch (Exception ex) {
-            throw new IOException("sendMessageInternal fail", ex);
         }
         return true;
     }
@@ -553,25 +514,6 @@ public class Connection implements Closeable {
         try {
             sendInternal(element);
             log(element, true);
-            logger.fine("Send: " + tag);
-            return true;
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Send fail: " + tag, ioe);
-        }
-        return false;
-    }
-
-    /**
-     * Send a message.
-     *
-     * @param message The {@code Message} to send.
-     */
-    public boolean sendMessage(Message message) {
-        if (message == null) return true;
-        final String tag = message.getType();
-        try {
-            sendMessageInternal(message);
-            log(message, true);
             logger.fine("Send: " + tag);
             return true;
         } catch (IOException ioe) {
@@ -703,7 +645,95 @@ public class Connection implements Closeable {
         return handleElement(element);
     }
 
+    // Message routines
 
+    private Message askMessageInternal(Message message) throws IOException {
+        final String tag = message.getType();
+        final int replyId = this.receivingThread.getNextNetworkReplyId();
+
+        if (Thread.currentThread() == this.receivingThread) {
+            throw new IOException("wait(ReceivingThread) for: " + tag);
+        }
+
+        QuestionMessage qm = new QuestionMessage(replyId, message);
+        NetworkReplyObject nro = this.receivingThread.waitForNetworkReply(replyId);
+        if (!sendMessageInternal(qm)) return null;
+
+        // Wait for response
+        Object response = nro.getResponse();
+        if (!(response instanceof ReplyMessage)) {
+            throw new IOException("Bad response to " + tag + ": " + response);
+        }
+        return ((ReplyMessage)response).getMessage();
+    }
+
+    private Message askMessage(Message message) throws IOException {
+        if (message == null) return null;
+        Message response = askMessageInternal(message);
+        logMessage(message, true);
+        logMessage(response, false);
+        return response;
+    }
+    
+    /**
+     * Log message.
+     *
+     * @param message The {@code Message} to log.
+     * @param send True if sending (else replying).
+     */
+    private void logMessage(Message message, boolean send) {
+        if (message == null || this.logWriter == null) return;
+        try {
+            synchronized (this.logWriter) {
+                this.lw.writeComment(this.name
+                    + ((send) ? SEND_SUFFIX : REPLY_SUFFIX));
+                message.toXML(this.lw);
+                this.lw.flush();
+            }
+        } catch (XMLStreamException xse) {
+            ; // Ignore logging failure
+        }
+    }
+
+    private boolean sendMessageInternal(Message message) throws IOException {
+        try {
+            synchronized (this.outputLock) {
+                if (this.xw == null) return false;
+                message.toXML(xw);
+            }
+        } catch (Exception ex) {
+            throw new IOException("sendMessageInternal fail", ex);
+        }
+        return true;
+    }
+
+    // In due course this is to replace send()
+    private boolean sendMessage(Message message) throws IOException {
+        final String tag = message.getType();
+        sendMessageInternal(message);
+        logMessage(message, true);
+        return true;
+    }
+
+    // In due course this is to replace request()
+    private boolean requestMessage(Message message) throws IOException {
+        String outTag = message.getType();
+        Message response = askMessage(message);
+        if (response == null) return true;
+        String inTag = response.getType();
+        try {
+            Message reply = handle(response);
+            assert reply == null; // Client message handlers all return null
+            logger.finest("Client ask: " + outTag + " -> " + inTag);
+            return !ErrorMessage.TAG.equals(inTag);
+        } catch (FreeColException fce) {
+            logger.log(Level.FINEST, "Error handling: " + outTag
+                + " -> " + inTag, fce);
+        }
+        return false;
+    }
+
+    
     // MessageHandler support
 
     /**
@@ -742,6 +772,7 @@ public class Connection implements Closeable {
 
     // Client handling
 
+    // Legacy DOM routine, to go away
     private boolean requestElement(Element request) {
         Element reply = null;
         try {
@@ -774,12 +805,18 @@ public class Connection implements Closeable {
         boolean ret;
 
         // Try Message-based routine
-        // String tag = message.getType();
-        // try {
-        //     return requestMessage(message);
-        // } catch (IOException ioe) {
-        //     logger.log(Level.FINEST, "client request(" + tag + ") fail", ioe);
-        // }
+        if (false) { // DISABLED FOR NOW
+            final String tag = message.getType();
+            try {
+                if (requestMessage(message)) {
+                    logger.finest("Client request: " + tag);
+                    return true;
+                }
+            } catch (IOException ioe) {
+                logger.log(Level.FINEST, "Client request(" + tag + ") fail",
+                           ioe);
+            }
+        }
         
         // Temporary fall back to using DOMMessage
         if (message instanceof DOMMessage) {
@@ -798,12 +835,17 @@ public class Connection implements Closeable {
         if (message == null) return true;
 
         // Try Message-based routine
-        // final String tag = message.getType();
-        // try {
-        //     return sendMessage(message);
-        // } catch (IOException ioe) {
-        //     logger.log(Level.FINEST, "client send(" + tag + ") fail", ioe);
-        // }
+        if (false) { // DISABLED FOR NOW
+            final String tag = message.getType();
+            try {
+                if (sendMessage(message)) {
+                    logger.finest("Client send: " + tag);
+                    return true;
+                }
+            } catch (IOException ioe) {
+                logger.log(Level.FINEST, "Client send(" + tag + ") fail", ioe);
+            }
+        }
 
         // Temporary fall back to using DOMMessage
         if (message instanceof DOMMessage) {
