@@ -20,6 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
@@ -156,6 +157,22 @@ public abstract class TrivialMessage extends DOMMessage {
     @Override
     public Map<String,String> getStringAttributes() {
         return Collections.<String,String>emptyMap();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<FreeColObject> getChildren() {
+        return Collections.<FreeColObject>emptyList();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setChildren(List<? extends FreeColObject> fcos) {
+        throw new RuntimeException("TrivialMessage.setChildren not implemented");
     }
     
     /**

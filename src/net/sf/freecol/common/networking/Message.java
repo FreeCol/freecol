@@ -339,6 +339,20 @@ public abstract class Message {
     }
 
     /**
+     * Get the child objects of this message.
+     *
+     * @return A list of child {@code FreeColObject}s.
+     */
+    abstract public List<FreeColObject> getChildren();
+        
+    /**
+     * Set the list of objects attached to this message.
+     *
+     * @param fcos The new list of attached {@code FreeColObject}s.
+     */
+    abstract public void setChildren(List<? extends FreeColObject> fcos);
+
+    /**
      * Build this message from an input stream.
      *
      * @param inputStream The {@code InputStream} to read.

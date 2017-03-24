@@ -233,6 +233,22 @@ public class DOMMessage extends Message {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public List<FreeColObject> getChildren() {
+        throw new RuntimeException("DOMMessage.getChildren NYI");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setChildren(List<? extends FreeColObject> fcos) {
+        throw new RuntimeException("DOMMessage.setChildren NYI");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public void readInputStream(InputStream inputStream)
         throws IOException, SAXException {
         this.document = DOMUtils.readDocument(new InputSource(inputStream));
