@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when logging in.
  */
-public class LoginMessage extends DOMMessage {
+public class LoginMessage extends ObjectMessage {
 
     public static final String TAG = "login";
     private static final String CURRENT_PLAYER_TAG = "currentPlayer";

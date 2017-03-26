@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to update the map generator options.
  */
-public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
+public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
 
     public static final String TAG = "updateMapGeneratorOptions";
 

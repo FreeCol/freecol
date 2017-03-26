@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when updating a trade route.
  */
-public class UpdateTradeRouteMessage extends DOMMessage {
+public class UpdateTradeRouteMessage extends ObjectMessage {
 
     public static final String TAG = "updateTradeRoute";
 

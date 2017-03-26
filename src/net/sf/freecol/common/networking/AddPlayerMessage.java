@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to add or update players to the game.
  */
-public class AddPlayerMessage extends DOMMessage {
+public class AddPlayerMessage extends ObjectMessage {
 
     public static final String TAG = "addPlayer";
 

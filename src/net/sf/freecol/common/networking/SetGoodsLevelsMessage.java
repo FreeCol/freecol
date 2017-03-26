@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when setting goods levels.
  */
-public class SetGoodsLevelsMessage extends DOMMessage {
+public class SetGoodsLevelsMessage extends ObjectMessage {
 
     public static final String TAG = "setGoodsLevels";
     private static final String COLONY_TAG = "colony";

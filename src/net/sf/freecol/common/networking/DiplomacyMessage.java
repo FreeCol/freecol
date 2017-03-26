@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when executing a diplomatic trade.
  */
-public class DiplomacyMessage extends DOMMessage {
+public class DiplomacyMessage extends ObjectMessage {
 
     public static final String TAG = "diplomacy";
     private static final String OTHER_ID_TAG = "otherId";

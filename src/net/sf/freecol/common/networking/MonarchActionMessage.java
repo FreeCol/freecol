@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when doing a monarch action.
  */
-public class MonarchActionMessage extends DOMMessage {
+public class MonarchActionMessage extends ObjectMessage {
 
     public static final String TAG = "monarchAction";
     private static final String ACTION_TAG = "action";

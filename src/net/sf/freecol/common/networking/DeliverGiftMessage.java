@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when delivering a gift to a Settlement.
  */
-public class DeliverGiftMessage extends DOMMessage {
+public class DeliverGiftMessage extends ObjectMessage {
 
     public static final String TAG = "deliverGift";
     private static final String SETTLEMENT_TAG = "settlement";

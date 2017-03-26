@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to tell a client to show a movement animation.
  */
-public class AnimateMoveMessage extends DOMMessage {
+public class AnimateMoveMessage extends ObjectMessage {
 
     public static final String TAG = "animateMove";
     private static final String NEW_TILE_TAG = "newTile";

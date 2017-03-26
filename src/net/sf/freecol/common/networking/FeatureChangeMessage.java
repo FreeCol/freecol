@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when to add or remove a feature.
  */
-public class FeatureChangeMessage extends DOMMessage {
+public class FeatureChangeMessage extends ObjectMessage {
 
     public static final String TAG = "featureChange";
     private static final String ADD_TAG = "add";

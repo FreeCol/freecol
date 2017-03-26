@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when moving a unit.
  */
-public class MoveMessage extends DOMMessage {
+public class MoveMessage extends AttributeMessage {
 
     public static final String TAG = "move";
     private static final String DIRECTION_TAG = "direction";

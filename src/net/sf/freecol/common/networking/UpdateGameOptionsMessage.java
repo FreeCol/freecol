@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to update the game options.
  */
-public class UpdateGameOptionsMessage extends DOMMessage {
+public class UpdateGameOptionsMessage extends ObjectMessage {
 
     public static final String TAG = "updateGameOptions";
 

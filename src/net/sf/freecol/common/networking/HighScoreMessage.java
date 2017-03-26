@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when an highScore occurs.
  */
-public class HighScoreMessage extends DOMMessage {
+public class HighScoreMessage extends ObjectMessage {
 
     public static final String TAG = "highScore";
     private static final String KEY_TAG = "key";

@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when looting cargo.
  */
-public class LootCargoMessage extends DOMMessage {
+public class LootCargoMessage extends ObjectMessage {
 
     public static final String TAG = "lootCargo";
     private static final String LOSER_TAG = "loser";

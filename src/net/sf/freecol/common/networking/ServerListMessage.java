@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to query and list the available servers.
  */
-public class ServerListMessage extends DOMMessage {
+public class ServerListMessage extends ObjectMessage {
 
     public static final String TAG = "serverList";
 

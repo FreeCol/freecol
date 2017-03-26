@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message that contains other messages.
  */
-public class MultipleMessage extends DOMMessage {
+public class MultipleMessage extends ObjectMessage {
 
     public static final String TAG = "multiple";
 

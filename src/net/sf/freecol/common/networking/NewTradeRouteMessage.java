@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to get a new trade route.
  */
-public class NewTradeRouteMessage extends DOMMessage {
+public class NewTradeRouteMessage extends ObjectMessage {
 
     public static final String TAG = "newTradeRoute";
 

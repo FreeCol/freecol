@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to update game objects.
  */
-public class UpdateMessage extends DOMMessage {
+public class UpdateMessage extends ObjectMessage {
 
     public static final String TAG = "update";
 

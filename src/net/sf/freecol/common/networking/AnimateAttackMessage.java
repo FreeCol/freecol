@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to tell a client to show an attack animation.
  */
-public class AnimateAttackMessage extends DOMMessage {
+public class AnimateAttackMessage extends ObjectMessage {
 
     public static final String TAG = "animateAttack";
     private static final String ATTACKER_TAG = "attacker";

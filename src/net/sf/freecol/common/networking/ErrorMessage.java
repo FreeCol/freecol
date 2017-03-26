@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when an error occurs.
  */
-public class ErrorMessage extends DOMMessage {
+public class ErrorMessage extends ObjectMessage {
 
     public static final String TAG = "error";
     private static final String MESSAGE_TAG = "message";

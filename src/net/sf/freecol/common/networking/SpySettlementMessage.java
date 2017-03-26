@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when spying on a settlement.
  */
-public class SpySettlementMessage extends DOMMessage {
+public class SpySettlementMessage extends ObjectMessage {
 
     public static final String TAG = "spySettlement";
     private static final String SETTLEMENT_TAG = "settlement";

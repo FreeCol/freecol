@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to handle native trade sessions.
  */
-public class NativeTradeMessage extends DOMMessage {
+public class NativeTradeMessage extends ObjectMessage {
 
     public static final String TAG = "nativeTrade";
     private static final String ACTION_TAG = "action";

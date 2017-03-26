@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when summarizing a nation.
  */
-public class NationSummaryMessage extends DOMMessage {
+public class NationSummaryMessage extends ObjectMessage {
 
     public static final String TAG = "nationSummary";
     private static final String PLAYER_TAG = "player";
