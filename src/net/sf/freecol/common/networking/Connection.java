@@ -427,17 +427,6 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Log message.
-     *
-     * @param message The {@code DOMMessage} to log.
-     * @param send True if sending (else replying).
-     */
-    protected void log(DOMMessage message, boolean send) {
-        if (message == null) return;
-        log(message.toXMLElement(), send);
-    }
-
-    /**
      * Low level routine to send a message over this Connection.
      *
      * @param element The {@code Element} (root element in a
@@ -577,6 +566,7 @@ public class Connection implements Closeable {
     public <T extends DOMMessage> void sendAndWait(T message) throws IOException {
         sendAndWaitElement(message.toXMLElement());
     }
+
     public <T extends DOMMessage> Element ask(T message) throws IOException {
         try {
             return askElement(message.toXMLElement());
@@ -600,6 +590,8 @@ public class Connection implements Closeable {
         return ret;
     }
 
+    // DOM handlers for ReceivingThread
+
     /**
      * Handle a query (has QUESTION_TAG), with given reply identifier,
      * and send a reply (has REPLY_TAG and the given reply identifier).
@@ -609,7 +601,7 @@ public class Connection implements Closeable {
      * @exception FreeColException if there is a handler problem.
      * @exception IOException if sending fails.
      */
-    public void handleQuery(DOMMessage msg, int replyId)
+    public void handleQuestion(DOMMessage msg, int replyId)
         throws FreeColException, IOException {
         Element element = msg.toXMLElement(), reply;
         element = (Element)element.getFirstChild();
@@ -629,24 +621,14 @@ public class Connection implements Closeable {
      */
     public void handleUpdate(DOMMessage msg)
         throws FreeColException, IOException {
-        Element reply = handle(msg);
+        Element reply = handleElement(msg.toXMLElement());
         if (reply != null) sendElement(reply);
     }
 
-    /**
-     * Handle a message.
-     *
-     * @param message The {@code DOMMessage} to handle.
-     * @return The response from the handler.
-     * @exception FreeColException if there is a handler problem.
-     */
-    public Element handle(DOMMessage message) throws FreeColException {
-        Element element = message.toXMLElement();
-        return handleElement(element);
-    }
 
-    // Message routines
-
+    // Low level Message routines
+    
+    // lowest level ask
     private Message askMessageInternal(Message message) throws IOException {
         final String tag = message.getType();
         final int replyId = this.receivingThread.getNextNetworkReplyId();
@@ -667,34 +649,25 @@ public class Connection implements Closeable {
         return ((ReplyMessage)response).getMessage();
     }
 
+    // ask-with-logging
     private Message askMessage(Message message) throws IOException {
         if (message == null) return null;
         Message response = askMessageInternal(message);
-        logMessage(message, true);
-        logMessage(response, false);
+        if (this.logWriter != null) {
+            try {
+                synchronized (this.logWriter) {
+                    this.lw.writeComment(this.name + SEND_SUFFIX);
+                    message.toXML(this.lw);
+                    this.lw.writeComment(this.name + REPLY_SUFFIX);
+                    if (response != null) response.toXML(this.lw);
+                    this.lw.flush();
+                }
+            } catch (XMLStreamException xse) {} // Ignore log failure
+        }
         return response;
     }
     
-    /**
-     * Log message.
-     *
-     * @param message The {@code Message} to log.
-     * @param send True if sending (else replying).
-     */
-    private void logMessage(Message message, boolean send) {
-        if (message == null || this.logWriter == null) return;
-        try {
-            synchronized (this.logWriter) {
-                this.lw.writeComment(this.name
-                    + ((send) ? SEND_SUFFIX : REPLY_SUFFIX));
-                message.toXML(this.lw);
-                this.lw.flush();
-            }
-        } catch (XMLStreamException xse) {
-            ; // Ignore logging failure
-        }
-    }
-
+    // lowest level send
     private boolean sendMessageInternal(Message message) throws IOException {
         try {
             synchronized (this.outputLock) {
@@ -707,33 +680,23 @@ public class Connection implements Closeable {
         return true;
     }
 
-    // In due course this is to replace send()
-    private boolean sendMessage(Message message) throws IOException {
-        final String tag = message.getType();
+    // send-with-logging, called from ReceivingThread
+    public boolean sendMessage(Message message) throws IOException {
+        if (message == null) return true;
         sendMessageInternal(message);
-        logMessage(message, true);
+        if (this.logWriter != null) {
+            try {
+                synchronized (this.logWriter) {
+                    this.lw.writeComment(this.name + SEND_SUFFIX);
+                    message.toXML(this.lw);
+                    this.lw.flush();
+                }
+            } catch (XMLStreamException xse) {} // Ignore logging failure
+        }
         return true;
     }
 
-    // In due course this is to replace request()
-    private boolean requestMessage(Message message) throws IOException {
-        String outTag = message.getType();
-        Message response = askMessage(message);
-        if (response == null) return true;
-        String inTag = response.getType();
-        try {
-            Message reply = handle(response);
-            assert reply == null; // Client message handlers all return null
-            logger.finest("Client ask: " + outTag + " -> " + inTag);
-            return !ErrorMessage.TAG.equals(inTag);
-        } catch (FreeColException fce) {
-            logger.log(Level.FINEST, "Error handling: " + outTag
-                + " -> " + inTag, fce);
-        }
-        return false;
-    }
 
-    
     // MessageHandler support
 
     /**
@@ -760,13 +723,17 @@ public class Connection implements Closeable {
      *
      * @param xr The {@code FreeColXMLReader} to read from.
      * @return The {@code Message} found, if any.
-     * @exception FreeColException there is a problem instantiating the message.
+     * @exception FreeColException there is a problem creating the message.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public Message reader(FreeColXMLReader xr)
         throws FreeColException, XMLStreamException {
         MessageHandler mh = getMessageHandler();
-        return (mh == null) ? null : mh.read(xr);
+        
+        // Temporary fast fail
+        if (mh == null) throw new FreeColException("No handler");
+
+        return mh.read(xr);
     }
 
 
@@ -793,6 +760,26 @@ public class Connection implements Closeable {
         return !ErrorMessage.TAG.equals(tag);
     }
 
+    // In due course this is to replace request() but should handle
+    // IOException in that form.
+    private boolean requestMessage(Message message) throws IOException {
+        final String outTag = message.getType();
+        Message response = askMessage(message);
+        if (response == null) return true;
+
+        final String inTag = response.getType();
+        try {
+            Message reply = handle(response);
+            assert reply == null; // Client message handlers all return null
+            logger.finest("Client ask: " + outTag + " -> " + inTag);
+            return true;
+        } catch (FreeColException fce) {
+            logger.log(Level.FINEST, "Client ask failure: " + outTag
+                + " -> " + inTag, fce);
+        }
+        return false; // !ErrorMessage.TAG.equals(inTag);
+    }
+
     /**
      * Client request.
      *
@@ -808,10 +795,7 @@ public class Connection implements Closeable {
         if (false) { // DISABLED FOR NOW
             final String tag = message.getType();
             try {
-                if (requestMessage(message)) {
-                    logger.finest("Client request: " + tag);
-                    return true;
-                }
+                if (requestMessage(message)) return true;
             } catch (IOException ioe) {
                 logger.log(Level.FINEST, "Client request(" + tag + ") fail",
                            ioe);

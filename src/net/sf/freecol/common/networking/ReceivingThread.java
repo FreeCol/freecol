@@ -343,7 +343,7 @@ final class ReceivingThread extends Thread {
             public void run() {
                 final String tag = msg.getType();
                 try {
-                    ReceivingThread.this.connection.handleQuery(msg, replyId);
+                    ReceivingThread.this.connection.handleQuestion(msg, replyId);
                 } catch (FreeColException fce) {
                     logger.log(Level.WARNING, "Query " + replyId
                         + " handler for " + tag + " failed", fce);
