@@ -437,17 +437,13 @@ public abstract class Message {
      * @exception XMLStreamException if there is a problem writing the stream.
      */
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Do not implement here, yet.
-        throw new XMLStreamException(getType() + ".toXML NYI");
+        xw.writeStartElement(getType());
 
-        // Should become:
-        //xw.writeStartElement(getType());
-        //
-        //writeAttributes(xw);
-        //
-        //writeChildren(xw);
-        //
-        //xw.writeEndElement();
+        writeAttributes(xw);
+
+        writeChildren(xw);
+
+        xw.writeEndElement();
     }
         
     /**

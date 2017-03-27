@@ -30,7 +30,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
- * A trivial message sent to the server to signal that the game should continue.
+ * A trivial message sent to the server to signal that the game should
+ * continue.
  */
 public class ContinueMessage extends TrivialMessage {
 

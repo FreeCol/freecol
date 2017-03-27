@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
@@ -183,6 +184,21 @@ public abstract class TrivialMessage extends DOMMessage {
         return Message.MessagePriority.NORMAL;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // FIXME: When TrivialMessage is no longer a DOMMessage this
+        // routine is redundant.
+        xw.writeStartElement(getType());
+
+        writeAttributes(xw);
+
+        writeChildren(xw);
+
+        xw.writeEndElement();
+    }
 
 
     // Convenience methods for the subclasses

@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
@@ -249,11 +251,21 @@ public class DOMMessage extends Message {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        throw new XMLStreamException("DOMMessage.toXML NYI");
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     public void readInputStream(InputStream inputStream)
         throws IOException, SAXException {
         this.document = DOMUtils.readDocument(new InputSource(inputStream));
     }
 
+    
 
     // Useful utilities for subclass *class*(Game,Element) constructors
     // Temporarily duplicated from DOMUtils
