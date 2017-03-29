@@ -56,8 +56,7 @@ public final class DefaultHandler extends Handler {
      * @param consoleLogging The flag to log to the console as well.
      * @param writer The {@code Writer} to use for logging.
      */
-    public DefaultHandler(boolean consoleLogging, Writer writer)
-        throws FreeColException {
+    public DefaultHandler(boolean consoleLogging, Writer writer) {
         this.consoleLogging = consoleLogging;
         this.writer = writer;
         
@@ -161,8 +160,10 @@ public final class DefaultHandler extends Handler {
             }
         }
 
-        // Do this last, as it shuts down debug runs
-        if (record.getThrown() != null) {
+        // Do this last, as it might shut down a debug run
+        Throwable t = record.getThrown();
+        if (t != null && !(t instanceof FreeColException
+                && ((FreeColException)t).debugAllowed())) {
             FreeColDebugger.handleCrash();
         }
     }

@@ -24,6 +24,10 @@ package net.sf.freecol.common;
  * The Exception thrown by the FreeCol application.
  */
 public final class FreeColException extends Exception {
+
+    /** Should this exception allow debug runs to continue? */
+    private boolean allowDebug = false;
+    
     
     /**
      * Build a new FreeCol specific exception with the given message.
@@ -42,5 +46,25 @@ public final class FreeColException extends Exception {
      */
     public FreeColException(String message, Throwable throwable) {
         super(message, throwable);
+    }
+
+
+    /**
+     * Make this exception *not* cause debug runs to end.
+     *
+     * @return This exception.
+     */
+    public FreeColException preserveDebug() {
+        this.allowDebug = true;
+        return this;
+    }
+
+    /**
+     * Get the debug state.
+     *
+     * @return Whether debug runs should continue following this exception.
+     */
+    public boolean debugAllowed() {
+        return this.allowDebug;
     }
 }
