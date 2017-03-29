@@ -151,16 +151,21 @@ public final class PreGameController extends FreeColClientHolder {
      * Start the game.
      */
     public void startGame() {
-        Game game;
-        for (;;) {
-            game = getGame();
-            if (game != null && game.getMap() != null) break;
-            Utils.delay(200, "Starting a game has been interupted.");
-        }
-
         new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
                 @Override
                 public void run() {
+                    // Wait until map is received from server
+                    // (sometimes a startGame message arrives arrives
+                    // when map is still null).  Make sure we do this
+                    // in a new thread so as not to block the input handler
+                    // from receiving the map!
+                    Game game;
+                    for (;;) {
+                        game = getGame();
+                        if (game != null && game.getMap() != null) break;
+                        Utils.delay(200, "StartGame has been interupted.");
+                    }
+
                     SwingUtilities.invokeLater(() -> {
                             startGameInternal();
                         });

@@ -111,7 +111,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 setNationType(new SetNationTypeMessage(getGame(), e)));
         register(StartGameMessage.TAG,
             (Connection c, Element e) ->
-                startGame()); // Does not need a message
+                TrivialMessage.startGameMessage.clientHandler(freeColClient));
         register(UpdateMessage.TAG,
             (Connection c, Element e) ->
                 update(new UpdateMessage(getGame(), e)));
@@ -281,31 +281,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
             player.changeNationType(nationType);
             getGUI().refreshPlayersTable();
         }
-    }
-
-    /**
-     * Handles an "startGame"-message.
-     *
-     * Wait until map is received from server, sometimes this
-     * message arrives when map is still null. Wait in other
-     * thread in order not to block and it can receive the map.
-     */
-    private void startGame() {
-        new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
-                @Override
-                public void run() {
-                    Game game;
-                    for (;;) {
-                        game = getGame();
-                        if (game != null && game.getMap() != null) break;
-                        Utils.delay(200, "Starting a game has been interupted.");
-                    }
-                    
-                    SwingUtilities.invokeLater(() -> {
-                            pgc().startGame();
-                        });
-                }
-            }.start();
     }
 
     /**
