@@ -313,6 +313,7 @@ final class ReceivingThread extends Thread {
         connection.sendDisconnect();
     }
 
+
     // Individual parts of listen().  Work in progress
     private DOMMessage domReader()
         throws IOException, SAXException {
@@ -321,41 +322,83 @@ final class ReceivingThread extends Thread {
         return new DOMMessage(this.in);
     }
 
-    private DOMMessage reader(BufferedInputStream bis)
-        throws IOException, SAXException {
-        //bis.reset();
-        return new DOMMessage(bis);
+    private Message messageReader(FreeColXMLReader xr)
+        throws FreeColException, XMLStreamException {
+        // XMLStreamException if the XML broke
+        // FreeColException if the contents were not valid XML but wrong
+        // in terms of FreeCol game logic.
+        final String tag = xr.getLocalName();
+//System.err.println("messageReader: " + tag);
+        Message m = this.connection.reader(xr);
+//System.err.println("messageReader-> " + ((m==null) ? "null" : m.toString()));
+        return m;
     }
 
-    private void reply(DOMMessage msg, int replyId) {
-        NetworkReplyObject nro = waitingThreads.remove(replyId);
-        if (nro == null) {
-            logger.warning("Could not find reply: " + replyId);
-        } else {
-            nro.setResponse(msg);
-        }
-    }
-
-    private Thread query(DOMMessage msg, final int replyId) {
-        return new Thread(this.connection.getName() + "-query-" + replyId + "-"
-                          + msg.getType()) {
+    private Thread domQuestion(DOMMessage msg, final int replyId) {
+        return new Thread(this.connection.getName() + "-question-" + replyId
+                          + "-" + msg.getType()) {
             @Override
             public void run() {
                 final String tag = msg.getType();
                 try {
                     ReceivingThread.this.connection.handleQuestion(msg, replyId);
                 } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, "Query " + replyId
+                    logger.log(Level.WARNING, "Question " + replyId
                         + " handler for " + tag + " failed", fce);
                 } catch (IOException ioe) {
-                    logger.log(Level.WARNING, "Query " + replyId
+                    logger.log(Level.WARNING, "Question " + replyId
                         + " response send for " + tag + " failed", ioe);
                 }
             }
         };
     }
 
-    private Thread update(DOMMessage msg) {
+    private Thread messageQuestion(final QuestionMessage qm,
+                                   final int replyId) {
+        final Connection conn = this.connection;
+        final Message query = qm.getMessage();
+        if (query == null) return null;
+        final String tag = query.getType();
+
+        return new Thread(conn.getName() + "-question-" + replyId + "-" + tag) {
+            @Override
+            public void run() {
+                Message reply;
+                try {
+                    reply = conn.handle(query);
+                } catch (FreeColException fce) {
+                    logger.log(Level.WARNING, "Question " + replyId
+                               + " handler fail: " + tag, fce);
+                    return;
+                }
+
+                final String replyTag = (reply == null) ? "null"
+                    : reply.getType();
+                try {
+                    conn.sendMessage(new ReplyMessage(replyId, reply));
+                    logger.log(Level.FINEST, "Question " + replyId + " " + tag
+                               + " -> " + replyTag);
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Question " + replyId
+                               + " response fail " + tag + " -> " + replyTag,
+                               ioe);
+                    return;
+                }
+            }
+        };
+    }
+
+    // Works for both Message and DOM code
+    private void reply(Message message, int replyId) {
+        NetworkReplyObject nro = waitingThreads.remove(replyId);
+        if (nro == null) {
+            logger.warning("Could not find reply: " + replyId);
+        } else {
+            nro.setResponse(message);
+        }
+    }
+
+    private Thread domUpdate(DOMMessage msg) {
         return new Thread(this.connection.getName() + "-update-"
                           + msg.getType()) {
             @Override
@@ -364,11 +407,42 @@ final class ReceivingThread extends Thread {
                 try {
                     ReceivingThread.this.connection.handleUpdate(msg);
                 } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, "Update handler for " + tag
-                        + " failed", fce);
+                    logger.log(Level.WARNING, "Update handler fail: " + tag,
+                               fce);
                 } catch (IOException ioe) {
-                    logger.log(Level.WARNING, "Update send for " + tag
-                        + " failed", ioe);
+                    logger.log(Level.WARNING, "Update send fail: " + tag, ioe);
+                }
+            }
+        };
+    }
+
+    private Thread messageUpdate(final Message message) {
+        if (message == null) return null;
+        final String inTag = message.getType();
+        final Connection conn = this.connection;
+
+        return new Thread(conn.getName() + "-update-" + inTag) {
+            @Override
+            public void run() {
+                Message reply;
+                try {
+                    reply = conn.handle(message);
+                } catch (FreeColException fce) {
+                    logger.log(Level.WARNING, "Update handler fail: " + inTag,
+                               fce);
+                    return;
+                }
+
+                final String outTag = (reply == null) ? "null"
+                    : reply.getType();
+                try {
+                    conn.sendMessage(reply);
+                    logger.log(Level.FINEST, "Update: " + inTag
+                               + " -> " + outTag);
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Update send fail: " + inTag,
+                               ioe);
+                    return;
                 }
             }
         };
@@ -401,22 +475,38 @@ final class ReceivingThread extends Thread {
 
         // Read the message, optionally create a thread to handle it
         Thread t = null;
-        DOMMessage msg = null;
+        DOMMessage dm = null;
         switch (tag) {
         case DisconnectMessage.TAG:
             // Do not actually read the message, it might be a fake one
             // due to end-of-stream.
-            msg = TrivialMessage.disconnectMessage;
-            t = update(msg);
+            dm = TrivialMessage.disconnectMessage;
+            t = domUpdate(dm);
             askToStop();
             break;
 
         case Connection.REPLY_TAG:
             // A reply.  Always respond, even when failing, so as to
             // unblock the waiting thread.
+
+            if (false) { // DISABLED FOR NOW
+                Message m = null;
+                try {
+                    m = messageReader(xr);
+                } catch (FreeColException|XMLStreamException ex) {
+                    // Just log for now, fall through to DOM-based code
+                    logger.log(Level.FINEST, "ReceivingThread.reply", ex);
+                }
+                if (m != null) {
+                    assert m instanceof ReplyMessage;
+                    reply(m, replyId);
+                    break;
+                }
+            }
+
             try {
-                msg = domReader();
-                reply(msg, replyId);
+                dm = domReader();
+                reply(dm, replyId);
             } catch (IOException|SAXException ex) {
                 reply(null, replyId);
                 throw ex;
@@ -424,28 +514,47 @@ final class ReceivingThread extends Thread {
             break;
 
         case Connection.QUESTION_TAG:
-            // A query.  Build a thread to handle it and send a reply.
-            msg = domReader();
-            t = query(msg, replyId);
+            // A question.  Build a thread to handle it and send a reply.
+
+            if (false) { // DISABLED FOR NOW
+                Message m = null;
+                try {
+                    m = messageReader(xr);
+                } catch (FreeColException|XMLStreamException ex) {
+                    // Just log for now, fall through to DOM-based code
+                    logger.log(Level.FINEST, "ReceivingThread.question", ex);
+                }
+                if (m != null) {
+                    assert m instanceof QuestionMessage;
+                    t = messageQuestion((QuestionMessage)m, replyId);
+                    break;
+                }
+            }
+
+            dm = domReader();
+            t = domQuestion(dm, replyId);
             break;
             
         default:
             // An ordinary update message.
             // Build a thread to handle it and possibly respond.
 
-            // XMLStreamException if the XML broke
-            // FreeColException if the contents were not valid XML but not
-            // missing in terms of FreeCol game logic.
-            try {
-                Message m = this.connection.reader(xr);
-                if (m != null) msg = (DOMMessage)m;
-            } catch (FreeColException|XMLStreamException ex) {
-                // Just log for now, fall through to DOM-based code
-                logger.log(Level.FINEST, "ReceivingThread: " + ex.getMessage());
+            if (true) {
+                Message m = null;
+                try {
+                    m = messageReader(xr);
+                } catch (FreeColException|XMLStreamException ex) {
+                    // Just log for now, fall through to DOM-based code
+                    logger.log(Level.FINEST, "ReceivingThread." + tag, ex);
+                }
+                if (m != null) {
+                    t = messageUpdate(m);
+                    break;
+                }
             }
 
-            if (msg == null) msg = domReader();
-            t = update(msg);
+            dm = domReader();
+            t = domUpdate(dm);
             break;
         }
 
