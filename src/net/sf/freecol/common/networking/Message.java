@@ -486,11 +486,17 @@ public abstract class Message {
             @SuppressWarnings("unchecked")
             final Class<? extends Message> cl
                 = (Class<? extends Message>)Introspector.getClassByName(className);
-            if (cl == null) throw new FreeColException("No class for: " + tag);
+            if (cl == null) {
+                throw new FreeColException("No class for: " + tag)
+                    .preserveDebug();
+            }
 
             final Class[] types = { Game.class, FreeColXMLReader.class };
             mb = Introspector.getConstructor(cl, types);
-            if (mb == null) throw new FreeColException("No constructor for: " + tag);
+            if (mb == null) {
+                throw new FreeColException("No constructor for: " + tag)
+                    .preserveDebug();
+            }
             builders.put(tag, mb);
         }
         try {

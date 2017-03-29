@@ -712,7 +712,8 @@ public class Connection implements Closeable {
 
         // FIXME: Temporary hack
         if (mh == null) {
-            throw new FreeColException("No handler for " + message.getType());
+            throw new FreeColException("No handler for " + message.getType())
+                .preserveDebug();
         }
 
         return mh.handle(message);
@@ -730,8 +731,11 @@ public class Connection implements Closeable {
         throws FreeColException, XMLStreamException {
         MessageHandler mh = getMessageHandler();
         
-        // Temporary fast fail
-        if (mh == null) throw new FreeColException("No handler");
+        // FIXME: Temporary fast fail
+        if (mh == null) {
+            throw new FreeColException("No handler at " + xr.getLocalName())
+                .preserveDebug();
+        }
 
         return mh.read(xr);
     }
