@@ -98,6 +98,14 @@ public class MonarchActionMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public boolean currentPlayerMessage() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MessagePriority getPriority() {
         MessagePriority mp = null;
         switch (this.action) {

@@ -64,6 +64,14 @@ public class EndTurnMessage extends TrivialMessage {
      * {@inheritDoc}
      */
     @Override
+    public boolean currentPlayerMessage() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         return igc(freeColServer).endTurn(serverPlayer);

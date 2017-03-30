@@ -87,15 +87,15 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         super(freeColServer);
 
         register(ChatMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new ChatMessage(getGame(), e)));
 
         register(DisconnectMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 TrivialMessage.disconnectMessage));
 
         register(LogoutMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new LogoutMessage(getGame(), e)));
     }
 
@@ -124,17 +124,15 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     /**
      * Internal wrapper for new message handling.
      *
-     * @param current If true, insist the message is from the current player
-     *     in the game.
      * @param connection The {@code Connection} the message arrived on.
-     * @param message The {@code DOMMessage} to handle.
+     * @param message The {@code Message} to handle.
      * @return The resulting reply {@code Message}.
      */
-    private Message internalHandler(boolean current, Connection connection,
-                                    DOMMessage message) {
+    private Message internalHandler(Connection connection, Message message) {
         final FreeColServer freeColServer = getFreeColServer();
         final ServerPlayer serverPlayer = freeColServer.getPlayer(connection);
         final Game game = freeColServer.getGame();
+        final boolean current = message.currentPlayerMessage();
         ChangeSet cs = (current && (game == null || serverPlayer == null
                 || serverPlayer != game.getCurrentPlayer()))
             ? serverPlayer.clientError("Received: " + message.getType()
@@ -146,15 +144,12 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     /**
      * Wrapper for new message handling.
      *
-     * @param current If true, insist the message is from the current player
-     *     in the game.
      * @param connection The {@code Connection} the message arrived on.
      * @param message The {@code DOMMessage} to handle.
      * @return The resulting reply {@code Element}.
      */
-    protected Element handler(boolean current, Connection connection,
-                              DOMMessage message) {
-        Message m = internalHandler(current, connection, message);
+    protected Element handler(Connection connection, DOMMessage message) {
+        Message m = internalHandler(connection, message);
         return (m == null) ? null : ((DOMMessage)m).toXMLElement();
     }
 

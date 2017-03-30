@@ -76,6 +76,14 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public boolean currentPlayerMessage() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public MessagePriority getPriority() {
         return MessagePriority.NORMAL;
     }

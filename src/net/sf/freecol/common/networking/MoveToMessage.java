@@ -68,6 +68,14 @@ public class MoveToMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public boolean currentPlayerMessage() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }

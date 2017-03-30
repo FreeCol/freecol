@@ -111,193 +111,193 @@ public final class InGameInputHandler extends ServerInputHandler {
         super(freeColServer);
 
         register(AbandonColonyMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new AbandonColonyMessage(getGame(), e)));
         register(AskSkillMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new AskSkillMessage(getGame(), e)));
         register(AssignTeacherMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new AssignTeacherMessage(getGame(), e)));
         register(AssignTradeRouteMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new AssignTradeRouteMessage(getGame(), e)));
         register(AttackMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new AttackMessage(getGame(), e)));
         register(BuildColonyMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new BuildColonyMessage(getGame(), e)));
         register(CashInTreasureTrainMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new CashInTreasureTrainMessage(getGame(), e)));
         register(ChangeStateMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new ChangeStateMessage(getGame(), e)));
         register(ChangeWorkImprovementTypeMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new ChangeWorkImprovementTypeMessage(getGame(), e)));
         register(ChangeWorkTypeMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new ChangeWorkTypeMessage(getGame(), e)));
         register(ChooseFoundingFatherMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new ChooseFoundingFatherMessage(getGame(), e)));
         register(ClaimLandMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new ClaimLandMessage(getGame(), e)));
         register(ClearSpecialityMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new ClearSpecialityMessage(getGame(), e)));
         register(ContinueMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 TrivialMessage.continueMessage));
         register(DeclareIndependenceMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new DeclareIndependenceMessage(getGame(), e)));
         register(DeclineMoundsMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new DeclineMoundsMessage(getGame(), e)));
         register(DeliverGiftMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new DeliverGiftMessage(getGame(), e)));
         register(DeleteTradeRouteMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new DeleteTradeRouteMessage(getGame(), e)));
         register(DemandTributeMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new DemandTributeMessage(getGame(), e)));
         register(DiplomacyMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new DiplomacyMessage(getGame(), e)));
         register(DisbandUnitMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new DisbandUnitMessage(getGame(), e)));
         register(DisembarkMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new DisembarkMessage(getGame(), e)));
         register(EmbarkMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new EmbarkMessage(getGame(), e)));
         register(EmigrateUnitMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new EmigrateUnitMessage(getGame(), e)));
         register(EndTurnMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 TrivialMessage.endTurnMessage));
         register(EnterRevengeModeMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 TrivialMessage.enterRevengeModeMessage));
         register(EquipForRoleMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new EquipForRoleMessage(getGame(), e)));
         register(FirstContactMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new FirstContactMessage(getGame(), e)));
         register(InciteMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new InciteMessage(getGame(), e)));
         register(IndianDemandMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new IndianDemandMessage(getGame(), e)));
         register(HighScoreMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new HighScoreMessage(getGame(), e)));
         register(JoinColonyMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new JoinColonyMessage(getGame(), e)));
         register(LearnSkillMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new LearnSkillMessage(getGame(), e)));
         register(LoadGoodsMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new LoadGoodsMessage(getGame(), e)));
         register(LootCargoMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new LootCargoMessage(getGame(), e)));
         register(MissionaryMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new MissionaryMessage(getGame(), e)));
         register(MonarchActionMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new MonarchActionMessage(getGame(), e)));
         register(MoveMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new MoveMessage(getGame(), e)));
         register(MoveToMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new MoveToMessage(getGame(), e)));
         //register(MultipleMessage.TAG,
-        //    (Connection conn, Element e) -> handler(false, conn,
+        //    (Connection conn, Element e) -> handler(conn,
         //        new MultipleMessage(getGame(), e)));
         register(NationSummaryMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new NationSummaryMessage(getGame(), e)));
         register(NativeGiftMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new NativeGiftMessage(getGame(), e)));
         register(NativeTradeMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new NativeTradeMessage(getGame(), e)));
         register(NewLandNameMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new NewLandNameMessage(getGame(), e)));
         register(NewRegionNameMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new NewRegionNameMessage(getGame(), e)));
         register(NewTradeRouteMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new NewTradeRouteMessage(getGame(), e)));
         register(PayArrearsMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new PayArrearsMessage(getGame(), e)));
         register(PayForBuildingMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new PayForBuildingMessage(getGame(), e)));
         register(PutOutsideColonyMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new PutOutsideColonyMessage(getGame(), e)));
         register(RearrangeColonyMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new RearrangeColonyMessage(getGame(), e)));
         register(RenameMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new RenameMessage(getGame(), e)));
         register(RetireMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 TrivialMessage.retireMessage));
         register(ScoutIndianSettlementMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new ScoutIndianSettlementMessage(getGame(), e)));
         register(ScoutSpeakToChiefMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new ScoutSpeakToChiefMessage(getGame(), e)));
         register(SetBuildQueueMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new SetBuildQueueMessage(getGame(), e)));
         register(SetCurrentStopMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new SetCurrentStopMessage(getGame(), e)));
         register(SetDestinationMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new SetDestinationMessage(getGame(), e)));
         register(SetGoodsLevelsMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new SetGoodsLevelsMessage(getGame(), e)));
         register(SpySettlementMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new SpySettlementMessage(getGame(), e)));
         register(TrainUnitInEuropeMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new TrainUnitInEuropeMessage(getGame(), e)));
         register(UnloadGoodsMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new UnloadGoodsMessage(getGame(), e)));
         register(UpdateTradeRouteMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new UpdateTradeRouteMessage(getGame(), e)));
         register(WorkMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new WorkMessage(getGame(), e)));
 
         register(MultipleMessage.TAG,

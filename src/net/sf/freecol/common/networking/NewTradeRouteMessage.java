@@ -65,6 +65,14 @@ public class NewTradeRouteMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public boolean currentPlayerMessage() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }

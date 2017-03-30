@@ -148,6 +148,15 @@ public abstract class Message {
     }
 
     /**
+     * Should this message only be sent to a server by the current player?
+     *
+     * @return True if this is a current-player-only message.
+     */
+    public boolean currentPlayerMessage() {
+        return false;
+    }
+    
+    /**
      * Checks if an attribute is present in this message.
      * 
      * @param key The attribute to look for.

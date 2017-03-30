@@ -54,13 +54,13 @@ public final class UserConnectionHandler extends ServerInputHandler {
         super(freeColServer);
 
         register(GameStateMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new GameStateMessage(getGame(), e)));
         register(LoginMessage.TAG,
             (Connection conn, Element e) -> loginHandler(conn,
                 new LoginMessage(getGame(), e)));
         register(VacantPlayersMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
+            (Connection conn, Element e) -> handler(conn,
                 new VacantPlayersMessage(getGame(), e)));
     }
 

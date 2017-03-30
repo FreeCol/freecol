@@ -65,6 +65,14 @@ public class JoinColonyMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public boolean currentPlayerMessage() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
