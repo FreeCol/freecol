@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.ChangeSet;
@@ -36,6 +38,7 @@ import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -50,7 +53,7 @@ import org.w3c.dom.Element;
  * @see Controller
  */
 public abstract class ServerInputHandler extends FreeColServerHolder
-    implements DOMMessageHandler {
+    implements MessageHandler, DOMMessageHandler {
 
     private static final Logger logger = Logger.getLogger(ServerInputHandler.class.getName());
 
@@ -87,15 +90,15 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         super(freeColServer);
 
         register(ChatMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new ChatMessage(getGame(), e)));
 
         register(DisconnectMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 TrivialMessage.disconnectMessage));
 
         register(LogoutMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new LogoutMessage(getGame(), e)));
     }
 
@@ -122,17 +125,28 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     }
 
     /**
+     * Get the server player associated with a connection.
+     *
+     * @param connection The {@code Connection} to look up.
+     * @return The {@code ServerPlayer} found.
+     */
+    protected ServerPlayer getServerPlayer(Connection connection) {
+        return getFreeColServer().getPlayer(connection);
+    }
+    
+    /**
      * Internal wrapper for new message handling.
      *
-     * @param connection The {@code Connection} the message arrived on.
+     * @param current If true, insist the message is from the current player
+     *     in the game.
+     * @param serverPlayer The {@code ServerPlayer} that sent the message.
      * @param message The {@code Message} to handle.
      * @return The resulting reply {@code Message}.
      */
-    private Message internalHandler(Connection connection, Message message) {
+    private Message internalHandler(boolean current, ServerPlayer serverPlayer,
+                                    Message message) {
         final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer serverPlayer = freeColServer.getPlayer(connection);
         final Game game = freeColServer.getGame();
-        final boolean current = message.currentPlayerMessage();
         ChangeSet cs = (current && (game == null || serverPlayer == null
                 || serverPlayer != game.getCurrentPlayer()))
             ? serverPlayer.clientError("Received: " + message.getType()
@@ -144,12 +158,16 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     /**
      * Wrapper for new message handling.
      *
+     * @param current If true, insist the message is from the current player
+     *     in the game.
      * @param connection The {@code Connection} the message arrived on.
      * @param message The {@code DOMMessage} to handle.
      * @return The resulting reply {@code Element}.
      */
-    protected Element handler(Connection connection, DOMMessage message) {
-        Message m = internalHandler(connection, message);
+    protected Element handler(boolean current, Connection connection,
+                              DOMMessage message) {
+        Message m = internalHandler(current, getServerPlayer(connection),
+                                    message);
         return (m == null) ? null : ((DOMMessage)m).toXMLElement();
     }
 
@@ -181,6 +199,28 @@ public abstract class ServerInputHandler extends FreeColServerHolder
                 connection.sendReconnect();
             }
         }
+        return ret;
+    }
+
+
+    // Implement MessageHandler
+
+    /**
+     * {@inheritDoc}
+     */
+    public Message handle(Message message) throws FreeColException {
+        return internalHandler(message.currentPlayerMessage(),
+                               message.getSourcePlayer(),
+                               message);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Message read(Connection connection)
+        throws FreeColException, XMLStreamException {
+        Message ret = Message.read(getGame(), connection.getFreeColXMLReader());
+        if (ret != null) ret.setSourcePlayer(getServerPlayer(connection));
         return ret;
     }
 }

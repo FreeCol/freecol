@@ -52,28 +52,28 @@ public final class PreGameInputHandler extends ServerInputHandler {
         super(freeColServer);
 
         register(ReadyMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new ReadyMessage(getGame(), e)));
         register(RequestLaunchMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 TrivialMessage.requestLaunchMessage));
         register(SetAvailableMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new SetAvailableMessage(getGame(), e)));
         register(SetColorMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new SetColorMessage(getGame(), e)));
         register(SetNationMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new SetNationMessage(getGame(), e)));
         register(SetNationTypeMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new SetNationTypeMessage(getGame(), e)));
         register(UpdateGameOptionsMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new UpdateGameOptionsMessage(getGame(), e)));
         register(UpdateMapGeneratorOptionsMessage.TAG,
-            (Connection conn, Element e) -> handler(conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new UpdateMapGeneratorOptionsMessage(getGame(), e)));
     }
 }
