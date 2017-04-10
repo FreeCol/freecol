@@ -320,6 +320,7 @@ public class GUI extends FreeColClientHolder {
         int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
             + MiniMap.MAX_TILE_SIZE / 2;
         int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
+        miniMap.setSize(width, height);
         BufferedImage image = new BufferedImage(
             width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g1 = image.createGraphics();
