@@ -39,11 +39,13 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColNetworkInputStream;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.common.util.Utils;
 
+import org.xml.sax.SAXException;
 import org.w3c.dom.Element;
 
 
@@ -85,6 +87,12 @@ public class Connection implements Closeable {
     /** A lock for the output side. */
     private final Object outputLock = new Object();
 
+    /** The wrapped version of the input stream. May go away. */
+    private FreeColNetworkInputStream fcnis;
+
+    /** A stream wrapping of the input stream (currently transient). */
+    private FreeColXMLReader xr;
+    
     private ReceivingThread receivingThread;
 
     private DOMMessageHandler domMessageHandler;
@@ -114,6 +122,8 @@ public class Connection implements Closeable {
         setSocket(null);
         this.in = null;
         this.out = null;
+        this.fcnis = null;
+        this.xr = null;
         this.receivingThread = null;
         this.domMessageHandler = null;
         this.xw = null;
@@ -155,7 +165,8 @@ public class Connection implements Closeable {
         setSocket(socket);
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
-        this.receivingThread = new ReceivingThread(this, this.in, name);
+        this.fcnis = new FreeColNetworkInputStream(this.in);
+        this.receivingThread = new ReceivingThread(this, name);
         this.domMessageHandler = domMessageHandler;
         this.xw = new FreeColXMLWriter(this.out,
             FreeColXMLWriter.WriteScope.toSave(), false);
@@ -260,6 +271,10 @@ public class Connection implements Closeable {
      */
     private void closeInputStream() {
         synchronized (this.inputLock) {
+            if (this.fcnis != null) {
+                this.fcnis.reallyClose();
+                this.fcnis = null;
+            }
             if (this.in == null) return;
             try {
                 this.in.close();
@@ -590,6 +605,43 @@ public class Connection implements Closeable {
         return ret;
     }
 
+    // ReceivingThread input support, work in progress
+
+    public FreeColXMLReader getFreeColXMLReader() {
+        return this.xr;
+    }
+
+    public String startListen() throws XMLStreamException {
+        this.fcnis.enable();
+        this.fcnis.mark(Connection.BUFFER_SIZE);
+        try {
+            this.xr = new FreeColXMLReader(this.fcnis); //.setTracing(true);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Failed to wrap input", ioe);
+            return DisconnectMessage.TAG;
+        }
+        this.xr.nextTag();
+        return this.xr.getLocalName();
+    }
+
+    public int getReplyId() {
+        return this.xr.getAttribute(NETWORK_REPLY_ID_TAG, -1);
+    }
+
+    public void endListen() {
+        if (this.xr != null) {
+            this.xr.close();
+            this.xr = null;
+        }
+    }
+
+    public DOMMessage domReader()
+        throws IOException, SAXException {
+        this.fcnis.enable();
+        this.fcnis.reset();
+        return new DOMMessage(this.fcnis);
+    }
+
     // DOM handlers for ReceivingThread
 
     /**
@@ -722,22 +774,21 @@ public class Connection implements Closeable {
     /**
      * Read a message using the MessageHandler.
      *
-     * @param xr The {@code FreeColXMLReader} to read from.
      * @return The {@code Message} found, if any.
      * @exception FreeColException there is a problem creating the message.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public Message reader(FreeColXMLReader xr)
+    public Message reader()
         throws FreeColException, XMLStreamException {
+        if (this.xr == null) return null;
+
         MessageHandler mh = getMessageHandler();
-        
-        // FIXME: Temporary fast fail
-        if (mh == null) {
+        if (mh == null) { // FIXME: Temporary fast fail
             throw new FreeColException("No handler at " + xr.getLocalName())
                 .preserveDebug();
         }
 
-        return mh.read(xr);
+        return mh.read(this.xr);
     }
 
 

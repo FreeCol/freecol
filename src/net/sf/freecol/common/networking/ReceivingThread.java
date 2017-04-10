@@ -51,9 +51,6 @@ final class ReceivingThread extends Thread {
     private final Map<Integer, NetworkReplyObject> waitingThreads
         = Collections.synchronizedMap(new HashMap<Integer, NetworkReplyObject>());
 
-    /** The wrapped version of the input stream. */
-    private final FreeColNetworkInputStream in;
-
     /** The connection to receive on. */
     private final Connection connection;
 
@@ -69,14 +66,11 @@ final class ReceivingThread extends Thread {
      * 
      * @param connection The {@code Connection} this
      *            {@code ReceivingThread} belongs to.
-     * @param in The stream to read from.
      * @param threadName The base name for the thread.
      */
-    public ReceivingThread(Connection connection, InputStream in,
-                           String threadName) {
+    public ReceivingThread(Connection connection, String threadName) {
         super(threadName + "-ReceivingThread-" + connection);
 
-        this.in = new FreeColNetworkInputStream(in);
         this.connection = connection;
         this.shouldRun = true;
         this.nextNetworkReplyId = 1;
@@ -138,24 +132,6 @@ final class ReceivingThread extends Thread {
 
 
     // Individual parts of listen().  Work in progress
-    private DOMMessage domReader()
-        throws IOException, SAXException {
-        this.in.enable();
-        this.in.reset();
-        return new DOMMessage(this.in);
-    }
-
-    private Message messageReader(FreeColXMLReader xr)
-        throws FreeColException, XMLStreamException {
-        // XMLStreamException if the XML broke
-        // FreeColException if the contents were not valid XML but wrong
-        // in terms of FreeCol game logic.
-        final String tag = xr.getLocalName();
-//System.err.println("messageReader: " + tag);
-        Message m = this.connection.reader(xr);
-//System.err.println("messageReader-> " + ((m==null) ? "null" : m.toString()));
-        return m;
-    }
 
     private Thread domQuestion(DOMMessage msg, final int replyId) {
         return new Thread(this.connection.getName() + "-question-" + replyId
@@ -280,20 +256,14 @@ final class ReceivingThread extends Thread {
      * @throws XMLStreamException if a problem occured during parsing.
      */
     private void listen() throws IOException, SAXException, XMLStreamException {
-        this.in.enable();
-        this.in.mark(Connection.BUFFER_SIZE);
-
-        // Start using FreeColXMLReader.  This must grow.
-        String tag = null;
-        int replyId = -1;
-        FreeColXMLReader xr = null;
+        String tag;
+        int replyId;
         try {
-            xr = new FreeColXMLReader(this.in); //.setTracing(true);
-            xr.nextTag();
-            tag = xr.getLocalName();
-            replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
+            tag = this.connection.startListen();
+            replyId = this.connection.getReplyId();
         } catch (XMLStreamException xse) {
             tag = DisconnectMessage.TAG;
+            replyId = -1;
         }
 
         // Read the message, optionally create a thread to handle it
@@ -315,7 +285,7 @@ final class ReceivingThread extends Thread {
             if (false) { // DISABLED FOR NOW
                 Message m = null;
                 try {
-                    m = messageReader(xr);
+                    m = this.connection.reader();
                 } catch (FreeColException|XMLStreamException ex) {
                     // Just log for now, fall through to DOM-based code
                     logger.log(Level.FINEST, "ReceivingThread.reply", ex);
@@ -328,7 +298,7 @@ final class ReceivingThread extends Thread {
             }
 
             try {
-                dm = domReader();
+                dm = this.connection.domReader();
                 reply(dm, replyId);
             } catch (IOException|SAXException ex) {
                 reply(null, replyId);
@@ -342,7 +312,7 @@ final class ReceivingThread extends Thread {
             if (false) { // DISABLED FOR NOW
                 Message m = null;
                 try {
-                    m = messageReader(xr);
+                    m = this.connection.reader();
                 } catch (FreeColException|XMLStreamException ex) {
                     // Just log for now, fall through to DOM-based code
                     logger.log(Level.FINEST, "ReceivingThread.question", ex);
@@ -354,7 +324,7 @@ final class ReceivingThread extends Thread {
                 }
             }
 
-            dm = domReader();
+            dm = this.connection.domReader();
             t = domQuestion(dm, replyId);
             break;
             
@@ -365,7 +335,7 @@ final class ReceivingThread extends Thread {
             if (true) {
                 Message m = null;
                 try {
-                    m = messageReader(xr);
+                    m = this.connection.reader();
                 } catch (FreeColException|XMLStreamException ex) {
                     // Just log for now, fall through to DOM-based code
                     logger.log(Level.FINEST, "ReceivingThread." + tag, ex);
@@ -376,7 +346,7 @@ final class ReceivingThread extends Thread {
                 }
             }
 
-            dm = domReader();
+            dm = this.connection.domReader();
             t = domUpdate(dm);
             break;
         }
@@ -384,8 +354,7 @@ final class ReceivingThread extends Thread {
         // Start the thread
         if (t != null) t.start();
 
-        // Clean up open stream
-        if (xr != null) xr.close();
+        this.connection.endListen(); // Clean up
     }
 
 
