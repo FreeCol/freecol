@@ -788,7 +788,7 @@ public class Connection implements Closeable {
                 .preserveDebug();
         }
 
-        return mh.read(this.xr);
+        return mh.read(this);
     }
 
 

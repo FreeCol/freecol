@@ -44,12 +44,12 @@ public interface MessageHandler {
     /**
      * Read an incoming Message.
      *
-     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param connection The {@code Connection} to read from.
      * @return The {@code Message} found, or null if none.
      * @exception FreeColException if the message can not be instantiated.
      * @exception XMLStreamException if there is a problem reading the
      *     message.
      */
-    public Message read(FreeColXMLReader xr)
+    public Message read(Connection connection)
         throws FreeColException, XMLStreamException;
 }

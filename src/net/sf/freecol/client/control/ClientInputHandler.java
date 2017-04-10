@@ -173,8 +173,8 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
-    public Message read(FreeColXMLReader xr)
+    public Message read(Connection connection)
         throws FreeColException, XMLStreamException {
-        return Message.read(getGame(), xr);
+        return Message.read(getGame(), connection.getFreeColXMLReader());
     }
 }
