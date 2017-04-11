@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -65,6 +67,17 @@ public class ChatMessage extends AttributeMessage {
               PRIVATE_TAG, getStringAttribute(element, PRIVATE_TAG));
     }
 
+    /**
+     * Create a new {@code ChatMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public ChatMessage(@SuppressWarnings("unused") Game game,
+                       FreeColXMLReader xr) {
+        super(TAG, xr, SENDER_TAG, MESSAGE_TAG, PRIVATE_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -73,6 +86,38 @@ public class ChatMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = getPlayer(game);
+        final String text = getMessage();
+        final boolean isPrivate = isPrivate();
+
+        if (freeColClient.isInGame()) {
+            invokeLater(freeColClient, () ->
+                igc(freeColClient).chat(player, text, isPrivate));
+        } else {
+            freeColClient.getGUI().displayChatMessage(player, text, isPrivate);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer server,
+                                   ServerPlayer serverPlayer) {
+        /* Do not trust the client-supplied sender name */
+        setStringAttribute(SENDER_TAG, serverPlayer.getId());
+
+        server.getInGameController()
+            .chat(serverPlayer, getMessage(), isPrivate());
+        return null;
+    }        
 
 
     // Public interface
@@ -84,7 +129,8 @@ public class ChatMessage extends AttributeMessage {
      * @return The player that sent this ChatMessage.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(SENDER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(SENDER_TAG),
+                                         Player.class);
     }
 
     /**
@@ -104,21 +150,4 @@ public class ChatMessage extends AttributeMessage {
     public boolean isPrivate() {
         return getBooleanAttribute(PRIVATE_TAG, false);
     }
-
-
-    // Override DOMMessage
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer server,
-                                   ServerPlayer serverPlayer) {
-        /* Do not trust the client-supplied sender name */
-        setStringAttribute(SENDER_TAG, serverPlayer.getId());
-
-        server.getInGameController()
-            .chat(serverPlayer, getMessage(), isPrivate());
-        return null;
-    }        
 }

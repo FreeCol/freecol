@@ -143,7 +143,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 animateMove(new AnimateMoveMessage(getGame(), e)));
         register(ChatMessage.TAG,
             (Connection c, Element e) ->
-                chat(new ChatMessage(getGame(), e)));
+                new ChatMessage(getGame(), e).clientHandler(freeColClient));
         register(ChooseFoundingFatherMessage.TAG,
             (Connection c, Element e) ->
                 chooseFoundingFather(new ChooseFoundingFatherMessage(getGame(), e)));
@@ -365,21 +365,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         // actually change unit positions, which happens in an "update".
         invokeAndWait(() ->
             igc().animateMove(unit, oldTile, newTile));
-    }
-
-    /**
-     * Handle a "chat"-message.
-     *
-     * @param message The {@code ChatMessage} to process.
-     */
-    private void chat(ChatMessage message) {
-        final Game game = getGame();
-        final Player player = message.getPlayer(game);
-        final String text = message.getMessage();
-        final boolean isPrivate = message.isPrivate();
-
-        invokeLater(() ->
-            igc().chat(player, text, isPrivate));
     }
 
     /**
