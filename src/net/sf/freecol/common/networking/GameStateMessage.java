@@ -62,6 +62,18 @@ public class GameStateMessage extends AttributeMessage {
     }
 
     /**
+     * Create a new {@code GameStateMessage} from a
+     * supplied element.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
+     */
+    public GameStateMessage(Game game, Element element) {
+        this(getEnumAttribute(element, STATE_TAG,
+                              ServerState.class, (ServerState)null));
+    }
+
+    /**
      * Create a new {@code GameStateMessage} from a stream.
      *
      * @param game The {@code Game} to read within (unused, no game
@@ -74,18 +86,6 @@ public class GameStateMessage extends AttributeMessage {
         this(xr.getAttribute(STATE_TAG, ServerState.class, (ServerState)null));
     }
         
-    /**
-     * Create a new {@code GameStateMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public GameStateMessage(Game game, Element element) {
-        this(getEnumAttribute(element, STATE_TAG,
-                              ServerState.class, (ServerState)null));
-    }
-
 
     /**
      * {@inheritDoc}
