@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -93,6 +94,20 @@ public class AttributeMessage extends TrivialMessage {
         this(element.getTagName());
 
         this.attributes.putAll(DOMUtils.getAttributeMap(element));
+    }
+
+    /**
+     * Create a new {@code AttributeMessage} from a stream.
+     *
+     * @param type The message type.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param attributes The attributes to read.
+     * @exception XMLStreamException if the stream is corrupt.
+     * @exception FreeColException if the internal message can not be read.
+     */
+    protected AttributeMessage(String type, FreeColXMLReader xr,
+                               String... attributes) {
+        this(type, xr.getAttributeMap(attributes));
     }
 
 

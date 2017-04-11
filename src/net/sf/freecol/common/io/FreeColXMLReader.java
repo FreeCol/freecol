@@ -635,6 +635,18 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
+     * Get a map of attributes.
+     *
+     * @param attributes The list of attributes to look up.
+     * @return A map of attributes.
+     */
+    public Map<String, String> getAttributeMap(String... attributes) {
+        Map<String, String> ret = new HashMap<>();
+        for (String a : attributes) ret.put(a, getAttribute(a, (String)null));
+        return ret;
+    }
+            
+    /**
      * Reads an XML-representation of a list of some general type.
      *
      * @param <T> The list member type.
