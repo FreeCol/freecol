@@ -94,7 +94,11 @@ public abstract class Message {
     public static final Comparator<Message> messagePriorityComparator
         = Comparator.comparingInt(Message::getPriorityLevel);
 
-                
+
+    /** The client player this message came from, if any. */
+    private ServerPlayer sourcePlayer = null;
+
+
     /**
      * Deliberately trivial constructor.
      */
@@ -155,7 +159,25 @@ public abstract class Message {
     public boolean currentPlayerMessage() {
         return false;
     }
-    
+
+    /**
+     * Get the source player for this message.
+     *
+     * @return The source {@code ServerPlayer}.
+     */
+    public ServerPlayer getSourcePlayer() {
+        return this.sourcePlayer;
+    }
+
+    /**
+     * Set the source player for this message.
+     *
+     * @param sourcePlayer The {@code ServerPlayer} that sent the message.
+     */
+    public void setSourcePlayer(ServerPlayer sourcePlayer) {
+        this.sourcePlayer = sourcePlayer;
+    }
+
     /**
      * Checks if an attribute is present in this message.
      * 
