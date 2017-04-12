@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Level;
@@ -77,6 +78,8 @@ public class Connection implements Closeable {
 
     /** The input stream to read from, derived from the socket. */
     private InputStream in;
+    /** The wrapped version of the input stream. May go away. */
+    private FreeColNetworkInputStream fcnis;
     /** A lock for the input side, including the socket. */
     private final Object inputLock = new Object();
 
@@ -86,9 +89,6 @@ public class Connection implements Closeable {
     private OutputStream out;
     /** A lock for the output side. */
     private final Object outputLock = new Object();
-
-    /** The wrapped version of the input stream. May go away. */
-    private FreeColNetworkInputStream fcnis;
 
     /** A stream wrapping of the input stream (currently transient). */
     private FreeColXMLReader xr;
@@ -616,8 +616,7 @@ public class Connection implements Closeable {
         this.fcnis.mark(Connection.BUFFER_SIZE);
         try {
             this.xr = new FreeColXMLReader(this.fcnis); //.setTracing(true);
-        } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "Failed to wrap input", xse);
+        } catch (Exception ex) {
             return DisconnectMessage.TAG;
         }
         this.xr.nextTag();

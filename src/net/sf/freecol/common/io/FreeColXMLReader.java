@@ -42,6 +42,7 @@ import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
 
 import net.sf.freecol.common.model.FreeColObject;
@@ -91,13 +92,20 @@ public class FreeColXMLReader extends StreamReaderDelegate
      *
      * @param bis The {@code BufferedInputStream} to create
      *     an {@code FreeColXMLReader} for.
-     * @exception XMLStreamException if thrown while creating the reader.
+     * @exception XMLStreamException can be thrown while creating the reader.
      */
-    public FreeColXMLReader(BufferedInputStream bis) throws XMLStreamException {
+    public FreeColXMLReader(BufferedInputStream bis)
+        throws XMLStreamException {
         super();
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
-        setParent(xif.createXMLStreamReader(bis, "UTF-8"));
+        XMLStreamReader xsr;
+        try {
+            xsr = xif.createXMLStreamReader(bis, "UTF-8");
+            setParent(xsr);
+        } catch (Exception ex) {
+            throw new XMLStreamException("Stream reader fail", ex);
+        }
         this.inputStream = bis;
         this.readScope = ReadScope.NORMAL;
         this.uninterned.clear();
@@ -108,18 +116,18 @@ public class FreeColXMLReader extends StreamReaderDelegate
      *
      * @param inputStream The {@code InputStream} to create
      *     an {@code FreeColXMLReader} for.
-     * @exception XMLStreamException if thrown while creating the reader.
+     * @exception XMLStreamException can be thrown while creating the reader.
      */
-    public FreeColXMLReader(InputStream inputStream) throws XMLStreamException {
+    public FreeColXMLReader(InputStream inputStream)
+        throws XMLStreamException {
         this(new BufferedInputStream(inputStream));
     }
 
     /**
      * Creates a new {@code FreeColXMLReader}.
      *
-     * @param file The {@code File} to create
-     *     an {@code FreeColXMLReader} for.
-     * @exception XMLStreamException if thrown while creating the reader.
+     * @param file The {@code File} to create an {@code FreeColXMLReader} for.
+     * @exception XMLStreamException can be thrown while creating the reader.
      * @exception FileNotFoundException if the file is missing.
      */
     public FreeColXMLReader(File file)
@@ -138,7 +146,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
         super();
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
-        setParent(xif.createXMLStreamReader(reader));
+        XMLStreamReader xsr = xif.createXMLStreamReader(reader);
+        setParent(xsr);
         this.inputStream = null;
         this.readScope = ReadScope.NORMAL;
         this.uninterned.clear();
