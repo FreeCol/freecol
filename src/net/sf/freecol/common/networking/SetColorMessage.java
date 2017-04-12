@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import java.awt.Color;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Specification;
@@ -62,6 +64,16 @@ public class SetColorMessage extends AttributeMessage {
               COLOR_TAG, getStringAttribute(element, COLOR_TAG));
     }
 
+    /**
+     * Create a new {@code SetAvailableMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to (null here).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public SetColorMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, NATION_TAG, COLOR_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -71,33 +83,27 @@ public class SetColorMessage extends AttributeMessage {
         return Message.MessagePriority.NORMAL;
     }
 
-
-    // Public interface
-
     /**
-     * Get the nation whose color is changing.
-     *
-     * @param spec The {@code Specification} to look up the nation in.
-     * @return The {@code Nation}.
+     * {@inheritDoc}
      */
-    public Nation getNation(Specification spec) {
-        return spec.getNation(getStringAttribute(NATION_TAG));
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Specification spec = game.getSpecification();
+        final Nation nation = getNation(spec);
+        final Color color = getColor();
+      
+        if (nation != null) {
+            if (color != null) {
+                nation.setColor(color);
+                freeColClient.getGUI().refreshPlayersTable();
+            } else {
+                logger.warning("Invalid color: " + toString());
+            }
+        } else {
+            logger.warning("Invalid nation: " + toString());
+        }
     }
-
-    /**
-     * Get the color.
-     *
-     * @return The new {@code Color}.
-     */
-    public Color getColor() {
-        Color color = null;
-        try {
-            int rgb = getIntegerAttribute(COLOR_TAG, 0);
-            color = new Color(rgb);
-        } catch (NumberFormatException nfe) {}
-        return color;
-    }
-
 
     /**
      * {@inheritDoc}
@@ -125,5 +131,32 @@ public class SetColorMessage extends AttributeMessage {
             logger.warning("setColor from unknown connection.");
         }
         return null;
+    }
+
+
+    // Public interface
+
+    /**
+     * Get the nation whose color is changing.
+     *
+     * @param spec The {@code Specification} to look up the nation in.
+     * @return The {@code Nation}.
+     */
+    public Nation getNation(Specification spec) {
+        return spec.getNation(getStringAttribute(NATION_TAG));
+    }
+
+    /**
+     * Get the color.
+     *
+     * @return The new {@code Color}.
+     */
+    public Color getColor() {
+        Color color = null;
+        try {
+            int rgb = getIntegerAttribute(COLOR_TAG, 0);
+            color = new Color(rgb);
+        } catch (NumberFormatException nfe) {}
+        return color;
     }
 }

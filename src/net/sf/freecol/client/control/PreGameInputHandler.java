@@ -102,7 +102,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 setAvailable(new SetAvailableMessage(getGame(), e)));
         register(SetColorMessage.TAG,
             (Connection c, Element e) ->
-                setColor(new SetColorMessage(getGame(), e)));
+                new SetColorMessage(getGame(), e).clientHandler(freeColClient));
         register(SetNationMessage.TAG,
             (Connection c, Element e) ->
                 setNation(new SetNationMessage(getGame(), e)));
@@ -162,29 +162,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
 
         game.getNationOptions().setNationState(nation, nationState);
         getGUI().refreshPlayersTable();
-    }
-
-    /**
-     * Handles an "setColor"-message.
-     *
-     * @param message The {@code SetColorMessage} to process.
-     */
-    private void setColor(SetColorMessage message) {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-        final Nation nation = message.getNation(spec);
-        final Color color = message.getColor();
-      
-        if (nation != null) {
-            if (color != null) {
-                nation.setColor(color);
-                getGUI().refreshPlayersTable();
-            } else {
-                logger.warning("Invalid color: " + message.toString());
-            }
-        } else {
-            logger.warning("Invalid nation: " + message.toString());
-        }
     }
 
     /**
