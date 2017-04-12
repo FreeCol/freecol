@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
@@ -56,6 +57,16 @@ public class PayArrearsMessage extends AttributeMessage {
      */
     public PayArrearsMessage(Game game, Element element) {
         super(TAG, GOODS_TYPE_TAG, getStringAttribute(element, GOODS_TYPE_TAG));
+    }
+
+    /**
+     * Create a new {@code PayArrearsMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public PayArrearsMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, GOODS_TYPE_TAG);
     }
 
 
