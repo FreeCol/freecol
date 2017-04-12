@@ -108,7 +108,6 @@ public abstract class TrivialMessage extends DOMMessage {
         throws FreeColException, XMLStreamException {
         this(tag);
 
-        xr.nextTag();
         xr.closeTag(tag);
     }
 
