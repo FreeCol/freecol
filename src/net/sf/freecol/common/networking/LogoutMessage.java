@@ -20,6 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Player;
@@ -64,6 +65,16 @@ public class LogoutMessage extends AttributeMessage {
     public LogoutMessage(Game game, Element element) {
         super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG),
               REASON_TAG, getStringAttribute(element, REASON_TAG));
+    }
+
+    /**
+     * Create a new {@code LogoutMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public LogoutMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, PLAYER_TAG, REASON_TAG);
     }
 
 
@@ -149,6 +160,7 @@ public class LogoutMessage extends AttributeMessage {
 
         return cs;
     }
+
 
     // Public interface
 
