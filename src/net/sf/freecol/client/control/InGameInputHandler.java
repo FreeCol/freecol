@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -170,7 +169,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 fountainOfYouth(new FountainOfYouthMessage(getGame(), e)));
         register(GameEndedMessage.TAG,
             (Connection c, Element e) ->
-                gameEnded(new GameEndedMessage(getGame(), e)));
+                new GameEndedMessage(getGame(), e).clientHandler(freeColClient));
         register(HighScoreMessage.TAG,
             (Connection c, Element e) ->
                 highScore(new HighScoreMessage(getGame(), e)));
@@ -495,27 +494,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().fountainOfYouth(n));
-    }
-
-    /**
-     * Handle a "gameEnded"-message.
-     *
-     * @param message The {@code GameEndedMessage} to process.
-     */
-    private void gameEnded(GameEndedMessage message) {
-        final Game game = getGame();
-        final Player winner = message.getWinner(game);
-        final String highScore = message.getScore();
-
-        if (winner == null) {
-            logger.warning("Invalid player for gameEnded");
-            return;
-        }
-        FreeColDebugger.finishDebugRun(getFreeColClient(), true);
-        if (winner != getMyPlayer()) return;
-        
-        invokeLater(() ->
-            igc().victory(highScore));
     }
 
     /**

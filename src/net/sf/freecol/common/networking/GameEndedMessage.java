@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -59,6 +62,16 @@ public class GameEndedMessage extends AttributeMessage {
               HIGH_SCORE_TAG, getStringAttribute(element, HIGH_SCORE_TAG));
     }
 
+    /**
+     * Create a new {@code GameEndedMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public GameEndedMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, WINNER_TAG, HIGH_SCORE_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -68,7 +81,29 @@ public class GameEndedMessage extends AttributeMessage {
         return Message.MessagePriority.NORMAL;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player winner = getWinner(game);
+        final String highScore = getScore();
 
+        if (winner == null) {
+            logger.warning("Invalid player for gameEnded");
+            return;
+        }
+        FreeColDebugger.finishDebugRun(freeColClient, true);
+        if (winner != freeColClient.getMyPlayer()) return;
+        
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).victory(highScore));
+    }
+
+    // No serverHandler needed, message only sent to client
+
+    
     // Public interface
 
     /**
