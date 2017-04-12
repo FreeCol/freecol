@@ -166,7 +166,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new FirstContactMessage(getGame(), e).clientHandler(freeColClient));
         register(FountainOfYouthMessage.TAG,
             (Connection c, Element e) ->
-                fountainOfYouth(new FountainOfYouthMessage(getGame(), e)));
+                new FountainOfYouthMessage(getGame(), e).clientHandler(freeColClient));
         register(GameEndedMessage.TAG,
             (Connection c, Element e) ->
                 new GameEndedMessage(getGame(), e).clientHandler(freeColClient));
@@ -463,24 +463,6 @@ public final class InGameInputHandler extends ClientInputHandler {
                 logger.warning("featureChange unrecognized: " + fco);
             }
         }
-    }
-
-    /**
-     * Handle a "fountainOfYouth"-message.
-     *
-     * @param message The {@code FountainOfYouthMessage} to process.
-     */
-    private void fountainOfYouth(FountainOfYouthMessage message) {
-        final Game game = getGame();
-        final int n = message.getMigrants();
-
-        if (n <= 0) {
-            logger.warning("Invalid migrants attribute: " + n);
-            return;
-        }
-
-        invokeLater(() ->
-            igc().fountainOfYouth(n));
     }
 
     /**

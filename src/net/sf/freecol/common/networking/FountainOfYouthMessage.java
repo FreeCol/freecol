@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -55,6 +57,16 @@ public class FountainOfYouthMessage extends AttributeMessage {
         super(TAG, MIGRANTS_TAG, getStringAttribute(element, MIGRANTS_TAG));
     }
 
+    /**
+     * Create a new {@code FountainOfYouthMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public FountainOfYouthMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, MIGRANTS_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -63,6 +75,25 @@ public class FountainOfYouthMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.LATE;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final int n = getMigrants();
+
+        if (n <= 0) {
+            logger.warning("Invalid migrants attribute: " + n);
+            return;
+        }
+
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).fountainOfYouth(n));
+    }
+
+    // No server handler required.
+    // This message is only sent to clients.
 
 
     // Public interface
@@ -75,7 +106,4 @@ public class FountainOfYouthMessage extends AttributeMessage {
     public int getMigrants() {
         return getIntegerAttribute(MIGRANTS_TAG, -1);
     }
-
-    // No server handler required.
-    // This message is only sent to clients.
 }
