@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
@@ -72,6 +73,16 @@ public class MissionaryMessage extends AttributeMessage {
               DENOUNCE_TAG, getStringAttribute(element, DENOUNCE_TAG));
     }
 
+    /**
+     * Create a new {@code LoadGoodsMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public MissionaryMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, DIRECTION_TAG, DENOUNCE_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -88,7 +99,6 @@ public class MissionaryMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
