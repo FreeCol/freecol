@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -59,12 +61,34 @@ public class SetAIMessage extends AttributeMessage {
               AI_TAG, getStringAttribute(element, AI_TAG));
     }
 
+    /**
+     * Create a new {@code SetAIMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr A {@code FreeColXMLReader} to read from.
+     */
+    public SetAIMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, PLAYER_TAG, AI_TAG);
+    }
+    
 
     /**
      * {@inheritDoc}
      */
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player p = getPlayer(game);
+        final boolean ai = getAI();
+
+        if (p != null) p.setAI(ai);
     }
 
 

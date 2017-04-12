@@ -217,7 +217,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 scoutSpeakToChief(new ScoutSpeakToChiefMessage(getGame(), e)));
         register(SetAIMessage.TAG,
             (Connection c, Element e) ->
-                setAI(new SetAIMessage(getGame(), e)));
+                new SetAIMessage(getGame(), e).clientHandler(freeColClient));
         register(SetCurrentPlayerMessage.TAG,
             (Connection c, Element e) ->
                 new SetCurrentPlayerMessage(getGame(), e).clientHandler(freeColClient));
@@ -659,19 +659,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().scoutSpeakToChief(unit, is, result));
-    }
-
-    /**
-     * Handle a "setAI"-message.
-     *
-     * @param message The {@code SetAIMessage} to process.
-     */
-    private void setAI(SetAIMessage message) {
-        final Game game = getGame();
-        final Player p = message.getPlayer(game);
-        final boolean ai = message.getAI();
-
-        if (p != null) p.setAI(ai);
     }
 
     /**
