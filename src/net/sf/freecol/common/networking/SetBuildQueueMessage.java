@@ -21,7 +21,9 @@ package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -70,6 +72,22 @@ public class SetBuildQueueMessage extends AttributeMessage {
         setArrayAttributes(DOMUtils.getArrayAttributes(element));
     }
 
+    /**
+     * Create a new {@code SetAvailableMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to (null here).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public SetBuildQueueMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, getAttributeMap(xr));
+    }
+
+    private static Map<String, String> getAttributeMap(FreeColXMLReader xr) {
+        Map<String, String> ret = xr.getArrayAttributeMap();
+        ret.put(COLONY_TAG, xr.getAttribute(COLONY_TAG, (String)null));
+        return ret;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -87,33 +105,6 @@ public class SetBuildQueueMessage extends AttributeMessage {
         return Message.MessagePriority.NORMAL;
     }
 
-
-    // Public interface
-
-    /**
-     * Get the colony that is building.
-     *
-     * @param player The {@code Player} that owns the colony.
-     * @return The colony.
-     */
-    public Colony getColony(Player player) {
-        return player.getOurFreeColGameObject(getStringAttribute(COLONY_TAG),
-                                              Colony.class);
-    }
-
-    /**
-     * Get the list of buildables defined by the array attributes.
-     *
-     * @param spec A {@code Specification} to use to make the buildable.
-     * @return A list of {@code BuildableType}s.
-     */
-    public List<BuildableType> getQueue(Specification spec) {
-        return transform(getArrayAttributes(), alwaysTrue(),
-                         id -> spec.getType(id, BuildableType.class),
-                         toListNoNulls());
-    }
-
-    
     /**
      * {@inheritDoc}
      */
@@ -140,5 +131,31 @@ public class SetBuildQueueMessage extends AttributeMessage {
         // Proceed to set the build queue.
         return freeColServer.getInGameController()
             .setBuildQueue(serverPlayer, colony, buildQueue);
+    }
+
+
+    // Public interface
+
+    /**
+     * Get the colony that is building.
+     *
+     * @param player The {@code Player} that owns the colony.
+     * @return The colony.
+     */
+    public Colony getColony(Player player) {
+        return player.getOurFreeColGameObject(getStringAttribute(COLONY_TAG),
+                                              Colony.class);
+    }
+
+    /**
+     * Get the list of buildables defined by the array attributes.
+     *
+     * @param spec A {@code Specification} to use to make the buildable.
+     * @return A list of {@code BuildableType}s.
+     */
+    public List<BuildableType> getQueue(Specification spec) {
+        return transform(getArrayAttributes(), alwaysTrue(),
+                         id -> spec.getType(id, BuildableType.class),
+                         toListNoNulls());
     }
 }
