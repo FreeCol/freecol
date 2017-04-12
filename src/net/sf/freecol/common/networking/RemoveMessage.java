@@ -20,8 +20,12 @@
 package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -71,6 +75,28 @@ public class RemoveMessage extends AttributeMessage {
         setArrayAttributes(DOMUtils.getArrayAttributes(element));
     }
 
+    /**
+     * Create a new {@code RemoveMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr A {@code FreeColXMLReader} to read from.
+     */
+    public RemoveMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, getAttributeMap(xr));
+    }
+
+    /**
+     * Get the attributes as a map.
+     *
+     * @param xr A {@code FreeColXMLReader} to read from.
+     * @return A map of the attributes.
+     */
+    private static Map<String, String> getAttributeMap(FreeColXMLReader xr) {
+        Map<String, String> ret = xr.getArrayAttributeMap();
+        ret.put(DIVERT_TAG, xr.getAttribute(DIVERT_TAG, (String)null));
+        return ret;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -78,6 +104,29 @@ public class RemoveMessage extends AttributeMessage {
     @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.REMOVE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final FreeColGameObject divert = getDivertObject(game);
+        final List<FreeColGameObject> objects = getRemovals(game);
+
+        if (objects.isEmpty()) return;
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).remove(objects, divert));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return null; // Only sent to client
     }
 
 
@@ -106,15 +155,5 @@ public class RemoveMessage extends AttributeMessage {
             if (fcgo != null) ret.add(fcgo);
         }
         return ret;
-    }
-    
-            
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        return null; // Only sent to client
     }
 }

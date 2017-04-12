@@ -211,7 +211,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 TrivialMessage.reconnectMessage.clientHandler(freeColClient));
         register(RemoveMessage.TAG,
             (Connection c, Element e) ->
-                remove(new RemoveMessage(getGame(), e)));
+                new RemoveMessage(getGame(), e).clientHandler(freeColClient));
         register(ScoutSpeakToChiefMessage.TAG,
             (Connection c, Element e) ->
                 scoutSpeakToChief(new ScoutSpeakToChiefMessage(getGame(), e)));
@@ -644,21 +644,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().newTurn(n));
-    }
-
-    /**
-     * Handle a "remove"-message.
-     *
-     * @param message The {@code RemoveMessage} to process.
-     */
-    private void remove(RemoveMessage message) {
-        final Game game = getGame();
-        final FreeColGameObject divert = message.getDivertObject(game);
-        final List<FreeColGameObject> objects = message.getRemovals(game);
-
-        if (!objects.isEmpty()) {
-            invokeLater(() -> igc().remove(objects, divert));
-        }
     }
 
     /**
