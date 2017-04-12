@@ -178,7 +178,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new InciteMessage(getGame(), e).clientHandler(freeColClient));
         register(IndianDemandMessage.TAG,
             (Connection c, Element e) ->
-                indianDemand(new IndianDemandMessage(getGame(), e)));
+                new IndianDemandMessage(getGame(), e).clientHandler(freeColClient));
         register(LogoutMessage.TAG,
             (Connection c, Element e) ->
                 new LogoutMessage(getGame(), e).clientHandler(freeColClient));
@@ -477,34 +477,6 @@ public final class InGameInputHandler extends ClientInputHandler {
             igc().displayHighScores(message.getKey(), message.getScores()));
     }
         
-    /**
-     * Handle an "indianDemand"-message.
-     *
-     * @param message The {@code IndianDemandMessage} to process.
-     */
-    private void indianDemand(IndianDemandMessage message) {
-        final Game game = getGame();
-        final Player player = getMyPlayer();
-        final Unit unit = message.getUnit(game);
-        final Colony colony = message.getColony(game);
-        final GoodsType goodsType = message.getType(game);
-        final int amount = message.getAmount();
-        
-        if (unit == null) {
-            logger.warning("IndianDemand with null unit.");
-            return;
-        }
-        if (colony == null) {
-            logger.warning("IndianDemand with null colony");
-            return;
-        } else if (!player.owns(colony)) {
-            throw new IllegalArgumentException("Demand to anothers colony");
-        }
-
-        invokeLater(() ->
-            igc().indianDemand(unit, colony, goodsType, amount));
-    }
-
     /**
      * Handle a "lootCargo"-message.
      *

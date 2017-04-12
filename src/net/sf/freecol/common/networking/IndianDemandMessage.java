@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
@@ -74,12 +76,101 @@ public class IndianDemandMessage extends AttributeMessage {
               RESULT_TAG, getStringAttribute(element, RESULT_TAG));
     }
 
+    /**
+     * Create a new {@code IndianDemandMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public IndianDemandMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, COLONY_TAG, TYPE_TAG, AMOUNT_TAG, RESULT_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
      */
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = freeColClient.getMyPlayer();
+        final Unit unit = getUnit(game);
+        final Colony colony = getColony(game);
+        final GoodsType goodsType = getType(game);
+        final int amount = getAmount();
+        
+        if (unit == null) {
+            logger.warning("IndianDemand with null unit.");
+            return;
+        }
+        if (colony == null) {
+            logger.warning("IndianDemand with null colony");
+            return;
+        } else if (!player.owns(colony)) {
+            throw new IllegalArgumentException("Demand to anothers colony");
+        }
+
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).indianDemand(unit, colony, goodsType, amount));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
+        final String unitId = getStringAttribute(UNIT_TAG);
+        final String colonyId = getStringAttribute(COLONY_TAG);
+        final Boolean result = getResult();
+        
+        Unit unit;
+        Colony colony;
+        try {
+            if (serverPlayer.isIndian()) { // Initial demand
+                unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
+                if (unit.getMovesLeft() <= 0) {
+                    return serverPlayer.clientError("Unit has no moves left: "
+                        + unitId);
+                }
+                colony = unit.getAdjacentSettlement(colonyId, Colony.class);
+                if (result != null) {
+                    return serverPlayer.clientError("Result in demand: "
+                        + serverPlayer.getId() + " " + result);
+                }
+            } else { // Reply from colony
+                unit = game.getFreeColGameObject(unitId, Unit.class);
+                if (unit == null) {
+                    return serverPlayer.clientError("Not a unit: "
+                        + unitId);
+                }
+                colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
+                if (result == null) {
+                    return serverPlayer.clientError("No result in demand response: "
+                        + serverPlayer.getId());
+                }
+            }
+        } catch (Exception e) {
+            return serverPlayer.clientError(e.getMessage());
+        }
+
+        int amount = getAmount();
+        if (amount <= 0) {
+            return serverPlayer.clientError("Bad amount: " + amount);
+        }
+
+        // Proceed to demand or respond.
+        return freeColServer.getInGameController()
+            .indianDemand(serverPlayer, unit, colony, getType(game), amount,
+                          result);
     }
 
 
@@ -145,58 +236,5 @@ public class IndianDemandMessage extends AttributeMessage {
     public IndianDemandMessage setResult(Boolean result) {
         setBooleanAttribute(RESULT_TAG, result);
         return this;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        final Game game = freeColServer.getGame();
-        final String unitId = getStringAttribute(UNIT_TAG);
-        final String colonyId = getStringAttribute(COLONY_TAG);
-        final Boolean result = getResult();
-        
-        Unit unit;
-        Colony colony;
-        try {
-            if (serverPlayer.isIndian()) { // Initial demand
-                unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
-                if (unit.getMovesLeft() <= 0) {
-                    return serverPlayer.clientError("Unit has no moves left: "
-                        + unitId);
-                }
-                colony = unit.getAdjacentSettlement(colonyId, Colony.class);
-                if (result != null) {
-                    return serverPlayer.clientError("Result in demand: "
-                        + serverPlayer.getId() + " " + result);
-                }
-            } else { // Reply from colony
-                unit = game.getFreeColGameObject(unitId, Unit.class);
-                if (unit == null) {
-                    return serverPlayer.clientError("Not a unit: "
-                        + unitId);
-                }
-                colony = serverPlayer.getOurFreeColGameObject(colonyId, Colony.class);
-                if (result == null) {
-                    return serverPlayer.clientError("No result in demand response: "
-                        + serverPlayer.getId());
-                }
-            }
-        } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage());
-        }
-
-        int amount = getAmount();
-        if (amount <= 0) {
-            return serverPlayer.clientError("Bad amount: " + amount);
-        }
-
-        // Proceed to demand or respond.
-        return freeColServer.getInGameController()
-            .indianDemand(serverPlayer, unit, colony, getType(game), amount,
-                          result);
     }
 }
