@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -60,6 +62,16 @@ public class ReadyMessage extends AttributeMessage {
               VALUE_TAG, getStringAttribute(element, VALUE_TAG));
     }
 
+    /**
+     * Create a new {@code ReadyMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public ReadyMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, PLAYER_TAG, VALUE_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -67,6 +79,38 @@ public class ReadyMessage extends AttributeMessage {
     @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = getPlayer(game);
+        final boolean ready = getValue();
+
+        if (player != null) {
+            player.setReady(ready);
+            freeColClient.getGUI().refreshPlayersTable();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        if (serverPlayer != null) {
+            boolean ready = getValue();
+            serverPlayer.setReady(ready);
+            freeColServer.sendToAll(new ReadyMessage(serverPlayer, ready),
+                                    serverPlayer);
+        } else {
+            logger.warning("Ready from unknown connection.");
+        }
+        return null;
     }
 
 
@@ -89,23 +133,5 @@ public class ReadyMessage extends AttributeMessage {
      */
     public boolean getValue() {
         return getBooleanAttribute(VALUE_TAG, false);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        if (serverPlayer != null) {
-            boolean ready = getValue();
-            serverPlayer.setReady(ready);
-            freeColServer.sendToAll(new ReadyMessage(serverPlayer, ready),
-                                    serverPlayer);
-        } else {
-            logger.warning("Ready from unknown connection.");
-        }
-        return null;
     }
 }

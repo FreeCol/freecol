@@ -84,7 +84,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 addPlayer(new AddPlayerMessage(getGame(), e)));
         register(ChatMessage.TAG,
             (Connection c, Element e) ->
-                chat(new ChatMessage(getGame(), e)));
+                new ChatMessage(getGame(), e).clientHandler(freeColClient));
         register(ErrorMessage.TAG,
             (Connection c, Element e) ->
                 error(new ErrorMessage(getGame(), e)));
@@ -96,7 +96,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 new LogoutMessage(getGame(), e).clientHandler(freeColClient));
         register(ReadyMessage.TAG,
             (Connection c, Element e) ->
-                ready(new ReadyMessage(getGame(), e)));
+                new ReadyMessage(getGame(), e).clientHandler(freeColClient));
         register(SetAvailableMessage.TAG,
             (Connection c, Element e) ->
                 setAvailable(new SetAvailableMessage(getGame(), e)));
@@ -138,20 +138,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
     }
 
     /**
-     * Handle a "chat"-message.
-     *
-     * @param message The {@code ChatMessage} to process.
-     */
-    private void chat(ChatMessage message) {
-        final Game game = getGame();
-        final Player player = message.getPlayer(game);
-        final String text = message.getMessage();
-        final boolean isPrivate = message.isPrivate();
-
-        getGUI().displayChatMessage(player, text, isPrivate);
-    }
-
-    /**
      * Handle an "error"-message.
      *
      * @param message The {@code ErrorMessage} to process.
@@ -161,22 +147,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final String text = message.getMessage();
 
         getGUI().showErrorMessage(template, text);
-    }
-
-    /**
-     * Handles a "ready"-message.
-     *
-     * @param message The {@code ReadyMessage} to process.
-     */
-    private void ready(ReadyMessage message) {
-        final Game game = getGame();
-        final Player player = message.getPlayer(game);
-        final boolean ready = message.getValue();
-
-        if (player != null) {
-            player.setReady(ready);
-            getGUI().refreshPlayersTable();
-        }
     }
 
     /**
