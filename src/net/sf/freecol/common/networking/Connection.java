@@ -625,7 +625,8 @@ public class Connection implements Closeable {
     }
 
     public int getReplyId() {
-        return this.xr.getAttribute(NETWORK_REPLY_ID_TAG, -1);
+        return (this.xr == null) ? -1
+            : this.xr.getAttribute(NETWORK_REPLY_ID_TAG, -1);
     }
 
     public void endListen() {
