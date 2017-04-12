@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
@@ -67,6 +68,16 @@ public class DemandTributeMessage extends AttributeMessage {
               DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
     }
 
+    /**
+     * Create a new {@code DemandTributeMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public DemandTributeMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, DIRECTION_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -83,7 +94,6 @@ public class DemandTributeMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
