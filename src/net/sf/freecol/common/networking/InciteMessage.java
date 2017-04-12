@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
@@ -72,6 +74,16 @@ public class InciteMessage extends AttributeMessage {
               GOLD_TAG, getStringAttribute(element, GOLD_TAG));
     }
 
+    /**
+     * Create a new {@code InciteMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public InciteMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, SETTLEMENT_TAG, ENEMY_TAG, GOLD_TAG);
+    }
+        
 
     /**
      * {@inheritDoc}
@@ -89,27 +101,22 @@ public class InciteMessage extends AttributeMessage {
         return Message.MessagePriority.NORMAL;
     }
 
-
-    // Public interface
-
-    public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = freeColClient.getMyPlayer();
+        final Unit unit = getUnit(player);
+        final IndianSettlement is = getSettlement(unit);
+        final Player enemy = getEnemy(game);
+        final int gold = getGold();
+        
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).incite(unit, is, enemy, gold));
     }
-
-    public IndianSettlement getSettlement(Unit unit) {
-        return unit.getAdjacentSettlement(getStringAttribute(SETTLEMENT_TAG),
-                                          IndianSettlement.class);
-    }
-
-    public Player getEnemy(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(ENEMY_TAG), Player.class);
-    }
-
-    public int getGold() {
-        return getIntegerAttribute(GOLD_TAG, -1);
-    }
-
-
+    
     /**
      * {@inheritDoc}
      */
@@ -156,5 +163,25 @@ public class InciteMessage extends AttributeMessage {
         // Valid, proceed to incite.
         return freeColServer.getInGameController()
             .incite(serverPlayer, unit, is, enemy, gold);
+    }
+
+
+    // Public interface
+
+    public Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
+    }
+
+    public IndianSettlement getSettlement(Unit unit) {
+        return unit.getAdjacentSettlement(getStringAttribute(SETTLEMENT_TAG),
+                                          IndianSettlement.class);
+    }
+
+    public Player getEnemy(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(ENEMY_TAG), Player.class);
+    }
+
+    public int getGold() {
+        return getIntegerAttribute(GOLD_TAG, -1);
     }
 }

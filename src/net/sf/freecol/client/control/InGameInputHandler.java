@@ -175,7 +175,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 highScore(new HighScoreMessage(getGame(), e)));
         register(InciteMessage.TAG,
             (Connection c, Element e) ->
-                incite(new InciteMessage(getGame(), e)));
+                new InciteMessage(getGame(), e).clientHandler(freeColClient));
         register(IndianDemandMessage.TAG,
             (Connection c, Element e) ->
                 indianDemand(new IndianDemandMessage(getGame(), e)));
@@ -508,23 +508,6 @@ public final class InGameInputHandler extends ClientInputHandler {
             igc().displayHighScores(message.getKey(), message.getScores()));
     }
         
-    /**
-     * Handle an "incite"-message.
-     *
-     * @param message The {@code InciteMessage} to process.
-     */
-    private void incite(InciteMessage message) {
-        final Game game = getGame();
-        final Player player = getMyPlayer();
-        final Unit unit = message.getUnit(player);
-        final IndianSettlement is = message.getSettlement(unit);
-        final Player enemy = message.getEnemy(game);
-        final int gold = message.getGold();
-        
-        invokeLater(() ->
-            igc().incite(unit, is, enemy, gold));
-    }
-    
     /**
      * Handle an "indianDemand"-message.
      *
