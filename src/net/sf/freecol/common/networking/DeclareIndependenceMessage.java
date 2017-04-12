@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
@@ -61,6 +62,16 @@ public class DeclareIndependenceMessage extends AttributeMessage {
              getStringAttribute(element, COUNTRY_NAME_TAG));
     }
 
+    /**
+     * Create a new {@code DeclareIndependenceMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public DeclareIndependenceMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, NATION_NAME_TAG, COUNTRY_NAME_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -77,7 +88,6 @@ public class DeclareIndependenceMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
