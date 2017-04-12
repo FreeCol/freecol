@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.server.FreeColServer;
@@ -56,6 +57,16 @@ public class NewTurnMessage extends AttributeMessage {
      */
     public NewTurnMessage(Game game, Element element) {
         super(TAG, TURN_TAG, getStringAttribute(element, TURN_TAG));
+    }
+
+    /**
+     * Create a new {@code NewTurnMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public NewTurnMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, TURN_TAG);
     }
 
 
