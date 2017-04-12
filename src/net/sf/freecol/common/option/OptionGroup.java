@@ -20,6 +20,7 @@
 package net.sf.freecol.common.option;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -346,9 +347,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             FreeColXMLReader xr = new FreeColXMLReader(file);
         ) {
             ret = load(xr);
-        } catch (IOException|XMLStreamException ex) {
+        } catch (FileNotFoundException|XMLStreamException xse) {
             logger.log(Level.WARNING, "Load OptionGroup(" + getId()
-                + ") from file " + file.getPath() + " crashed", ex);
+                + ") from file " + file.getPath() + " crashed", xse);
             return false;
         }
         logger.info("Load OptionGroup(" + getId() + ") from " + file.getPath()
@@ -398,8 +399,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                         + optionId, ex);
                 }
                 xr.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "IO error with " + file, ioe);
+            } catch (FileNotFoundException|XMLStreamException xse) {
+                logger.log(Level.WARNING, "IO error with " + file, xse);
             }
         }
         return null;

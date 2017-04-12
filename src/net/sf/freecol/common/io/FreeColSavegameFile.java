@@ -25,6 +25,7 @@ import java.io.BufferedInputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Stream;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
@@ -156,9 +157,10 @@ public class FreeColSavegameFile extends FreeColDataFile {
      *
      * @return A reader for the file "client-options.xml" within this file.
      * @exception IOException if there is a problem opening the input stream.
+     * @exception XMLStreamException if there is a problem creating the reader.
      */
     public FreeColXMLReader getClientOptionsFreeColXMLReader()
-        throws IOException {
+        throws IOException, XMLStreamException {
         return new FreeColXMLReader(getInputStream(CLIENT_OPTIONS));
     }
 
@@ -167,9 +169,10 @@ public class FreeColSavegameFile extends FreeColDataFile {
      *
      * @return A reader for the file "savegame.xml" within this file.
      * @exception IOException if there is a problem opening the input stream.
+     * @exception XMLStreamException if there is a problem creating the reader.
      */
     public FreeColXMLReader getSavedGameFreeColXMLReader()
-        throws IOException {
+        throws IOException, XMLStreamException {
         return new FreeColXMLReader(getInputStream(SAVEGAME_FILE));
     }
 }

@@ -616,8 +616,8 @@ public class Connection implements Closeable {
         this.fcnis.mark(Connection.BUFFER_SIZE);
         try {
             this.xr = new FreeColXMLReader(this.fcnis); //.setTracing(true);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to wrap input", ioe);
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Failed to wrap input", xse);
             return DisconnectMessage.TAG;
         }
         this.xr.nextTag();

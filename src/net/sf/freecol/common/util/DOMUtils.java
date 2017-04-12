@@ -115,7 +115,7 @@ public class DOMUtils {
                 ? FreeColXMLReader.ReadScope.NORMAL
                 : FreeColXMLReader.ReadScope.NOINTERN);
             return xr;
-        } catch (TransformerException ex) {
+        } catch (XMLStreamException|TransformerException ex) {
             throw new RuntimeException("Reader creation failure", ex);
         }
     }
