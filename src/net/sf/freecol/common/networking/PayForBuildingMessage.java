@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -58,6 +59,16 @@ public class PayForBuildingMessage extends AttributeMessage {
         super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
     }
 
+    /**
+     * Create a new {@code PayForBuildingMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public PayForBuildingMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, COLONY_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -74,7 +85,6 @@ public class PayForBuildingMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
