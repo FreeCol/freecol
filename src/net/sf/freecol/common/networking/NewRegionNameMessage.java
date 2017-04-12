@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
@@ -71,6 +73,16 @@ public class NewRegionNameMessage extends AttributeMessage {
               NEW_REGION_NAME_TAG, getStringAttribute(element, NEW_REGION_NAME_TAG));
     }
 
+    /**
+     * Create a new {@code NewRegionNameMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public NewRegionNameMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, REGION_TAG, TILE_TAG, UNIT_TAG, NEW_REGION_NAME_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -78,6 +90,60 @@ public class NewRegionNameMessage extends AttributeMessage {
     @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.LATE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Tile tile = getTile(game);
+        final Unit unit = getUnit(freeColClient.getMyPlayer());
+        final Region region = getRegion(game);
+        final String defaultName = getNewRegionName();
+
+        if (defaultName == null || region == null) return;
+
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).newRegionName(region, defaultName, tile, unit));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
+
+        Tile tile = getTile(game);
+        if (!serverPlayer.hasExplored(tile)) {
+            return serverPlayer.clientError("Can not claim discovery in unexplored tile: "
+                + getStringAttribute(TILE_TAG));
+        }
+
+        Unit unit;
+        try {
+            unit = getUnit(serverPlayer);
+        } catch (Exception e) {
+            return serverPlayer.clientError(e.getMessage());
+        }
+
+        Region region = tile.getDiscoverableRegion();
+        if (region == null) {
+            return serverPlayer.clientError("No discoverable region in: "
+                + tile.getId());
+        }
+        String regionId = getStringAttribute(REGION_TAG);
+        if (!region.getId().equals(regionId)) {
+            return serverPlayer.clientError("Region mismatch, "
+                + region.getId() + " != " + regionId);
+        }
+        
+        // Do the discovery
+        return freeColServer.getInGameController()
+            .setNewRegionName(serverPlayer, unit, region, getNewRegionName());
     }
 
 
@@ -120,43 +186,5 @@ public class NewRegionNameMessage extends AttributeMessage {
      */
     public String getNewRegionName() {
         return getStringAttribute(NEW_REGION_NAME_TAG);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        final Game game = freeColServer.getGame();
-
-        Tile tile = getTile(game);
-        if (!serverPlayer.hasExplored(tile)) {
-            return serverPlayer.clientError("Can not claim discovery in unexplored tile: "
-                + getStringAttribute(TILE_TAG));
-        }
-
-        Unit unit;
-        try {
-            unit = getUnit(serverPlayer);
-        } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage());
-        }
-
-        Region region = tile.getDiscoverableRegion();
-        if (region == null) {
-            return serverPlayer.clientError("No discoverable region in: "
-                + tile.getId());
-        }
-        String regionId = getStringAttribute(REGION_TAG);
-        if (!region.getId().equals(regionId)) {
-            return serverPlayer.clientError("Region mismatch, "
-                + region.getId() + " != " + regionId);
-        }
-        
-        // Do the discovery
-        return freeColServer.getInGameController()
-            .setNewRegionName(serverPlayer, unit, region, getNewRegionName());
     }
 }

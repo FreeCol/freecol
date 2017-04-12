@@ -199,7 +199,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new NewLandNameMessage(getGame(), e).clientHandler(freeColClient));
         register(NewRegionNameMessage.TAG,
             (Connection c, Element e) ->
-                newRegionName(new NewRegionNameMessage(getGame(), e)));
+                new NewRegionNameMessage(getGame(), e).clientHandler(freeColClient));
         register(NewTurnMessage.TAG,
             (Connection c, Element e) ->
                 newTurn(new NewTurnMessage(getGame(), e)));
@@ -536,24 +536,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().nativeTrade(action, nt));
-    }
-
-    /**
-     * Handle a "newRegionName"-message.
-     *
-     * @param message The {@code NewRegionNameMessage} to process.
-     */
-    private void newRegionName(NewRegionNameMessage message) {
-        final Game game = getGame();
-        final Tile tile = message.getTile(game);
-        final Unit unit = message.getUnit(getMyPlayer());
-        final Region region = message.getRegion(game);
-        final String defaultName = message.getNewRegionName();
-
-        if (defaultName == null || region == null) return;
-
-        invokeLater(() ->
-            igc().newRegionName(region, defaultName, tile, unit));
     }
 
     /**
