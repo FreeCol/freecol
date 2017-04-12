@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Direction;
@@ -65,6 +66,16 @@ public class DeclineMoundsMessage extends AttributeMessage {
               DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
     }
 
+    /**
+     * Create a new {@code DeclineMoundsMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public DeclineMoundsMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, DIRECTION_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -81,7 +92,6 @@ public class DeclineMoundsMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
