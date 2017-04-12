@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
@@ -62,6 +63,16 @@ public class ChangeStateMessage extends AttributeMessage {
               STATE_TAG, getStringAttribute(element, STATE_TAG));
     }
 
+    /**
+     * Create a new {@code ChangeStateMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public ChangeStateMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, STATE_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -78,7 +89,6 @@ public class ChangeStateMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
