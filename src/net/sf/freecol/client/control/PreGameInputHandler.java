@@ -108,7 +108,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 setNation(new SetNationMessage(getGame(), e)));
         register(SetNationTypeMessage.TAG,
             (Connection c, Element e) ->
-                setNationType(new SetNationTypeMessage(getGame(), e)));
+                new SetNationTypeMessage(getGame(), e).clientHandler(freeColClient));
         register(StartGameMessage.TAG,
             (Connection c, Element e) ->
                 TrivialMessage.startGameMessage.clientHandler(freeColClient));
@@ -176,22 +176,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
 
         if (player != null && nation != null) {
             player.setNation(nation);
-            getGUI().refreshPlayersTable();
-        }
-    }
-
-    /**
-     * Handles a "setNationType"-message.
-     *
-     * @param message The {@code SetNationTypeMessage} to process.
-     */
-    private void setNationType(SetNationTypeMessage message) {
-        final Game game = getGame();
-        final Player player = message.getPlayer(game);
-        final NationType nationType = message.getValue(getSpecification());
-        
-        if (player != null && nationType != null) {
-            player.changeNationType(nationType);
             getGUI().refreshPlayersTable();
         }
     }

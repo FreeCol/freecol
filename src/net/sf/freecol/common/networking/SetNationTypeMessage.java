@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
@@ -62,6 +64,16 @@ public class SetNationTypeMessage extends AttributeMessage {
               VALUE_TAG, getStringAttribute(element, VALUE_TAG));
     }
 
+    /**
+     * Create a new {@code SetNationTypeMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to (null here).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public SetNationTypeMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, PLAYER_TAG, VALUE_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -71,29 +83,20 @@ public class SetNationTypeMessage extends AttributeMessage {
         return Message.MessagePriority.NORMAL;
     }
 
-
-    // Public interface
-
     /**
-     * Get the player that is setting its nationType.
-     *
-     * @param game The {@code Game} to look up the player in.
-     * @return The {@code Player} found, or null.
+     * {@inheritDoc}
      */
-    public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = getPlayer(game);
+        final NationType nationType = getValue(game.getSpecification());
+        
+        if (player != null && nationType != null) {
+            player.changeNationType(nationType);
+            freeColClient.getGUI().refreshPlayersTable();
+        }
     }
-
-    /**
-     * Get the nationType to set.
-     *
-     * @param spec The {@code Specification} to look up the nationType in.
-     * @return The {@code NationType}.
-     */
-    public NationType getValue(Specification spec) {
-        return spec.getNationType(getStringAttribute(VALUE_TAG));
-    }
-
 
     /**
      * {@inheritDoc}
@@ -137,5 +140,28 @@ public class SetNationTypeMessage extends AttributeMessage {
             logger.warning("setNationType from unknown connection.");
         }
         return null;
+    }
+
+
+    // Public interface
+
+    /**
+     * Get the player that is setting its nationType.
+     *
+     * @param game The {@code Game} to look up the player in.
+     * @return The {@code Player} found, or null.
+     */
+    public Player getPlayer(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
+    }
+
+    /**
+     * Get the nationType to set.
+     *
+     * @param spec The {@code Specification} to look up the nationType in.
+     * @return The {@code NationType}.
+     */
+    public NationType getValue(Specification spec) {
+        return spec.getNationType(getStringAttribute(VALUE_TAG));
     }
 }
