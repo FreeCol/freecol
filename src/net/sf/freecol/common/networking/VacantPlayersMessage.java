@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -61,6 +63,16 @@ public class VacantPlayersMessage extends AttributeMessage {
         setArrayAttributes(DOMUtils.getArrayAttributes(element));
     }
 
+    /**
+     * Create a new {@code VacantPlayersMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to (null here).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public VacantPlayersMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr.getArrayAttributeMap());
+    }
+
 
     /**
      * {@inheritDoc}
@@ -68,6 +80,28 @@ public class VacantPlayersMessage extends AttributeMessage {
     @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final List<String> vacant = getVacantPlayers();
+
+        freeColClient.setVacantPlayerNames(vacant);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+        @SuppressWarnings("unused") ServerPlayer serverPlayer) {
+        // Called from UserConnectionHandler, without serverPlayer being defined
+        return ChangeSet.simpleChange((ServerPlayer)null,
+            new VacantPlayersMessage()
+                .setVacantPlayers(freeColServer.getGame()));
     }
 
 
@@ -95,18 +129,5 @@ public class VacantPlayersMessage extends AttributeMessage {
         setArrayAttributes(transform(game.getLiveEuropeanPlayers(),
                                      vacantPred, Player::getNationId));
         return this;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-        @SuppressWarnings("unused") ServerPlayer serverPlayer) {
-        // Called from UserConnectionHandler, without serverPlayer being defined
-        return ChangeSet.simpleChange((ServerPlayer)null,
-            new VacantPlayersMessage()
-                .setVacantPlayers(freeColServer.getGame()));
     }
 }

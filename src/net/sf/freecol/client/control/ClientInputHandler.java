@@ -82,7 +82,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
         register(MultipleMessage.TAG, (Connection c, Element e) ->
             multiple(new MultipleMessage(getGame(), e)));
         register(VacantPlayersMessage.TAG, (Connection c, Element e) ->
-            vacantPlayers(new VacantPlayersMessage(getGame(), e)));
+            new VacantPlayersMessage(getGame(), e).clientHandler(freeColClient));
     }
 
 
@@ -121,18 +121,6 @@ public abstract class ClientInputHandler extends FreeColClientHolder
         if (result != null) {
             logger.warning("Multiple message -> " + result.getType());
         }
-    }
-
-    /**
-     * Handle a "vacantPlayers"-message.
-     *
-     * @param message The {@code VacantPlayersMessage} to process.
-     */
-    protected void vacantPlayers(VacantPlayersMessage message) {
-        final FreeColClient fcc = getFreeColClient();
-        final List<String> vacant = message.getVacantPlayers();
-
-        fcc.setVacantPlayerNames(vacant);
     }
 
 
