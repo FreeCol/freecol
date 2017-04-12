@@ -145,7 +145,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new ChatMessage(getGame(), e).clientHandler(freeColClient));
         register(ChooseFoundingFatherMessage.TAG,
             (Connection c, Element e) ->
-                chooseFoundingFather(new ChooseFoundingFatherMessage(getGame(), e)));
+                new ChooseFoundingFatherMessage(getGame(), e).clientHandler(freeColClient));
         register(CloseMenusMessage.TAG,
             (Connection c, Element e) ->
                 TrivialMessage.closeMenusMessage.clientHandler(freeColClient));
@@ -364,19 +364,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         // actually change unit positions, which happens in an "update".
         invokeAndWait(() ->
             igc().animateMove(unit, oldTile, newTile));
-    }
-
-    /**
-     * Handle an "chooseFoundingFather"-request.
-     *
-     * @param message The {@code ChooseFoundingFatherMessage} to process.
-     */
-    private void chooseFoundingFather(ChooseFoundingFatherMessage message) {
-        final Game game = getGame();
-        final List<FoundingFather> fathers = message.getFathers(game);
-        
-        invokeLater(() ->
-            igc().chooseFoundingFather(fathers));
     }
 
     /**

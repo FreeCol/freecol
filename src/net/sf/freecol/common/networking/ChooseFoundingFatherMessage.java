@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
@@ -79,6 +81,16 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
                 k -> spec.getFoundingFather(getStringAttribute(element, k))));
     }
 
+    /**
+     * Create a new {@code ChooseFoundingFatherMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public ChooseFoundingFatherMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, FOUNDING_FATHER_TAG);
+    }
+
 
     /**
      * Set the attributes arising from a list of founding fathers.
@@ -108,7 +120,43 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
         return Message.MessagePriority.EARLY;
     }
 
-    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final List<FoundingFather> fathers = getFathers(game);
+        
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).chooseFoundingFather(fathers));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
+        final List<FoundingFather> offered = serverPlayer.getOfferedFathers();
+        final FoundingFather ff = getFather(game);
+
+        if (!serverPlayer.canRecruitFoundingFather()) {
+            return serverPlayer.clientError("Player can not recruit fathers: "
+                + serverPlayer.getId());
+        } else if (ff == null) {
+            return serverPlayer.clientError("No founding father selected");
+        } else if (!offered.contains(ff)) {
+            return serverPlayer.clientError("Founding father not offered: "
+                + ff.getId());
+        }
+
+        serverPlayer.updateCurrentFather(ff);
+        return null;
+    }
+
+
     // Public interface
 
     /**
@@ -144,30 +192,5 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
         final Specification spec = game.getSpecification();
         return transform(fatherKeys, tid -> hasAttribute(tid),
                          tid -> spec.getFoundingFather(getStringAttribute(tid)));
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        final Game game = freeColServer.getGame();
-        final List<FoundingFather> offered = serverPlayer.getOfferedFathers();
-        final FoundingFather ff = getFather(game);
-
-        if (!serverPlayer.canRecruitFoundingFather()) {
-            return serverPlayer.clientError("Player can not recruit fathers: "
-                + serverPlayer.getId());
-        } else if (ff == null) {
-            return serverPlayer.clientError("No founding father selected");
-        } else if (!offered.contains(ff)) {
-            return serverPlayer.clientError("Founding father not offered: "
-                + ff.getId());
-        }
-
-        serverPlayer.updateCurrentFather(ff);
-        return null;
     }
 }
