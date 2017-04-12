@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -65,6 +66,16 @@ public class ScoutIndianSettlementMessage extends AttributeMessage {
     public ScoutIndianSettlementMessage(Game game, Element element) {
         super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
               DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
+    }
+
+    /**
+     * Create a new {@code ScoutIndianSettlementMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public ScoutIndianSettlementMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, DIRECTION_TAG);
     }
 
 
