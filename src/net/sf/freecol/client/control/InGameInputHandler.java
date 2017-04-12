@@ -223,7 +223,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new SetCurrentPlayerMessage(getGame(), e).clientHandler(freeColClient));
         register(SetDeadMessage.TAG,
             (Connection c, Element e) ->
-                setDead(new SetDeadMessage(getGame(), e)));
+                new SetDeadMessage(getGame(), e).clientHandler(freeColClient));
         register(SetStanceMessage.TAG,
             (Connection c, Element e) ->
                 new SetStanceMessage(getGame(), e).clientHandler(freeColClient));
@@ -567,24 +567,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().newTurn(n));
-    }
-
-    /**
-     * Handle a "setDead"-message.
-     *
-     * @param message The {@code SetDeadMessage} to process.
-     */
-    private void setDead(SetDeadMessage message) {
-        final Game game = getGame();
-        final Player player = message.getPlayer(game);
-
-        if (player == null) {
-            logger.warning("Invalid player for setDead");
-            return;
-        }
-
-        invokeLater(() ->
-            igc().setDead(player));
     }
 
     /**

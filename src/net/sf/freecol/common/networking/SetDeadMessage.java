@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -55,6 +57,15 @@ public class SetDeadMessage extends AttributeMessage {
         super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG));
     }
 
+    /**
+     * Create a new {@code SetDeadMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to (null here).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public SetDeadMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, PLAYER_TAG);
+    }
 
     /**
      * {@inheritDoc}
@@ -63,6 +74,26 @@ public class SetDeadMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.EARLY;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = getPlayer(game);
+
+        if (player == null) {
+            logger.warning("Invalid player for setDead");
+            return;
+        }
+
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).setDead(player));
+    }
+
+    // No server handler required.
+    // This message is only sent to clients.
 
 
     // Public interface
@@ -76,7 +107,4 @@ public class SetDeadMessage extends AttributeMessage {
     public Player getPlayer(Game game) {
         return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
     }
-
-    // No server handler required.
-    // This message is only sent to clients.
 }
