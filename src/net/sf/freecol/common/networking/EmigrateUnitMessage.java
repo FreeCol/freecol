@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Europe.MigrationType;
@@ -58,6 +59,16 @@ public class EmigrateUnitMessage extends AttributeMessage {
         super(TAG, SLOT_TAG, getStringAttribute(element, SLOT_TAG));
     }
 
+    /**
+     * Create a new {@code EmigrateUnitMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public EmigrateUnitMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, SLOT_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -73,7 +84,6 @@ public class EmigrateUnitMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
