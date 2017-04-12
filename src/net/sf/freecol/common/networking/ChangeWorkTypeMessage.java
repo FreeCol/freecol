@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
@@ -63,6 +64,16 @@ public class ChangeWorkTypeMessage extends AttributeMessage {
               WORK_TYPE_TAG, getStringAttribute(element, WORK_TYPE_TAG));
     }
 
+    /**
+     * Create a new {@code ChangeWorkTypeMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public ChangeWorkTypeMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, WORK_TYPE_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -79,7 +90,6 @@ public class ChangeWorkTypeMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
