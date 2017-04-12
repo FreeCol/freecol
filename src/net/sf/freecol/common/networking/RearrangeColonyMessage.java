@@ -20,8 +20,11 @@
 package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -159,6 +162,7 @@ public class RearrangeColonyMessage extends AttributeMessage {
             return ret;
         }
 
+            
         // Interface Comparable<Arrangement>
 
         /**
@@ -212,21 +216,39 @@ public class RearrangeColonyMessage extends AttributeMessage {
         setArrangementAttributes(Arrangement.readArrangements(game, element));
     }
 
-
     /**
-     * {@inheritDoc}
+     * Create a new {@code RearrangeColonyMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
      */
-    @Override
-    public boolean currentPlayerMessage() {
-        return true;
+    public RearrangeColonyMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, getAttributeMap(xr));
     }
 
     /**
-     * {@inheritDoc}
+     * Read the attributes from the stream.
+     * 
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @return An attribute map.
      */
-    @Override
-    public MessagePriority getPriority() {
-        return Message.MessagePriority.NORMAL;
+    private static Map<String, String> getAttributeMap(FreeColXMLReader xr) {
+        Map<String, String> ret = new HashMap<>();
+        ret.put(COLONY_TAG, xr.getAttribute(COLONY_TAG, (String)null));
+        int n = xr.getAttribute(FreeColObject.ARRAY_SIZE_TAG, 0);
+        for (int i = 0; i < n; i++) {
+            ret.put(Arrangement.unitKey(i),
+                xr.getAttribute(Arrangement.unitKey(i), (String)null));
+            ret.put(Arrangement.locKey(i),
+                xr.getAttribute(Arrangement.locKey(i), (String)null));
+            ret.put(Arrangement.workKey(i),
+                xr.getAttribute(Arrangement.workKey(i), (String)null));
+            ret.put(Arrangement.roleKey(i),
+                xr.getAttribute(Arrangement.roleKey(i), (String)null));
+            ret.put(Arrangement.roleCountKey(i),
+                xr.getAttribute(Arrangement.roleCountKey(i), (String)null));
+        }
+        return ret;
     }
 
     /**
@@ -249,39 +271,22 @@ public class RearrangeColonyMessage extends AttributeMessage {
         setIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, i);
     }
 
-
-    // Public interface
-
     /**
-     * Check if the are no arrangements present.
-     *
-     * @return True if there are no arrangements.
+     * {@inheritDoc}
      */
-    public boolean isEmpty() {
-        return getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, 0) == 0;
+    @Override
+    public boolean currentPlayerMessage() {
+        return true;
     }
 
     /**
-     * Get arrangements from the attributes.
-     *
-     * @param game The {@code Game} to create arrangements in.
-     * @return A list of {@code Arrangement}s.
+     * {@inheritDoc}
      */
-    public List<Arrangement> getArrangements(Game game) {
-        List<Arrangement> ret = new ArrayList<>();
-        int n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, 0);
-        for (int i = 0; i < n; i++) {
-            ret.add(new Arrangement(game,
-                                    getStringAttribute(Arrangement.unitKey(i)),
-                                    getStringAttribute(Arrangement.locKey(i)),
-                                    getStringAttribute(Arrangement.workKey(i)),
-                                    getStringAttribute(Arrangement.roleKey(i)),
-                                    getStringAttribute(Arrangement.roleCountKey(i))));
-        }
-        return ret;
+    @Override
+    public MessagePriority getPriority() {
+        return Message.MessagePriority.NORMAL;
     }
 
-    
     /**
      * {@inheritDoc}
      */
@@ -321,5 +326,37 @@ public class RearrangeColonyMessage extends AttributeMessage {
         // Rearrange can proceed.
         return freeColServer.getInGameController()
             .rearrangeColony(serverPlayer, colony, arrangements);
+    }
+
+
+    // Public interface
+
+    /**
+     * Check if the are no arrangements present.
+     *
+     * @return True if there are no arrangements.
+     */
+    public boolean isEmpty() {
+        return getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, 0) == 0;
+    }
+
+    /**
+     * Get arrangements from the attributes.
+     *
+     * @param game The {@code Game} to create arrangements in.
+     * @return A list of {@code Arrangement}s.
+     */
+    public List<Arrangement> getArrangements(Game game) {
+        List<Arrangement> ret = new ArrayList<>();
+        int n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, 0);
+        for (int i = 0; i < n; i++) {
+            ret.add(new Arrangement(game,
+                                    getStringAttribute(Arrangement.unitKey(i)),
+                                    getStringAttribute(Arrangement.locKey(i)),
+                                    getStringAttribute(Arrangement.workKey(i)),
+                                    getStringAttribute(Arrangement.roleKey(i)),
+                                    getStringAttribute(Arrangement.roleCountKey(i))));
+        }
+        return ret;
     }
 }
