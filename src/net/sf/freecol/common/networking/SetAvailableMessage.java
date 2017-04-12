@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -59,13 +61,58 @@ public class SetAvailableMessage extends AttributeMessage {
         super(TAG, NATION_TAG, getStringAttribute(element, NATION_TAG),
               STATE_TAG, getStringAttribute(element, STATE_TAG));
     }
-        
+
+    /**
+     * Create a new {@code SetAvailableMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to (null here).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public SetAvailableMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, NATION_TAG, STATE_TAG);
+    }
+    
 
     /**
      * {@inheritDoc}
      */
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Specification spec = game.getSpecification();
+        final Nation nation = getNation(spec);
+        final NationState nationState = getNationState();
+
+        game.getNationOptions().setNationState(nation, nationState);
+        freeColClient.getGUI().refreshPlayersTable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
+        final Specification spec = game.getSpecification();
+        
+        if (serverPlayer != null) {
+            Nation nation = getNation(spec);
+            NationState state = getNationState();
+            game.getNationOptions().setNationState(nation, state);
+            freeColServer.sendToAll(new SetAvailableMessage(nation, state),
+                                    serverPlayer);
+        } else {
+            logger.warning("setAvailable from unknown player.");
+        }
+        return null;
     }
 
 
@@ -88,27 +135,5 @@ public class SetAvailableMessage extends AttributeMessage {
      */
     public NationState getNationState() {
         return Enum.valueOf(NationState.class, getStringAttribute(STATE_TAG));
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        final Game game = freeColServer.getGame();
-        final Specification spec = game.getSpecification();
-        
-        if (serverPlayer != null) {
-            Nation nation = getNation(spec);
-            NationState state = getNationState();
-            game.getNationOptions().setNationState(nation, state);
-            freeColServer.sendToAll(new SetAvailableMessage(nation, state),
-                                    serverPlayer);
-        } else {
-            logger.warning("setAvailable from unknown player.");
-        }
-        return null;
     }
 }

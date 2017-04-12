@@ -99,7 +99,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 new ReadyMessage(getGame(), e).clientHandler(freeColClient));
         register(SetAvailableMessage.TAG,
             (Connection c, Element e) ->
-                setAvailable(new SetAvailableMessage(getGame(), e)));
+                new SetAvailableMessage(getGame(), e).clientHandler(freeColClient));
         register(SetColorMessage.TAG,
             (Connection c, Element e) ->
                 new SetColorMessage(getGame(), e).clientHandler(freeColClient));
@@ -147,21 +147,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final String text = message.getMessage();
 
         getGUI().showErrorMessage(template, text);
-    }
-
-    /**
-     * Handles a "setAvailable"-message.
-     *
-     * @param message The {@code SetAvailableMessage} to process.
-     */
-    private void setAvailable(SetAvailableMessage message) {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-        final Nation nation = message.getNation(spec);
-        final NationState nationState = message.getNationState();
-
-        game.getNationOptions().setNationState(nation, nationState);
-        getGUI().refreshPlayersTable();
     }
 
     /**
