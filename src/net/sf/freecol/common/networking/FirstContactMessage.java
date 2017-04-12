@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -70,6 +72,16 @@ public class FirstContactMessage extends AttributeMessage {
               RESULT_TAG, getStringAttribute(element, RESULT_TAG));
     }
 
+    /**
+     * Create a new {@code FirstContactMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public FirstContactMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, PLAYER_TAG, OTHER_TAG, TILE_TAG, CAMPS_TAG, RESULT_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -79,34 +91,33 @@ public class FirstContactMessage extends AttributeMessage {
         return Message.MessagePriority.EARLY;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = getPlayer(game);
+        final Player other = getOtherPlayer(game);
+        final Tile tile = getTile(game);
+        final int n = getSettlementCount();
 
-    // Public interface
+        if (player == null || player != freeColClient.getMyPlayer()) {
+            logger.warning("firstContact with bad player: " + player);
+            return;
+        }
+        if (other == null || other == player || !other.isIndian()) {
+            logger.warning("firstContact with bad other player: " + other);
+            return;
+        }
+        if (tile != null && tile.getOwner() != other) {
+            logger.warning("firstContact with bad tile: " + tile);
+            return;
+        }
 
-    public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).firstContact(player, other, tile, n));
     }
-
-    public Player getOtherPlayer(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(OTHER_TAG), Player.class);
-    }
-
-    public Tile getTile(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(TILE_TAG), Tile.class);
-    }
-
-    public int getSettlementCount() {
-        return getIntegerAttribute(CAMPS_TAG, -1);
-    }
-            
-    public boolean getResult() {
-        return getBooleanAttribute(RESULT_TAG, (Boolean)null);
-    }
-
-    public FirstContactMessage setResult(boolean result) {
-        setBooleanAttribute(RESULT_TAG, result);
-        return this;
-    }
-
 
     /**
      * {@inheritDoc}
@@ -138,5 +149,33 @@ public class FirstContactMessage extends AttributeMessage {
         return freeColServer.getInGameController()
             .nativeFirstContact(serverPlayer, otherPlayer,
                                 getTile(game), getResult());
+    }
+
+
+    // Public interface
+
+    public Player getPlayer(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
+    }
+
+    public Player getOtherPlayer(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(OTHER_TAG), Player.class);
+    }
+
+    public Tile getTile(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(TILE_TAG), Tile.class);
+    }
+
+    public int getSettlementCount() {
+        return getIntegerAttribute(CAMPS_TAG, -1);
+    }
+            
+    public boolean getResult() {
+        return getBooleanAttribute(RESULT_TAG, (Boolean)null);
+    }
+
+    public FirstContactMessage setResult(boolean result) {
+        setBooleanAttribute(RESULT_TAG, result);
+        return this;
     }
 }
