@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
@@ -67,6 +68,16 @@ public class UnloadGoodsMessage extends AttributeMessage {
               CARRIER_TAG, getStringAttribute(element, CARRIER_TAG));
     }
 
+    /**
+     * Create a new {@code UnloadGoodsMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to (null here).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public UnloadGoodsMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, TYPE_TAG, AMOUNT_TAG, CARRIER_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -83,7 +94,6 @@ public class UnloadGoodsMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
