@@ -196,7 +196,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 nativeTrade(new NativeTradeMessage(getGame(), e)));
         register(NewLandNameMessage.TAG,
             (Connection c, Element e) ->
-                newLandName(new NewLandNameMessage(getGame(), e)));
+                new NewLandNameMessage(getGame(), e).clientHandler(freeColClient));
         register(NewRegionNameMessage.TAG,
             (Connection c, Element e) ->
                 newRegionName(new NewRegionNameMessage(getGame(), e)));
@@ -595,22 +595,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().nativeTrade(action, nt));
-    }
-
-    /**
-     * Handle a "newLandName"-message.
-     *
-     * @param message The {@code NewLandNameMessage} to process.
-     */
-    private void newLandName(NewLandNameMessage message) {
-        final Game game = getGame();
-        final Unit unit = message.getUnit(getMyPlayer());
-        final String defaultName = message.getNewLandName();
-
-        if (unit == null || defaultName == null || !unit.hasTile()) return;
-
-        invokeLater(() ->
-            igc().newLandName(defaultName, unit));
     }
 
     /**

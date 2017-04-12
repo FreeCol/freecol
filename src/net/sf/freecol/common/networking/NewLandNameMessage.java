@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -62,6 +64,16 @@ public class NewLandNameMessage extends AttributeMessage {
               NEW_LAND_NAME_TAG, getStringAttribute(element, NEW_LAND_NAME_TAG));
     }
 
+    /**
+     * Create a new {@code NewLandNameMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public NewLandNameMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, NEW_LAND_NAME_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -71,28 +83,20 @@ public class NewLandNameMessage extends AttributeMessage {
         return Message.MessagePriority.LATE;
     }
 
-
-    // Public interface
-
     /**
-     * Public accessor for the unit.
-     *
-     * @param player The {@code Player} who owns the unit.
-     * @return The {@code Unit} of this message.
+     * {@inheritDoc}
      */
-    public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
-    }
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Unit unit = getUnit(freeColClient.getMyPlayer());
+        final String defaultName = getNewLandName();
 
-    /**
-     * Public accessor for the new land name.
-     *
-     * @return The new land name of this message.
-     */
-    public String getNewLandName() {
-        return getStringAttribute(NEW_LAND_NAME_TAG);
-    }
+        if (unit == null || defaultName == null || !unit.hasTile()) return;
 
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).newLandName(defaultName, unit));
+    }
 
     /**
      * {@inheritDoc}
@@ -124,5 +128,27 @@ public class NewLandNameMessage extends AttributeMessage {
         // Set name.
         return freeColServer.getInGameController()
             .setNewLandName(serverPlayer, unit, newLandName);
+    }
+
+
+    // Public interface
+
+    /**
+     * Public accessor for the unit.
+     *
+     * @param player The {@code Player} who owns the unit.
+     * @return The {@code Unit} of this message.
+     */
+    public Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
+    }
+
+    /**
+     * Public accessor for the new land name.
+     *
+     * @return The new land name of this message.
+     */
+    public String getNewLandName() {
+        return getStringAttribute(NEW_LAND_NAME_TAG);
     }
 }
