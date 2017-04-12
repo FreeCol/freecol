@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -71,6 +73,16 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
               RESULT_TAG, getStringAttribute(element, RESULT_TAG));
     }
 
+    /**
+     * Create a new {@code ScoutSpeakToChiefMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr A {@code FreeColXMLReader} to read from.
+     */
+    public ScoutSpeakToChiefMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG, SETTLEMENT_TAG, RESULT_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -88,24 +100,6 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
         return Message.MessagePriority.LATE;
     }
 
-
-    // Public interface
-
-    public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
-    }
-
-    public IndianSettlement getSettlement(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(SETTLEMENT_TAG),
-                                         IndianSettlement.class);
-    }
-
-    public String getResult() {
-        String result = getStringAttribute(RESULT_TAG);
-        return (result == null) ? "" : result;
-    }
-
-    
     /**
      * {@inheritDoc}
      */
@@ -143,5 +137,36 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
         // Valid request, do the scouting.
         return freeColServer.getInGameController()
             .scoutSpeakToChief(serverPlayer, unit, is);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Unit unit = getUnit(game);
+        final IndianSettlement is = getSettlement(game);
+        final String result = getResult();
+
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).scoutSpeakToChief(unit, is, result));
+    }
+
+
+    // Public interface
+
+    public Unit getUnit(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(UNIT_TAG), Unit.class);
+    }
+
+    public IndianSettlement getSettlement(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(SETTLEMENT_TAG),
+                                         IndianSettlement.class);
+    }
+
+    public String getResult() {
+        String result = getStringAttribute(RESULT_TAG);
+        return (result == null) ? "" : result;
     }
 }

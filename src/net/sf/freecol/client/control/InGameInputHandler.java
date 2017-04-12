@@ -214,7 +214,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new RemoveMessage(getGame(), e).clientHandler(freeColClient));
         register(ScoutSpeakToChiefMessage.TAG,
             (Connection c, Element e) ->
-                scoutSpeakToChief(new ScoutSpeakToChiefMessage(getGame(), e)));
+                new ScoutSpeakToChiefMessage(getGame(), e).clientHandler(freeColClient));
         register(SetAIMessage.TAG,
             (Connection c, Element e) ->
                 new SetAIMessage(getGame(), e).clientHandler(freeColClient));
@@ -567,21 +567,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().newTurn(n));
-    }
-
-    /**
-     * Handle a "scoutSpeakToChief"-message.
-     *
-     * @param message The {@code ScoutSpeakToChiefMessage} to process.
-     */
-    private void scoutSpeakToChief(ScoutSpeakToChiefMessage message) {
-        final Game game = getGame();
-        final Unit unit = message.getUnit(game);
-        final IndianSettlement is = message.getSettlement(game);
-        final String result = message.getResult();
-
-        invokeLater(() ->
-            igc().scoutSpeakToChief(unit, is, result));
     }
 
     /**
