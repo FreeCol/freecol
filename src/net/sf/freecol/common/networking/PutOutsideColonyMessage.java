@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
@@ -58,6 +59,16 @@ public class PutOutsideColonyMessage extends AttributeMessage {
         super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
+    /**
+     * Create a new {@code PutOutsideColonyMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public PutOutsideColonyMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, UNIT_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -74,7 +85,6 @@ public class PutOutsideColonyMessage extends AttributeMessage {
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
