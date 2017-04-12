@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
@@ -64,6 +66,16 @@ public class SetStanceMessage extends AttributeMessage {
               SECOND_TAG, getStringAttribute(element, SECOND_TAG));
     }
 
+    /**
+     * Create a new {@code SetStanceMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to (null here).
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public SetStanceMessage(Game game, FreeColXMLReader xr) {
+        super(TAG, xr, STANCE_TAG, FIRST_TAG, SECOND_TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -71,6 +83,29 @@ public class SetStanceMessage extends AttributeMessage {
     @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.STANCE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Stance stance = getStance();
+        final Player p1 = getFirstPlayer(game);
+        final Player p2 = getSecondPlayer(game);
+
+        if (p1 == null) {
+            logger.warning("Invalid player1 for setStance");
+            return;
+        }
+        if (p2 == null) {
+            logger.warning("Invalid player2 for setStance");
+            return;
+        }
+
+        invokeLater(freeColClient, () ->
+            igc(freeColClient).setStance(stance, p1, p2));
     }
 
 
