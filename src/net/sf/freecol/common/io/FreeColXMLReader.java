@@ -637,6 +637,22 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
             
     /**
+     * Get a map of the array attributes.
+     *
+     * @return A map of array attributes.
+     */
+    public Map<String, String> getArrayAttributeMap() {
+        Map<String, String> ret = new HashMap<>();
+        int n = getAttribute(FreeColObject.ARRAY_SIZE_TAG, -1);
+        for (int i = 0; i < n; i++) {
+            String key = FreeColObject.arrayKey(i);
+            if (!hasAttribute(key)) break;
+            ret.put(key, getAttribute(key, (String)null));
+        }
+        return ret;
+    }
+        
+    /**
      * Reads an XML-representation of a list of some general type.
      *
      * @param <T> The list member type.
