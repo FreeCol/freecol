@@ -111,14 +111,28 @@ final class ReceivingThread extends Thread {
     }
 
     /**
-     * Tells this thread that it does not need to do any more work.
+     * Stop this thread.
+     *
+     * @return True if the thread was previously running and is now stopped.
      */
-    public synchronized void askToStop() {
+    private synchronized boolean stopThread() {
+        boolean ret = this.shouldRun;
         if (this.shouldRun) {
             this.shouldRun = false;
             for (NetworkReplyObject o : this.waitingThreads.values()) {
                 o.interrupt();
             }
+        }
+        return ret;
+    }
+        
+    /**
+     * Ask this thread to stop work.
+     */
+    public void askToStop() {
+        if (stopThread()) {
+            logger.info("Stopped receiving thread for "
+                + this.connection.getName());
         }
     }
 

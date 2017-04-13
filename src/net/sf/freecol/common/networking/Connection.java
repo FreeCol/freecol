@@ -900,7 +900,10 @@ public class Connection implements Closeable {
      * Close this connection.
      */
     public void close() {
-        if (this.receivingThread != null) this.receivingThread.askToStop();
+        if (this.receivingThread != null) {
+            this.receivingThread.askToStop();
+            this.receivingThread = null;
+        }
 
         closeOutputStream();
         closeInputStream();
