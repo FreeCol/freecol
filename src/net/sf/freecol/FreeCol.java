@@ -293,8 +293,15 @@ public final class FreeCol {
 
         // Having parsed the command line args, we know where the user
         // directories should be, so we can set up the rest of the
-        // file/directory structure.
-        String userMsg = FreeColDirectories.setUserDirectories();
+        // file/directory structure.  Exit on failure here.
+        StringTemplate key = FreeColDirectories.setUserDirectories();
+        if (key != null) fatal(key);
+
+        // We used to display the result of setUserDirectories when we
+        // were doing a dodgy migration in 0.9 -> 0.10.  So userMsg is
+        // no longer really needed, but keep it around in case something
+        // similar comes up.
+        String userMsg = null;
 
         // Now we have the log file path, start logging.
         final Logger baseLogger = Logger.getLogger("");

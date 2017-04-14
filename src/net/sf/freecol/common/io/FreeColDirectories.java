@@ -38,6 +38,7 @@ import javax.swing.filechooser.FileSystemView;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.util.OSUtils;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -284,80 +285,6 @@ public class FreeColDirectories {
     }
 
     /**
-     * Get directories for XDG compliant systems.
-     *
-     * Result is:
-     * - Negative if a non-XDG OS is detected or there is insufficient
-     *   XDG structure to merit migrating, or what structure there is is
-     *   broken in some way.
-     * - Zero if there is at least one relevant XDG environment
-     *   variable in use and it points to a valid writable directory,
-     *   or the default exists and is writable.
-     * - Positive if there are a full set of suitable XDG directories and
-     *   there are freecol directories therein.
-     * - Otherwise negative, including non-directories in the wrong place
-     *   and unwritable directories.
-     *
-     * The intent is to ignore XDG on negative, migrate on zero, and use
-     * on positive.
-     *
-     * @param dirs An array of {@code File} to be filled in with the
-     *     XDG directory if it is present or created.
-     * @return The XDG compliance state.
-     */
-    private static int getXDGDirs(File[] dirs) {
-        if (onMacOSX() || onWindows() || !onUnix()) return -1;
-
-        int ret = -1;
-        File home = getUserDefaultDirectory();
-        if (home == null) return -1; // Fail badly
-        String[][] xdg = { { XDG_CONFIG_HOME_ENV, XDG_CONFIG_HOME_DEFAULT },
-                           { XDG_DATA_HOME_ENV,   XDG_DATA_HOME_DEFAULT },
-                           { XDG_CACHE_HOME_ENV,  XDG_CACHE_HOME_DEFAULT } };
-        File[] todo = new File[xdg.length];
-        for (int i = 0; i < xdg.length; i++) {
-            String env = System.getenv(xdg[i][0]);
-            File d = (env != null) ? new File(env) : new File(home, xdg[i][1]);
-            if (d.exists()) {
-                if (!d.isDirectory() || !d.canWrite()) {
-                    return -1; // Fail hard if something is broken
-                }
-                ret = Math.max(ret, 0);
-                File f = new File(d, FREECOL_DIRECTORY);
-                if (f.exists()) {
-                    if (!f.isDirectory() || !f.canWrite()) {
-                        return -1; // Again, fail hard
-                    }
-                    dirs[i] = f;
-                    todo[i] = null;
-                    ret++;
-                } else {
-                    dirs[i] = d;
-                    todo[i] = f;
-                }
-            } else {
-                dirs[i] = null;
-                todo[i] = d;
-            }
-        }
-        if (ret < 0) return -1; // No evidence of interest in XDG standard
-        if (ret == xdg.length) return 1; // Already fully XDG compliant
-
-        // Create the directories for migration
-        for (int i = 0; i < xdg.length; i++) {
-            if (todo[i] != null) {
-                if (!todo[i].getPath().endsWith(FREECOL_DIRECTORY)) {
-                    if (!todo[i].mkdir()) return -1;
-                    todo[i] = new File(todo[i], FREECOL_DIRECTORY);
-                }
-                if (!todo[i].mkdir()) return -1;
-                dirs[i] = todo[i];
-            }
-        }
-        return 0;
-    }
-
-    /**
      * Is the specified file a writable directory?
      *
      * @param f The {@code File} to check.
@@ -383,71 +310,115 @@ public class FreeColDirectories {
         return null;
     }
 
+    private static StringTemplate bad() {
+        return StringTemplate.key("main.userDir.fail");
+    }
+
+    private static StringTemplate badHome() {
+        return StringTemplate.key("main.userDir.noHome");
+    }
+
+    private static StringTemplate badDir(File d) {
+        return StringTemplate.template("main.userDir.badDir")
+            .addName("%name%", d.getPath());
+    }
+
+    private static StringTemplate badConfig(File f) {
+        return StringTemplate.template("main.userDir.badConfig")
+            .addName("%name%", f.getPath());
+    }
+
+    private static StringTemplate badData(File f) {
+        return StringTemplate.template("main.userDir.badData")
+            .addName("%name%", f.getPath());
+    }
+
+    private static StringTemplate badCache(File f) {
+        return StringTemplate.template("main.userDir.badCache")
+            .addName("%name%", f.getPath());
+    }
+
+    /**
+     * Get directories for XDG compliant systems.
+     *
+     * Result is:
+     * - Negative if a non-XDG OS is detected or there is insufficient
+     *   XDG structure to merit migrating, or what structure there is is
+     *   broken in some way.
+     * - Zero if there is at least one relevant XDG environment
+     *   variable in use and it points to a valid writable directory,
+     *   or the default exists and is writable.
+     * - Positive if there are a full set of suitable XDG directories and
+     *   there are freecol directories therein.
+     * - Otherwise negative, including non-directories in the wrong place
+     *   and unwritable directories.
+     *
+     * The intent is to ignore XDG on negative, migrate on zero, and use
+     * on positive.
+     *
+     * @param dirs An array of {@code File} to be filled in with the
+     *     XDG directory if it is present or created.
+     * @return The XDG compliance state.
+     */
+    private static StringTemplate getXDGDirs(File[] dirs) {
+        File home = getUserDefaultDirectory();
+        if (home == null) return badHome();
+
+        String env = System.getenv(XDG_CONFIG_HOME_ENV);
+        File d = (env != null) ? new File(env)
+            : new File(home, XDG_CONFIG_HOME_DEFAULT);
+        if (!isGoodDirectory(d)) return badDir(d);
+        File f = new File(d, FREECOL_DIRECTORY);
+        if (!isGoodDirectory(f)) return badConfig(f);
+        dirs[0] = f;
+
+        env = System.getenv(XDG_DATA_HOME_ENV);
+        d = (env != null) ? new File(env)
+            : new File(home, XDG_DATA_HOME_DEFAULT);
+        if (!isGoodDirectory(d)) return badDir(d);
+        f = new File(d, FREECOL_DIRECTORY);
+        if (!isGoodDirectory(f)) return badData(f);
+        dirs[1] = f;
+
+        env = System.getenv(XDG_CACHE_HOME_ENV);
+        d = (env != null) ? new File(env)
+            : new File(home, XDG_CACHE_HOME_DEFAULT);
+        if (!isGoodDirectory(d)) return badDir(d);
+        f = new File(d, FREECOL_DIRECTORY);
+        if (!isGoodDirectory(f)) return badCache(f);
+        dirs[2] = f;
+
+        return null;
+    }
+
     /**
      * Get FreeCol directories for MacOSX.
      *
      * No separate cache directory here.
      *
-     * Result is:
-     * - Negative on failure.
-     * - Zero if a migration is needed.
-     * - Positive if no migration is needed.
-     *
      * @param dirs An array of {@code File} to be filled in with the
-     *     MacOSX freecol directories if present or created.
-     * @return The migration state.
+     *     MacOSX freecol directories.
+     * @return Null on success, an error message on failure.
      */
-    private static int getMacOSXDirs(File[] dirs) {
-        if (!onMacOSX()) return -1;
-        int ret = 0;
-        File homeDir = getUserDefaultDirectory();
-        if (homeDir == null) return -1;
-        File libDir = new File(homeDir, "Library");
-        if (!isGoodDirectory(libDir)) return -1;
+    private static StringTemplate getMacOSXDirs(File[] dirs) {
+        File home = getUserDefaultDirectory();
+        if (home == null) return badHome();
+        File libDir = new File(home, "Library");
+        if (!isGoodDirectory(libDir)) return badDir(libDir);
 
-        if (dirs[0] == null) {
-            File prefsDir = new File(libDir, "Preferences");
-            if (isGoodDirectory(prefsDir)) {
-                dirs[0] = prefsDir;
-                File d = new File(prefsDir, FREECOL_DIRECTORY);
-                if (d.exists()) {
-                    if (d.isDirectory() && d.canWrite()) {
-                        dirs[0] = d;
-                        ret++;
-                    } else return -1;
-                }
-            } else return -1;
-        }
-
-        if (dirs[1] == null) {
-            File appsDir = new File(libDir, "Application Support");
-            if (isGoodDirectory(appsDir)) {
-                dirs[1] = appsDir;
-                File d = new File(appsDir, FREECOL_DIRECTORY);
-                if (d.exists()) {
-                    if (d.isDirectory() && d.canWrite()) {
-                        dirs[1] = d;
-                        ret++;
-                    } else return -1;
-                }
-            } else return -1;
-        }
-
-        if (dirs[2] == null) {
-            dirs[2] = dirs[1];
-        }
-
-        if (ret == 2) return 1;
-
-        File d = requireDir(new File(dirs[0], FREECOL_DIRECTORY));
-        if (d == null) return -1;
+        File prefsDir = new File(libDir, "Preferences");
+        if (!isGoodDirectory(prefsDir)) return badDir(prefsDir);
+        File d = new File(prefsDir, FREECOL_DIRECTORY);
+        if (!isGoodDirectory(d)) return badConfig(d);
         dirs[0] = d;
 
-        d = requireDir(new File(dirs[1], FREECOL_DIRECTORY));
-        if (d == null) return -1;
-        dirs[1] = d;
+        File appsDir = new File(libDir, "Application Support");
+        if (!isGoodDirectory(appsDir)) return badDir(appsDir);
+        d = new File(appsDir, FREECOL_DIRECTORY);
+        if (!isGoodDirectory(d)) return badData(d);
+        dirs[1] = dirs[2] = d;
 
-        return 0;
+        return null;
     }
 
 
@@ -462,63 +433,17 @@ public class FreeColDirectories {
      * - Positive if no migration is needed.
      *
      * @param dirs An array of {@code File} to be filled in with the
-     *     Windows freecol directories if present or created.
-     * @return The migration state.
+     *     Windows freecol directories.
+     * @return Null on success, an error message on failure.
      */
-    private static int getWindowsDirs(File[] dirs) {
-        if (onMacOSX() || !onWindows() || onUnix()) return -1;
-
+    private static StringTemplate getWindowsDirs(File[] dirs) {
         File home = getUserDefaultDirectory();
-        if (home == null) return -1; // Fail badly
-        File d = requireDir(new File(home, FREECOL_DIRECTORY));
-        if (d == null) return -1;
+        if (home == null) return badHome();
+
+        File d = new File(home, FREECOL_DIRECTORY);
+        if (!isGoodDirectory(d)) return badDir(d);
         dirs[0] = dirs[1] = dirs[2] = d;
-        return 1; // Do not migrate windows
-    }
-
-    /**
-     * Find the old user directory.
-     *
-     * Does not try to be clever, just tries ~/FreeCol, ~/.freecol, and
-     * ~/Library/FreeCol which should find the old directory on the three
-     * known systems.
-     *
-     * @return The old user directory, or null if none found.
-     */
-    private static File getOldUserDirectory() {
-        File home = getUserDefaultDirectory();
-        File old = new File(home, "FreeCol");
-        if (old.exists() && old.isDirectory() && old.canRead()) return old;
-        old = new File(home, ".freecol");
-        if (old.exists() && old.isDirectory() && old.canRead()) return old;
-        old = new File(home, "Library");
-        if (old.exists() && old.isDirectory() && old.canRead()) {
-            old = new File(old, "FreeCol");
-            if (old.exists() && old.isDirectory() && old.canRead()) return old;
-        }
         return null;
-    }
-
-    /**
-     * Copy directory with given name under an old directory to a new
-     * directory.
-     *
-     * @param oldDir The old directory.
-     * @param name The name of the directory to copy.
-     * @param newDir The new directory.
-     */
-    private static void copyIfFound(File oldDir, String name, File newDir) {
-        File src = new File(oldDir, name);
-        File dst = new File(newDir, name);
-        if (src.exists() && src.isDirectory() && !dst.exists()) {
-            try {
-                Files.copy(src.toPath(), dst.toPath(),
-                    StandardCopyOption.COPY_ATTRIBUTES);
-            } catch (IOException ioe) {
-                System.err.println("Could not copy " + src.toString() + " to "
-                    + dst.toString() + ": " + ioe.getMessage());
-            }
-        }
     }
 
     /**
@@ -594,12 +519,7 @@ public class FreeColDirectories {
     }
 
     /**
-     * Checks/creates the freecol directory structure for the current
-     * user.
-     *
-     * The main user directory used to be in the current user's home
-     * directory, and called ".freecol" (UNIXes including Mac in
-     * 0.9.x) or "freecol" or even FreeCol.  Now we use:
+     * Set the user directories for the current user.
      *
      * - on XDG standard compliant Unixes:
      *   - config:  ~/.config/freecol
@@ -610,7 +530,6 @@ public class FreeColDirectories {
      *   - else:    ~/Library/Application Support/freecol
      * - on Windows:
      *   - everything in <em>default directory</em>/freecol
-     * - otherwise use what was there
      *
      * Note: the freecol data directory is set independently and earlier
      * in initialization than this routine.
@@ -618,75 +537,45 @@ public class FreeColDirectories {
      * FIXME: Should the default location of the main user and data
      * directories be determined by the installer?
      *
-     * @return A message key to use to create a message to the user
-     *     possibly describing any directory migration, or null if
-     *     nothing to say.
+     * @return Null on success, otherwise an error message template.
      */
-    public static synchronized String setUserDirectories() {
-        if (userConfigDirectory != null
-            && !isGoodDirectory(userConfigDirectory))
-            userConfigDirectory = null;
-        if (userDataDirectory != null
-            && !isGoodDirectory(userDataDirectory))
-            userDataDirectory = null;
-        if (userCacheDirectory != null
-            && !isGoodDirectory(userCacheDirectory))
-            userCacheDirectory = null;
-        File dirs[] = { userConfigDirectory, userDataDirectory,
-                        userCacheDirectory };
-
-        // If the CL-specified directories are valid, all is well.
-        // Check for OSX next because it is a Unix.
-        int migrate = (dirs[0] != null && isGoodDirectory(dirs[0])
-            && dirs[1] != null && isGoodDirectory(dirs[1])
-            && dirs[2] != null && isGoodDirectory(dirs[2])) ? 1
-            : (onMacOSX()) ? getMacOSXDirs(dirs)
+    public static synchronized StringTemplate setUserDirectories() {
+        // Find the OS-specific directories.
+        // Check OSX before XDG because OSX is still unix-like.
+        File[] dirs = { null, null, null };
+        StringTemplate err = (onMacOSX()) ? getMacOSXDirs(dirs)
             : (onUnix()) ? getXDGDirs(dirs)
             : (onWindows()) ? getWindowsDirs(dirs)
-            : -1;
-        File oldDir = getOldUserDirectory();
-        if (migrate < 0) {
-            if (oldDir == null) return "main.userDir.fail";
-            dirs[0] = dirs[1] = dirs[2] = oldDir; // Do not migrate.
-            migrate = 1;
-        }
+            : bad();
+        if (err != null) return err;
 
-        // Only set user directories if not already overridden at the
-        // command line, and do not migrate in such cases.
-        if (userConfigDirectory == null) {
+        // Override directories if not set or not valid.
+        if (userConfigDirectory == null
+            || !isGoodDirectory(userConfigDirectory)) {
             userConfigDirectory = dirs[0];
-        } else migrate = 1;
-        if (userDataDirectory == null) {
+        }
+        if (userDataDirectory == null
+            || !isGoodDirectory(userDataDirectory)) {
             userDataDirectory = dirs[1];
-        } else migrate = 1;
-        if (userCacheDirectory == null) {
+        }
+        if (userCacheDirectory == null
+            || !isGoodDirectory(userCacheDirectory)) {
             userCacheDirectory = dirs[2];
-        } else migrate = 1;
-        if (migrate == 0 && oldDir != null) {
-            copyIfFound(oldDir, "classic", userConfigDirectory);
-            copyIfFound(oldDir, "freecol", userConfigDirectory);
-            copyIfFound(oldDir, "save",    userDataDirectory);
-            copyIfFound(oldDir, "mods",    userDataDirectory);
         }
 
+        // Derive the other directories and files
         if (logFilePath == null) {
             logFilePath = getUserCacheDirectory() + SEPARATOR + LOG_FILE;
         }
-
         if (saveDirectory == null) {
             saveDirectory = new File(getUserDataDirectory(), SAVE_DIRECTORY);
-            if (!insistDirectory(saveDirectory)) return "main.userDir.fail";
+            if (!insistDirectory(saveDirectory)) return badDir(saveDirectory);
         }
         deriveAutosaveDirectory();
-
         userModsDirectory = new File(getUserDataDirectory(), MODS_DIRECTORY);
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
 
-        return (migrate > 0) ? null
-            : (onMacOSX())  ? "main.userDir.macosx"
-            : (onUnix())    ? "main.userDir.unix"
-            : (onWindows()) ? "main.userDir.windows"
-            : null;
+        return null;
     }
 
     /**
