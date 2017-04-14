@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -149,6 +152,15 @@ public class SpySettlementMessage extends ObjectMessage {
         // Spy on the settlement
         return freeColServer.getInGameController()
             .spySettlement(serverPlayer, unit, colony);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
     }
 
     /**

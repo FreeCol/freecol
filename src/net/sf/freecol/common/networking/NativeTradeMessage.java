@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.NativeTrade;
@@ -138,6 +141,15 @@ public class NativeTradeMessage extends ObjectMessage {
 
         return freeColServer.getInGameController()
             .nativeTrade(serverPlayer, getAction(), nt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
     }
 
     /**

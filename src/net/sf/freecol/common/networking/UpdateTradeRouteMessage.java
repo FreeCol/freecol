@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
@@ -80,6 +83,15 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
                                    ServerPlayer serverPlayer) {
         return freeColServer.getInGameController()
             .updateTradeRoute(serverPlayer, this.tradeRoute);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
     }
 
     /**

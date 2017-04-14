@@ -22,6 +22,9 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.server.FreeColServer;
@@ -122,6 +125,15 @@ public class HighScoreMessage extends ObjectMessage {
                                    ServerPlayer serverPlayer) {
         return freeColServer.getInGameController()
             .getHighScores(serverPlayer, this.key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
     }
 
     /**

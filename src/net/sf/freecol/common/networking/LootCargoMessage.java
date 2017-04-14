@@ -22,6 +22,9 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
@@ -91,6 +94,50 @@ public class LootCargoMessage extends ObjectMessage {
         return Message.MessagePriority.LATE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Game game = freeColServer.getGame();
+
+        Unit winner;
+        try {
+            winner = getUnit(game);
+        } catch (Exception e) {
+            return serverPlayer.clientError(e.getMessage());
+        }
+        // Do not check loserId, as it might have sunk.  It is enough
+        // that the attacker knows it.  Similarly the server is better
+        // placed to check the goods validity.
+
+        // Try to loot.
+        return freeColServer.getInGameController()
+            .lootCargo(serverPlayer, winner, this.loserId, goods);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
+    }
+
+    /**
+     * Convert this LootCargoMessage to XML.
+     *
+     * @return The XML representation of this message.
+     */
+    @Override
+    public Element toXMLElement() {
+        return new DOMMessage(TAG,
+            WINNER_TAG, this.winnerId,
+            LOSER_TAG, this.loserId)
+            .add(this.goods).toXMLElement();
+    }
 
     // Public interface
 
@@ -120,42 +167,5 @@ public class LootCargoMessage extends ObjectMessage {
      */
     public List<Goods> getGoods() {
         return goods;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        final Game game = freeColServer.getGame();
-
-        Unit winner;
-        try {
-            winner = getUnit(game);
-        } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage());
-        }
-        // Do not check loserId, as it might have sunk.  It is enough
-        // that the attacker knows it.  Similarly the server is better
-        // placed to check the goods validity.
-
-        // Try to loot.
-        return freeColServer.getInGameController()
-            .lootCargo(serverPlayer, winner, this.loserId, goods);
-    }
-
-    /**
-     * Convert this LootCargoMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            WINNER_TAG, this.winnerId,
-            LOSER_TAG, this.loserId)
-            .add(this.goods).toXMLElement();
     }
 }

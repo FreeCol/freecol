@@ -22,6 +22,9 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -120,6 +123,20 @@ public class UpdateMessage extends ObjectMessage {
 
 
     /**
+     * Append another object and optional partial fields to update.
+     *
+     * @param fco The {@code FreeColObject} to update.
+     * @param flds An optional list of fields to update.
+     */
+    private void append(FreeColObject fco, List<String> flds) {
+        if (fco != null
+            && FreeColGameObject.class.isAssignableFrom(fco.getClass())) {
+            this.fcgos.add((FreeColGameObject)fco);
+            this.fields.add(flds);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -142,20 +159,33 @@ public class UpdateMessage extends ObjectMessage {
     }
               
     /**
-     * Append another object and optional partial fields to update.
-     *
-     * @param fco The {@code FreeColObject} to update.
-     * @param flds An optional list of fields to update.
+     * {@inheritDoc}
      */
-    private void append(FreeColObject fco, List<String> flds) {
-        if (fco != null
-            && FreeColGameObject.class.isAssignableFrom(fco.getClass())) {
-            this.fcgos.add((FreeColGameObject)fco);
-            this.fields.add(flds);
-        }
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
     }
 
-            
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Element toXMLElement() {
+        DOMMessage message = new DOMMessage(TAG);
+        final int n = this.fcgos.size();
+        for (int i = 0; i < n; i++) {
+            List<String> part = this.fields.get(i);
+            if (part == null) {
+                message.add(this.fcgos.get(i), this.destination);
+            } else {
+                message.add(this.fcgos.get(i), part);
+            }
+        }
+        return message.toXMLElement();
+    }
+
+
     // Public interface
 
     /**
@@ -174,27 +204,5 @@ public class UpdateMessage extends ObjectMessage {
      */
     public List<List<String>> getFields() {
         return this.fields;
-    }
-
-    
-    // No server handler required.
-    // This message is only sent to the client.
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        DOMMessage message = new DOMMessage(TAG);
-        final int n = this.fcgos.size();
-        for (int i = 0; i < n; i++) {
-            List<String> part = this.fields.get(i);
-            if (part == null) {
-                message.add(this.fcgos.get(i), this.destination);
-            } else {
-                message.add(this.fcgos.get(i), part);
-            }
-        }
-        return message.toXMLElement();
     }
 }

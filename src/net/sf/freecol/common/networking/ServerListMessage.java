@@ -22,6 +22,9 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.DOMUtils;
@@ -64,6 +67,15 @@ public class ServerListMessage extends ObjectMessage {
                 e -> new RegisterServerMessage(null, element).getServerInfo()));
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
+    }
 
     // Public interface
 

@@ -19,7 +19,10 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
@@ -123,6 +126,27 @@ public class ErrorMessage extends ObjectMessage {
         return Message.MessagePriority.NORMAL;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
+    }
+
+    /**
+     * Convert this ErrorMessage to XML.
+     *
+     * @return The XML representation of this message.
+     */
+    @Override
+    public Element toXMLElement() {
+        return new DOMMessage(TAG,
+            MESSAGE_TAG, this.message)
+            .add(this.template).toXMLElement();
+    }
+
 
     // Public interface
 
@@ -151,30 +175,5 @@ public class ErrorMessage extends ObjectMessage {
      */
     public String getMessage() {
         return this.message;
-    }
-
-        
-    /**
-     * Handle a "error"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return Null.
-     */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        // Not needed, error messages are only sent by the server
-        return null;
-    }
-
-    /**
-     * Convert this ErrorMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            MESSAGE_TAG, this.message)
-            .add(this.template).toXMLElement();
     }
 }

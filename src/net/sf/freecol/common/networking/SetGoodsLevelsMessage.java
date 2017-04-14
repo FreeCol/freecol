@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Game;
@@ -106,6 +109,15 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
         // Proceed to set.
         return freeColServer.getInGameController()
             .setGoodsLevels(serverPlayer, colony, this.data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
     }
 
     /**

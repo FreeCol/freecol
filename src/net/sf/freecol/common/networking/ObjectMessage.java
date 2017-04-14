@@ -96,15 +96,6 @@ public class ObjectMessage extends AttributeMessage {
         if (objects != null) this.objects.addAll(fcos);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
-    }
-
 
     // DOMMessage
 

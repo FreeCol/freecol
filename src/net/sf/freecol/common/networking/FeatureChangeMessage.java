@@ -22,6 +22,9 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -123,6 +126,15 @@ public class FeatureChangeMessage extends ObjectMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         return null; // Only sent to client
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
     }
 
     /**

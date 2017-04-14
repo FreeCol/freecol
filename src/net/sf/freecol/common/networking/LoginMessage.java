@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -312,6 +313,15 @@ public class LoginMessage extends ObjectMessage {
         }
         return ChangeSet.clientError((ServerPlayer)null, StringTemplate
             .template("server.couldNotLogin"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
     }
 
     /**

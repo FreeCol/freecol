@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -85,6 +88,28 @@ public class MultipleMessage extends ObjectMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
+    }
+
+    /**
+     * Convert this MultipleMessage to XML.
+     *
+     * @return The XML representation of this message.
+     */
+    @Override
+    public Element toXMLElement() {
+        DOMMessage result = new DOMMessage(TAG);
+        for (Element e : this.elements) result.add(e);
+        return result.toXMLElement();
+    }
+
+
     // Public interface
 
     /**
@@ -115,18 +140,5 @@ public class MultipleMessage extends ObjectMessage {
     public Element handle(FreeColServer freeColServer, Connection connection) {
         Message m = applyHandler(connection.getDOMMessageHandler(), connection);
         return (m == null) ? null : ((DOMMessage)m).toXMLElement();
-    }
-
-
-    /**
-     * Convert this MultipleMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(TAG);
-        for (Element e : this.elements) result.add(e);
-        return result.toXMLElement();
     }
 }
