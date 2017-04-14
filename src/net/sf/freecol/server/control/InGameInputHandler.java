@@ -213,7 +213,7 @@ public final class InGameInputHandler extends ServerInputHandler {
             (Connection conn, Element e) -> handler(true, conn,
                 new LoadGoodsMessage(getGame(), e)));
         register(LootCargoMessage.TAG,
-            (Connection conn, Element e) -> handler(true, conn,
+            (Connection conn, Element e) -> handler(false, conn,
                 new LootCargoMessage(getGame(), e)));
         register(MissionaryMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
