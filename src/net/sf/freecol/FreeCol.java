@@ -274,7 +274,6 @@ public final class FreeCol {
             locale = Messages.getLocale(localeArg);
         }
         Messages.loadMessageBundle(locale);
-
         // Now that we can emit error messages, parse the other
         // command line arguments.
         handleArgs(args);
@@ -471,6 +470,56 @@ public final class FreeCol {
         return null;
     }
 
+    /** Definitions for all the options. */
+    private static String argDir = "cli.arg.directory";
+    private static String argFile = "cli.arg.file";
+    private static String[][] optionsTable = {
+        // Help options
+        { "?", "usage", "cli.help", null },
+        { "@", "help", "cli.help", null },
+        // Special early options
+        { "d", "freecol-data", "cli.freecol-data", argDir },
+        { "L", "default-locale", "cli.default-locale", "cli.arg.locale" },
+        // Ordinary options
+        { "a", "advantages", getAdvantagesDescription(), "cli.arg.advantages" },
+        { "",  "check-savegame", "cli.check-savegame", argFile },
+        { "O", "clientOptions", "cli.clientOptions", "cli.arg.clientOptions" },
+        { "D", "debug", getDebugDescription(), "cli.arg.debug" },
+        { "R", "debug-run", "cli.debug-run", "cli.arg.debugRun" },
+        { "S", "debug-start", "cli.debug-start", null },
+        { "D", "difficulty", "cli.difficulty", "cli.arg.difficulty" },
+        { "e", "europeans", "cli.european-count", "cli.arg.europeans" },
+        { "",  "fast", "cli.fast", null },
+        { "f", "font", "cli.font", "cli.arg.font" },
+        { "F", "full-screen", "cli.full-screen", null },
+        { "g", "gui-scale", getGUIScaleDescription(), "!cli.arg.gui-scale" },
+        { "H", "headless", "cli.headless", null },
+        { "l", "load-savegame", "cli.load-savegame", argFile },
+        { "",  "log-console", "cli.log-console", null },
+        { "",  "log-file", "cli.log-file", "cli.arg.name" },
+        { "",  "log-level", "cli.log-level", "cli.arg.loglevel" },
+        { "m", "meta-server", "cli.meta-server", "cli.arg.metaServer" },
+        { "n", "name", "cli.name", "cli.arg.name" },
+        { "",  "no-intro", "cli.no-intro", null },
+        { "",  "no-java-check", "cli.no-java-check", null },
+        { "",  "no-memory-check", "cli.no-memory-check", null },
+        { "",  "no-sound", "cli.no-sound", null },
+        { "",  "no-splash", "cli.no-splash", null },
+        { "p", "private", "cli.private", null },
+        { "Z", "seed", "cli.seed", "cli.arg.seed" },
+        { "",  "server", "cli.server", null },
+        { "",  "server-name", "cli.server-name", "cli.arg.name" },
+        { "",  "server-port", "cli.server-port", "cli.arg.port" },
+        { "s", "splash", "cli.splash", "!" + argFile },
+        { "t", "tc", "cli.tc", "cli.arg.name" },
+        { "T", "timeout", "cli.timeout", "cli.arg.timeout" },
+        { "C", "user-cache-directory", "cli.user-cache-directory", argDir },
+        { "c", "user-config-directory", "cli.user-config-directory", argDir },
+        { "u", "user-data-directory", "cli.user-data-directory", argDir },
+        { "v", "version", "cli.version", null },
+        { "w", "windowed", "cli.windowed", "!cli.arg.dimensions" },
+    };
+
     /**
      * Processes the command-line arguments and takes appropriate
      * actions for each of them.
@@ -479,198 +528,24 @@ public final class FreeCol {
      */
     private static void handleArgs(String[] args) {
         Options options = new Options();
-        final String help = Messages.message("cli.help");
-        final String argDirectory = Messages.message("cli.arg.directory");
-
-        // Help options.
-        options.addOption(Option.builder().longOpt("usage")
-                          .desc(help)
-                          .build());
-        options.addOption(Option.builder().longOpt("help")
-                          .desc(help)
-                          .build());
-
-        // Special options handled early.
-        options.addOption(Option.builder().longOpt("freecol-data")
-                          .desc(Messages.message("cli.freecol-data"))
-                          .argName(argDirectory)
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("default-locale")
-                          .desc(Messages.message("cli.default-locale"))
-                          .argName(Messages.message("cli.arg.locale"))
-                          .hasArg()
-                          .build());
-
-        // Ordinary options, handled here.
-        options.addOption(Option.builder().longOpt("advantages")
-                          .desc(Messages.message(StringTemplate
-                                  .template("cli.advantages")
-                                  .addName("%advantages%", getValidAdvantages())))
-                          .argName(Messages.message("cli.arg.advantages"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("check-savegame")
-                          .desc(Messages.message("cli.check-savegame"))
-                          .argName(Messages.message("cli.arg.file"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("clientOptions")
-                          .desc(Messages.message("cli.clientOptions"))
-                          .argName(Messages.message("cli.arg.clientOptions"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("debug")
-                          .desc(Messages.message(StringTemplate
-                                  .template("cli.debug")
-                                  .addName("%modes%", FreeColDebugger.getDebugModes())))
-                          .argName(Messages.message("cli.arg.debug"))
-                          .hasArgs()
-                          .build());
-        options.addOption(Option.builder().longOpt("debug-run")
-                          .desc(Messages.message("cli.debug-run"))
-                          .argName(Messages.message("cli.arg.debugRun"))
-                          .hasArgs()
-                          .build());
-        options.addOption(Option.builder().longOpt("debug-start")
-                          .desc(Messages.message("cli.debug-start"))
-                          .build());
-        options.addOption(Option.builder().longOpt("difficulty")
-                          .desc(Messages.message("cli.difficulty"))
-                          .argName(Messages.message("cli.arg.difficulty"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("europeans")
-                          .desc(Messages.message("cli.european-count"))
-                          .argName(Messages.message("cli.arg.europeans"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("fast")
-                          .desc(Messages.message("cli.fast"))
-                          .build());
-        options.addOption(Option.builder().longOpt("font")
-                          .desc(Messages.message("cli.font"))
-                          .argName(Messages.message("cli.arg.font"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("full-screen")
-                          .desc(Messages.message("cli.full-screen"))
-                          .build());
-        options.addOption(Option.builder().longOpt("gui-scale")
-                          .desc(Messages.message(StringTemplate
-                                  .template("cli.gui-scale")
-                                  .addName("%scales%", getValidGUIScales())))
-                          .argName(Messages.message("cli.arg.gui-scale"))
-                          .optionalArg(true)
-                          .build());
-        options.addOption(Option.builder().longOpt("headless")
-                          .desc(Messages.message("cli.headless"))
-                          .build());
-        options.addOption(Option.builder().longOpt("load-savegame")
-                          .desc(Messages.message("cli.load-savegame"))
-                          .argName(Messages.message("cli.arg.file"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("log-console")
-                          .desc(Messages.message("cli.log-console"))
-                          .build());
-        options.addOption(Option.builder().longOpt("log-file")
-                          .desc(Messages.message("cli.log-file"))
-                          .argName(Messages.message("cli.arg.name"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("log-level")
-                          .desc(Messages.message("cli.log-level"))
-                          .argName(Messages.message("cli.arg.loglevel"))
-                          .hasArgs()
-                          .build());
-        options.addOption(Option.builder().longOpt("meta-server")
-                          .desc(Messages.message("cli.meta-server"))
-                          .argName(Messages.message("cli.arg.metaServer"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("name")
-                          .desc(Messages.message("cli.name"))
-                          .argName(Messages.message("cli.arg.name"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("no-intro")
-                          .desc(Messages.message("cli.no-intro"))
-                          .build());
-        options.addOption(Option.builder().longOpt("no-java-check")
-                          .desc(Messages.message("cli.no-java-check"))
-                          .build());
-        options.addOption(Option.builder().longOpt("no-memory-check")
-                          .desc(Messages.message("cli.no-memory-check"))
-                          .build());
-        options.addOption(Option.builder().longOpt("no-sound")
-                          .desc(Messages.message("cli.no-sound"))
-                          .build());
-        options.addOption(Option.builder().longOpt("no-splash")
-                          .desc(Messages.message("cli.no-splash"))
-                          .build());
-        options.addOption(Option.builder().longOpt("private")
-                          .desc(Messages.message("cli.private"))
-                          .build());
-        options.addOption(Option.builder().longOpt("seed")
-                          .desc(Messages.message("cli.seed"))
-                          .argName(Messages.message("cli.arg.seed"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("server")
-                          .desc(Messages.message("cli.server"))
-                          .build());
-        options.addOption(Option.builder().longOpt("server-name")
-                          .desc(Messages.message("cli.server-name"))
-                          .argName(Messages.message("cli.arg.name"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("server-port")
-                          .desc(Messages.message("cli.server-port"))
-                          .argName(Messages.message("cli.arg.port"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("splash")
-                          .desc(Messages.message("cli.splash"))
-                          .argName(Messages.message("cli.arg.file"))
-                          .optionalArg(true)
-                          .build());
-        options.addOption(Option.builder().longOpt("tc")
-                          .desc(Messages.message("cli.tc"))
-                          .argName(Messages.message("cli.arg.name"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("timeout")
-                          .desc(Messages.message("cli.timeout"))
-                          .argName(Messages.message("cli.arg.timeout"))
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("user-cache-directory")
-                          .desc(Messages.message("cli.user-cache-directory"))
-                          .argName(argDirectory)
-                          .type(File.class)
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("user-config-directory")
-                          .desc(Messages.message("cli.user-config-directory"))
-                          .argName(argDirectory)
-                          .type(File.class)
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("user-data-directory")
-                          .desc(Messages.message("cli.user-data-directory"))
-                          .argName(argDirectory)
-                          .type(File.class)
-                          .hasArg()
-                          .build());
-        options.addOption(Option.builder().longOpt("version")
-                          .desc(Messages.message("cli.version"))
-                          .build());
-        options.addOption(Option.builder().longOpt("windowed")
-                          .desc(Messages.message("cli.windowed"))
-                          .argName(Messages.message("cli.arg.dimensions"))
-                          .optionalArg(true)
-                          .build());
+        for (String[] o : optionsTable) {
+            String arg = o[3];
+            Option op = new Option(o[0], o[1], arg != null,
+                ((o[2].startsWith("cli.")) ? Messages.message(o[2]) : o[2]));
+            if (arg != null) {
+                boolean optional = false;
+                if (arg.startsWith("!")) {
+                    optional = true;
+                    arg = arg.substring(1, arg.length());
+                }
+                if (arg.startsWith(argDir)
+                    || arg.startsWith(argFile)) op.setType(File.class);
+                if (arg.startsWith("cli.")) arg = Messages.message(arg);
+                op.setArgName(arg);
+                op.setOptionalArg(optional);
+            }
+            options.addOption(op);
+        }
 
         CommandLineParser parser = new DefaultParser();
         boolean usageError = false;
@@ -1023,6 +898,26 @@ public final class FreeCol {
     }
 
     /**
+     * Get a description for the advantages argument.
+     *
+     * @return A suitable description.
+     */
+    private static String getAdvantagesDescription() {
+        return Messages.message(StringTemplate.template("cli.advantages")
+            .addName("%advantages%", getValidAdvantages()));
+    }
+
+    /**
+     * Get a description for the debug argument.
+     *
+     * @return A suitable description.
+     */
+    private static String getDebugDescription() {
+        return Messages.message(StringTemplate.template("cli.debug")
+            .addName("%modes%", FreeColDebugger.getDebugModes()));
+    }
+
+    /**
      * Gets the difficulty level.
      *
      * @return The name of a difficulty level.
@@ -1135,6 +1030,16 @@ public final class FreeCol {
              i += GUI_SCALE_STEP_PCT) sb.append(i).append(',');
         sb.setLength(sb.length()-1);
         return sb.toString();
+    }
+
+    /**
+     * Get a description of the GUI scale argument.
+     *
+     * @return A suitable description.
+     */
+    private static String getGUIScaleDescription() {
+        return Messages.message(StringTemplate.template("cli.gui-scale")
+                                    .addName("%scales%", getValidGUIScales()));
     }
 
     /**
