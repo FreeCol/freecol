@@ -2584,14 +2584,12 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Chat with another player.
      *
-     * Called from IGIH.chat.
-     *
      * @param player The {@code Player} to chat with.
      * @param message What to say.
      * @param pri If true, the message is private.
      */
-    public void chat(Player player, String message, boolean pri) {
-        getGUI().displayChatMessage(player, message, pri);
+    public void displayChat(Player player, String message, boolean pri) {
+        getGUI().displayChat(player, message, pri);
     }
 
     /**

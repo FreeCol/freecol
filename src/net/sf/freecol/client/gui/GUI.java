@@ -341,13 +341,21 @@ public class GUI extends FreeColClientHolder {
      *
      * @param player The player who sent the chat message.
      * @param message The chat message.
-     * @param privateChat 'true' if the message is a private one, 'false'
-     *     otherwise.
-     * @see GUIMessage
+     * @param privateChat True if the message is private.
      */
-    public void displayChatMessage(Player player, String message,
-                                   boolean privateChat) {}
+    public void displayChat(Player player, String message,
+                            boolean privateChat) {}
 
+    /**
+     * A chat message was received during the pre-game setup.
+     *
+     * @param player The player who sent the chat message.
+     * @param message The chat message.
+     * @param privateChat True if the message is private.
+     */
+    public void displayStartChat(Player player, String message,
+                                 boolean privateChat) {}
+    
     /**
      * Refresh the GUI.
      */

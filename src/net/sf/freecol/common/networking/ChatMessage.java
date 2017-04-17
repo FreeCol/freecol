@@ -99,9 +99,10 @@ public class ChatMessage extends AttributeMessage {
 
         if (freeColClient.isInGame()) {
             invokeLater(freeColClient, () ->
-                igc(freeColClient).chat(player, text, isPrivate));
+                igc(freeColClient).displayChat(player, text, isPrivate));
         } else {
-            freeColClient.getGUI().displayChatMessage(player, text, isPrivate);
+            invokeLater(freeColClient, () ->
+                pgc(freeColClient).displayChat(player, text, isPrivate));
         }
     }
 

@@ -95,7 +95,7 @@ public final class StartGamePanel extends FreeColPanel {
 
     private final ActionListener chatCmd = ae -> {
         if (!chat.getText().isEmpty()) {
-            getFreeColClient().getPreGameController().chat(chat.getText());
+            getFreeColClient().getPreGameController().sendChat(chat.getText());
             displayChat(getMyPlayer().getName(), chat.getText(), false);
             chat.setText("");
         }

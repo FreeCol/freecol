@@ -70,10 +70,21 @@ public final class PreGameController extends FreeColClientHolder {
      *
      * @param message The text of the message.
      */
-    public void chat(String message) {
+    public void sendChat(String message) {
         askServer().chat(getMyPlayer(), message);
     }
 
+    /**
+     * Display a chat message.
+     *
+     * @param player The {@code Player} to chat with.
+     * @param message What to say.
+     * @param pri If true, the message is private.
+     */
+    public void displayChat(Player player, String message, boolean pri) {
+        getGUI().displayStartChat(player, message, pri);
+    }
+    
     /**
      * Requests the game to be started.  This will only be successful
      * if all players are ready to start the game.

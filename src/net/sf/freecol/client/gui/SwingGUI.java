@@ -508,10 +508,19 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void displayChatMessage(Player player, String message,
-                                   boolean privateChat) {
-        canvas.displayChatMessage(new GUIMessage(
+    public void displayChat(Player player, String message,
+                            boolean privateChat) {
+        canvas.displayChat(new GUIMessage(
             player.getName() + ": " + message, player.getNationColor()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void displayStartChat(Player player, String message,
+                                 boolean privateChat) {
+        canvas.displayStartChat(player.getName(), message, privateChat);
     }
 
     /**

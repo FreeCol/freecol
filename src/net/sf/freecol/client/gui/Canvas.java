@@ -1211,9 +1211,22 @@ public final class Canvas extends JDesktopPane {
      *
      * @param message The chat message.
      */
-    public void displayChatMessage(GUIMessage message) {
+    public void displayChat(GUIMessage message) {
         chatDisplay.addMessage(message);
         repaint(0, 0, getWidth(), getHeight());
+    }
+
+    /**
+     * Tells that a chat message was received.
+     *
+     * @param message The chat message.
+     */
+    public void displayStartChat(String senderName, String message,
+                                 boolean privateChat) {
+        StartGamePanel sgp = getExistingFreeColPanel(StartGamePanel.class);
+        if (sgp != null) {
+            sgp.displayChat(senderName, message, privateChat);
+        }
     }
 
     /**
