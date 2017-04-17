@@ -69,20 +69,12 @@ public abstract class WrapperMessage extends AttributeMessage {
         throws XMLStreamException, FreeColException {
         super(tag, REPLY_ID_TAG, xr.getAttribute(REPLY_ID_TAG, (String)null));
 
-        System.err.println("WM at " + tag + "/" + xr.getLocalName());
         if (xr.moreTags()) {
-            System.err.println("WM then " + xr.getLocalName());
-            try {
-                this.message = Message.read(game, xr);
-            } catch (Exception ex) {
-                System.err.println("WM FAIL " + ex);
-                throw ex;
-            }
-            System.err.println("WM read " + ((this.message == null) ? "null" : this.message.getType()));
+            String mt = xr.getLocalName();
+            this.message = Message.read(game, xr);
+            xr.closeTag(mt);
         }
-        System.err.println("WM done? " + xr.getLocalName());
-        xr.closeTag(tag);
-        System.err.println("WM done " + xr.getLocalName());
+        xr.expectTag(tag);
     }
         
 
