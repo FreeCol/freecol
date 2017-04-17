@@ -133,7 +133,7 @@ public class LoginMessage extends ObjectMessage {
         xr.nextTag();
         final String tag = xr.getLocalName();
         this.game = (Game.TAG.equals(tag)) ? new Game(null, xr) : null;
-        xr.closeTag(TAG);
+        xr.expectTag(TAG);
     }
 
 
@@ -331,15 +331,16 @@ public class LoginMessage extends ObjectMessage {
     public Element toXMLElement() {
         Player player = (this.game == null || this.userName == null) ? null
             : getPlayer(this.game);
-        String state = (this.state == null) ? "" : this.state.toString();
-        return new DOMMessage(TAG,
+        DOMMessage ret = new DOMMessage(TAG,
             USER_NAME_TAG, this.userName,
             VERSION_TAG, this.version,
-            STATE_TAG, state,
             SINGLE_PLAYER_TAG, Boolean.toString(this.singlePlayer),
             CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer))
-            .add(this.game, player)
-            .toXMLElement();
+            .add(this.game, player);
+        if (this.state != null) {
+            ret.setStringAttribute(STATE_TAG, this.state.toString());
+        }
+        return ret.toXMLElement();
     }
 
 
