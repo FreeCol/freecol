@@ -548,7 +548,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
                                       attrib.toUpperCase(Locale.US));
             } catch (Exception e) {
                 logger.warning(attributeName + " is not a "
-                    + defaultValue.getClass().getName() + ": " + attrib);
+                    + returnClass.getName() + ": " + attrib);
             }
         }
         return result;
