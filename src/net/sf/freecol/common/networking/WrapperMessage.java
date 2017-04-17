@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
@@ -68,12 +69,34 @@ public abstract class WrapperMessage extends AttributeMessage {
         throws XMLStreamException, FreeColException {
         super(tag, REPLY_ID_TAG, xr.getAttribute(REPLY_ID_TAG, (String)null));
 
-        xr.nextTag();
-        this.message = Message.read(game, xr);
+        System.err.println("WM at " + tag + "/" + xr.getLocalName());
+        if (xr.moreTags()) {
+            System.err.println("WM then " + xr.getLocalName());
+            try {
+                this.message = Message.read(game, xr);
+            } catch (Exception ex) {
+                System.err.println("WM FAIL " + ex);
+                throw ex;
+            }
+            System.err.println("WM read " + ((this.message == null) ? "null" : this.message.getType()));
+        }
+        System.err.println("WM done? " + xr.getLocalName());
         xr.closeTag(tag);
+        System.err.println("WM done " + xr.getLocalName());
     }
         
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSourcePlayer(ServerPlayer serverPlayer) {
+        super.setSourcePlayer(serverPlayer);
+        if (this.message != null) { // Propagate to wrapped message
+            this.message.setSourcePlayer(serverPlayer);
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -94,6 +117,16 @@ public abstract class WrapperMessage extends AttributeMessage {
             : this.message.serverHandler(freeColServer, serverPlayer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.message != null) {
+            this.message.toXML(xw);
+        }
+    }
+    
 
     // Public interface
 
@@ -113,5 +146,14 @@ public abstract class WrapperMessage extends AttributeMessage {
      */
     public Message getMessage() {
         return this.message;
+    }
+
+    /**
+     * Get the type of the wrapped message.
+     *
+     * @return The subtype, or null if no message.
+     */
+    public String getSubType() {
+        return (this.message == null) ? null : this.message.getType();
     }
 }

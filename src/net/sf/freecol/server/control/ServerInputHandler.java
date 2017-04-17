@@ -36,9 +36,11 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.DisconnectMessage;
+import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.QuestionMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -220,7 +222,21 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     public Message read(Connection connection)
         throws FreeColException, XMLStreamException {
         Message ret = Message.read(getGame(), connection.getFreeColXMLReader());
-        if (ret != null) ret.setSourcePlayer(getServerPlayer(connection));
+        // Messages arriving at the server can be from any player, so we
+        // have to attach the sender to the message.  Other readers are
+        // on the client side and only ever receive messages from the server.
+        // Handle the really special case of a login-question, where there
+        // is no player-connection set up yet; we need to feed a stub player
+        // with the correct connection to the server handler.
+        if (ret != null) {
+            ServerPlayer serverPlayer = getServerPlayer(connection);
+            if (serverPlayer == null
+                && ret instanceof QuestionMessage
+                && LoginMessage.TAG.equals(((QuestionMessage)ret).getSubType())) {
+                serverPlayer = new ServerPlayer(connection);
+            }
+            ret.setSourcePlayer(serverPlayer);
+        }
         return ret;
     }
 }
