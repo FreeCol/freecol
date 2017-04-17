@@ -55,5 +55,7 @@ public class QuestionMessage extends WrapperMessage {
     public QuestionMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException, FreeColException {
         super(TAG, game, xr);
+
+        xr.expectTag(TAG);
     }
 }
