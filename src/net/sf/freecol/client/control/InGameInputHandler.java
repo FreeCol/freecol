@@ -133,7 +133,7 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         register(AddPlayerMessage.TAG,
             (Connection c, Element e) ->
-                addPlayer(new AddPlayerMessage(getGame(), e)));
+                new AddPlayerMessage(getGame(), e).clientHandler(freeColClient));
         register(AnimateAttackMessage.TAG,
             (Connection c, Element e) ->
                 animateAttack(new AnimateAttackMessage(getGame(), e)));
@@ -283,16 +283,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
 
     // Individual message handlers
-
-    /**
-     * Handle an "addPlayer"-message.
-     *
-     * @param message The {@code AddPlayerMessage} to process.
-     */
-    private void addPlayer(AddPlayerMessage message) {
-        // Do not need to do anything, reading the player in does
-        // enough for now.
-    }
 
     /**
      * Handle an "animateAttack"-message.

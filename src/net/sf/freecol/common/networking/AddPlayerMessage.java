@@ -24,6 +24,8 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -71,6 +73,29 @@ public class AddPlayerMessage extends ObjectMessage {
         this.players.addAll(DOMUtils.getChildren(game, element, Player.class));
     }
 
+    /**
+     * Create a new {@code AddPlayerMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public AddPlayerMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        this();
+
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (Player.TAG.equals(tag)) {
+                Player p = xr.readFreeColObject(game, Player.class);
+                if (p != null) this.players.add(p);
+            } else {
+                expected(Player.TAG, tag);
+            }
+        }
+        xr.expectTag(TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -84,11 +109,18 @@ public class AddPlayerMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public Element toXMLElement() {
+        return new DOMMessage(TAG)
+            .add(this.players).toXMLElement();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        for (Player p : this.players) p.toXML(xw);
+    }
 
     /**
      * {@inheritDoc}
@@ -97,27 +129,16 @@ public class AddPlayerMessage extends ObjectMessage {
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
         // Ignored
     }
-        
-    /**
-     * Handle a "addPlayer"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return Null.
-     */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        // Only sent by the server to the clients.
-        return null;
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .add(this.players).toXMLElement();
+    public void clientHandler(FreeColClient client) {
+        // Do not need to do anything, reading the player in does
+        // enough for now.
     }
+
 
     // Public interface
 
