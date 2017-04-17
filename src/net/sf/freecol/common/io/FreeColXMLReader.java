@@ -415,6 +415,18 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
+     * Standardized way to throw a parsing exception with a bit of context.
+     *
+     * @param context A context string.
+     * @exception XMLStreamException is always thrown.
+     */
+    public void unexpectedTag(String context) throws XMLStreamException {
+        throw new XMLStreamException("In " + context
+            + ", unexpected tag " + getLocalName()
+            + ", at: " + currentTag());
+    }
+
+    /**
      * Is there an attribute present in the stream?
      *
      * @param attributeName An attribute name

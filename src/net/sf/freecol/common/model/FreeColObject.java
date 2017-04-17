@@ -1222,9 +1222,7 @@ public abstract class FreeColObject
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        throw new XMLStreamException("In " + getXMLTagName()
-            + ", unexpected tag " + xr.getLocalName()
-            + ", at: " + xr.currentTag());
+        xr.unexpectedTag(getXMLTagName());
     }
 
     /**
