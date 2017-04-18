@@ -343,6 +343,17 @@ public abstract class AIPlayer extends AIObject {
             });
     }
 
+    /**
+     * Handle a fountain of youth.
+     *
+     * @param n The number of emigrating units.
+     */
+    public void fountainOfYouthHandler(int n) {
+        invoke(() -> {
+                for (int i = 0; i < n; i++) AIMessage.askEmigrate(this, 0);
+            });
+    }
+
 
     // AI behaviour interface to be implemented by subclasses
 

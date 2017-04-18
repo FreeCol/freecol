@@ -24,6 +24,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -79,6 +80,16 @@ public class FountainOfYouthMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final int n = getMigrants();
+
+        aiPlayer.fountainOfYouthHandler(n);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
         final int n = getMigrants();
@@ -88,8 +99,7 @@ public class FountainOfYouthMessage extends AttributeMessage {
             return;
         }
 
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).fountainOfYouth(n));
+        igc(freeColClient).fountainOfYouthHandler(n);
     }
 
     // No server handler required.

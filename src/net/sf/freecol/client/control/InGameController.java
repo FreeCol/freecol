@@ -3249,19 +3249,19 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Handle a fountain of youth event.
      *
-     * Called from IGIH.fountainOfYouth.
-     *
      * @param n The number of migrants available for selection.
      */
-    public void fountainOfYouth(int n) {
+    public void fountainOfYouthHandler(int n) {
         final Player player = getMyPlayer();
         final boolean fountainOfYouth = true;
-        getGUI().showEmigrationDialog(player, fountainOfYouth,
-            (Integer value) -> { // Value is a valid slot
-                emigrate(player,
-                         Europe.MigrationType.convertToMigrantSlot(value),
-                         n-1, fountainOfYouth);
-            });
+        
+        invokeLater(() ->
+            getGUI().showEmigrationDialog(player, fountainOfYouth,
+                (Integer value) -> { // Value is a valid slot
+                    emigrate(player,
+                             Europe.MigrationType.convertToMigrantSlot(value),
+                             n-1, fountainOfYouth);
+                }));
     }
 
     /**

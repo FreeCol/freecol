@@ -189,7 +189,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case FountainOfYouthMessage.TAG:
-                fountainOfYouth(new FountainOfYouthMessage(game, element));
+                new FountainOfYouthMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case IndianDemandMessage.TAG:
                 indianDemand(new IndianDemandMessage(game, element));
@@ -262,20 +263,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
     }
 
     // Individual message handlers
-
-    /**
-     * Replies to fountain of youth offer.
-     *
-     * @param message The {@code FountainOfYouthMessage} to process.
-     */
-    private void fountainOfYouth(FountainOfYouthMessage message) {
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final int n = message.getMigrants();
-
-        getMyAIPlayer().invoke(() -> {
-                for (int i = 0; i < n; i++) AIMessage.askEmigrate(aiPlayer, 0);
-            });
-    }
 
     /**
      * Handles an "indianDemand"-message.
