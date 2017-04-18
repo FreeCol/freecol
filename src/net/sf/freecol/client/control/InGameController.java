@@ -3233,17 +3233,17 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * A player makes first contact with a native player.
      *
-     * Called from IGIH.firstContact.
-     *
      * @param player The {@code Player} making contact.
      * @param other The native {@code Player} being contacted.
      * @param tile An optional {@code Tile} to offer the player if
      *     they have made a first landing.
      * @param n The number of settlements claimed by the native player.
      */
-    public void firstContact(Player player, Player other, Tile tile, int n) {
-        getGUI().showFirstContactDialog(player, other, tile, n,
-            (Boolean b) -> firstContact(player, other, tile, b));
+    public void firstContactHandler(Player player, Player other, Tile tile,
+                                    int n) {
+        invokeLater(() ->
+            getGUI().showFirstContactDialog(player, other, tile, n,
+                (Boolean b) -> firstContact(player, other, tile, b)));
     }
 
     /**

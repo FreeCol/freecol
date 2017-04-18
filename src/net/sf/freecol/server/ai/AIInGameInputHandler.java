@@ -185,7 +185,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case FirstContactMessage.TAG:
-                firstContact(new FirstContactMessage(game, element));
+                new FirstContactMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case FountainOfYouthMessage.TAG:
                 fountainOfYouth(new FountainOfYouthMessage(game, element));
@@ -261,24 +262,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
     }
 
     // Individual message handlers
-
-    /**
-     * Replies to a first contact offer.
-     *
-     * @param message The {@code FirstContactMessage} to process.
-     */
-    private void firstContact(FirstContactMessage message) {
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final Game game = getGame();
-        final Player contactor = message.getPlayer(game);
-        final Player contactee = message.getOtherPlayer(game);
-        final Tile tile = message.getTile(game);
-
-        aiPlayer.invoke(() -> {
-                AIMessage.askFirstContact(aiPlayer, contactor, contactee,
-                                          tile, true);
-            });
-    }
 
     /**
      * Replies to fountain of youth offer.

@@ -284,7 +284,7 @@ public abstract class AIPlayer extends AIObject {
     }
 
     // Message.aiHandler support
-    
+
     /**
      * Choose a founding father.
      *
@@ -328,7 +328,22 @@ public abstract class AIPlayer extends AIObject {
                 AIMessage.askDiplomacy(this, our, other, agreement);
             });
     }
-    
+
+    /**
+     * Handle a first contact.
+     *
+     * @param contactor The contacting {@code Player}.
+     * @param contactee The contacted {@code Player}.
+     * @param tile The {@code Tile} where contact occurs.
+     */
+    public void firstContactHandler(Player contactor, Player contactee,
+                                    Tile tile) {
+        invoke(() -> {
+                AIMessage.askFirstContact(this, contactor, contactee, tile, true);
+            });
+    }
+
+
     // AI behaviour interface to be implemented by subclasses
 
     /**

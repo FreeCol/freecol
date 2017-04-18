@@ -20,11 +20,13 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -95,6 +97,19 @@ public class FirstContactMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Game game = freeColServer.getGame();
+        final Player contactor = getPlayer(game);
+        final Player contactee = getOtherPlayer(game);
+        final Tile tile = getTile(game);
+
+        aiPlayer.firstContactHandler(contactor, contactee, tile);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
         final Player player = getPlayer(game);
@@ -115,8 +130,7 @@ public class FirstContactMessage extends AttributeMessage {
             return;
         }
 
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).firstContact(player, other, tile, n));
+        igc(freeColClient).firstContactHandler(player, other, tile, n);
     }
 
     /**
