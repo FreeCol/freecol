@@ -24,7 +24,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -62,15 +65,17 @@ import net.sf.freecol.common.networking.GameEndedMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
-import net.sf.freecol.common.networking.NativeGiftMessage;
-import net.sf.freecol.common.networking.NativeTradeMessage;
-import net.sf.freecol.common.networking.NewTradeRouteMessage;
-import net.sf.freecol.common.networking.NewTurnMessage;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
+import net.sf.freecol.common.networking.NativeGiftMessage;
+import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
+import net.sf.freecol.common.networking.NewTradeRouteMessage;
+import net.sf.freecol.common.networking.NewTurnMessage;
 import net.sf.freecol.common.networking.ReconnectMessage;
 import net.sf.freecol.common.networking.RemoveMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
@@ -82,6 +87,7 @@ import net.sf.freecol.common.networking.StartGameMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.FreeColServerHolder;
 import net.sf.freecol.server.model.ServerPlayer;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -91,12 +97,10 @@ import org.w3c.dom.Element;
 /**
  * Handles the network messages that arrives while in the game.
  */
-public final class AIInGameInputHandler implements DOMMessageHandler {
+public final class AIInGameInputHandler extends FreeColServerHolder
+    implements MessageHandler, DOMMessageHandler {
 
     private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
-
-    /** The server. */
-    private final FreeColServer freeColServer;
 
     /** The player for whom I work. */
     private final ServerPlayer serverPlayer;
@@ -116,9 +120,9 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
     public AIInGameInputHandler(FreeColServer freeColServer,
                                 ServerPlayer serverPlayer,
                                 AIMain aiMain) {
-        if (freeColServer == null) {
-            throw new NullPointerException("freeColServer == null");
-        } else if (serverPlayer == null) {
+        super(freeColServer);
+        
+        if (serverPlayer == null) {
             throw new NullPointerException("serverPlayer == null");
         } else if (!serverPlayer.isAI()) {
             throw new RuntimeException("Applying AIInGameInputHandler to a non-AI player!");
@@ -126,51 +130,40 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
             throw new NullPointerException("aiMain == null");
         }
 
-        this.freeColServer = freeColServer;
         this.serverPlayer = serverPlayer;
         this.aiMain = aiMain;
     }
 
 
     /**
-     * Get the AI player using this {@code AIInGameInputHandler}.
+     * Get player using this handler.
      *
-     * @return The {@code AIPlayer}.
-     */
-    private AIPlayer getAIPlayer() {
-        return this.aiMain.getAIPlayer(this.serverPlayer);
-    }
-
-    /**
-     * Gets the AI unit corresponding to a given unit, if any.
-     *
-     * @param unit The {@code Unit} to look up.
-     * @return The corresponding AI unit or null if not found.
-     */
-    private AIUnit getAIUnit(Unit unit) {
-        return this.aiMain.getAIUnit(unit);
-    }
-
-    /**
-     * Get the game.
-     *
-     * @return The {@code Game} in the server.
-     */
-    private Game getGame() {
-        return this.freeColServer.getGame();
-    }
-
-    /**
-     * Get the enclosed player.
-     *
-     * @return This {@code ServerPlayer}.
+     * @return The {@code ServerPlayer}.
      */
     private ServerPlayer getMyPlayer() {
         return this.serverPlayer;
     }
 
+    /**
+     * Get the AI player using this handler.
+     *
+     * @return The {@code AIPlayer}.
+     */
+    private AIPlayer getMyAIPlayer() {
+        return this.aiMain.getAIPlayer(this.serverPlayer);
+    }
 
-    // Implement MessageHandler
+    /**
+     * Get the AI main in this handler.
+     *
+     * @return The {@code AIMain}.
+     */
+    private AIMain getAIMain() {
+        return this.aiMain;
+    }
+
+
+    // Implement DOMMessageHandler
 
     /**
      * {@inheritDoc}
@@ -259,7 +252,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
                 break;
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "AI input handler for " + getMyPlayer()
+            logger.log(Level.WARNING, "AI input handler for " + getMyAIPlayer()
                 + " caught error handling " + tag, e);
         }
         return null;
@@ -274,7 +267,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      * @param message The {@code ChooseFoundingFatherMessage} to process.
      */
     private void chooseFoundingFather(ChooseFoundingFatherMessage message) {
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final List<FoundingFather> fathers = message.getFathers(getGame());
         final FoundingFather ff = aiPlayer.selectFoundingFather(fathers);
 
@@ -292,7 +285,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      * @param message The {@code DiplomacyMessage} to process.
      */
     private void diplomacy(DiplomacyMessage message) {
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final Game game = getGame();
         final FreeColGameObject our = message.getOurFCGO(game);
         final FreeColGameObject other = message.getOtherFCGO(game);
@@ -325,7 +318,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      * @param message The {@code FirstContactMessage} to process.
      */
     private void firstContact(FirstContactMessage message) {
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final Game game = getGame();
         final Player contactor = message.getPlayer(game);
         final Player contactee = message.getOtherPlayer(game);
@@ -343,10 +336,10 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      * @param message The {@code FountainOfYouthMessage} to process.
      */
     private void fountainOfYouth(FountainOfYouthMessage message) {
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final int n = message.getMigrants();
 
-        getAIPlayer().invoke(() -> {
+        getMyAIPlayer().invoke(() -> {
                 for (int i = 0; i < n; i++) AIMessage.askEmigrate(aiPlayer, 0);
             });
     }
@@ -358,7 +351,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      */
     private void indianDemand(IndianDemandMessage message) {
         final Game game = getGame();
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final Unit unit = message.getUnit(game);
         final Colony colony = message.getColony(game);
         final GoodsType type = message.getType(game);
@@ -389,7 +382,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
         final List<Goods> initialGoods = message.getGoods();
         final String defenderId = message.getDefenderId();
 
-        getAIPlayer().invoke(() -> {
+        getMyAIPlayer().invoke(() -> {
                 List<Goods> goods = sort(initialGoods,
                                          market.getSalePriceComparator());
                 List<Goods> loot = new ArrayList<>();
@@ -400,7 +393,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
                     loot.add(g);
                     space -= g.getSpaceTaken();
                 }
-                AIMessage.askLoot(getAIUnit(unit), defenderId, loot);
+                AIMessage.askLoot(getAIMain().getAIUnit(unit), defenderId, loot);
             });
     }
 
@@ -410,19 +403,19 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      * @param message The {@code MonarchActionMessage} to process.
      */
     private void monarchAction(MonarchActionMessage message) {
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final MonarchAction action = message.getAction();
 
         boolean accept;
         switch (action) {
         case RAISE_TAX_WAR: case RAISE_TAX_ACT:
-            accept = getAIPlayer().acceptTax(message.getTax());
+            accept = getMyAIPlayer().acceptTax(message.getTax());
             logger.finest("AI player monarch action " + action
                           + " = " + accept);
             break;
 
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
-            accept = getAIPlayer().acceptMercenaries();
+            accept = getMyAIPlayer().acceptMercenaries();
             logger.finest("AI player monarch action " + action
                           + " = " + accept);
             break;
@@ -453,7 +446,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      * @param message The {@code NationSummaryMessage} to process.
      */
     private void nationSummary(NationSummaryMessage message) {
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final Player player = aiPlayer.getPlayer();
         final Player other = message.getPlayer(getGame());
         final NationSummary ns = message.getNationSummary();
@@ -469,7 +462,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      * @param message The {@code NativeTradeMessage} to process.
      */
     private void nativeTrade(NativeTradeMessage message) {
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final NativeTrade nt = message.getNativeTrade();
         final NativeTradeAction action = message.getAction();
 
@@ -485,7 +478,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      * @param message The {@code NewLandNameMessage} to process.
      */
     private void newLandName(NewLandNameMessage message) {
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final Unit unit = message.getUnit(aiPlayer.getPlayer());
         final String name = message.getNewLandName();
 
@@ -500,7 +493,7 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
      * @param message The {@code NewRegionNameMessage} to process.
      */
     private void newRegionName(NewRegionNameMessage message) {
-        final AIPlayer aiPlayer = getAIPlayer();
+        final AIPlayer aiPlayer = getMyAIPlayer();
         final Game game = getGame();
         final Region region = message.getRegion(game);
         final Tile tile = message.getTile(game);
@@ -534,10 +527,28 @@ public final class AIInGameInputHandler implements DOMMessageHandler {
 
         if (currentPlayer != null
             && getMyPlayer().getId().equals(currentPlayer.getId())) {
-            getAIPlayer().invoke(() -> {
-                    getAIPlayer().startWorking();
-                    AIMessage.askEndTurn(getAIPlayer());
+            getMyAIPlayer().invoke(() -> {
+                    getMyAIPlayer().startWorking();
+                    AIMessage.askEndTurn(getMyAIPlayer());
                 });
         }
+    }
+
+    // Implement MessageHandler
+
+    /**
+     * {@inheritDoc}
+     */
+    public Message handle(Message message) throws FreeColException {
+        message.aiHandler(getFreeColServer(), getMyAIPlayer());
+        return null; 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Message read(Connection connection)
+        throws FreeColException, XMLStreamException {
+        return Message.read(getGame(), connection.getFreeColXMLReader());
     }
 }
