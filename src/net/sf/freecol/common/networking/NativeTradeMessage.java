@@ -98,18 +98,6 @@ public class NativeTradeMessage extends ObjectMessage {
         return Message.MessagePriority.LATE;
     }
 
-
-    // Public interface
-
-    public NativeTradeAction getAction() {
-        return this.action;
-    }
-
-    public NativeTrade getNativeTrade() {
-        return this.nt;
-    }
-
-    
     /**
      * {@inheritDoc}
      */
@@ -162,5 +150,16 @@ public class NativeTradeMessage extends ObjectMessage {
         return new DOMMessage(TAG,
             ACTION_TAG, getAction().toString())
             .add(this.nt).toXMLElement();
+    }
+
+
+    // Public interface
+
+    public NativeTradeAction getAction() {
+        return this.action;
+    }
+
+    public NativeTrade getNativeTrade() {
+        return this.nt;
     }
 }
