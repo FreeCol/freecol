@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -132,6 +133,51 @@ public class MonarchActionMessage extends ObjectMessage {
         return mp;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final MonarchAction action = getAction();
+        final int tax = getTax();
+
+        aiPlayer.monarchActionHandler(action, tax);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return igc(freeColServer)
+            .monarchAction(serverPlayer, getAction(), getResult());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
+    }
+
+    /**
+     * Convert this MonarchMessage to XML.
+     *
+     * @return The XML representation of this message.
+     */
+    @Override
+    public Element toXMLElement() {
+        return new DOMMessage(TAG,
+            ACTION_TAG, this.action.toString(),
+            MONARCH_TAG, this.monarchKey,
+            TAX_TAG, this.tax,
+            RESULT_TAG, this.resultString)
+            .add(this.template).toXMLElement();
+    }
+
 
     // Public interface
 
@@ -204,40 +250,5 @@ public class MonarchActionMessage extends ObjectMessage {
     public MonarchActionMessage setResult(boolean accept) {
         this.resultString = Boolean.toString(accept);
         return this;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        return freeColServer.getInGameController()
-            .monarchAction(serverPlayer, getAction(), getResult());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
-    }
-
-    /**
-     * Convert this MonarchMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            ACTION_TAG, this.action.toString(),
-            MONARCH_TAG, this.monarchKey,
-            TAX_TAG, this.tax,
-            RESULT_TAG, this.resultString)
-            .add(this.template).toXMLElement();
     }
 }

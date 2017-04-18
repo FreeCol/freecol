@@ -201,7 +201,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case MonarchActionMessage.TAG:
-                monarchAction(new MonarchActionMessage(game, element));
+                new MonarchActionMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case MultipleMessage.TAG:
                 multiple(connection, element);
@@ -266,40 +267,7 @@ public final class AIInGameInputHandler extends FreeColServerHolder
 
     // Individual message handlers
 
-    /**
-     * Handles a "monarchAction"-message.
-     *
-     * @param message The {@code MonarchActionMessage} to process.
-     */
-    private void monarchAction(MonarchActionMessage message) {
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final MonarchAction action = message.getAction();
-
-        boolean accept;
-        switch (action) {
-        case RAISE_TAX_WAR: case RAISE_TAX_ACT:
-            accept = getMyAIPlayer().acceptTax(message.getTax());
-            logger.finest("AI player monarch action " + action
-                          + " = " + accept);
-            break;
-
-        case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
-            accept = getMyAIPlayer().acceptMercenaries();
-            logger.finest("AI player monarch action " + action
-                          + " = " + accept);
-            break;
-
-        default:
-            logger.finest("AI player ignoring monarch action " + action);
-            return;
-        }
-
-        aiPlayer.invoke(() -> {
-                AIMessage.askMonarchAction(aiPlayer, action, accept);
-            });
-    }
-
-    /**
+   /**
      * Handle all the children of this element.
      *
      * @param connection The {@code Connection} the element arrived on.

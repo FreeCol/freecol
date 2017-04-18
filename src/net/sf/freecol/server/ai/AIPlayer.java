@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
@@ -400,6 +401,34 @@ public abstract class AIPlayer extends AIObject {
 
         invoke(() -> {
                 AIMessage.askLoot(getAIUnit(unit), defenderId, loot);
+            });
+    }
+
+    /**
+     * Handle the monarch.
+     *
+     * @param action The {@code MonarchAction} to respond to.
+     * @param tax The tax change if any.
+     */
+    public void monarchActionHandler(MonarchAction action, int tax) {
+        boolean accept;
+        switch (action) {
+        case RAISE_TAX_WAR: case RAISE_TAX_ACT:
+            accept = acceptTax(tax);
+            break;
+
+        case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
+            accept = acceptMercenaries();
+            break;
+
+        default:
+            logger.finest("AI player ignoring monarch action " + action);
+            return;
+        }
+        logger.finest("AI player monarch action " + action + " = " + accept);
+
+        invoke(() -> {
+                AIMessage.askMonarchAction(this, action, accept);
             });
     }
 
