@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import net.sf.freecol.common.util.DOMUtils;
@@ -98,6 +99,19 @@ public class LootCargoMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Game game = freeColServer.getGame();
+        final Unit unit = getUnit(game);
+        final List<Goods> initialGoods = getGoods();
+        final String defenderId = getDefenderId();
+
+        aiPlayer.lootCargoHandler(unit, initialGoods, defenderId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
@@ -113,7 +127,7 @@ public class LootCargoMessage extends ObjectMessage {
         // placed to check the goods validity.
 
         // Try to loot.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .lootCargo(serverPlayer, winner, this.loserId, goods);
     }
 

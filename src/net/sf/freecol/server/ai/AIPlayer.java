@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
@@ -374,6 +375,32 @@ public abstract class AIPlayer extends AIObject {
                                               amount, result);
                 });
         }
+    }
+
+    /**
+     * Handle a looting.
+     *
+     * @param unit The looting {@code Unit}.
+     * @param initialGoods A list of {@code Goods} to choose from.
+     * @param defenderId The identifier for the defending unit (may be gone!).
+     */
+    public void lootCargoHandler(Unit unit, List<Goods> initialGoods,
+                                 String defenderId) {
+        final Market market = getPlayer().getMarket();
+        List<Goods> goods = sort(initialGoods,
+                                 market.getSalePriceComparator());
+        List<Goods> loot = new ArrayList<>();
+        int space = unit.getSpaceLeft();
+        while (!goods.isEmpty() && space > 0) {
+            Goods g = goods.remove(0);
+            if (g.getSpaceTaken() > space) continue; // Approximate
+            loot.add(g);
+            space -= g.getSpaceTaken();
+        }
+
+        invoke(() -> {
+                AIMessage.askLoot(getAIUnit(unit), defenderId, loot);
+            });
     }
 
 

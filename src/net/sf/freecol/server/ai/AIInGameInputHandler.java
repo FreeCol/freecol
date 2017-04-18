@@ -197,7 +197,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case LootCargoMessage.TAG:
-                lootCargo(new LootCargoMessage(game, element));
+                new LootCargoMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case MonarchActionMessage.TAG:
                 monarchAction(new MonarchActionMessage(game, element));
@@ -264,33 +265,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
     }
 
     // Individual message handlers
-
-    /**
-     * Replies to loot cargo offer.
-     *
-     * @param message The {@code LootCargoMessage} to process.
-     */
-    private void lootCargo(LootCargoMessage message) {
-        final Game game = getGame();
-        final Market market = getMyPlayer().getMarket();
-        final Unit unit = message.getUnit(game);
-        final List<Goods> initialGoods = message.getGoods();
-        final String defenderId = message.getDefenderId();
-
-        getMyAIPlayer().invoke(() -> {
-                List<Goods> goods = sort(initialGoods,
-                                         market.getSalePriceComparator());
-                List<Goods> loot = new ArrayList<>();
-                int space = unit.getSpaceLeft();
-                while (!goods.isEmpty() && space > 0) {
-                    Goods g = goods.remove(0);
-                    if (g.getSpaceTaken() > space) continue; // Approximate
-                    loot.add(g);
-                    space -= g.getSpaceTaken();
-                }
-                AIMessage.askLoot(getAIMain().getAIUnit(unit), defenderId, loot);
-            });
-    }
 
     /**
      * Handles a "monarchAction"-message.
