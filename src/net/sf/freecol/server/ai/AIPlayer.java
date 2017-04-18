@@ -282,6 +282,21 @@ public abstract class AIPlayer extends AIObject {
         thread.start();
     }
 
+    // Message.aiHandler support
+    
+    /**
+     * Choose a founding father.
+     *
+     * @param fathers A list of {@code FoundingFather}s to choose from.
+     */
+    public void chooseFoundingFatherHandler(List<FoundingFather> fathers) {
+        FoundingFather ff = selectFoundingFather(fathers);
+        if (ff == null) return;
+        invoke(() -> {
+                AIMessage.askChooseFoundingFather(this, fathers, ff);
+            });
+    }
+
     
     // AI behaviour interface to be implemented by subclasses
 

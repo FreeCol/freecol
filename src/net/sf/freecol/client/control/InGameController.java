@@ -263,6 +263,15 @@ public final class InGameController extends FreeColClientHolder {
         }
     }
 
+    /**
+     * GUI delegator.
+     *
+     * @param runnable The {@code Runnable} to run.
+     */
+    private void invokeLater(Runnable runnable) {
+        getFreeColClient().getGUI().invokeNowOrLater(runnable);
+    }
+
 
     // Server access routines called from multiple places.
 
@@ -2753,15 +2762,14 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Choose a founding father from an offered list.
      *
-     * Called from IGIH.chooseFoundingFather.
-     *
      * @param ffs A list of {@code FoundingFather}s to choose from.
      */
-    public void chooseFoundingFather(List<FoundingFather> ffs) {
+    public void chooseFoundingFatherHandler(List<FoundingFather> ffs) {
         if (ffs == null || ffs.isEmpty()) return;
        
-        getGUI().showChooseFoundingFatherDialog(ffs,
-            (FoundingFather ff) -> chooseFoundingFather(ffs, ff));
+        invokeLater(() ->
+            getGUI().showChooseFoundingFatherDialog(ffs,
+                (FoundingFather ff) -> chooseFoundingFather(ffs, ff)));
     }
 
     /**

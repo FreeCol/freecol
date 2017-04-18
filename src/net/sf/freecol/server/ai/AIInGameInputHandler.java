@@ -177,7 +177,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
         try {
             switch (tag) {
             case ChooseFoundingFatherMessage.TAG:
-                chooseFoundingFather(new ChooseFoundingFatherMessage(game, element));
+                new ChooseFoundingFatherMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case DiplomacyMessage.TAG:
                 diplomacy(new DiplomacyMessage(game, element));
@@ -259,25 +260,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
     }
 
     // Individual message handlers
-
-    /**
-     * Handles a "chooseFoundingFather"-message.
-     * Only meaningful for AIPlayer types that implement selectFoundingFather.
-     *
-     * @param message The {@code ChooseFoundingFatherMessage} to process.
-     */
-    private void chooseFoundingFather(ChooseFoundingFatherMessage message) {
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final List<FoundingFather> fathers = message.getFathers(getGame());
-        final FoundingFather ff = aiPlayer.selectFoundingFather(fathers);
-
-        if (ff != null) {
-            logger.finest(aiPlayer.getId() + " chose founding father: " + ff);
-            aiPlayer.invoke(() -> {
-                    AIMessage.askChooseFoundingFather(aiPlayer, fathers, ff);
-                });
-        }
-    }
 
     /**
      * Handles an "diplomacy"-message.

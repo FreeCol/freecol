@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -124,12 +125,22 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Game game = freeColServer.getGame();
+        final List<FoundingFather> fathers = getFathers(game);
+
+        aiPlayer.chooseFoundingFatherHandler(fathers);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
         final List<FoundingFather> fathers = getFathers(game);
         
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).chooseFoundingFather(fathers));
+        igc(freeColClient).chooseFoundingFatherHandler(fathers);
     }
 
     /**
