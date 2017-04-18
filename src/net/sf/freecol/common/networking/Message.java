@@ -45,6 +45,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.xml.sax.SAXException;
@@ -433,6 +434,19 @@ public abstract class Message {
             return true;
         }
         return false;             
+    }
+
+    /**
+     * AI-side handler for this message.
+     *
+     * AI handlers always return null.
+     * FIXME: One day the FreeColServer should devolve to AIMain.
+     * 
+     * @param freeColServer The {@code FreeColServer} handling the request.
+     * @param aiPlayer The {@code AIPlayer} the message was sent to.
+     */
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        throw new RuntimeException("NYI aiHandler for: " + getType());
     }
 
     /**
