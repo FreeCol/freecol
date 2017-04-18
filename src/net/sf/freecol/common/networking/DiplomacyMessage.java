@@ -21,6 +21,7 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -30,6 +31,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -143,58 +145,18 @@ public class DiplomacyMessage extends ObjectMessage {
         return Message.MessagePriority.LATE;
     }
 
-
-    // Public interface
-
     /**
-     * Get the extra {@code Unit}.
-     *
-     * @return The extra {@code Unit}, or null if none.
+     * {@inheritDoc}
      */
-    public Unit getExtraUnit() {
-        return this.extraUnit;
-    }
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Game game = freeColServer.getGame();
+        final FreeColGameObject our = getOurFCGO(game);
+        final FreeColGameObject other = getOtherFCGO(game);
+        final DiplomaticTrade agreement = getAgreement();
 
-    /**
-     * Get our FCGO.
-     *
-     * @param game The {@code Game} to extract the FCGO from.
-     * @return Our {@code FreeColGameObject}.
-     */
-    public FreeColGameObject getOurFCGO(Game game) {
-        return game.getFreeColGameObject(this.ourId);
+        aiPlayer.diplomacyHandler(our, other, agreement);
     }
-
-    /**
-     * Get the other FCGO.
-     *
-     * @param game The {@code Game} to extract the FCGO from.
-     * @return The other {@code FreeColGameObject}.
-     */
-    public FreeColGameObject getOtherFCGO(Game game) {
-        return game.getFreeColGameObject(this.otherId);
-    }
-
-    /**
-     * Get the agreement (a {@code DiplomaticTrade}) in this message.
-     *
-     * @return The agreement in this message.
-     */
-    public DiplomaticTrade getAgreement() {
-        return this.agreement;
-    }
-
-    /**
-     * Set the agreement (a {@code DiplomaticTrade}) in this message.
-     *
-     * @param agreement The {@code DiplomaticTrade} to set.
-     * @return This message.
-     */
-    public DiplomacyMessage setAgreement(DiplomaticTrade agreement) {
-        this.agreement = agreement;
-        return this;
-    }
-
 
     /**
      * {@inheritDoc}
@@ -378,5 +340,57 @@ public class DiplomacyMessage extends ObjectMessage {
             OTHER_ID_TAG, this.otherId)
             .add(this.agreement)
             .add(this.extraUnit).toXMLElement();
+    }
+
+
+    // Public interface
+
+    /**
+     * Get the extra {@code Unit}.
+     *
+     * @return The extra {@code Unit}, or null if none.
+     */
+    public Unit getExtraUnit() {
+        return this.extraUnit;
+    }
+
+    /**
+     * Get our FCGO.
+     *
+     * @param game The {@code Game} to extract the FCGO from.
+     * @return Our {@code FreeColGameObject}.
+     */
+    public FreeColGameObject getOurFCGO(Game game) {
+        return game.getFreeColGameObject(this.ourId);
+    }
+
+    /**
+     * Get the other FCGO.
+     *
+     * @param game The {@code Game} to extract the FCGO from.
+     * @return The other {@code FreeColGameObject}.
+     */
+    public FreeColGameObject getOtherFCGO(Game game) {
+        return game.getFreeColGameObject(this.otherId);
+    }
+
+    /**
+     * Get the agreement (a {@code DiplomaticTrade}) in this message.
+     *
+     * @return The agreement in this message.
+     */
+    public DiplomaticTrade getAgreement() {
+        return this.agreement;
+    }
+
+    /**
+     * Set the agreement (a {@code DiplomaticTrade}) in this message.
+     *
+     * @param agreement The {@code DiplomaticTrade} to set.
+     * @return This message.
+     */
+    public DiplomacyMessage setAgreement(DiplomaticTrade agreement) {
+        this.agreement = agreement;
+        return this;
     }
 }

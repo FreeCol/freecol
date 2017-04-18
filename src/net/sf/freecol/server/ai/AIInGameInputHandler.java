@@ -181,7 +181,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case DiplomacyMessage.TAG:
-                diplomacy(new DiplomacyMessage(game, element));
+                new DiplomacyMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case FirstContactMessage.TAG:
                 firstContact(new FirstContactMessage(game, element));
@@ -260,39 +261,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
     }
 
     // Individual message handlers
-
-    /**
-     * Handles an "diplomacy"-message.
-     *
-     * @param message The {@code DiplomacyMessage} to process.
-     */
-    private void diplomacy(DiplomacyMessage message) {
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final Game game = getGame();
-        final FreeColGameObject our = message.getOurFCGO(game);
-        final FreeColGameObject other = message.getOtherFCGO(game);
-        final DiplomaticTrade agreement = message.getAgreement();
-
-        StringBuilder sb = new StringBuilder(256);
-        sb.append("AI Diplomacy: ").append(agreement);
-        switch (agreement.getStatus()) {
-        case PROPOSE_TRADE:
-            agreement.setStatus(aiPlayer.acceptDiplomaticTrade(agreement));
-            sb.append(" -> ").append(agreement);
-            logger.fine(sb.toString());
-            break;
-        default: // Do not need to respond to others
-            sb.append(" -> ignoring ").append(agreement.getStatus());
-            logger.fine(sb.toString());
-            return;
-        }
-
-        aiPlayer.invoke(() -> {
-                // Note: transposing {our,other} here, the message is
-                // in sender sense.
-                AIMessage.askDiplomacy(aiPlayer, our, other, agreement);
-            });
-    }
 
     /**
      * Replies to a first contact offer.

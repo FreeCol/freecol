@@ -34,6 +34,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -297,6 +298,36 @@ public abstract class AIPlayer extends AIObject {
             });
     }
 
+    /**
+     * Handle a diplomacy message.
+     *
+     * @param our Our {@code FreeColGameObject}.
+     * @param other Their {@code FreeColGameObject}.
+     * @param agreement The {@code DiplomaticTrade} being negotiated.
+     */
+    public void diplomacyHandler(FreeColGameObject our,
+                                 FreeColGameObject other,
+                                 DiplomaticTrade agreement) {
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("AI Diplomacy: ").append(agreement);
+        switch (agreement.getStatus()) {
+        case PROPOSE_TRADE:
+            agreement.setStatus(this.acceptDiplomaticTrade(agreement));
+            sb.append(" -> ").append(agreement);
+            logger.fine(sb.toString());
+            break;
+        default: // Do not need to respond to others
+            sb.append(" -> ignoring ").append(agreement.getStatus());
+            logger.fine(sb.toString());
+            return;
+        }
+
+        invoke(() -> {
+                // Note: transposing {our,other} here, the message is
+                // in sender sense.
+                AIMessage.askDiplomacy(this, our, other, agreement);
+            });
+    }
     
     // AI behaviour interface to be implemented by subclasses
 
