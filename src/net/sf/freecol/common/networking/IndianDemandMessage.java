@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -98,6 +99,21 @@ public class IndianDemandMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Game game = freeColServer.getGame();
+        final Unit unit = getUnit(game);
+        final Colony colony = getColony(game);
+        final GoodsType type = getType(game);
+        final int amount = getAmount();
+        final Boolean initialResult = getResult();
+
+        aiPlayer.indianDemandHandler(unit, colony, type, amount, initialResult);
+    }
+        
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
         final Player player = freeColClient.getMyPlayer();
@@ -117,8 +133,7 @@ public class IndianDemandMessage extends AttributeMessage {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
 
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).indianDemand(unit, colony, goodsType, amount));
+        igc(freeColClient).indianDemandHandler(unit, colony, goodsType, amount);
     }
 
     /**

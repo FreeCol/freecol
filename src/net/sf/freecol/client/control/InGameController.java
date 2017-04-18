@@ -3368,119 +3368,114 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Handle a native demand at a colony.
      *
-     * Called from IGIH.indianDemand
-     *
      * @param unit The native {@code Unit} making the demand.
      * @param colony The {@code Colony} demanded of.
      * @param type The {@code GoodsType} demanded (null means gold).
      * @param amount The amount of goods/gold demanded.
      */
-    public void indianDemand(Unit unit, Colony colony,
-                             GoodsType type, int amount) {
+    public void indianDemandHandler(Unit unit, Colony colony,
+                                    GoodsType type, int amount) {
         if (unit == null || colony == null) return;
-
         final Player player = getMyPlayer();
         final int opt = getClientOptions()
             .getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
-        boolean accepted;
-        ModelMessage m = null;
-        String nation = Messages.message(unit.getOwner().getNationLabel());
-        if (type == null) {
-            switch (opt) {
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                accepted = getGUI().confirm(colony.getTile(), StringTemplate
-                    .template("indianDemand.gold.text")
-                    .addName("%nation%", nation)
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%amount%", amount),
-                    unit, "accept", "indianDemand.gold.no");
-                break;
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                                     "indianDemand.gold.text", colony, unit)
-                    .addName("%nation%", nation)
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%amount%", amount);
-                accepted = true;
-                break;
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                                     "indianDemand.gold.text", colony, unit)
-                    .addName("%nation%", nation)
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%amount%", amount);
-                accepted = false;
-                break;
-            default:
-                throw new RuntimeException("Impossible option value.");
-            }
-        } else {
-            switch (opt) {
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                if (type.isFoodType()) {
-                    accepted = getGUI().confirm(colony.getTile(),
-                        StringTemplate.template("indianDemand.food.text")
-                            .addName("%nation%", nation)
-                            .addName("%colony%", colony.getName())
-                            .addAmount("%amount%", amount),
-                        unit, "indianDemand.food.yes", "indianDemand.food.no");
+        final String nation = Messages.message(unit.getOwner().getNationLabel());
+        invokeLater(() -> {
+                boolean accepted;
+                ModelMessage m = null;
+                if (type == null) {
+                    switch (opt) {
+                    case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
+                        accepted = getGUI().confirm(colony.getTile(),
+                            StringTemplate.template("indianDemand.gold.text")
+                                .addName("%nation%", nation)
+                                .addName("%colony%", colony.getName())
+                                .addAmount("%amount%", amount),
+                            unit, "accept", "indianDemand.gold.no");
+                        break;
+                    case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
+                        m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                            "indianDemand.gold.text", colony, unit)
+                                .addName("%nation%", nation)
+                                .addName("%colony%", colony.getName())
+                                .addAmount("%amount%", amount);
+                        accepted = true;
+                        break;
+                    case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
+                        m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                            "indianDemand.gold.text", colony, unit)
+                                .addName("%nation%", nation)
+                                .addName("%colony%", colony.getName())
+                                .addAmount("%amount%", amount);
+                        accepted = false;
+                        break;
+                    default:
+                        throw new RuntimeException("Impossible option value.");
+                    }
                 } else {
-                    accepted = getGUI().confirm(colony.getTile(),
-                        StringTemplate.template("indianDemand.other.text")
-                            .addName("%nation%", nation)
-                            .addName("%colony%", colony.getName())
-                            .addAmount("%amount%", amount)
-                            .addNamed("%goods%", type),
-                        unit, "accept", "indianDemand.other.no");
+                    switch (opt) {
+                    case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
+                        if (type.isFoodType()) {
+                            accepted = getGUI().confirm(colony.getTile(),
+                                StringTemplate.template("indianDemand.food.text")
+                                    .addName("%nation%", nation)
+                                    .addName("%colony%", colony.getName())
+                                    .addAmount("%amount%", amount),
+                                unit, "indianDemand.food.yes", "indianDemand.food.no");
+                        } else {
+                            accepted = getGUI().confirm(colony.getTile(),
+                                StringTemplate.template("indianDemand.other.text")
+                                    .addName("%nation%", nation)
+                                    .addName("%colony%", colony.getName())
+                                    .addAmount("%amount%", amount)
+                                    .addNamed("%goods%", type),
+                                unit, "accept", "indianDemand.other.no");
+                        }
+                        break;
+                    case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
+                        if (type.isFoodType()) {
+                            m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                                "indianDemand.food.text", colony, unit)
+                                    .addName("%nation%", nation)
+                                    .addName("%colony%", colony.getName())
+                                    .addAmount("%amount%", amount);
+                        } else {
+                            m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                                "indianDemand.other.text", colony, unit)
+                                    .addName("%nation%", nation)
+                                    .addName("%colony%", colony.getName())
+                                    .addAmount("%amount%", amount)
+                                    .addNamed("%goods%", type);
+                        }
+                        accepted = true;
+                        break;
+                    case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
+                        if (type.isFoodType()) {
+                            m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                                "indianDemand.food.text", colony, unit)
+                                    .addName("%nation%", nation)
+                                    .addName("%colony%", colony.getName())
+                                    .addAmount("%amount%", amount);
+                        } else {
+                            m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
+                                "indianDemand.other.text", colony, unit)
+                                    .addName("%nation%", nation)
+                                    .addName("%colony%", colony.getName())
+                                    .addAmount("%amount%", amount)
+                                    .addNamed("%goods%", type);
+                        }
+                        accepted = false;
+                        break;
+                    default:
+                        throw new RuntimeException("Impossible option value.");
+                    }
                 }
-                break;
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                if (type.isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                                         "indianDemand.food.text",
-                                         colony, unit)
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount);
-                } else {
-                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                                         "indianDemand.other.text",
-                                         colony, unit)
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount)
-                        .addNamed("%goods%", type);
+                if (m != null) {
+                    player.addModelMessage(m);
+                    displayModelMessages(false);
                 }
-                accepted = true;
-                break;
-            case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                if (type.isFoodType()) {
-                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                                         "indianDemand.food.text",
-                                         colony, unit)
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount);
-                } else {
-                    m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                                         "indianDemand.other.text",
-                                         colony, unit)
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount)
-                        .addNamed("%goods%", type);
-                }
-                accepted = false;
-                break;
-            default:
-                throw new RuntimeException("Impossible option value.");
-            }
-        }
-        if (m != null) {
-            player.addModelMessage(m);
-            displayModelMessages(false);
-        }
-        askServer().indianDemand(unit, colony, type, amount, accepted);
+                askServer().indianDemand(unit, colony, type, amount, accepted);
+            });
     }
 
     /**

@@ -354,6 +354,28 @@ public abstract class AIPlayer extends AIObject {
             });
     }
 
+    /**
+     * Handle a native demand.
+     *
+     * @param unit The {@code Unit} making demands.
+     * @param colony The {@code Colony} where demands are being made.
+     * @param type The {@code GoodsType} demanded.
+     * @param amount The amount of gold demanded.
+     * @param initial The acceptance state of the demand.
+     */
+    public void indianDemandHandler(Unit unit, Colony colony, GoodsType type,
+                                    int amount, Boolean initial) {
+        Boolean result = indianDemand(unit, colony, type, amount, initial);
+        logger.finest("AI handling native demand by " + unit
+            + " at " + colony + " result: " + initial + " -> " + result);
+        if (result != null) {
+            invoke(() -> {
+                    AIMessage.askIndianDemand(this, unit, colony, type,
+                                              amount, result);
+                });
+        }
+    }
+
 
     // AI behaviour interface to be implemented by subclasses
 

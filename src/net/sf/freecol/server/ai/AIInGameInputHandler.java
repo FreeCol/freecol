@@ -193,7 +193,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case IndianDemandMessage.TAG:
-                indianDemand(new IndianDemandMessage(game, element));
+                new IndianDemandMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case LootCargoMessage.TAG:
                 lootCargo(new LootCargoMessage(game, element));
@@ -263,32 +264,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
     }
 
     // Individual message handlers
-
-    /**
-     * Handles an "indianDemand"-message.
-     *
-     * @param message The {@code IndianDemandMessage} to process.
-     */
-    private void indianDemand(IndianDemandMessage message) {
-        final Game game = getGame();
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final Unit unit = message.getUnit(game);
-        final Colony colony = message.getColony(game);
-        final GoodsType type = message.getType(game);
-        final int amount = message.getAmount();
-        final Boolean initialResult = message.getResult();
-
-        Boolean result = aiPlayer.indianDemand(unit, colony, type, amount,
-                                               initialResult);
-        logger.finest("AI handling native demand by " + unit
-            + " at " + colony + " result: " + initialResult + " -> " + result);
-        if (result != null) {
-            aiPlayer.invoke(() -> {
-                    AIMessage.askIndianDemand(aiPlayer, unit, colony,
-                                              type, amount, result);
-                });
-        }
-    }
 
     /**
      * Replies to loot cargo offer.
