@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -96,6 +97,17 @@ public class NativeTradeMessage extends ObjectMessage {
     @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.LATE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final NativeTrade nt = getNativeTrade();
+        final NativeTradeAction action = getAction();
+
+        aiPlayer.nativeTradeHandler(action, nt);
     }
 
     /**

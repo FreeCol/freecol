@@ -212,7 +212,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case NativeTradeMessage.TAG:
-                nativeTrade(new NativeTradeMessage(game, element));
+                new NativeTradeMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case NewLandNameMessage.TAG:
                 newLandName(new NewLandNameMessage(game, element));
@@ -276,22 +277,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      */
     private void multiple(Connection connection, Element element) {
         new MultipleMessage(element).applyHandler(this, connection);
-    }
-
-    /**
-     * Handle a native trade message.
-     *
-     * @param message The {@code NativeTradeMessage} to process.
-     */
-    private void nativeTrade(NativeTradeMessage message) {
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final NativeTrade nt = message.getNativeTrade();
-        final NativeTradeAction action = message.getAction();
-
-        NativeTradeAction result = aiPlayer.handleTrade(action, nt);
-        aiPlayer.invoke(() -> {
-                AIMessage.askNativeTrade(aiPlayer, result, nt);
-            });
     }
 
     /**

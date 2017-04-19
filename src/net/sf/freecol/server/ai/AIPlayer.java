@@ -445,6 +445,19 @@ public abstract class AIPlayer extends AIObject {
             + " for AI " + player.getSuffix());
     }
 
+    /**
+     * Handle a native trade.
+     *
+     * @param action The {@code NativeTradeAction} to perform.
+     * @param nt The {@code NativeTrade} itself.
+     */
+    public void nativeTradeHandler(NativeTradeAction action, NativeTrade nt) {
+        invoke(() -> {
+                NativeTradeAction result = handleTrade(action, nt);
+                AIMessage.askNativeTrade(this, result, nt);
+            });
+    }
+
 
     // AI behaviour interface to be implemented by subclasses
 
