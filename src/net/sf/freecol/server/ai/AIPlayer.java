@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
@@ -430,6 +431,18 @@ public abstract class AIPlayer extends AIObject {
         invoke(() -> {
                 AIMessage.askMonarchAction(this, action, accept);
             });
+    }
+
+    /**
+     * Handle an incoming nation summary.
+     *
+     * @param other The {@code Player} the summary applies to.
+     * @param ns The {@code NationSummary} itself.
+     */
+    public void nationSummaryHandler(Player other, NationSummary ns) {
+        getPlayer().putNationSummary(other, ns);
+        logger.info("Updated nation summary of " + other.getSuffix()
+            + " for AI " + player.getSuffix());
     }
 
 

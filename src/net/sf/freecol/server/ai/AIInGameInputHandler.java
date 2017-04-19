@@ -208,7 +208,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                 multiple(connection, element);
                 break;
             case NationSummaryMessage.TAG:
-                nationSummary(new NationSummaryMessage(game, element));
+                new NationSummaryMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case NativeTradeMessage.TAG:
                 nativeTrade(new NativeTradeMessage(game, element));
@@ -275,22 +276,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      */
     private void multiple(Connection connection, Element element) {
         new MultipleMessage(element).applyHandler(this, connection);
-    }
-
-    /**
-     * Handle an incoming nation summary.
-     *
-     * @param message The {@code NationSummaryMessage} to process.
-     */
-    private void nationSummary(NationSummaryMessage message) {
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final Player player = aiPlayer.getPlayer();
-        final Player other = message.getPlayer(getGame());
-        final NationSummary ns = message.getNationSummary();
-
-        player.putNationSummary(other, ns);
-        logger.info("Updated nation summary of " + other.getSuffix()
-            + " for AI " + player.getSuffix());
     }
 
     /**

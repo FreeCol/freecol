@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -82,40 +83,17 @@ public class NationSummaryMessage extends ObjectMessage {
         return Message.MessagePriority.LATE;
     }
 
-
-    // Public interface
-
     /**
-     * Client side helper to get the player.
-     *
-     * @param game The {@code Game} to look for a player within.
-     * @return The player.
+     * {@inheritDoc}
      */
-    public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(playerId, Player.class);
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Player other = getPlayer(freeColServer.getGame());
+        final NationSummary ns = getNationSummary();
+
+        aiPlayer.nationSummaryHandler(other, ns);
     }
 
-    /**
-     * Client side helper to get the summary.
-     *
-     * @return The summary.
-     */
-    public NationSummary getNationSummary() {
-        return this.summary;
-    }
-
-    /**
-     * Set the nation summary.
-     *
-     * @param ns The new {@code NationSummary}.
-     * @return This message.
-     */
-    public NationSummaryMessage setNationSummary(NationSummary ns) {
-        this.summary = ns;
-        return this;
-    }
-    
-    
     /**
      * {@inheritDoc}
      */
@@ -154,5 +132,38 @@ public class NationSummaryMessage extends ObjectMessage {
         return new DOMMessage(TAG,
             PLAYER_TAG, this.playerId)
             .add(summary).toXMLElement();
+    }
+
+
+    // Public interface
+
+    /**
+     * Client side helper to get the player.
+     *
+     * @param game The {@code Game} to look for a player within.
+     * @return The player.
+     */
+    public Player getPlayer(Game game) {
+        return game.getFreeColGameObject(playerId, Player.class);
+    }
+
+    /**
+     * Client side helper to get the summary.
+     *
+     * @return The summary.
+     */
+    public NationSummary getNationSummary() {
+        return this.summary;
+    }
+
+    /**
+     * Set the nation summary.
+     *
+     * @param ns The new {@code NationSummary}.
+     * @return This message.
+     */
+    public NationSummaryMessage setNationSummary(NationSummary ns) {
+        this.summary = ns;
+        return this;
     }
 }
