@@ -26,6 +26,8 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 
 
 /**
@@ -61,7 +63,15 @@ public class ReconnectMessage extends TrivialMessage {
      * {@inheritDoc}
      */
     @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        aiPlayer.reconnectHandler();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clientHandler(FreeColClient freeColClient) {
-        invokeLater(freeColClient, () -> igc(freeColClient).reconnect());
+        igc(freeColClient).reconnectHandler();
     }
 }

@@ -4252,7 +4252,7 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Query whether the user wants to reconnect?
      *
-     * Called from ReconnectAction, IGIH.reconnectRunnable
+     * Called from ReconnectAction.
      *
      * Returns no status, this game is going away.
      */
@@ -4266,6 +4266,13 @@ public final class InGameController extends FreeColClientHolder {
             logger.finest("Reconnect accepted.");
             fcc.getConnectController().requestLogout(LogoutReason.RECONNECT);
         }
+    }
+
+    /**
+     * Handle a reconnect message.
+     */
+    public void reconnectHandler() {
+        invokeLater(() -> reconnect());
     }
 
     /**

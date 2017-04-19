@@ -486,6 +486,12 @@ public abstract class AIPlayer extends AIObject {
             });
     }    
 
+    /**
+     * Handle reconnect.
+     */
+    public void reconnectHandler() {
+        logger.warning("Reconnect");
+    }
 
     // AI behaviour interface to be implemented by subclasses
 
