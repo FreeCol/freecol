@@ -216,7 +216,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case NewLandNameMessage.TAG:
-                newLandName(new NewLandNameMessage(game, element));
+                new NewLandNameMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case NewRegionNameMessage.TAG:
                 newRegionName(new NewRegionNameMessage(game, element));
@@ -277,21 +278,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      */
     private void multiple(Connection connection, Element element) {
         new MultipleMessage(element).applyHandler(this, connection);
-    }
-
-    /**
-     * Replies to offer to name the new land.
-     *
-     * @param message The {@code NewLandNameMessage} to process.
-     */
-    private void newLandName(NewLandNameMessage message) {
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final Unit unit = message.getUnit(aiPlayer.getPlayer());
-        final String name = message.getNewLandName();
-
-        aiPlayer.invoke(() -> {
-                AIMessage.askNewLandName(aiPlayer, unit, name);
-            });
     }
 
     /**

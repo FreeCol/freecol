@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -87,15 +88,24 @@ public class NewLandNameMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Unit unit = getUnit(aiPlayer.getPlayer());
+        final String name = getNewLandName();
+
+        aiPlayer.newLandNameHandler(unit, name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
         final Unit unit = getUnit(freeColClient.getMyPlayer());
         final String defaultName = getNewLandName();
 
         if (unit == null || defaultName == null || !unit.hasTile()) return;
 
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).newLandName(defaultName, unit));
+        igc(freeColClient).newLandNameHandler(unit, defaultName);
     }
 
     /**
@@ -126,7 +136,7 @@ public class NewLandNameMessage extends AttributeMessage {
         }
 
         // Set name.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .setNewLandName(serverPlayer, unit, newLandName);
     }
 

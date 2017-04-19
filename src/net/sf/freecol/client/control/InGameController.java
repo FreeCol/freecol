@@ -3798,42 +3798,6 @@ public final class InGameController extends FreeColClientHolder {
     } 
 
     /**
-     * A player names the New World.
-     *
-     * Called from GUI.showNameNewLandDialog
-     *
-     * @param unit The {@code Unit} that landed.
-     * @param name The name to use.
-     * @return True if the new land was named.
-     */
-    public boolean nameNewLand(Unit unit, String name) {
-        if (unit == null || name == null) return false;
-
-        // Respond to the server.
-        if (!askServer().newLandName(unit, name)) return false;
-
-        // The name is set, bring up the first landing panel.
-        final Player player = unit.getOwner();
-        StringTemplate t = StringTemplate.template("event.firstLanding")
-            .addName("%name%", name);
-        getGUI().showEventPanel(Messages.message(t), "image.flavor.event.firstLanding",
-                           null);
-
-        // Add tutorial message.
-        final String key = FreeColActionUI
-            .getHumanKeyStrokeText(getFreeColClient()
-                .getActionManager().getFreeColAction("buildColonyAction")
-                .getAccelerator());
-        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                               "buildColony.tutorial", player)
-            .addName("%colonyKey%", key)
-            .add("%colonyMenuItem%", "buildColonyAction.name")
-            .add("%ordersMenuItem%", "menuBar.orders"));
-        displayModelMessages(false);
-        return true;
-    }
-
-    /**
      * The player names a new region.
      *
      * Called from newRegionName, GUI.showNameNewRegionDialog
@@ -4010,18 +3974,53 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * A player names the New World.
+     *
+     * Called from GUI.showNameNewLandDialog
+     *
+     * @param unit The {@code Unit} that landed.
+     * @param name The name to use.
+     * @return True if the new land was named.
+     */
+    public boolean newLandName(Unit unit, String name) {
+        if (unit == null || name == null) return false;
+
+        // Respond to the server.
+        if (!askServer().newLandName(unit, name)) return false;
+
+        // The name is set, bring up the first landing panel.
+        final Player player = unit.getOwner();
+        StringTemplate t = StringTemplate.template("event.firstLanding")
+            .addName("%name%", name);
+        getGUI().showEventPanel(Messages.message(t), "image.flavor.event.firstLanding",
+                           null);
+
+        // Add tutorial message.
+        final String key = FreeColActionUI
+            .getHumanKeyStrokeText(getFreeColClient()
+                .getActionManager().getFreeColAction("buildColonyAction")
+                .getAccelerator());
+        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                               "buildColony.tutorial", player)
+            .addName("%colonyKey%", key)
+            .add("%colonyMenuItem%", "buildColonyAction.name")
+            .add("%ordersMenuItem%", "menuBar.orders"));
+        displayModelMessages(false);
+        return true;
+    }
+
+    /**
      * Ask the player to name the new land.
      *
-     * Called from IGIH.newLandName.
-     *
-     * @param defaultName The default name to use.
      * @param unit The {@code Unit} that has landed.
+     * @param defaultName The default name to use.
      */
-    public void newLandName(String defaultName, Unit unit) {
-        getGUI().showNamingDialog(
-            StringTemplate.key("newLand.text"), defaultName, unit,
-            (String name) -> nameNewLand(unit,
-                (name == null || name.isEmpty()) ? defaultName : name));
+    public void newLandNameHandler(Unit unit, String defaultName) {
+        invokeLater(() ->
+            getGUI().showNamingDialog(StringTemplate.key("newLand.text"),
+                                      defaultName, unit,
+                (String name) -> newLandName(unit,
+                    (name == null || name.isEmpty()) ? defaultName : name)));
     }
 
     /**

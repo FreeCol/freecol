@@ -458,6 +458,18 @@ public abstract class AIPlayer extends AIObject {
             });
     }
 
+    /**
+     * Handle a new land name.
+     *
+     * @param unit The {@code Unit} discovering the new world.
+     * @param name The default name.
+     */
+    public void newLandNameHandler(Unit unit, String name) {
+        invoke(() -> {
+                AIMessage.askNewLandName(this, unit, name);
+            });
+    }
+
 
     // AI behaviour interface to be implemented by subclasses
 
