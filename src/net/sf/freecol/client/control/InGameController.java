@@ -3376,6 +3376,7 @@ public final class InGameController extends FreeColClientHolder {
     public void indianDemandHandler(Unit unit, Colony colony,
                                     GoodsType type, int amount) {
         if (unit == null || colony == null) return;
+
         final Player player = getMyPlayer();
         final int opt = getClientOptions()
             .getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
@@ -4024,31 +4025,49 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * Ask the player to name a new region.
+     * The player names a new region.
      *
-     * Called from IGIH.newRegionName.
+     * Called from newRegionName, GUI.showNameNewRegionDialog
+     *
+     * @param tile The {@code Tile} within the region.
+     * @param unit The {@code Unit} that has discovered the region.
+     * @param region The {@code Region} to name.
+     * @param name The name to offer.
+     * @return True if the new region was named.
+     */
+    public boolean newRegionName(final Region region, final Tile tile,
+                                 final Unit unit, final String name) {
+        if (tile == null || unit == null || region == null) return false;
+
+        return askServer().newRegionName(region, tile, unit, name);
+    }
+
+    /**
+     * Handle new region naming.
      *
      * @param region The {@code Region} to name.
-     * @param defaultName The default name to use.
      * @param tile The {@code Tile} the unit landed at.
      * @param unit The {@code Unit} that has landed.
+     * @param name The default name to use.
      */
-    public void newRegionName(Region region, String defaultName, Tile tile,
-                              Unit unit) {
-        if (region.hasName()) {
-            if (region.isPacific()) {
-                getGUI().showEventPanel(Messages.message("event.discoverPacific"),
-                                   "image.flavor.event.discoverPacific", null);
-            }
-            nameNewRegion(tile, unit, region, defaultName);
-        } else {
-            getGUI().showNamingDialog(
-                StringTemplate.template("nameRegion.text")
-                              .addStringTemplate("%type%", region.getLabel()),
-                defaultName, unit,
-                (String name) -> nameNewRegion(tile, unit, region,
-                    (name == null || name.isEmpty()) ? defaultName : name));
-        }
+    public void newRegionNameHandler(Region region, Tile tile, Unit unit,
+                                     String name) {
+        invokeLater(() -> {
+                if (region.hasName()) {
+                    if (region.isPacific()) {
+                        getGUI().showEventPanel(Messages.message("event.discoverPacific"),
+                            "image.flavor.event.discoverPacific", null);
+                    }
+                    newRegionName(region, tile, unit, name);
+                } else {
+                    getGUI().showNamingDialog(StringTemplate
+                        .template("nameRegion.text")
+                        .addStringTemplate("%type%", region.getLabel()),
+                        name, unit,
+                        (String n) -> newRegionName(region, tile, unit,
+                            (n == null || n.isEmpty()) ? name : n));
+                }
+            });
     }
 
     /**

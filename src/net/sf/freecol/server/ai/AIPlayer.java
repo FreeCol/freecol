@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Tile;
@@ -469,6 +470,21 @@ public abstract class AIPlayer extends AIObject {
                 AIMessage.askNewLandName(this, unit, name);
             });
     }
+
+    /**
+     * Handle a new region naming.
+     *
+     * @param region The {@code Region} to name.
+     * @param tile The {@code Tile} the tile where the region was found.
+     * @param unit The {@code Unit} that discovers the region.
+     * @param name The default name.
+     */
+    public void newRegionNameHandler(Region region, Tile tile, Unit unit,
+                                     String name) {
+        invoke(() -> {
+                AIMessage.askNewRegionName(this, region, tile, unit, name);
+            });
+    }    
 
 
     // AI behaviour interface to be implemented by subclasses

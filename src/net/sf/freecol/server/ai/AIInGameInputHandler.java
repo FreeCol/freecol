@@ -220,7 +220,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case NewRegionNameMessage.TAG:
-                newRegionName(new NewRegionNameMessage(game, element));
+                new NewRegionNameMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case ReconnectMessage.TAG:
                 logger.info("Reconnect on illegal operation.");
@@ -278,24 +279,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      */
     private void multiple(Connection connection, Element element) {
         new MultipleMessage(element).applyHandler(this, connection);
-    }
-
-    /**
-     * Replies to offer to name a new region name.
-     *
-     * @param message The {@code NewRegionNameMessage} to process.
-     */
-    private void newRegionName(NewRegionNameMessage message) {
-        final AIPlayer aiPlayer = getMyAIPlayer();
-        final Game game = getGame();
-        final Region region = message.getRegion(game);
-        final Tile tile = message.getTile(game);
-        final Unit unit = message.getUnit(aiPlayer.getPlayer());
-        final String name = message.getNewRegionName();
-
-        aiPlayer.invoke(() -> {
-                AIMessage.askNewRegionName(aiPlayer, region, tile, unit, name);
-            });
     }
 
     /**

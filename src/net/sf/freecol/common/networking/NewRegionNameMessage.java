@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -96,17 +97,32 @@ public class NewRegionNameMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Game game = freeColServer.getGame();
+        final Region region = getRegion(game);
+        final Tile tile = getTile(game);
+        final Unit unit = getUnit(aiPlayer.getPlayer());
+        final String name = getNewRegionName();
+
+        aiPlayer.newRegionNameHandler(region, tile, unit, name);
+    }
+
+        
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
         final Tile tile = getTile(game);
         final Unit unit = getUnit(freeColClient.getMyPlayer());
         final Region region = getRegion(game);
-        final String defaultName = getNewRegionName();
+        final String name = getNewRegionName();
 
-        if (defaultName == null || region == null) return;
+        if (name == null || region == null) return;
 
         invokeLater(freeColClient, () ->
-            igc(freeColClient).newRegionName(region, defaultName, tile, unit));
+            igc(freeColClient).newRegionName(region, tile, unit, name));
     }
 
     /**
