@@ -227,7 +227,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                 logger.info("Reconnect on illegal operation.");
                 break;
             case SetAIMessage.TAG:
-                setAI(new SetAIMessage(game, element));
+                new SetAIMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case SetCurrentPlayerMessage.TAG:
                 setCurrentPlayer(new SetCurrentPlayerMessage(game, element));
@@ -279,6 +280,71 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      */
     private void multiple(Connection connection, Element element) {
         new MultipleMessage(element).applyHandler(this, connection);
+    }
+
+    /**
+     * Handle an incoming nation summary.
+     *
+     * @param message The {@code NationSummaryMessage} to process.
+     */
+    private void nationSummary(NationSummaryMessage message) {
+        final AIPlayer aiPlayer = getMyAIPlayer();
+        final Player player = aiPlayer.getPlayer();
+        final Player other = message.getPlayer(getGame());
+        final NationSummary ns = message.getNationSummary();
+
+        player.putNationSummary(other, ns);
+        logger.info("Updated nation summary of " + other.getSuffix()
+            + " for AI " + player.getSuffix());
+    }
+
+    /**
+     * Handle a native trade message.
+     *
+     * @param message The {@code NativeTradeMessage} to process.
+     */
+    private void nativeTrade(NativeTradeMessage message) {
+        final AIPlayer aiPlayer = getMyAIPlayer();
+        final NativeTrade nt = message.getNativeTrade();
+        final NativeTradeAction action = message.getAction();
+
+        NativeTradeAction result = aiPlayer.handleTrade(action, nt);
+        aiPlayer.invoke(() -> {
+                AIMessage.askNativeTrade(aiPlayer, result, nt);
+            });
+    }
+
+    /**
+     * Replies to offer to name the new land.
+     *
+     * @param message The {@code NewLandNameMessage} to process.
+     */
+    private void newLandName(NewLandNameMessage message) {
+        final AIPlayer aiPlayer = getMyAIPlayer();
+        final Unit unit = message.getUnit(aiPlayer.getPlayer());
+        final String name = message.getNewLandName();
+
+        aiPlayer.invoke(() -> {
+                AIMessage.askNewLandName(aiPlayer, unit, name);
+            });
+    }
+
+    /**
+     * Replies to offer to name a new region name.
+     *
+     * @param message The {@code NewRegionNameMessage} to process.
+     */
+    private void newRegionName(NewRegionNameMessage message) {
+        final AIPlayer aiPlayer = getMyAIPlayer();
+        final Game game = getGame();
+        final Region region = message.getRegion(game);
+        final Tile tile = message.getTile(game);
+        final Unit unit = message.getUnit(aiPlayer.getPlayer());
+        final String name = message.getNewRegionName();
+
+        aiPlayer.invoke(() -> {
+                AIMessage.askNewRegionName(aiPlayer, region, tile, unit, name);
+            });
     }
 
     /**

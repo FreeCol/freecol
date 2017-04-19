@@ -4566,6 +4566,16 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Handle setting the AI state of a player.
+     *
+     * @param player The {@code Player} to set.
+     * @param ai The new AI state.
+     */
+    public void setAIHandler(Player player, boolean ai) {
+        player.setAI(ai);
+    }
+
+    /**
      * Changes the current construction project of a {@code Colony}.
      *
      * Called from BuildQueuePanel

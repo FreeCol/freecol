@@ -24,6 +24,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -83,12 +84,26 @@ public class SetAIMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
-    public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
-        final Player p = getPlayer(game);
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Player player = getPlayer(freeColServer.getGame());
         final boolean ai = getAI();
 
-        if (p != null) p.setAI(ai);
+        if (player == null) return;
+
+        aiPlayer.setAIHandler(player, ai);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Player player = getPlayer(freeColClient.getGame());
+        final boolean ai = getAI();
+
+        if (player == null) return;
+
+        igc(freeColClient).setAIHandler(player, ai);
     }
 
 

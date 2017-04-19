@@ -493,6 +493,17 @@ public abstract class AIPlayer extends AIObject {
         logger.warning("Reconnect");
     }
 
+    /**
+     * Handle setting the AI state of a player.
+     *
+     * @param player The {@code Player} to set.
+     * @param ai The new AI state.
+     */
+    public void setAIHandler(Player player, boolean ai) {
+        player.setAI(ai);
+    }
+
+
     // AI behaviour interface to be implemented by subclasses
 
     /**
