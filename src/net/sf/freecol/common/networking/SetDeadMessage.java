@@ -24,6 +24,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -79,6 +80,14 @@ public class SetDeadMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
         final Player player = getPlayer(game);
@@ -91,9 +100,6 @@ public class SetDeadMessage extends AttributeMessage {
         invokeLater(freeColClient, () ->
             igc(freeColClient).setDead(player));
     }
-
-    // No server handler required.
-    // This message is only sent to clients.
 
 
     // Public interface

@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -113,6 +114,46 @@ public class AnimateAttackMessage extends ObjectMessage {
         return Message.MessagePriority.ANIMATION;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
+    }
+        
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return null; // Only sent to client
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Element toXMLElement() {
+        return new DOMMessage(TAG,
+            ATTACKER_TAG, getStringAttribute(ATTACKER_TAG),
+            ATTACKER_TILE_TAG, getStringAttribute(ATTACKER_TILE_TAG),
+            DEFENDER_TAG, getStringAttribute(DEFENDER_TAG),
+            DEFENDER_TILE_TAG, getStringAttribute(DEFENDER_TILE_TAG),
+            SUCCESS_TAG, getStringAttribute(SUCCESS_TAG))
+            .add(this.attacker).add(this.defender).toXMLElement();
+    }
+
 
     // Public interface
 
@@ -163,38 +204,5 @@ public class AnimateAttackMessage extends ObjectMessage {
      */
     public boolean getResult() {
         return getBooleanAttribute(SUCCESS_TAG, false);
-    }
-
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        return null; // Only sent to client
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            ATTACKER_TAG, getStringAttribute(ATTACKER_TAG),
-            ATTACKER_TILE_TAG, getStringAttribute(ATTACKER_TILE_TAG),
-            DEFENDER_TAG, getStringAttribute(DEFENDER_TAG),
-            DEFENDER_TILE_TAG, getStringAttribute(DEFENDER_TILE_TAG),
-            SUCCESS_TAG, getStringAttribute(SUCCESS_TAG))
-            .add(this.attacker).add(this.defender).toXMLElement();
     }
 }

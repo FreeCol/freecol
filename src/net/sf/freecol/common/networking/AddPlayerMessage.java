@@ -28,6 +28,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import net.sf.freecol.common.util.DOMUtils;
@@ -89,6 +90,35 @@ public class AddPlayerMessage extends ObjectMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
+    }
+        
+    /**
+     * Handle a "addPlayer"-message.
+     *
+     * @param server The {@code FreeColServer} handling the message.
+     * @param serverPlayer The {@code ServerPlayer} the message applies to.
+     * @return Null.
+     */
+    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
+        // Only sent by the server to the clients.
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Element toXMLElement() {
+        return new DOMMessage(TAG)
+            .add(this.players).toXMLElement();
+    }
+
     // Public interface
 
     /**
@@ -109,27 +139,5 @@ public class AddPlayerMessage extends ObjectMessage {
     public AddPlayerMessage addPlayer(Player p) {
         this.players.add(p);
         return this;
-    }
-
-
-    /**
-     * Handle a "addPlayer"-message.
-     *
-     * @param server The {@code FreeColServer} handling the message.
-     * @param serverPlayer The {@code ServerPlayer} the message applies to.
-     * @return Null.
-     */
-    public Element handle(FreeColServer server, ServerPlayer serverPlayer) {
-        // Only sent by the server to the clients.
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .add(this.players).toXMLElement();
     }
 }

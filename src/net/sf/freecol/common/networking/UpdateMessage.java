@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import net.sf.freecol.common.util.DOMUtils;
@@ -158,6 +159,14 @@ public class UpdateMessage extends ObjectMessage {
         return false;
     }
               
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
+    }
+
     /**
      * {@inheritDoc}
      */

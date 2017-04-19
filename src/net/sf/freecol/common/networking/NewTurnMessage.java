@@ -23,6 +23,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -78,6 +79,14 @@ public class NewTurnMessage extends AttributeMessage {
         return Message.MessagePriority.NORMAL;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
+    }
+
 
     // Public interface
 
@@ -89,8 +98,4 @@ public class NewTurnMessage extends AttributeMessage {
     public int getTurnNumber() {
         return getIntegerAttribute(TURN_TAG, 0);
     }
-
-
-    // No server handler method required.
-    // This message is only sent to clients.
 }

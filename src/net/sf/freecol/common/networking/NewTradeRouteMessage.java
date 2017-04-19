@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -80,29 +81,13 @@ public class NewTradeRouteMessage extends ObjectMessage {
         return Message.MessagePriority.NORMAL;
     }
 
-
-    // Public interface
-
     /**
-     * Get the new trade route.
-     *
-     * @return The {@code TradeRoute} attached to this message.
+     * {@inheritDoc}
      */
-    public TradeRoute getTradeRoute() {
-        return this.tradeRoute;
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
     }
-
-    /**
-     * Set the new trade route.
-     *
-     * @param tradeRoute The {@code TradeRoute} to attach.
-     * @return This message.
-     */
-    public NewTradeRouteMessage setTradeRoute(TradeRoute tradeRoute) {
-        this.tradeRoute = tradeRoute;
-        return this;
-    }
-
 
     /**
      * {@inheritDoc}
@@ -132,5 +117,28 @@ public class NewTradeRouteMessage extends ObjectMessage {
     public Element toXMLElement() {
         return new DOMMessage(TAG)
             .add(this.tradeRoute).toXMLElement();
+    }
+
+
+    // Public interface
+
+    /**
+     * Get the new trade route.
+     *
+     * @return The {@code TradeRoute} attached to this message.
+     */
+    public TradeRoute getTradeRoute() {
+        return this.tradeRoute;
+    }
+
+    /**
+     * Set the new trade route.
+     *
+     * @param tradeRoute The {@code TradeRoute} to attach.
+     * @return This message.
+     */
+    public NewTradeRouteMessage setTradeRoute(TradeRoute tradeRoute) {
+        this.tradeRoute = tradeRoute;
+        return this;
     }
 }

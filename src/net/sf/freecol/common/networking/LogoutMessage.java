@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -83,6 +84,14 @@ public class LogoutMessage extends AttributeMessage {
      */
     public MessagePriority getPriority() {
         return MessagePriority.NORMAL;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
     }
 
     /**

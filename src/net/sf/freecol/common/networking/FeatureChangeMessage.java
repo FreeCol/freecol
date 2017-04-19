@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import net.sf.freecol.common.util.DOMUtils;
@@ -87,6 +88,43 @@ public class FeatureChangeMessage extends ObjectMessage {
         return Message.MessagePriority.OWNED;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return null; // Only sent to client
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Element toXMLElement() {
+        return new DOMMessage(TAG,
+            ID_TAG, getStringAttribute(ID_TAG),
+            ADD_TAG, getStringAttribute(ADD_TAG))
+            .add(this.fcos).toXMLElement();
+    }
+
 
     // Public interface
 
@@ -116,35 +154,5 @@ public class FeatureChangeMessage extends ObjectMessage {
      */
     public boolean getAdd() {
         return getBooleanAttribute(ADD_TAG, false);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        return null; // Only sent to client
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            ID_TAG, getStringAttribute(ID_TAG),
-            ADD_TAG, getStringAttribute(ADD_TAG))
-            .add(this.fcos).toXMLElement();
     }
 }

@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -90,6 +91,44 @@ public class AnimateMoveMessage extends ObjectMessage {
         return Message.MessagePriority.ANIMATION;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return null; // Only sent to client
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Suppress toXML for now
+        throw new XMLStreamException(getType() + ".toXML NYI");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Element toXMLElement() {
+        return new DOMMessage(TAG,
+            NEW_TILE_TAG, getStringAttribute(NEW_TILE_TAG),
+            OLD_TILE_TAG, getStringAttribute(OLD_TILE_TAG),
+            UNIT_TAG, getStringAttribute(UNIT_TAG))
+            .add(this.unit).toXMLElement();
+    }
+
 
     // Public interface
 
@@ -121,36 +160,5 @@ public class AnimateMoveMessage extends ObjectMessage {
     public Tile getOldTile(Game game) {
         return game.getFreeColGameObject(getStringAttribute(OLD_TILE_TAG),
                                          Tile.class);
-    }
-
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        return null; // Only sent to client
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            NEW_TILE_TAG, getStringAttribute(NEW_TILE_TAG),
-            OLD_TILE_TAG, getStringAttribute(OLD_TILE_TAG),
-            UNIT_TAG, getStringAttribute(UNIT_TAG))
-            .add(this.unit).toXMLElement();
     }
 }

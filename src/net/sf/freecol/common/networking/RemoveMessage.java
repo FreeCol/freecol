@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import net.sf.freecol.common.util.DOMUtils;
@@ -104,6 +105,14 @@ public class RemoveMessage extends AttributeMessage {
     @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.REMOVE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        // Ignored
     }
 
     /**
