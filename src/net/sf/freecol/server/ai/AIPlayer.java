@@ -503,6 +503,20 @@ public abstract class AIPlayer extends AIObject {
         player.setAI(ai);
     }
 
+    /**
+     * Handle a current player setting.
+     *
+     * @param currentPlayer The new current {@code Player}.
+     */
+    public void setCurrentPlayerHandler(Player currentPlayer) {
+        if (getPlayer().getId().equals(currentPlayer.getId())) {
+            invoke(() -> {
+                    startWorking();
+                    AIMessage.askEndTurn(this);
+                });
+        }
+    }
+
 
     // AI behaviour interface to be implemented by subclasses
 

@@ -27,6 +27,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -85,6 +86,18 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Player currentPlayer = getPlayer(freeColServer.getGame());
+
+        if (currentPlayer == null) return;
+
+        aiPlayer.setCurrentPlayerHandler(currentPlayer);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clientHandler(FreeColClient freeColClient)
         throws FreeColException {
         final Game game = freeColClient.getGame();
@@ -95,9 +108,7 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
                 + getStringAttribute(PLAYER_TAG));
         }
 
-        // It is safe to call this directly
-        freeColClient.getInGameController()
-            .setCurrentPlayer(player);
+        igc(freeColClient).setCurrentPlayerHandler(player);
     }
 
     // No server handler required.
@@ -113,6 +124,7 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
      * @return The {@code Player} whose turn it now is.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG), Player.class);
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG),
+                                         Player.class);
     }
 }

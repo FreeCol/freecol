@@ -231,7 +231,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case SetCurrentPlayerMessage.TAG:
-                setCurrentPlayer(new SetCurrentPlayerMessage(game, element));
+                new SetCurrentPlayerMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
                 
             // Since we're the server, we can see everything.
@@ -359,22 +360,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
         if (p != null) p.setAI(ai);
     }
 
-    /**
-     * Handles a "setCurrentPlayer"-message.
-     *
-     * @param message The {@code SetCurrentPlayerMessage} to process.
-     */
-    private void setCurrentPlayer(SetCurrentPlayerMessage message) {
-        final Player currentPlayer = message.getPlayer(getGame());
-
-        if (currentPlayer != null
-            && getMyPlayer().getId().equals(currentPlayer.getId())) {
-            getMyAIPlayer().invoke(() -> {
-                    getMyAIPlayer().startWorking();
-                    AIMessage.askEndTurn(getMyAIPlayer());
-                });
-        }
-    }
 
     // Implement MessageHandler
 

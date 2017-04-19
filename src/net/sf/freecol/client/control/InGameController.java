@@ -4601,7 +4601,7 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Set a player to be the new current player.
      *
-     * Called from IGIH.newTurn, IGIH.setCurrentPlayer, CC.login
+     * Called from IGIH.newTurn, CC.login
      *
      * @param player The {@code Player} to be the new current player.
      * @return True if the current player changes.
@@ -4654,6 +4654,15 @@ public final class InGameController extends FreeColClientHolder {
         return true;
     }
 
+    /**
+     * Handle a current player setting.
+     *
+     * @param currentPlayer The new current {@code Player}.
+     */
+    public void setCurrentPlayerHandler(Player currentPlayer) {
+        setCurrentPlayer(currentPlayer); // Seems safe to call directly
+    }
+    
     /**
      * Set a player to be dead.
      *
