@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
@@ -44,20 +46,8 @@ public class MonarchActionMessage extends ObjectMessage {
     private static final String RESULT_TAG = "result";
     private static final String TAX_TAG = "tax";
 
-    /** The monarch action. */
-    private final MonarchAction action;
-
     /** A template describing the action. */
-    private final StringTemplate template;
-
-    /** The monarch image key. */
-    private final String monarchKey;
-
-    /** The tax rate, if appropriate. */
-    private String tax;
-
-    /** Is the offer accepted?  Valid in replies from client. */
-    private String resultString;
+    private StringTemplate template = null;
 
 
     /**
@@ -70,13 +60,7 @@ public class MonarchActionMessage extends ObjectMessage {
      */
     public MonarchActionMessage(MonarchAction action,
                                 StringTemplate template, String monarchKey) {
-        super(TAG);
-
-        this.action = action;
-        this.template = template;
-        this.monarchKey = monarchKey;
-        this.tax = null;
-        this.resultString = null;
+        super(TAG, ACTION_TAG, action.toString(), MONARCH_TAG, monarchKey);
     }
 
     /**
@@ -87,14 +71,40 @@ public class MonarchActionMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public MonarchActionMessage(Game game, Element element) {
-        super(TAG);
-
-        this.action = getEnumAttribute(element, ACTION_TAG,
-            MonarchAction.class, (MonarchAction)null);
-        this.monarchKey = getStringAttribute(element, MONARCH_TAG);
-        this.tax = getStringAttribute(element, TAX_TAG);
-        this.resultString = getStringAttribute(element, RESULT_TAG);
+        super(TAG, ACTION_TAG, getStringAttribute(element, ACTION_TAG),
+              MONARCH_TAG, getStringAttribute(element, MONARCH_TAG),
+              TAX_TAG, getStringAttribute(element, TAX_TAG),
+              RESULT_TAG, getStringAttribute(element, RESULT_TAG));
+        
         this.template = getChild(game, element, 0, StringTemplate.class);
+    }
+
+    /**
+     * Create a new {@code MonarchActionMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public MonarchActionMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, ACTION_TAG, MONARCH_TAG, TAX_TAG, RESULT_TAG);
+
+        this.template = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (StringTemplate.TAG.equals(tag)) {
+                if (this.template == null) {
+                    this.template = xr.readFreeColObject(game, StringTemplate.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(StringTemplate.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
     }
 
 
@@ -112,7 +122,8 @@ public class MonarchActionMessage extends ObjectMessage {
     @Override
     public MessagePriority getPriority() {
         MessagePriority mp = null;
-        switch (this.action) {
+        MonarchAction action = getAction();
+        switch (action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
             mp = Message.MessagePriority.EARLY;
@@ -128,7 +139,7 @@ public class MonarchActionMessage extends ObjectMessage {
         }
         if (mp == null) {
             throw new RuntimeException("Missing priority for action: "
-                + this.action);
+                + action);
         }
         return mp;
     }
@@ -148,6 +159,19 @@ public class MonarchActionMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final MonarchAction action = getAction();
+        final StringTemplate template = getTemplate();
+        final String key = getMonarchKey();
+        
+        igc(freeColClient).monarchActionHandler(action, template, key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         return igc(freeColServer)
@@ -158,9 +182,8 @@ public class MonarchActionMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.template != null) this.template.toXML(xw);
     }
 
     /**
@@ -171,10 +194,10 @@ public class MonarchActionMessage extends ObjectMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(TAG,
-            ACTION_TAG, this.action.toString(),
-            MONARCH_TAG, this.monarchKey,
-            TAX_TAG, this.tax,
-            RESULT_TAG, this.resultString)
+            ACTION_TAG, getStringAttribute(ACTION_TAG),
+            MONARCH_TAG, getStringAttribute(MONARCH_TAG),
+            TAX_TAG, getStringAttribute(TAX_TAG),
+            RESULT_TAG, getStringAttribute(RESULT_TAG))
             .add(this.template).toXMLElement();
     }
 
@@ -187,7 +210,8 @@ public class MonarchActionMessage extends ObjectMessage {
      * @return The monarch action type.
      */
     public MonarchAction getAction() {
-        return action;
+        return getEnumAttribute(ACTION_TAG, MonarchAction.class,
+                                (MonarchAction)null);
     }
 
     /**
@@ -196,7 +220,7 @@ public class MonarchActionMessage extends ObjectMessage {
      * @return The template.
      */
     public StringTemplate getTemplate() {
-        return template;
+        return this.template;
     }
 
     /**
@@ -205,7 +229,7 @@ public class MonarchActionMessage extends ObjectMessage {
      * @return The monarch key.
      */
     public String getMonarchKey() {
-        return this.monarchKey;
+        return getStringAttribute(MONARCH_TAG);
     }
 
     /**
@@ -214,11 +238,7 @@ public class MonarchActionMessage extends ObjectMessage {
      * @return The tax amount, or negative if none present.
      */
     public int getTax() {
-        try {
-            return Integer.parseInt(tax);
-        } catch (Exception e) {
-            return -1;
-        }
+        return getIntegerAttribute(TAX_TAG, -1);
     }
 
     /**
@@ -228,7 +248,7 @@ public class MonarchActionMessage extends ObjectMessage {
      * @return This message.
      */
     public MonarchActionMessage setTax(int tax) {
-        this.tax = Integer.toString(tax);
+        setStringAttribute(TAX_TAG, Integer.toString(tax));
         return this;
     }
 
@@ -237,8 +257,8 @@ public class MonarchActionMessage extends ObjectMessage {
      *
      * @return The result.
      */
-    public boolean getResult() {
-        return Boolean.parseBoolean(resultString);
+    public Boolean getResult() {
+        return getBooleanAttribute(RESULT_TAG, (Boolean)null);
     }
 
     /**
@@ -248,7 +268,7 @@ public class MonarchActionMessage extends ObjectMessage {
      * @return This message.
      */
     public MonarchActionMessage setResult(boolean accept) {
-        this.resultString = Boolean.toString(accept);
+        setStringAttribute(RESULT_TAG, Boolean.toString(accept));
         return this;
     }
 }

@@ -187,7 +187,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new LootCargoMessage(getGame(), e).clientHandler(freeColClient));
         register(MonarchActionMessage.TAG,
             (Connection c, Element e) ->
-                monarchAction(new MonarchActionMessage(getGame(), e)));
+                new MonarchActionMessage(getGame(), e).clientHandler(freeColClient));
         register(NationSummaryMessage.TAG,
             (Connection c, Element e) ->
                 nationSummary(new NationSummaryMessage(getGame(), e)));
@@ -283,20 +283,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
 
     // Individual message handlers
-
-    /**
-     * Handle a "monarchAction"-message.
-     *
-     * @param message The {@code MonarchActionMessage} to process.
-     */
-    private void monarchAction(MonarchActionMessage message) {
-        final Game game = getGame();
-        final StringTemplate template = message.getTemplate();
-        final String key = message.getMonarchKey();
-        
-        invokeLater(() ->
-            igc().monarch(message.getAction(), template, key));
-    }
 
     /**
      * Handle a "nationSummary"-message.

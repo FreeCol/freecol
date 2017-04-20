@@ -3746,16 +3746,15 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Do a monarch interaction.
      *
-     * Called from IGIH.monarchAction.
-     *
      * @param action The {@code MonarchAction} to perform.
      * @param template A {@code StringTemplate} describing the action.
      * @param monarchKey A key for the monarch involved.
      */
-    public void monarch(MonarchAction action, StringTemplate template,
-                        String monarchKey) {
-        getGUI().showMonarchDialog(action, template, monarchKey,
-            (Boolean b) -> monarchAction(action, b));
+    public void monarchActionHandler(MonarchAction action,
+                                     StringTemplate template, String monarchKey) {
+        invokeLater(() ->
+            getGUI().showMonarchDialog(action, template, monarchKey,
+                (Boolean b) -> monarchAction(action, b)));
     }
 
     /**
