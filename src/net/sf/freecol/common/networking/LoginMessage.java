@@ -54,23 +54,8 @@ public class LoginMessage extends ObjectMessage {
     private static final String USER_NAME_TAG = "userName";
     private static final String VERSION_TAG = "version";
     
-    /** The user name. */
-    private final String userName;
-
-    /** The client FreeCol version. */
-    private final String version;
-
-    /** The server state. */
-    private final ServerState state;
-    
-    /** Is this a single player game. */
-    private final boolean singlePlayer;
-
-    /** Is the client the current player. */
-    private final boolean currentPlayer;
-
     /** The game. */
-    private final Game game;
+    private Game game;
 
         
     /**
@@ -85,13 +70,11 @@ public class LoginMessage extends ObjectMessage {
      */
     public LoginMessage(String userName, String version, ServerState state,
                         boolean singlePlayer, boolean currentPlayer, Game game) {
-        super(TAG);
+        super(TAG, USER_NAME_TAG, userName, VERSION_TAG, version,
+              SINGLE_PLAYER_TAG, Boolean.toString(singlePlayer),
+              CURRENT_PLAYER_TAG, Boolean.toString(currentPlayer));
 
-        this.userName = userName;
-        this.version = version;
-        this.state = state;
-        this.singlePlayer = singlePlayer;
-        this.currentPlayer = currentPlayer;
+        if (state != null) setStringAttribute(STATE_TAG, state.toString());
         this.game = game;
     }
 
@@ -122,17 +105,18 @@ public class LoginMessage extends ObjectMessage {
     public LoginMessage(@SuppressWarnings("unused")Game game,
                         FreeColXMLReader xr)
         throws XMLStreamException {
-        super(TAG);
+        super(TAG, xr, USER_NAME_TAG, VERSION_TAG, STATE_TAG,
+              SINGLE_PLAYER_TAG, CURRENT_PLAYER_TAG);
         
-        this.userName = xr.getAttribute(USER_NAME_TAG, (String)null);
-        this.version = xr.getAttribute(VERSION_TAG, (String)null);
-        this.state = xr.getAttribute(STATE_TAG, ServerState.class, (ServerState)null);
-        this.singlePlayer = xr.getAttribute(SINGLE_PLAYER_TAG, true);
-        this.currentPlayer = xr.getAttribute(CURRENT_PLAYER_TAG, false);
-
-        xr.nextTag();
-        final String tag = xr.getLocalName();
-        this.game = (Game.TAG.equals(tag)) ? new Game(null, xr) : null;
+        this.game = null;
+        while (xr.moreTags()) {
+            final String tag = xr.getLocalName();
+            if (Game.TAG.equals(tag)) {
+                this.game = new Game(null, xr);
+            } else {
+                expected(Game.TAG, tag);
+            }
+        }
         xr.expectTag(TAG);
     }
 
@@ -151,8 +135,8 @@ public class LoginMessage extends ObjectMessage {
     @Override
     public void clientHandler(FreeColClient freeColClient) {
         freeColClient.getConnectController()
-            .login(this.state, this.game, this.userName,
-                   this.singlePlayer, this.currentPlayer);
+            .login(getState(), this.game, getUserName(),
+                   getSinglePlayer(), getCurrentPlayer());
     }
 
     /**
@@ -168,16 +152,18 @@ public class LoginMessage extends ObjectMessage {
         // to a single player game. This would be easy if we used a
         // dummy connection for single player games.
 
-        if (this.userName == null || this.userName.isEmpty()) {
+        final String userName = getUserName();
+        final String version = getVersion();
+        if (userName == null || userName.isEmpty()) {
             return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                 .template("server.missingUserName"));
-        } else if (this.version == null || this.version.isEmpty()) {
+        } else if (version == null || version.isEmpty()) {
             return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                 .template("server.missingVersion"));
-        } else if (!this.version.equals(FreeCol.getVersion())) {
+        } else if (!version.equals(FreeCol.getVersion())) {
             return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                 .template("server.wrongFreeColVersion")
-                .addName("%clientVersion%", this.version)
+                .addName("%clientVersion%", version)
                 .addName("%serverVersion%", FreeCol.getVersion()));
         }
 
@@ -202,7 +188,7 @@ public class LoginMessage extends ObjectMessage {
             if (present != null) {
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameInUse")
-                    .addName("%name%", this.userName));
+                    .addName("%name%", userName));
             }
 
             // Complete initialization...
@@ -211,7 +197,7 @@ public class LoginMessage extends ObjectMessage {
                                     nation);
 
             // ... but override player name.
-            serverPlayer.setName(this.userName);
+            serverPlayer.setName(userName);
 
             // Add the new player and inform all other players
             ChangeSet cs = new ChangeSet();
@@ -226,7 +212,7 @@ public class LoginMessage extends ObjectMessage {
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(conn);
             cs.add(See.only(serverPlayer),
-                   new LoginMessage(this.userName, this.version,
+                   new LoginMessage(userName, version,
                                     freeColServer.getServerState(),
                                     freeColServer.getSinglePlayer(),
                                     serverGame.getCurrentPlayer() == serverPlayer,
@@ -234,7 +220,7 @@ public class LoginMessage extends ObjectMessage {
             return cs;
 
         case LOAD_GAME:
-            if (FreeColServer.MAP_EDITOR_NAME.equals(this.userName)) {
+            if (FreeColServer.MAP_EDITOR_NAME.equals(userName)) {
                 // Trying to start a map, see BR#2976 -> IR#217
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("error.mapEditorGame"));
@@ -253,12 +239,12 @@ public class LoginMessage extends ObjectMessage {
                 // Another player already connected on the name
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameInUse")
-                    .addName("%name%", this.userName));
+                    .addName("%name%", userName));
             } else if (present.isAI()) {
                 // Should not connect to AI
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameInUse")
-                    .addName("%name%", this.userName));
+                    .addName("%name%", userName));
             }
 
             present.setConnection(conn);
@@ -271,7 +257,7 @@ public class LoginMessage extends ObjectMessage {
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(present,
-                new LoginMessage(this.userName, this.version,
+                new LoginMessage(userName, version,
                                  freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
                                  serverGame.getCurrentPlayer() == present,
@@ -294,7 +280,7 @@ public class LoginMessage extends ObjectMessage {
                 // Another player already connected on the name
                 return ChangeSet.clientError((ServerPlayer)null, StringTemplate
                     .template("server.userNameInUse")
-                    .addName("%name%", this.userName));
+                    .addName("%name%", userName));
             }
 
             present.setConnection(conn);
@@ -302,7 +288,7 @@ public class LoginMessage extends ObjectMessage {
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(conn);
             return ChangeSet.simpleChange(present,
-                new LoginMessage(this.userName, this.version,
+                new LoginMessage(userName, version,
                                  freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
                                  serverGame.getCurrentPlayer() == present,
@@ -319,9 +305,8 @@ public class LoginMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.game != null) this.game.toXML(xw);
     }
 
     /**
@@ -329,16 +314,17 @@ public class LoginMessage extends ObjectMessage {
      */
     @Override
     public Element toXMLElement() {
-        Player player = (this.game == null || this.userName == null) ? null
+        Player player = (this.game == null || getUserName() == null) ? null
             : getPlayer(this.game);
         DOMMessage ret = new DOMMessage(TAG,
-            USER_NAME_TAG, this.userName,
-            VERSION_TAG, this.version,
-            SINGLE_PLAYER_TAG, Boolean.toString(this.singlePlayer),
-            CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer))
+            USER_NAME_TAG, getUserName(),
+            VERSION_TAG, getVersion(),
+            SINGLE_PLAYER_TAG, Boolean.toString(getSinglePlayer()),
+            CURRENT_PLAYER_TAG, Boolean.toString(getCurrentPlayer()))
             .add(this.game, player);
-        if (this.state != null) {
-            ret.setStringAttribute(STATE_TAG, this.state.toString());
+        ServerState state = getState();
+        if (state != null) {
+            ret.setStringAttribute(STATE_TAG, state.toString());
         }
         return ret.toXMLElement();
     }
@@ -347,23 +333,24 @@ public class LoginMessage extends ObjectMessage {
     // Public interface
 
     public String getUserName() {
-        return this.userName;
+        return getStringAttribute(USER_NAME_TAG);
     }
 
     public String getVersion() {
-        return this.version;
+        return getStringAttribute(VERSION_TAG);
     }
 
     public ServerState getState() {
-        return this.state;
+        return getEnumAttribute(STATE_TAG, ServerState.class,
+                                (ServerState)null);
     }
 
     public boolean getSinglePlayer() {
-        return this.singlePlayer;
+        return getBooleanAttribute(SINGLE_PLAYER_TAG, false);
     }
 
     public boolean getCurrentPlayer() {
-        return this.currentPlayer;
+        return getBooleanAttribute(CURRENT_PLAYER_TAG, false);
     }
 
     public Game getGame() {
@@ -377,6 +364,6 @@ public class LoginMessage extends ObjectMessage {
      * @return The {@code ServerPlayer} found.
      */
     public ServerPlayer getPlayer(Game game) {
-        return (ServerPlayer)game.getPlayerByName(this.userName);
+        return (ServerPlayer)game.getPlayerByName(getUserName());
     }
 }
