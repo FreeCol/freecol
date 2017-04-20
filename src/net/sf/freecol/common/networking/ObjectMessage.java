@@ -21,9 +21,11 @@ package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -60,10 +62,12 @@ public class ObjectMessage extends AttributeMessage {
      * attributes and optional objects.
      *
      * @param type The message type.
-     * @param attributes A map of key,value pairs.
+     * @param attributes A list of key,value pairs.
      */
     public ObjectMessage(String type, String... attributes) {
         super(type, attributes);
+
+        this.objects.clear();
     }
 
     /**
@@ -76,6 +80,22 @@ public class ObjectMessage extends AttributeMessage {
         this(element.getTagName());
 
         this.objects.addAll(DOMUtils.getChildren(game, element));
+    }
+
+    /**
+     * Create a new {@code AttributeMessage} from a stream.
+     *
+     * @param type The message type.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param attributes The attributes to read.
+     * @exception XMLStreamException if the stream is corrupt.
+     * @exception FreeColException if the internal message can not be read.
+     */
+    protected ObjectMessage(String type, FreeColXMLReader xr,
+                            String... attributes) {
+        super(type, xr.getAttributeMap(attributes));
+
+        this.objects.clear();
     }
 
 
