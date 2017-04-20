@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -40,7 +42,7 @@ public class NewTradeRouteMessage extends ObjectMessage {
     public static final String TAG = "newTradeRoute";
 
     /** The new trade route. */
-    private TradeRoute tradeRoute;
+    private TradeRoute tradeRoute = null;
 
 
     /**
@@ -62,6 +64,34 @@ public class NewTradeRouteMessage extends ObjectMessage {
         this();
 
         this.tradeRoute = getChild(game, element, 0, true, TradeRoute.class);
+    }
+
+    /**
+     * Create a new {@code NewTradeRouteMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public NewTradeRouteMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        this();
+
+        this.tradeRoute = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (TradeRoute.TAG.equals(tag)) {
+                if (this.tradeRoute == null) {
+                    this.tradeRoute = xr.readFreeColObject(game, TradeRoute.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(TradeRoute.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
     }
 
 
@@ -93,9 +123,20 @@ public class NewTradeRouteMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final TradeRoute tr = getTradeRoute();
+
+        if (tr != null) igc(freeColClient).newTradeRouteHandler(tr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .newTradeRoute(serverPlayer);
     }
 
@@ -103,9 +144,8 @@ public class NewTradeRouteMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.tradeRoute != null) this.tradeRoute.toXML(xw);
     }
 
     /**

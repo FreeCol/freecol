@@ -4197,6 +4197,17 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Handle a new trade route.
+     *
+     * @param tr The {@code TradeRoute} to add.
+     */
+    public void newTradeRouteHandler(TradeRoute tr) {
+        final Player player = getMyPlayer();
+
+        player.addTradeRoute(tr);
+    }
+
+    /**
      * Switch to a new turn.
      *
      * @param turn The turn number.

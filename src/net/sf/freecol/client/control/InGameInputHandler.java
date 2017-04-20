@@ -205,7 +205,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new NewTurnMessage(getGame(), e).clientHandler(freeColClient));
         register(NewTradeRouteMessage.TAG,
             (Connection c, Element e) ->
-                newTradeRoute(new NewTradeRouteMessage(getGame(), e)));
+                new NewTradeRouteMessage(getGame(), e).clientHandler(freeColClient));
         register(ReconnectMessage.TAG,
             (Connection c, Element e) ->
                 TrivialMessage.reconnectMessage.clientHandler(freeColClient));
@@ -284,19 +284,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
     // Individual message handlers
 
-    /**
-     * Handle a "newTradeRoute"-message.
-     *
-     * @param message The {@code NewTradeRouteMessage} to process.
-     */
-    private void newTradeRoute(NewTradeRouteMessage message) {
-        final Game game = getGame();
-        final Player player = getMyPlayer();
-        final TradeRoute tr = message.getTradeRoute();
-
-        if (player != null && tr != null) player.addTradeRoute(tr);
-    }
-        
     /**
      * Handle a "spyResult" message.
      *
