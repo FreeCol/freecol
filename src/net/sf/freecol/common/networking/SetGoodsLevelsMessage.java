@@ -21,6 +21,7 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ExportData;
@@ -40,11 +41,8 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
     public static final String TAG = "setGoodsLevels";
     private static final String COLONY_TAG = "colony";
 
-    /** The identifier of the colony where the goods levels are set. */
-    private final String colonyId;
-
     /** The new ExportData. */
-    private final ExportData data;
+    private ExportData data = null;
 
 
     /**
@@ -55,9 +53,8 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
      * @param data The new {@code ExportData}.
      */
     public SetGoodsLevelsMessage(Colony colony, ExportData data) {
-        super(TAG);
+        super(TAG, COLONY_TAG, colony.getId());
 
-        this.colonyId = colony.getId();
         this.data = data;
     }
 
@@ -69,12 +66,38 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetGoodsLevelsMessage(Game game, Element element) {
-        super(TAG);
+        super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
 
-        this.colonyId = getStringAttribute(element, COLONY_TAG);
         this.data = getChild(game, element, 0, ExportData.class);
     }
 
+    /**
+     * Create a new {@code SetGoodsLevelsMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public SetGoodsLevelsMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, COLONY_TAG);
+
+        this.data = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (ExportData.TAG.equals(tag)) {
+                if (this.data == null) {
+                    this.data = xr.readFreeColObject(game, ExportData.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(ExportData.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
+    }
 
     /**
      * {@inheritDoc}
@@ -100,14 +123,14 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
                                    ServerPlayer serverPlayer) {
         Colony colony;
         try {
-            colony = serverPlayer.getOurFreeColGameObject(this.colonyId,
+            colony = serverPlayer.getOurFreeColGameObject(getStringAttribute(COLONY_TAG),
                                                           Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage());
         }
 
         // Proceed to set.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .setGoodsLevels(serverPlayer, colony, this.data);
     }
 
@@ -115,9 +138,8 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.data != null) this.data.toXML(xw);
     }
 
     /**
@@ -128,7 +150,7 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(TAG,
-            COLONY_TAG, this.colonyId)
-            .add(data).toXMLElement();
+            COLONY_TAG, getStringAttribute(COLONY_TAG))
+            .add(this.data).toXMLElement();
     }
 }
