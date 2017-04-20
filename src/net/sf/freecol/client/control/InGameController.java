@@ -2369,27 +2369,29 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Animate an attack.
      *
-     * Called from IGIH.animateAttack.
-     *
      * @param attacker The attacking {@code Unit}.
      * @param defender The defending {@code Unit}.
      * @param attackerTile The {@code Tile} the attack originates from.
      * @param defenderTile The {@code Tile} the defence takes place on.
      * @param success True if the attack succeeds.
      */
-    public void animateAttack(Unit attacker, Unit defender,
-                              Tile attackerTile, Tile defenderTile,
-                              boolean success) {
+    public void animateAttackHandler(Unit attacker, Unit defender,
+                                     Tile attackerTile, Tile defenderTile,
+                                     boolean success) {
         // Note: we used to focus the map on the unit even when
         // animation is off as long as the center-active-unit option
         // was set.  However IR#115 requested that if animation is off
         // that we display nothing so as to speed up the other player
         // moves as much as possible.
-        if (getFreeColClient().getAnimationSpeed(attacker.getOwner()) > 0) {
-            getGUI().animateUnitAttack(attacker, defender,
-                                  attackerTile, defenderTile, success);
-        }
-        getGUI().refresh();
+        final FreeColClient fcc = getFreeColClient();
+        invokeAndWait(() -> {
+                if (fcc.getAnimationSpeed(attacker.getOwner()) > 0) {
+                    getGUI().animateUnitAttack(attacker, defender,
+                                               attackerTile, defenderTile,
+                                               success);
+                }
+                getGUI().refresh();
+            });
     }
 
     /**

@@ -136,7 +136,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new AddPlayerMessage(getGame(), e).clientHandler(freeColClient));
         register(AnimateAttackMessage.TAG,
             (Connection c, Element e) ->
-                animateAttack(new AnimateAttackMessage(getGame(), e)));
+                new AnimateAttackMessage(getGame(), e).clientHandler(freeColClient));
         register(AnimateMoveMessage.TAG,
             (Connection c, Element e) ->
                 animateMove(new AnimateMoveMessage(getGame(), e)));
@@ -283,44 +283,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
 
     // Individual message handlers
-
-    /**
-     * Handle an "animateAttack"-message.
-     *
-     * @param message The {@code AnimateAttackMessage} to process.
-     */
-    private void animateAttack(AnimateAttackMessage message) {
-        final Game game = getGame();
-        final Player player = getMyPlayer();
-        final Unit attacker = message.getAttacker(game);
-        final Unit defender = message.getDefender(game);
-        final Tile attackerTile = message.getAttackerTile(game);
-        final Tile defenderTile = message.getDefenderTile(game);
-        final boolean result = message.getResult();
-
-        if (attacker == null) {
-            logger.warning("Attack animation for: " + player.getId()
-                + " missing attacker.");
-        }
-        if (defender == null) {
-            logger.warning("Attack animation for: " + player.getId()
-                + " omitted defender.");
-        }
-        if (attackerTile == null) {
-            logger.warning("Attack animation for: " + player.getId()
-                + " omitted attacker tile.");
-        }
-        if (defenderTile == null) {
-            logger.warning("Attack animation for: " + player.getId()
-                + " omitted defender tile.");
-        }
-
-        // This only performs animation, if required.  It does not
-        // actually perform an attack.
-        invokeAndWait(() ->
-            igc().animateAttack(attacker, defender,
-                                attackerTile, defenderTile, result));
-    }
 
     /**
      * Handle an "animateMove"-message.
@@ -541,6 +503,24 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (player != null && tr != null) player.addTradeRoute(tr);
     }
         
+    /**
+     * Handle a "newTurn"-message.
+     *
+     * @param message The {@code NewTurnMessage} to process.
+     */
+    private void newTurn(NewTurnMessage message) {
+        final Game game = getGame();
+        final int n = message.getTurnNumber();
+
+        if (n < 0) {
+            logger.warning("Invalid turn for newTurn");
+            return;
+        }
+
+        invokeLater(() ->
+            igc().newTurn(n));
+    }
+
     /**
      * Handle a "spyResult" message.
      *

@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Direction;
@@ -105,6 +107,37 @@ public class AnimateAttackMessage extends ObjectMessage {
         this.defender = getChild(game, element, 1, true, Unit.class);
     }
 
+    /**
+     * Create a new {@code AnimateAttackMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public AnimateAttackMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, ATTACKER_TAG, ATTACKER_TILE_TAG,
+              DEFENDER_TAG, DEFENDER_TILE_TAG, SUCCESS_TAG);
+
+        this.attacker = this.defender = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (Unit.TAG.equals(tag)) {
+                if (this.attacker == null) {
+                    this.attacker = xr.readFreeColObject(game, Unit.class);
+                } else if (this.defender == null) {
+                    this.defender = xr.readFreeColObject(game, Unit.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(Unit.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -126,6 +159,43 @@ public class AnimateAttackMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = freeColClient.getMyPlayer();
+        final Unit attacker = getAttacker(game);
+        final Unit defender = getDefender(game);
+        final Tile attackerTile = getAttackerTile(game);
+        final Tile defenderTile = getDefenderTile(game);
+        final boolean result = getResult();
+
+        if (attacker == null) {
+            logger.warning("Attack animation for: " + player.getId()
+                + " missing attacker.");
+        }
+        if (defender == null) {
+            logger.warning("Attack animation for: " + player.getId()
+                + " omitted defender.");
+        }
+        if (attackerTile == null) {
+            logger.warning("Attack animation for: " + player.getId()
+                + " omitted attacker tile.");
+        }
+        if (defenderTile == null) {
+            logger.warning("Attack animation for: " + player.getId()
+                + " omitted defender tile.");
+        }
+
+        // This only performs animation, if required.  It does not
+        // actually perform an attack.
+        igc(freeColClient)
+            .animateAttackHandler(attacker, defender,
+                                  attackerTile, defenderTile, result);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         return null; // Only sent to client
@@ -135,9 +205,9 @@ public class AnimateAttackMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.attacker != null) this.attacker.toXML(xw);
+        if (this.defender != null) this.defender.toXML(xw);
     }
 
     /**
