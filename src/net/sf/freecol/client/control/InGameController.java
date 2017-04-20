@@ -272,6 +272,15 @@ public final class InGameController extends FreeColClientHolder {
         getFreeColClient().getGUI().invokeNowOrLater(runnable);
     }
 
+    /**
+     * GUI delegator.
+     *
+     * @param runnable The {@code Runnable} to run.
+     */
+    private void invokeAndWait(Runnable runnable) {
+        getFreeColClient().getGUI().invokeNowOrWait(runnable);
+    }
+
 
     // Server access routines called from multiple places.
 
