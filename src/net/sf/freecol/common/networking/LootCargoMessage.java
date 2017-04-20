@@ -24,6 +24,8 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -46,14 +48,8 @@ public class LootCargoMessage extends ObjectMessage {
     private static final String LOSER_TAG = "loser";
     private static final String WINNER_TAG = "winner";
 
-    /** The object identifier of the unit that is looting. */
-    private final String winnerId;
-
-    /** The object identifier of the unit that is looted. */
-    private final String loserId;
-
     /** The goods to be looted. */
-    private final List<Goods> goods;
+    private List<Goods> goods = new ArrayList<>();
 
 
     /**
@@ -64,11 +60,9 @@ public class LootCargoMessage extends ObjectMessage {
      * @param goods The {@code AbstractGoods} to loot.
      */
     public LootCargoMessage(Unit winner, String loserId, List<Goods> goods) {
-        super(TAG);
+        super(TAG, WINNER_TAG, winner.getId(), LOSER_TAG, loserId);
 
-        this.winnerId = winner.getId();
-        this.loserId = loserId;
-        this.goods = (goods == null) ? null : new ArrayList<>(goods);
+        this.goods.clear();
     }
 
     /**
@@ -79,11 +73,39 @@ public class LootCargoMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public LootCargoMessage(Game game, Element element) {
-        super(TAG);
+        super(TAG, WINNER_TAG, getStringAttribute(element, WINNER_TAG),
+              LOSER_TAG, getStringAttribute(element, LOSER_TAG));
 
-        this.winnerId = getStringAttribute(element, WINNER_TAG);
-        this.loserId = getStringAttribute(element, LOSER_TAG);
-        this.goods = DOMUtils.getChildren(game, element, Goods.class);
+        this.goods.addAll(DOMUtils.getChildren(game, element, Goods.class));
+    }
+
+    /**
+     * Create a new {@code LootCargoMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public LootCargoMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, WINNER_TAG, LOSER_TAG);
+
+        this.goods.clear();
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (Goods.TAG.equals(tag)) {
+                if (this.goods == null) {
+                    Goods g = xr.readFreeColObject(game, Goods.class);
+                    if (g != null) this.goods.add(g);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(Goods.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
     }
 
 
@@ -101,11 +123,26 @@ public class LootCargoMessage extends ObjectMessage {
     @Override
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
         final Game game = freeColServer.getGame();
-        final Unit unit = getUnit(game);
+        final Unit winner = getWinner(game);
         final List<Goods> initialGoods = getGoods();
-        final String defenderId = getDefenderId();
+        final String loserId = getLoserId();
 
-        aiPlayer.lootCargoHandler(unit, initialGoods, defenderId);
+        aiPlayer.lootCargoHandler(winner, initialGoods, loserId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Unit unit = getWinner(game);
+        final String loserId = getLoserId();
+        final List<Goods> goods = getGoods();
+
+        if (unit == null || goods == null) return;
+
+        igc(freeColClient).lootCargoHandler(unit, goods, loserId);
     }
 
     /**
@@ -118,26 +155,25 @@ public class LootCargoMessage extends ObjectMessage {
 
         Unit winner;
         try {
-            winner = getUnit(game);
+            winner = getWinner(game);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage());
         }
-        // Do not check loserId, as it might have sunk.  It is enough
-        // that the attacker knows it.  Similarly the server is better
-        // placed to check the goods validity.
+        // Do not check the defender identifier, as it might have
+        // sunk.  It is enough that the attacker knows it.  Similarly
+        // the server is better placed to check the goods validity.
 
         // Try to loot.
         return igc(freeColServer)
-            .lootCargo(serverPlayer, winner, this.loserId, goods);
+            .lootCargo(serverPlayer, winner, getLoserId(), getGoods());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        for (Goods g : this.goods) g.toXML(xw);
     }
 
     /**
@@ -148,9 +184,9 @@ public class LootCargoMessage extends ObjectMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(TAG,
-            WINNER_TAG, this.winnerId,
-            LOSER_TAG, this.loserId)
-            .add(this.goods).toXMLElement();
+            WINNER_TAG, getStringAttribute(WINNER_TAG),
+            LOSER_TAG, getLoserId())
+            .add(getGoods()).toXMLElement();
     }
 
     // Public interface
@@ -161,17 +197,18 @@ public class LootCargoMessage extends ObjectMessage {
      * @param game The {@code Game} to look for the unit in.
      * @return The winner unit.
      */
-    public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(winnerId, Unit.class);
+    public Unit getWinner(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(WINNER_TAG),
+                                         Unit.class);
     }
 
     /**
      * Public accessor to help the client in game controller.
      *
-     * @return The defender Object Identifier.
+     * @return The loser unit object Identifier.
      */
-    public String getDefenderId() {
-        return loserId;
+    public String getLoserId() {
+        return getStringAttribute(LOSER_TAG);
     }
 
     /**
@@ -180,6 +217,6 @@ public class LootCargoMessage extends ObjectMessage {
      * @return The goods to loot.
      */
     public List<Goods> getGoods() {
-        return goods;
+        return this.goods;
     }
 }

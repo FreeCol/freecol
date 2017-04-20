@@ -151,7 +151,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 TrivialMessage.closeMenusMessage.clientHandler(freeColClient));
         register(DiplomacyMessage.TAG,
             (Connection c, Element e) ->
-                diplomacy(new DiplomacyMessage(getGame(), e)));
+                new DiplomacyMessage(getGame(), e).clientHandler(freeColClient));
         register(DisconnectMessage.TAG,
             (Connection c, Element e) ->
                 TrivialMessage.disconnectMessage.clientHandler(freeColClient));
@@ -184,7 +184,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new LogoutMessage(getGame(), e).clientHandler(freeColClient));
         register(LootCargoMessage.TAG,
             (Connection c, Element e) ->
-                lootCargo(new LootCargoMessage(getGame(), e)));
+                new LootCargoMessage(getGame(), e).clientHandler(freeColClient));
         register(MonarchActionMessage.TAG,
             (Connection c, Element e) ->
                 monarchAction(new MonarchActionMessage(getGame(), e)));
@@ -283,122 +283,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
 
     // Individual message handlers
-
-    /**
-     * Handle a "diplomacy"-message.
-     *
-     * @param message The {@code DiplomacyMessage} to process.
-     */
-    private void diplomacy(DiplomacyMessage message) {
-        final Game game = getGame();
-        final DiplomaticTrade agreement = message.getAgreement();
-        final FreeColGameObject our = message.getOurFCGO(game);
-        final FreeColGameObject other = message.getOtherFCGO(game);
-
-        if (our == null) {
-            logger.warning("Our FCGO omitted from diplomacy message.");
-            return;
-        }
-        if (other == null) {
-            logger.warning("Other FCGO omitted from diplomacy message.");
-            return;
-        }
-
-        invokeLater(() ->
-            igc().diplomacy(our, other, agreement));
-    }
-
-    /**
-     * Handle an "error"-message.
-     *
-     * @param message The {@code ErrorMessage} to process.
-     */
-    private void error(ErrorMessage message) {
-        invokeLater(() ->
-            igc().error(message.getTemplate(), message.getMessage()));
-    }
-
-    /**
-     * Handle a "featureChange"-message.
-     *
-     * @param message The {@code FeatureChangeMessage} to process.
-     */
-    private void featureChange(FeatureChangeMessage message) {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-        final FreeColGameObject parent = message.getParent(game);
-        final List<FreeColObject> children = message.getChildren();
-        final boolean add = message.getAdd();
-
-        if (parent == null) {
-            logger.warning("featureChange with null parent.");
-            return;
-        }
-        if (children.isEmpty()) {
-            logger.warning("featureChange with no children.");
-            return;
-        }
-
-        // Add or remove a feature from a FreeColGameObject
-        for (FreeColObject fco : children) {
-            if (fco instanceof Ability) {
-                if (add) {
-                    parent.addAbility((Ability)fco);
-                } else {
-                    parent.removeAbility((Ability)fco);
-                }
-            } else if (fco instanceof Modifier) {
-                if (add) {
-                    parent.addModifier((Modifier)fco);
-                } else {
-                    parent.removeModifier((Modifier)fco);
-                }
-            } else if (fco instanceof HistoryEvent) {
-                if (parent instanceof Player && add) {
-                    Player player = (Player)parent;
-                    player.addHistory((HistoryEvent)fco);
-                } else {
-                    logger.warning("Feature change NYI: "
-                        + parent + "/" + add + "/" + fco);
-                }
-            } else if (fco instanceof LastSale) {
-                if (parent instanceof Player && add) {
-                    Player player = (Player)parent;
-                    player.addLastSale((LastSale)fco);
-                } else {
-                    logger.warning("Feature change NYI: "
-                        + parent + "/" + add + "/" + fco);
-                }
-            } else if (fco instanceof ModelMessage) {
-                if (parent instanceof Player && add) {
-                    Player player = (Player)parent;
-                    player.addModelMessage((ModelMessage)fco);
-                } else {
-                    logger.warning("Feature change NYI: "
-                        + parent + "/" + add + "/" + fco);
-                }
-            } else {        
-                logger.warning("featureChange unrecognized: " + fco);
-            }
-        }
-    }
-
-    /**
-     * Handle a "lootCargo"-message.
-     *
-     * @param message The {@code LootCargoMessage} to process.
-     */
-    private void lootCargo(LootCargoMessage message) {
-        final Game game = getGame();
-        final Unit unit = message.getUnit(game);
-        final String defenderId = message.getDefenderId();
-        final List<Goods> goods = message.getGoods();
-
-        if (unit == null || goods == null) return;
-
-        invokeLater(() ->
-            igc().loot(unit, goods, defenderId));
-    }
 
     /**
      * Handle a "monarchAction"-message.

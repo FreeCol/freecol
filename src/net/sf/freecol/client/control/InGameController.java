@@ -3706,15 +3706,14 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Loot some cargo.
      *
-     * Called from IGIH.lootCargo.
-     *
      * @param unit The {@code Unit} that is looting.
      * @param goods A list of {@code Goods} to choose from.
-     * @param defenderId The identifier of the defender unit (may have sunk).
+     * @param loserId The identifier of the defender unit (may have sunk).
      */
-    public void loot(Unit unit, List<Goods> goods, String defenderId) {
-        getGUI().showCaptureGoodsDialog(unit, goods,
-            (List<Goods> gl) -> lootCargo(unit, gl, defenderId));
+    public void lootCargoHandler(Unit unit, List<Goods> goods, String loserId) {
+        invokeLater(() ->
+            getGUI().showCaptureGoodsDialog(unit, goods,
+                (List<Goods> gl) -> lootCargo(unit, gl, loserId)));
     }
 
     /**
