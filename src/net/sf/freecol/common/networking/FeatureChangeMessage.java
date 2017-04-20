@@ -24,10 +24,17 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.LastSale;
+import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -79,6 +86,40 @@ public class FeatureChangeMessage extends ObjectMessage {
         this.fcos.addAll(DOMUtils.getChildren(game, element));
     }
 
+    /**
+     * Create a new {@code FeatureChangeMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public FeatureChangeMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, ID_TAG, ADD_TAG);
+
+        this.fcos.clear();
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            FreeColObject fco = null;
+            if (Ability.TAG.equals(tag)) {
+                fco = xr.readFreeColObject(game, Ability.class);
+            } else if (Modifier.TAG.equals(tag)) {
+                fco = xr.readFreeColObject(game, Modifier.class);
+            } else if (HistoryEvent.TAG.equals(tag)) {
+                fco = xr.readFreeColObject(game, HistoryEvent.class);
+            } else if (LastSale.TAG.equals(tag)) {
+                fco = xr.readFreeColObject(game, LastSale.class);
+            } else if (ModelMessage.TAG.equals(tag)) {
+                fco = xr.readFreeColObject(game, ModelMessage.class);
+            } else {
+                expected("Feature", tag);
+            }
+            this.fcos.add(fco);
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -94,6 +135,28 @@ public class FeatureChangeMessage extends ObjectMessage {
     @Override
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
         // Ignored
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final FreeColGameObject parent = getParent(game);
+        final List<FreeColObject> children = getChildren();
+        final boolean add = getAdd();
+
+        if (parent == null) {
+            logger.warning("featureChange with null parent.");
+            return;
+        }
+        if (children.isEmpty()) {
+            logger.warning("featureChange with no children.");
+            return;
+        }
+
+        igc(freeColClient).featureChangeHandler(parent, children, add);
     }
 
     /**

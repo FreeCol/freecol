@@ -160,7 +160,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new ErrorMessage(getGame(), e).clientHandler(freeColClient));
         register(FeatureChangeMessage.TAG,
             (Connection c, Element e) ->
-                featureChange(new FeatureChangeMessage(getGame(), e)));
+                new FeatureChangeMessage(getGame(), e).clientHandler(freeColClient));
         register(FirstContactMessage.TAG,
             (Connection c, Element e) ->
                 new FirstContactMessage(getGame(), e).clientHandler(freeColClient));
@@ -306,6 +306,16 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         invokeLater(() ->
             igc().diplomacy(our, other, agreement));
+    }
+
+    /**
+     * Handle an "error"-message.
+     *
+     * @param message The {@code ErrorMessage} to process.
+     */
+    private void error(ErrorMessage message) {
+        invokeLater(() ->
+            igc().error(message.getTemplate(), message.getMessage()));
     }
 
     /**

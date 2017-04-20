@@ -64,7 +64,9 @@ import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
@@ -73,6 +75,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.MarketWas;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.NationSummary;
@@ -3226,6 +3229,58 @@ public final class InGameController extends FreeColClientHolder {
         if (!requireOurTurn()) return false;
 
         return doExecuteGotoOrders();
+    }
+
+    /**
+     * Handle feature changes.
+     *
+     * @param parent The parent {@code FreeColGameObject} to add to.
+     * @param children The child {@code FreeColObject}s that change.
+     * @param add If true, add the child, otherwise remove it.
+     */
+    public void featureChangeHandler(FreeColGameObject parent,
+                                     List<FreeColObject> children, boolean add) {
+        for (FreeColObject fco : children) {
+            if (fco instanceof Ability) {
+                if (add) {
+                    parent.addAbility((Ability)fco);
+                } else {
+                    parent.removeAbility((Ability)fco);
+                }
+            } else if (fco instanceof Modifier) {
+                if (add) {
+                    parent.addModifier((Modifier)fco);
+                } else {
+                    parent.removeModifier((Modifier)fco);
+                }
+            } else if (fco instanceof HistoryEvent) {
+                if (parent instanceof Player && add) {
+                    Player player = (Player)parent;
+                    player.addHistory((HistoryEvent)fco);
+                } else {
+                    logger.warning("Feature change NYI: "
+                        + parent + "/" + add + "/" + fco);
+                }
+            } else if (fco instanceof LastSale) {
+                if (parent instanceof Player && add) {
+                    Player player = (Player)parent;
+                    player.addLastSale((LastSale)fco);
+                } else {
+                    logger.warning("Feature change NYI: "
+                        + parent + "/" + add + "/" + fco);
+                }
+            } else if (fco instanceof ModelMessage) {
+                if (parent instanceof Player && add) {
+                    Player player = (Player)parent;
+                    player.addModelMessage((ModelMessage)fco);
+                } else {
+                    logger.warning("Feature change NYI: "
+                        + parent + "/" + add + "/" + fco);
+                }
+            } else {        
+                logger.warning("featureChange unrecognized: " + fco);
+            }
+        }
     }
 
     /**
