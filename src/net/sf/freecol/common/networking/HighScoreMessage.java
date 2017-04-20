@@ -24,6 +24,8 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighScore;
@@ -42,9 +44,6 @@ public class HighScoreMessage extends ObjectMessage {
     public static final String TAG = "highScore";
     private static final String KEY_TAG = "key";
 
-    /** An optional key for the final display. */
-    private final String key;
-
     /** The high scores. */
     private final List<HighScore> scores = new ArrayList<>();
     
@@ -56,9 +55,8 @@ public class HighScoreMessage extends ObjectMessage {
      * @param key A message key for the final display.
      */
     public HighScoreMessage(String key) {
-        super(TAG);
+        super(TAG, KEY_TAG, key);
 
-        this.key = key;
         this.scores.clear();
     }
 
@@ -74,6 +72,31 @@ public class HighScoreMessage extends ObjectMessage {
         setScores(DOMUtils.getChildren(game, element, HighScore.class));
     }
 
+    /**
+     * Create a new {@code HighScoreMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public HighScoreMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, KEY_TAG);
+
+        this.scores.clear();
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (HighScore.TAG.equals(tag)) {
+                HighScore hs = xr.readFreeColObject(game, HighScore.class);
+                if (hs != null) this.scores.add(hs);
+            } else {
+                expected(HighScore.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -83,7 +106,48 @@ public class HighScoreMessage extends ObjectMessage {
         return Message.MessagePriority.NORMAL;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final String key = getKey();
+        final List<HighScore> scores = getScores();
 
+        igc(freeColClient).highScoreHandler(key, scores);
+    }
+        
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return igc(freeColServer)
+            .getHighScores(serverPlayer, getKey());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        for (HighScore hs : this.scores) hs.toXML(xw);
+    }
+
+    /**
+     * Convert this HighScoreMessage to XML.
+     *
+     * @return The XML representation of this message.
+     */
+    @Override
+    public Element toXMLElement() {
+        return new DOMMessage(TAG,
+            KEY_TAG, getKey())
+            .add(this.scores).toXMLElement();
+    }
+
+    
     // Public interface
 
     /**
@@ -92,7 +156,7 @@ public class HighScoreMessage extends ObjectMessage {
      * @return The key.
      */
     public String getKey() {
-        return this.key;
+        return getStringAttribute(KEY_TAG);
     }
 
     /**
@@ -114,36 +178,5 @@ public class HighScoreMessage extends ObjectMessage {
         this.scores.clear();
         this.scores.addAll(scores);
         return this;
-    }
-
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        return freeColServer.getInGameController()
-            .getHighScores(serverPlayer, this.key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
-    }
-
-    /**
-     * Convert this HighScoreMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            KEY_TAG, this.key).add(this.scores).toXMLElement();
     }
 }

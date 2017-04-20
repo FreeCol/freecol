@@ -172,7 +172,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new GameEndedMessage(getGame(), e).clientHandler(freeColClient));
         register(HighScoreMessage.TAG,
             (Connection c, Element e) ->
-                highScore(new HighScoreMessage(getGame(), e)));
+                new HighScoreMessage(getGame(), e).clientHandler(freeColClient));
         register(InciteMessage.TAG,
             (Connection c, Element e) ->
                 new InciteMessage(getGame(), e).clientHandler(freeColClient));
@@ -383,18 +383,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         }
     }
 
-    /**
-     * Handle a "highScore"-message.
-     *
-     * @param message The {@code HighScoreMessage} to process.
-     */
-    private void highScore(HighScoreMessage message) {
-        final Game game = getGame();
-
-        invokeLater(() ->
-            igc().displayHighScores(message.getKey(), message.getScores()));
-    }
-        
     /**
      * Handle a "lootCargo"-message.
      *

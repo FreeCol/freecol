@@ -3060,32 +3060,6 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * Display the high scores.
-     *
-     * Called from IGIH.gameEnded, ReportHighScoresAction
-     *
-     * @param high A {@code Boolean} whose values indicates whether
-     *     a new high score has been achieved, or no information if null.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean displayHighScores(Boolean high) {
-        return askServer().getHighScores((high == null) ? null
-            : ((high) ? "highscores.yes" : "highscores.no"));
-    }
-
-    /**
-     * Display the high scores.
-     *
-     * Called from IGIH.highScore.
-     *
-     * @param key An optional message key.
-     * @param scores The list of {@code HighScore} records to display.
-     */
-    public void displayHighScores(String key, List<HighScore> scores) {
-        getGUI().showHighScoresPanel(key, scores);
-    }
-
-    /**
      * Displays pending {@code ModelMessage}s.
      *
      * Called from IGIH.displayModelMessagesRunnable
@@ -3385,6 +3359,31 @@ public final class InGameController extends FreeColClientHolder {
             updateGUI(null);
         }
         return ret;
+    }
+
+    /**
+     * Display the high scores.
+     *
+     * Called from IGIH.gameEnded, ReportHighScoresAction
+     *
+     * @param high A {@code Boolean} whose values indicates whether
+     *     a new high score has been achieved, or no information if null.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean highScore(Boolean high) {
+        return askServer().getHighScores((high == null) ? null
+            : ((high) ? "highscores.yes" : "highscores.no"));
+    }
+
+    /**
+     * Display the high scores.
+     *
+     * @param key An optional message key.
+     * @param scores The list of {@code HighScore} records to display.
+     */
+    public void highScoreHandler(String key, List<HighScore> scores) {
+        invokeLater(() ->
+            getGUI().showHighScoresPanel(key, scores));
     }
 
     /**
@@ -5003,7 +5002,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param score If "true", a new high score was reached.
      */
     public void victory(String score) {
-        displayHighScores("true".equalsIgnoreCase(score));
+        highScore("true".equalsIgnoreCase(score));
         getGUI().showVictoryDialog((Boolean result) -> victory(result));
     }
 
