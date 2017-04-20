@@ -3196,13 +3196,22 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Display an error.
      *
-     * Called from IGIH.error.
-     *
      * @param template A {@code StringTemplate} to display.
      * @param message An extra non-i18n message to display if debugging.
      */
     public void error(StringTemplate template, String message) {
         getGUI().showErrorMessage(template, message);
+    }
+
+    /**
+     * Handle an error.
+     *
+     * @param template A {@code StringTemplate} to display.
+     * @param message An extra non-i18n message to display if debugging.
+     */
+    public void errorHandler(StringTemplate template, String message) {
+        invokeLater(() ->
+            error(template, message));
     }
 
     /**

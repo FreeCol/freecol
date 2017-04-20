@@ -22,6 +22,8 @@ package net.sf.freecol.common.networking;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -42,10 +44,7 @@ public class ErrorMessage extends ObjectMessage {
     private static final String MESSAGE_TAG = "message";
 
     /** A template to present to the client. */
-    private StringTemplate template;
-
-    /** An optional detailed but non-i18n message for logging/debugging. */
-    private String message;
+    private StringTemplate template = null;
 
 
     /**
@@ -56,10 +55,9 @@ public class ErrorMessage extends ObjectMessage {
      * @param message An optional non-i18n message.
      */
     public ErrorMessage(StringTemplate template, String message) {
-        super(TAG);
+        super(TAG, MESSAGE_TAG, message);
 
         this.template = template;
-        this.message = message;
     }
 
     /**
@@ -68,7 +66,9 @@ public class ErrorMessage extends ObjectMessage {
      * @param template The {@code StringTemplate} to send.
      */
     public ErrorMessage(StringTemplate template) {
-        this(template, null);
+        super(TAG);
+
+        this.template = template;
     }
 
     /**
@@ -112,12 +112,38 @@ public class ErrorMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ErrorMessage(Game game, Element element) {
-        super(TAG);
+        super(TAG, MESSAGE_TAG, element.getAttribute(MESSAGE_TAG));
 
-        this.message = element.getAttribute(MESSAGE_TAG);
         this.template = getChild(game, element, 0, StringTemplate.class);
     }
 
+    /**
+     * Create a new {@code ErrorMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public ErrorMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, MESSAGE_TAG);
+
+        this.template = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (StringTemplate.TAG.equals(tag)) {
+                if (this.template == null) {
+                    this.template = xr.readFreeColObject(game, StringTemplate.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(StringTemplate.TAG, tag);
+            }
+        }
+        xr.expectTag(TAG);
+    }
+    
 
     /**
      * {@inheritDoc}
@@ -139,9 +165,19 @@ public class ErrorMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void clientHandler(FreeColClient freeColClient) {
+        final StringTemplate template = getTemplate();
+        final String message = getMessage();
+        
+        igc(freeColClient).errorHandler(template, message);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.template != null) this.template.toXML(xw);
     }
 
     /**
@@ -152,7 +188,7 @@ public class ErrorMessage extends ObjectMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(TAG,
-            MESSAGE_TAG, this.message)
+            MESSAGE_TAG, getMessage())
             .add(this.template).toXMLElement();
     }
 
@@ -183,6 +219,6 @@ public class ErrorMessage extends ObjectMessage {
      * @return The message.
      */
     public String getMessage() {
-        return this.message;
+        return getStringAttribute(MESSAGE_TAG);
     }
 }
