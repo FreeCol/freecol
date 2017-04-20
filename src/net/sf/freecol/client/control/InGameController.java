@@ -1258,7 +1258,7 @@ public final class InGameController extends FreeColClientHolder {
         case SETTLEMENT_TRIBUTE:
             int amount = (settlement instanceof Colony)
                 ? getGUI().confirmEuropeanTribute(unit, (Colony)settlement,
-                    getNationSummary(settlement.getOwner()))
+                    nationSummary(settlement.getOwner()))
                 : (settlement instanceof IndianSettlement)
                 ? getGUI().confirmNativeTribute(unit, (IndianSettlement)settlement)
                 : -1;
@@ -3315,28 +3315,6 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * Get the nation summary for a player.
-     *
-     * Called from DiplomaticTradePanel, ReportForeignAffairsPanel,
-     * ReportIndianPanel
-     *
-     * @param player The {@code Player} to summarize.
-     * @return A summary of that nation, or null on error.
-     */
-    public NationSummary getNationSummary(Player player) {
-        if (player == null) return null;
-
-        final Player myPlayer = getMyPlayer();
-        NationSummary ns = myPlayer.getNationSummary(player);
-        if (ns != null) return ns;
-        // Refresh from server
-        if (askServer().nationSummary(myPlayer, player)) {
-            return myPlayer.getNationSummary(player);
-        }
-        return null;
-    }
-
-    /**
      * Go to a tile.
      *
      * Called from CanvasMouseListener, TilePopup
@@ -3887,6 +3865,41 @@ public final class InGameController extends FreeColClientHolder {
         if (tile == null || unit == null || region == null) return false;
 
         return askServer().newRegionName(region, tile, unit, name);
+    }
+
+    /**
+     * Get the nation summary for a player.
+     *
+     * Called from DiplomaticTradePanel, ReportForeignAffairsPanel,
+     * ReportIndianPanel
+     *
+     * @param player The {@code Player} to summarize.
+     * @return A summary of that nation, or null on error.
+     */
+    public NationSummary nationSummary(Player player) {
+        if (player == null) return null;
+
+        final Player myPlayer = getMyPlayer();
+        NationSummary ns = myPlayer.getNationSummary(player);
+        if (ns != null) return ns;
+        // Refresh from server
+        if (askServer().nationSummary(myPlayer, player)) {
+            return myPlayer.getNationSummary(player);
+        }
+        return null;
+    }
+
+    /**
+     * Handle a nation summary update.
+     *
+     * @param other The {@code Player} to update.
+     * @param ns The {@code NationSummary} for the other player.
+     */
+    public void nationSummaryHandler(Player other, NationSummary ns) {
+        final Player player = getMyPlayer();
+        player.putNationSummary(other, ns);
+        logger.info("Updated nation summary of " + other.getSuffix()
+            + " for " + player.getSuffix() + " with " + ns);
     }
 
     /**

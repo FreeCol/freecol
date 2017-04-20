@@ -190,7 +190,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new MonarchActionMessage(getGame(), e).clientHandler(freeColClient));
         register(NationSummaryMessage.TAG,
             (Connection c, Element e) ->
-                nationSummary(new NationSummaryMessage(getGame(), e)));
+                new NationSummaryMessage(getGame(), e).clientHandler(freeColClient));
         register(NativeTradeMessage.TAG,
             (Connection c, Element e) ->
                 new NativeTradeMessage(getGame(), e).clientHandler(freeColClient));
@@ -283,22 +283,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
 
     // Individual message handlers
-
-    /**
-     * Handle a "nationSummary"-message.
-     *
-     * @param message The {@code NationSummaryMessage} to process.
-     */
-    private void nationSummary(NationSummaryMessage message) {
-        final Game game = getGame();
-        final Player player = getMyPlayer();
-        final Player other = message.getPlayer(game);
-        final NationSummary ns = message.getNationSummary();
-
-        player.putNationSummary(other, ns);
-        logger.info("Updated nation summary of " + other.getSuffix()
-            + " for " + player.getSuffix() + " with " + ns);
-    }
 
     /**
      * Handle a "newTradeRoute"-message.

@@ -80,7 +80,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
 
         int n;
         for (Player enemy : getGame().getLiveEuropeanPlayerList()) {
-            NationSummary ns = igc().getNationSummary(enemy);
+            NationSummary ns = igc().nationSummary(enemy);
             if (ns == null) continue;
 
             JPanel enemyPanel = new MigPanel(new MigLayout("gapy 0",

@@ -875,7 +875,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                 .addStringTemplate("%otherNation%", otherNation);
         this.exchangeMessage = Messages.message("negotiationDialog.exchange");
 
-        NationSummary ns = igc().getNationSummary(otherPlayer);
+        NationSummary ns = igc().nationSummary(otherPlayer);
         int gold = (ns == null
                 || ns.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
                 : ns.getGold();

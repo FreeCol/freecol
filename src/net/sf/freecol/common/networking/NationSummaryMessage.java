@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationSummary;
@@ -40,11 +42,8 @@ public class NationSummaryMessage extends ObjectMessage {
     public static final String TAG = "nationSummary";
     private static final String PLAYER_TAG = "player";
 
-    /** The identifier of the player to summarize. */
-    private final String playerId;
-
     /** The summary. */
-    private NationSummary summary;
+    private NationSummary summary = null;
 
 
     /**
@@ -54,9 +53,8 @@ public class NationSummaryMessage extends ObjectMessage {
      * @param player The {@code Player} to summarize.
      */
     public NationSummaryMessage(Player player) {
-        super(TAG);
+        super(TAG, PLAYER_TAG, player.getId());
 
-        this.playerId = player.getId();
         this.summary = null;
     }
 
@@ -68,10 +66,37 @@ public class NationSummaryMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NationSummaryMessage(Game game, Element element) {
-        super(TAG);
-
-        this.playerId = getStringAttribute(element, PLAYER_TAG);
+        super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG));
+        
         this.summary = getChild(game, element, 0, NationSummary.class);
+    }
+
+    /**
+     * Create a new {@code NationSummaryMessage} from a stream.
+     *
+     * @param game The {@code Game} containing the nation to summarize.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public NationSummaryMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, PLAYER_TAG);
+
+        this.summary = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (NationSummary.TAG.equals(tag)) {
+                if (this.summary == null) {
+                    this.summary = xr.readFreeColObject(game, NationSummary.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(NationSummary.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
     }
 
 
@@ -98,18 +123,31 @@ public class NationSummaryMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player other = getPlayer(game);
+        final NationSummary ns = getNationSummary();
+
+        igc(freeColClient).nationSummaryHandler(other, ns);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
 
         Player player = getPlayer(game);
         if (player == null) {
-            return serverPlayer.clientError("Not a player: " + this.playerId);
+            return serverPlayer.clientError("Not a player: "
+                + getStringAttribute(PLAYER_TAG));
         } else if (player.isIndian() && !serverPlayer.hasContacted(player)) {
             return null;
         }
 
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .nationSummary(serverPlayer, player);
     }
 
@@ -117,9 +155,8 @@ public class NationSummaryMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.summary != null) this.summary.toXML(xw);
     }
 
     /**
@@ -130,8 +167,8 @@ public class NationSummaryMessage extends ObjectMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(TAG,
-            PLAYER_TAG, this.playerId)
-            .add(summary).toXMLElement();
+            PLAYER_TAG, getStringAttribute(PLAYER_TAG))
+            .add(this.summary).toXMLElement();
     }
 
 
@@ -144,7 +181,8 @@ public class NationSummaryMessage extends ObjectMessage {
      * @return The player.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(playerId, Player.class);
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG),
+                                         Player.class);
     }
 
     /**
