@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -47,23 +48,11 @@ public class DiplomacyMessage extends ObjectMessage {
     private static final String OTHER_ID_TAG = "otherId";
     private static final String OUR_ID_TAG = "ourId";
 
-    /**
-     * The identifier of our entity that is conducting diplomacy
-     * (either a unit or a settlement).
-     */
-    private final String ourId;
-
-    /**
-     * The identifier of the other entity to negotiate with (unit or
-     * settlement).
-     */
-    private final String otherId;
-
     /** The agreement being negotiated. */
-    private DiplomaticTrade agreement;
+    private DiplomaticTrade agreement = null;
 
     /** An extra unit if needed (when a scout is on board a ship). */
-    private Unit extraUnit;
+    private Unit extraUnit = null;
 
 
     /**
@@ -75,10 +64,8 @@ public class DiplomacyMessage extends ObjectMessage {
      */
     public DiplomacyMessage(FreeColGameObject our, FreeColGameObject other,
                             DiplomaticTrade agreement) {
-        super(TAG);
+        super(TAG, OUR_ID_TAG, our.getId(), OTHER_ID_TAG, other.getId());
 
-        this.ourId = our.getId();
-        this.otherId = other.getId();
         this.agreement = agreement;
         this.extraUnit = null;
     }
@@ -128,14 +115,46 @@ public class DiplomacyMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DiplomacyMessage(Game game, Element element) {
-        super(TAG);
+        super(TAG, OUR_ID_TAG, getStringAttribute(element, OUR_ID_TAG),
+              OTHER_ID_TAG, getStringAttribute(element, OTHER_ID_TAG));
 
-        this.ourId = getStringAttribute(element, OUR_ID_TAG);
-        this.otherId = getStringAttribute(element, OTHER_ID_TAG);
         this.agreement = getChild(game, element, 0, false, DiplomaticTrade.class);
         this.extraUnit = getChild(game, element, 1, true, Unit.class);
     }
 
+    /**
+     * Create a new {@code DiplomacyMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     */
+    public DiplomacyMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, OUR_ID_TAG, OTHER_ID_TAG);
+
+        this.agreement = null;
+        this.extraUnit = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (DiplomaticTrade.TAG.equals(tag)) {
+                if (this.agreement == null) {
+                    this.agreement = xr.readFreeColObject(game, DiplomaticTrade.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else if (Unit.TAG.equals(tag)) {
+                if (this.extraUnit == null) {
+                    this.extraUnit = xr.readFreeColObject(game, Unit.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected((this.agreement == null) ? DiplomaticTrade.TAG : Unit.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
+    }
 
     /**
      * {@inheritDoc}
@@ -174,20 +193,22 @@ public class DiplomacyMessage extends ObjectMessage {
         Colony ourColony = null;
         FreeColGameObject our = getOurFCGO(game);
         ChangeSet cs = null;
+        String ourId = getStringAttribute(OUR_ID_TAG);
+        String otherId = getStringAttribute(OTHER_ID_TAG);
         if (our == null) {
-            cs = serverPlayer.clientError("Missing our object: " + this.ourId);
+            cs = serverPlayer.clientError("Missing our object: " + ourId);
         } if (our instanceof Unit) {
             ourUnit = (Unit)our;
             if (!serverPlayer.owns(ourUnit)) {
-                cs = serverPlayer.clientError("Not our unit: " + this.ourId);
+                cs = serverPlayer.clientError("Not our unit: " + ourId);
             } else if (!ourUnit.hasTile()) {
                 cs = serverPlayer.clientError("Our unit is not on the map: "
-                    + this.ourId);
+                    + ourId);
             }
         } else if (our instanceof Colony) {
             ourColony = (Colony)our;
             if (!serverPlayer.owns(ourColony)) {
-                cs = serverPlayer.clientError("Not our settlement: " + this.ourId);
+                cs = serverPlayer.clientError("Not our settlement: " + ourId);
             }
         } else {
             cs = serverPlayer.clientError("Our object is bogus: " + our);
@@ -199,23 +220,23 @@ public class DiplomacyMessage extends ObjectMessage {
         Player otherPlayer = null;
         FreeColGameObject other = getOtherFCGO(game);
         if (other == null) {
-            cs = serverPlayer.clientError("Missing other object: " + this.otherId);
+            cs = serverPlayer.clientError("Missing other object: " + otherId);
         } else if (other instanceof Unit) {
             otherUnit = (Unit)other;
             if (serverPlayer.owns(otherUnit)) {
                 cs = serverPlayer.clientError("Contacting our unit? "
-                    + this.otherId);
+                    + otherId);
             } else if (!otherUnit.hasTile()) {
                 cs = serverPlayer.clientError("Other unit is not on the map: "
-                    + this.otherId);
+                    + otherId);
             } else if (ourUnit != null
                 && !ourUnit.getTile().isAdjacent(otherUnit.getTile())) {
-                cs = serverPlayer.clientError("Our unit " + this.ourId
-                    + " is not adjacent to other unit " + this.otherId);
+                cs = serverPlayer.clientError("Our unit " + ourId
+                    + " is not adjacent to other unit " + otherId);
             } else if (ourColony != null
                 && !ourColony.getTile().isAdjacent(otherUnit.getTile())) {
-                cs = serverPlayer.clientError("Our colony " + this.ourId
-                    + " is not adjacent to other unit " + this.otherId);
+                cs = serverPlayer.clientError("Our colony " + ourId
+                    + " is not adjacent to other unit " + otherId);
             } else {
                 otherPlayer = otherUnit.getOwner();
             }
@@ -223,15 +244,15 @@ public class DiplomacyMessage extends ObjectMessage {
             otherColony = (Colony)other;
             if (serverPlayer.owns(otherColony)) {
                 cs = serverPlayer.clientError("Contacting our colony? "
-                    + this.otherId);
+                    + otherId);
             } else if (ourUnit != null
                 && !ourUnit.getTile().isAdjacent(otherColony.getTile())) {
-                cs = serverPlayer.clientError("Our unit " + this.ourId
-                    + " is not adjacent to other colony " + this.otherId);
+                cs = serverPlayer.clientError("Our unit " + ourId
+                    + " is not adjacent to other colony " + otherId);
             } else if (ourColony != null
                 && !ourColony.getTile().isAdjacent(otherColony.getTile())) {
-                cs = serverPlayer.clientError("Our colony " + this.ourId
-                    + " is not adjacent to other colony " + this.otherId);
+                cs = serverPlayer.clientError("Our colony " + ourId
+                    + " is not adjacent to other colony " + otherId);
             } else {
                 otherPlayer = otherColony.getOwner();
             }
@@ -323,9 +344,9 @@ public class DiplomacyMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.agreement != null) this.agreement.toXML(xw);
+        if (this.extraUnit != null) this.extraUnit.toXML(xw);
     }
 
     /**
@@ -336,8 +357,8 @@ public class DiplomacyMessage extends ObjectMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(TAG,
-            OUR_ID_TAG, this.ourId,
-            OTHER_ID_TAG, this.otherId)
+            OUR_ID_TAG, getStringAttribute(OUR_ID_TAG),
+            OTHER_ID_TAG, getStringAttribute(OTHER_ID_TAG))
             .add(this.agreement)
             .add(this.extraUnit).toXMLElement();
     }
@@ -346,22 +367,13 @@ public class DiplomacyMessage extends ObjectMessage {
     // Public interface
 
     /**
-     * Get the extra {@code Unit}.
-     *
-     * @return The extra {@code Unit}, or null if none.
-     */
-    public Unit getExtraUnit() {
-        return this.extraUnit;
-    }
-
-    /**
      * Get our FCGO.
      *
      * @param game The {@code Game} to extract the FCGO from.
      * @return Our {@code FreeColGameObject}.
      */
     public FreeColGameObject getOurFCGO(Game game) {
-        return game.getFreeColGameObject(this.ourId);
+        return game.getFreeColGameObject(getStringAttribute(OUR_ID_TAG));
     }
 
     /**
@@ -371,7 +383,7 @@ public class DiplomacyMessage extends ObjectMessage {
      * @return The other {@code FreeColGameObject}.
      */
     public FreeColGameObject getOtherFCGO(Game game) {
-        return game.getFreeColGameObject(this.otherId);
+        return game.getFreeColGameObject(getStringAttribute(OTHER_ID_TAG));
     }
 
     /**
@@ -392,5 +404,14 @@ public class DiplomacyMessage extends ObjectMessage {
     public DiplomacyMessage setAgreement(DiplomaticTrade agreement) {
         this.agreement = agreement;
         return this;
+    }
+
+    /**
+     * Get the extra {@code Unit}.
+     *
+     * @return The extra {@code Unit}, or null if none.
+     */
+    public Unit getExtraUnit() {
+        return this.extraUnit;
     }
 }
