@@ -96,7 +96,6 @@ public class ObjectMessage extends AttributeMessage {
         if (objects != null) this.objects.addAll(fcos);
     }
 
-
     // DOMMessage
 
     /**
@@ -106,5 +105,19 @@ public class ObjectMessage extends AttributeMessage {
     public Element toXMLElement() {
         return DOMUtils.createElement(getType(), getStringAttributes(),
                                       getChildren());
+    }
+
+
+    /**
+     * Complain about finding the wrong XML element.
+     *
+     * @param wanted The tag we wanted.
+     * @param got The tag we got.
+     * @exception XMLStreamException is always thrown.
+     */
+    protected void expected(String wanted, String got)
+        throws XMLStreamException {
+        throw new XMLStreamException("In " + getClass().getName()
+            + ", expected " + wanted + " but read: " + got);
     }
 }
