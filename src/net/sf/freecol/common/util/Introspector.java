@@ -329,7 +329,7 @@ public class Introspector {
      * @param constructor The {@code Constructor} to use.
      * @param params The constructor parameters.
      * @return The instance created, or null on error.
-     * @exception FreeColException if there is a FreeCol failure.
+     * @exception IntrospectorException if there is a FreeCol failure.
      */
     public static <T> T construct(Constructor<T> constructor, Object[] params)
         throws IntrospectorException {
@@ -337,12 +337,13 @@ public class Introspector {
         try {
             instance = constructor.newInstance(params);
         } catch (InvocationTargetException ite) {
-            Throwable thr = ite.getCause();
-            String msg = ite.getMessage();
-            if (msg == null && thr instanceof Exception) {
-                msg = ((Exception)thr).getMessage();
+            Throwable cause = ite.getCause();
+            if (cause instanceof Exception) {
+                Exception ex = (Exception)cause;
+                throw new IntrospectorException(ex.getMessage(), ex.getCause());
+            } else {
+                throw new IntrospectorException(ite.getMessage(), cause);
             }
-            throw new IntrospectorException(msg, thr);
         } catch (IllegalAccessException | InstantiationException ex) {
             instance = null;
         }
