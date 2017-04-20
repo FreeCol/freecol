@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -41,9 +43,6 @@ public class NativeTradeMessage extends ObjectMessage {
 
     public static final String TAG = "nativeTrade";
     private static final String ACTION_TAG = "action";
-
-    /** The action to perform. */
-    private NativeTradeAction action;
 
     /** The native trade underway. */
     private NativeTrade nt = null;
@@ -69,9 +68,8 @@ public class NativeTradeMessage extends ObjectMessage {
      * @param nt The {@code NativeTrade}
      */
     public NativeTradeMessage(NativeTradeAction action, NativeTrade nt) {
-        super(TAG);
+        super(TAG, ACTION_TAG, action.toString());
 
-        this.action = action;
         this.nt = nt;
     }
 
@@ -83,11 +81,37 @@ public class NativeTradeMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NativeTradeMessage(Game game, Element element) {
-        super(TAG);
+        super(TAG, ACTION_TAG, getStringAttribute(element, ACTION_TAG));
 
-        this.action = getEnumAttribute(element, ACTION_TAG,
-            NativeTradeAction.class, (NativeTradeAction)null);
         this.nt = getChild(game, element, 0, false, NativeTrade.class);
+    }
+
+    /**
+     * Create a new {@code NativeTradeMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public NativeTradeMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, ACTION_TAG);
+
+        this.nt = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (NativeTrade.TAG.equals(tag)) {
+                if (this.nt == null) {
+                    this.nt = xr.readFreeColObject(game, NativeTrade.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(NativeTrade.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
     }
 
 
@@ -108,6 +132,18 @@ public class NativeTradeMessage extends ObjectMessage {
         final NativeTradeAction action = getAction();
 
         aiPlayer.nativeTradeHandler(action, nt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final NativeTradeAction action = getAction();
+        final NativeTrade nt = getNativeTrade();
+
+        igc(freeColClient).nativeTradeHandler(action, nt);
     }
 
     /**
@@ -139,7 +175,7 @@ public class NativeTradeMessage extends ObjectMessage {
             return serverPlayer.clientError("Unit not adjacent to settlement");
         }
 
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .nativeTrade(serverPlayer, getAction(), nt);
     }
 
@@ -147,9 +183,8 @@ public class NativeTradeMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.nt != null) this.nt.toXML(xw);
     }
 
     /**
@@ -161,14 +196,15 @@ public class NativeTradeMessage extends ObjectMessage {
     public Element toXMLElement() {
         return new DOMMessage(TAG,
             ACTION_TAG, getAction().toString())
-            .add(this.nt).toXMLElement();
+            .add(getNativeTrade()).toXMLElement();
     }
 
 
     // Public interface
 
     public NativeTradeAction getAction() {
-        return this.action;
+        return getEnumAttribute(ACTION_TAG, NativeTradeAction.class,
+                                (NativeTradeAction)null);
     }
 
     public NativeTrade getNativeTrade() {

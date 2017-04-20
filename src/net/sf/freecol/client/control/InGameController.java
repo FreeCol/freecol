@@ -3892,26 +3892,21 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Cache a native trade update.
      *
-     * Called from IGIH.nativeTrade.
-     *
      * @param action The {@code NativeTradeAction} to handle.
      * @param nt The {@code NativeTrade} underway.
      */
-    public void nativeTrade(NativeTradeAction action, NativeTrade nt) {
+    public void nativeTradeHandler(NativeTradeAction action, NativeTrade nt) {
         if (nt == null) return;
+        
         final IndianSettlement is = nt.getIndianSettlement();
         final Unit unit = nt.getUnit();
         if (!getMyPlayer().owns(unit)) {
             logger.warning("We do not own the trading unit: " + unit);
             return;
         }
-        final StringTemplate base = StringTemplate
-            .template("trade.welcome")
-            .addStringTemplate("%nation%", is.getOwner().getNationLabel())
-            .addName("%settlement%", is.getName());
 
-        TradeAction act = null;
         NativeTradeItem nti = null;
+        TradeAction act = null;
         StringTemplate prompt = null;
         switch (action) { // Only consider actions returned by server
         case ACK_OPEN:
@@ -3951,12 +3946,14 @@ public final class InGameController extends FreeColClientHolder {
                 .addNamed("%goodsType%", nt.getItem().getGoods().getType());
             break;
         case NAK_HAGGLE:
-            getGUI().showInformationMessage(StringTemplate
-                .template("trade.noTradeHaggle"));
+            invokeLater(() ->
+                getGUI().showInformationMessage(StringTemplate
+                    .template("trade.noTradeHaggle")));
             return;
         case NAK_HOSTILE:
-            getGUI().showInformationMessage(StringTemplate
-                .template("trade.noTradeHostile"));
+            invokeLater(() ->
+                getGUI().showInformationMessage(StringTemplate
+                    .template("trade.noTradeHostile")));
             return;
         case NAK_INVALID: // Should not happen, log and fail quietly.
         default:
@@ -3964,6 +3961,30 @@ public final class InGameController extends FreeColClientHolder {
             return;
         }
 
+        final TradeAction actF = act;
+        final NativeTradeItem ntiF = nti;
+        final StringTemplate promptF = prompt;
+        invokeLater(() ->
+            nativeTrade(nt, actF, ntiF, promptF));
+    }
+
+    /**
+     * Execute the native trade.
+     *
+     * @param nt The {@code NativeTrade} underway.
+     * @param act The {@code TradeAction} to perform.
+     * @param nti The {@code NativeTradeItem} being haggled over, if any.
+     * @param prompt An action-specific base prompt, if any.
+     */
+    private void nativeTrade(NativeTrade nt, TradeAction act,
+                             NativeTradeItem nti, StringTemplate prompt) {
+        final IndianSettlement is = nt.getIndianSettlement();
+        final Unit unit = nt.getUnit();
+        final StringTemplate base = StringTemplate
+            .template("trade.welcome")
+            .addStringTemplate("%nation%", is.getOwner().getNationLabel())
+            .addName("%settlement%", is.getName());
+        
         // Col1 only displays at most 3 types of goods for sale.
         // Maintain this for now but consider lifting in a future
         // "enhanced trade" mode.

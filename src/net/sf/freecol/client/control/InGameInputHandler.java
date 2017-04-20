@@ -193,7 +193,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 nationSummary(new NationSummaryMessage(getGame(), e)));
         register(NativeTradeMessage.TAG,
             (Connection c, Element e) ->
-                nativeTrade(new NativeTradeMessage(getGame(), e)));
+                new NativeTradeMessage(getGame(), e).clientHandler(freeColClient));
         register(NewLandNameMessage.TAG,
             (Connection c, Element e) ->
                 new NewLandNameMessage(getGame(), e).clientHandler(freeColClient));
@@ -298,20 +298,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         player.putNationSummary(other, ns);
         logger.info("Updated nation summary of " + other.getSuffix()
             + " for " + player.getSuffix() + " with " + ns);
-    }
-
-    /**
-     * Handle a "nativeTrade"-message.
-     *
-     * @param message The {@code NativeTradeMessage} to process.
-     */
-    private void nativeTrade(NativeTradeMessage message) {
-        final Game game = getGame();
-        final NativeTradeAction action = message.getAction();
-        final NativeTrade nt = message.getNativeTrade();
-
-        invokeLater(() ->
-            igc().nativeTrade(action, nt));
     }
 
     /**
