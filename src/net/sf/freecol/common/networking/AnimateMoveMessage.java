@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Direction;
@@ -82,6 +84,34 @@ public class AnimateMoveMessage extends ObjectMessage {
         this.unit = getChild(game, element, 0, true, Unit.class);
     }
 
+    /**
+     * Create a new {@code AnimateMoveMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public AnimateMoveMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, NEW_TILE_TAG, OLD_TILE_TAG, UNIT_TAG);
+
+        this.unit = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (Unit.TAG.equals(tag)) {
+                if (this.unit == null) {
+                    this.unit = xr.readFreeColObject(game, Unit.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(Unit.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -103,6 +133,38 @@ public class AnimateMoveMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Player player = freeColClient.getMyPlayer();
+        final Unit unit = getUnit(game);
+        final Tile oldTile = getOldTile(game);
+        final Tile newTile = getNewTile(game);
+
+        if (unit == null) {
+            logger.warning("Animation for: " + player.getId()
+                + " missing Unit.");
+            return;
+        }
+        if (oldTile == null) {
+            logger.warning("Animation for: " + player.getId()
+                + " missing old Tile.");
+            return;
+        }
+        if (newTile == null) {
+            logger.warning("Animation for: " + player.getId()
+                + " missing new Tile.");
+            return;
+        }
+
+        // This only performs animation, if required.  It does not
+        // actually change unit positions, which happens in an "update".
+        igc(freeColClient).animateMoveHandler(unit, oldTile, newTile);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         return null; // Only sent to client
@@ -112,9 +174,8 @@ public class AnimateMoveMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.unit != null) this.unit.toXML(xw);
     }
 
     /**

@@ -139,7 +139,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new AnimateAttackMessage(getGame(), e).clientHandler(freeColClient));
         register(AnimateMoveMessage.TAG,
             (Connection c, Element e) ->
-                animateMove(new AnimateMoveMessage(getGame(), e)));
+                new AnimateMoveMessage(getGame(), e).clientHandler(freeColClient));
         register(ChatMessage.TAG,
             (Connection c, Element e) ->
                 new ChatMessage(getGame(), e).clientHandler(freeColClient));
@@ -283,40 +283,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
 
     // Individual message handlers
-
-    /**
-     * Handle an "animateMove"-message.
-     *
-     * @param message The {@code AnimateMoveMessage} to process.
-     */
-    private void animateMove(AnimateMoveMessage message) {
-        final Game game = getGame();
-        final Player player = getMyPlayer();
-        final Unit unit = message.getUnit(game);
-        final Tile oldTile = message.getOldTile(game);
-        final Tile newTile = message.getNewTile(game);
-
-        if (unit == null) {
-            logger.warning("Animation for: " + player.getId()
-                + " missing Unit.");
-            return;
-        }
-        if (oldTile == null) {
-            logger.warning("Animation for: " + player.getId()
-                + " missing old Tile.");
-            return;
-        }
-        if (newTile == null) {
-            logger.warning("Animation for: " + player.getId()
-                + " missing new Tile.");
-            return;
-        }
-
-        // This only performs animation, if required.  It does not
-        // actually change unit positions, which happens in an "update".
-        invokeAndWait(() ->
-            igc().animateMove(unit, oldTile, newTile));
-    }
 
     /**
      * Handle a "diplomacy"-message.
@@ -503,24 +469,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (player != null && tr != null) player.addTradeRoute(tr);
     }
         
-    /**
-     * Handle a "newTurn"-message.
-     *
-     * @param message The {@code NewTurnMessage} to process.
-     */
-    private void newTurn(NewTurnMessage message) {
-        final Game game = getGame();
-        final int n = message.getTurnNumber();
-
-        if (n < 0) {
-            logger.warning("Invalid turn for newTurn");
-            return;
-        }
-
-        invokeLater(() ->
-            igc().newTurn(n));
-    }
-
     /**
      * Handle a "spyResult" message.
      *

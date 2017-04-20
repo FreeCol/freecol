@@ -2397,24 +2397,25 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Animate a move.
      *
-     * Called from IGIH.animateMove.
-     *
      * @param unit The {@code Unit} that moves.
      * @param oldTile The {@code Tile} the move begins at.
      * @param newTile The {@code Tile} the move ends at.
      */
-    public void animateMove(Unit unit, Tile oldTile, Tile newTile) {
+    public void animateMoveHandler(Unit unit, Tile oldTile, Tile newTile) {
         // Note: we used to focus the map on the unit even when
         // animation is off as long as the center-active-unit option
         // was set.  However IR#115 requested that if animation is off
         // that we display nothing so as to speed up the other player
         // moves as much as possible.
-        if (getFreeColClient().getAnimationSpeed(unit.getOwner()) > 0) {
-            getGUI().animateUnitMove(unit, oldTile, newTile);
-        } else if (getMyPlayer().owns(unit)) {
-            getGUI().requireFocus(newTile);
-        }
-        getGUI().refresh();
+        final FreeColClient fcc = getFreeColClient();
+        invokeAndWait(() -> {
+                if (fcc.getAnimationSpeed(unit.getOwner()) > 0) {
+                    getGUI().animateUnitMove(unit, oldTile, newTile);
+                } else if (getMyPlayer().owns(unit)) {
+                    getGUI().requireFocus(newTile);
+                }
+                getGUI().refresh();
+            });
     }
 
     /**
