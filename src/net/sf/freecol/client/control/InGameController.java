@@ -4101,8 +4101,6 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Switch to a new turn.
      *
-     * Called from IGIH.newTurn
-     *
      * @param turn The turn number.
      * @return True if the new turn occurs.
      */
@@ -4133,6 +4131,15 @@ public final class InGameController extends FreeColClientHolder {
         return true;
     }
 
+    /**
+     * Handle the new turn.
+     *
+     * @param turn The new turn number.
+     */
+    public void newTurnHandler(int turn) {
+        invokeLater(() -> newTurn(turn));
+    }
+    
     /**
      * Makes a new unit active.
      *

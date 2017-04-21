@@ -202,7 +202,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new NewRegionNameMessage(getGame(), e).clientHandler(freeColClient));
         register(NewTurnMessage.TAG,
             (Connection c, Element e) ->
-                newTurn(new NewTurnMessage(getGame(), e)));
+                new NewTurnMessage(getGame(), e).clientHandler(freeColClient));
         register(NewTradeRouteMessage.TAG,
             (Connection c, Element e) ->
                 newTradeRoute(new NewTradeRouteMessage(getGame(), e)));
@@ -541,24 +541,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (player != null && tr != null) player.addTradeRoute(tr);
     }
         
-    /**
-     * Handle a "newTurn"-message.
-     *
-     * @param message The {@code NewTurnMessage} to process.
-     */
-    private void newTurn(NewTurnMessage message) {
-        final Game game = getGame();
-        final int n = message.getTurnNumber();
-
-        if (n < 0) {
-            logger.warning("Invalid turn for newTurn");
-            return;
-        }
-
-        invokeLater(() ->
-            igc().newTurn(n));
-    }
-
     /**
      * Handle a "spyResult" message.
      *

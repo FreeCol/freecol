@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Turn;
@@ -85,6 +86,22 @@ public class NewTurnMessage extends AttributeMessage {
     @Override
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
         // Ignored
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final int turn = getTurnNumber();
+
+        if (turn < 0) {
+            logger.warning("Invalid turn for newTurn: "
+                + Integer.toString(turn) );
+            return;
+        }
+
+        igc(freeColClient).newTurnHandler(turn);
     }
 
 
