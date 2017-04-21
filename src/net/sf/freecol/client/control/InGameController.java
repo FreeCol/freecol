@@ -4900,14 +4900,13 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * Spy on a colony.
+     * Spy on a settlement.
      *
-     * Called from IGIH.spyResult.
-     *
-     * @param tile A special copy of the {@code Tile} with the colony.
+     * @param tile A special copy of the {@code Tile} with the settlement.
      */
-    public void spyColony(Tile tile) {
-        getGUI().showSpyColonyPanel(tile);
+    public void spySettlementHandler(Tile tile) {
+        invokeLater(() ->
+            getGUI().showSpyColonyPanel(tile));
     }
     
     /**

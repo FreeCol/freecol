@@ -229,7 +229,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new SetStanceMessage(getGame(), e).clientHandler(freeColClient));
         register(SpySettlementMessage.TAG,
             (Connection c, Element e) ->
-                spySettlement(new SpySettlementMessage(getGame(), e)));
+                new SpySettlementMessage(getGame(), e).clientHandler(freeColClient));
         register(UpdateMessage.TAG,
             (Connection c, Element e) ->
                 update(new UpdateMessage(getGame(), e)));
@@ -283,19 +283,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
 
     // Individual message handlers
-
-    /**
-     * Handle a "spyResult" message.
-     *
-     * @param message The {@code SpySettlementMessage} to process.
-     */
-    private void spySettlement(SpySettlementMessage message) {
-        final Game game = getGame();
-        final Tile spyTile = message.getSpyTile();
-
-        invokeLater(() ->
-            igc().spyColony(spyTile));
-    }
 
     /**
      * Handle an "update"-message.

@@ -21,7 +21,10 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -45,12 +48,6 @@ public class SpySettlementMessage extends ObjectMessage {
     private static final String SETTLEMENT_TAG = "settlement";
     private static final String UNIT_TAG = "unit";
 
-    /** The identifier of the object doing the spying. */
-    private final String unitId;
-
-    /** The identifier of the settlement to spy on. */
-    private final String settlementId;
-
     /**
      * A copy of the tile with the settlement on it, but including all
      * the extra (normally invisible) information.
@@ -66,10 +63,8 @@ public class SpySettlementMessage extends ObjectMessage {
      * @param settlement The {@code Settlement} the unit is looking at.
      */
     public SpySettlementMessage(Unit unit, Settlement settlement) {
-        super(TAG);
+        super(TAG, SETTLEMENT_TAG, settlement.getId(), UNIT_TAG, unit.getId());
 
-        this.unitId = unit.getId();
-        this.settlementId = settlement.getId();
         this.spyTile = settlement.getTile();
     }
 
@@ -81,11 +76,38 @@ public class SpySettlementMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SpySettlementMessage(Game game, Element element) {
-        super(TAG);
+        super(TAG, SETTLEMENT_TAG, getStringAttribute(element, SETTLEMENT_TAG),
+              UNIT_TAG, getStringAttribute(element, UNIT_TAG));
 
-        this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
         this.spyTile = getChild(game, element, 0, false, Tile.class);
+    }
+
+    /**
+     * Create a new {@code SpySettlementMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public SpySettlementMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, SETTLEMENT_TAG, UNIT_TAG);
+
+        this.spyTile = null;
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (Tile.TAG.equals(tag)) {
+                if (this.spyTile == null) {
+                    this.spyTile = xr.readFreeColObject(game, Tile.class);
+                } else {
+                    expected(TAG, tag);
+                }
+            } else {
+                expected(Tile.TAG, tag);
+            }
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
     }
 
 
@@ -97,21 +119,16 @@ public class SpySettlementMessage extends ObjectMessage {
         return Message.MessagePriority.NORMAL;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Tile spyTile = getSpyTile();
 
-    // Public interface
-
-    public Tile getSpyTile() {
-        return this.spyTile;
+        igc(freeColClient).spySettlementHandler(spyTile);
     }
-
-    public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(this.unitId, Unit.class);
-    }
-
-    public Colony getColony(Game game) {
-        return game.getFreeColGameObject(this.settlementId, Colony.class);
-    }
-
 
     /**
      * {@inheritDoc}
@@ -121,6 +138,7 @@ public class SpySettlementMessage extends ObjectMessage {
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
 
+        String unitId = getStringAttribute(UNIT_TAG);
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
@@ -129,18 +147,18 @@ public class SpySettlementMessage extends ObjectMessage {
         }
         if (!unit.hasAbility(Ability.SPY_ON_COLONY)) {
             return serverPlayer.clientError("Unit lacks ability"
-                + " to spy on colony: " + this.unitId);
+                + " to spy on colony: " + unitId);
         }
 
+        String settlementId = getStringAttribute(SETTLEMENT_TAG);
         Colony colony = getColony(game);
         if (colony == null) {
-            return serverPlayer.clientError("Not a colony: "
-                + this.settlementId);
+            return serverPlayer.clientError("Not a colony: " + settlementId);
         }
         Tile tile = colony.getTile();
         if (!unit.getTile().isAdjacent(tile)) {
-            return serverPlayer.clientError("Unit " + this.unitId
-                + " not adjacent to colony: " + this.settlementId);
+            return serverPlayer.clientError("Unit " + unitId
+                + " not adjacent to colony: " + settlementId);
         }
 
         MoveType type = unit.getMoveType(tile);
@@ -150,7 +168,7 @@ public class SpySettlementMessage extends ObjectMessage {
         }
 
         // Spy on the settlement
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .spySettlement(serverPlayer, unit, colony);
     }
 
@@ -158,9 +176,13 @@ public class SpySettlementMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.spyTile != null) {
+            WriteScope ws = xw.getWriteScope();
+            xw.setWriteScope(WriteScope.toServer());
+            this.spyTile.toXML(xw);
+            xw.setWriteScope(ws);
+        }
     }
 
     /**
@@ -171,9 +193,26 @@ public class SpySettlementMessage extends ObjectMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(TAG,
-                              UNIT_TAG, this.unitId,
-                              SETTLEMENT_TAG, this.settlementId)
+            UNIT_TAG, getStringAttribute(UNIT_TAG),
+            SETTLEMENT_TAG, getStringAttribute(SETTLEMENT_TAG))
             .add(this.spyTile).toXMLElement();
         
+    }
+
+
+    // Public interface
+
+    public Tile getSpyTile() {
+        return this.spyTile;
+    }
+
+    public Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG),
+                                              Unit.class);
+    }
+
+    public Colony getColony(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(SETTLEMENT_TAG),
+                                         Colony.class);
     }
 }
