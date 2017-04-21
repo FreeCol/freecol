@@ -24,7 +24,10 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -122,6 +125,24 @@ public class UpdateMessage extends ObjectMessage {
         this((ServerPlayer)null, DOMUtils.getChildren(game, element));
     }
 
+    /**
+     * Create a new {@code UpdateMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public UpdateMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        this((ServerPlayer)null);
+
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            this.fcgos.addAll(xr.readFreeColObject(game));
+            xr.expectTag(tag);
+        }
+        xr.expectTag(TAG);
+    }
 
     /**
      * Append another object and optional partial fields to update.
@@ -171,9 +192,33 @@ public class UpdateMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+
+        igc(freeColClient).updateHandler(getObjects());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        WriteScope ws = null;
+        if (this.destination != null) {
+            ws = xw.getWriteScope();
+            xw.setWriteScope(WriteScope.toClient(this.destination));
+        }
+        final int n = this.fcgos.size();
+        for (int i = 0; i < n; i++) {
+            FreeColGameObject fcgo = this.fcgos.get(i);
+            List<String> parts = this.fields.get(i);
+            if (parts == null) {
+                fcgo.toXML(xw);
+            } else {
+                fcgo.toXMLPartial(xw, parts);
+            }
+        }
+        if (ws != null) xw.setWriteScope(ws);
     }
 
     /**

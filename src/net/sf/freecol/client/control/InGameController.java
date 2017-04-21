@@ -5023,6 +5023,24 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Handle updates.
+     *
+     * @param objects The {@code FreeColGameObject}s to update.
+     */
+    public void updateHandler(List<FreeColGameObject> objects) {
+        final Player player = getMyPlayer();
+        boolean visibilityChange = false;
+
+        for (FreeColGameObject fcgo : objects) {
+            if ((fcgo instanceof Player && (fcgo == player))
+                || ((fcgo instanceof Ownable) && player.owns((Ownable)fcgo))) {
+                visibilityChange = true;//-vis(player)
+            }
+        }
+        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
+    }
+
+    /**
      * Updates a trade route.
      *
      * Called from TradeRoutePanel(), TradeRoutePanel.newRoute

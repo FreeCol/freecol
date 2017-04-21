@@ -232,7 +232,7 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new SpySettlementMessage(getGame(), e).clientHandler(freeColClient));
         register(UpdateMessage.TAG,
             (Connection c, Element e) ->
-                update(new UpdateMessage(getGame(), e)));
+                new UpdateMessage(getGame(), e).clientHandler(freeColClient));
     }
 
 
@@ -279,27 +279,5 @@ public final class InGameInputHandler extends ClientInputHandler {
             }
         }
         return reply;
-    }
-
-
-    // Individual message handlers
-
-    /**
-     * Handle an "update"-message.
-     *
-     * @param message The {@code UpdateMessage} to process.
-     */
-    private void update(UpdateMessage message) {
-        final Player player = getMyPlayer();
-        final Game game = getGame();
-
-        boolean visibilityChange = false;
-        for (FreeColGameObject fcgo : message.getObjects()) {
-            if ((fcgo instanceof Player && (fcgo == player))
-                || ((fcgo instanceof Ownable) && player.owns((Ownable)fcgo))) {
-                visibilityChange = true;//-vis(player)
-            }
-        }
-        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
     }
 }
