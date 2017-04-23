@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -33,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -638,9 +640,14 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public int priceGoods(List<AbstractGoods> goods) {
-        return (any(goods, ag -> getGoodsCount(ag.getType()) < ag.getAmount()))
-            ? -1 : 0;
+    public int priceGoods(List<AbstractGoods> goods) throws FreeColException {
+        final Predicate<AbstractGoods> pred = ag ->
+            getGoodsCount(ag.getType()) < ag.getAmount();
+        AbstractGoods missing = find(goods, pred);
+        if (missing != null) {
+            throw new FreeColException("Goods missing: " + missing);
+        }
+        return 0;
     }
 
     /**
@@ -651,13 +658,17 @@ public abstract class Settlement extends GoodsLocation
         if (!unit.roleIsAvailable(role)) return false;
 
         // Get the change in goods
-        List<AbstractGoods> required = unit.getGoodsDifference(role, roleCount);
+        List<AbstractGoods> req = unit.getGoodsDifference(role, roleCount);
 
         // Check if the required goods are available
-        if (priceGoods(required) < 0) return false;
+        try {
+            priceGoods(req);
+        } catch (FreeColException fce) {
+            return false;
+        }
 
         // Make the change
-        for (AbstractGoods ag : required) {
+        for (AbstractGoods ag : req) {
             addGoods(ag.getType(), -ag.getAmount());
         }
 

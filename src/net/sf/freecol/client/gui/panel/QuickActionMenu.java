@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.MarketLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.client.gui.label.UnitLabel.UnitAction;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -673,11 +674,15 @@ public final class QuickActionMenu extends JPopupMenu {
                 newItem = null;
                 for (int count = r.getMaximumCount(); count > 0; count--) {
                     List<AbstractGoods> req = unit.getGoodsDifference(r, count);
-                    int price = uloc.priceGoods(req);
-                    if (price < 0 || unit.getOwner().checkGold(price)) {
-                        newItem = createRoleItem(unitLabel, role, roleCount,
-                                                 r, count, price);
-                        break;
+                    try {
+                        int price = uloc.priceGoods(req);
+                        if (unit.getOwner().checkGold(price)) {
+                            newItem = createRoleItem(unitLabel, role, roleCount,
+                                                     r, count, price);
+                            break;
+                        }
+                    } catch (FreeColException fce) {
+                        continue;
                     }
                 }
             }

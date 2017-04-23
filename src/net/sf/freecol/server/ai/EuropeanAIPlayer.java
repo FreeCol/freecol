@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
@@ -513,7 +514,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             && scoutsNeeded() > 0
             && randoms[cheatIndex++] < equipScoutCheatPercent) {
             for (Unit u : transform(europe.getUnits(), equipPred)) {
-                cheatGold(europe.priceGoods(u.getGoodsDifference(scoutRole, 1)), lb);
+                try {
+                    int g = europe.priceGoods(u.getGoodsDifference(scoutRole, 1));
+                    cheatGold(g, lb);
+                } catch (FreeColException fce) {
+                    continue;
+                }
                 if (getAIUnit(u).equipForRole(spec.getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null))) {
                     lb.add(" to equip scout ", u, ", ");
                     player.logCheat("Equip scout " + u.toShortString());
@@ -526,7 +532,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             && pioneersNeeded() > 0
             && randoms[cheatIndex++] < equipPioneerCheatPercent) {
             for (Unit u : transform(europe.getUnits(), equipPred)) {
-                cheatGold(europe.priceGoods(u.getGoodsDifference(pioneerRole, 1)), lb);
+                try {
+                    int g = europe.priceGoods(u.getGoodsDifference(pioneerRole, 1)); 
+                    cheatGold(g, lb);
+                } catch (FreeColException fce) {
+                    continue;
+                }
                 if (getAIUnit(u).equipForRole(spec.getRoleWithAbility(Ability.IMPROVE_TERRAIN, null))) {
                     lb.add(" to equip pioneer ", u, ", ");
                     player.logCheat("Equip pioneer " + u.toShortString());

@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
@@ -460,9 +461,12 @@ public class AIUnit extends TransportableAIObject {
         if (count > 0) {
             for (; count > 0; count--) {
                 List<AbstractGoods> req = unit.getGoodsDifference(role, count);
-                int price = ((UnitLocation)loc).priceGoods(req);
-                if (price < 0) continue;
-                if (player.checkGold(price)) break;
+                try {
+                    int price = ((UnitLocation)loc).priceGoods(req);
+                    if (player.checkGold(price)) break;
+                } catch (FreeColException fce) {
+                    continue;
+                }
             }
             if (count <= 0) return false;
         }

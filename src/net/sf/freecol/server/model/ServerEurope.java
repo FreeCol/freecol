@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -82,24 +83,26 @@ public class ServerEurope extends Europe implements TurnTaker {
         if (!unit.roleIsAvailable(role)) return false;
 
         // Get the change in goods
-        List<AbstractGoods> required = unit.getGoodsDifference(role, roleCount);
+        List<AbstractGoods> req = unit.getGoodsDifference(role, roleCount);
 
-        // Check the pricing
-        int price = priceGoods(required);
-        if (price > 0 && !unit.getOwner().checkGold(price)) return false;
+        // Check the pricing and ability to trade
+        try {
+            int price = priceGoods(req);
+            if (price > 0 && !unit.getOwner().checkGold(price)) return false;
+        } catch (FreeColException fce) {
+            return false;
+        }
 
         // Sell any excess
         final ServerPlayer owner = (ServerPlayer)getOwner();
-        for (AbstractGoods ag : transform(required,
-                g -> (g.getAmount() < 0
-                    && owner.canTrade(g.getType(), Market.Access.EUROPE)))) {
+        for (AbstractGoods ag : transform(req, g -> g.getAmount() < 0)) {
             int rm = owner.sell(null, ag.getType(), -ag.getAmount());
             if (rm > 0) {
                 owner.addExtraTrade(new AbstractGoods(ag.getType(), rm));
             }
         }
         // Buy what is needed
-        for (AbstractGoods ag : transform(required, AbstractGoods::isPositive)) {
+        for (AbstractGoods ag : transform(req, AbstractGoods::isPositive)) {
             int m = owner.buy(null, ag.getType(), ag.getAmount());
             if (m > 0) {
                 owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));

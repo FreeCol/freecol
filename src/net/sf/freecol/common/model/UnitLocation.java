@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -520,11 +521,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * What would the price be for a collection of goods at this location?
      *
      * @param goods The list of {@code AbstractGoods} to check for.
-     * @return Negative if the goods are unavailable, otherwise the
-     *     price (may be zero).
+     * @return The net cost of acquiring the goods at this location.
+     * @exception FreeColException if the goods are unavailable for any reason.
      */
-    public int priceGoods(List<AbstractGoods> goods) {
-        return -1;
+    public int priceGoods(List<AbstractGoods> goods) throws FreeColException {
+        if (goods.isEmpty()) return 0;
+        throw new FreeColException("Not available: " + goods.get(0));
     }
 
     /**

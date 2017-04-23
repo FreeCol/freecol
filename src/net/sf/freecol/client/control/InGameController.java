@@ -37,6 +37,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -3138,8 +3139,12 @@ public final class InGameController extends FreeColClientHolder {
                     return false; // payment failed
                 }
             }
-            price = player.getEurope().priceGoods(req);
-            if (price > 0 && !player.checkGold(price)) return false;
+            try {
+                price = player.getEurope().priceGoods(req);
+                if (!player.checkGold(price)) return false;
+            } catch (FreeColException fce) {
+                return false;
+            }
         } else if (colony != null) {
             for (AbstractGoods ag : req) {
                 if (colony.getGoodsCount(ag.getType()) < ag.getAmount()) {

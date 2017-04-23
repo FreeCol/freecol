@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -383,16 +384,15 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     @Override
-    public int priceGoods(List<AbstractGoods> goods) {
-        Player player = getOwner();
-        Market market = player.getMarket();
+    public int priceGoods(List<AbstractGoods> goods) throws FreeColException {
+        final Player player = getOwner();
+        final Market market = player.getMarket();
         int price = 0;
         for (AbstractGoods ag : goods) {
             GoodsType goodsType = ag.getType();
             // Refuse to trade in boycotted goods
             if (!player.canTrade(goodsType)) {
-                price = -1;
-                break;
+                throw new FreeColException("Can not trade " + goodsType);
             }
             if (ag.getAmount() > 0) {
                 price += market.getBidPrice(goodsType, ag.getAmount());
