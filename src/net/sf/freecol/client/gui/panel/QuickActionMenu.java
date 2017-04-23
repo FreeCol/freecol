@@ -608,6 +608,11 @@ public final class QuickActionMenu extends JPopupMenu {
                 + Messages.message(StringTemplate.template("goldAmount")
                     .addAmount("%amount%", price))
                 + ")";
+        } else if (price < 0) {
+            text += " ("
+                + Messages.message(StringTemplate.template("goldAmount")
+                    .addAmount("%amount%", -price))
+                + " (" + Messages.message("income") + "))";
         }
 
         // Get an icon
@@ -626,7 +631,6 @@ public final class QuickActionMenu extends JPopupMenu {
         }
         Icon icon = (change == null) ? null : new ImageIcon(
             gui.getImageLibrary().getSmallIconImage(change.getType()));
-
         JMenuItem item = new JMenuItem(text, icon);
         final InGameController igc = freeColClient.getInGameController();
         item.addActionListener((ActionEvent ae) -> {
@@ -670,8 +674,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 for (int count = r.getMaximumCount(); count > 0; count--) {
                     List<AbstractGoods> req = unit.getGoodsDifference(r, count);
                     int price = uloc.priceGoods(req);
-                    if (price < 0) continue;
-                    if (unit.getOwner().checkGold(price)) {
+                    if (price < 0 || unit.getOwner().checkGold(price)) {
                         newItem = createRoleItem(unitLabel, role, roleCount,
                                                  r, count, price);
                         break;

@@ -86,7 +86,7 @@ public class ServerEurope extends Europe implements TurnTaker {
 
         // Check the pricing
         int price = priceGoods(required);
-        if (price < 0 || !unit.getOwner().checkGold(price)) return false;
+        if (price > 0 && !unit.getOwner().checkGold(price)) return false;
 
         // Sell any excess
         final ServerPlayer owner = (ServerPlayer)getOwner();

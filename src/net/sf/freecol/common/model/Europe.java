@@ -387,14 +387,18 @@ public class Europe extends UnitLocation
         Player player = getOwner();
         Market market = player.getMarket();
         int price = 0;
-        for (AbstractGoods ag : transform(goods, AbstractGoods::isPositive)) {
+        for (AbstractGoods ag : goods) {
             GoodsType goodsType = ag.getType();
             // Refuse to trade in boycotted goods
             if (!player.canTrade(goodsType)) {
                 price = -1;
                 break;
             }
-            price += market.getBidPrice(goodsType, ag.getAmount());
+            if (ag.getAmount() > 0) {
+                price += market.getBidPrice(goodsType, ag.getAmount());
+            } else {
+                price += market.getSalePrice(goodsType, ag.getAmount());
+            }
         }
         return price;
     }

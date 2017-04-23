@@ -3139,7 +3139,7 @@ public final class InGameController extends FreeColClientHolder {
                 }
             }
             price = player.getEurope().priceGoods(req);
-            if (price < 0 || !player.checkGold(price)) return false;
+            if (price > 0 && !player.checkGold(price)) return false;
         } else if (colony != null) {
             for (AbstractGoods ag : req) {
                 if (colony.getGoodsCount(ag.getType()) < ag.getAmount()) {
