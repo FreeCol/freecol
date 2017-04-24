@@ -61,6 +61,8 @@ public class MonarchActionMessage extends ObjectMessage {
     public MonarchActionMessage(MonarchAction action,
                                 StringTemplate template, String monarchKey) {
         super(TAG, ACTION_TAG, action.toString(), MONARCH_TAG, monarchKey);
+
+        this.template = template;
     }
 
     /**
