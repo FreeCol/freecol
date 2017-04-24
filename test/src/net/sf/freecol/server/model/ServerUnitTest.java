@@ -54,6 +54,8 @@ public class ServerUnitTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.carpenterHouse");
     private static final BuildingType townHallType
         = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType warehouseType
+        = spec().getBuildingType("model.building.depot");
 
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
@@ -491,14 +493,15 @@ public class ServerUnitTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
 
         // Lumber should be delivered on this turn
-        int lumber = colony.getGoodsCount(lumberType);
+        colony.removeGoods(lumberType);
         ServerTestHelper.newTurn();
-        assertEquals("Lumber delivery with hardy pioneer", lumber + 20 * 2,
+        assertEquals("Lumber delivery with hardy pioneer", 20 * 2,
                      colony.getGoodsCount(lumberType));
 
-        // Upgrade to lumber mill
+        // Upgrade to lumber mill and full warehouse
         assertTrue(none(colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)));
         colony.getBuilding(carpenterHouseType).upgrade();
+        colony.getBuilding(warehouseType).upgrade();
         assertEquals(1,
             count(colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)));
 
@@ -513,9 +516,9 @@ public class ServerUnitTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
 
         // Lumber should be delivered on this turn
-        lumber = colony.getGoodsCount(lumberType);
+        colony.removeGoods(lumberType);
         ServerTestHelper.newTurn();
         assertEquals("Lumber delivered with hardy pioneer and mill",
-                     lumber + 20 * 2 * 3, colony.getGoodsCount(lumberType));
+                     20 * 2 * 3, colony.getGoodsCount(lumberType));
     }
 }

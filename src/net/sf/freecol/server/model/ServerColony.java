@@ -506,6 +506,146 @@ public class ServerColony extends Colony implements TurnTaker {
         return true;
     }
 
+    /**
+     * Do the checks for user warnings that must wait for all player
+     * settlements, units and whatever to stabilize.  Along the way,
+     * throw away excess goods.
+     *
+     * For example, a pioneer might clear a colony tile and change the
+     * lumber amount.
+     *
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    public void csWarnings(Random random, LogBuilder lb, ChangeSet cs) {
+        final Specification spec = getSpecification();
+        final BuildQueue<?>[] queues = new BuildQueue<?>[] {
+            this.buildQueue, this.populationQueue };
+        final GoodsContainer container = getGoodsContainer();
+
+        for (WorkLocation wl : getCurrentWorkLocationsList()) {
+            if (wl instanceof ServerBuilding) {
+                // FIXME: generalize to other WorkLocations?
+                ((ServerBuilding)wl).csCheckMissingInput(getProductionInfo(wl),
+                                                         cs);
+            }
+        }
+
+        List<BuildQueue<? extends BuildableType>> built = new ArrayList<>();
+        for (BuildQueue<?> queue : queues) {
+            ProductionInfo info = getProductionInfo(queue);
+            if (info == null) continue;
+            if (info.getConsumption().isEmpty()) {
+                BuildableType build = queue.getCurrentlyBuilding();
+                if (build != null) {
+                    AbstractGoods needed = new AbstractGoods();
+                    int complete = getTurnsToComplete(build, needed);
+                    // Warn if about to fail, or if no useful progress
+                    // towards completion is possible.
+                    if (complete == -2 || complete == -1) {
+                        cs.addMessage(owner,
+                            new ModelMessage(MessageType.MISSING_GOODS,
+                                             "model.colony.buildableNeedsGoods",
+                                             this, build)
+                                .addName("%colony%", getName())
+                                .addNamed("%buildable%", build)
+                                .addAmount("%amount%", needed.getAmount())
+                                .addNamed("%goodsType%", needed.getType()));
+                    }
+                }
+            }
+        }
+
+        // Throw away goods there is no room for, and warn about
+        // levels that will be exceeded next turn
+        final int limit = getWarehouseCapacity();
+        final int adjustment = limit / GoodsContainer.CARGO_SIZE;
+        for (Goods goods : transform(getCompactGoods(),
+                                     AbstractGoods::isStorable)) {
+            final GoodsType type = goods.getType();
+            final ExportData exportData = getExportData(type);
+            final int low = exportData.getLowLevel() * adjustment;
+            final int high = exportData.getHighLevel() * adjustment;
+            final int amount = goods.getAmount();
+            final int oldAmount = container.getOldGoodsCount(type);
+
+            if (amount < low && oldAmount >= low
+                && type != spec.getPrimaryFoodType()) {
+                cs.addMessage(owner,
+                    new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
+                                     "model.colony.warehouseEmpty",
+                                     this, type)
+                        .addNamed("%goods%", type)
+                        .addAmount("%level%", low)
+                        .addName("%colony%", getName()));
+                continue;
+            }
+            if (type.limitIgnored()) continue;
+            String messageId = null;
+            int waste = 0;
+            if (amount > limit) {
+                // limit has been exceeded
+                waste = amount - limit;
+                container.removeGoods(type, waste);
+                messageId = "model.colony.warehouseWaste";
+            } else if (amount == limit && oldAmount < limit) {
+                // limit has been reached during this turn
+                messageId = "model.colony.warehouseOverfull";
+            } else if (amount > high && oldAmount <= high) {
+                // high-water-mark has been reached this turn
+                messageId = "model.colony.warehouseFull";
+            }
+            if (messageId != null) {
+                cs.addMessage(owner,
+                    new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
+                                     messageId, this, type)
+                        .addNamed("%goods%", type)
+                        .addAmount("%waste%", waste)
+                        .addAmount("%level%", high)
+                        .addName("%colony%", getName()));
+            }
+
+            // No problem this turn, but what about the next?
+            if (!(exportData.getExported()
+                  && hasAbility(Ability.EXPORT)
+                  && owner.canTrade(type, Market.Access.CUSTOM_HOUSE))
+                && amount <= limit) {
+                int loss = amount + getNetProductionOf(type) - limit;
+                if (loss > 0) {
+                    cs.addMessage(owner,
+                        new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
+                                         "model.colony.warehouseSoonFull",
+                                         this, type)
+                            .addNamed("%goods%", goods)
+                            .addName("%colony%", getName())
+                            .addAmount("%amount%", loss));
+                }
+            }
+        }
+    
+        // If a build queue is empty, check that we are not producing
+        // any goods types useful for BuildableTypes, except if that
+        // type is the input to some other form of production.  (Note:
+        // isBuildingMaterial is also true for goods used to produce
+        // role-equipment, hence neededForBuildableType).  Such
+        // production probably means we forgot to reset the build
+        // queue.  Thus, if hammers are being produced it is worth
+        // warning about, but not if producing tools.
+        if (any(queues, BuildQueue::isEmpty)
+            && any(spec.getGoodsTypeList(), g ->
+                (g.isBuildingMaterial()
+                    && !g.isRawMaterial()
+                    && !g.isBreedable()
+                    && getAdjustedNetProductionOf(g) > 0
+                    && neededForBuildableType(g)))) {
+            cs.addMessage(owner,
+                new ModelMessage(MessageType.BUILDING_COMPLETED,
+                    "model.colony.notBuildingAnything", this)
+                .addName("%colony%", getName()));
+        }
+    }
+
 
     // Implement TurnTaker
 
@@ -562,10 +702,6 @@ public class ServerColony extends Colony implements TurnTaker {
                     }
                 }
             }
-            if (wl instanceof ServerBuilding) {
-                // FIXME: generalize to other WorkLocations?
-                ((ServerBuilding)wl).csCheckMissingInput(productionInfo, cs);
-            }
         }
 
         // Check the build queues and build new stuff.  If a queue
@@ -576,25 +712,7 @@ public class ServerColony extends Colony implements TurnTaker {
         for (BuildQueue<?> queue : queues) {
             ProductionInfo info = getProductionInfo(queue);
             if (info == null) continue;
-            if (info.getConsumption().isEmpty()) {
-                BuildableType build = queue.getCurrentlyBuilding();
-                if (build != null) {
-                    AbstractGoods needed = new AbstractGoods();
-                    int complete = getTurnsToComplete(build, needed);
-                    // Warn if about to fail, or if no useful progress
-                    // towards completion is possible.
-                    if (complete == -2 || complete == -1) {
-                        cs.addMessage(owner,
-                            new ModelMessage(MessageType.MISSING_GOODS,
-                                             "model.colony.buildableNeedsGoods",
-                                             this, build)
-                                .addName("%colony%", getName())
-                                .addNamed("%buildable%", build)
-                                .addAmount("%amount%", needed.getAmount())
-                                .addNamed("%goodsType%", needed.getType()));
-                    }
-                }
-            } else {
+            if (!info.getConsumption().isEmpty()) {
                 // Ready to build something.  FIXME: OO!
                 BuildableType buildable = csNextBuildable(queue, cs);
                 if (buildable == null) {
@@ -638,7 +756,7 @@ public class ServerColony extends Colony implements TurnTaker {
                 addGoods(goodsType, net);
             }
 
-            // Handle the food situation
+            // Handle starvation at once.
             if (goodsType == spec.getPrimaryFoodType()) {
                 // Check for famine when total primary food goes negative.
                 if (net + stored < 0) {
@@ -667,14 +785,13 @@ public class ServerColony extends Colony implements TurnTaker {
                     if (turns <= Colony.FAMINE_TURNS && !newUnitBorn) {
                         cs.addMessage(owner,
                             new ModelMessage(MessageType.WARNING,
-                                             "model.colony.famineFeared",
-                                             this)
-                                .addName("%colony%", getName())
-                                .addAmount("%number%", turns));
+                                "model.colony.famineFeared", this)
+                            .addName("%colony%", getName())
+                            .addAmount("%number%", turns));
                         lb.add(" famine in ", turns,
-                               " food=", stored, " production=", net);
+                            " food=", stored, " production=", net);
                     }
-                }
+                }                
             }
         }
         invalidateCache();
@@ -745,73 +862,6 @@ public class ServerColony extends Colony implements TurnTaker {
             }
         }
 
-        // Throw away goods there is no room for, and warn about
-        // levels that will be exceeded next turn
-        final int limit = getWarehouseCapacity();
-        final int adjustment = limit / GoodsContainer.CARGO_SIZE;
-        for (Goods goods : transform(getCompactGoods(),
-                                     AbstractGoods::isStorable)) {
-            final GoodsType type = goods.getType();
-            final ExportData exportData = getExportData(type);
-            final int low = exportData.getLowLevel() * adjustment;
-            final int high = exportData.getHighLevel() * adjustment;
-            int amount = goods.getAmount();
-            int oldAmount = container.getOldGoodsCount(type);
-
-            if (amount < low && oldAmount >= low
-                && !(type == spec.getPrimaryFoodType() && newUnitBorn)) {
-                cs.addMessage(owner,
-                    new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
-                                     "model.colony.warehouseEmpty",
-                                     this, type)
-                        .addNamed("%goods%", type)
-                        .addAmount("%level%", low)
-                        .addName("%colony%", getName()));
-                continue;
-            }
-            if (type.limitIgnored()) continue;
-            String messageId = null;
-            int waste = 0;
-            if (amount > limit) {
-                // limit has been exceeded
-                waste = amount - limit;
-                container.removeGoods(type, waste);
-                messageId = "model.colony.warehouseWaste";
-            } else if (amount == limit && oldAmount < limit) {
-                // limit has been reached during this turn
-                messageId = "model.colony.warehouseOverfull";
-            } else if (amount > high && oldAmount <= high) {
-                // high-water-mark has been reached this turn
-                messageId = "model.colony.warehouseFull";
-            }
-            if (messageId != null) {
-                cs.addMessage(owner,
-                    new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
-                                     messageId, this, type)
-                        .addNamed("%goods%", type)
-                        .addAmount("%waste%", waste)
-                        .addAmount("%level%", high)
-                        .addName("%colony%", getName()));
-            }
-
-            // No problem this turn, but what about the next?
-            if (!(exportData.getExported()
-                  && hasAbility(Ability.EXPORT)
-                  && owner.canTrade(type, Market.Access.CUSTOM_HOUSE))
-                && amount <= limit) {
-                int loss = amount + getNetProductionOf(type) - limit;
-                if (loss > 0) {
-                    cs.addMessage(owner,
-                        new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
-                                         "model.colony.warehouseSoonFull",
-                                         this, type)
-                            .addNamed("%goods%", goods)
-                            .addName("%colony%", getName())
-                            .addAmount("%amount%", loss));
-                }
-            }
-        }
-
         // Check for free buildings
         for (BuildingType buildingType : transform(spec.getBuildingTypeList(),
                 bt -> isAutomaticBuild(bt))) {
@@ -820,28 +870,7 @@ public class ServerColony extends Colony implements TurnTaker {
         }
         checkBuildQueueIntegrity(true, null);
 
-        // If a build queue is empty, check that we are not producing
-        // any goods types useful for BuildableTypes, except if that
-        // type is the input to some other form of production.  (Note:
-        // isBuildingMaterial is also true for goods used to produce
-        // role-equipment, hence neededForBuildableType).  Such
-        // production probably means we forgot to reset the build
-        // queue.  Thus, if hammers are being produced it is worth
-        // warning about, but not if producing tools.
-        if (any(queues, BuildQueue::isEmpty)
-            && any(spec.getGoodsTypeList(), g ->
-                (g.isBuildingMaterial()
-                    && !g.isRawMaterial()
-                    && !g.isBreedable()
-                    && getAdjustedNetProductionOf(g) > 0
-                    && neededForBuildableType(g)))) {
-            cs.addMessage(owner,
-                new ModelMessage(MessageType.BUILDING_COMPLETED,
-                    "model.colony.notBuildingAnything", this)
-                .addName("%colony%", getName()));
-        }
-
-        // Update SoL.
+        // Update SoL
         updateSoL();
         if (sonsOfLiberty / 10 != oldSonsOfLiberty / 10) {
             cs.addMessage(owner,
@@ -860,6 +889,7 @@ public class ServerColony extends Colony implements TurnTaker {
             }
         }
         updateProductionBonus();
+
         // We have to wait for the production bonus to stabilize
         // before checking for completion of training.  This is a rare
         // case so it is not worth reordering the work location calls

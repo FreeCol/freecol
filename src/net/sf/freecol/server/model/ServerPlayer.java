@@ -4358,11 +4358,11 @@ outer:  for (Effect effect : effects) {
         lb.add("PLAYER ", getName(), ": ");
         final Game game = getGame();
         final Specification spec = getSpecification();
+        int oldImmigration = getImmigration(), oldLiberty = getLiberty(),
+            newSoL = 0, newImmigration = 0, newLiberty = 0;
 
         // Settlements
         List<Settlement> settlements = getSettlementList();
-        int oldImmigration = getImmigration(), oldLiberty = getLiberty(),
-            newSoL = 0;
         for (Settlement settlement : settlements) {
             ((TurnTaker)settlement).csNewTurn(random, lb, cs);
             newSoL += settlement.getSoL();
@@ -4382,15 +4382,9 @@ outer:  for (Effect effect : effects) {
             }
             oldSoL = newSoL; // Remember SoL for check changes at next turn.
         }
-        int newImmigration = getImmigration() - oldImmigration,
-            newLiberty = getLiberty() - oldLiberty;
-
-        // Europe.
-        if (europe != null) {
-            ((TurnTaker)europe).csNewTurn(random, lb, cs);
-            modifyImmigration(europe.getImmigration(newImmigration));
-            newImmigration = getImmigration() - oldImmigration;
-        }
+        newImmigration = getImmigration() - oldImmigration;
+        newLiberty = getLiberty() - oldLiberty;
+        
         // Units.
         for (Unit unit : getUnitList()) {
             try {
@@ -4399,6 +4393,13 @@ outer:  for (Effect effect : effects) {
                 logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(),
                            cce);
             }
+        }
+
+        // Europe.
+        if (europe != null) {
+            ((TurnTaker)europe).csNewTurn(random, lb, cs);
+            modifyImmigration(europe.getImmigration(newImmigration));
+            newImmigration = getImmigration() - oldImmigration;
         }
 
         if (isEuropean()) {
@@ -4467,6 +4468,12 @@ outer:  for (Effect effect : effects) {
                     + land.size() + " land, "
                     + leftOver.size() + " left over) arrives at " + entry
                     + "(for " + port.getName() + ")");
+            }
+
+            for (Settlement settlement : settlements) {
+                if (settlement instanceof ServerColony) {
+                    ((ServerColony)settlement).csWarnings(random, lb, cs);
+                }
             }
         }
 
