@@ -2381,16 +2381,23 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public void toXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
         // Special override of tile output serialization that handles
         // the tile caching.
-        Player player = xw.getClientPlayer();
+        final Player player = xw.getClientPlayer();
         Tile tile;
 
         if (player == null) {
             // 1. If not writing to a player, just write this tile.
             this.internalToXML(xw, tag);
 
-        } else if ((tile = getCachedTile(player)) == null) {
-            // 2. If there is no cached tile, then it is unexplored, so
-            //    write the minimal tile (id, x, y).
+        } else if ((tile = getCachedTile(player)) != null) {
+            // 2. There is a cached tile, so write it instead.
+            tile.internalToXML(xw, tag);
+
+        } else if (isExploredBy(player)) {
+            // 3. Tile is explored, write it
+            this.internalToXML(xw, tag);
+
+        } else {
+            // 4. Tile is not explored.
             xw.writeStartElement(tag);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
@@ -2400,11 +2407,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             xw.writeAttribute(Y_TAG, this.y);
 
             xw.writeEndElement();
-
-        } else {
-            // 3. Otherwise write the cached tile, which will either
-            //    be a copy or {@code this}.
-            tile.internalToXML(xw, tag);
         }
     }
 
@@ -2489,7 +2491,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // Show tile contents (e.g. enemy units) if not scoped to a
         // player that can not see the tile, and there is no blocking
         // enemy settlement.
-        Player player = xw.getClientPlayer();
+        final Player player = xw.getClientPlayer();
         if ((player == null || player.canSee(this)) 
             && (settlement == null
                 || xw.validFor(settlement.getOwner()))) {
