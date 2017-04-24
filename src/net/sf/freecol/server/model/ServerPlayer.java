@@ -1901,6 +1901,7 @@ outer:  for (Effect effect : effects) {
         if (uct != null && uct.appliesTo(this)) {
             for (Unit u : getUnitList()) {
                 for (UnitTypeChange uc : uct.getUnitChanges(u.getType())) {
+                    if (!uc.appliesTo(u)) continue;
                     u.changeType(uc.to);//-vis(this)
                     visibilityChange = true;
                     cs.add(See.perhaps(), u);
