@@ -297,6 +297,7 @@ public abstract class AIPlayer extends AIObject {
     public void chooseFoundingFatherHandler(List<FoundingFather> fathers) {
         FoundingFather ff = selectFoundingFather(fathers);
         if (ff == null) return;
+        logger.finest(getId() + " chose founding father: " + ff);
         invoke(() -> {
                 AIMessage.askChooseFoundingFather(this, fathers, ff);
             });
