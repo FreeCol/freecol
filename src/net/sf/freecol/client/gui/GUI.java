@@ -305,6 +305,13 @@ public class GUI extends FreeColClientHolder {
     public void clearGotoPath() {}
 
     /**
+     * Close a panel.
+     *
+     * @param panel The panel to close.
+     */
+    public void closePanel(String panel) {}
+    
+    /**
      * Create a thumbnail for the minimap.
      * 
      * FIXME: Delete all code inside this method and replace it with

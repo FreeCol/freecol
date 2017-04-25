@@ -1162,6 +1162,35 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Close a panel by class name.
+     *
+     * @param panel The panel to close.
+     */
+    public void closePanel(String panel) {
+        if (panel.endsWith("Panel")) {
+            for (Component c1 : getComponents()) {
+                if (c1 instanceof JInternalFrame) {
+                    for (Component c2 : ((JInternalFrame)c1).getContentPane()
+                             .getComponents()) {
+                        if (panel.equals(c2.getClass().getName())) {
+                            notifyClose(c2, (JInternalFrame)c1);
+                            return;
+                        }
+                    }
+                }
+            }
+        } else if (panel.endsWith("Dialog")) {
+            for (FreeColDialog<?> fcd : dialogs) {
+                if (panel.equals(fcd.getClass().getName())) {
+                    dialogs.remove(fcd);
+                    fcd.dispose();
+                    return;
+                }
+            }
+        }        
+    }
+
+    /**
      * Closes the {@link MainPanel}.
      */
     public void closeMainPanel() {

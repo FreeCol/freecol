@@ -48,8 +48,6 @@ public abstract class TrivialMessage extends DOMMessage {
      * True trivial messages have no distinguishing parts, so we might
      * as well just use some explicit constants.
      */
-    public static final CloseMenusMessage closeMenusMessage
-        = new CloseMenusMessage();
     public static final ContinueMessage continueMessage
         = new ContinueMessage();
     public static final DisconnectMessage disconnectMessage

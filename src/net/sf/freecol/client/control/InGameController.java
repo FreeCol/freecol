@@ -2915,11 +2915,9 @@ public final class InGameController extends FreeColClientHolder {
 
     /**
      * Close any open GUI menus.
-     *
-     * Called from IGIH.closeMenus.
      */
-    public void closeMenus() {
-        getGUI().closeMenus();
+    public void closeHandler(String panel) {
+        getGUI().closePanel(panel);
     }
 
     /**

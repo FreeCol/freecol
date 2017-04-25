@@ -33,33 +33,52 @@ import org.w3c.dom.Element;
 
 
 /**
- * A trivial message sent to clients to signal that menus should be closed.
+ * A message sent to clients to signal that a panel should be closed.
  */
-public class CloseMenusMessage extends TrivialMessage {
+public class CloseMessage extends AttributeMessage {
 
-    public static final String TAG = "closeMenus";
-    
+    public static final String TAG = "close";
+    private static final String PANEL_TAG = "panel";
+
 
     /**
-     * Create a new {@code CloseMenusMessage}.
+     * Create a new {@code CloseMessage}.
      */
-    public CloseMenusMessage() {
-        super(TAG);
+    public CloseMessage(String panel) {
+        super(TAG, PANEL_TAG, panel);
     }
 
     /**
-     * Create a new {@code CloseMenusMessage} from a stream.
+     * Create a new {@code CloseMessage} from a supplied element.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
+     */
+    public CloseMessage(Game game, Element element) {
+        super(TAG, PANEL_TAG, getStringAttribute(element, PANEL_TAG));
+    }
+
+    /**
+     * Create a new {@code CloseMessage} from a stream.
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
      * @exception FreeColException if the internal message can not be read.
      */
-    public CloseMenusMessage(Game game, FreeColXMLReader xr)
+    public CloseMessage(Game game, FreeColXMLReader xr)
         throws FreeColException, XMLStreamException {
-        super(TAG, game, xr);
+        super(TAG, xr, PANEL_TAG);
     }
     
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MessagePriority getPriority() {
+        return Message.MessagePriority.LAST;
+    }
 
     /**
      * {@inheritDoc}
@@ -80,6 +99,13 @@ public class CloseMenusMessage extends TrivialMessage {
         // answered quickly enough and that the offering player has
         // assumed this player has refused-by-inaction, and therefore,
         // the popup needs to be closed.
-        invokeAndWait(freeColClient, () -> igc(freeColClient).closeMenus());
+        igc(freeColClient).closeHandler(getPanel());
+    }
+
+
+    // Public interface
+
+    public String getPanel() {
+        return getStringAttribute(PANEL_TAG);
     }
 }

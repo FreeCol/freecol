@@ -508,6 +508,14 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
+    public void closePanel(String panel) {
+        canvas.closePanel(panel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void displayChat(Player player, String message,
                             boolean privateChat) {
         canvas.displayChat(new GUIMessage(

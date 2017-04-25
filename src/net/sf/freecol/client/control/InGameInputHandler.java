@@ -58,7 +58,7 @@ import net.sf.freecol.common.networking.AnimateAttackMessage;
 import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
-import net.sf.freecol.common.networking.CloseMenusMessage;
+import net.sf.freecol.common.networking.CloseMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -146,9 +146,9 @@ public final class InGameInputHandler extends ClientInputHandler {
         register(ChooseFoundingFatherMessage.TAG,
             (Connection c, Element e) ->
                 new ChooseFoundingFatherMessage(getGame(), e).clientHandler(freeColClient));
-        register(CloseMenusMessage.TAG,
+        register(CloseMessage.TAG,
             (Connection c, Element e) ->
-                TrivialMessage.closeMenusMessage.clientHandler(freeColClient));
+                new CloseMessage(getGame(), e).clientHandler(freeColClient));
         register(DiplomacyMessage.TAG,
             (Connection c, Element e) ->
                 new DiplomacyMessage(getGame(), e).clientHandler(freeColClient));

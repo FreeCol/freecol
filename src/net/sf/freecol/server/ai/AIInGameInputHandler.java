@@ -51,7 +51,7 @@ import net.sf.freecol.common.networking.AnimateMoveMessage;
 import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
-import net.sf.freecol.common.networking.CloseMenusMessage;
+import net.sf.freecol.common.networking.CloseMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
 import net.sf.freecol.common.networking.DisconnectMessage;
@@ -243,7 +243,7 @@ public final class AIInGameInputHandler extends FreeColServerHolder
             case AnimateMoveMessage.TAG:
             case AssignTradeRouteMessage.TAG:
             case ChatMessage.TAG:
-            case CloseMenusMessage.TAG:
+            case CloseMessage.TAG:
             case DeleteTradeRouteMessage.TAG:
             case DisconnectMessage.TAG:
             case ErrorMessage.TAG:

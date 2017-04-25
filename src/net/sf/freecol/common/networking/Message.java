@@ -78,7 +78,8 @@ public abstract class Message {
         // Symbolic priorities used by various non-fixed types
         EARLY(1),
         NORMAL(15),
-        LATE(90);
+        LATE(90),
+        LAST(99);
 
         private final int level;
 

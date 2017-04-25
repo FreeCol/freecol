@@ -31,10 +31,9 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
-import net.sf.freecol.common.networking.CloseMenusMessage;
+import net.sf.freecol.common.networking.CloseMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.TrivialMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -319,13 +318,14 @@ public class DiplomacySession extends TimedSession {
      */
     @Override
     protected boolean complete(boolean result) {
+        final String dialogName = "net.sf.freecol.client.gui.dialog.NegotiationDialog";
         ChangeSet cs = new ChangeSet();
         boolean ret = complete(false, cs);
         if (!ret) { // Withdraw offer
             cs.add(See.only((ServerPlayer)this.agreement.getSender()),
-                   TrivialMessage.closeMenusMessage);
+                   new CloseMessage(dialogName));
             cs.add(See.only((ServerPlayer)this.agreement.getRecipient()),
-                   TrivialMessage.closeMenusMessage);
+                   new CloseMessage(dialogName));
         }
         getGame().sendToAll(cs);
         return ret;
