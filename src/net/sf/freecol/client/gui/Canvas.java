@@ -100,6 +100,7 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.dialog.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.dialog.MapSizeDialog;
 import net.sf.freecol.client.gui.dialog.MonarchDialog;
+import net.sf.freecol.client.gui.dialog.NativeDemandDialog;
 import net.sf.freecol.client.gui.dialog.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.dialog.Parameters;
@@ -2332,6 +2333,25 @@ public final class Canvas extends JDesktopPane {
                 new FreeColStringInputDialog(freeColClient, frame, false,
                                              Messages.message(template),
                                              defaultName, "ok", null),
+                unit.getTile(), handler));
+    }
+
+    /**
+     * Display a dialog to handle a native demand to a colony.
+     *
+     * @param unit The demanding {@code Unit}.
+     * @param colony The {@code Colony} being demanded of.
+     * @param type The {@code GoodsType} demanded (may be null for gold).
+     * @param amount The amount of goods demanded.
+     * @param handler A {@code DialogHandler} for the dialog response.
+     */
+    public void showNativeDemandDialog(Unit unit, Colony colony,
+                                       GoodsType type, int amount,
+                                       DialogHandler<Boolean> handler) {
+        SwingUtilities.invokeLater(
+            new DialogCallback<>(
+                new NativeDemandDialog(freeColClient, frame, unit, colony,
+                                       type, amount),
                 unit.getTile(), handler));
     }
 

@@ -1293,6 +1293,10 @@ public class GUI extends FreeColClientHolder {
 
     public void showFindSettlementPanel() {}
 
+    public void showFirstContactDialog(final Player player, final Player other,
+                                       final Tile tile, int settlementCount,
+                                       DialogHandler<Boolean> handler) {}
+
     public OptionGroup showGameOptionsDialog(boolean editable, boolean custom) {
         return null;
     }
@@ -1385,14 +1389,14 @@ public class GUI extends FreeColClientHolder {
                                  final Unit unit,
                                  DialogHandler<String> handler) {}
 
-    public void showFirstContactDialog(final Player player, final Player other,
-                                       final Tile tile, int settlementCount,
+    public void showNativeDemandDialog(Unit unit, Colony colony,
+                                       GoodsType type, int amount,
                                        DialogHandler<Boolean> handler) {}
 
     public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
-                                                     FreeColGameObject other,
-                                                     DiplomaticTrade agreement,
-                                                     StringTemplate comment) {
+                                                 FreeColGameObject other,
+                                                 DiplomaticTrade agreement,
+                                                 StringTemplate comment) {
         return null;
     }
 

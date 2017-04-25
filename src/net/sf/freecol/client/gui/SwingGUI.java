@@ -1488,6 +1488,16 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
+    public void showNativeDemandDialog(Unit unit, Colony colony,
+                                       GoodsType type, int amount,
+                                       DialogHandler<Boolean> handler) {
+        canvas.showNativeDemandDialog(unit, colony, type, amount, handler);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
                                                      FreeColGameObject other,
                                                      DiplomaticTrade agreement,

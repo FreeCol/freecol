@@ -124,7 +124,7 @@ public class NativeDemandSession extends TimedSession {
         if (!ret) {
             completeInternal(result, cs);
             cs.add(See.only(getColonyOwner()),
-                   new CloseMessage("NativeDemandDialog"));
+                   new CloseMessage("net.sf.freecol.client.gui.dialog.NativeDemandDialog"));
             getGame().sendToAll(cs);
         }
         return ret;
