@@ -21,6 +21,7 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -175,6 +176,28 @@ public class DiplomacyMessage extends ObjectMessage {
         final DiplomaticTrade agreement = getAgreement();
 
         aiPlayer.diplomacyHandler(our, other, agreement);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final DiplomaticTrade agreement = getAgreement();
+        final FreeColGameObject our = getOurFCGO(game);
+        final FreeColGameObject other = getOtherFCGO(game);
+
+        if (our == null) {
+            logger.warning("Our FCGO omitted from diplomacy message.");
+            return;
+        }
+        if (other == null) {
+            logger.warning("Other FCGO omitted from diplomacy message.");
+            return;
+        }
+
+        igc(freeColClient).diplomacyHandler(our, other, agreement);
     }
 
     /**

@@ -2981,14 +2981,12 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Handle a diplomatic offer.
      *
-     * Called from IGIH.diplomacy
-     *
      * @param our Our {@code FreeColGameObject} that is negotiating.
      * @param other The other {@code FreeColGameObject}.
      * @param agreement The {@code DiplomaticTrade} agreement.
      */
-    public void diplomacy(FreeColGameObject our, FreeColGameObject other,
-                          DiplomaticTrade agreement) {
+    public void diplomacyHandler(FreeColGameObject our, FreeColGameObject other,
+                                 DiplomaticTrade agreement) {
         final Player player = getMyPlayer();
         final Player otherPlayer = agreement.getOtherPlayer(player);
         StringTemplate t, nation = otherPlayer.getNationLabel();
