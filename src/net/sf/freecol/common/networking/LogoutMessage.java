@@ -105,8 +105,7 @@ public class LogoutMessage extends AttributeMessage {
         if (player == null) return;
 
         if (freeColClient.isInGame()) {
-            invokeLater(freeColClient, () ->
-                igc(freeColClient).logout(player, reason));
+            igc(freeColClient).logoutHandler(player, reason);
 
         } else {
             game.removePlayer(player);

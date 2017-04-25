@@ -113,6 +113,19 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Unit unit = getUnit(game);
+        final IndianSettlement is = getSettlement(game);
+        final String result = getResult();
+
+        igc(freeColClient).scoutSpeakToChiefHandler(unit, is, result);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final String unitId = getStringAttribute(UNIT_TAG);
@@ -146,20 +159,6 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
         // Valid request, do the scouting.
         return freeColServer.getInGameController()
             .scoutSpeakToChief(serverPlayer, unit, is);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
-        final Unit unit = getUnit(game);
-        final IndianSettlement is = getSettlement(game);
-        final String result = getResult();
-
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).scoutSpeakToChief(unit, is, result));
     }
 
 

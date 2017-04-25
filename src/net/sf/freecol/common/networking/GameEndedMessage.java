@@ -106,11 +106,8 @@ public class GameEndedMessage extends AttributeMessage {
         FreeColDebugger.finishDebugRun(freeColClient, true);
         if (winner != freeColClient.getMyPlayer()) return;
         
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).victory(highScore));
+        igc(freeColClient).gameEndedHandler(highScore);
     }
-
-    // No serverHandler needed, message only sent to client
 
     
     // Public interface

@@ -111,9 +111,6 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
         igc(freeColClient).setCurrentPlayerHandler(player);
     }
 
-    // No server handler required.
-    // This message is only sent to clients.
-
 
     // Public interface
 

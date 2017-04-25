@@ -125,8 +125,7 @@ public class RemoveMessage extends AttributeMessage {
         final List<FreeColGameObject> objects = getRemovals(game);
 
         if (objects.isEmpty()) return;
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).remove(objects, divert));
+        igc(freeColClient).removeHandler(objects, divert);
     }
 
     /**

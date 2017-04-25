@@ -97,8 +97,7 @@ public class SetDeadMessage extends AttributeMessage {
             return;
         }
 
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).setDead(player));
+        igc(freeColClient).setDeadHandler(player);
     }
 
 

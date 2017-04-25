@@ -113,8 +113,7 @@ public class SetStanceMessage extends AttributeMessage {
             return;
         }
 
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).setStance(stance, p1, p2));
+        igc(freeColClient).setStanceHandler(stance, p1, p2);
     }
 
 

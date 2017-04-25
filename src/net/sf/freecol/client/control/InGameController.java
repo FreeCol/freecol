@@ -2341,7 +2341,8 @@ public final class InGameController extends FreeColClientHolder {
     // confirm where they can come from.
     //
     // User command all return a success/failure indication, except if
-    // the game is stopped.  IGIH-initiated routines do not need to.
+    // the game is stopped.  Message.clientHandler-initiated routines
+    // do not need to.
     //
     // Successfully executed commands should update the GUI.
 
@@ -3059,8 +3060,6 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Displays pending {@code ModelMessage}s.
      *
-     * Called from IGIH.displayModelMessagesRunnable
-     *
      * @param allMessages Display all messages or just the undisplayed ones.
      * @return True if any messages were displayed.
      */
@@ -3316,6 +3315,18 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * The player has won, show the high scores and victory dialog.
+     *
+     * @param score If "true", a new high score was reached.
+     */
+    public void gameEndedHandler(String score) {
+        invokeLater(() -> {
+                highScore("true".equalsIgnoreCase(score));
+                getGUI().showVictoryDialog((Boolean result) -> victory(result));
+            });
+    }
+
+    /**
      * Go to a tile.
      *
      * Called from CanvasMouseListener, TilePopup
@@ -3343,7 +3354,7 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Display the high scores.
      *
-     * Called from IGIH.gameEnded, ReportHighScoresAction
+     * Called from ReportHighScoresAction
      *
      * @param high A {@code Boolean} whose values indicates whether
      *     a new high score has been achieved, or no information if null.
@@ -3393,29 +3404,33 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Handle an incite response.
      *
-     * Called from IGIH.incite.
-     *
      * @param unit The {@code Unit} that is inciting.
      * @param is The {@code IndianSettlement} being incited.
      * @param enemy The {@code Player} incited against.
      * @param gold The gold required by the natives to become hostile.
      */
-    public void incite(Unit unit, IndianSettlement is, Player enemy, int gold) {
+    public void inciteHandler(Unit unit, IndianSettlement is, Player enemy,
+                              int gold) {
         final Player player = getMyPlayer();
         
         if (gold < 0) {
             ; // protocol fail
         } else if (!player.checkGold(gold)) {
-            getGUI().showInformationMessage(is, StringTemplate
-                .template("missionarySettlement.inciteGoldFail")
-                .add("%player%", enemy.getName())
-                .addAmount("%amount%", gold));
-        } else if (getGUI().confirm(unit.getTile(), StringTemplate
-                .template("missionarySettlement.inciteConfirm")
-                .addStringTemplate("%enemy%", enemy.getNationLabel())
-                .addAmount("%amount%", gold),
-                unit, "yes", "no")) {
-            askServer().incite(unit, is, enemy, gold);
+            invokeLater(() ->
+                getGUI().showInformationMessage(is, StringTemplate
+                    .template("missionarySettlement.inciteGoldFail")
+                    .add("%player%", enemy.getName())
+                    .addAmount("%amount%", gold)));
+        } else {
+            invokeLater(() -> {
+                    if (getGUI().confirm(unit.getTile(), StringTemplate
+                            .template("missionarySettlement.inciteConfirm")
+                            .addStringTemplate("%enemy%", enemy.getNationLabel())
+                            .addAmount("%amount%", gold),
+                            unit, "yes", "no")) {
+                        askServer().incite(unit, is, enemy, gold);
+                    }
+                });
         }
     }
 
@@ -3642,12 +3657,10 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Log out the current player.
      *
-     * Called from IGIH.logout.
-     *
      * @param player The {@code Player} that is logging out.
      * @param reason The reason for logging out.
      */
-    public void logout(Player player, LogoutReason reason) {
+    public void logoutHandler(Player player, LogoutReason reason) {
         if (player == null) return;
 
         final Game game = getGame();
@@ -4434,13 +4447,11 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Remove game objects.
      *
-     * Called from IGIH.remove().
-     *
      * @param objects A list of {@code FreeColGameObject}s to remove.
      * @param divert An object to divert to when the original disappears.
      */
-    public void remove(List<FreeColGameObject> objects,
-                       FreeColGameObject divert) {
+    public void removeHandler(List<FreeColGameObject> objects,
+                              FreeColGameObject divert) {
         final Player player = getMyPlayer();
         boolean visibilityChange = false;
         for (FreeColGameObject fcgo : objects) {
@@ -4572,39 +4583,41 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Display the results of speaking to a chief.
      *
-     * Called from IGIH.scoutSpeakToChief.
-     *
      * @param unit The {@code Unit} that was speaking.
      * @param is The {@code IndianSettlement} spoken to.
      * @param result The result.
      */
-    public void scoutSpeakToChief(Unit unit, IndianSettlement is,
-                                  String result) {
+    public void scoutSpeakToChiefHandler(Unit unit, IndianSettlement is,
+                                         String result) {
         switch (result) {
         case "":
             break;
         case "die":
-            getGUI().showInformationMessage(is,
-                "scoutSettlement.speakDie");
+            invokeLater(() ->
+                getGUI().showInformationMessage(is, "scoutSettlement.speakDie"));
             break;
         case "expert":
-            getGUI().showInformationMessage(is, StringTemplate
-                .template("scoutSettlement.expertScout")
-                .addNamed("%unit%", unit.getType()));
+            invokeLater(() ->
+                getGUI().showInformationMessage(is, StringTemplate
+                    .template("scoutSettlement.expertScout")
+                    .addNamed("%unit%", unit.getType())));
             break;
         case "tales":
-            getGUI().showInformationMessage(is,
-                "scoutSettlement.speakTales");
+            invokeLater(() ->
+                getGUI().showInformationMessage(is,
+                    "scoutSettlement.speakTales"));
             break;
         case "nothing":
-            getGUI().showInformationMessage(is, StringTemplate
-                .template("scoutSettlement.speakNothing")
-                .addStringTemplate("%nation%", unit.getOwner().getNationLabel()));
+            invokeLater(() ->
+                getGUI().showInformationMessage(is, StringTemplate
+                    .template("scoutSettlement.speakNothing")
+                    .addStringTemplate("%nation%", unit.getOwner().getNationLabel())));
             break;
         default: // result == amount of gold
-            getGUI().showInformationMessage(is, StringTemplate
-                .template("scoutSettlement.speakBeads")
-                .add("%amount%", result));
+            invokeLater(() ->
+                getGUI().showInformationMessage(is, StringTemplate
+                    .template("scoutSettlement.speakBeads")
+                    .add("%amount%", result)));
             break;
         }
     }
@@ -4727,8 +4740,6 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Set a player to be the new current player.
      *
-     * Called from IGIH.newTurn, CC.login
-     *
      * @param player The {@code Player} to be the new current player.
      * @return True if the current player changes.
      */
@@ -4788,45 +4799,46 @@ public final class InGameController extends FreeColClientHolder {
     public void setCurrentPlayerHandler(Player currentPlayer) {
         setCurrentPlayer(currentPlayer); // Seems safe to call directly
     }
-    
+
+    /**
+     * This player has died.
+     */
+    public void setDead() {
+        final FreeColClient fcc = getFreeColClient();
+        final Player player = getMyPlayer();
+        FreeColDebugger.finishDebugRun(fcc, true);
+        if (fcc.getSinglePlayer()) {
+            if (player.getPlayerType() == Player.PlayerType.RETIRED) {
+                    ; // Do nothing, retire routine will quit
+            } else if (player.getPlayerType() != Player.PlayerType.UNDEAD) {
+                if (getGUI().confirm("defeatedSinglePlayer.text",
+                                     "defeatedSinglePlayer.yes", "quit")) {
+                    askServer().enterRevengeMode();
+                }
+            } else {
+                fcc.getConnectController()
+                    .requestLogout(LogoutReason.DEFEATED);
+            }
+        } else {
+            if (!getGUI().confirm("defeated.text", "defeated.yes", "quit")) {
+                fcc.getConnectController()
+                    .requestLogout(LogoutReason.DEFEATED);
+            }
+        }
+    }
+
     /**
      * Set a player to be dead.
      *
-     * Called from IGIH.setDead
-     *
      * @param dead The dead {@code Player}.
-     * @return True if the player is marked as dead.
      */
-    public boolean setDead(Player dead) {
-        if (dead == null) return false;
-
+    public void setDeadHandler(Player dead) {
         final Player player = getMyPlayer();
         if (player == dead) {
-            final FreeColClient fcc = getFreeColClient();
-            FreeColDebugger.finishDebugRun(fcc, true);
-            if (fcc.getSinglePlayer()) {
-                if (player.getPlayerType() == Player.PlayerType.RETIRED) {
-                    ; // Do nothing, retire routine will quit
-
-                } else if (player.getPlayerType() != Player.PlayerType.UNDEAD
-                    && getGUI().confirm("defeatedSinglePlayer.text",
-                                        "defeatedSinglePlayer.yes", "quit")) {
-                    askServer().enterRevengeMode();
-                } else {
-                    fcc.getConnectController()
-                        .requestLogout(LogoutReason.DEFEATED);
-                }
-            } else {
-                if (!getGUI().confirm("defeated.text",
-                                      "defeated.yes", "quit")) {
-                    fcc.getConnectController()
-                        .requestLogout(LogoutReason.DEFEATED);
-                }
-            }
+            invokeLater(() -> setDead());
         } else {
             player.setStance(dead, null);
         }
-        return true;
     }
 
     /**
@@ -4876,14 +4888,12 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Notify the player that the stance between two players has changed.
      *
-     * Called from IGIH.setStance
-     *
      * @param stance The changed {@code Stance}.
      * @param first The first {@code Player}.
      * @param second The second {@code Player}.
      * @return True if the stance change succeeds.
      */
-    public boolean setStance(Stance stance, Player first, Player second) {
+    public boolean setStanceHandler(Stance stance, Player first, Player second) {
         if (stance == null || first == null || second == null) return false;
 
         final Player player = getMyPlayer();
@@ -4895,7 +4905,8 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         }
         if (player == first && old == Stance.UNCONTACTED) {
-            sound("sound.event.meet." + second.getNationId());
+            invokeLater(() ->
+                sound("sound.event.meet." + second.getNationId()));
         }
         return true;
     }
@@ -5053,18 +5064,6 @@ public final class InGameController extends FreeColClientHolder {
         if (route == null) return false;
 
         return askServer().updateTradeRoute(route);
-    }
-
-    /**
-     * The player has won, show the high scores and victory dialog.
-     *
-     * Called from IGIH.gameEnded.
-     *
-     * @param score If "true", a new high score was reached.
-     */
-    public void victory(String score) {
-        highScore("true".equalsIgnoreCase(score));
-        getGUI().showVictoryDialog((Boolean result) -> victory(result));
     }
 
     /**

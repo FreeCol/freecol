@@ -113,8 +113,7 @@ public class InciteMessage extends AttributeMessage {
         final Player enemy = getEnemy(game);
         final int gold = getGold();
         
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).incite(unit, is, enemy, gold));
+        igc(freeColClient).inciteHandler(unit, is, enemy, gold);
     }
     
     /**
