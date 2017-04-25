@@ -461,7 +461,7 @@ public abstract class Message {
      */
     public void clientHandler(FreeColClient freeColClient)
         throws FreeColException {
-        ; // Do nothing, overriding routines do the real work
+        throw new RuntimeException("NYI clientHandler for: " + getType());
     }
 
     /**
