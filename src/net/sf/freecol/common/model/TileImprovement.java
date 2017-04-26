@@ -47,6 +47,9 @@ public class TileImprovement extends TileItem implements Named {
 
     public static final String TAG = "tileImprovement";
 
+    public static final String EMPTY_RIVER_STYLE = "0000";
+    public static final String EMPTY_ROAD_STYLE = "00000000";
+    
     /** River magnitudes */
     public static final int NO_RIVER = 0;
     public static final int SMALL_RIVER = 1;
@@ -113,11 +116,7 @@ public class TileImprovement extends TileItem implements Named {
     public TileImprovement(Game game, Tile tile, TileImprovement template) {
         super(game, tile);
 
-        this.type = template.type;
-        this.turnsToComplete = template.turnsToComplete;
-        this.magnitude = template.magnitude;
-        this.style = template.style;
-        this.virtual = template.virtual;
+        copy(template);
     }
 
     /**
@@ -132,6 +131,21 @@ public class TileImprovement extends TileItem implements Named {
         super(game, id);
     }
 
+
+    /**
+     * Copy another tile improvement into this one.
+     *
+     * @param template The other {@code TileImprovement} to copy.
+     * @return This tile improvement.
+     */
+    public TileImprovement copy(TileImprovement template) {
+        this.type = template.type;
+        this.turnsToComplete = template.turnsToComplete;
+        this.magnitude = template.magnitude;
+        this.style = template.style;
+        this.virtual = template.virtual;
+        return this;
+    }
 
     /**
      * Gets the type of this tile improvement.
@@ -282,7 +296,10 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     private void setConnected(Direction direction, boolean value, String magnitude) {
-        String old = (style == null) ? "00000000" : style.getString();
+        if (style == null) {
+            style = TileImprovementStyle.getInstance(EMPTY_ROAD_STYLE);
+        }
+        String old = style.toString();
         List<Direction> directions = getConnectionDirections();
         int end = directions.size();
         StringBuilder updated = new StringBuilder();
@@ -480,7 +497,7 @@ public class TileImprovement extends TileItem implements Named {
                 setConnected(d, false);
             }
         }
-        return (style == null) ? null : style.getString();
+        return (this.style == null) ? null : this.style.getString();
     }
 
     /**
@@ -730,24 +747,25 @@ public class TileImprovement extends TileItem implements Named {
 
         virtual = xr.getAttribute(VIRTUAL_TAG, false);
 
+        style = null;
         String str = xr.getAttribute(STYLE_TAG, (String)null);
         List<Direction> dirns = getConnectionDirections();
         if (dirns == null) {
-            style = null;
             if (str != null && !str.isEmpty())
+                logger.warning("At " + tile + " ignored nonempty style for "
+                    + type + ": " + str + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+        } else if (str == null) {
+            if (!isComplete() || isVirtual()) {
+                ; // Null style OK for incomplete or virtual roads
+            } else {
                 logger.warning("At " + tile
-                    + " ignored superfluous TileImprovementStyle: " + str);
+                    + " unexpected null style for " + type + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+            }
+        } else if (str.length() != dirns.size()) {
+            logger.warning("At " + tile + " ignored bogus style for " + type
+                + ": " + str + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
         } else {
             style = TileImprovementStyle.getInstance(str);
-            if (style == null || style.getString().length() != dirns.size()) {
-                // incomplete roads are expected to have a null style
-                if (style != null || dirns.size() != 8 || isComplete()) {
-                    logger.warning("At " + tile
-                        + " with " + ((dirns.size() == 8) ? "road" : "river")
-                        + " ignored bogus TileImprovementStyle: " + str);
-                }
-                style = null;
-            }
         }
     }
 

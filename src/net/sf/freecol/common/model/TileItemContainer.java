@@ -163,8 +163,6 @@ public class TileItemContainer extends FreeColGameObject {
 
     /**
      * Try to add a {@code TileItem} to this container.
-     * If the item is of lower magnitude than an existing one the existing
-     * one stands.
      *
      * @param item The {@code TileItem} to add to this container.
      * @return The added {@code TileItem} or the existing
@@ -172,26 +170,20 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public final TileItem tryAddTileItem(TileItem item) {
         if (item == null) return null;
-        List<TileItem> items = getTileItems();
-        for (int index = 0; index < items.size(); index++) {
-            TileItem oldItem = items.get(index);
-            if (item instanceof TileImprovement
-                && oldItem instanceof TileImprovement) {
+        if (item instanceof TileImprovement) {
+            // Consider merging with improvements of the same type
+            TileImprovement newTip = (TileImprovement)item;
+            for (TileItem oldItem : getTileItems()) {
+                if (!(oldItem instanceof TileImprovement)) continue;
                 TileImprovement oldTip = (TileImprovement)oldItem;
-                TileImprovement newTip = (TileImprovement)item;
                 if (oldTip.getType().getId().equals(newTip.getType().getId())) {
                     if (oldTip.getMagnitude() < newTip.getMagnitude()) {
-                        synchronized (tileItems) {
-                            tileItems.set(index, item);
-                        }
-                        oldItem.dispose();
+                        oldTip.copy(newTip); // Override with larger version
                         invalidateCache();
-                        return item;
-                    } else {
-                        return oldItem; // Found it, but not replacing.
                     }
+                    return oldItem;
                 } else if (oldItem.getZIndex() > item.getZIndex()) {
-                    break;
+                    break; // New item is under old one, can not merge
                 }
             }
         }

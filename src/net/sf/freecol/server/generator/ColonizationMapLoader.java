@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
@@ -181,8 +182,8 @@ public class ColonizationMapLoader implements MapLoader {
                         TileItemContainer container = new TileItemContainer(game, tiles[x][y]);
                         TileImprovement river =
                             new TileImprovement(game, tiles[x][y], riverType,
-                                                null);//TODO: connections!
-                        river.setMagnitude (overlay <= 3 ? 1 : 2);
+                                TileImprovementStyle.getInstance(TileImprovement.EMPTY_RIVER_STYLE));//TODO: connections!
+                        river.setMagnitude(overlay <= 3 ? 1 : 2);
                         container.tryAddTileItem(river);
                         tiles[x][y].setTileItemContainer(container);
                     }

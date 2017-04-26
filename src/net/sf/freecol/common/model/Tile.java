@@ -818,7 +818,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             tileItemContainer = new TileItemContainer(getGame(), this);
         }
         TileItem added = tileItemContainer.tryAddTileItem(item);
-        return added == item;
+        return added != null;
     }
 
     /**
@@ -872,12 +872,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         TileImprovementType riverType = getSpecification()
             .getTileImprovementType("model.improvement.river");
         TileImprovement river = new TileImprovement(getGame(), this, riverType,
-                                                    null);
+            TileImprovementStyle.getInstance(TileImprovement.EMPTY_RIVER_STYLE));
         river.setTurnsToComplete(0);
         river.setMagnitude(magnitude);
-        if (!addTileItem(river)) return null;
         river.updateRiverConnections(conns);
-        return river;
+        // Have to return getRiver() because "river" might be merged into an
+        // existing one.
+        return (addTileItem(river)) ? getRiver() : null;
     }
 
     /**
@@ -903,7 +904,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         TileImprovementType roadType = getSpecification()
             .getTileImprovementType("model.improvement.road");
         TileImprovement road = new TileImprovement(getGame(), this, roadType,
-                                                   null);
+            TileImprovementStyle.getInstance(TileImprovement.EMPTY_ROAD_STYLE));
         road.setMagnitude(1);
         return (addTileItem(road)) ? road : null;
     }
