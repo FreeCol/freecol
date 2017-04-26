@@ -44,7 +44,7 @@ public class FreeColSeed {
     public static long getFreeColSeed(boolean generate) {
         if (generate) {
             freeColSeed = new SecureRandom().nextLong();
-            logger.info("Using seed: " + freeColSeed);
+            logger.config("Using seed: " + freeColSeed);
         }
         return freeColSeed;
     }
@@ -65,6 +65,6 @@ public class FreeColSeed {
      */
     public static void incrementFreeColSeed() {
         freeColSeed = getFreeColSeed(false) + 1;
-        logger.info("Reseeded with: " + freeColSeed);
+        logger.config("Reseeded with: " + freeColSeed);
     }
 }
