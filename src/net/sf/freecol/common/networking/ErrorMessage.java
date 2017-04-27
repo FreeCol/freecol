@@ -169,7 +169,11 @@ public class ErrorMessage extends ObjectMessage {
         final StringTemplate template = getTemplate();
         final String message = getMessage();
         
-        igc(freeColClient).errorHandler(template, message);
+        if (freeColClient.isInGame()) {
+            igc(freeColClient).errorHandler(template, message);
+        } else {
+            pgc(freeColClient).errorHandler(template, message);
+        }
     }
 
     /**

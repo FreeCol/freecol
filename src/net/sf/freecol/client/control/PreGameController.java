@@ -84,7 +84,14 @@ public final class PreGameController extends FreeColClientHolder {
     public void displayChat(Player player, String message, boolean pri) {
         getGUI().displayStartChat(player, message, pri);
     }
-    
+
+    /**
+     * Handle an error.
+     */
+    public void errorHandler(StringTemplate template, String message) {
+        getGUI().showErrorMessage(template, message);
+    }            
+        
     /**
      * Requests the game to be started.  This will only be successful
      * if all players are ready to start the game.

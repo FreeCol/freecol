@@ -299,10 +299,5 @@ public final class InGameInputHandler extends ServerInputHandler {
         register(WorkMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
                 new WorkMessage(getGame(), e)));
-
-        register(MultipleMessage.TAG,
-            (Connection connection, Element element) ->
-                new MultipleMessage(getGame(), element)
-                    .handle(freeColServer, connection));
     }
 }

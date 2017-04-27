@@ -87,7 +87,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 new ChatMessage(getGame(), e).clientHandler(freeColClient));
         register(ErrorMessage.TAG,
             (Connection c, Element e) ->
-                error(new ErrorMessage(getGame(), e)));
+                new ErrorMessage(getGame(), e).clientHandler(freeColClient));
         register(LoginMessage.TAG,
             (Connection c, Element e) ->
                 new LoginMessage(new Game(), e).clientHandler(freeColClient));
@@ -135,18 +135,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
         // Reading the player in does most of the work.
 
         getGUI().refreshPlayersTable();
-    }
-
-    /**
-     * Handle an "error"-message.
-     *
-     * @param message The {@code ErrorMessage} to process.
-     */
-    private void error(ErrorMessage message) {
-        final StringTemplate template = message.getTemplate();
-        final String text = message.getMessage();
-
-        getGUI().showErrorMessage(template, text);
     }
 
     /**
