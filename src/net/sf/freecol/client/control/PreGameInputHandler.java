@@ -81,7 +81,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
 
         register(AddPlayerMessage.TAG,
             (Connection c, Element e) ->
-                addPlayer(new AddPlayerMessage(getGame(), e)));
+                new AddPlayerMessage(getGame(), e).clientHandler(freeColClient));
         register(ChatMessage.TAG,
             (Connection c, Element e) ->
                 new ChatMessage(getGame(), e).clientHandler(freeColClient));
@@ -125,17 +125,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
 
 
     // Individual handlers
-
-    /**
-     * Handles an "addPlayer"-message.
-     *
-     * @param message The {@code AddPlayerMessage} to process.
-     */
-    private void addPlayer(AddPlayerMessage message) {
-        // Reading the player in does most of the work.
-
-        getGUI().refreshPlayersTable();
-    }
 
     /**
      * Handles an "update"-message.

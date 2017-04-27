@@ -92,6 +92,7 @@ public class AddPlayerMessage extends ObjectMessage {
             } else {
                 expected(Player.TAG, tag);
             }
+            xr.expectTag(tag);
         }
         xr.expectTag(TAG);
     }
@@ -134,9 +135,13 @@ public class AddPlayerMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void clientHandler(FreeColClient client) {
-        // Do not need to do anything, reading the player in does
-        // enough for now.
+    public void clientHandler(FreeColClient freeColClient) {
+        if (freeColClient.isInGame()) {
+            // Do not need to do anything, an interning read of the
+            // player does enough for now.
+        } else {
+            pgc(freeColClient).addPlayerHandler();
+        }
     }
 
 

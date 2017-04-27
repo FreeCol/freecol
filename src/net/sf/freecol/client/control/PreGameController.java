@@ -66,6 +66,13 @@ public final class PreGameController extends FreeColClientHolder {
 
 
     /**
+     * Handle an addPlayer message.
+     */
+    public void addPlayerHandler() {
+        getFreeColClient().getGUI().refreshPlayersTable();
+    }
+
+    /**
      * Sends a chat message.
      *
      * @param message The text of the message.
