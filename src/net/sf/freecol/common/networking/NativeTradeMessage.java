@@ -188,9 +188,7 @@ public class NativeTradeMessage extends ObjectMessage {
     }
 
     /**
-     * Convert this NativeTradeMessage to XML.
-     *
-     * @return The XML representation of this message.
+     * {@inheritDoc}
      */
     @Override
     public Element toXMLElement() {

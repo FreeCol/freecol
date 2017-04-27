@@ -34,6 +34,15 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.ChangeSet;
+import net.sf.freecol.common.networking.ReadyMessage;
+import net.sf.freecol.common.networking.SetAvailableMessage;
+import net.sf.freecol.common.networking.SetColorMessage;
+import net.sf.freecol.common.networking.SetNationMessage;
+import net.sf.freecol.common.networking.SetNationTypeMessage;
+import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
+import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
+import net.sf.freecol.common.networking.VacantPlayersMessage;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -81,6 +90,22 @@ public final class PreGameController extends Controller {
     }
 
     /**
+     * A player changes its readiness.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that changes its state.
+     * @param ready The new readiness.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet ready(ServerPlayer serverPlayer, boolean ready) {
+        final FreeColServer freeColServer = getFreeColServer();
+        
+        serverPlayer.setReady(ready);
+        getFreeColServer().sendToAll(new ReadyMessage(serverPlayer, ready),
+                                     serverPlayer);
+        return null;
+    }
+        
+    /**
      * Launch the game if possible.
      * 
      * @param serverPlayer The {@code ServerPlayer} that requested launching.
@@ -126,5 +151,116 @@ public final class PreGameController extends Controller {
         }
 
         return null;
+    }
+
+    /**
+     * Handle a player changing its availability.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that changed.
+     * @param nation The changed {@code Nation}.
+     * @param state The new {@code NationState}.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet setAvailable(ServerPlayer serverPlayer, Nation nation,
+                                  NationState state) {
+        getGame().getNationOptions().setNationState(nation, state);
+        getFreeColServer().sendToAll(new SetAvailableMessage(nation, state),
+                                     serverPlayer);
+        return null;
+    }
+
+    /**
+     * Handle a player changing its color.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that changed.
+     * @param nation The changed {@code Nation}.
+     * @param color The new {@code Color}.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet setColor(ServerPlayer serverPlayer, Nation nation,
+                              Color color) {
+        nation.setColor(color);
+        getFreeColServer().sendToAll(new SetColorMessage(nation, color),
+                                     serverPlayer);
+        return null;
+    }
+
+    /**
+     * Handle a player changing its nation.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that changed.
+     * @param nation The changed {@code Nation}.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet setNation(ServerPlayer serverPlayer, Nation nation) {
+        serverPlayer.setNation(nation);
+        getFreeColServer().sendToAll(new SetNationMessage(serverPlayer, nation),
+                                     serverPlayer);
+        return null;
+    }
+
+    /**
+     * Handle a player changing its nation type.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that changed.
+     * @param nationType The changed {@code NationType}.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet setNationType(ServerPlayer serverPlayer,
+                                   NationType nationType) {
+        serverPlayer.changeNationType(nationType);
+        getFreeColServer().sendToAll(new SetNationTypeMessage(serverPlayer, nationType),
+                                     serverPlayer);
+        return null;
+    }
+
+    /**
+     * Handle a player changing its game options.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that changed.
+     * @param options The new {@code OptionGroup} containing the game options.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet updateGameOptions(ServerPlayer serverPlayer,
+                                       OptionGroup options) {
+        final Game game = getFreeColServer().getGame();
+        final Specification spec = game.getSpecification();
+
+        if (!spec.mergeGameOptions(options, "server")) {
+            return serverPlayer.clientError("Game option merge failed");
+        }
+        getFreeColServer().sendToAll(new UpdateGameOptionsMessage(spec.getGameOptions()),
+                                     serverPlayer);
+        return null;
+    }
+
+    /**
+     * Handle a player changing its map generator options.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that changed.
+     * @param options The new {@code OptionGroup} containing the map
+     *     generator options.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet updateMapGeneratorOptions(ServerPlayer serverPlayer,
+                                               OptionGroup options) {
+        final Game game = getFreeColServer().getGame();
+        final Specification spec = game.getSpecification();
+        
+        if (!spec.mergeMapGeneratorOptions(options, "server")) {
+            return serverPlayer.clientError("Map option merge failed");
+        }
+        getFreeColServer().sendToAll(new UpdateMapGeneratorOptionsMessage(spec.getMapGeneratorOptions()),
+                                     serverPlayer);
+        return null;
+    }
+
+    /**
+     * Handle a request for vacant players.
+     */
+    public ChangeSet vacantPlayers() {
+        return ChangeSet.simpleChange((ServerPlayer)null,
+            new VacantPlayersMessage()
+                .setVacantPlayers(getFreeColServer().getGame()));
     }
 }

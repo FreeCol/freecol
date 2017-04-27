@@ -93,16 +93,16 @@ public class SetColorMessage extends AttributeMessage {
         final Nation nation = getNation(spec);
         final Color color = getColor();
       
-        if (nation != null) {
-            if (color != null) {
-                nation.setColor(color);
-                freeColClient.getGUI().refreshPlayersTable();
-            } else {
-                logger.warning("Invalid color: " + toString());
-            }
-        } else {
+        if (nation == null) {
             logger.warning("Invalid nation: " + toString());
+            return;
         }
+        if (color == null) {
+            logger.warning("Invalid color: " + toString());
+            return;
+        }
+
+        pgc(freeColClient).setColorHandler(nation, color);
     }
 
     /**
@@ -111,26 +111,22 @@ public class SetColorMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final Specification spec = freeColServer.getGame().getSpecification();
-        
-        if (serverPlayer != null) {
-            Nation nation = getNation(spec);
-            if (nation != null) {
-                Color color = getColor();
-                if (color != null) {
-                    nation.setColor(color);
-                    freeColServer.sendToAll(new SetColorMessage(nation, color),
-                                            serverPlayer);
-                } else {
-                    logger.warning("Invalid color: " + this.toString());
-                }
-            } else {
-                logger.warning("Invalid nation: " + this.toString());
-            }
-        } else {
-            logger.warning("setColor from unknown connection.");
+        if (serverPlayer == null) {
+            logger.warning("setColor from unknown connection");
         }
-        return null;
+        
+        final Specification spec = freeColServer.getGame().getSpecification();
+        final Nation nation = getNation(spec);
+        final Color color = getColor();
+
+        if (nation == null) {
+            return serverPlayer.clientError("Invalid nation: " + this.toString());
+        } else if (color == null) {
+            return serverPlayer.clientError("Invalid color: " + this.toString());
+        }
+
+        return pgc(freeColServer)
+            .setColor(serverPlayer, nation, color);
     }
 
 

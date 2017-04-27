@@ -116,8 +116,6 @@ public class ObjectMessage extends AttributeMessage {
         if (objects != null) this.objects.addAll(fcos);
     }
 
-    // DOMMessage
-
     /**
      * {@inheritDoc}
      */

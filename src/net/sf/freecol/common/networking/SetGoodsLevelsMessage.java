@@ -99,6 +99,7 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
         xr.expectTag(TAG);
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -113,7 +114,6 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
     public MessagePriority getPriority() {
         return MessagePriority.NORMAL;
     }
-
 
     /**
      * {@inheritDoc}
@@ -138,14 +138,13 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+    public void writeAttributes(FreeColXMLWriter xw)
+        throws XMLStreamException {
         if (this.data != null) this.data.toXML(xw);
     }
 
     /**
-     * Convert this SetGoodsLevelsMessage to XML.
-     *
-     * @return The XML representation of this message.
+     * {@inheritDoc}
      */
     @Override
     public Element toXMLElement() {

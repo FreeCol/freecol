@@ -324,7 +324,7 @@ public class RearrangeColonyMessage extends AttributeMessage {
         }
 
         // Rearrange can proceed.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .rearrangeColony(serverPlayer, colony, arrangements);
     }
 

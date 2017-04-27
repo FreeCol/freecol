@@ -120,7 +120,7 @@ public class ChangeStateMessage extends AttributeMessage {
         }
 
         // Proceed to change.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .changeState(serverPlayer, unit, state);
     }
 }

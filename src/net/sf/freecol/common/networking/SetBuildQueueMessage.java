@@ -129,7 +129,7 @@ public class SetBuildQueueMessage extends AttributeMessage {
         }
 
         // Proceed to set the build queue.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .setBuildQueue(serverPlayer, colony, buildQueue);
     }
 

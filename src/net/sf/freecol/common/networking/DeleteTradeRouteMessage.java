@@ -112,7 +112,7 @@ public class DeleteTradeRouteMessage extends AttributeMessage {
         }
 
         // Proceed to delete.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .deleteTradeRoute(serverPlayer, tradeRoute);
     }
 }

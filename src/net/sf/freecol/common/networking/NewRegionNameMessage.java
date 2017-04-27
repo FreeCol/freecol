@@ -106,7 +106,6 @@ public class NewRegionNameMessage extends AttributeMessage {
 
         aiPlayer.newRegionNameHandler(region, tile, unit, name);
     }
-
         
     /**
      * {@inheritDoc}
@@ -121,8 +120,7 @@ public class NewRegionNameMessage extends AttributeMessage {
 
         if (name == null || region == null) return;
 
-        invokeLater(freeColClient, () ->
-            igc(freeColClient).newRegionName(region, tile, unit, name));
+        igc(freeColClient).newRegionNameHandler(region, tile, unit, name);
     }
 
     /**
@@ -158,7 +156,7 @@ public class NewRegionNameMessage extends AttributeMessage {
         }
         
         // Do the discovery
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .setNewRegionName(serverPlayer, unit, region, getNewRegionName());
     }
 

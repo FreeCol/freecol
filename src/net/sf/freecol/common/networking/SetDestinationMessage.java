@@ -103,7 +103,7 @@ public class SetDestinationMessage extends AttributeMessage {
             : game.findFreeColLocation(destinationId);
 
         // Set destination
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .setDestination(serverPlayer, unit, destination);
     }
 }

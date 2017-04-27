@@ -102,7 +102,7 @@ public class PayForBuildingMessage extends AttributeMessage {
         }
 
         // Proceed to pay.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .payForBuilding(serverPlayer, colony);
     }
 }

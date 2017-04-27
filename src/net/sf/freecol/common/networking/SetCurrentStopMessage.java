@@ -116,7 +116,7 @@ public class SetCurrentStopMessage extends AttributeMessage {
         }
 
         // Valid, set.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .setCurrentStop(serverPlayer, serverUnit, count);
     }
 }

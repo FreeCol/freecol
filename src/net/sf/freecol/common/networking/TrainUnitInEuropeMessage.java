@@ -100,7 +100,7 @@ public class TrainUnitInEuropeMessage extends AttributeMessage {
         }
 
         // Proceed to train a unit.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .trainUnitInEurope(serverPlayer, type);
     }
 }

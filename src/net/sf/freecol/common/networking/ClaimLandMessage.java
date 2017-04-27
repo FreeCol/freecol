@@ -190,7 +190,7 @@ public class ClaimLandMessage extends AttributeMessage {
         // Proceed to claim.  Note, does not require unit, it is only
         // required for permission checking above.  Settlement is required
         // to set owning settlement.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .claimLand(serverPlayer, tile, settlement, price);
     }
 }

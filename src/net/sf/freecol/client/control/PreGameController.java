@@ -36,6 +36,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
@@ -80,7 +81,10 @@ public final class PreGameController extends FreeColClientHolder {
      * @param message The text of the message.
      */
     public void sendChat(String message) {
-        askServer().chat(getMyPlayer(), message);
+        final Player player = getMyPlayer();
+
+        getGUI().displayStartChat(player, message, false);
+        askServer().chat(player, message);
     }
 
     /**
@@ -90,7 +94,7 @@ public final class PreGameController extends FreeColClientHolder {
      * @param message What to say.
      * @param pri If true, the message is private.
      */
-    public void displayChat(Player player, String message, boolean pri) {
+    public void chatHandler(Player player, String message, boolean pri) {
         getGUI().displayStartChat(player, message, pri);
     }
 
@@ -100,6 +104,33 @@ public final class PreGameController extends FreeColClientHolder {
     public void errorHandler(StringTemplate template, String message) {
         getGUI().showErrorMessage(template, message);
     }            
+
+    /**
+     * Handle a player logging out.
+     *
+     * @param player The {@code Player} that is logging out.
+     * @param reason The {@code LogoutReason} why the player left.
+     */
+    public void logoutHandler(Player player, LogoutReason reason) {
+        final FreeColClient freeColClient = getFreeColClient();
+
+        getGame().removePlayer(player);
+        getGUI().refreshPlayersTable();
+        if (player == getMyPlayer()) {
+            freeColClient.getConnectController().logout(reason);
+        }
+    }
+
+    /**
+     * Handle a ready message.
+     *
+     * @param player The {@code Player} whose readiness changed.
+     * @param ready The new readiness state.
+     */
+    public void readyHandler(Player player, boolean ready) {
+        player.setReady(ready);
+        getGUI().refreshPlayersTable();
+    }
         
     /**
      * Requests the game to be started.  This will only be successful
@@ -129,6 +160,17 @@ public final class PreGameController extends FreeColClientHolder {
     }
 
     /**
+     * Handle a setAvailable message.
+     *
+     * @param nation The {@code Nation} to set.
+     * @param nationState The {@code NationState} value to set.
+     */
+    public void setAvailableHandler(Nation nation, NationState nationState) {
+        getGame().getNationOptions().setNationState(nation, nationState);
+        getGUI().refreshPlayersTable();
+    }
+    
+    /**
      * Sets a nation's colour.
      *
      * @param nation The {@code Nation} to set the color for.
@@ -140,6 +182,17 @@ public final class PreGameController extends FreeColClientHolder {
         askServer().setColor(nation, color);
     }
 
+    /**
+     * Handle a setColor message.
+     *
+     * @param nation The {@code Nation} to set the color for.
+     * @param color The {@code Color} to set.
+     */
+    public void setColorHandler(Nation nation, Color color) {
+        nation.setColor(color);
+        getGUI().refreshPlayersTable();
+    }
+        
     /**
      * Sets this client's player's nation.
      *
@@ -160,6 +213,16 @@ public final class PreGameController extends FreeColClientHolder {
         getMyPlayer().changeNationType(nationType);
 
         askServer().setNationType(nationType);
+    }
+
+    /**
+     * Handle a nation type change.
+     *
+     * @param nationType Which nation type this player wishes to set.
+     */
+    public void setNationTypeHandler(NationType nationType) {
+        getMyPlayer().changeNationType(nationType);
+        getGUI().refreshPlayersTable();
     }
 
     /**

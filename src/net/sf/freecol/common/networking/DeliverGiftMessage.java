@@ -162,9 +162,7 @@ public class DeliverGiftMessage extends ObjectMessage {
     }
     
     /**
-     * Convert this DeliverGiftMessage to XML.
-     *
-     * @return The XML representation of this message.
+     * {@inheritDoc}
      */
     @Override
     public Element toXMLElement() {

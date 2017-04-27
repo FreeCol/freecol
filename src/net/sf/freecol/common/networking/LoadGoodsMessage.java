@@ -151,7 +151,7 @@ public class LoadGoodsMessage extends AttributeMessage {
         }
 
         // Load the goods
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .loadGoods(serverPlayer, (Location)fcgo, type, amount, carrier);
     }
 }

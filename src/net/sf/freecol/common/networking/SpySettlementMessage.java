@@ -186,9 +186,7 @@ public class SpySettlementMessage extends ObjectMessage {
     }
 
     /**
-     * Convert this SpySettlementMessage to XML.
-     *
-     * @return The XML representation of this message.
+     * {@inheritDoc}
      */
     @Override
     public Element toXMLElement() {

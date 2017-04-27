@@ -110,7 +110,7 @@ public class CashInTreasureTrainMessage extends AttributeMessage {
         }
 
         // Cash in
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .cashInTreasureTrain(serverPlayer, unit);
     }
 }

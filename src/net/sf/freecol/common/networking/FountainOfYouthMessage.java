@@ -102,9 +102,6 @@ public class FountainOfYouthMessage extends AttributeMessage {
         igc(freeColClient).fountainOfYouthHandler(n);
     }
 
-    // No server handler required.
-    // This message is only sent to clients.
-
 
     // Public interface
 

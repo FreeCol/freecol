@@ -81,7 +81,6 @@ public class EquipForRoleMessage extends AttributeMessage {
         return Message.MessagePriority.NORMAL;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -126,7 +125,7 @@ public class EquipForRoleMessage extends AttributeMessage {
         }
 
         // Proceed to equip.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .equipForRole(serverPlayer, unit, role, count);
     }
 }

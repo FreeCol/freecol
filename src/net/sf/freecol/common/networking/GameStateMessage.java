@@ -99,14 +99,9 @@ public class GameStateMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
-    public void clientHandler(FreeColClient freeColClient)
-        throws FreeColException {
+    public void clientHandler(FreeColClient freeColClient) {
         final ServerState state = getState();
-        if (state == null) {
-            throw new FreeColException("Invalid state: "
-                + getStringAttribute(STATE_TAG));
-        }
-        freeColClient.setServerState(state);
+        if (state != null) freeColClient.setServerState(state);
     }
 
     /**
@@ -115,9 +110,10 @@ public class GameStateMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
         @SuppressWarnings("unused") ServerPlayer serverPlayer) {
-        // Called from UserConnectionHandler, without serverPlayer being defined
-        return ChangeSet.simpleChange((ServerPlayer)null,
-            new GameStateMessage(freeColServer.getServerState()));
+        // Called from UserConnectionHandler, without serverPlayer
+        // being defined
+        return igc(freeColServer)
+            .gameState();
     }
 
 

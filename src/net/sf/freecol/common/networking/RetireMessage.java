@@ -65,6 +65,7 @@ public class RetireMessage extends TrivialMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        return igc(freeColServer).retire(serverPlayer);
+        return igc(freeColServer)
+            .retire(serverPlayer);
     }
 }

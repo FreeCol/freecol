@@ -106,12 +106,12 @@ public class ChatMessage extends AttributeMessage {
         final String text = getMessage();
         final boolean isPrivate = isPrivate();
 
+        if (player == null || text == null) return;
+
         if (freeColClient.isInGame()) {
-            invokeLater(freeColClient, () ->
-                igc(freeColClient).displayChat(player, text, isPrivate));
+            igc(freeColClient).chatHandler(player, text, isPrivate);
         } else {
-            invokeLater(freeColClient, () ->
-                pgc(freeColClient).displayChat(player, text, isPrivate));
+            pgc(freeColClient).chatHandler(player, text, isPrivate);
         }
     }
 
@@ -119,14 +119,14 @@ public class ChatMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
-    public ChangeSet serverHandler(FreeColServer server,
+    public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         /* Do not trust the client-supplied sender name */
         setStringAttribute(SENDER_TAG, serverPlayer.getId());
 
-        server.getInGameController()
+        // IGC routine the same as PGC
+        return igc(freeColServer)
             .chat(serverPlayer, getMessage(), isPrivate());
-        return null;
     }        
 
 

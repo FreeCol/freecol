@@ -165,15 +165,6 @@ public class AnimateMoveMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        return null; // Only sent to client
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         if (this.unit != null) this.unit.toXML(xw);
     }

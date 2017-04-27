@@ -144,7 +144,7 @@ public class ChangeWorkImprovementTypeMessage extends AttributeMessage {
         }
 
         // Proceed to change.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .changeWorkImprovementType(serverPlayer, unit, type);
     }
 }

@@ -112,7 +112,7 @@ public class JoinColonyMessage extends AttributeMessage {
         }
 
         // Try to buy.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .joinColony(serverPlayer, unit, colony);
     }
 }

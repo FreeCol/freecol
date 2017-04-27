@@ -122,7 +122,7 @@ public class NativeGiftMessage extends AttributeMessage {
         }
 
         // Proceed to deliver.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .nativeGift(serverPlayer, unit, colony);
     }
 }

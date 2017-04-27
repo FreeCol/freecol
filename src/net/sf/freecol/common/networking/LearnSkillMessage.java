@@ -134,7 +134,7 @@ public class LearnSkillMessage extends AttributeMessage {
         }
 
         // Learn the skill if possible.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .learnFromIndianSettlement(serverPlayer, unit, is);
     }
 }

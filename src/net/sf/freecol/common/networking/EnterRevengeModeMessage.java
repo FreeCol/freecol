@@ -66,6 +66,7 @@ public class EnterRevengeModeMessage extends TrivialMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        return igc(freeColServer).enterRevengeMode(serverPlayer);
+        return igc(freeColServer)
+            .enterRevengeMode(serverPlayer);
     }
 }

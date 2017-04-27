@@ -103,7 +103,7 @@ public class DisembarkMessage extends AttributeMessage {
         }
 
         // Do the disembark.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .disembarkUnit(serverPlayer, unit);
     }
 }

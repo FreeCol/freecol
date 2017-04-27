@@ -102,17 +102,14 @@ public class LogoutMessage extends AttributeMessage {
         final Game game = freeColClient.getGame();
         final Player player = getPlayer(game);
         final LogoutReason reason = getReason();
+
         if (player == null) return;
 
         if (freeColClient.isInGame()) {
             igc(freeColClient).logoutHandler(player, reason);
 
         } else {
-            game.removePlayer(player);
-            freeColClient.getGUI().refreshPlayersTable();
-            if (player == freeColClient.getMyPlayer()) {
-                freeColClient.getConnectController().logout(reason);
-            }
+            pgc(freeColClient).logoutHandler(player, reason);
         }
     }
 

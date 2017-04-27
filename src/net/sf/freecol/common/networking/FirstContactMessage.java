@@ -160,7 +160,7 @@ public class FirstContactMessage extends AttributeMessage {
         }
 
         // Proceed to contact.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .nativeFirstContact(serverPlayer, otherPlayer,
                                 getTile(game), getResult());
     }

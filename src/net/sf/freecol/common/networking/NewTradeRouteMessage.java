@@ -127,7 +127,9 @@ public class NewTradeRouteMessage extends ObjectMessage {
         final Game game = freeColClient.getGame();
         final TradeRoute tr = getTradeRoute();
 
-        if (tr != null) igc(freeColClient).newTradeRouteHandler(tr);
+        if (tr == null) return;
+
+        igc(freeColClient).newTradeRouteHandler(tr);
     }
 
     /**

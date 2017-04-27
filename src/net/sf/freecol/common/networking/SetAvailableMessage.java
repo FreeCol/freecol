@@ -90,8 +90,7 @@ public class SetAvailableMessage extends AttributeMessage {
         final Nation nation = getNation(spec);
         final NationState nationState = getNationState();
 
-        game.getNationOptions().setNationState(nation, nationState);
-        freeColClient.getGUI().refreshPlayersTable();
+        pgc(freeColClient).setAvailableHandler(nation, nationState);
     }
 
     /**
@@ -100,19 +99,17 @@ public class SetAvailableMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
+        if (serverPlayer == null) {
+            logger.warning("setAvailable from unknown player");
+        }
+        
         final Game game = freeColServer.getGame();
         final Specification spec = game.getSpecification();
-        
-        if (serverPlayer != null) {
-            Nation nation = getNation(spec);
-            NationState state = getNationState();
-            game.getNationOptions().setNationState(nation, state);
-            freeColServer.sendToAll(new SetAvailableMessage(nation, state),
-                                    serverPlayer);
-        } else {
-            logger.warning("setAvailable from unknown player.");
-        }
-        return null;
+        final Nation nation = getNation(spec);
+        final NationState state = getNationState();
+
+        return pgc(freeColServer)
+            .setAvailable(serverPlayer, nation, state);
     }
 
 

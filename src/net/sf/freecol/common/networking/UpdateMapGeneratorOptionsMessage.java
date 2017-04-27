@@ -104,26 +104,21 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
             return serverPlayer.clientError("Not an admin: " + serverPlayer);
         }
         final Specification spec = freeColServer.getGame().getSpecification();
-        if (this.options == null) {
-            return serverPlayer.clientError("No map options to merge");
+        final OptionGroup optionGroup = getMapGeneratorOptions();
+        if (optionGroup == null) {
+            return serverPlayer.clientError("No game options to merge");
         }
-        if (!spec.mergeMapGeneratorOptions(this.options, "server")) {
-            return serverPlayer.clientError("Map option merge failed");
-        }
-            
-        UpdateMapGeneratorOptionsMessage message
-            = new UpdateMapGeneratorOptionsMessage(spec.getMapGeneratorOptions());
-        freeColServer.sendToAll(message, serverPlayer);
-        return null;
+
+        return pgc(freeColServer)
+            .updateMapGeneratorOptions(serverPlayer, optionGroup);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.options != null) this.options.toXML(xw);
     }
 
     /**

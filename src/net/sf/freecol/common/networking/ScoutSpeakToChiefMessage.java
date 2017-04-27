@@ -157,7 +157,7 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
         }
 
         // Valid request, do the scouting.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .scoutSpeakToChief(serverPlayer, unit, is);
     }
 

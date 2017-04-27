@@ -133,7 +133,7 @@ public class UnloadGoodsMessage extends AttributeMessage {
         }
 
         // Try to unload.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .unloadGoods(serverPlayer, type, amount, carrier);
     }
 }

@@ -74,6 +74,7 @@ public class EndTurnMessage extends TrivialMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        return igc(freeColServer).endTurn(serverPlayer);
+        return igc(freeColServer)
+            .endTurn(serverPlayer);
     }
 }

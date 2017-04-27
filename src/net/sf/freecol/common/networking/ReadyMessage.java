@@ -90,10 +90,9 @@ public class ReadyMessage extends AttributeMessage {
         final Player player = getPlayer(game);
         final boolean ready = getValue();
 
-        if (player != null) {
-            player.setReady(ready);
-            freeColClient.getGUI().refreshPlayersTable();
-        }
+        if (player == null) return;
+
+        pgc(freeColClient).readyHandler(player, ready);
     }
 
     /**
@@ -102,15 +101,14 @@ public class ReadyMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        if (serverPlayer != null) {
-            boolean ready = getValue();
-            serverPlayer.setReady(ready);
-            freeColServer.sendToAll(new ReadyMessage(serverPlayer, ready),
-                                    serverPlayer);
-        } else {
-            logger.warning("Ready from unknown connection.");
+        if (serverPlayer == null) {
+            logger.warning("Ready from unknown player.");
         }
-        return null;
+
+        final boolean ready = getValue();
+
+        return pgc(freeColServer)
+            .ready(serverPlayer, ready);
     }
 
 

@@ -99,9 +99,8 @@ public class VacantPlayersMessage extends AttributeMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
         @SuppressWarnings("unused") ServerPlayer serverPlayer) {
         // Called from UserConnectionHandler, without serverPlayer being defined
-        return ChangeSet.simpleChange((ServerPlayer)null,
-            new VacantPlayersMessage()
-                .setVacantPlayers(freeColServer.getGame()));
+        return pgc(freeColServer)
+            .vacantPlayers();
     }
 
 

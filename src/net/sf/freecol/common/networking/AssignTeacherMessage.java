@@ -133,7 +133,7 @@ public class AssignTeacherMessage extends AttributeMessage {
         }
 
         // Proceed to assign.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .assignTeacher(serverPlayer, student, teacher);
     }
 }

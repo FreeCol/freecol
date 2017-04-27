@@ -189,9 +189,7 @@ public class MonarchActionMessage extends ObjectMessage {
     }
 
     /**
-     * Convert this MonarchMessage to XML.
-     *
-     * @return The XML representation of this message.
+     * {@inheritDoc}
      */
     @Override
     public Element toXMLElement() {

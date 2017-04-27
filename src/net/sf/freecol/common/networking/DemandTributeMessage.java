@@ -139,7 +139,7 @@ public class DemandTributeMessage extends AttributeMessage {
         }
 
         // Do the demand
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .demandTribute(serverPlayer, unit, is);
     }
 }

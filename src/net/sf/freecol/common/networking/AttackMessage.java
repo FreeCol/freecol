@@ -137,7 +137,7 @@ public class AttackMessage extends AttributeMessage {
         }
 
         // Proceed to attack.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .combat(serverPlayer, unit, defender, null);
     }
 }

@@ -112,7 +112,7 @@ public class DeclareIndependenceMessage extends AttributeMessage {
         }
 
         // Declare.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .declareIndependence(serverPlayer, nationName, countryName);
     }
 }

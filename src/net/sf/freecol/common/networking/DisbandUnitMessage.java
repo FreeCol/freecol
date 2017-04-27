@@ -102,7 +102,7 @@ public class DisbandUnitMessage extends AttributeMessage {
         }
 
         // Try to clear.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .disbandUnit(serverPlayer, unit);
     }
 }

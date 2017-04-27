@@ -133,7 +133,7 @@ public class WorkMessage extends AttributeMessage {
         }
 
         // Work.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .work(serverPlayer, unit, workLocation);
     }
 }

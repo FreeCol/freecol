@@ -110,23 +110,6 @@ public class AddPlayerMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .add(this.players).toXMLElement();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        for (Player p : this.players) p.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
         // Ignored
     }
@@ -142,6 +125,23 @@ public class AddPlayerMessage extends ObjectMessage {
         } else {
             pgc(freeColClient).addPlayerHandler();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        for (Player p : this.players) p.toXML(xw);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Element toXMLElement() {
+        return new DOMMessage(TAG)
+            .add(this.players).toXMLElement();
     }
 
 

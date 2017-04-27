@@ -105,33 +105,29 @@ public class SetNationMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        final Game game = freeColServer.getGame();
-        final Specification spec = game.getSpecification();
-
-        if (serverPlayer != null) {
-            Player other = getPlayer(game);
-            if (other != null && (ServerPlayer)other != serverPlayer) {
-                logger.warning("Player " + other.getId()
-                    + " set from " + serverPlayer.getId());
-                return null;
-            }
-            Nation nation = getValue(spec);
-            if (nation != null
-                && game.getNationOptions().getNations().get(nation)
-                    == NationState.AVAILABLE) {
-                serverPlayer.setNation(nation);
-                freeColServer.sendToAll(new SetNationMessage(serverPlayer, nation),
-                                        serverPlayer);
-            } else {
-                return serverPlayer.clientError(StringTemplate
-                    .template("server.badNation")
-                    .addName("%nation%", (nation == null) ? "null"
-                        : nation.getId()));
-            }
-        } else {
+        if (serverPlayer == null) {
             logger.warning("setNation from unknown connection.");
         }
-        return null;
+        
+        final Game game = freeColServer.getGame();
+        final Player other = getPlayer(game);
+        if (other != null && (ServerPlayer)other != serverPlayer) {
+            return serverPlayer.clientError("Player " + other.getId()
+                + " set from " + serverPlayer.getId());
+        }
+
+        final Specification spec = game.getSpecification();
+        final Nation nation = getValue(spec);
+        if (nation == null
+            || game.getNationOptions().getNations().get(nation) != NationState.AVAILABLE) {
+            return serverPlayer.clientError(StringTemplate
+                .template("server.badNation")
+                .addName("%nation%", (nation == null) ? "null"
+                    : nation.getId()));
+        }
+
+        return pgc(freeColServer)
+            .setNation(serverPlayer, nation);
     }
 
 

@@ -85,7 +85,6 @@ public class PayArrearsMessage extends AttributeMessage {
         return Message.MessagePriority.NORMAL;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -96,7 +95,7 @@ public class PayArrearsMessage extends AttributeMessage {
             .getGoodsType(getStringAttribute(GOODS_TYPE_TAG));
 
         // Proceed to pay.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .payArrears(serverPlayer, goodsType);
     }
 }

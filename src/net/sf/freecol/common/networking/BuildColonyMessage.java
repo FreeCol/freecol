@@ -126,7 +126,7 @@ public class BuildColonyMessage extends AttributeMessage {
         }
 
         // Build can proceed.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .buildSettlement(serverPlayer, unit, colonyName);
     }
 }

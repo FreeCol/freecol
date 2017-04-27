@@ -115,7 +115,7 @@ public class MoveToMessage extends AttributeMessage {
         }
 
         // Proceed to move.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .moveTo(serverPlayer, unit, destination);
     }
 }

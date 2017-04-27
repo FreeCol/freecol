@@ -109,7 +109,7 @@ public class RenameMessage extends AttributeMessage {
         }
 
         // Proceed to rename.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .renameObject(serverPlayer, (Nameable)fcgo,
                           getStringAttribute(NAME_TAG));
     }

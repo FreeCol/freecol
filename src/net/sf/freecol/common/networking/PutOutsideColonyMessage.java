@@ -109,7 +109,7 @@ public class PutOutsideColonyMessage extends AttributeMessage {
         }
 
         // Proceed to put outside.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .putOutsideColony(serverPlayer, unit);
     }
 }

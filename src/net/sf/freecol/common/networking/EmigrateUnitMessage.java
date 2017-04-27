@@ -130,7 +130,7 @@ public class EmigrateUnitMessage extends AttributeMessage {
         }
 
         // Proceed to emigrate.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .emigrate(serverPlayer, slot, type);
     }
 }

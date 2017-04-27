@@ -65,6 +65,7 @@ public class ContinueMessage extends TrivialMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        return igc(freeColServer).continuePlaying(serverPlayer);
+        return igc(freeColServer)
+            .continuePlaying(serverPlayer);
     }
 }

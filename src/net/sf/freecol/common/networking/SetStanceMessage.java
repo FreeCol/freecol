@@ -147,7 +147,4 @@ public class SetStanceMessage extends AttributeMessage {
     public Player getSecondPlayer(Game game) {
         return game.getFreeColGameObject(getStringAttribute(SECOND_TAG), Player.class);
     }
-
-    // No server handler required.
-    // This message is only sent to clients.
 }

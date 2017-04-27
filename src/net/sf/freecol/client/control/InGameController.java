@@ -2608,14 +2608,31 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Sends a public chat message.
+     *
+     * Called from ChatPanel
+     *
+     * @param chat The text of the message.
+     * @return True if the message was sent.
+     */
+    public boolean chat(String chat) {
+        if (chat == null) return false;
+
+        final Player player = getMyPlayer();
+        getGUI().displayChat(player, chat, false);
+        return askServer().chat(player, chat);
+    }
+
+    /**
      * Chat with another player.
      *
      * @param player The {@code Player} to chat with.
      * @param message What to say.
      * @param pri If true, the message is private.
      */
-    public void displayChat(Player player, String message, boolean pri) {
-        getGUI().displayChat(player, message, pri);
+    public void chatHandler(Player player, String message, boolean pri) {
+        invokeLater(() ->
+            getGUI().displayChat(player, message, pri));
     }
 
     /**
@@ -4627,20 +4644,6 @@ public final class InGameController extends FreeColClientHolder {
             updateGUI(null);
         }
         return ret;
-    }
-
-    /**
-     * Sends a public chat message.
-     *
-     * Called from ChatPanel
-     *
-     * @param chat The text of the message.
-     * @return True if the message was sent.
-     */
-    public boolean sendChat(String chat) {
-        if (chat == null) return false;
-
-        return askServer().chat(getMyPlayer(), chat);
     }
 
     /**

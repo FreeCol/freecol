@@ -118,7 +118,7 @@ public class ChangeWorkTypeMessage extends AttributeMessage {
         }
 
         // Proceed to changeWorkType.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .changeWorkType(serverPlayer, unit, type);
     }
 }

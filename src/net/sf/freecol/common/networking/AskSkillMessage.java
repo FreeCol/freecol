@@ -130,7 +130,7 @@ public class AskSkillMessage extends AttributeMessage {
         }
 
         // Update the skill
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .askLearnSkill(serverPlayer, unit, is);
     }
 }

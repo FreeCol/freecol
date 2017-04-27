@@ -74,14 +74,13 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
         return MessagePriority.NORMAL;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .updateTradeRoute(serverPlayer, this.tradeRoute);
     }
 
@@ -89,15 +88,12 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.tradeRoute != null) this.tradeRoute.toXML(xw);
     }
 
     /**
-     * Convert this UpdateTradeRouteMessage to XML.
-     *
-     * @return The XML representation of this message.
+     * {@inheritDoc}
      */
     @Override
     public Element toXMLElement() {

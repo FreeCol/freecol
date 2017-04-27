@@ -127,7 +127,7 @@ public class MoveMessage extends AttributeMessage {
         }
 
         // Proceed to move.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .move(serverPlayer, unit, tile);
     }
 }

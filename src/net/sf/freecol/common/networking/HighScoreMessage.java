@@ -136,9 +136,7 @@ public class HighScoreMessage extends ObjectMessage {
     }
 
     /**
-     * Convert this HighScoreMessage to XML.
-     *
-     * @return The XML representation of this message.
+     * {@inheritDoc}
      */
     @Override
     public Element toXMLElement() {

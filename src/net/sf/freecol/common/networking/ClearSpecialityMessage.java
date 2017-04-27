@@ -102,7 +102,7 @@ public class ClearSpecialityMessage extends AttributeMessage {
         }
 
         // Try to clear.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .clearSpeciality(serverPlayer, unit);
     }
 }

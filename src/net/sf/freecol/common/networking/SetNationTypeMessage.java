@@ -89,13 +89,9 @@ public class SetNationTypeMessage extends AttributeMessage {
     @Override
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
-        final Player player = getPlayer(game);
         final NationType nationType = getValue(game.getSpecification());
-        
-        if (player != null && nationType != null) {
-            player.changeNationType(nationType);
-            freeColClient.getGUI().refreshPlayersTable();
-        }
+
+        pgc(freeColClient).setNationTypeHandler(nationType);
     }
 
     /**
@@ -104,42 +100,40 @@ public class SetNationTypeMessage extends AttributeMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
+        if (serverPlayer == null) {
+            logger.warning("setNationType from unknown connection.");
+            return null;
+        }
+        
         final Game game = freeColServer.getGame();
         final Specification spec = game.getSpecification();
-
-        if (serverPlayer != null) {
-            NationType fixedNationType
-                = spec.getNation(serverPlayer.getNationId()).getType();
-            NationType nationType = getValue(spec);
-            boolean ok;
-            switch (game.getNationOptions().getNationalAdvantages()) {
-            case SELECTABLE:
-                ok = true;
-                break;
-            case FIXED:
-                if (nationType.equals(fixedNationType)) return null;
-                ok = false;
-                break;
-            case NONE:
-                ok = nationType == spec.getDefaultNationType();
-                break;
-            default:
-                ok = false;
-                break;
-            }
-            if (ok) {
-                serverPlayer.changeNationType(nationType);
-                freeColServer.sendToAll(new SetNationTypeMessage(serverPlayer, nationType),
-                                        serverPlayer);
-            } else {
-                return serverPlayer.clientError(StringTemplate
-                    .template("server.badNationType")
-                    .addName("%nationType%", String.valueOf(nationType)));
-            }
-        } else {
-            logger.warning("setNationType from unknown connection.");
+        final NationType fixedNationType
+            = spec.getNation(serverPlayer.getNationId()).getType();
+        final NationType nationType = getValue(spec);
+        boolean ok;
+        switch (game.getNationOptions().getNationalAdvantages()) {
+        case SELECTABLE:
+            ok = true;
+            break;
+        case FIXED:
+            if (nationType.equals(fixedNationType)) return null;
+            ok = false;
+            break;
+        case NONE:
+            ok = nationType == spec.getDefaultNationType();
+            break;
+        default:
+            ok = false;
+            break;
         }
-        return null;
+        if (!ok) {
+            return serverPlayer.clientError(StringTemplate
+                .template("server.badNationType")
+                .addName("%nationType%", String.valueOf(nationType)));
+        }
+
+        return pgc(freeColServer)
+            .setNationType(serverPlayer, nationType);
     }
 
 

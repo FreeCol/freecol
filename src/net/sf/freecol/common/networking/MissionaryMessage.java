@@ -160,9 +160,7 @@ public class MissionaryMessage extends AttributeMessage {
 
         // Valid, proceed to denounce/establish.
         return (denounce)
-            ? freeColServer.getInGameController()
-                .denounceMission(serverPlayer, unit, is)
-            : freeColServer.getInGameController()
-                .establishMission(serverPlayer, unit, is);
+            ? igc(freeColServer).denounceMission(serverPlayer, unit, is)
+            : igc(freeColServer).establishMission(serverPlayer, unit, is);
     }
 }

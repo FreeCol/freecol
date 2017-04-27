@@ -127,7 +127,4 @@ public class SetAIMessage extends AttributeMessage {
     public boolean getAI() {
         return getBooleanAttribute(AI_TAG, false);
     }
-
-    // No server handler method required.
-    // This message is only sent to clients.
 }

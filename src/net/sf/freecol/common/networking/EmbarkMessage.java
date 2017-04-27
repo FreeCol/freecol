@@ -154,7 +154,7 @@ public class EmbarkMessage extends AttributeMessage {
         }
 
         // Proceed to embark
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .embarkUnit(serverPlayer, unit, carrier);
     }
 }

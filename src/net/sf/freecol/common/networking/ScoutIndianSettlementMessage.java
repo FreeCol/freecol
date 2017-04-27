@@ -95,7 +95,6 @@ public class ScoutIndianSettlementMessage extends AttributeMessage {
         return Message.MessagePriority.NORMAL;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -136,7 +135,7 @@ public class ScoutIndianSettlementMessage extends AttributeMessage {
         }
 
         // Valid request, do the scouting.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .scoutIndianSettlement(serverPlayer, unit, is);
     }
 }

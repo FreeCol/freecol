@@ -107,6 +107,7 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GameEndedMessage;
+import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -1215,11 +1216,37 @@ public final class InGameController extends Controller {
      * @param serverPlayer The {@code ServerPlayer} that is chatting.
      * @param message The chat message.
      * @param pri A privacy setting, currently a noop.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
-    public void chat(ServerPlayer serverPlayer, String message, boolean pri) {
+    public ChangeSet chat(ServerPlayer serverPlayer, String message,
+                          boolean pri) {
         getGame().sendToOthers(serverPlayer,
             ChangeSet.simpleChange(See.all().except(serverPlayer),
                 new ChatMessage(serverPlayer, message, false)));
+        return null;
+    }
+
+
+    /**
+     * Choose a founding father.
+     *
+     * @param serverPlayer The {@code ServerPlayer} that is choosing.
+     * @param ff A {@code FoundingFather} to select.
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet chooseFoundingFather(ServerPlayer serverPlayer,
+                                          FoundingFather ff) {
+        final List<FoundingFather> offered = serverPlayer.getOfferedFathers();
+
+        if (!serverPlayer.canRecruitFoundingFather()) {
+            return serverPlayer.clientError("Player can not recruit fathers: "
+                + serverPlayer.getId());
+        } else if (!offered.contains(ff)) {
+            return serverPlayer.clientError("Founding father not offered: "
+                + ff.getId());
+        }
+        serverPlayer.updateCurrentFather(ff);
+        return null;
     }
 
 
@@ -2354,6 +2381,18 @@ public final class InGameController extends Controller {
             getGame().sendToOthers(serverPlayer, cs);
         }
         return cs;
+    }
+
+
+    /**
+     * Get the game state.
+     *
+     * @return A {@code ChangeSet} encapsulating this action.
+     */
+    public ChangeSet gameState() {
+        final FreeColServer freeColServer = getFreeColServer();
+        return ChangeSet.simpleChange((ServerPlayer)null,
+            new GameStateMessage(freeColServer.getServerState()));
     }
 
 

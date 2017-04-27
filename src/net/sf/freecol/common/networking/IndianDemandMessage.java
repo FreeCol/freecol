@@ -183,7 +183,7 @@ public class IndianDemandMessage extends AttributeMessage {
         }
 
         // Proceed to demand or respond.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .indianDemand(serverPlayer, unit, colony, getType(game), amount,
                           result);
     }

@@ -78,18 +78,6 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
         return MessagePriority.NORMAL;
     }
 
-
-    // Public interface
-
-    /**
-     * Get the associated option group.
-     *
-     * @return The options.
-     */
-    public OptionGroup getGameOptions() {
-        return this.options;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -116,30 +104,22 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
             return serverPlayer.clientError("Not an admin: " + serverPlayer);
         }
         final Specification spec = freeColServer.getGame().getSpecification();
-        if (this.options == null) {
+        final OptionGroup optionGroup = getGameOptions();
+        if (optionGroup == null) {
             return serverPlayer.clientError("No game options to merge");
         }
-        if (!spec.mergeGameOptions(this.options, "server")) {
-            return serverPlayer.clientError("Game option merge failed");
-        }
 
-        UpdateGameOptionsMessage message
-            = new UpdateGameOptionsMessage(spec.getGameOptions());
-        freeColServer.sendToAll(message, serverPlayer);
-        return null;
+        return pgc(freeColServer)
+            .updateGameOptions(serverPlayer, optionGroup);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        if (this.options != null) this.options.toXML(xw);
     }
-
-
-    // Override DOMMessage
 
     /**
      * {@inheritDoc}
@@ -149,4 +129,17 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
         return new DOMMessage(TAG)
             .add(this.options).toXMLElement();
     }
+
+
+    // Public interface
+
+    /**
+     * Get the associated option group.
+     *
+     * @return The options.
+     */
+    public OptionGroup getGameOptions() {
+        return this.options;
+    }
+
 }

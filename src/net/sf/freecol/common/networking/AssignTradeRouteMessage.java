@@ -129,7 +129,7 @@ public class AssignTradeRouteMessage extends AttributeMessage {
         }
 
         // Proceed to assign.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .assignTradeRoute(serverPlayer, unit, tradeRoute);
     }
 }

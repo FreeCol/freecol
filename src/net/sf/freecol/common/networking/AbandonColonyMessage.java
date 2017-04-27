@@ -107,7 +107,7 @@ public class AbandonColonyMessage extends AttributeMessage {
 
         // Proceed to abandon
         // FIXME: Player.settlements is still being fixed on the client side.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .abandonSettlement(serverPlayer, colony);
     }
 }

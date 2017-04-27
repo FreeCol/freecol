@@ -124,7 +124,7 @@ public class DeclineMoundsMessage extends AttributeMessage {
         }
 
         // Clear the mounds.
-        return freeColServer.getInGameController()
+        return igc(freeColServer)
             .declineMounds(serverPlayer, tile);
     }
 }
