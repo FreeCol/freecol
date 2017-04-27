@@ -21,6 +21,7 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -77,18 +78,21 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
         return MessagePriority.NORMAL;
     }
 
-
-    // Public interface
-
     /**
-     * Get the associated option group.
-     *
-     * @return The options.
+     * {@inheritDoc}
      */
-    public OptionGroup getMapGeneratorOptions() {
-        return this.options;
-    }
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Specification spec = game.getSpecification();
+        final OptionGroup mapOptions = getMapGeneratorOptions();
 
+        if (freeColClient.isInGame()) {
+            ; // Ignore
+        } else {
+            pgc(freeColClient).updateMapGeneratorOptionsHandler(mapOptions);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -122,9 +126,6 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
         throw new XMLStreamException(getType() + ".toXML NYI");
     }
 
-
-    // Override DOMMessage
-
     /**
      * {@inheritDoc}
      */
@@ -132,5 +133,17 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
     public Element toXMLElement() {
         return new DOMMessage(TAG)
             .add(this.options).toXMLElement();
+    }
+
+    
+    // Public interface
+
+    /**
+     * Get the associated option group.
+     *
+     * @return The options.
+     */
+    public OptionGroup getMapGeneratorOptions() {
+        return this.options;
     }
 }

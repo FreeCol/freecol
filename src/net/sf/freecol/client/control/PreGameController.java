@@ -298,4 +298,15 @@ public final class PreGameController extends FreeColClientHolder {
 
         askServer().updateMapGeneratorOptions(mgo);
     }
+
+    /**
+     * Handle new map options.
+     *
+     * @param mapOptions An {@code OptionGroup} containing the map options.
+     */
+    public void updateMapGeneratorOptionsHandler(OptionGroup mapOptions) {
+        if (!getSpecification().mergeMapGeneratorOptions(mapOptions, "client")) {
+            logger.warning("Map generator option update failed");
+        }
+    }        
 }
