@@ -114,7 +114,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 TrivialMessage.startGameMessage.clientHandler(freeColClient));
         register(UpdateMessage.TAG,
             (Connection c, Element e) ->
-                update(new UpdateMessage(getGame(), e)));
+                new UpdateMessage(getGame(), e).clientHandler(freeColClient));
         register(UpdateGameOptionsMessage.TAG,
             (Connection c, Element e) ->
                 new UpdateGameOptionsMessage(getGame(), e).clientHandler(freeColClient));
@@ -127,21 +127,17 @@ public final class PreGameInputHandler extends ClientInputHandler {
     // Individual handlers
 
     /**
-     * Handles an "update"-message.
+     * Handles an "updateGameOptions"-message.
      *
-     * @param message The {@code UpdateMessage} to process.
+     * @param message The {@code UpdateGameOptionsMessage} to process.
      */
-    private void update(UpdateMessage message) {
-        final FreeColClient fcc = getFreeColClient();
+    private void updateGameOptions(UpdateGameOptionsMessage message) {
         final Game game = getGame();
-        final List<FreeColGameObject> objects = message.getObjects();
+        final Specification spec = game.getSpecification();
+        final OptionGroup gameOptions = message.getGameOptions();
         
-        for (FreeColGameObject fcgo : objects) {
-            if (fcgo instanceof Game) {
-                fcc.addSpecificationActions(((Game)fcgo).getSpecification());
-            } else {
-                logger.warning("Game node expected: " + fcgo.getId());
-            }
+        if (!spec.mergeGameOptions(gameOptions, "client")) {
+            logger.warning("Game option update failed");
         }
     }
 

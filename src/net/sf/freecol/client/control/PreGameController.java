@@ -21,6 +21,7 @@ package net.sf.freecol.client.control;
 
 import java.awt.Color;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -33,6 +34,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -247,6 +249,22 @@ public final class PreGameController extends FreeColClientHolder {
         }
         igc().nextModelMessage();
         return true;
+    }
+
+    /**
+     * Handles an update.
+     *
+     * @param objects The {@code FreeColGameObject}s to update.
+     */
+    public void updateHandler(List<FreeColGameObject> objects) {
+        for (FreeColGameObject fcgo : objects) {
+            if (fcgo instanceof Game) {
+                final FreeColClient fcc = getFreeColClient();
+                fcc.addSpecificationActions(((Game)fcgo).getSpecification());
+            } else {
+                logger.warning("Game node expected: " + fcgo.getId());
+            }
+        }
     }
 
     /**

@@ -193,9 +193,11 @@ public class UpdateMessage extends ObjectMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
-
-        igc(freeColClient).updateHandler(getObjects());
+        if (freeColClient.isInGame()) {
+            igc(freeColClient).updateHandler(getObjects());
+        } else {
+            pgc(freeColClient).updateHandler(getObjects());
+        }
     }
 
     /**
