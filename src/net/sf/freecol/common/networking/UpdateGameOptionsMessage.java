@@ -21,6 +21,7 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -89,6 +90,21 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
         return this.options;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Game game = freeColClient.getGame();
+        final Specification spec = game.getSpecification();
+        final OptionGroup gameOptions = getGameOptions();
+
+        if (freeColClient.isInGame()) {
+            ; // Ignored
+        } else {
+            pgc(freeColClient).updateGameOptionsHandler(getGameOptions());
+        }
+    }
 
     /**
      * {@inheritDoc}

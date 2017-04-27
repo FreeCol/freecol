@@ -254,6 +254,17 @@ public final class PreGameController extends FreeColClientHolder {
     }
 
     /**
+     * Handle new game options.
+     *
+     * @param gameOptions The {@code OptionGroup} containing the game options.
+     */
+    public void updateGameOptionsHandler(OptionGroup gameOptions) {
+        if (!getSpecification().mergeGameOptions(gameOptions, "client")) {
+            logger.warning("Game option update failed");
+        }
+    }
+
+    /**
      * Update the {@link MapGeneratorOptions} at the server.
      * This method should be called after updating that object.
      */

@@ -117,7 +117,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 update(new UpdateMessage(getGame(), e)));
         register(UpdateGameOptionsMessage.TAG,
             (Connection c, Element e) ->
-                updateGameOptions(new UpdateGameOptionsMessage(getGame(), e)));
+                new UpdateGameOptionsMessage(getGame(), e).clientHandler(freeColClient));
         register(UpdateMapGeneratorOptionsMessage.TAG,
             (Connection c, Element e) ->
                 updateMapGeneratorOptions(new UpdateMapGeneratorOptionsMessage(getGame(), e)));
@@ -156,21 +156,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
         }
     }
 
-    /**
-     * Handles an "updateGameOptions"-message.
-     *
-     * @param message The {@code UpdateGameOptionsMessage} to process.
-     */
-    private void updateGameOptions(UpdateGameOptionsMessage message) {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-        final OptionGroup gameOptions = message.getGameOptions();
-        
-        if (!spec.mergeGameOptions(gameOptions, "client")) {
-            logger.warning("Game option update failed");
-        }
-    }
-    
     /**
      * Handles an "updateMapGeneratorOptions"-message.
      *
