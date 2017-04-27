@@ -1840,7 +1840,7 @@ public final class Specification {
             logger.warning("Null difficulty level supplied");
             return;
         }
-        logger.info("Applying difficulty level " + level.getId());
+        logger.config("Applying difficulty level " + level.getId());
         addOptionGroup(level, true);
         this.difficultyLevel = level.getId();
     }
