@@ -1835,6 +1835,7 @@ public class InGameControllerTest extends FreeColTestCase {
         FoundingFather father = new FoundingFather("father", spec());
         father.setType(FoundingFatherType.TRADE);
         father.setUnits(units);
+        spec().addTestFather(father);
         igc.addFoundingFather(dutch, father);
 
         assertEquals(2, dutch.getUnitCount());

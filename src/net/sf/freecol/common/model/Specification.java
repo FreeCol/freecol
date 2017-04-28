@@ -679,6 +679,16 @@ public final class Specification {
     }
 
     /**
+     * Add a father, for test purposes.
+     *
+     * @param ff The {@code FoundingFather} to add.
+     */
+    public void addTestFather(FoundingFather ff) {
+        allTypes.put(ff.getId(), ff);
+        foundingFathers.add(ff);
+    }
+
+    /**
      * Disable editing of some critical option groups.
      */
     public void disableEditing() {
