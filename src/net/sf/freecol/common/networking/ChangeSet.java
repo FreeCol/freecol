@@ -1512,6 +1512,15 @@ public class ChangeSet {
     // specific plater.
 
     /**
+     * Merge a change set into this one.
+     *
+     * @param cs The other {@code ChangeSet}.
+     */
+    public void merge(ChangeSet other) {
+        this.changes.addAll(other.changes);
+    }
+
+    /**
      * Build an update message.
      *
      * @param serverPlayer The {@code ServerPlayer} to send the update to.
