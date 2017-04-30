@@ -227,9 +227,6 @@ public final class InGameInputHandler extends ServerInputHandler {
         register(MoveToMessage.TAG,
             (Connection conn, Element e) -> handler(true, conn,
                 new MoveToMessage(getGame(), e)));
-        //register(MultipleMessage.TAG,
-        //    (Connection conn, Element e) -> handler(true, conn,
-        //        new MultipleMessage(getGame(), e)));
         register(NationSummaryMessage.TAG,
             (Connection conn, Element e) -> handler(false, conn,
                 new NationSummaryMessage(getGame(), e)));

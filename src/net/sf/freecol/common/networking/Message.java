@@ -457,7 +457,7 @@ public abstract class Message {
      * Client handlers always return null.
      *
      * @param freeColClient The {@code FreeColClient} to handle this message.
-     * @exception FreeColException if there is a problem handling the message.
+     * @exception FreeColException if there is a problem building the message.
      */
     public void clientHandler(FreeColClient freeColClient)
         throws FreeColException {
