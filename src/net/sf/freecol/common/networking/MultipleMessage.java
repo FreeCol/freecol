@@ -25,10 +25,13 @@ import java.util.function.Function;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import net.sf.freecol.common.util.DOMUtils;
 import org.w3c.dom.Element;
@@ -92,11 +95,41 @@ public class MultipleMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+        final Connection conn = aiPlayer.getConnection();
+        Message msg = DOMUtils.handleList(conn.getDOMMessageHandler(),
+                                          conn, this.elements);
+        if (msg != null) {
+            logger.warning("Multiple AI message -> " + msg.getType());
+        }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientHandler(FreeColClient freeColClient) {
+        final Connection conn = freeColClient.askServer().getConnection();
+        Message msg = DOMUtils.handleList(freeColClient.getInGameInputHandler(),
+                                          conn, this.elements);
+        if (msg != null) {
+            logger.warning("Multiple client message -> " + msg.getType());
+        }
+    }
+            
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        final Connection conn = serverPlayer.getConnection();
+        Message msg = DOMUtils.handleList((DOMMessageHandler)freeColServer.getInputHandler(),
+                                          conn, this.elements);
+        return (msg == null) ? null
+            : ChangeSet.simpleChange(serverPlayer, (DOMMessage)msg);
+    }
+            
     /**
      * {@inheritDoc}
      */
@@ -130,7 +163,6 @@ public class MultipleMessage extends ObjectMessage {
                                 Connection connection) {
         return DOMUtils.handleList(handler, connection, this.elements);
     }
-
 
     /**
      * About to go away.

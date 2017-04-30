@@ -431,6 +431,15 @@ public final class FreeColClient {
     }
 
     /**
+     * Gets the input handler that will be used when the game has been started.
+     *
+     * @return The {@code InGameInputHandler}.
+     */
+    public InGameInputHandler getInGameInputHandler() {
+        return inGameInputHandler;
+    }
+
+    /**
      * Gets the controller for the map editor, if we are in the map editor.
      *
      * @return The map editor controller, if any.

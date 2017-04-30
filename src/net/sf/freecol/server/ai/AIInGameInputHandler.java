@@ -206,7 +206,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
                     .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case MultipleMessage.TAG:
-                multiple(connection, element);
+                new MultipleMessage(game, element)
+                    .aiHandler(getFreeColServer(), getMyAIPlayer());
                 break;
             case NationSummaryMessage.TAG:
                 new NationSummaryMessage(game, element)
@@ -269,18 +270,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
             logger.log(Level.WARNING, logMe + "failed " + tag, ex);
         }
         return null;
-    }
-
-    // Individual message handlers
-
-   /**
-     * Handle all the children of this element.
-     *
-     * @param connection The {@code Connection} the element arrived on.
-     * @param element The {@code Element} to process.
-     */
-    private void multiple(Connection connection, Element element) {
-        new MultipleMessage(element).applyHandler(this, connection);
     }
 
 

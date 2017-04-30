@@ -35,7 +35,10 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.DOMMessageHandler;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.GameStateMessage;
+import net.sf.freecol.common.networking.LoginMessage;
+import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.MultipleMessage;
@@ -78,11 +81,23 @@ public abstract class ClientInputHandler extends FreeColClientHolder
         register(DisconnectMessage.TAG, (Connection c, Element e) ->
             TrivialMessage.disconnectMessage.clientHandler(freeColClient));
 
+        register(ErrorMessage.TAG,
+            (Connection c, Element e) ->
+                new ErrorMessage(getGame(), e).clientHandler(freeColClient));
+
         register(GameStateMessage.TAG, (Connection c, Element e) ->
             new GameStateMessage(getGame(), e).clientHandler(freeColClient));
 
+        register(LoginMessage.TAG,
+            (Connection c, Element e) ->
+                new LoginMessage(null, e).clientHandler(freeColClient));
+
+        register(LogoutMessage.TAG,
+            (Connection c, Element e) ->
+                new LogoutMessage(getGame(), e).clientHandler(freeColClient));
+
         register(MultipleMessage.TAG, (Connection c, Element e) ->
-            multiple(new MultipleMessage(getGame(), e)));
+            new MultipleMessage(getGame(), e).clientHandler(freeColClient));
 
         register(VacantPlayersMessage.TAG, (Connection c, Element e) ->
             new VacantPlayersMessage(getGame(), e).clientHandler(freeColClient));
@@ -109,23 +124,6 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     protected final boolean unregister(String name, DOMClientNetworkRequestHandler handler) {
         return this.domHandlerMap.remove(name, handler);
     }
-
-
-    // Useful handlers
-
-    /**
-     * Handle a "multiple"-message.
-     *
-     * @param message The {@code MultipleMessage} to process.
-     */
-    protected void multiple(MultipleMessage message) {
-        // Using null Connection, it should go away completely soon
-        Message result = message.applyHandler(this, null);
-        if (result != null) {
-            logger.warning("Multiple message -> " + result.getType());
-        }
-    }
-
 
     // Implement DOMMessageHandler
 

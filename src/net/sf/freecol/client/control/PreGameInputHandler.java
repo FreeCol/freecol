@@ -42,9 +42,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.ErrorMessage;
-import net.sf.freecol.common.networking.LoginMessage;
-import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.ReadyMessage;
 import net.sf.freecol.common.networking.SetAvailableMessage;
@@ -85,18 +82,11 @@ public final class PreGameInputHandler extends ClientInputHandler {
         register(ChatMessage.TAG,
             (Connection c, Element e) ->
                 new ChatMessage(getGame(), e).clientHandler(freeColClient));
-        register(ErrorMessage.TAG,
-            (Connection c, Element e) ->
-                new ErrorMessage(getGame(), e).clientHandler(freeColClient));
-        register(LoginMessage.TAG,
-            (Connection c, Element e) ->
-                new LoginMessage(new Game(), e).clientHandler(freeColClient));
-        register(LogoutMessage.TAG,
-            (Connection c, Element e) ->
-                new LogoutMessage(getGame(), e).clientHandler(freeColClient));
+
         register(ReadyMessage.TAG,
             (Connection c, Element e) ->
                 new ReadyMessage(getGame(), e).clientHandler(freeColClient));
+
         register(SetAvailableMessage.TAG,
             (Connection c, Element e) ->
                 new SetAvailableMessage(getGame(), e).clientHandler(freeColClient));
@@ -112,12 +102,15 @@ public final class PreGameInputHandler extends ClientInputHandler {
         register(StartGameMessage.TAG,
             (Connection c, Element e) ->
                 TrivialMessage.startGameMessage.clientHandler(freeColClient));
+
         register(UpdateMessage.TAG,
             (Connection c, Element e) ->
                 new UpdateMessage(getGame(), e).clientHandler(freeColClient));
+
         register(UpdateGameOptionsMessage.TAG,
             (Connection c, Element e) ->
                 new UpdateGameOptionsMessage(getGame(), e).clientHandler(freeColClient));
+
         register(UpdateMapGeneratorOptionsMessage.TAG,
             (Connection c, Element e) ->
                 new UpdateMapGeneratorOptionsMessage(getGame(), e).clientHandler(freeColClient));

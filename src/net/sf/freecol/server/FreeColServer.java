@@ -85,6 +85,7 @@ import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.InGameInputHandler;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.PreGameInputHandler;
+import net.sf.freecol.server.control.ServerInputHandler;
 import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.SimpleMapGenerator;
@@ -516,6 +517,23 @@ public final class FreeColServer {
         return (getServerState() == ServerState.IN_GAME)
             ? this.inGameController
             : this.preGameController;
+    }
+
+    /**
+     * Get the current input handler.
+     *
+     * @return The {@code ServerInputHandler} for the current server state.
+     */
+    public ServerInputHandler getInputHandler() {
+        switch (this.serverState) {
+        case PRE_GAME: case LOAD_GAME:
+            return this.preGameInputHandler;
+        case IN_GAME:
+            return this.inGameInputHandler;
+        default:
+            break;
+        }
+        return null;
     }
 
     /**
