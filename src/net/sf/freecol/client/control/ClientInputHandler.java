@@ -77,10 +77,13 @@ public abstract class ClientInputHandler extends FreeColClientHolder
 
         register(DisconnectMessage.TAG, (Connection c, Element e) ->
             TrivialMessage.disconnectMessage.clientHandler(freeColClient));
+
         register(GameStateMessage.TAG, (Connection c, Element e) ->
             new GameStateMessage(getGame(), e).clientHandler(freeColClient));
+
         register(MultipleMessage.TAG, (Connection c, Element e) ->
             multiple(new MultipleMessage(getGame(), e)));
+
         register(VacantPlayersMessage.TAG, (Connection c, Element e) ->
             new VacantPlayersMessage(getGame(), e).clientHandler(freeColClient));
     }
@@ -129,20 +132,21 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
-    public Element handle(Connection connection, Element element)
-        throws FreeColException {
+    public Element handle(Connection connection, Element element) {
         if (element == null) return null;
+
+        final String logMe = "Client handler ";
         final String tag = element.getTagName();
         DOMClientNetworkRequestHandler handler = domHandlerMap.get(tag);
+        if (handler == null) {
+            throw new RuntimeException(logMe + "missing for " + tag);
+        }
+
         try {
-            if (handler == null) {
-                logger.warning("Client ignored: " + tag);
-            } else {
-                handler.handle(connection, element);
-                logger.log(Level.FINEST, "Client handled: " + tag);
-            }
+            handler.handle(connection, element);
+            logger.log(Level.FINEST, logMe + tag + " to null");
         } catch (Exception ex) {
-            logger.log(Level.WARNING, "Client failed: " + tag, ex);
+            logger.log(Level.WARNING, logMe + "failed " + tag, ex);
         }
         return null;
     }

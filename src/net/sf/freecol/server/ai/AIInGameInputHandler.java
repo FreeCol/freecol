@@ -172,6 +172,7 @@ public final class AIInGameInputHandler extends FreeColServerHolder
     public synchronized Element handle(Connection connection, Element element) {
         if (element == null) return null;
 
+        final String logMe = "AI(" + getMyPlayer().getId() + ") handler ";
         final Game game = getGame();
         final String tag = element.getTagName();
         try {
@@ -261,12 +262,11 @@ public final class AIInGameInputHandler extends FreeColServerHolder
             case UpdateMessage.TAG:
                 break;
             default:
-                logger.warning("Unknown message type: " + tag);
-                break;
+                throw new RuntimeException(logMe + "missing for " + tag);
             }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "AI input handler for " + getMyAIPlayer()
-                + " caught error handling " + tag, e);
+            //logger.log(Level.FINEST, logMe + tag + " to null");
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, logMe + "failed " + tag, ex);
         }
         return null;
     }
