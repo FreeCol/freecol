@@ -746,7 +746,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The {@code NationType} of this player.
      */
     public NationType getNationType() {
-        return nationType;
+        return this.nationType;
     }
 
     /**
@@ -755,7 +755,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newNationType The new {@code NationType}.
      */
     public void setNationType(NationType newNationType) {
-        nationType = newNationType;
+        this.nationType = newNationType;
     }
 
     /**
@@ -764,7 +764,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newNationType The new {@code NationType}.
      */
     public void changeNationType(NationType newNationType) {
-        if (nationType != null) removeFeatures(nationType);
+        if (this.nationType != null) removeFeatures(this.nationType);
         setNationType(newNationType);
         if (newNationType != null) addFeatures(newNationType);
     }
@@ -775,7 +775,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player can found colonies.
      */
     public boolean canBuildColonies() {
-        return nationType.hasAbility(Ability.FOUNDS_COLONIES);
+        return this.nationType != null
+            && this.nationType.hasAbility(Ability.FOUNDS_COLONIES);
     }
 
     /**
@@ -784,7 +785,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player can recruit founding fathers.
      */
     public boolean canHaveFoundingFathers() {
-        return nationType.hasAbility(Ability.ELECT_FOUNDING_FATHER);
+        return this.nationType != null
+            && this.nationType.hasAbility(Ability.ELECT_FOUNDING_FATHER);
     }
 
     /**
