@@ -1622,7 +1622,7 @@ public final class MapViewer extends FreeColClientHolder {
                 if (settlement instanceof Colony) {
                     Colony colony = (Colony)settlement;
                     String string = Integer.toString(
-                        colony.getDisplayUnitCount());
+                        colony.getApparentUnitCount());
                     leftImage = createLabel(g, string,
                         ((colony.getPreferredSizeChange() > 0)
                             ? italicFont : font),

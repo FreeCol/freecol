@@ -96,6 +96,20 @@ public abstract class NationType extends FreeColSpecObjectType {
     }
 
     /**
+     * Set the settlement types.
+     *
+     * @param settlementTypes A new list of {@code SettlementType}s.
+     */
+    public final void setSettlementTypes(List<SettlementType> settlementTypes) {
+        if (this.settlementTypes == null) {
+            this.settlementTypes = new ArrayList<>();
+        } else {
+            this.settlementTypes.clear();
+        }
+        this.settlementTypes.addAll(settlementTypes);
+    }
+
+    /**
      * Add a settlement type.
      *
      * @param settlementType The {@code SettlementType} to add.
@@ -184,6 +198,23 @@ public abstract class NationType extends FreeColSpecObjectType {
      * @return True if this is a REF nation.
      */
     public abstract boolean isREF();
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        NationType o = copyInCast(other, NationType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.numberOfSettlements = o.getNumberOfSettlements();
+        this.aggression = o.getAggression();
+        this.setSettlementTypes(o.getSettlementTypes());
+        return true;
+    }
 
 
     // Serialization

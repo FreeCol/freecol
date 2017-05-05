@@ -215,6 +215,22 @@ public class AbstractUnit extends FreeColObject {
     }
 
 
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        AbstractUnit o = copyInCast(other, AbstractUnit.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.roleId = o.getRoleId();
+        this.number = o.getNumber();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String ROLE_TAG = "role";

@@ -140,6 +140,29 @@ public class NationSummary extends FreeColObject {
     }
 
 
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        NationSummary o = copyInCast(other, NationSummary.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.stance = o.getStance();
+        this.numberOfSettlements = o.getNumberOfSettlements();
+        this.numberOfUnits = o.getNumberOfUnits();
+        this.militaryStrength = o.getMilitaryStrength();
+        this.navalStrength = o.getNavalStrength();
+        this.gold = o.getGold();
+        this.soL = o.getSoL();
+        this.foundingFathers = o.getFoundingFathers();
+        this.tax = o.getTax();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String FOUNDING_FATHERS_TAG = "foundingFathers";

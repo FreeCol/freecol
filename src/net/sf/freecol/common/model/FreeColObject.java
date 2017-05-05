@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -116,7 +117,7 @@ public abstract class FreeColObject
      * @return The identifier.
      */
     public String getId() {
-        return id;
+        return this.id;
     }
 
     /**
@@ -126,6 +127,17 @@ public abstract class FreeColObject
      */
     public void setId(final String newId) {
         this.id = newId;
+    }
+
+    /**
+     * Does another FreeColObject have the same identifier?
+     *
+     * @param other The other {@code FreeColObject} to check.
+     * @return True if the identifiers are non-null and equal.
+     */
+    public boolean idEquals(FreeColObject other) {
+        return other != null && this.id != null
+            && this.id.equals(other.getId());
     }
 
     /**
@@ -282,81 +294,85 @@ public abstract class FreeColObject
 
     // Property change support
 
+    protected PropertyChangeSupport getPropertyChangeSupport() {
+        return this.pcs;
+    }
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        if (pcs == null) pcs = new PropertyChangeSupport(this);
-        pcs.addPropertyChangeListener(listener);
+        if (this.pcs == null) this.pcs = new PropertyChangeSupport(this);
+        this.pcs.addPropertyChangeListener(listener);
     }
 
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        if (pcs == null) pcs = new PropertyChangeSupport(this);
-        pcs.addPropertyChangeListener(propertyName, listener);
+        if (this.pcs == null) this.pcs = new PropertyChangeSupport(this);
+        this.pcs.addPropertyChangeListener(propertyName, listener);
     }
 
     public void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
-        if (pcs != null) {
-            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        if (this.pcs != null) {
+            this.pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
         }
     }
 
     public void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
-        if (pcs != null) {
-            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        if (this.pcs != null) {
+            this.pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
         }
     }
 
     public void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
-        if (pcs != null) {
-            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        if (this.pcs != null) {
+            this.pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
         }
     }
 
     public void firePropertyChange(PropertyChangeEvent event) {
-        if (pcs != null) {
-            pcs.firePropertyChange(event);
+        if (this.pcs != null) {
+            this.pcs.firePropertyChange(event);
         }
     }
 
     public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-        if (pcs != null) {
-            pcs.firePropertyChange(propertyName, oldValue, newValue);
+        if (this.pcs != null) {
+            this.pcs.firePropertyChange(propertyName, oldValue, newValue);
         }
     }
 
     public void firePropertyChange(String propertyName, int oldValue, int newValue) {
-        if (pcs != null) {
-            pcs.firePropertyChange(propertyName, oldValue, newValue);
+        if (this.pcs != null) {
+            this.pcs.firePropertyChange(propertyName, oldValue, newValue);
         }
     }
 
     public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-        if (pcs != null) {
-            pcs.firePropertyChange(propertyName, oldValue, newValue);
+        if (this.pcs != null) {
+            this.pcs.firePropertyChange(propertyName, oldValue, newValue);
         }
     }
 
     public PropertyChangeListener[] getPropertyChangeListeners() {
-        return (pcs == null) ? new PropertyChangeListener[0]
-            : pcs.getPropertyChangeListeners();
+        return (this.pcs == null) ? new PropertyChangeListener[0]
+            : this.pcs.getPropertyChangeListeners();
     }
 
     public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
-        return (pcs == null) ? new PropertyChangeListener[0]
-            : pcs.getPropertyChangeListeners(propertyName);
+        return (this.pcs == null) ? new PropertyChangeListener[0]
+            : this.pcs.getPropertyChangeListeners(propertyName);
     }
 
     public boolean hasListeners(String propertyName) {
-        return (pcs == null) ? false : pcs.hasListeners(propertyName);
+        return (this.pcs == null) ? false : this.pcs.hasListeners(propertyName);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        if (pcs != null) {
-            pcs.removePropertyChangeListener(listener);
+        if (this.pcs != null) {
+            this.pcs.removePropertyChangeListener(listener);
         }
     }
 
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        if (pcs != null) {
-            pcs.removePropertyChangeListener(propertyName, listener);
+        if (this.pcs != null) {
+            this.pcs.removePropertyChangeListener(propertyName, listener);
         }
     }
 
@@ -946,8 +962,8 @@ public abstract class FreeColObject
      * @return The copied object, or null on error.
      */
     public <T extends FreeColObject> T copy(Game game) {
-        @SuppressWarnings("unchecked")
-        Class<T> returnClass = (Class<T>)this.getClass();
+        @SuppressWarnings("unchecked") Class<T> returnClass
+            = (Class<T>)this.getClass();
         return this.copy(game, returnClass);
     }
 
@@ -960,8 +976,8 @@ public abstract class FreeColObject
      * @return The copied object, or null on error.
      */
     public <T extends FreeColObject> T copy(Game game, Player player) {
-        @SuppressWarnings("unchecked")
-        Class<T> returnClass = (Class<T>)this.getClass();
+        @SuppressWarnings("unchecked") Class<T> returnClass
+            = (Class<T>)this.getClass();
         return this.copy(game, returnClass, player);
     }
 
@@ -984,8 +1000,8 @@ public abstract class FreeColObject
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass) {
         T ret = null;
         try (
-            FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize()));
-        ) {
+             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize()));
+             ) {
             ret = xr.copy(game, returnClass);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
@@ -1003,11 +1019,11 @@ public abstract class FreeColObject
      * @return The copied object, or null on error.
      */
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass,
-                                            Player player) {
+        Player player) {
         T ret = null;
         try (
-            FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize(player)));
-        ) {
+             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize(player)));
+             ) {
             ret = xr.copy(game, returnClass);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
@@ -1015,6 +1031,37 @@ public abstract class FreeColObject
         return ret;
     }
 
+    /**
+     * Copy another FreeColObject into this one if it is compatible.
+     *
+     * @param other The other object.
+     * @return True if the copy in is succesful.
+     */
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        if (!idEquals(other)) return false;
+        this.pcs = other.getPropertyChangeSupport();
+        return true;
+    } 
+
+    /**
+     * If another object can be copied into this one, 
+     *
+     * @param T The {@code FreeColObject} subclass of the object to copy in.
+     * @param other The {@code FreeColObject} to copy in.
+     * @param R The {@code FreeColObject} subclass to copy in to.
+     * @param returnClass The return class.
+     * @return The other object cast to the return class, or null
+     *     if incompatible in any way.
+     */
+    protected <T extends FreeColObject, R extends FreeColObject> R
+        copyInCast(T other, Class<R> returnClass) {
+        try {
+            R ret = returnClass.cast(other);
+            if (idEquals(other)) return ret;
+        } catch (ClassCastException cce) {}
+        return (R)null;
+    }
+        
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

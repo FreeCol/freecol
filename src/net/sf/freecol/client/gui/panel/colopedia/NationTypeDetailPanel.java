@@ -190,7 +190,7 @@ public class NationTypeDetailPanel
             SwingConstants.CENTER));
 
         List<String> regionNames = new ArrayList<>();
-        for (String regionName : nationType.getRegionNames()) {
+        for (String regionName : nationType.getRegions()) {
             regionNames.add(Messages.getName(regionName));
         }
         panel.add(Utility.localizedLabel("colopedia.nationType.regions"));

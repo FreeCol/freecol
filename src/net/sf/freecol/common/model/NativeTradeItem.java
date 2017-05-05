@@ -51,6 +51,7 @@ public class NativeTradeItem extends GoodsTradeItem {
     /** Magic number for price to denote an invalid item. */
     public static final int PRICE_INVALID = -1;
 
+
     /** The current valuation by the natives. */
     private int price;
 
@@ -160,6 +161,22 @@ public class NativeTradeItem extends GoodsTradeItem {
      */
     public Predicate<NativeTradeItem> goodsMatcher() {
         return matchKeyEquals(this.getGoods(), NativeTradeItem::getGoods);
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        NativeTradeItem o = copyInCast(other, NativeTradeItem.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.price = o.getPrice();
+        this.haggleCount = o.getHaggleCount();
+        return true;
     }
 
 

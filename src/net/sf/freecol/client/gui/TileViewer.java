@@ -628,7 +628,7 @@ public final class TileViewer extends FreeColClientHolder {
 
                 if (withNumber) {
                     String populationString = Integer.toString(
-                        colony.getDisplayUnitCount());
+                        colony.getApparentUnitCount());
                     int bonus = colony.getProductionBonus();
                     Color theColor = ResourceManager.getColor(
                         "color.map.productionBonus." + bonus);

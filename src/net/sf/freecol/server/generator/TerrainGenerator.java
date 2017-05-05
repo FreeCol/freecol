@@ -783,7 +783,7 @@ public class TerrainGenerator {
     private Resource createResource(Tile tile) {
         if (tile == null) return null;
         ResourceType resourceType = RandomChoice.getWeightedRandom(null, null,
-            tile.getType().getWeightedResources(), random);
+            tile.getType().getResourceTypes(), random);
         if (resourceType == null) return null;
         int minValue = resourceType.getMinValue();
         int maxValue = resourceType.getMaxValue();

@@ -96,6 +96,25 @@ public final class FeatureContainer {
         }
     }
 
+    protected Collection<Ability> getAbilityValues() {
+        Set<Ability> ret = new HashSet<>();
+        synchronized (abilitiesLock) {
+            if (abilities != null) {
+                for (Set<Ability> as : this.abilities.values()) ret.addAll(as);
+            }
+        }
+        return ret;
+    }
+    protected Collection<Modifier> getModifierValues() {
+        Set<Modifier> ret = new HashSet<>();
+        synchronized (modifiersLock) {
+            if (modifiers != null) {
+                for (Set<Modifier> ms : this.modifiers.values()) ret.addAll(ms);
+            }
+        }
+        return ret;
+    }
+    
 
     /**
      * Is the given set of abilities non-empty and contains no
@@ -451,6 +470,17 @@ public final class FeatureContainer {
         }
     }
 
+    /**
+     * Copy anther feature container.
+     */
+    public void copy(FeatureContainer other) {
+        clear();
+        if (other != null) {
+            for (Ability a : other.getAbilityValues()) addAbility(a);
+            for (Modifier m : other.getModifierValues()) addModifier(m);
+        }
+    }
+                
     /**
      * Clear this feature container.
      */

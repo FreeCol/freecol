@@ -55,19 +55,6 @@ public class LostCityRumour extends TileItem {
     // How many `nothing' rumours are there.
     private static int rumourNothing = -1;
 
-    /**
-     * The type of the rumour.  A RumourType, or null if the type has
-     * not yet been determined.
-     */
-    private RumourType type = null;
-
-    /**
-     * The name of this rumour, or null, if it has none.  Rumours such
-     * as the Seven Cities of Gold and Fountains of Youth may have
-     * individual names.
-     */
-    private String name = null;
-
     /** Constants describing types of Lost City Rumours. */
     public static enum RumourType {
         NO_SUCH_RUMOUR,
@@ -99,6 +86,20 @@ public class LostCityRumour extends TileItem {
             return Messages.descriptionKey("model." + getKey() + "." + variant);
         }
     }
+
+
+    /**
+     * The type of the rumour.  A RumourType, or null if the type has
+     * not yet been determined.
+     */
+    private RumourType type = null;
+
+    /**
+     * The name of this rumour, or null, if it has none.  Rumours such
+     * as the Seven Cities of Gold and Fountains of Youth may have
+     * individual names.
+     */
+    private String name = null;
 
 
     /**
@@ -380,6 +381,22 @@ public class LostCityRumour extends TileItem {
             result = -1;
         }
         return result;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        LostCityRumour o = copyInCast(other, LostCityRumour.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.type = o.getType();
+        this.name = o.getName();
+        return true;
     }
 
 

@@ -1296,6 +1296,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the old SoL.
+     *
+     * @return The SoL amount from the previous turn.
+     */
+    protected int getOldSoL() {
+        return this.oldSoL;
+    }
+
+    /**
      * Gets the total percentage of rebels in all this player's colonies.
      *
      * @return The total percentage of rebels in all this player's colonies.
@@ -1307,12 +1316,31 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the bells for intervention.
+     *
+     * @return The intervention bell amount.
+     */
+    protected int getInterventionBells() {
+        return this.interventionBells;
+    }
+
+    /**
      * Gets the founding fathers in this player's congress.
      *
      * @return A set of {@code FoundingFather}s in congress.
      */
-    public Set<FoundingFather> getFathers() {
+    public Set<FoundingFather> getFoundingFathers() {
         return foundingFathers;
+    }
+
+    /**
+     * Gets the founding fathers in this player's congress.
+     *
+     * @param A set of {@code FoundingFather}s in congress.
+     */
+    protected void setFoundingFathers(Set<FoundingFather> foundingFathers) {
+        this.foundingFathers.clear();
+        this.foundingFathers.addAll(foundingFathers);
     }
 
     /**
@@ -1449,7 +1477,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return StringTemplate.template("model.player.colonialIndependence");
         final Event event = getSpecification()
             .getEvent("model.event.declareIndependence");
-        Limit limit = find(event.getLimits(), l -> !l.evaluate(this));
+        Limit limit = find(event.getLimitValues(), l -> !l.evaluate(this));
         return (limit == null) ? null
             : StringTemplate.template(limit.getDescriptionKey())
                 .addAmount("%limit%", limit.getRightHandSide()
@@ -1564,6 +1592,28 @@ public class Player extends FreeColGameObject implements Nameable {
         market = new Market(getGame(), this);
     }
 
+    /**
+     * Get the last sales events.
+     *
+     * @return The {@code LastSale}s list.
+     */
+    protected java.util.Map<String, LastSale> getLastSales() {
+        if (this.lastSales == null) this.lastSales = new HashMap<>();
+        return this.lastSales;
+    }
+    
+    /**
+     * Set the last sales events.
+     *
+     * @param lastSales The new list of {@code LastSale}s.
+     */
+    protected void setLastSales(java.util.Map<String, LastSale> lastSales) {
+        if (this.lastSales == null) this.lastSales = new HashMap<>(); else {
+            this.lastSales.clear();
+        }
+        this.lastSales.putAll(lastSales);
+    }
+    
     /**
      * Gets the current sales data for a location and goods type.
      *
@@ -1785,7 +1835,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getRecruitPrice() {
         // return Math.max(0, (getCrossesRequired() - crosses) * 10);
-        return getEurope().getRecruitPrice();
+        return getEurope().getCurrentRecruitPrice();
     }
 
     /**
@@ -2433,7 +2483,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<ModelMessage> getNewModelMessages() {
         synchronized (this.modelMessages) {
-            return transform(this.modelMessages, m -> !m.hasBeenDisplayed());
+            return transform(this.modelMessages, m -> !m.getDisplayed());
         }
     }
 
@@ -2467,7 +2517,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void removeDisplayedModelMessages() {
         synchronized (this.modelMessages) {
-            removeInPlace(this.modelMessages, ModelMessage::hasBeenDisplayed);
+            removeInPlace(this.modelMessages, ModelMessage::getDisplayed);
         }
     }
 
@@ -2477,6 +2527,18 @@ public class Player extends FreeColGameObject implements Nameable {
     public void clearModelMessages() {
         synchronized (this.modelMessages) {
             this.modelMessages.clear();
+        }
+    }
+
+    /**
+     * Set the model message list.
+     *
+     * @param modelMessages The new {@code ModelMessages}.
+     */
+    protected void setModelMessages(List<ModelMessage> modelMessages) {
+        synchronized (this.modelMessages) {
+            this.modelMessages.clear();
+            this.modelMessages.addAll(modelMessages);
         }
     }
 
@@ -2549,6 +2611,16 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
+    /**
+     * Clear the history events.
+     */
+    protected void setHistory(List<HistoryEvent> history) {
+        synchronized (this.history) {
+            this.history.clear();
+            this.history.addAll(history);
+        }
+    }
+    
 
     //
     // The players view of the Map
@@ -2787,6 +2859,25 @@ public class Player extends FreeColGameObject implements Nameable {
     //
 
     /**
+     * Get the tension map.
+     *
+     * @return The map of tension between players.
+     */
+    protected java.util.Map<Player, Tension> getTension() {
+        return this.tension;
+    }
+
+    /**
+     * Set the tension map.
+     *
+     * @param The new map of tension between players.
+     */
+    protected void setTension(java.util.Map<Player, Tension> tension) {
+        this.tension.clear();
+        this.tension.putAll(tension);
+    }
+
+    /**
      * Gets the hostility this player has against the given player.
      *
      * @param player The other {@code Player}.
@@ -2824,6 +2915,25 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the players that can not set up missions.
+     *
+     * @return The set of banned players.
+     */
+    protected Set<Player> getBannedMissions() {
+        return this.bannedMissions;
+    }
+        
+    /**
+     * Set banned mission set.
+     *
+     * @param bannedMissions The new set of banned players.
+     */
+    protected void setBannedMissions(Set<Player> bannedMissions) {
+        this.bannedMissions.clear();
+        this.bannedMissions.addAll(bannedMissions);
+    }
+        
+    /**
      * Does this player ban missions from another player?
      *
      * @param player The other {@code Player} to test.
@@ -2852,6 +2962,25 @@ public class Player extends FreeColGameObject implements Nameable {
         if (bannedMissions != null) bannedMissions.remove(player);
     }
 
+    /**
+     * Get the stance map.
+     *
+     * @return A map of player identifiers to stances.
+     */
+    protected java.util.Map<String, Stance> getStances() {
+        return this.stance;
+    }
+
+    /**
+     * Set the stance map.
+     *
+     * @param stances A new stance map.
+     */
+    protected void setStances(java.util.Map<String, Stance> stances) {
+        this.stance.clear();
+        this.stance.putAll(stances);
+    }
+    
     /**
      * Gets the stance towards a given player.
      *
@@ -3785,6 +3914,52 @@ public class Player extends FreeColGameObject implements Nameable {
     @Override
     public int getClassIndex () {
         return PLAYER_CLASS_INDEX;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Player o = copyInCast(other, Player.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.name = o.getName();
+        this.independentNationName = o.getIndependentNationName();
+        this.playerType = o.getPlayerType();
+        this.nationType = o.getNationType();
+        this.nationId = o.getNationId();
+        this.newLandName = o.getNewLandName();
+        this.admin = o.isAdmin();
+        this.ai = o.isAI();
+        this.ready = o.getReady();
+        this.dead = o.getDead();
+        this.attackedByPrivateers = o.getAttackedByPrivateers();
+        this.bankrupt = o.getBankrupt();
+        this.score = o.getScore();
+        this.gold = o.getGold();
+        this.immigration = o.getImmigration();
+        this.immigrationRequired = o.getImmigrationRequired();
+        this.liberty = o.getLiberty();
+        this.oldSoL = o.getOldSoL();
+        this.interventionBells = o.getInterventionBells();
+        this.tax = o.getTax();
+        this.entryLocation = o.getEntryLocation();
+        this.market = o.getMarket();
+        this.europe = o.getEurope();
+        this.monarch = o.getMonarch();
+        this.setFoundingFathers(o.getFoundingFathers());
+        this.currentFather = o.getCurrentFather();
+        this.setTension(o.getTension());
+        this.setBannedMissions(o.getBannedMissions());
+        this.setStances(o.getStances());
+        // TradeRoutes are special
+        //this.tradeRoutes.clear();
+        //this.tradeRoutes.addAll(o.getTradeRoutes());
+        this.setModelMessages(o.getModelMessages());
+        this.setHistory(o.getHistory());
+        this.setLastSales(o.getLastSales());
+        return true;
     }
 
 

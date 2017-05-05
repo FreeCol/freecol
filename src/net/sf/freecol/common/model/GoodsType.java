@@ -528,6 +528,39 @@ public final class GoodsType extends FreeColSpecObjectType {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        GoodsType o = copyInCast(other, GoodsType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.isFarmed = o.isFarmed();
+        this.isFood = o.isFoodType();
+        this.ignoreLimit = o.limitIgnored();
+        this.newWorldGoods = o.isNewWorldGoodsType();
+        this.isMilitary = o.getMilitary();
+        this.buildingMaterial = o.isBuildingMaterial();
+        this.tradeGoods = o.isTradeGoods();
+        this.storable = o.isStorable();
+        this.storedAs = o.getStoredAs();
+        this.madeFrom = o.getInputType();
+        this.makes = o.getOutputType();
+        this.initialAmount = o.getInitialAmount();
+        this.initialPrice = o.getInitialSellPrice();
+        this.priceDiff = o.getPriceDifference();
+        this.breedingNumber = o.getBreedingNumber();
+        this.price = o.getPrice();
+        this.productionWeight = o.getProductionWeight();
+        this.lowProductionThreshold = o.getLowProductionThreshold();
+        this.zeroProductionFactor = o.getZeroProductionFactor();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String BREEDING_NUMBER_TAG = "breeding-number";

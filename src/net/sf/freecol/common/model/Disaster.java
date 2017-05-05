@@ -47,6 +47,7 @@ public class Disaster extends FreeColSpecObjectType {
     /** Whether to apply one, many or all applicable disasters. */
     public static enum Effects { ONE, SEVERAL, ALL };
 
+
     /** Whether this disaster is natural.  Defaults to false. */
     private boolean natural = false;
 
@@ -98,6 +99,20 @@ public class Disaster extends FreeColSpecObjectType {
     }
 
     /**
+     * Set the effect list.
+     *
+     * @param effects The new effects list.
+     */
+    protected void setEffects(List<RandomChoice<Effect>> effects) {
+        if (this.effects == null) {
+            this.effects = new ArrayList<>();
+        } else {
+            this.effects.clear();
+        }
+        this.effects.addAll(effects);
+    }
+
+    /**
      * Add an effect.
      *
      * @param effect The {@code Effect} to add.
@@ -106,6 +121,23 @@ public class Disaster extends FreeColSpecObjectType {
         if (effects == null) effects = new ArrayList<>();
         effects.add(new RandomChoice<>(effect, effect.getProbability()));
     }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Disaster o = copyInCast(other, Disaster.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.natural = o.isNatural();
+        this.numberOfEffects = o.getNumberOfEffects();
+        this.setEffects(o.getEffects());
+        return true;
+    }       
 
 
     // Serialization

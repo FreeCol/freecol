@@ -269,7 +269,9 @@ public class Map extends FreeColGameObject implements Location {
     /** The regions on the map. */
     private final List<Region> regions = new ArrayList<>();
 
-    /** The search tracing status.  Do not serialize. */
+    // Do not serialize below
+
+    /** The search tracing status. */
     private boolean traceSearch = false;
 
 
@@ -350,6 +352,15 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Get the tiles.
+     *
+     * @param An doubly indexed array of tiles.
+     */
+    protected Tile[][] getTiles() {
+        return this.tiles;
+    }
+
+    /**
      * Gets the Tile at position (x, y).  'x' specifies a column and
      * 'y' specifies a row.  (0, 0) is the Tile at the top-left corner
      * of the Map.
@@ -402,16 +413,26 @@ public class Map extends FreeColGameObject implements Location {
         return this.tiles[0].length;
     }
 
+    /**
+     * Get the layer.
+     *
+     * @return The maximum implemented layer on this map.
+     */
     public final Layer getLayer() {
         return layer;
     }
 
+    /**
+     * Set the layer.
+     *
+     * @param newLayer The new maximum implemented layer for this map.
+     */
     public final void setLayer(final Layer newLayer) {
         this.layer = newLayer;
     }
 
     /**
-     * Gets the {@code MinimumLatitude} value.
+     * Get the minimum latitude.
      *
      * @return The minimum latitude of this map.
      */
@@ -419,13 +440,18 @@ public class Map extends FreeColGameObject implements Location {
         return minimumLatitude;
     }
 
+    /**
+     * Set the minimum latitude.
+     *
+     * @param newMinimumLatitude The new minimum latitude for this map.
+     */
     public final void setMinimumLatitude(final int newMinimumLatitude) {
         this.minimumLatitude = newMinimumLatitude;
         calculateLatitudePerRow();
     }
 
     /**
-     * Gets the {@code MaximumLatitude} value.
+     * Get the maximum latitude.
      *
      * @return The maximum latitude of this map.
      */
@@ -433,13 +459,18 @@ public class Map extends FreeColGameObject implements Location {
         return maximumLatitude;
     }
 
+    /**
+     * Set the maxmimum latitude.
+     *
+     * @param newMaximumLatitude The new maximum latitude for this map.
+     */
     public final void setMaximumLatitude(final int newMaximumLatitude) {
         this.maximumLatitude = newMaximumLatitude;
         calculateLatitudePerRow();
     }
 
     /**
-     * Gets the {@code LatitudePerRow} value.
+     * Get the latitude/row.
      *
      * @return The latitude change between rows.
      */
@@ -447,6 +478,9 @@ public class Map extends FreeColGameObject implements Location {
         return latitudePerRow;
     }
 
+    /**
+     * Recalculate the latitude/row from the current maximum and minimum.
+     */
     private final void calculateLatitudePerRow() {
         this.latitudePerRow = 1f * (maximumLatitude - minimumLatitude) /
             (getHeight() - 1);
@@ -2513,6 +2547,27 @@ public class Map extends FreeColGameObject implements Location {
             }
         }
         return result;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Map o = copyInCast(other, Map.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.tiles = o.getTiles();
+        this.layer = o.getLayer();
+        this.minimumLatitude = o.getMinimumLatitude();
+        this.maximumLatitude = o.getMaximumLatitude();
+        this.latitudePerRow = o.getLatitudePerRow();
+        this.regions.clear();
+        this.regions.addAll(o.getRegions());
+        return true;
     }
 
 

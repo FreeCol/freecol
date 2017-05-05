@@ -217,6 +217,27 @@ public class Scope extends FreeColObject {
     }
 
 
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Scope o = copyInCast(other, Scope.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.type = o.getType();
+        this.abilityId = o.getAbilityId();
+        this.abilityValue = o.getAbilityValue();
+        this.methodName = o.getMethodName();
+        this.methodValue = o.getMethodValue();
+        this.matchesNull = o.isMatchesNull();
+        this.matchNegated = o.isMatchNegated();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String ABILITY_ID_TAG = "ability-id";

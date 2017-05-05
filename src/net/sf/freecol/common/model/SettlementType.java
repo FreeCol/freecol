@@ -77,7 +77,7 @@ public class SettlementType extends FreeColSpecObjectType {
     private int convertThreshold = 100;
 
     /** The plunder this SettlementType generates when destroyed. */
-    private List<PlunderType> plunder = null;
+    private List<PlunderType> plunderTypes = null;
 
     /** The gifts this SettlementType generates when visited by a scout. */
     private RandomRange gifts = null;
@@ -210,47 +210,60 @@ public class SettlementType extends FreeColSpecObjectType {
     }
 
     /**
+     * Get the list of plunder types.
+     *
+     * @return The list of {@code PlunderType}s.
+     */
+    public List<PlunderType> getPlunderTypes() {
+        return (this.plunderTypes == null)
+            ? Collections.<PlunderType>emptyList()
+            : this.plunderTypes;
+    }
+
+    /**
+     * Set the plunder types.
+     *
+     * @param plunderTypes The new plunder type list.
+     */
+    protected void setPlunderTypes(List<PlunderType> plunderTypes) {
+        if (this.plunderTypes == null) {
+            this.plunderTypes = new ArrayList<>();
+        } else {
+            this.plunderTypes.clear();
+        }
+        this.plunderTypes.addAll(plunderTypes);
+    }
+
+    /**
      * Gets the plunder range available for the supplied unit.
      *
      * @param unit The {@code Unit} to check.
      * @return The plunder range, or null if none applicable.
      */
     public final RandomRange getPlunderRange(Unit unit) {
-        if (this.plunder == null) return null;
-        PlunderType pt = find(plunder, p -> p.appliesTo(unit));
+        if (this.plunderTypes == null) return null;
+        PlunderType pt = find(this.plunderTypes, p -> p.appliesTo(unit));
         return (pt == null) ? null : pt.getPlunder();
     }
 
     /**
-     * Get the list of plunder types.
-     *
-     * @return The list of {@code PlunderType}s.
-     */
-    public List<PlunderType> getPlunderTypes() {
-        return (this.plunder == null) ? Collections.<PlunderType>emptyList()
-            : this.plunder;
-    }
-
-    /**
-     * Add a plunder.
+     * Add a plunder type.
      *
      * @param pt The {@code PlunderType} to add.
      */
-    private void addPlunder(PlunderType pt) {
-        if (plunder == null) plunder = new ArrayList<>();
-        plunder.add(pt);
+    private void addPlunderType(PlunderType pt) {
+        if (this.plunderTypes == null) this.plunderTypes = new ArrayList<>();
+        this.plunderTypes.add(pt);
     }
     
     /**
      * Get the range of gifts available to a unit.
      *
-     * @param unit The {@code Unit} to check.
      * @return A range of gifts, or null if none applicable.
      */
-    public final RandomRange getGifts(Unit unit) {
+    public final RandomRange getGifts() {
         return this.gifts;
     }
-
 
     /**
      * Gets the warehouse capacity of this settlement.
@@ -262,7 +275,33 @@ public class SettlementType extends FreeColSpecObjectType {
     }
 
 
+    // Override FreeColObject
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        SettlementType o = copyInCast(other, SettlementType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.capital = o.isCapital();
+        this.visibleRadius = o.getVisibleRadius();
+        this.claimableRadius = o.getClaimableRadius();
+        this.extraClaimableRadius = o.getExtraClaimableRadius();
+        this.wanderingRadius = o.getWanderingRadius();
+        this.minimumSize = o.getMinimumSize();
+        this.maximumSize = o.getMaximumSize();
+        this.minimumGrowth = o.getMinimumGrowth();
+        this.maximumGrowth = o.getMaximumGrowth();
+        this.tradeBonus = o.getTradeBonus();
+        this.convertThreshold = o.getConvertThreshold();
+        this.setPlunderTypes(o.getPlunderTypes());
+        this.gifts = o.getGifts();
+        return true;
+    }
+
+        
     // Serialization
 
     private static final String CAPITAL_TAG = "capital";
@@ -328,8 +367,8 @@ public class SettlementType extends FreeColSpecObjectType {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (this.plunder != null) {
-            for (PlunderType pt : this.plunder) pt.toXML(xw);
+        if (this.plunderTypes != null) {
+            for (PlunderType pt : this.plunderTypes) pt.toXML(xw);
         }
 
         if (this.gifts != null) {
@@ -428,7 +467,7 @@ public class SettlementType extends FreeColSpecObjectType {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         if (xr.shouldClearContainers()) {
-            this.plunder = null;
+            this.plunderTypes = null;
             this.gifts = null;
         }
 
@@ -447,7 +486,7 @@ public class SettlementType extends FreeColSpecObjectType {
             xr.closeTag(GIFTS_TAG);
 
         } else if (PlunderType.TAG.equals(tag)) {
-            addPlunder(new PlunderType(xr, getSpecification()));
+            addPlunderType(new PlunderType(xr, getSpecification()));
 
         } else {
             super.readChild(xr);

@@ -704,7 +704,7 @@ public final class InGameController extends FreeColClientHolder {
                 && !continueIgnoreMessage(m.getIgnoredMessageKey(), thisTurn)) {
                 messages.add(m);
             }
-            m.setBeenDisplayed(true);
+            m.setDisplayed(true);
         }
 
         reapIgnoredMessages(thisTurn);

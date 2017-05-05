@@ -98,6 +98,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
     public static final String UNDEAD
         = "model.unitChange.undead";
 
+
     /** The individual unit changes valid for this change type. */
     public final Map<UnitType, List<UnitTypeChange>> changes = new HashMap<>();
 
@@ -124,6 +125,25 @@ public class UnitChangeType extends FreeColSpecObjectType {
      */
     public boolean getOwnerChange() {
         return this.ownerChange;
+    }
+
+    /**
+     * Get the change map.
+     *
+     * @return The map of unit type to eligible changes.
+     */
+    protected Map<UnitType, List<UnitTypeChange>> getChanges() {
+        return this.changes;
+    }
+
+    /**
+     * Set the change map.
+     *
+     * @param changes The new map of unit type to eligible changes.
+     */
+    protected void setChanges(Map<UnitType, List<UnitTypeChange>> changes) {
+        this.changes.clear();
+        this.changes.putAll(changes);
     }
 
     /**
@@ -166,6 +186,22 @@ public class UnitChangeType extends FreeColSpecObjectType {
         this.changes.remove(from);
     }
     // end @compat 0.11.6
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        UnitChangeType o = copyInCast(other, UnitChangeType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.setChanges(o.getChanges());
+        this.ownerChange = o.getOwnerChange();
+        return true;
+    }
 
 
     // Serialization

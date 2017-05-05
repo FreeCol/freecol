@@ -60,6 +60,7 @@ public class Nation extends FreeColSpecObjectType {
         // other European non-player nations
         "austrian", "german", "prussian", "turkish");
 
+
     /** The nation type, European, native, etc. */
     private NationType type;
 
@@ -159,27 +160,8 @@ public class Nation extends FreeColSpecObjectType {
      *
      * @return True if the nation starts on the east coast.
      */
-    public final boolean startsOnEastCoast() {
+    public final boolean getStartsOnEastCoast() {
         return startsOnEastCoast;
-    }
-
-
-    /**
-     * Get a message key for the ruler of this nation.
-     *
-     * @return The name key for the ruler.
-     */
-    public final String getRulerNameKey() {
-        return Messages.rulerKey(getId());
-    }
-
-    /**
-     * Get the name of the nation monarch.
-     *
-     * @return The ruler name.
-     */
-    public String getRulerName() {
-        return Messages.message(getRulerNameKey());
     }
 
     /**
@@ -198,6 +180,24 @@ public class Nation extends FreeColSpecObjectType {
      */
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    /**
+     * Get a message key for the ruler of this nation.
+     *
+     * @return The name key for the ruler.
+     */
+    public final String getRulerNameKey() {
+        return Messages.rulerKey(getId());
+    }
+
+    /**
+     * Get the name of the nation monarch.
+     *
+     * @return The ruler name.
+     */
+    public String getRulerName() {
+        return Messages.message(getRulerNameKey());
     }
 
     /**
@@ -222,6 +222,27 @@ public class Nation extends FreeColSpecObjectType {
         return "";
     }
 
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Nation o = copyInCast(other, Nation.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.type = o.getType();
+        this.selectable = o.isSelectable();
+        this.refNation = o.getREFNation();
+        this.preferredLatitude = o.getPreferredLatitude();
+        this.startsOnEastCoast = o.getStartsOnEastCoast();
+        this.color = o.getColor();
+        return true;
+    }
+
+    
     // Serialization
 
     private static final String COLOR_TAG = "color";

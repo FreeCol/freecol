@@ -52,20 +52,21 @@ public final class UnitType extends BuildableType implements Consumer {
     /** The default offence value. */
     public static final int DEFAULT_DEFENCE = 1;
 
+
     /**
      * The offence of this UnitType. Only Units with an offence value
      * greater than zero can attack.
      */
-    private int offence = DEFAULT_OFFENCE;
+    private int baseOffence = DEFAULT_OFFENCE;
 
     /** The defence of this UnitType. */
-    private int defence = DEFAULT_DEFENCE;
+    private int baseDefence = DEFAULT_DEFENCE;
 
     /** The capacity of this UnitType. */
     private int space = 0;
 
     /** Is this the default unit type? */
-    private boolean defaultUnit = false;
+    private boolean defaultUnitType = false;
 
     /**
      * The number of hit points this UnitType has. At the moment, this
@@ -175,7 +176,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The base offence value.
      */
     public int getBaseOffence() {
-        return offence;
+        return this.baseOffence;
     }
 
     /**
@@ -184,7 +185,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The offence value.
      */
     public double getOffence() {
-        return applyModifiers(offence, null, Modifier.OFFENCE);
+        return applyModifiers(this.baseOffence, null, Modifier.OFFENCE);
     }
 
     /**
@@ -202,7 +203,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The defence value.
      */
     public int getBaseDefence() {
-        return defence;
+        return this.baseDefence;
     }
 
     /**
@@ -211,7 +212,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The defence value.
      */
     public double getDefence() {
-        return applyModifiers(defence, null, Modifier.DEFENCE);
+        return applyModifiers(this.baseDefence, null, Modifier.DEFENCE);
     }
 
     /**
@@ -233,7 +234,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return True if this is the default unit type.
      */
     public boolean isDefaultUnitType() {
-        return defaultUnit;
+        return this.defaultUnitType;
     }
 
     /**
@@ -505,6 +506,24 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
+     * Get the consumption map.
+     *
+     * @return The map of the consumed goods.
+     */
+    protected TypeCountMap<GoodsType> getConsumption() {
+        return this.consumption;
+    }
+
+    /**
+     * Set the consumption map.
+     *
+     * @param consumption The new map of the consumed goods.
+     */
+    protected void setConsumption(TypeCountMap<GoodsType> consumption) {
+        this.consumption = consumption;
+    }
+
+    /**
      * Gets the number of units of the given GoodsType this UnitType
      * consumes per turn (when in a settlement).
      *
@@ -614,6 +633,39 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        UnitType o = copyInCast(other, UnitType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.baseOffence = o.getBaseOffence();
+        this.baseDefence = o.getBaseDefence();
+        this.space = o.getSpace();
+        this.defaultUnitType = o.isDefaultUnitType();
+        this.hitPoints = o.getHitPoints();
+        this.spaceTaken = o.getSpaceTaken();
+        this.skill = o.getSkill();
+        this.price = o.getPrice();
+        this.movement = o.getMovement();
+        this.lineOfSight = o.getLineOfSight();
+        this.recruitProbability = o.getRecruitProbability();
+        this.expertProduction = o.getExpertProduction();
+        this.scoreValue = o.getScoreValue();
+        this.maximumExperience = o.getMaximumExperience();
+        this.maximumAttrition = o.getMaximumAttrition();
+        this.priority = o.getPriority();
+        this.skillTaught = o.getSkillTaught();
+        this.defaultRole = o.getDefaultRole();
+        this.consumption = o.getConsumption();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String CONSUMES_TAG = "consumes";
@@ -662,11 +714,11 @@ public final class UnitType extends BuildableType implements Consumer {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(OFFENCE_TAG, offence);
+        xw.writeAttribute(OFFENCE_TAG, baseOffence);
 
-        xw.writeAttribute(DEFENCE_TAG, defence);
+        xw.writeAttribute(DEFENCE_TAG, baseDefence);
 
-        xw.writeAttribute(DEFAULT_UNIT_TAG, defaultUnit);
+        xw.writeAttribute(DEFAULT_UNIT_TAG, this.defaultUnitType);
 
         xw.writeAttribute(MOVEMENT_TAG, movement);
 
@@ -746,16 +798,16 @@ public final class UnitType extends BuildableType implements Consumer {
 
         UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);
 
-        offence = xr.getAttribute(OFFENCE_TAG, parent.offence);
+        this.baseOffence = xr.getAttribute(OFFENCE_TAG, parent.baseOffence);
 
-        defence = xr.getAttribute(DEFENCE_TAG, parent.defence);
+        this.baseDefence = xr.getAttribute(DEFENCE_TAG, parent.baseDefence);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_DEFAULT_UNIT_TAG)) {
-            defaultUnit = xr.getAttribute(OLD_DEFAULT_UNIT_TAG, false);
+            this.defaultUnitType = xr.getAttribute(OLD_DEFAULT_UNIT_TAG, false);
         } else
             // end @compat 0.11.3
-            defaultUnit = xr.getAttribute(DEFAULT_UNIT_TAG, false);
+            this.defaultUnitType = xr.getAttribute(DEFAULT_UNIT_TAG, false);
 
         movement = xr.getAttribute(MOVEMENT_TAG, parent.movement);
 

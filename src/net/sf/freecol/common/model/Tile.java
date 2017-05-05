@@ -207,9 +207,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /** A map of cached tiles for each European player, null in clients. */
     private final java.util.Map<Player, Tile> cachedTiles;
 
+    // Do not serialize below
+
     /**
-     * A map of native settlement internals for each European player,
-     * null in clients.
+     * A cache of native settlement internals for each European
+     * player, null in clients.
      */
     private final java.util.Map<Player, IndianSettlementInternals> playerIndianSettlements;
 
@@ -1808,6 +1810,27 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Get the cached tile map.
+     *
+     * @return The map of cached tiles.
+     */
+    protected java.util.Map<Player, Tile> getCachedTiles() {
+        return this.cachedTiles;
+    }
+
+    /**
+     * Get the cached tile map.
+     *
+     * @param cachedTiles The new map of cached {@code Tile}s.
+     */
+    protected void setCachedTiles(java.util.Map<Player, Tile> cachedTiles) {
+        if (this.cachedTiles != null) {
+            this.cachedTiles.clear();
+            if (cachedTiles != null) this.cachedTiles.putAll(cachedTiles);
+        }
+    }
+
+    /**
      * Get a players view of this tile.
      *
      * @param player The {@code Player} who owns the view.
@@ -2351,6 +2374,30 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return getType().getAbilities(id, fcgot, turn);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Tile o = copyInCast(other, Tile.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.type = o.getType();
+        this.x = o.getX();
+        this.y = o.getY();
+        this.owner = o.getOwner();
+        this.settlement = o.getSettlement();
+        this.owningSettlement = o.getOwningSettlement();
+        this.tileItemContainer = o.getTileItemContainer();
+        this.region = o.getRegion();
+        this.highSeasCount = o.getHighSeasCount();
+        this.moveToEurope = o.getMoveToEurope();
+        this.style = o.getStyle();
+        this.contiguity = o.getContiguity();
+        this.setCachedTiles(o.getCachedTiles());
+        return true;
+    }
+
 
     // Serialization
 
@@ -2633,10 +2680,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
                     // Temporary workaround for BR#2618 on input
                     Colony colony = tile.getColony();
-                    if (colony != null && colony.getDisplayUnitCount() <= 0) {
+                    if (colony != null && colony.getApparentUnitCount() <= 0) {
                         logger.warning("Copied colony " + colony.getId()
                             + " display unit count set to 1 from corrupt: "
-                            + colony.getDisplayUnitCount());
+                            + colony.getApparentUnitCount());
                         colony.setDisplayUnitCount(1);
                     }
                     // end workaround

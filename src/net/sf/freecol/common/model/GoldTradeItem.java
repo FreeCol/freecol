@@ -115,6 +115,21 @@ public class GoldTradeItem extends TradeItem {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        ColonyTradeItem o = copyInCast(other, ColonyTradeItem.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.gold = o.getGold();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String GOLD_TAG = "gold";

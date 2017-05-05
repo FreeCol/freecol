@@ -65,18 +65,18 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     private int movementCost = -1;
 
     /**
-     * The layer a TileItem belongs to. Items with higher zIndex
-     * will be displayed above items with a lower zIndex. E.g. the
-     * LostCityRumour would be displayed above the Plow improvement.
-     */
-    private int zIndex;
-
-    /**
      * Can this improvement expose a resource when completed? This
      * should only apply to improvement types that change the
      * underlying tile type (e.g. clearing forests).
      */
     private int exposeResourcePercent;
+
+    /**
+     * The layer a TileItem belongs to. Items with higher zIndex
+     * will be displayed above items with a lower zIndex. E.g. the
+     * LostCityRumour would be displayed above the Plow improvement.
+     */
+    private int zIndex;
 
     /** The workers that can make this improvement. */
     private Set<String> allowedWorkers = null;
@@ -154,6 +154,32 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     }
 
     /**
+     * Get the standard movement cost of the tile improvement type.
+     *
+     * @return The movement cost.
+     */
+    public int getMoveCost() {
+        return this.movementCost;
+    }
+
+    /**
+     * Possibly reduce the cost of moving due to this tile improvement
+     * type.
+     *
+     * Only applies if movementCost is positive (see spec).  Do not
+     * return zero from a movement costing routine or units get free
+     * moves!
+     *
+     * @param originalCost The original movement cost.
+     * @return The movement cost after any change.
+     */
+    public int getMoveCost(int originalCost) {
+        return (movementCost > 0 && movementCost < originalCost)
+            ? movementCost
+            : originalCost;
+    }
+
+    /**
      * Gets the percent chance that this tile improvement can expose a
      * resource on the tile. This only applies to TileImprovementTypes
      * that change the underlying tile type (e.g. clearing forests).
@@ -162,29 +188,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      */
     public int getExposeResourcePercent() {
         return exposeResourcePercent;
-    }
-
-    /**
-     * Get a weighted list of natural disasters than can strike this
-     * tile improvement type.
-     *
-     * @return A stream of {@code Disaster} choices.
-     */
-    public Stream<RandomChoice<Disaster>> getDisasterChoices() {
-        return (disasters == null)
-            ? Stream.<RandomChoice<Disaster>>empty()
-            : disasters.stream();
-    }
-
-    /**
-     * Add a disaster.
-     *
-     * @param disaster The {@code Disaster} to add.
-     * @param probability The probability of the disaster.
-     */
-    private void addDisaster(Disaster disaster, int probability) {
-        if (disasters == null) disasters = new ArrayList<>();
-        disasters.add(new RandomChoice<>(disaster, probability));
     }
 
     /**
@@ -206,15 +209,36 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     }
 
     /**
+     * Get the set of allowed worker identifiers.
+     *
+     * @return The set of allowed worker identifiers.
+     */
+    protected Set<String> getAllowedWorkers() {
+        if (this.allowedWorkers == null) this.allowedWorkers = new HashSet<>();
+        return this.allowedWorkers;
+    }
+
+    /**
+     * Set the set of allowed worker identifiers.
+     *
+     * @param allowed The new set of allowed worker identifiers.
+     */
+    protected void setAllowedWorkers(Set<String> allowed) {
+        if (this.allowedWorkers == null) {
+            this.allowedWorkers = new HashSet<>();
+        } else {
+            this.allowedWorkers.clear();
+        }
+        this.allowedWorkers.addAll(allowed);
+    }
+
+    /**
      * Add an allowed worker identifier.
      *
      * @param id The worker identifier to add.
      */
     private void addAllowedWorker(String id) {
-        if (allowedWorkers == null) {
-            allowedWorkers = new HashSet<>();
-        }
-        allowedWorkers.add(id);
+        getAllowedWorkers().add(id);
     }
 
     /**
@@ -267,6 +291,30 @@ public final class TileImprovementType extends FreeColSpecObjectType {
 
     public Modifier getProductionModifier(GoodsType goodsType) {
         return first(getModifiers(goodsType.getId()));
+    }
+
+    /**
+     * Get the tile type change map.
+     *
+     * @return The map of tile type to changes.
+     */
+    protected Map<TileType, TileTypeChange> getTileTypeChanges() {
+        if (this.tileTypeChanges == null) this.tileTypeChanges = new HashMap<>();
+        return this.tileTypeChanges;
+    }
+
+    /**
+     * Set the tile type change map.
+     *
+     * @param changes A new map of tile type to changes.
+     */
+    protected void setTileTypeChanges(Map<TileType, TileTypeChange> changes) {
+        if (this.tileTypeChanges == null) {
+            this.tileTypeChanges = new HashMap<>();
+        } else {
+            this.tileTypeChanges.clear();
+        }
+        this.tileTypeChanges.putAll(changes);
     }
 
     /**
@@ -327,23 +375,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     }
 
     /**
-     * Possibly reduce the cost of moving due to this tile improvement
-     * type.
-     *
-     * Only applies if movementCost is positive (see spec).  Do not
-     * return zero from a movement costing routine or units get free
-     * moves!
-     *
-     * @param originalCost The original movement cost.
-     * @return The movement cost after any change.
-     */
-    public int getMoveCost(int originalCost) {
-        return (movementCost > 0 && movementCost < originalCost)
-            ? movementCost
-            : originalCost;
-    }
-
-    /**
      * Gets the increase in production of the given GoodsType
      * this tile improvement type would yield at a specified tile.
      *
@@ -373,6 +404,79 @@ public final class TileImprovementType extends FreeColSpecObjectType {
             }
         }
         return value;
+    }
+
+    /**
+     * Get the list of disasters for this tile type.
+     *
+     * @return The disaster list.
+     */
+    protected List<RandomChoice<Disaster>> getDisasters() {
+        if (this.disasters == null) this.disasters = new ArrayList<>();
+        return this.disasters;
+    }
+
+    /**
+     * Set the list of disasters for this tile type.
+     *
+     * @param disasters The new list of {@code Disaster}s.
+     */
+    protected void setDisasters(List<RandomChoice<Disaster>> disasters) {
+        if (this.disasters == null) {
+            this.disasters = new ArrayList<>();
+        } else {
+            this.disasters.clear();
+        }
+        this.disasters.addAll(disasters);
+    }
+
+    /**
+     * Get a weighted list of natural disasters than can strike this
+     * tile improvement type.
+     *
+     * @return A stream of {@code Disaster} choices.
+     */
+    public Stream<RandomChoice<Disaster>> getDisasterChoices() {
+        return (disasters == null)
+            ? Stream.<RandomChoice<Disaster>>empty()
+            : disasters.stream();
+    }
+
+    /**
+     * Add a disaster.
+     *
+     * @param disaster The {@code Disaster} to add.
+     * @param probability The probability of the disaster.
+     */
+    private void addDisaster(Disaster disaster, int probability) {
+        if (disasters == null) disasters = new ArrayList<>();
+        disasters.add(new RandomChoice<>(disaster, probability));
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        TileImprovementType o = copyInCast(other, TileImprovementType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.natural = o.isNatural();
+        this.magnitude = o.getMagnitude();
+        this.addWorkTurns = o.getAddWorkTurns();
+        this.requiredImprovementType = o.getRequiredImprovementType();
+        this.requiredRole = o.getRequiredRole();
+        this.expendedAmount = o.getExpendedAmount();
+        this.movementCost = o.getMoveCost();
+        this.exposeResourcePercent = o.getExposeResourcePercent();
+        this.zIndex = o.getZIndex();
+        this.setAllowedWorkers(o.getAllowedWorkers());
+        this.setTileTypeChanges(o.getTileTypeChanges());
+        this.setDisasters(o.getDisasters());
+        return true;
     }
 
 

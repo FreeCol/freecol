@@ -366,7 +366,7 @@ public class SimpleMapGenerator implements MapGenerator {
             }
             indians.add(player);
             List<String> regionKeys
-                = ((IndianNationType)player.getNationType()).getRegionNames();
+                = ((IndianNationType)player.getNationType()).getRegions();
             Territory territory = null;
             if (regionKeys == null || regionKeys.isEmpty()) {
                 territory = new Territory(player, map.getRandomLandTile(random));
@@ -392,7 +392,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     outer: for (String key : regionKeys) {
                         Territory otherTerritory = territoryMap.get(key);
                         for (String otherKey : ((IndianNationType) otherTerritory.player.getNationType())
-                                 .getRegionNames()) {
+                                 .getRegions()) {
                             if (territoryMap.get(otherKey) == null) {
                                 ServerRegion foundRegion = otherTerritory.region;
                                 otherTerritory.region = (ServerRegion)map.getRegionByKey(otherKey);
@@ -1048,8 +1048,9 @@ public class SimpleMapGenerator implements MapGenerator {
             case GameOptions.STARTING_POSITIONS_HISTORICAL:
                 for (Player player : players) {
                     Nation nation = player.getNation();
-                    positions.add(new Position(nation.startsOnEastCoast() ? east : west,
-                                               map.getRow(nation.getPreferredLatitude())));
+                    int where = (nation.getStartsOnEastCoast()) ? east : west;
+                    positions.add(new Position(where,
+                            map.getRow(nation.getPreferredLatitude())));
                 }
                 break;
             }

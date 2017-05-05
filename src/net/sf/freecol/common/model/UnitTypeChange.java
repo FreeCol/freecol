@@ -87,6 +87,24 @@ public class UnitTypeChange extends FreeColSpecObjectType {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        UnitTypeChange o = copyInCast(other, UnitTypeChange.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.from = o.from;
+        this.to = o.to;
+        this.probability = o.probability;
+        this.turns = o.turns;
+        return true;
+    }
+
+
     // Serialization
 
     private static final String FROM_TAG = "from";
@@ -138,7 +156,6 @@ public class UnitTypeChange extends FreeColSpecObjectType {
         String id = getId();
         if (id == null || "".equals(id)) {
             id = "model.unitChange.faked." + fakeIdIndex++;
-System.err.println("FAKED ID " + id);
             setId(id);
         }
         // end @compat 0.11.6

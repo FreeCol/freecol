@@ -121,6 +121,21 @@ public class InciteTradeItem extends TradeItem {
     }
     
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        InciteTradeItem o = copyInCast(other, InciteTradeItem.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.victim = o.getVictim();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String VICTIM_TAG = "victim";

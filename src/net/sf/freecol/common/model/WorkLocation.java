@@ -140,21 +140,12 @@ public abstract class WorkLocation extends UnitLocation
 
 
     /**
-     * Gets the owning settlement for this work location.
-     *
-     * @return The owning settlement for this work location.
-     */
-    public Settlement getOwningSettlement() {
-        return colony;
-    }
-
-    /**
      * Get the production type.
      *
      * @return The {@code ProductionType} for this work location.
      */
     public final ProductionType getProductionType() {
-        return productionType;
+        return this.productionType;
     }
 
     /**
@@ -163,9 +154,9 @@ public abstract class WorkLocation extends UnitLocation
      * @param newProductionType The new {@code ProductionType} value.
      */
     public final void setProductionType(final ProductionType newProductionType) {
-        if (!Utils.equals(newProductionType, productionType)) {
-            productionType = newProductionType;
-            colony.invalidateCache();
+        if (!Utils.equals(newProductionType, this.productionType)) {
+            this.productionType = newProductionType;
+            getColony().invalidateCache();
             logger.fine("Production type at " + this
                 + " is now: " + newProductionType);
         }
@@ -221,13 +212,13 @@ public abstract class WorkLocation extends UnitLocation
      *     null if none found.
      */
     public Occupation getOccupation(Unit unit, boolean userMode) {
-        LogBuilder lb = new LogBuilder((colony.getOccupationTrace()) ? 64 : 0);
-        lb.add(colony.getName(), "/", this, ".getOccupation(", unit, ")");
+        LogBuilder lb = new LogBuilder((getColony().getOccupationTrace()) ? 64 : 0);
+        lb.add(getColony().getName(), "/", this, ".getOccupation(", unit, ")");
 
         Occupation best = new Occupation(null, null, null);
         int bestAmount = 0;
         for (Collection<GoodsType> types
-                 : colony.getWorkTypeChoices(unit, userMode)) {
+                 : getColony().getWorkTypeChoices(unit, userMode)) {
             lb.add("\n  ");
             logFreeColObjects(types, lb);
             bestAmount = best.improve(unit, this, bestAmount, types, lb);
@@ -255,8 +246,8 @@ public abstract class WorkLocation extends UnitLocation
             unitType = spec.getDefaultUnitType(getOwner().getNationType());
         }
         
-        LogBuilder lb = new LogBuilder((colony.getOccupationTrace()) ? 64 : 0);
-        lb.add(colony.getName(), "/", this, ".getOccupation(",
+        LogBuilder lb = new LogBuilder((getColony().getOccupationTrace()) ? 64 : 0);
+        lb.add(getColony().getName(), "/", this, ".getOccupation(",
                unitType.getSuffix(), ")");
 
         Collection<GoodsType> types = spec.getGoodsTypeList();
@@ -330,14 +321,14 @@ public abstract class WorkLocation extends UnitLocation
         }
         // Do we have a chance of satisfying the inputs?
         final ToIntFunction<AbstractGoods> prod = ag ->
-            colony.getNetProductionOf(ag.getType());
+            getColony().getNetProductionOf(ag.getType());
         delta = Math.min(delta, min(productionType.getInputs(), prod));
         if (delta <= 0) return null;
 
         // Is the production actually a good idea?  Not if we are independent
         // and have maximized liberty, or for immigration.
         if (owner.getPlayerType() == Player.PlayerType.INDEPENDENT
-            && ((goodsType.isLibertyType() && colony.getSoL() >= 100)
+            && ((goodsType.isLibertyType() && getColony().getSoL() >= 100)
                 || goodsType.isImmigrationType())) 
             return null;
         
@@ -367,12 +358,14 @@ public abstract class WorkLocation extends UnitLocation
      * @param unitType The type of {@code Unit} to check.
      * @param unit The Unit itself.
      * @param goodsType The {@code GoodsType} to check.
-     * @param workLocation The {@code WorkLocation} to check. This can be overloaded with a defualt
-     *                          parameter of "this" to call the WorkLocation instance currently in
-     *                          in reference.
+     * @param workLocation The {@code WorkLocation} to check. This can
+     *     be overloaded with a default parameter of "this" to call
+     *     the WorkLocation instance currently in in reference.
      * @return True or false, depending on whether the suggestion is valid.
      */
-    protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType, WorkLocation workLocation) {
+    protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit,
+                                          GoodsType goodsType,
+                                          WorkLocation workLocation) {
         return false;
     }
 
@@ -453,7 +446,8 @@ public abstract class WorkLocation extends UnitLocation
      * @return True if there are any outputs.
      */
     public boolean hasOutputs() {
-        return productionType != null && any(productionType.getOutputs());
+        return this.productionType != null
+            && any(this.productionType.getOutputs());
     }
 
     /**
@@ -677,7 +671,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     @Override
     public final Tile getTile() {
-        return colony.getTile();
+        return getSettlement().getTile();
     }
 
     /**
@@ -735,7 +729,15 @@ public abstract class WorkLocation extends UnitLocation
      */
     @Override
     public final Settlement getSettlement() {
-        return colony;
+        return this.colony;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final Colony getColony() {
+        return this.colony;
     }
 
     /**
@@ -928,7 +930,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     @Override
     public Player getOwner() {
-        return colony.getOwner();
+        return getColony().getOwner();
     }
 
     /**
@@ -947,6 +949,22 @@ public abstract class WorkLocation extends UnitLocation
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        WorkLocation o = copyInCast(other, WorkLocation.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.colony = o.getColony();
+        this.productionType = o.getProductionType();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String COLONY_TAG = "colony";
@@ -959,7 +977,7 @@ public abstract class WorkLocation extends UnitLocation
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(COLONY_TAG, colony);
+        xw.writeAttribute(COLONY_TAG, this.colony);
     }
 
     /**
@@ -969,7 +987,7 @@ public abstract class WorkLocation extends UnitLocation
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (productionType != null) productionType.toXML(xw);
+        if (this.productionType != null) this.productionType.toXML(xw);
     }
 
     /**
@@ -979,8 +997,8 @@ public abstract class WorkLocation extends UnitLocation
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        colony = xr.findFreeColGameObject(getGame(), COLONY_TAG,
-                                          Colony.class, (Colony)null, true);
+        this.colony = xr.findFreeColGameObject(getGame(), COLONY_TAG,
+            Colony.class, (Colony)null, true);
     }
 
     /**
@@ -992,7 +1010,7 @@ public abstract class WorkLocation extends UnitLocation
         final String tag = xr.getLocalName();
 
         if (ProductionType.TAG.equals(tag)) {
-            productionType = new ProductionType(xr, spec);
+            this.productionType = new ProductionType(xr, spec);
 
         } else {
             super.readChild(xr);

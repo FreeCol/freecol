@@ -202,4 +202,19 @@ public abstract class AIObject extends FreeColObject {
     public final void setGame(Game game) {
         throw new RuntimeException("Can not set game");
     }
+
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        AIObject o = copyInCast(other, AIObject.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        //this.aiMain is fixed
+        this.uninitialized = o.isUninitialized();
+        return true;
+    }
 }

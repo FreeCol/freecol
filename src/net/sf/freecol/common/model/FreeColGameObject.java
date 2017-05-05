@@ -170,6 +170,20 @@ public abstract class FreeColGameObject extends FreeColObject {
         this.disposed = true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        FreeColGameObject fcgo = copyInCast(other, FreeColGameObject.class);
+        if (fcgo == null) return false;
+        super.copyIn(fcgo);
+        this.game = fcgo.getGame();
+        this.disposed = fcgo.isDisposed();
+        this.initialized = fcgo.isInitialized();
+        return true;
+    }
+
 
     // Routines to be overridden where meaningful by subclasses.
 

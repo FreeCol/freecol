@@ -100,6 +100,21 @@ public class Effect extends FreeColSpecObjectType {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Effect o = copyInCast(other, Effect.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.probability = o.getProbability();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String PROBABILITY_TAG = "probability";

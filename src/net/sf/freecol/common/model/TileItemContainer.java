@@ -566,6 +566,22 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
 
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        TileItemContainer o = copyInCast(other, TileItemContainer.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.tile = o.getTile();
+        setTileItems(o.getTileItems());
+        return true;
+    }
+
+
     // Serialization
 
     private static final String TILE_TAG = "tile";

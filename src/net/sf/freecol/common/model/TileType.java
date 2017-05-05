@@ -50,6 +50,7 @@ public final class TileType extends FreeColSpecObjectType
     public static final TileType WATER = new TileType("WATER", true);
     public static final TileType LAND  = new TileType("LAND", false);
 
+
     /** Is this a forested tile? */
     private boolean forest;
 
@@ -193,6 +194,25 @@ public final class TileType extends FreeColSpecObjectType
         return basicWorkTurns;
     }
 
+    protected int getHumidity(int i) {
+        return this.humidity[i];
+    }
+    protected void setHumidity(int i, int value) {
+        this.humidity[i] = value;
+    }
+    protected int getTemperature(int i) {
+        return this.temperature[i];
+    }
+    protected void setTemperature(int i, int value) {
+        this.temperature[i] = value;
+    }
+    protected int getAltitude(int i) {
+        return this.altitude[i];
+    }
+    protected void setAltitude(int i, int value) {
+        this.altitude[i] = value;
+    }
+    
     /**
      * Is this tile type suitable for a given range type value.
      *
@@ -219,10 +239,23 @@ public final class TileType extends FreeColSpecObjectType
      *
      * @return A weighted list of resource types.
      */
-    public List<RandomChoice<ResourceType>> getWeightedResources() {
-        return (resourceTypes == null)
-            ? Collections.<RandomChoice<ResourceType>>emptyList()
-            : resourceTypes;
+    public List<RandomChoice<ResourceType>> getResourceTypes() {
+        if (this.resourceTypes == null) this.resourceTypes = new ArrayList<>();
+        return this.resourceTypes;
+    }
+
+    /**
+     * Set the resource types list.
+     *
+     * @param resourceTypes The list of resource type choices.
+     */
+    protected void setResourceTypes(List<RandomChoice<ResourceType>> resourceTypes) {
+        if (this.resourceTypes == null) {
+            this.resourceTypes = new ArrayList<>();
+        } else {
+            this.resourceTypes.clear();
+        }
+        this.resourceTypes.addAll(resourceTypes);
     }
 
     /**
@@ -230,9 +263,9 @@ public final class TileType extends FreeColSpecObjectType
      *
      * @return A list of {@code ResourceType}s.
      */
-    public List<ResourceType> getResourceTypes() {
-        return (resourceTypes == null) ? Collections.<ResourceType>emptyList()
-            : transform(resourceTypes, alwaysTrue(), RandomChoice::getObject);
+    public List<ResourceType> getResourceTypeValues() {
+        return transform(getResourceTypes(), alwaysTrue(),
+                         RandomChoice::getObject);
     }
 
     /**
@@ -243,8 +276,8 @@ public final class TileType extends FreeColSpecObjectType
      *     present.
      */
     private void addResourceType(ResourceType type, int prob) {
-        if (resourceTypes == null) resourceTypes = new ArrayList<>();
-        resourceTypes.add(new RandomChoice<>(type, prob));
+        if (this.resourceTypes == null) this.resourceTypes = new ArrayList<>();
+        this.resourceTypes.add(new RandomChoice<>(type, prob));
     }
 
     /**
@@ -255,6 +288,29 @@ public final class TileType extends FreeColSpecObjectType
      */
     public boolean canHaveResourceType(ResourceType resourceType) {
         return getResourceTypes().contains(resourceType);
+    }
+
+    /**
+     * Get the disaster choices.
+     *
+     * @return A list of {@code Disaster} choices.
+     */
+    protected List<RandomChoice<Disaster>> getDisasters() {
+        return this.disasters;
+    }
+
+    /**
+     * Set the disaster choices.
+     *
+     * @param disasters The new {@code Disaster} choice list.
+     */
+    protected void setDisasters(List<RandomChoice<Disaster>> disasters) {
+        if (this.disasters == null) {
+            this.disasters = new ArrayList<>();
+        } else {
+            this.disasters.clear();
+        }
+        this.disasters.addAll(disasters);
     }
 
     /**
@@ -279,6 +335,25 @@ public final class TileType extends FreeColSpecObjectType
         disasters.add(new RandomChoice<>(disaster, probability));
     }
 
+    /**
+     * Get the production type list.
+     *
+     * @return The {@code ProductionType} list.
+     */
+    protected List<ProductionType> getProductionTypes() {
+        return this.productionTypes;
+    }
+    
+    /**
+     * Set the production type list.
+     *
+     * @param productionTypes The new {@code ProductionType} list.
+     */
+    protected void setProductionTypes(List<ProductionType> productionTypes) {
+        this.productionTypes.clear();
+        this.productionTypes.addAll(productionTypes);
+    }
+    
     /**
      * Gets the production types available at the current difficulty
      * level.
@@ -376,6 +451,39 @@ public final class TileType extends FreeColSpecObjectType
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        TileType o = copyInCast(other, TileType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.forest = o.isForested();
+        this.water = o.isWater();
+        this.canSettle = o.canSettle();
+        this.connected = o.isHighSeasConnected();
+        this.elevation = o.isElevation();
+        this.basicMoveCost = o.getBasicMoveCost();
+        this.basicWorkTurns = o.getBasicWorkTurns();
+        for (int i = 0; i < this.humidity.length; i++) {
+            this.setHumidity(i, o.getHumidity(i));
+        }
+        for (int i = 0; i < this.temperature.length; i++) {
+            this.setTemperature(i, o.getTemperature(i));
+        }
+        for (int i = 0; i < this.altitude.length; i++) {
+            this.setAltitude(i, o.getAltitude(i));
+        }
+        this.setResourceTypes(o.getResourceTypes());
+        this.setDisasters(o.getDisasters());
+        this.setProductionTypes(o.getProductionTypes());
+        return true;
+    }
+
+
     // Serialization
 
     private static final String ALTITUDE_MIN_TAG = "altitude-minimum";
@@ -415,19 +523,19 @@ public final class TileType extends FreeColSpecObjectType
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(BASIC_MOVE_COST_TAG, basicMoveCost);
+        xw.writeAttribute(BASIC_MOVE_COST_TAG, this.basicMoveCost);
 
-        xw.writeAttribute(BASIC_WORK_TURNS_TAG, basicWorkTurns);
+        xw.writeAttribute(BASIC_WORK_TURNS_TAG, this.basicWorkTurns);
 
-        xw.writeAttribute(IS_FOREST_TAG, forest);
+        xw.writeAttribute(IS_FOREST_TAG, this.forest);
 
-        xw.writeAttribute(IS_WATER_TAG, water);
+        xw.writeAttribute(IS_WATER_TAG, this.water);
 
-        xw.writeAttribute(IS_ELEVATION_TAG, elevation);
+        xw.writeAttribute(IS_ELEVATION_TAG, this.elevation);
 
-        xw.writeAttribute(IS_CONNECTED_TAG, connected);
+        xw.writeAttribute(IS_CONNECTED_TAG, this.connected);
 
-        xw.writeAttribute(CAN_SETTLE_TAG, canSettle);
+        xw.writeAttribute(CAN_SETTLE_TAG, this.canSettle);
     }
 
     /**
@@ -439,32 +547,34 @@ public final class TileType extends FreeColSpecObjectType
 
         xw.writeStartElement(GEN_TAG);
 
-        xw.writeAttribute(HUMIDITY_MIN_TAG, humidity[0]);
+        xw.writeAttribute(HUMIDITY_MIN_TAG, this.humidity[0]);
 
-        xw.writeAttribute(HUMIDITY_MAX_TAG, humidity[1]);
+        xw.writeAttribute(HUMIDITY_MAX_TAG, this.humidity[1]);
 
-        xw.writeAttribute(TEMPERATURE_MIN_TAG, temperature[0]);
+        xw.writeAttribute(TEMPERATURE_MIN_TAG, this.temperature[0]);
 
-        xw.writeAttribute(TEMPERATURE_MAX_TAG, temperature[1]);
+        xw.writeAttribute(TEMPERATURE_MAX_TAG, this.temperature[1]);
 
-        xw.writeAttribute(ALTITUDE_MIN_TAG, altitude[0]);
+        xw.writeAttribute(ALTITUDE_MIN_TAG, this.altitude[0]);
 
-        xw.writeAttribute(ALTITUDE_MAX_TAG, altitude[1]);
+        xw.writeAttribute(ALTITUDE_MAX_TAG, this.altitude[1]);
 
         xw.writeEndElement();
 
-        for (ProductionType productionType : productionTypes) {
+        for (ProductionType productionType : this.productionTypes) {
             productionType.toXML(xw);
         }
 
-        for (RandomChoice<ResourceType> choice : getWeightedResources()) {
-            xw.writeStartElement(RESOURCE_TAG);
+        if (this.resourceTypes != null) {
+            for (RandomChoice<ResourceType> choice : this.resourceTypes) {
+                xw.writeStartElement(RESOURCE_TAG);
 
-            xw.writeAttribute(TYPE_TAG, choice.getObject());
+                xw.writeAttribute(TYPE_TAG, choice.getObject());
 
-            xw.writeAttribute(PROBABILITY_TAG, choice.getProbability());
+                xw.writeAttribute(PROBABILITY_TAG, choice.getProbability());
 
-            xw.writeEndElement();
+                xw.writeEndElement();
+            }
         }
 
         for (RandomChoice<Disaster> choice : iterable(getDisasterChoices())) {
@@ -485,19 +595,19 @@ public final class TileType extends FreeColSpecObjectType
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        basicMoveCost = xr.getAttribute(BASIC_MOVE_COST_TAG, 1);
+        this.basicMoveCost = xr.getAttribute(BASIC_MOVE_COST_TAG, 1);
 
-        basicWorkTurns = xr.getAttribute(BASIC_WORK_TURNS_TAG, 1);
+        this.basicWorkTurns = xr.getAttribute(BASIC_WORK_TURNS_TAG, 1);
 
-        forest = xr.getAttribute(IS_FOREST_TAG, false);
+        this.forest = xr.getAttribute(IS_FOREST_TAG, false);
 
-        water = xr.getAttribute(IS_WATER_TAG, false);
+        this.water = xr.getAttribute(IS_WATER_TAG, false);
 
-        elevation = xr.getAttribute(IS_ELEVATION_TAG, false);
+        this.elevation = xr.getAttribute(IS_ELEVATION_TAG, false);
 
-        canSettle = xr.getAttribute(CAN_SETTLE_TAG, !water);
+        this.canSettle = xr.getAttribute(CAN_SETTLE_TAG, !water);
 
-        connected = xr.getAttribute(IS_CONNECTED_TAG, false);
+        this.connected = xr.getAttribute(IS_CONNECTED_TAG, false);
 
     }
 
@@ -508,9 +618,9 @@ public final class TileType extends FreeColSpecObjectType
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         if (xr.shouldClearContainers()) {
-            disasters = null;
-            resourceTypes = null;
-            productionTypes.clear();
+            this.disasters = null;
+            this.resourceTypes = null;
+            this.productionTypes.clear();
         }
 
         super.readChildren(xr);
@@ -533,41 +643,41 @@ public final class TileType extends FreeColSpecObjectType
             xr.closeTag(DISASTER_TAG);
 
         } else if (GEN_TAG.equals(tag)) {
-            humidity[0] = xr.getAttribute(HUMIDITY_MIN_TAG, 0);
-            humidity[1] = xr.getAttribute(HUMIDITY_MAX_TAG, 100);
-            temperature[0] = xr.getAttribute(TEMPERATURE_MIN_TAG, -20);
-            temperature[1] = xr.getAttribute(TEMPERATURE_MAX_TAG, 40);
-            altitude[0] = xr.getAttribute(ALTITUDE_MIN_TAG, 0);
-            altitude[1] = xr.getAttribute(ALTITUDE_MAX_TAG, 0);
+            this.humidity[0] = xr.getAttribute(HUMIDITY_MIN_TAG, 0);
+            this.humidity[1] = xr.getAttribute(HUMIDITY_MAX_TAG, 100);
+            this.temperature[0] = xr.getAttribute(TEMPERATURE_MIN_TAG, -20);
+            this.temperature[1] = xr.getAttribute(TEMPERATURE_MAX_TAG, 40);
+            this.altitude[0] = xr.getAttribute(ALTITUDE_MIN_TAG, 0);
+            this.altitude[1] = xr.getAttribute(ALTITUDE_MAX_TAG, 0);
             // @compat 0.11.3
             if (xr.hasAttribute(OLD_HUMIDITY_MIN_TAG)) {
-                humidity[0] = xr.getAttribute(OLD_HUMIDITY_MIN_TAG, 0);
+                this.humidity[0] = xr.getAttribute(OLD_HUMIDITY_MIN_TAG, 0);
             }
             if (xr.hasAttribute(OLD_HUMIDITY_MAX_TAG)) {
-                humidity[1] = xr.getAttribute(OLD_HUMIDITY_MAX_TAG, 100);
+                this.humidity[1] = xr.getAttribute(OLD_HUMIDITY_MAX_TAG, 100);
             }
             if (xr.hasAttribute(OLD_TEMPERATURE_MIN_TAG)) {
-                temperature[0] = xr.getAttribute(OLD_TEMPERATURE_MIN_TAG, -20);
+                this.temperature[0] = xr.getAttribute(OLD_TEMPERATURE_MIN_TAG, -20);
             }
             if (xr.hasAttribute(OLD_TEMPERATURE_MAX_TAG)) {
-                temperature[1] = xr.getAttribute(OLD_TEMPERATURE_MAX_TAG, 40);
+                this.temperature[1] = xr.getAttribute(OLD_TEMPERATURE_MAX_TAG, 40);
             }
             if (xr.hasAttribute(OLD_ALTITUDE_MIN_TAG)) {
-                altitude[0] = xr.getAttribute(OLD_ALTITUDE_MIN_TAG, 0);
+                this.altitude[0] = xr.getAttribute(OLD_ALTITUDE_MIN_TAG, 0);
             }
             if (xr.hasAttribute(OLD_ALTITUDE_MAX_TAG)) {
-                altitude[1] = xr.getAttribute(OLD_ALTITUDE_MAX_TAG, 0);
+                this.altitude[1] = xr.getAttribute(OLD_ALTITUDE_MAX_TAG, 0);
             }
             // end @compat 0.11.3
             xr.closeTag(GEN_TAG);
 
         } else if (PRODUCTION_TAG.equals(tag)
             && xr.getAttribute(DELETE_TAG, false)) {
-            productionTypes.clear();
+            this.productionTypes.clear();
             xr.closeTag(PRODUCTION_TAG);
 
         } else if (PRODUCTION_TAG.equals(tag)) {
-            productionTypes.add(new ProductionType(xr, spec));
+            this.productionTypes.add(new ProductionType(xr, spec));
 
         } else if (RESOURCE_TAG.equals(tag)) {
             addResourceType(xr.getType(spec, TYPE_TAG, ResourceType.class,

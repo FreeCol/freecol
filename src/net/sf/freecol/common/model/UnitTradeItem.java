@@ -118,6 +118,21 @@ public class UnitTradeItem extends TradeItem {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        UnitTradeItem o = copyInCast(other, UnitTradeItem.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.unit = o.getUnit();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String UNIT_TAG = "unit";

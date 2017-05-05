@@ -112,6 +112,13 @@ public final class BuildingType extends BuildableType
         return workPlaces;
     }
 
+    public int getMinimumSkill() {
+        return this.minSkill;
+    }
+    public int getMaximumSkill() {
+        return this.maxSkill;
+    }
+
     /**
      * Gets the amount of gold necessary to maintain a Building of
      * this type for one turn.
@@ -127,7 +134,7 @@ public final class BuildingType extends BuildableType
      *
      * @return The production amount.
      */
-    public int getExpertWithConnectionsProduction() {
+    public int getExpertConnectionProduction() {
         return this.expertConnectionProduction;
     }
 
@@ -235,6 +242,25 @@ public final class BuildingType extends BuildableType
      */
     public boolean isAutomaticBuild() {
         return !needsGoodsToBuild() && getUpgradesFrom() == null;
+    }
+
+    /**
+     * Get the production type list.
+     *
+     * @return The {@code ProductionType} list.
+     */
+    protected List<ProductionType> getProductionTypes() {
+        return this.productionTypes;
+    }
+    
+    /**
+     * Set the production type list.
+     *
+     * @param productionTypes The new {@code ProductionType} list.
+     */
+    protected void setProductionTypes(List<ProductionType> productionTypes) {
+        this.productionTypes.clear();
+        this.productionTypes.addAll(productionTypes);
     }
 
     /**
@@ -439,6 +465,29 @@ public final class BuildingType extends BuildableType
         }
         if (cmp == 0) cmp = super.compareTo(other);
         return cmp;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        BuildingType o = copyInCast(other, BuildingType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.level = o.getLevel();
+        this.workPlaces = o.getWorkPlaces();
+        this.minSkill = o.getMinimumSkill();
+        this.maxSkill = o.getMaximumSkill();
+        this.upkeep = o.getUpkeep();
+        this.priority = o.getPriority();
+        this.expertConnectionProduction = o.getExpertConnectionProduction();
+        this.competenceFactor = o.getCompetenceFactor();
+        this.rebelFactor = o.getRebelFactor();
+        this.upgradesFrom = o.getUpgradesFrom();
+        this.upgradesTo = o.getUpgradesTo();
+        this.setProductionTypes(o.getProductionTypes());        
+        return true;
     }
 
 

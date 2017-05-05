@@ -253,6 +253,22 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
 
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        AbstractGoods o = copyInCast(other, AbstractGoods.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.type = o.getType();
+        this.amount = o.getAmount();
+        return true;
+    }
+
+
     // Override Object
 
     /**

@@ -59,13 +59,16 @@ public final class Market extends FreeColGameObject implements Ownable {
         CUSTOM_HOUSE,
     }
 
+
     /** The contents of the market, keyed by goods type. */
     private final Map<GoodsType, MarketData> marketData = new HashMap<>();
 
     /** The owning player. */
     private Player owner;
 
-    /** Watching listeners.  Do not serialize. */
+    // Do not serialize below
+
+    /** Watching listeners. */
     private final ArrayList<TransactionListener> transactionListeners
         = new ArrayList<>();
 
@@ -124,14 +127,21 @@ public final class Market extends FreeColGameObject implements Ownable {
         return data;
     }
 
-    // ------------------------------------------------------------ API methods
+    /**
+     * Get the market data.
+     *
+     * @return The map of goods type to market data.
+     */
+    protected Map<GoodsType, MarketData> getMarketData() {
+        return this.marketData;
+    }
 
     /**
      * Get the market data values.
      *
      * @return The market data in this market.
      */
-    public Collection<MarketData> getMarketData() {
+    public Collection<MarketData> getMarketDataValues() {
         return this.marketData.values();
     }
 
@@ -431,6 +441,8 @@ public final class Market extends FreeColGameObject implements Ownable {
             -> getSalePrice(t.getType(), t.getAmount())).reversed();
     }
 
+    // TransactionListener support
+
     /**
      * Adds a transaction listener for notification of any transaction
      *
@@ -463,9 +475,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     // Interface Ownable
 
     /**
-     * Gets the owner of this {@code Market}.
-     *
-     * @return The owner of this {@code Market}.
+     * {@inheritDoc}
      */
     @Override
     public Player getOwner() {
@@ -473,9 +483,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Sets the owner of this {@code Market}.
-     *
-     * @param owner The {@code Player} to own this {@code Market}.
+     * {@inheritDoc}
      */
     @Override
     public void setOwner(Player owner) {
@@ -490,6 +498,23 @@ public final class Market extends FreeColGameObject implements Ownable {
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
         return (player == getOwner()) ? getOwner().getEurope() : null;
+    }
+
+
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Market o = copyInCast(other, Market.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.marketData.clear();
+        this.marketData.putAll(o.getMarketData());
+        this.owner = o.getOwner();
+        return true;
     }
 
 

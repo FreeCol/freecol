@@ -113,6 +113,22 @@ public final class LastSale extends FreeColObject {
     }
 
 
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        LastSale o = copyInCast(other, LastSale.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.when = o.getWhen();
+        this.price = o.getPrice();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String PRICE_TAG = "price";

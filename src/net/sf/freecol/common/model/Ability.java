@@ -464,8 +464,8 @@ public final class Ability extends Feature {
     public Ability(Ability template) {
         this((Specification)null);
         
-        copyFrom(template);
-        this.value = template.value;
+        setId(template.getId());
+        copyIn(template);
     }
 
     /**
@@ -502,6 +502,21 @@ public final class Ability extends Feature {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Ability o = copyInCast(other, Ability.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.value = o.getValue();
+        return true;
+    }
+
+    
     // Serialization
 
 

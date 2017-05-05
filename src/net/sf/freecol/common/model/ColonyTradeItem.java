@@ -80,6 +80,14 @@ public class ColonyTradeItem extends TradeItem {
     }
 
 
+    protected String getColonyId() {
+        return this.colonyId;
+    }
+    protected String getColonyName() {
+        return this.colonyName;
+    }
+
+
     // Interface TradeItem
 
     /**
@@ -125,6 +133,22 @@ public class ColonyTradeItem extends TradeItem {
             : colony.evaluateFor(player);
     }
     
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        ColonyTradeItem o = copyInCast(other, ColonyTradeItem.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.colonyId = o.getColonyId();
+        this.colonyName = o.getColonyName();
+        return true;
+    }
+
 
     // Serialization
 

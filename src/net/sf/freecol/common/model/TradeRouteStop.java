@@ -276,6 +276,22 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     }
 
 
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        TradeRouteStop o = copyInCast(other, TradeRouteStop.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.location = o.getLocation();
+        this.setCargo(o.getCargo());
+        return true;
+    }
+
+
     // Serialization
 
     private static final String CARGO_TAG = "cargo";

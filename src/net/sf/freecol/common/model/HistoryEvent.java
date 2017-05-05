@@ -206,6 +206,24 @@ public class HistoryEvent extends StringTemplate {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        HistoryEvent o = copyInCast(other, HistoryEvent.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.turn = o.getTurn();
+        this.eventType = o.getEventType();
+        this.playerId = o.getPlayerId();
+        this.score = o.getScore();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String EVENT_TYPE_TAG = "eventType";

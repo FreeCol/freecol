@@ -112,7 +112,7 @@ public class TerrainDetailPanel
             tileType, ImageLibrary.TILE_OVERLAY_SIZE);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
-        List<ResourceType> resourceList = tileType.getResourceTypes();
+        List<ResourceType> resourceList = tileType.getResourceTypeValues();
         ResourceType rt = first(resourceList);
         if (rt != null) {
             panel.add(Utility.localizedLabel("colopedia.terrain.resource"));

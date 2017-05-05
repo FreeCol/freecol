@@ -140,7 +140,6 @@ public class NativeTrade extends FreeColGameObject {
     private List<NativeTradeItem> settlementToUnit = new ArrayList<>();
 
 
-
     /**
      * Simple constructor, used in Game.newInstance.
      *
@@ -487,6 +486,29 @@ public class NativeTrade extends FreeColGameObject {
      */
     public boolean isInternable() {
         return false;
+    }
+
+
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        NativeTrade o = copyInCast(other, NativeTrade.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.unit = o.getUnit();
+        this.is = o.getIndianSettlement();
+        this.count = o.getCount();
+        this.buy = o.getBuy();
+        this.sell = o.getSell();
+        this.gift = o.getGift();
+        this.item = o.getItem();
+        this.unitToSettlement = o.getUnitToSettlement();
+        this.settlementToUnit = o.getSettlementToUnit();
+        return true;
     }
 
 

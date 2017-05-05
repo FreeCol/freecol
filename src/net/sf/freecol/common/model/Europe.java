@@ -143,6 +143,7 @@ public class Europe extends UnitLocation
         }
     }
 
+
     /**
      * This list represents the types of the units that can be
      * recruited in Europe.
@@ -153,7 +154,7 @@ public class Europe extends UnitLocation
     protected final java.util.Map<UnitType, Integer> unitPrices = new HashMap<>();
 
     /** Current price to recruit a unit. */
-    protected int recruitPrice;
+    protected int baseRecruitPrice;
 
     /** The lower bound on recruitment price. */
     protected int recruitLowerCap;
@@ -175,7 +176,7 @@ public class Europe extends UnitLocation
         super(game);
 
         this.owner = owner;
-        this.recruitPrice = RECRUIT_PRICE_INITIAL;
+        this.baseRecruitPrice = RECRUIT_PRICE_INITIAL;
         this.recruitLowerCap = LOWER_CAP_INITIAL;
     }
 
@@ -202,6 +203,16 @@ public class Europe extends UnitLocation
     }
 
     /**
+     * Set the recruitables list.
+     *
+     * @param recruitables The new list of recruitables {@code UnitType}s.
+     */
+    protected void setRecruitables(List<UnitType> recruitables) {
+        this.recruitables.clear();
+        this.recruitables.addAll(recruitables);
+    }
+
+    /**
      * Add a recruitable unit type.
      *
      * @param unitType The recruitable {@code UnitType} to add.
@@ -216,6 +227,25 @@ public class Europe extends UnitLocation
     }
 
     /**
+     * Get the unit price map.
+     *
+     * @return The map of {@code UnitType} to its price.
+     */
+    protected java.util.Map<UnitType, Integer> getUnitPrices() {
+        return this.unitPrices;
+    }
+
+    /**
+     * Set the unit price map.
+     *
+     * @param unitPrices The new map of {@code UnitType}s to price.
+     */
+    protected void setUnitPrices(java.util.Map<UnitType, Integer> unitPrices) {
+        this.unitPrices.clear();
+        this.unitPrices.putAll(unitPrices);
+    }
+    
+    /**
      * Gets the price of a unit in Europe.
      *
      * @param unitType The {@code UnitType} to price.
@@ -228,17 +258,35 @@ public class Europe extends UnitLocation
     }
 
     /**
+     * Get the base recruit price.
+     *
+     * @return The base recruit price.
+     */
+    protected int getBaseRecruitPrice() {
+        return this.baseRecruitPrice;
+    }
+    
+    /**
      * Gets the current price for a recruit.
      *
      * @return The current price of the recruit in this {@code Europe}.
      */
-    public int getRecruitPrice() {
+    public int getCurrentRecruitPrice() {
         if (!owner.isColonial()) return -1;
         int required = owner.getImmigrationRequired();
         int immigration = owner.getImmigration();
         int difference = Math.max(required - immigration, 0);
-        return Math.max((recruitPrice * difference) / required,
+        return Math.max((getBaseRecruitPrice() * difference) / required,
                         recruitLowerCap);
+    }
+
+    /**
+     * Get the recruit lower cap price.
+     *
+     * @return The lower cap on the recruit price.
+     */
+    protected int getRecruitLowerCap() {
+        return this.recruitLowerCap;
     }
 
     /**
@@ -262,26 +310,6 @@ public class Europe extends UnitLocation
         return n;
     }
 
-
-    // Override FreeColObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FeatureContainer getFeatureContainer() {
-        return featureContainer;
-    }
-
-    // Override FreeColGameObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FreeColGameObject getLinkTarget(Player player) {
-        return (getOwner() == player) ? this : null;
-    }
 
     // Interface Location (from UnitLocation)
     // Inheriting:
@@ -500,8 +528,24 @@ public class Europe extends UnitLocation
         super.disposeResources();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return (getOwner() == player) ? this : null;
+    }
+
 
     // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FeatureContainer getFeatureContainer() {
+        return this.featureContainer;
+    }
 
     /**
      * {@inheritDoc}
@@ -522,6 +566,23 @@ public class Europe extends UnitLocation
     @Override
     public int getClassIndex () {
         return EUROPE_CLASS_INDEX;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Europe o = copyInCast(other, Europe.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.setRecruitables(o.getRecruitables());
+        this.setUnitPrices(o.getUnitPrices());
+        this.baseRecruitPrice = o.getBaseRecruitPrice();
+        this.recruitLowerCap = o.getRecruitLowerCap();
+        this.owner = o.getOwner();
+        this.featureContainer.copy(o.getFeatureContainer());
+        return true;
     }
 
 
@@ -545,7 +606,7 @@ public class Europe extends UnitLocation
         super.writeAttributes(xw);
 
         if (xw.validFor(getOwner())) {
-            xw.writeAttribute(RECRUIT_PRICE_TAG, recruitPrice);
+            xw.writeAttribute(RECRUIT_PRICE_TAG, baseRecruitPrice);
 
             xw.writeAttribute(RECRUIT_LOWER_CAP_TAG, recruitLowerCap);
 
@@ -600,8 +661,8 @@ public class Europe extends UnitLocation
         owner = xr.findFreeColGameObject(getGame(), OWNER_TAG,
                                          Player.class, (Player)null, true);
 
-        recruitPrice = xr.getAttribute(RECRUIT_PRICE_TAG,
-                                       RECRUIT_PRICE_INITIAL);
+        baseRecruitPrice = xr.getAttribute(RECRUIT_PRICE_TAG,
+                                           RECRUIT_PRICE_INITIAL);
 
         recruitLowerCap = xr.getAttribute(RECRUIT_LOWER_CAP_TAG,
                                           LOWER_CAP_INITIAL);

@@ -166,31 +166,21 @@ public class ServerUnit extends Unit implements TurnTaker {
         super(game);
 
         final Specification spec = getSpecification();
-        this.unitType = type;
+        this.type = type;
         this.owner = owner;
         this.state = UnitState.ACTIVE; // placeholder
         this.role = getSpecification().getDefaultRole(); // placeholder
         this.location = null;
         this.entryLocation = null;
-        if (unitType.hasAbility(Ability.PERSON)) {
-            this.nationality = owner.getNationId();
-            this.ethnicity = nationality;
-        } else {
-            this.nationality = null;
-            this.ethnicity = null;
-        }
-
         this.workLeft = -1;
         this.workType = null;
         this.movesLeft = getInitialMovesLeft();
-        this.hitPoints = unitType.getHitPoints();
         this.experienceType = null;
         this.experience = 0;
         this.workImprovement = null;
         this.student = this.teacher = null;
         this.turnsOfTraining = 0;
         this.indianSettlement = null;
-        this.hitPoints = unitType.getHitPoints();
         this.destination = null;
         this.tradeRoute = null;
         this.currentStop = -1;
@@ -200,7 +190,16 @@ public class ServerUnit extends Unit implements TurnTaker {
 
         // Check for creation change
         UnitTypeChange uc = getUnitChange(UnitChangeType.CREATION);
-        if (uc != null) this.unitType = uc.to;
+        if (uc != null) this.type = uc.to;
+
+        if (this.type.hasAbility(Ability.PERSON)) {
+            this.nationality = owner.getNationId();
+            this.ethnicity = nationality;
+        } else {
+            this.nationality = null;
+            this.ethnicity = null;
+        }
+        this.hitPoints = this.type.getHitPoints();
 
         // Fix up role, state and location now other values are present.
         changeRole(role, role.getMaximumCount());
@@ -210,7 +209,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             setGoodsContainer(new GoodsContainer(game, this));
         }
 
-        owner.addUnit(this);
+        this.owner.addUnit(this);
     }
 
 
@@ -258,7 +257,7 @@ public class ServerUnit extends Unit implements TurnTaker {
                 < exposeResource) {
                 ResourceType resType = RandomChoice
                     .getWeightedRandom(logger, "Resource type",
-                                       tile.getType().getWeightedResources(),
+                                       tile.getType().getResourceTypes(),
                                        random);
                 int minValue = resType.getMinValue();
                 int maxValue = resType.getMaxValue();

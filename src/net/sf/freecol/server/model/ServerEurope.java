@@ -142,8 +142,8 @@ public class ServerEurope extends Europe implements TurnTaker {
      */
     public void increaseRecruitmentDifficulty() {
         final Specification spec = getSpecification();
-        recruitPrice += spec.getInteger(GameOptions.RECRUIT_PRICE_INCREASE);
-        recruitLowerCap += spec.getInteger(GameOptions.LOWER_CAP_INCREASE);
+        this.baseRecruitPrice += spec.getInteger(GameOptions.RECRUIT_PRICE_INCREASE);
+        this.recruitLowerCap += spec.getInteger(GameOptions.LOWER_CAP_INCREASE);
     }
 
     /**

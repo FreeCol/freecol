@@ -234,6 +234,21 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         return this.featureContainer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        FreeColSpecObjectType o = copyInCast(other, FreeColSpecObjectType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.abstractType = o.isAbstractType();
+        this.featureContainer = o.getFeatureContainer();
+        this.setScopes(o.getScopeList());
+        this.index = o.getIndex();
+        return true;
+    }
+
 
     // Serialization
 

@@ -157,6 +157,16 @@ public class Force extends FreeColSpecObject {
     }
 
     /**
+     * Set the land unit list.
+     *
+     * @param landUnits Set the new land {@code AbstractUnit}s.
+     */
+    protected void setLandUnitList(List<AbstractUnit> landUnits) {
+        clearLandUnits();
+        this.landUnits.addAll(landUnits);
+    }
+    
+    /**
      * Gets the naval units.
      *
      * @return A copy of the list of the naval units.
@@ -165,6 +175,16 @@ public class Force extends FreeColSpecObject {
         return AbstractUnit.deepCopy(this.navalUnits);
     }
 
+    /**
+     * Set the naval unit list.
+     *
+     * @param navalUnits Set the new land {@code AbstractUnit}s.
+     */
+    protected void setNavalUnitList(List<AbstractUnit> navalUnits) {
+        clearNavalUnits();
+        this.navalUnits.addAll(navalUnits);
+    }
+    
     /**
      * Is this Force empty?
      *
@@ -221,6 +241,24 @@ public class Force extends FreeColSpecObject {
     }
 
                     
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Force o = copyInCast(other, Force.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.setLandUnitList(o.getLandUnitsList());
+        this.setNavalUnitList(o.getNavalUnitsList());
+        this.spaceRequired = o.getSpaceRequired();
+        this.capacity = o.getCapacity();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String LAND_UNITS_TAG = "landUnits";

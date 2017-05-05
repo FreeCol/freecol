@@ -69,7 +69,17 @@ public class HighSeas extends UnitLocation {
      * @return A list of {@code Location}s.
      */
     public final List<Location> getDestinations() {
-        return destinations;
+        return this.destinations;
+    }
+
+    /**
+     * Set the destination list.
+     *
+     * @param destinations The new list of destination {@code Location}s.
+     */
+    protected void setDestinations(List<Location> destinations) {
+        this.destinations.clear();
+        this.destinations.addAll(destinations);
     }
 
     /**
@@ -79,8 +89,8 @@ public class HighSeas extends UnitLocation {
      */
     public void addDestination(Location destination) {
         if (destination != null) {
-            if (!destinations.contains(destination)) {
-                destinations.add(destination);
+            if (!this.destinations.contains(destination)) {
+                this.destinations.add(destination);
             } else {
                 logger.warning(getId() + " already included destination "
                     + destination.getId());
@@ -96,19 +106,9 @@ public class HighSeas extends UnitLocation {
      * @param destination A destination {@code Location}.
      */
     public void removeDestination(Location destination) {
-        destinations.remove(destination);
+        this.destinations.remove(destination);
     }
 
-
-    // Override FreeColGameObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FreeColGameObject getLinkTarget(Player player) {
-        return player.getEurope();
-    }
 
     // Interface Location (from UnitLocation)
     // Inherits
@@ -175,6 +175,32 @@ public class HighSeas extends UnitLocation {
     }
 
 
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return player.getEurope();
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        HighSeas o = copyInCast(other, HighSeas.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.setDestinations(o.getDestinations());
+        return true;
+    }
+
+
     // Serialization
 
     private static final String DESTINATION_TAG = "destination";
@@ -187,10 +213,10 @@ public class HighSeas extends UnitLocation {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Location destination : transform(destinations, isNotNull())) {
+        for (Location loc : transform(this.destinations, isNotNull())) {
             xw.writeStartElement(DESTINATION_TAG);
 
-            xw.writeLocationAttribute(ID_ATTRIBUTE_TAG, destination);
+            xw.writeLocationAttribute(ID_ATTRIBUTE_TAG, loc);
             
             xw.writeEndElement();
         }
@@ -202,7 +228,7 @@ public class HighSeas extends UnitLocation {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        destinations.clear();
+        this.destinations.clear();
 
         super.readChildren(xr);
     }

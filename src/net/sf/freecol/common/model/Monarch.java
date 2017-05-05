@@ -51,27 +51,6 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     public static final String TAG = "monarch";
 
-    /** The minimum price for a monarch offer of mercenaries. */
-    public static final int MONARCH_MINIMUM_PRICE = 200;
-
-    /** The minimum price for a Hessian offer of mercenaries. */
-    public static final int HESSIAN_MINIMUM_PRICE = 5000;
-
-    /**
-     * The minimum tax rate (given in percentage) from where it
-     * can be lowered.
-     */
-    public static final int MINIMUM_TAX_RATE = 20;
-
-    /** The player of this monarch. */
-    private Player player;
-
-    /** Whether a frigate has been provided. */
-    private boolean supportSea = false;
-
-    /** Whether displeasure has been incurred. */
-    private boolean displeasure = false;
-
     /** Constants describing monarch actions. */
     public static enum MonarchAction {
         NO_ACTION,
@@ -115,6 +94,28 @@ public final class Monarch extends FreeColGameObject implements Named {
             return "model." + getKey() + ".header";
         }
     }
+
+    /** The minimum price for a monarch offer of mercenaries. */
+    public static final int MONARCH_MINIMUM_PRICE = 200;
+
+    /** The minimum price for a Hessian offer of mercenaries. */
+    public static final int HESSIAN_MINIMUM_PRICE = 5000;
+
+    /**
+     * The minimum tax rate (given in percentage) from where it
+     * can be lowered.
+     */
+    public static final int MINIMUM_TAX_RATE = 20;
+
+
+    /** The player of this monarch. */
+    private Player player;
+
+    /** Whether a frigate has been provided. */
+    private boolean supportSea = false;
+
+    /** Whether displeasure has been incurred. */
+    private boolean displeasure = false;
 
     /**
      * The Royal Expeditionary Force, which the Monarch will send to
@@ -183,6 +184,17 @@ public final class Monarch extends FreeColGameObject implements Named {
         // the server, so the Forces *must* be instantiated lazily.
     }
 
+
+    /**
+     * Get the owning player.
+     *
+     * Note: Monarchs are not and should not be Ownable.
+     *
+     * @return The {@code Player} associated with this monarch.
+     */
+    protected Player getPlayer() {
+        return this.player;
+    }
 
     /**
      * Get the force describing the REF.
@@ -769,6 +781,25 @@ public final class Monarch extends FreeColGameObject implements Named {
     @Override
     public String getNameKey() {
         return this.player.getNation().getRulerNameKey();
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Monarch o = copyInCast(other, Monarch.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.player = o.getPlayer();
+        this.supportSea = o.getSupportSea();
+        this.displeasure = o.getDispleasure();
+        this.expeditionaryForce = o.getExpeditionaryForce();
+        this.interventionForce = o.getInterventionForce();
+        return true;
     }
 
 

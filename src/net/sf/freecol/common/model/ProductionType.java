@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
@@ -41,6 +42,10 @@ import net.sf.freecol.common.util.Utils;
 public class ProductionType extends FreeColSpecObject {
 
     public static final String TAG = "production";
+    
+    public static final List<AbstractGoods> EMPTY_LIST
+        = Collections.<AbstractGoods>emptyList();
+
 
     /** Whether this production type applies only to colony center tiles. */
     private boolean unattended;
@@ -145,108 +150,12 @@ public class ProductionType extends FreeColSpecObject {
 
 
     /**
-     * Get the input goods.
-     *
-     * @return A stream of the input {@code AbstractGoods}.
-     */
-    public final Stream<AbstractGoods> getInputs() {
-        return (inputs == null) ? Stream.<AbstractGoods>empty()
-            : inputs.stream();
-    }
-
-    /**
-     * Set the input goods.
-     *
-     * @param newInputs The new list of input {@code AbstractGoods}.
-     */
-    public final void setInputs(final List<AbstractGoods> newInputs) {
-        this.inputs = newInputs;
-    }
-
-    /**
-     * Add a new input.
-     *
-     * @param type The {@code GoodsType} to add.
-     * @param amount The amount of goods.
-     */
-    private void addInput(GoodsType type, int amount) {
-        if (inputs == null) inputs = new ArrayList<>(1);
-        inputs.add(new AbstractGoods(type, amount));
-    }
-
-    /**
-     * Get the output goods.
-     *
-     * @return A stream of the output {@code AbstractGoods}.
-     */
-    public final Stream<AbstractGoods> getOutputs() {
-        return (outputs == null) ? Stream.<AbstractGoods>empty()
-            : outputs.stream();
-    }
-
-    /**
-     * Set the output goods.
-     *
-     * @param newOutputs The new list of output {@code AbstractGoods}.
-     */
-    public final void setOutputs(final List<AbstractGoods> newOutputs) {
-        this.outputs = newOutputs;
-    }
-
-    /**
-     * Add a new output.
-     *
-     * @param type The {@code GoodsType} to add.
-     * @param amount The amount of goods.
-     */
-    public void addOutput(GoodsType type, int amount) {
-        if (outputs == null) outputs = new ArrayList<>(1);
-        outputs.add(new AbstractGoods(type, amount));
-    }
-
-    /**
-     * Add a new output.
-     *
-     * @param ag The {@code AbstractGoods} to add.
-     */
-    public void addOutput(AbstractGoods ag) {
-        if (outputs == null) outputs = new ArrayList<>(1);
-        outputs.add(ag);
-    }
-
-    /**
-     * Get the goods of the given goods type in this production type.
-     *
-     * @param goodsType The {@code GoodsType} to check.
-     * @return The {@code AbstractGoods} output if any, otherwise
-     *     null.
-     */
-    public AbstractGoods getOutput(GoodsType goodsType) {
-        return (outputs == null) ? null
-            : find(outputs, AbstractGoods.matches(goodsType));
-    }
-
-    /**
-     * Get the type of the most productive output.
-     *
-     * @return The {@code GoodsType} of the most productive output.
-     */
-    public GoodsType getBestOutputType() {
-        AbstractGoods goods;
-        return (outputs == null
-            || (goods = maximize(outputs,
-                    AbstractGoods.ascendingAmountComparator)) == null)
-            ? null
-            : goods.getType();
-    }
-
-    /**
      * Get the unattended production state.
      *
      * @return True if this is unattended production.
      */
     public final boolean getUnattended() {
-        return unattended;
+        return this.unattended;
     }
 
     /**
@@ -265,7 +174,7 @@ public class ProductionType extends FreeColSpecObject {
      * @return The production level key.
      */
     public final String getProductionLevel() {
-        return productionLevel;
+        return this.productionLevel;
     }
 
     /**
@@ -276,8 +185,8 @@ public class ProductionType extends FreeColSpecObject {
      */
     public boolean appliesTo(String level) {
         return level == null
-            || productionLevel == null
-            || level.equals(productionLevel);
+            || this.productionLevel == null
+            || level.equals(this.productionLevel);
     }
 
     /**
@@ -288,9 +197,122 @@ public class ProductionType extends FreeColSpecObject {
      * @return True if this production applies.
      */
     public boolean appliesExactly(String level) {
-        return level != null && level.equals(productionLevel);
+        return level != null && level.equals(this.productionLevel);
     }
 
+    /**
+     * Get the input goods list.
+     *
+     * @return A list of the input {@code AbstractGoods}.
+     */
+    public final List<AbstractGoods> getInputList() {
+        return (this.inputs == null) ? EMPTY_LIST : this.inputs;
+    }
+        
+    /**
+     * Get the input goods as a stream.
+     *
+     * @return A stream of the input {@code AbstractGoods}.
+     */
+    public final Stream<AbstractGoods> getInputs() {
+        return (this.inputs == null) ? Stream.<AbstractGoods>empty()
+            : this.inputs.stream();
+    }
+
+    /**
+     * Set the input goods.
+     *
+     * @param newInputs The new list of input {@code AbstractGoods}.
+     */
+    public final void setInputs(final List<AbstractGoods> newInputs) {
+        this.inputs = newInputs;
+    }
+
+    /**
+     * Add a new input.
+     *
+     * @param type The {@code GoodsType} to add.
+     * @param amount The amount of goods.
+     */
+    private void addInput(GoodsType type, int amount) {
+        if (this.inputs == null) this.inputs = new ArrayList<>(1);
+        this.inputs.add(new AbstractGoods(type, amount));
+    }
+
+    /**
+     * Get the output goods list.
+     *
+     * @return A list of the output {@code AbstractGoods}.
+     */
+    public final List<AbstractGoods> getOutputList() {
+        return (this.outputs == null) ? EMPTY_LIST : this.outputs;
+    }
+        
+    /**
+     * Get the output goods as a stream.
+     *
+     * @return A stream of the output {@code AbstractGoods}.
+     */
+    public final Stream<AbstractGoods> getOutputs() {
+        return (this.outputs == null) ? Stream.<AbstractGoods>empty()
+            : this.outputs.stream();
+    }
+
+    /**
+     * Set the output goods.
+     *
+     * @param newOutputs The new list of output {@code AbstractGoods}.
+     */
+    public final void setOutputs(final List<AbstractGoods> newOutputs) {
+        this.outputs = newOutputs;
+    }
+
+    /**
+     * Add a new output.
+     *
+     * @param type The {@code GoodsType} to add.
+     * @param amount The amount of goods.
+     */
+    public void addOutput(GoodsType type, int amount) {
+        if (this.outputs == null) this.outputs = new ArrayList<>(1);
+        this.outputs.add(new AbstractGoods(type, amount));
+    }
+
+    /**
+     * Add a new output.
+     *
+     * @param ag The {@code AbstractGoods} to add.
+     */
+    public void addOutput(AbstractGoods ag) {
+        if (this.outputs == null) this.outputs = new ArrayList<>(1);
+        this.outputs.add(ag);
+    }
+
+    /**
+     * Get the goods of the given goods type in this production type.
+     *
+     * @param goodsType The {@code GoodsType} to check.
+     * @return The {@code AbstractGoods} output if any, otherwise
+     *     null.
+     */
+    public AbstractGoods getOutput(GoodsType goodsType) {
+        return (this.outputs == null) ? null
+            : find(this.outputs, AbstractGoods.matches(goodsType));
+    }
+
+    /**
+     * Get the type of the most productive output.
+     *
+     * @return The {@code GoodsType} of the most productive output.
+     */
+    public GoodsType getBestOutputType() {
+        AbstractGoods goods;
+        return (this.outputs == null
+            || (goods = maximize(this.outputs,
+                    AbstractGoods.ascendingAmountComparator)) == null)
+            ? null
+            : goods.getType();
+    }
 
     /**
      * Convenience function to check if there is an output for a given
@@ -336,6 +358,24 @@ public class ProductionType extends FreeColSpecObject {
             goodsType == null || ag.getType() == goodsType;
         return maximize(getOutputs(), typePred,
                         AbstractGoods.ascendingAmountComparator);
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        ProductionType o = copyInCast(other, ProductionType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.unattended = o.getUnattended();
+        this.productionLevel = o.getProductionLevel();
+        this.setOutputs(o.getOutputList());
+        this.setInputs(o.getInputList());
+        return true;
     }
 
 

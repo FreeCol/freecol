@@ -387,7 +387,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             if (resource != null) {
                 t.getTileItemContainer().removeTileItem(resource);
             } else {
-                List<ResourceType> resList = t.getType().getResourceTypes();
+                List<ResourceType> resList = t.getType().getResourceTypeValues();
                 switch (resList.size()) {
                 case 0:
                     return;

@@ -477,6 +477,31 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Region o = copyInCast(other, Region.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.name = o.getName();
+        this.key = o.getKey();
+        this.type = o.getType();
+        this.parent = o.getParent();
+        this.children = o.getChildren();
+        this.claimable = o.getClaimable();
+        this.discoverable = o.getDiscoverable();
+        this.discoveredIn = o.getDiscoveredIn();
+        this.discoveredBy = o.getDiscoveredBy();
+        this.discoverer = o.getDiscoverer();
+        this.scoreValue = o.getScoreValue();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String CHILD_TAG = "child";

@@ -427,7 +427,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     @Override
-    public final Colony getColony() {
+    public Colony getColony() {
         // Final as this will always work if getSettlement() does.
         Settlement settlement = getSettlement();
         return (settlement instanceof Colony) ? (Colony)settlement : null;
@@ -437,7 +437,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     @Override
-    public final IndianSettlement getIndianSettlement() {
+    public IndianSettlement getIndianSettlement() {
         // Final as this will always work if getSettlement() does.
         Settlement settlement = getSettlement();
         return (settlement instanceof IndianSettlement)
@@ -539,6 +539,24 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public boolean equipForRole(Unit unit, Role role, int roleCount) {
         return false;
+    }
+
+
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        UnitLocation o = copyInCast(other, UnitLocation.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        synchronized (this.units) {
+            this.units.clear();
+            this.units.addAll(o.getUnitList());
+        }
+        return true;
     }
 
 

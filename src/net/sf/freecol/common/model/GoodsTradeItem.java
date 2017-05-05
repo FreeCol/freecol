@@ -173,6 +173,21 @@ public class GoodsTradeItem extends TradeItem {
     public String getXMLTagName() { return TAG; }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        ColonyTradeItem o = copyInCast(other, ColonyTradeItem.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.goods = o.getGoods();
+        return true;
+    }
+
+
     // Override Object
 
     /**

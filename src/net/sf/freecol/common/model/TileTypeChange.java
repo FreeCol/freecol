@@ -97,6 +97,23 @@ public class TileTypeChange extends FreeColSpecObjectType {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        TileTypeChange o = copyInCast(other, TileTypeChange.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.from = o.getFrom();
+        this.to = o.getTo();
+        this.production = o.getProduction();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String FROM_TAG = "from";

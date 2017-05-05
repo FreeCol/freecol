@@ -43,6 +43,7 @@ public class MarketData extends FreeColGameObject {
     /** Inclusive upper bound on goods price. */
     public static final int MAXIMUM_PRICE = 19;
 
+
     /** What type of goods is this. */
     private GoodsType goodsType;
 
@@ -387,6 +388,31 @@ public class MarketData extends FreeColGameObject {
     public void update() {
         costToBuy = -1; // Disable price change clamping
         price();
+    }
+
+
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        MarketData o = copyInCast(other, MarketData.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.goodsType = o.getGoodsType();
+        this.costToBuy = o.getCostToBuy();
+        this.paidForSale = o.getPaidForSale();
+        this.amountInMarket = o.getAmountInMarket();
+        this.initialPrice = o.getInitialPrice();
+        this.arrears = o.getArrears();
+        this.sales = o.getSales();
+        this.incomeBeforeTaxes = o.getIncomeBeforeTaxes();
+        this.incomeAfterTaxes = o.getIncomeAfterTaxes();
+        this.oldPrice = o.getOldPrice();
+        this.traded = o.getTraded();
+        return true;
     }
 
 

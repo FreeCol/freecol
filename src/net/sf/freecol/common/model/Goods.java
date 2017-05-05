@@ -41,6 +41,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
     public static final String TAG = "goods";
 
+
     /** 
      * The game containing these goods.  It would be nice to make this
      * a FreeColGameObject, but then it could not extend AbstractGoods.
@@ -237,6 +238,22 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     }
     
     
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Goods o = copyInCast(other, Goods.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        //Game can not change.  No: this.game = o.getGame();
+        this.location = o.getLocation();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String AMOUNT_TAG = "amount";

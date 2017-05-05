@@ -290,6 +290,23 @@ public final class Limit extends FreeColSpecObjectType {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Limit o = copyInCast(other, Limit.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.operator = o.getOperator();
+        this.leftHandSide = o.getLeftHandSide();
+        this.rightHandSide = o.getRightHandSide();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String LEFT_HAND_SIDE_TAG = "left-hand-side";

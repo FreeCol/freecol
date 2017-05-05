@@ -84,6 +84,22 @@ public final class ResourceType extends FreeColSpecObjectType {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        ResourceType o = copyInCast(other, ResourceType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.maxValue = o.getMaxValue();
+        this.minValue = o.getMinValue();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String MAXIMUM_VALUE_TAG = "maximum-value";

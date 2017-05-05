@@ -463,6 +463,24 @@ public class StringTemplate extends FreeColObject {
     }
 
 
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        StringTemplate o = copyInCast(other, StringTemplate.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.templateType = o.getTemplateType();
+        this.defaultId = o.getDefaultId();
+        this.keys = o.getKeys();
+        this.replacements = o.getReplacements();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String DEFAULT_ID_TAG = "defaultId";

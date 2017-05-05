@@ -134,6 +134,21 @@ public class StanceTradeItem extends TradeItem {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        StanceTradeItem o = copyInCast(other, StanceTradeItem.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.stance = o.getStance();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String STANCE_TAG = "stance";

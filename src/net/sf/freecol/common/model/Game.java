@@ -130,6 +130,9 @@ public class Game extends FreeColGameObject {
     };
 
 
+    /** The Specification this game uses. */
+    private Specification specification = null;
+
     /**
      * The next available identifier that can be given to a new
      * {@code FreeColGameObject}.
@@ -170,9 +173,6 @@ public class Game extends FreeColGameObject {
     private String initialActiveUnitId = null;
     
     // Serialization not required below.
-
-    /** The Specification this game uses. */
-    private Specification specification = null;
 
     /**
      * References to all objects created in this game.
@@ -378,8 +378,8 @@ public class Game extends FreeColGameObject {
      *
      * @return Nothing.
      */
-    public String getNextId() {
-        throw new IllegalStateException("game.getNextId not implemented");
+    public int getNextId() {
+        throw new RuntimeException("game.getNextId not implemented");
     }
 
     /**
@@ -1042,6 +1042,15 @@ public class Game extends FreeColGameObject {
      *
      * @return The active unit identifier, if any.
      */
+    public String getInitialActiveUnitId() {
+        return this.initialActiveUnitId;
+    }
+
+    /**
+     * Get the initial active unit.
+     *
+     * @return The initial active {@code Unit} or null if none.
+     */
     public Unit getInitialActiveUnit() {
         return (this.initialActiveUnitId == null) ? null
             : getFreeColGameObject(this.initialActiveUnitId, Unit.class);
@@ -1353,6 +1362,31 @@ public class Game extends FreeColGameObject {
         // can not yet pass "this" to the FreeColGameObject constructor.
     }
     
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Game o = copyInCast(other, Game.class);
+        if (o == null) return false;
+        this.specification = o.getSpecification();
+        this.nextId = o.getNextId();
+        this.uuid = o.getUUID();
+        this.clientUserName = o.getClientUserName();
+        this.players.clear();
+        this.players.addAll(o.getPlayerList());
+        this.unknownEnemy = o.getUnknownEnemy();
+        this.map = o.getMap();
+        this.nationOptions = o.getNationOptions();
+        this.currentPlayer = o.getCurrentPlayer();
+        this.turn = o.getTurn();
+        this.spanishSuccession = o.getSpanishSuccession();
+        this.initialActiveUnitId = o.getInitialActiveUnitId();
+        return true;
+    }
+
 
     // Serialization
     // Note: The order of the children is really sensitive.

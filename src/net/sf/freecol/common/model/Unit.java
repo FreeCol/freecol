@@ -125,6 +125,7 @@ public class Unit extends GoodsLocation
         }
     }
 
+
     /** The individual name of this unit, not of the unit type. */
     protected String name = null;
 
@@ -132,7 +133,7 @@ public class Unit extends GoodsLocation
     protected Player owner;
 
     /** The unit type. */
-    protected UnitType unitType;
+    protected UnitType type;
 
     /** Current unit state. */
     protected UnitState state = UnitState.ACTIVE;
@@ -475,7 +476,7 @@ public class Unit extends GoodsLocation
      * @return The current {@code UnitType}.
      */
     public final UnitType getType() {
-        return this.unitType;
+        return this.type;
     }
 
     /**
@@ -483,10 +484,10 @@ public class Unit extends GoodsLocation
      *
      * -vis: Has visibility issues as the line of sight may change.
      *
-     * @param unitType The new type of the unit.
+     * @param type The new type of the unit.
      */
-    public void setType(UnitType unitType) {
-        this.unitType = unitType;
+    public void setType(UnitType type) {
+        this.type = type;
     }
 
     /**
@@ -520,7 +521,7 @@ public class Unit extends GoodsLocation
      * @return The score for this unit.
      */
     public int getScoreValue() {
-        return (this.unitType == null) ? 0 : this.unitType.getScoreValue();
+        return (this.type == null) ? 0 : this.type.getScoreValue();
     }
 
     /**
@@ -529,7 +530,7 @@ public class Unit extends GoodsLocation
      * @return True if this is a naval {@code Unit}.
      */
     public boolean isNaval() {
-        return (this.unitType == null) ? false : this.unitType.isNaval();
+        return (this.type == null) ? false : this.type.isNaval();
     }
 
     /**
@@ -538,8 +539,8 @@ public class Unit extends GoodsLocation
      * @return True if the owner should be hidden from clients.
      */
     public boolean isOwnerHidden() {
-        return (this.unitType == null) ? false
-            : this.unitType.hasAbility(Ability.PIRACY);
+        return (this.type == null) ? false
+            : this.type.hasAbility(Ability.PIRACY);
     }
 
     /**
@@ -586,7 +587,7 @@ public class Unit extends GoodsLocation
      * @return True if this unit is a colonist.
      */
     public boolean isColonist() {
-        return this.unitType.hasAbility(Ability.FOUND_COLONY)
+        return this.type.hasAbility(Ability.FOUND_COLONY)
             && owner.hasAbility(Ability.FOUNDS_COLONIES);
     }
 
@@ -596,7 +597,7 @@ public class Unit extends GoodsLocation
      * @return True if this unit can carry goods or other units.
      */
     public boolean isCarrier() {
-        return this.unitType.canCarryGoods() || this.unitType.canCarryUnits();
+        return this.type.canCarryGoods() || this.type.canCarryUnits();
     }
 
     /**
@@ -605,8 +606,8 @@ public class Unit extends GoodsLocation
      * @return True if this unit is a person.
      */
     public boolean isPerson() {
-        return (this.unitType == null) ? false
-            : this.unitType.hasAbility(Ability.PERSON);
+        return (this.type == null) ? false
+            : this.type.hasAbility(Ability.PERSON);
     }
 
     /**
@@ -1200,7 +1201,7 @@ public class Unit extends GoodsLocation
      */
     public int getWorkTurnsLeft() {
         return (state == UnitState.IMPROVING
-                && unitType.hasAbility(Ability.EXPERT_PIONEER))
+                && this.type.hasAbility(Ability.EXPERT_PIONEER))
             ? (getWorkLeft() + 1) / 2
             : getWorkLeft();
     }
@@ -1569,7 +1570,7 @@ public class Unit extends GoodsLocation
      * @return True if under repair.
      */
     public boolean isDamaged() {
-        return hitPoints < unitType.getHitPoints();
+        return hitPoints < this.type.getHitPoints();
     }
 
     /**
@@ -1578,7 +1579,7 @@ public class Unit extends GoodsLocation
      * @return The number of turns left to be repaired.
      */
     public int getTurnsForRepair() {
-        return unitType.getHitPoints() - getHitPoints();
+        return this.type.getHitPoints() - getHitPoints();
     }
 
     /**
@@ -1882,7 +1883,7 @@ public class Unit extends GoodsLocation
      *     that a defensive unit also will be offensive.
      */
     public boolean isDefensiveUnit() {
-        return (unitType.isDefensive() || getRole().isDefensive())
+        return (this.type.isDefensive() || getRole().isDefensive())
             && !isCarrier(); // Not wagons or ships
     }
 
@@ -1893,7 +1894,7 @@ public class Unit extends GoodsLocation
      * @return True if this is an offensive unit.
      */
     public boolean isOffensiveUnit() {
-        return unitType.isOffensive() || getRole().isOffensive();
+        return this.type.isOffensive() || getRole().isOffensive();
     }
 
     /**
@@ -2416,8 +2417,8 @@ public class Unit extends GoodsLocation
     @Override
     public int getInitialMovesLeft() {
         Turn turn = getGame().getTurn();
-        return (int)applyModifiers(unitType.getMovement(), turn,
-                                   Modifier.MOVEMENT_BONUS, unitType);
+        return (int)applyModifiers(this.type.getMovement(), turn,
+                                   Modifier.MOVEMENT_BONUS, this.type);
     }
 
     /**
@@ -2446,7 +2447,7 @@ public class Unit extends GoodsLocation
         float base = getSpecification().getInteger(GameOptions.TURNS_TO_SAIL);
         return (int)getOwner().applyModifiers(base, getGame().getTurn(),
                                               Modifier.SAIL_HIGH_SEAS,
-                                              unitType);
+                                              this.type);
     }
 
     /**
@@ -2486,7 +2487,7 @@ public class Unit extends GoodsLocation
      */
     public boolean canBuildColony() {
         final Specification spec = getSpecification();
-        return hasTile() && unitType.canBuildColony() && getMovesLeft() > 0
+        return hasTile() && this.type.canBuildColony() && getMovesLeft() > 0
             && (!getOwner().isRebel()
                 || spec.getBoolean(GameOptions.FOUND_COLONY_DURING_REBELLION));
     }
@@ -3202,11 +3203,11 @@ public class Unit extends GoodsLocation
      */
     public int getLineOfSight() {
         final Turn turn = getGame().getTurn();
-        return (int)applyModifiers(unitType.getLineOfSight(), turn,
+        return (int)applyModifiers(this.type.getLineOfSight(), turn,
             Stream.concat(this.getModifiers(Modifier.LINE_OF_SIGHT_BONUS,
-                                            unitType, turn),
+                                            this.type, turn),
                 ((hasTile() && getTile().isExplored())
-                    ? getTile().getType().getModifiers(Modifier.LINE_OF_SIGHT_BONUS, unitType, turn)
+                    ? getTile().getType().getModifiers(Modifier.LINE_OF_SIGHT_BONUS, this.type, turn)
                     : Stream.<Modifier>empty())));
     }
 
@@ -3310,7 +3311,7 @@ public class Unit extends GoodsLocation
      * @return The total space.
      */
     public int getCargoCapacity() {
-        return unitType.getSpace();
+        return this.type.getSpace();
     }
 
     /**
@@ -3517,7 +3518,7 @@ public class Unit extends GoodsLocation
                 .getInteger(GameOptions.TREASURE_TRANSPORT_FEE)
                 * getTreasureAmount()) / 100.0f;
             return (int)getOwner().applyModifiers(fee, getGame().getTurn(),
-                Modifier.TREASURE_TRANSPORT_FEE, unitType);
+                Modifier.TREASURE_TRANSPORT_FEE, this.type);
         }
         return 0;
     }
@@ -3529,7 +3530,7 @@ public class Unit extends GoodsLocation
      *     signals a more advanced type of units.
      */
     public int getSkillLevel() {
-        return getSkillLevel(unitType);
+        return getSkillLevel(this.type);
     }
 
     /**
@@ -3785,7 +3786,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public List<AbstractGoods> getConsumedGoods() {
-        return unitType.getConsumedGoods();
+        return this.type.getConsumedGoods();
     }
 
     /**
@@ -3793,7 +3794,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public int getPriority() {
-        return unitType.getPriority();
+        return this.type.getPriority();
     }
 
 
@@ -4061,7 +4062,7 @@ public class Unit extends GoodsLocation
     public int getSpaceTaken() {
         // We do not have to consider what this unit is carrying
         // because carriers can not be put onto carriers.  Yet.
-        return unitType.getSpaceTaken();
+        return this.type.getSpaceTaken();
     }
 
     /**
@@ -4279,6 +4280,47 @@ public class Unit extends GoodsLocation
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Unit o = copyInCast(other, Unit.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.name = o.getName();
+        this.owner = o.getOwner();
+        this.type = o.getType();
+        this.state = o.getState();
+        this.role = o.getRole();
+        this.roleCount = o.getRoleCount();
+        this.location = o.getLocation();
+        this.entryLocation = o.getEntryLocation();
+        this.movesLeft = o.getMovesLeft();
+        this.workType = o.getWorkType();
+        this.experienceType = o.getExperienceType();
+        this.experience = o.getExperience();
+        this.workLeft = o.getWorkLeft();
+        this.workImprovement = o.getWorkImprovement();
+        this.student = o.getStudent();
+        this.teacher = o.getTeacher();
+        this.turnsOfTraining = o.getTurnsOfTraining();
+        this.nationality = o.getNationality();
+        this.ethnicity = o.getEthnicity();
+        this.indianSettlement = o.getIndianSettlement();
+        this.hitPoints = o.getHitPoints();
+        this.destination = o.getDestination();
+        this.tradeRoute = o.getTradeRoute();
+        this.currentStop = o.getCurrentStop();
+        this.treasureAmount = o.getTreasureAmount();
+        this.attrition = o.getAttrition();
+        this.visibleGoodsCount = o.getVisibleGoodsCount();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String ATTRITION_TAG = "attrition";
@@ -4325,7 +4367,7 @@ public class Unit extends GoodsLocation
 
         if (name != null) xw.writeAttribute(NAME_TAG, name);
 
-        xw.writeAttribute(UNIT_TYPE_TAG, unitType);
+        xw.writeAttribute(UNIT_TYPE_TAG, this.type);
 
         xw.writeAttribute(MOVES_LEFT_TAG, movesLeft);
 
@@ -4433,9 +4475,9 @@ public class Unit extends GoodsLocation
                                          Player.class, (Player)null, true);
         if (xr.shouldIntern()) game.checkOwners(this, oldOwner);
 
-        UnitType oldUnitType = unitType;
-        unitType = xr.getType(spec, UNIT_TYPE_TAG,
-                              UnitType.class, (UnitType)null);
+        UnitType oldUnitType = this.type;
+        this.type = xr.getType(spec, UNIT_TYPE_TAG,
+                               UnitType.class, (UnitType)null);
 
         state = xr.getAttribute(STATE_TAG, UnitState.class, UnitState.ACTIVE);
 

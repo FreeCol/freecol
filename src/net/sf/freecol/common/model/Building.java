@@ -47,6 +47,7 @@ public class Building extends WorkLocation
     
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
+
     /** The type of building. */
     protected BuildingType buildingType;
 
@@ -311,8 +312,7 @@ public class Building extends WorkLocation
             if (available < required
                 && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
                 && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)
-                && ((minimumGoodsInput = getType()
-                        .getExpertWithConnectionsProduction()
+                && ((minimumGoodsInput = getType().getExpertConnectionProduction()
                         * count(getUnits(),
                             matchKey(getExpertUnitType(), Unit::getType)))
                     > available)) {
@@ -656,6 +656,18 @@ public class Building extends WorkLocation
                                          Turn turn) {
         // Buildings have no modifiers independent of type
         return getType().getModifiers(id, fcgot, turn);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Building o = copyInCast(other, Building.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.buildingType = o.getType();
+        return true;
     }
 
 

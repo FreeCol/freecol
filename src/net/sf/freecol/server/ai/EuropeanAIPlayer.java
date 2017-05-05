@@ -2468,7 +2468,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             result = TradeStatus.PROPOSE_TRADE;
         } else {
             int unacceptable = 0, value = 0;
-            for (TradeItem item : agreement.getTradeItems()) {
+            for (TradeItem item : agreement.getItems()) {
                 if (item instanceof StanceTradeItem) {
                     getNationSummary(other); // Freshen the name summary cache
                 }                    
@@ -2508,7 +2508,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 lb.add("  All accepted at ", value, ".");
             } else { // If too many items are unacceptable, reject
                 double ratio = (double)unacceptable
-                    / (unacceptable + agreement.getTradeItems().size());
+                    / (unacceptable + agreement.getItems().size());
                 if (ratio > 0.5 - 0.5 * agreement.getVersion()) {
                     result = rejectAgreement(peace, agreement);
                     lb.add("  Too many (", unacceptable, ") unacceptable.");

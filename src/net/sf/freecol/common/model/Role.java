@@ -241,8 +241,22 @@ public class Role extends BuildableType {
      * @return A list of {@code RoleChange}s.
      */
     public final List<RoleChange> getRoleChanges() {
-        return (roleChanges == null) ? Collections.<RoleChange>emptyList()
-            : this.roleChanges;
+        if (this.roleChanges == null) this.roleChanges = new ArrayList<>();
+        return this.roleChanges;
+    }
+
+    /**
+     * Set the role change list.
+     *
+     * @param roleChange The new list of {@code RoleChange}s.
+     */
+    protected final void setRoleChanges(List<RoleChange> roleChanges) {
+        if (this.roleChanges == null) {
+            this.roleChanges = new ArrayList<>();
+        } else {
+            this.roleChanges.clear();
+        }
+        this.roleChanges.addAll(roleChanges);
     }
 
     /**
@@ -410,6 +424,24 @@ public class Role extends BuildableType {
     }
 
         
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Role o = copyInCast(other, Role.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.downgrade = o.getDowngrade();
+        this.maximumCount = o.getMaximumCount();
+        this.expertUnit = o.getExpertUnit();
+        this.setRoleChanges(o.getRoleChanges());
+        return true;
+    }
+
+
     // Serialization
 
     private static final String CAPTURE_TAG = "capture";

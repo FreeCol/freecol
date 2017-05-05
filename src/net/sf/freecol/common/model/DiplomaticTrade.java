@@ -292,9 +292,9 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get a list of all items to trade.
      *
-     * @return A list of all the TradeItems.
+     * @return A list of all the {@code TradeItems}.
      */
-    public final List<TradeItem> getTradeItems() {
+    public final List<TradeItem> getItems() {
         return this.items;
     }
 
@@ -412,6 +412,27 @@ public class DiplomaticTrade extends FreeColGameObject {
      */
     public boolean isInternable() {
         return false;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        DiplomaticTrade o = copyInCast(other, DiplomaticTrade.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.context = o.getContext();
+        this.status = o.getStatus();
+        this.sender = o.getSender();
+        this.recipient = o.getRecipient();
+        this.items.clear();
+        this.items.addAll(o.getItems());
+        this.version = o.getVersion();
+        return true;
     }
 
 
@@ -537,7 +558,7 @@ public class DiplomaticTrade extends FreeColGameObject {
             .append(" to=").append(getRecipient().getId())
             .append(" version=").append(getVersion())
             .append(" [");
-        for (TradeItem item : getTradeItems()) sb.append(' ').append(item);
+        for (TradeItem item : getItems()) sb.append(' ').append(item);
         sb.append(" ]]");
         return sb.toString();
     }

@@ -155,15 +155,6 @@ public class NationOptions extends FreeColSpecObject {
 
 
     /**
-     * Get the nations in the game.
-     *
-     * @return A map of the nations.
-     */
-    public final Map<Nation, NationState> getNations() {
-        return nations;
-    }
-
-    /**
      * Get the national advantages.
      *
      * @return The national advantages.
@@ -173,13 +164,32 @@ public class NationOptions extends FreeColSpecObject {
     }
 
     /**
+     * Get the nations in the game.
+     *
+     * @return A map of the nations.
+     */
+    public final Map<Nation, NationState> getNations() {
+        return this.nations;
+    }
+
+    /**
+     * Set the nation map.
+     *
+     * @param nations The new nations map.
+     */
+    protected void setNations(Map<Nation, NationState> nations) {
+        this.nations.clear();
+        this.nations.putAll(nations);
+    }
+
+    /**
      * Get the {@code NationState} value of a particular Nation.
      *
      * @param nation The {@code Nation} to query.
      * @return The corresponding {@code NationState}.
      */
     public final NationState getNationState(Nation nation) {
-        return nations.get(nation);
+        return this.nations.get(nation);
     }
 
     /**
@@ -191,6 +201,22 @@ public class NationOptions extends FreeColSpecObject {
     public final void setNationState(final Nation nation,
                                      final NationState state) {
         this.nations.put(nation, state);
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        NationOptions o = copyInCast(other, NationOptions.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.nationalAdvantages = o.getNationalAdvantages();
+        this.setNations(o.getNations());
+        return true;
     }
 
 

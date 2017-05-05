@@ -121,9 +121,9 @@ public class EmigrateUnitMessage extends AttributeMessage {
             }
             type = MigrationType.NORMAL;
         } else {
-            if (!serverPlayer.checkGold(europe.getRecruitPrice())) {
+            if (!serverPlayer.checkGold(europe.getCurrentRecruitPrice())) {
                 return serverPlayer.clientError("No migrants available at cost "
-                    + europe.getRecruitPrice()
+                    + europe.getCurrentRecruitPrice()
                     + " for player with " + serverPlayer.getGold() + " gold");
             }
             type = MigrationType.RECRUIT;

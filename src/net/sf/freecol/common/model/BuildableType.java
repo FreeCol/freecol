@@ -167,6 +167,16 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     }
 
     /**
+     * Set the goods required to build an instance of this buildable.
+     *
+     * @param goods The new required goods.
+     */
+    public void setRequiredGoods(List<AbstractGoods> goods) {
+        this.requiredGoods.clear();
+        this.requiredGoods.addAll(goods);
+    }
+
+    /**
      * Get the amount required of a given {@code GoodsType} to build
      * an instance of this buildable.
      *
@@ -252,6 +262,25 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     public int getMaximumIndex(Colony colony, JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
         return UNABLE_TO_BUILD;
     }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        BuildableType o = copyInCast(other, BuildableType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.setRequiredPopulation(o.getRequiredPopulation());
+        this.setRequiredAbilities(o.getRequiredAbilities());
+        this.setRequiredGoods(o.getRequiredGoodsList());
+        this.setLimits(o.getLimits());
+        return true;
+    }
+
 
     // Serialization
 

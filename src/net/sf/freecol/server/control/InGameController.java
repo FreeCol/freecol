@@ -1704,7 +1704,7 @@ public final class InGameController extends Controller {
         Player indianPlayer = is.getOwner();
         int gold = 0;
         int year = getGame().getTurn().getNumber();
-        RandomRange gifts = is.getType().getGifts(unit);
+        RandomRange gifts = is.getType().getGifts();
         if (is.getLastTribute() + TURNS_PER_TRIBUTE < year
             && gifts != null) {
             switch (indianPlayer.getTension(serverPlayer).getLevel()) {
@@ -3470,7 +3470,7 @@ public final class InGameController extends Controller {
                 result = "expert";
             } else {
                 // Choose tales 1/3 of the time, or if there are no beads.
-                RandomRange gifts = is.getType().getGifts(unit);
+                RandomRange gifts = is.getType().getGifts();
                 int gold = (gifts == null) ? 0
                     : gifts.getAmount("Base beads amount", random, true);
                 if (gold <= 0 || rnd <= 3) {
@@ -3848,7 +3848,8 @@ public final class InGameController extends Controller {
             return serverPlayer.clientError("Not an existing trade route: "
                 + tradeRoute.getId());
         }
-        tr.updateFrom(tradeRoute);
+        tr.setId(tradeRoute.getId());
+        tr.copyIn(tradeRoute);
 
         // Have to update the whole player alas.
         return new ChangeSet().add(See.only(serverPlayer), serverPlayer);

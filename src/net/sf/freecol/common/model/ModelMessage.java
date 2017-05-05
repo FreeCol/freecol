@@ -94,7 +94,7 @@ public class ModelMessage extends StringTemplate {
     private String sourceId;
     private String displayId;
     private MessageType messageType;
-    private boolean beenDisplayed = false;
+    private boolean displayed = false;
 
 
     /**
@@ -230,17 +230,17 @@ public class ModelMessage extends StringTemplate {
      *
      * @return True if this message has been displayed.
      */
-    public boolean hasBeenDisplayed() {
-        return beenDisplayed;
+    public boolean getDisplayed() {
+        return this.displayed;
     }
 
     /**
      * Sets whether this message has been displayed.
      *
-     * @param beenDisplayed The new displayed state.
+     * @param displayed The new displayed state.
      */
-    public void setBeenDisplayed(boolean beenDisplayed) {
-        this.beenDisplayed = beenDisplayed;
+    public void setDisplayed(boolean displayed) {
+        this.displayed = displayed;
     }
 
     /**
@@ -372,6 +372,24 @@ public class ModelMessage extends StringTemplate {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        ModelMessage o = copyInCast(other, ModelMessage.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.sourceId = o.getSourceId();
+        this.displayId = o.getDisplayId();
+        this.messageType = o.getMessageType();
+        this.displayed = o.getDisplayed();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String DISPLAY_TAG = "display";
@@ -393,7 +411,7 @@ public class ModelMessage extends StringTemplate {
 
         xw.writeAttribute(MESSAGE_TYPE_TAG, messageType);
 
-        xw.writeAttribute(HAS_BEEN_DISPLAYED_TAG, beenDisplayed);
+        xw.writeAttribute(HAS_BEEN_DISPLAYED_TAG, displayed);
     }
 
     /**
@@ -410,7 +428,7 @@ public class ModelMessage extends StringTemplate {
         messageType = xr.getAttribute(MESSAGE_TYPE_TAG, 
                                       MessageType.class, MessageType.DEFAULT);
 
-        beenDisplayed = xr.getAttribute(HAS_BEEN_DISPLAYED_TAG, false);
+        displayed = xr.getAttribute(HAS_BEEN_DISPLAYED_TAG, false);
     }
 
     /**

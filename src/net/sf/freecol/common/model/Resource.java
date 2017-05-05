@@ -44,6 +44,7 @@ public class Resource extends TileItem {
     /** Some resources are unlimited. */
     private static final int UNLIMITED = -1;
 
+
     /** The type of resource. */
     private ResourceType type;
 
@@ -278,6 +279,22 @@ public class Resource extends TileItem {
             result = -1;
         }
         return result;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Resource o = copyInCast(other, Resource.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.type = o.getType();
+        this.quantity = o.getQuantity();
+        return true;
     }
 
 

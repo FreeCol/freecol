@@ -56,6 +56,7 @@ public class TileImprovement extends TileItem implements Named {
     public static final int LARGE_RIVER = 2;
     public static final int FJORD_RIVER = 3;
 
+
     /** The type of this improvement. */
     private TileImprovementType type;
 
@@ -692,6 +693,25 @@ public class TileImprovement extends TileItem implements Named {
             // end @compat 0.11.6
         }
         return result;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        TileImprovement o = copyInCast(other, TileImprovement.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.type = o.getType();
+        this.turnsToComplete = o.getTurnsToComplete();
+        this.magnitude = o.getMagnitude();
+        this.style = o.getStyle();
+        this.virtual = o.isVirtual();
+        return true;
     }
 
 

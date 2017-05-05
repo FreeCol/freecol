@@ -54,7 +54,7 @@ public class MarketWas {
     public MarketWas(Player player) {
         this.market = player.getMarket();
         this.tax = player.getTax();
-        for (MarketData md : this.market.getMarketData()) {
+        for (MarketData md : this.market.getMarketDataValues()) {
             this.costToBuy.put(md.getGoodsType(), md.getCostToBuy());
             this.paidForSale.put(md.getGoodsType(), md.getPaidForSale());
         }

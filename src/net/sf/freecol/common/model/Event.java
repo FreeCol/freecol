@@ -90,11 +90,50 @@ public class Event extends FreeColSpecObjectType {
     }
 
     /**
+     * Get the score value of this event.
+     *
+     * @return The score value.
+     */
+    public final int getScoreValue() {
+        return scoreValue;
+    }
+
+    /**
+     * Set the score value of this event.
+     *
+     * @param newScoreValue The new score value.
+     */
+    public final void setScoreValue(final int newScoreValue) {
+        this.scoreValue = newScoreValue;
+    }
+
+    /**
+     * Get the limit map.
+     *
+     * @return The map of the limits.
+     */
+    protected Map<String, Limit> getLimits() {
+        return this.limits;
+    }
+
+    /**
+     * Set the limits on this event.
+     *
+     * @param limits A new limits map.
+     */
+    protected void setLimits(Map<String, Limit> limits) {
+        if (this.limits == null) this.limits = new HashMap<>(); else {
+            this.limits.clear();
+        }
+        this.limits.putAll(limits);
+    }
+
+    /**
      * Get the limits on this event.
      *
      * @return A list of limits.
      */
-    public final Collection<Limit> getLimits() {
+    public final Collection<Limit> getLimitValues() {
         return (limits == null) ? Collections.<Limit>emptyList()
             : limits.values();
     }
@@ -119,22 +158,21 @@ public class Event extends FreeColSpecObjectType {
         limits.put(limit.getId(), limit);
     }
 
-    /**
-     * Get the score value of this event.
-     *
-     * @return The score value.
-     */
-    public final int getScoreValue() {
-        return scoreValue;
-    }
+
+    // Override FreeColObject
 
     /**
-     * Set the score value of this event.
-     *
-     * @param newScoreValue The new score value.
+     * {@inheritDoc}
      */
-    public final void setScoreValue(final int newScoreValue) {
-        this.scoreValue = newScoreValue;
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Event o = copyInCast(other, Event.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.value = o.getValue();
+        this.scoreValue = o.getScoreValue();
+        this.setLimits(o.getLimits());
+        return true;
     }
 
 
@@ -169,7 +207,7 @@ public class Event extends FreeColSpecObjectType {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Limit limit : getLimits()) limit.toXML(xw);
+        for (Limit limit : getLimitValues()) limit.toXML(xw);
     }
 
     /**

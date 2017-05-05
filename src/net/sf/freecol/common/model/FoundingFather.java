@@ -212,6 +212,26 @@ public class FoundingFather extends FreeColSpecObjectType {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        FoundingFather o = copyInCast(other, FoundingFather.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.type = o.getType();
+        for (int i = 0; i < weight.length; i++) {
+            this.weight[i] = o.getWeight(i);
+        }
+        this.setEvents(o.getEvents());
+        this.setUnits(o.getUnitList());
+        return true;
+    }
+
+
     // Serialization
 
     private static final String FROM_ID_TAG = "from-id";

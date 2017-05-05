@@ -53,6 +53,7 @@ public class ColonyTile extends WorkLocation {
     /** The maximum number of units a ColonyTile can hold. */
     public static final int UNIT_CAPACITY = 1;
 
+
     /**
      * The tile to work.  This is accessed through getWorkTile().
      * Beware!  Do not confuse this with getTile(), which returns
@@ -513,6 +514,21 @@ public class ColonyTile extends WorkLocation {
         return (isColonyCenterTile()) ? super.getClaimTemplate()
             : (StringTemplate.template("model.colonyTile.claim")
                 .addNamed("%direction%", getTile().getDirection(workTile)));
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        ColonyTile o = copyInCast(other, ColonyTile.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.workTile = o.getWorkTile();
+        return true;
     }
 
 

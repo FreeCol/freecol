@@ -62,4 +62,19 @@ public abstract class FreeColSpecObject extends FreeColObject {
     protected void setSpecification(Specification specification) {
         this.specification = specification;
     }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        FreeColSpecObject o = copyInCast(other, FreeColSpecObject.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.specification = o.getSpecification();
+        return true;
+    }
 }

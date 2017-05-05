@@ -231,6 +231,21 @@ public abstract class TradeItem extends FreeColGameObject {
     }
 
     
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        TradeItem o = copyInCast(other, TradeItem.class);
+        if (o == null) return false;
+        this.source = o.getSource();
+        this.destination = o.getDestination();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String DESTINATION_TAG = "destination";

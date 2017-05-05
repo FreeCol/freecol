@@ -53,6 +53,10 @@ public abstract class Settlement extends GoodsLocation
 
     public static final int FOOD_PER_COLONIST = 200;
 
+
+    /** The type of settlement. */
+    private SettlementType type = null;
+
     /** The {@code Player} owning this {@code Settlement}. */
     protected Player owner;
 
@@ -61,9 +65,6 @@ public abstract class Settlement extends GoodsLocation
 
     /** The {@code Tile} where this {@code Settlement} is located. */
     protected Tile tile;
-
-    /** The type of settlement. */
-    private SettlementType type = null;
 
     /** The tiles this settlement owns. */
     private final Set<Tile> ownedTiles = new HashSet<>();
@@ -176,10 +177,20 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Get the tiles this settlement owns.
      *
-     * @return A list of tiles.
+     * @return A set of tiles.
      */
     public Set<Tile> getOwnedTiles() {
         return new HashSet<>(ownedTiles);
+    }
+
+    /**
+     * Set the owned tiles set.
+     *
+     * @param ownedTiles The new set of owned {@code Tile}s.
+     */
+    protected void setOwnedTiles(Set<Tile> ownedTiles) {
+        this.ownedTiles.clear();
+        this.ownedTiles.addAll(ownedTiles);
     }
 
     /**
@@ -479,7 +490,7 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public FeatureContainer getFeatureContainer() {
-        return featureContainer;
+        return this.featureContainer;
     }
 
     /**
@@ -813,6 +824,26 @@ public abstract class Settlement extends GoodsLocation
             result = -1;
         }
         return result;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Settlement o = copyInCast(other, Settlement.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.type = o.getType();
+        this.owner = o.getOwner();
+        this.name = o.getName();
+        this.tile = o.getTile();
+        this.setOwnedTiles(o.getOwnedTiles());
+        this.featureContainer.copy(o.getFeatureContainer());
+        return true;
     }
 
 

@@ -194,6 +194,25 @@ public class ExportData extends FreeColObject {
     }
 
 
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        ExportData o = copyInCast(other, ExportData.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.highLevel = o.getHighLevel();
+        this.lowLevel = o.getLowLevel();
+        this.importLevel = o.getImportLevel();
+        this.exportLevel = o.getExportLevel();
+        this.exported = o.getExported();
+        return true;
+    }
+
+
     // Serialization
 
     private static final String EXPORTED_TAG = "exported";

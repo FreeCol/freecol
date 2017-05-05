@@ -303,7 +303,16 @@ public class HighScore extends FreeColObject {
     }
 
     /**
-     * Get the {@code Date} the score was achieved as a string.
+     * Get the date.
+     *
+     * @return The date.
+     */
+    public final Date getDate() {
+        return date;
+    }
+
+    /**
+     * Get the {@code Date} the score was achieved as a formatted string.
      *
      * @return The date string.
      */
@@ -440,6 +449,33 @@ public class HighScore extends FreeColObject {
             ret = false;
         }
         return ret;
+    }
+
+
+    // Overide FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        HighScore o = copyInCast(other, HighScore.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.independenceTurn = o.getIndependenceTurn();
+        this.playerName = o.getPlayerName();
+        this.nationId = o.getNationId();
+        this.nationTypeId = o.getNationTypeId();
+        this.score = o.getScore();
+        this.level = o.getLevel();
+        this.nationName = o.getNationName();
+        this.difficulty = o.getDifficulty();
+        this.nUnits = o.getUnitCount();
+        this.nColonies = o.getColonyCount();
+        this.newLandName = o.getNewLandName();
+        this.date = o.getDate();
+        this.retirementTurn = o.getRetirementTurn();
+        return true;
     }
 
 

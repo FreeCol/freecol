@@ -99,6 +99,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /** The maximum gift amount. */
     public static final int GIFT_MAXIMUM = 80;
 
+
     /**
      * This is the skill that can be learned by Europeans at this
      * settlement.  At the server side its value will be null when the
@@ -186,6 +187,27 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
+     * Gets a list of the units native to this settlement.
+     *
+     * @return The list of units native to this settlement.
+     */
+    public List<Unit> getOwnedUnitList() {
+        synchronized (this.ownedUnits) {
+            return new ArrayList<>(this.ownedUnits);
+        }
+    }
+
+    /**
+     * Set the owned units list.
+     *
+     * @param ownedUnits The new owned {@code Unit} list.
+     */
+    protected void setOwnedUnitList(List<Unit> ownedUnits) {
+        clearOwnedUnits();
+        this.ownedUnits.addAll(ownedUnits);
+    }
+
+    /**
      * Adds the given {@code Unit} to the list of units that
      * belongs to this {@code IndianSettlement}.
      *
@@ -196,17 +218,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             if (!this.ownedUnits.contains(unit)) {
                 this.ownedUnits.add(unit);
             }
-        }
-    }
-
-    /**
-     * Gets a list of the units native to this settlement.
-     *
-     * @return The list of units native to this settlement.
-     */
-    public List<Unit> getOwnedUnitList() {
-        synchronized (this.ownedUnits) {
-            return new ArrayList<>(this.ownedUnits);
         }
     }
 
@@ -481,7 +492,26 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 : mostHated.getCountryLabel())
             : StringTemplate.key("model.indianSettlement.mostHatedUnknown");
     }
-            
+
+    /**
+     * Get the contact levels.
+     *
+     * @return The contact level map.
+     */
+    protected java.util.Map<Player, ContactLevel> getContactLevels() {
+        return this.contactLevels;
+    }
+
+    /**
+     * Set the contact levels.
+     *
+     * @param contactLevels The new contact level map.
+     */
+    protected void setContactLevels(java.util.Map<Player, ContactLevel> contactLevels) {
+        this.contactLevels.clear();
+        this.contactLevels.putAll(contactLevels);
+    }
+    
     /**
      * Gets the contact level between this settlement and a player.
      *
@@ -597,6 +627,27 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             break;
         }
         return false;
+    }
+
+    /**
+     * Get the alarm map.
+     *
+     * @return The map of player to tension.
+     */
+    protected java.util.Map<Player, Tension> getAlarm() {
+        return this.alarm;
+    }
+
+    /**
+     * Set the alarm map.
+     *
+     * @param alarm The new map of {@code Player} to {@code Tension}.
+     */
+    protected void setAlarm(java.util.Map<Player, Tension> alarm) {
+        clearAlarm();
+        synchronized (this.alarm) {
+            this.alarm.putAll(alarm);
+        }
     }
 
     /**
@@ -1177,6 +1228,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
+    public final IndianSettlement getIndianSettlement() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Location up() {
         return this;
     }
@@ -1442,6 +1501,30 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             }
         }
         return result;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        IndianSettlement o = copyInCast(other, IndianSettlement.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.learnableSkill = o.getLearnableSkill();
+        this.setWantedGoods(o.getWantedGoods());
+        this.setContactLevels(o.getContactLevels());
+        this.setOwnedUnitList(o.getOwnedUnitList());
+        this.missionary = o.getMissionary();
+        this.convertProgress = o.getConvertProgress();
+        this.lastTribute = o.getLastTribute();
+        this.mostHated = o.getMostHated();
+        this.setAlarm(o.getAlarm());
+        this.setGoodsForSale(o.getGoodsForSale());
+        return true;
     }
 
 

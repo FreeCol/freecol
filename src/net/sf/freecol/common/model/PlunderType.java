@@ -34,7 +34,7 @@ public class PlunderType extends FreeColSpecObjectType {
     public static final String TAG = "plunder";
 
     /** The range of plunder amounts. */
-    private RandomRange range;
+    private RandomRange plunder;
     
     /**
      * Creates a new plunder type.
@@ -67,7 +67,22 @@ public class PlunderType extends FreeColSpecObjectType {
      * @return The plunder range, or null if none applicable.
      */
     public final RandomRange getPlunder() {
-        return this.range;
+        return this.plunder;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        PlunderType o = copyInCast(other, PlunderType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.plunder = o.getPlunder();
+        return true;
     }
 
 
@@ -80,7 +95,7 @@ public class PlunderType extends FreeColSpecObjectType {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        if (this.range != null) this.range.writeAttributes(xw);
+        if (this.plunder != null) this.plunder.writeAttributes(xw);
     }
 
     /**
@@ -90,7 +105,7 @@ public class PlunderType extends FreeColSpecObjectType {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        this.range = new RandomRange(xr);
+        this.plunder = new RandomRange(xr);
     }
 
     /**

@@ -484,6 +484,18 @@ public class AIMain extends FreeColObject
         return getGame().getSpecification();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        AIMain o = copyInCast(other, AIMain.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.nextId = Integer.valueOf(o.getNextId());
+        return true;
+    }
+
 
     // Serialization
 

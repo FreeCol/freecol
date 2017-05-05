@@ -86,23 +86,6 @@ public class TradeRoute extends FreeColGameObject
 
 
     /**
-     * Copy all fields from another trade route to this one.  This is
-     * useful when an updated route is received on the server side
-     * from the client.
-     *
-     * @param other The {@code TradeRoute} to copy from.
-     */
-    public synchronized void updateFrom(TradeRoute other) {
-        setName(other.getName());
-        setOwner(other.getOwner());
-        clearStops();
-        for (TradeRouteStop otherStop : other.getStops()) {
-            addStop(new TradeRouteStop(otherStop));
-        }
-        this.silent = other.silent;
-    }
-
-    /**
      * Does this trade route generate no messages to the player?
      *
      * @return True if this trade route is silent.
@@ -323,6 +306,25 @@ public class TradeRoute extends FreeColGameObject
     @Override
     public final void setOwner(final Player newOwner) {
         this.owner = newOwner;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        TradeRoute o = copyInCast(other, TradeRoute.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.name = o.getName();
+        this.owner = o.getOwner();
+        this.stops.clear();
+        this.stops.addAll(o.getStops());
+        this.silent = o.isSilent();
+        return true;
     }
 
 

@@ -78,22 +78,6 @@ public abstract class Feature extends FreeColSpecObject
 
 
     /**
-     * Copy another Feature.
-     *
-     * @param other The other {@code Feature} to copy.
-     */
-    protected void copyFrom(Feature other) {
-        setId(other.getId());
-        setSpecification(other.getSpecification());
-        this.source = other.source;
-        this.firstTurn = other.firstTurn;
-        this.lastTurn = other.lastTurn;
-        this.duration = other.duration;
-        this.temporary = other.temporary;
-        setScopes(other.getScopeList());
-    }
-
-    /**
      * Does this feature have a time limit?
      *
      * @return True if the feature is time limited.
@@ -311,7 +295,27 @@ public abstract class Feature extends FreeColSpecObject
         return this.scopes != null && !this.scopes.isEmpty();
     }
 
+
+    // Override FreeColObject
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Feature o = copyInCast(other, Feature.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.source = o.getSource();
+        this.firstTurn = o.getFirstTurn();
+        this.lastTurn = o.getLastTurn();
+        this.duration = o.getDuration();
+        this.temporary = o.isTemporary();
+        this.setScopes(o.getScopeList());
+        return true;
+    }
+
+
     // Serialization
 
     private static final String DURATION_TAG = "duration";

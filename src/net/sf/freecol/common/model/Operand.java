@@ -57,6 +57,7 @@ public class Operand extends Scope {
         SETTLEMENT, PLAYER, GAME, NONE
     }
 
+
     /** The type of object the operand really represents. */
     private OperandType operandType = OperandType.NONE;
 
@@ -213,7 +214,7 @@ public class Operand extends Scope {
                     result += ourCount(player.getSettlementList());
                     break;
                 case FOUNDING_FATHERS:
-                    result += ourCount(player.getFathers());
+                    result += ourCount(player.getFoundingFathers());
                     break;
                 default:
                     return null;
@@ -257,7 +258,7 @@ public class Operand extends Scope {
                 s -> String.valueOf(s.invokeMethod(methodName,
                         Boolean.class, Boolean.FALSE)).equals(methodValue));
         case FOUNDING_FATHERS:
-            return ourCount(player.getFathers());
+            return ourCount(player.getFoundingFathers());
         default:
             break;
         }
@@ -290,6 +291,23 @@ public class Operand extends Scope {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Operand o = copyInCast(other, Operand.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.operandType = o.getOperandType();
+        this.scopeLevel = o.getScopeLevel();
+        this.value = o.getValue();
+        return true;
+    }
+
+        
     // Serialization
 
     private static final String OPERAND_TYPE_TAG = "operand-type";

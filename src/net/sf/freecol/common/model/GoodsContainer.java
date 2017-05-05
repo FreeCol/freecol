@@ -103,6 +103,15 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
 
     /**
+     * Get the parent location.
+     *
+     * @return The parent {@code Location}.
+     */
+    protected Location getParent() {
+        return this.parent;
+    }
+
+    /**
      * Set the goods location.
      *
      * @param location The {@code Location} to set.
@@ -112,6 +121,48 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             throw new IllegalArgumentException("Null GoodsContainer Location.");
         }
         this.parent = location;
+    }
+
+    /**
+     * Get the stored goods.
+     *
+     * @return A map of the stored goods.
+     */
+    protected Map<GoodsType, Integer> getStoredGoods() {
+        return this.storedGoods;
+    }
+
+    /**
+     * Set the stored goods.
+     *
+     * @param goods A map of the new stored goods.
+     */
+    protected void setStoredGoods(Map<GoodsType, Integer> goods) {
+        synchronized (this.storedGoods) {
+            this.storedGoods.clear();
+            this.storedGoods.putAll(goods);
+        }
+    }
+
+    /**
+     * Get the old stored goods.
+     *
+     * @return A map of the old stored goods.
+     */
+    protected Map<GoodsType, Integer> getOldStoredGoods() {
+        return this.oldStoredGoods;
+    }
+    
+    /**
+     * Set the old stored goods.
+     *
+     * @param goods A map of the new old stored goods.
+     */
+    protected void setOldStoredGoods(Map<GoodsType, Integer> goods) {
+        synchronized (this.oldStoredGoods) {
+            this.oldStoredGoods.clear();
+            this.oldStoredGoods.putAll(goods);
+        }
     }
 
     /**
@@ -480,6 +531,23 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public void disposeResources() {
         clearContainers();
         super.disposeResources();
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        GoodsContainer o = copyInCast(other, GoodsContainer.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.parent = o.getParent();
+        this.setStoredGoods(o.getStoredGoods());
+        this.setOldStoredGoods(o.getOldStoredGoods());
+        return true;
     }
 
 

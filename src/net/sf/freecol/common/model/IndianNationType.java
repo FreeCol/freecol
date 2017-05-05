@@ -100,69 +100,24 @@ public class IndianNationType extends NationType {
     }
 
     /**
-     * Gets the list of regions in which this tribe may settle.
-     *
-     * @return A list of regions identifiers.
-     */
-    public List<String> getRegionNames() {
-        return (regions == null) ? Collections.<String>emptyList()
-            : regions;
-    }
-
-    /**
-     * Add a region identifier.
-     *
-     * @param id The object identifier.
-     */
-    private void addRegion(String id) {
-        if (regions == null) regions = new ArrayList<>();
-        regions.add(id);
-    }
-
-    /**
-     * Can this Nation can settle the given Tile?
-     *
-     * @param tile a {@code Tile} value
-     * @return a {@code boolean} value
-     */
-    /*
-    public boolean canSettleTile(Tile tile) {
-        if (tile.getType().canSettle()) {
-            return canSettleRegion(tile.getRegion());
-        } else {
-            return false;
-        }
-    }
-    */
-    /**
-     * Can this Nation can settle the given Region?
-     *
-     * @param region a {@code Region} value
-     * @return a {@code boolean} value
-     */
-    /*
-    public boolean canSettleRegion(Region region) {
-        if (regions.isEmpty()) {
-            return true;
-        } else if (regions.contains(region.getId())) {
-            return true;
-        } else if (region.getParent() == null) {
-            return false;
-        } else {
-            return canSettleRegion(region.getParent());
-        }
-    }
-    */
-
-    /**
      * Gets a list of this Nation's skills.
      *
      * @return A list of national skills.
      */
     public List<RandomChoice<UnitType>> getSkills() {
-        return (skills == null)
+        return (this.skills == null)
             ? Collections.<RandomChoice<UnitType>>emptyList()
-            : skills;
+            : this.skills;
+    }
+
+    /**
+     * Set the skills of this nation.
+     *
+     * @param skills The new skills list.
+     */
+    protected void setSkills(List<RandomChoice<UnitType>> skills) {
+        this.skills.clear();
+        this.skills.addAll(skills);
     }
 
     /**
@@ -206,6 +161,57 @@ public class IndianNationType extends NationType {
         return transform(skills, alwaysTrue(), mapper);
     }
 
+    /**
+     * Gets the list of regions in which this tribe may settle.
+     *
+     * @return A list of regions identifiers.
+     */
+    public List<String> getRegions() {
+        return (regions == null) ? Collections.<String>emptyList()
+            : regions;
+    }
+
+    /**
+     * Set the settleable regions list.
+     *
+     * @param regions The new list of region identifiers.
+     */    
+    protected void setRegions(List<String> regions) {
+        if (this.regions == null) {
+            this.regions = new ArrayList<>();
+        } else {
+            this.regions.clear();
+        }
+        this.regions.addAll(regions);
+    }
+
+    /**
+     * Add a region identifier.
+     *
+     * @param id The object identifier.
+     */
+    private void addRegion(String id) {
+        if (regions == null) regions = new ArrayList<>();
+        regions.add(id);
+    }
+
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        IndianNationType o = copyInCast(other, IndianNationType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.setSkills(o.getSkills());
+        this.setRegions(o.getRegions());
+        return true;
+    }
+
 
     // Serialization
 
@@ -230,7 +236,7 @@ public class IndianNationType extends NationType {
             xw.writeEndElement();
         }
 
-        for (String region : getRegionNames()) {
+        for (String region : getRegions()) {
             xw.writeStartElement(Region.TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, region);

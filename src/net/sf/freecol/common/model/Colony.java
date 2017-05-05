@@ -92,6 +92,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         LIMIT_EXCEEDED
     }
 
+
     /** A map of Buildings, indexed by the id of their basic type. */
     protected final java.util.Map<String, Building> buildingMap = new HashMap<>();
 
@@ -186,15 +187,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     // Primitive accessors.
 
     /**
-     * Gets a {@code List} of every {@link Building} in this
-     * {@code Colony}.
+     * Get a list of every {@link Building} in this {@code Colony}.
      *
      * @return A list of {@code Building}s.
-     * @see Building
      */
     public List<Building> getBuildings() {
-        synchronized (buildingMap) {
-            return new ArrayList<>(buildingMap.values());
+        synchronized (this.buildingMap) {
+            return new ArrayList<>(this.buildingMap.values());
         }
     }
 
@@ -208,9 +207,26 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The {@code Building} found.
      */
     public Building getBuilding(BuildingType type) {
-        synchronized (buildingMap) {
-            return buildingMap.get(type.getFirstLevel().getId());
+        synchronized (this.buildingMap) {
+            return this.buildingMap.get(type.getFirstLevel().getId());
         }
+    }
+
+    /**
+     * Reset the building map.
+     *
+     * @param buildings The list of buildings to use.
+     */
+    protected void setBuildingMap(List<Building> buildings) {
+        clearBuildingMap();
+        for (Building b : buildings) addBuilding(b);
+    }
+
+    /**
+     * Clear the building map.
+     */
+    protected void clearBuildingMap() {
+        synchronized (this.buildingMap) { this.buildingMap.clear(); }
     }
 
     /**
@@ -221,14 +237,25 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @see ColonyTile
      */
     public List<ColonyTile> getColonyTiles() {
-        synchronized (colonyTiles) {
-            return colonyTiles;
+        synchronized (this.colonyTiles) {
+            return this.colonyTiles;
         }
     }
 
     /**
-     * Get the {@code ColonyTile} matching the given
-     * {@code Tile}.
+     * Set the colony tile list.
+     *
+     * @param colonyTiles The new list of {@code ColonyTile}s.
+     */
+    protected void setColonyTiles(List<ColonyTile> colonyTiles) {
+        synchronized (this.colonyTiles) {
+            this.colonyTiles.clear();
+            this.colonyTiles.addAll(colonyTiles);
+        }
+    }
+        
+    /**
+     * Get the {@code ColonyTile} matching the given {@code Tile}.
      *
      * @param tile The {@code Tile} to check.
      * @return The corresponding {@code ColonyTile}, or null if not found.
@@ -238,13 +265,32 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
+     * Get the export data.
+     *
+     * @return The list of {@code ExportData}.
+     */
+    protected Collection<ExportData> getExportData() {
+        return this.exportData.values();
+    }
+
+    /**
+     * Set the export data.
+     *
+     * @param exportData The new list of {@code ExportData}.
+     */
+    protected void setExportData(Collection<ExportData> exportData) {
+        this.exportData.clear();
+        for (ExportData ed : exportData) setExportData(ed);
+    }
+
+    /**
      * Get the export date for a goods type.
      *
      * @param goodsType The {@code GoodsType} to check.
      * @return The required {@code ExportData}.
      */
     public ExportData getExportData(final GoodsType goodsType) {
-        ExportData result = exportData.get(goodsType.getId());
+        ExportData result = this.exportData.get(goodsType.getId());
         if (result == null) {
             result = new ExportData(goodsType, getWarehouseCapacity());
             setExportData(result);
@@ -258,16 +304,29 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param newExportData A new {@code ExportData} value.
      */
     public final void setExportData(final ExportData newExportData) {
-        exportData.put(newExportData.getId(), newExportData);
+        this.exportData.put(newExportData.getId(), newExportData);
     }
 
+    protected int getSonsOfLiberty() {
+        return this.sonsOfLiberty;
+    }
+    protected int getOldSonsOfLiberty() {
+        return this.oldSonsOfLiberty;
+    }
+    protected int getTories() {
+        return this.tories;
+    }
+    protected int getOldTories() {
+        return this.oldTories;
+    }
+    
     /**
      * Gets the production bonus of the colony.
      *
      * @return The current production bonus of the colony.
      */
     public int getProductionBonus() {
-        return productionBonus;
+        return this.productionBonus;
     }
 
     /**
@@ -287,7 +346,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param amount An amount of immigration.
      */
     public void modifyImmigration(int amount) {
-        immigration += amount;
+        this.immigration += amount;
     }
 
     /**
@@ -296,7 +355,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The establishment {@code Turn}.
      */
     public Turn getEstablished() {
-        return established;
+        return this.established;
     }
 
     /**
@@ -309,21 +368,59 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Get the {@code BuildQueue} contents.
+     * Get the build queue contents.
      *
      * @return A list of {@code Buildable}s.
      */
     public List<BuildableType> getBuildQueue() {
-        return buildQueue.getValues();
+        return this.buildQueue.getValues();
     }
 
     /**
-     * Set the build queue value.
+     * Set the build queue.
      *
      * @param newBuildQueue A list of new values for the build queue.
      */
-    public void setBuildQueue(final List<BuildableType> newBuildQueue) {
-        buildQueue.setValues(newBuildQueue);
+    public void setBuildQueue(final List<BuildableType> buildQueue) {
+        this.buildQueue.setValues(buildQueue);
+    }
+
+    /**
+     * Get the population queue contents.
+     *
+     * @return A list of {@code Buildable}s.
+     */
+    public List<UnitType> getPopulationQueue() {
+        return this.populationQueue.getValues();
+    }
+
+    /**
+     * Set the population queue.
+     *
+     * @param newPopulationQueue A list of new values for the population queue.
+     */
+    public void setPopulationQueue(final List<UnitType> populationQueue) {
+        this.populationQueue.setValues(populationQueue);
+    }
+    
+    /**
+     * Get the display unit count.
+     *
+     * @return The explicit unit count for display purposes.
+     */
+    public int getDisplayUnitCount() {
+        return this.displayUnitCount;
+    }
+
+    /**
+     * Sets the apparent number of units at this colony.
+     * Used in client enemy colonies
+     *
+     * @param count The new apparent number of {@code Unit}s at
+     *     this colony.
+     */
+    public void setDisplayUnitCount(int count) {
+        this.displayUnitCount = count;
     }
 
 
@@ -1559,19 +1656,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @return The apparent number of {@code Unit}s at this colony.
      */
-    public int getDisplayUnitCount() {
-        return (displayUnitCount > 0) ? displayUnitCount : getUnitCount();
-    }
-
-    /**
-     * Sets the apparent number of units at this colony.
-     * Used in client enemy colonies
-     *
-     * @param count The new apparent number of {@code Unit}s at
-     *     this colony.
-     */
-    public void setDisplayUnitCount(int count) {
-        this.displayUnitCount = count;
+    public int getApparentUnitCount() {
+        return (this.displayUnitCount > 0) ? this.displayUnitCount
+            : getUnitCount();
     }
 
 
@@ -1708,7 +1795,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 result += v;
             }
         } else { // Much guesswork
-            result = getDisplayUnitCount() * 1000
+            result = getApparentUnitCount() * 1000
                     + 500 // Some useful goods?
                     + 200 * count(getTile().getSurroundingTiles(0, 1),
                     matchKey(this, Tile::getOwningSettlement));
@@ -2486,6 +2573,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
+    public final Colony getColony() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Location up() {
         return this;
     }
@@ -2576,7 +2671,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         if (isUndead()) {
             key = ".undead";
         } else {
-            int count = getDisplayUnitCount();
+            int count = getApparentUnitCount();
             key = (count <= 3) ? ".small"
                     : (count <= 7) ? ".medium"
                     : ".large";
@@ -2875,6 +2970,31 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         return COLONY_CLASS_INDEX;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Colony o = copyInCast(other, Colony.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.setBuildingMap(o.getBuildings());
+        this.setColonyTiles(o.getColonyTiles());
+        this.setExportData(o.getExportData());
+        this.liberty = o.getLiberty();
+        this.sonsOfLiberty = o.getSonsOfLiberty();
+        this.oldSonsOfLiberty = o.getOldSonsOfLiberty();
+        this.tories = o.getTories();
+        this.oldTories = o.getOldTories();
+        this.productionBonus = o.getProductionBonus();
+        this.immigration = o.getImmigration();
+        this.established = o.getEstablished();
+        this.setBuildQueue(o.getBuildQueue());
+        this.setPopulationQueue(o.getPopulationQueue());
+        this.displayUnitCount = o.getDisplayUnitCount();
+        return true;
+    }
+
 
     // Serialization
 
@@ -2924,7 +3044,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         } else {
 
-            int uc = getDisplayUnitCount();
+            int uc = getApparentUnitCount();
             if (uc <= 0) {
                 FreeCol.trace(logger, "Unit count fail: " + uc
                     + " id=" + getId()
@@ -3013,7 +3133,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         synchronized (colonyTiles) { colonyTiles.clear(); }
-        synchronized (buildingMap) { buildingMap.clear(); }
+        clearBuildingMap();
         exportData.clear();
         buildQueue.clear();
         populationQueue.clear();

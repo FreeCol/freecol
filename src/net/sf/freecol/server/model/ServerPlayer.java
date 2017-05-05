@@ -570,7 +570,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             return IS_DEAD;
         }
         UnitType unitType = null;
-        int price = Math.min(europe.getRecruitPrice(),
+        int price = Math.min(europe.getCurrentRecruitPrice(),
                              min(spec.getUnitTypesWithAbility(Ability.FOUND_COLONY),
                                  unitPricer));
         goldNeeded += price;
@@ -834,7 +834,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         int oldScore = this.score;
         this.score = sum(getUnits(), Unit::getScoreValue)
             + sum(getColonies(), Colony::getLiberty)
-            + SCORE_FOUNDING_FATHER * count(getFathers());
+            + SCORE_FOUNDING_FATHER * count(getFoundingFathers());
         int gold = getGold();
         if (gold != GOLD_NOT_ACCOUNTED) {
             this.score += (int)Math.floor(SCORE_GOLD * gold);
@@ -2038,7 +2038,8 @@ outer:  for (Effect effect : effects) {
      */
     public List<BuildingType> getFreeBuildingTypes() {
         final Specification spec = getGame().getSpecification();
-        return transform(flatten(getFathers(), ff -> ff.getEvents().stream()),
+        return transform(flatten(getFoundingFathers(),
+                         ff -> ff.getEvents().stream()),
                          matchKeyEquals("model.event.freeBuilding", Event::getId),
                          ev -> spec.getBuildingType(ev.getValue()));
     }
@@ -2111,7 +2112,7 @@ outer:  for (Effect effect : effects) {
             setRemainingEmigrants(getRemainingEmigrants() - 1);
             break;
         case RECRUIT:
-            modifyGold(-europe.getRecruitPrice());
+            modifyGold(-europe.getCurrentRecruitPrice());
             cs.addPartial(See.only(this), this,
                 "gold", String.valueOf(this.getGold()));
             europe.increaseRecruitmentDifficulty();

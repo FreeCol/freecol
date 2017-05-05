@@ -246,12 +246,8 @@ public class Modifier extends Feature {
     public Modifier(Modifier template) {
         this(template.getSpecification());
 
-        copyFrom(template);
-        setType(template.getType());
-        setValue(template.getValue());
-        setIncrementType(template.getIncrementType());
-        setIncrement(template.getIncrement());
-        setModifierIndex(template.getModifierIndex());
+        setId(template.getId());
+        copyIn(template);
     }
 
     /**
@@ -518,6 +514,25 @@ public class Modifier extends Feature {
     public float applyTo(float number, Turn turn) {
         return (incrementType == null) ? apply(number, value)
             : apply(number, getValue(turn), getType());
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        Modifier o = copyInCast(other, Modifier.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.setType(o.getType());
+        this.setValue(o.getValue());
+        this.setIncrement(o.getIncrement());
+        this.setIncrementType(o.getIncrementType());
+        this.setModifierIndex(o.getModifierIndex());
+        return true;
     }
 
 

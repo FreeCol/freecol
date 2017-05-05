@@ -237,10 +237,10 @@ public class ServerGame extends Game implements TurnTaker {
      * @return A unique identifier.
      */
     @Override
-    public String getNextId() {
-        String id = Integer.toString(nextId);
-        nextId++;
-        return id;
+    public int getNextId() {
+        int ret = this.nextId;
+        this.nextId++;
+        return ret;
     }
 
     /**
@@ -476,7 +476,7 @@ public class ServerGame extends Game implements TurnTaker {
         
         // Check trade carefully before committing.
         boolean fail = false;
-        for (TradeItem tradeItem : agreement.getTradeItems()) {
+        for (TradeItem tradeItem : agreement.getItems()) {
             final ServerPlayer source = (ServerPlayer)tradeItem.getSource();
             final ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
             if (!tradeItem.isValid()) {
@@ -545,7 +545,7 @@ public class ServerGame extends Game implements TurnTaker {
         }
         if (fail) return false;
 
-        for (TradeItem tradeItem : agreement.getTradeItems()) {
+        for (TradeItem tradeItem : agreement.getItems()) {
             final ServerPlayer source = (ServerPlayer)tradeItem.getSource();
             final ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
             // Collect changes for updating.  Not very OO but

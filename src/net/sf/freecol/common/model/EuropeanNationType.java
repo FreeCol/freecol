@@ -62,34 +62,24 @@ public class EuropeanNationType extends NationType {
 
 
     /**
-     * Is this a REF nation type?
+     * Get the starting unit map.
      *
-     * @return True if this is a REF nation type.
+     * @return The map of national starting units by difficulty.
      */
-    @Override
-    public final boolean isREF() {
-        return ref;
+    protected Map<String, Map<String, AbstractUnit>> getStartingUnitMap() {
+        return this.startingUnitMap;
     }
 
     /**
-     * Is this a European nation type?
+     * Set the starting unit map.
      *
-     * @return True.
+     * @param startingUnitMap The new map of national starting units.
      */
-    @Override
-    public boolean isEuropean() {
-        return true;
+    protected void setStartingUnitMap(Map<String, Map<String, AbstractUnit>> startingUnitMap) {
+        this.startingUnitMap.clear();
+        this.startingUnitMap.putAll(startingUnitMap);
     }
 
-    /**
-     * Is this a native nation type?
-     *
-     * @return False.
-     */
-    @Override
-    public boolean isIndian() {
-        return false;
-    }
 
     /**
      * Gets the starting units for this nation type.
@@ -136,6 +126,54 @@ public class EuropeanNationType extends NationType {
             startingUnitMap.put(exTag, units);
         }
         units.put(id, unit);
+    }
+
+
+    // Override NationType
+
+    /**
+     * Is this a REF nation type?
+     *
+     * @return True if this is a REF nation type.
+     */
+    @Override
+    public final boolean isREF() {
+        return ref;
+    }
+
+    /**
+     * Is this a European nation type?
+     *
+     * @return True.
+     */
+    @Override
+    public boolean isEuropean() {
+        return true;
+    }
+
+    /**
+     * Is this a native nation type?
+     *
+     * @return False.
+     */
+    @Override
+    public boolean isIndian() {
+        return false;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        EuropeanNationType o = copyInCast(other, EuropeanNationType.class);
+        if (o == null) return false;
+        super.copyIn(o);
+        this.setStartingUnitMap(o.getStartingUnitMap());
+        return true;
     }
 
 
