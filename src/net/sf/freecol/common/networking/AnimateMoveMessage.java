@@ -81,7 +81,7 @@ public class AnimateMoveMessage extends ObjectMessage {
         super(TAG, NEW_TILE_TAG, getStringAttribute(element, NEW_TILE_TAG),
               OLD_TILE_TAG, getStringAttribute(element, OLD_TILE_TAG),
               UNIT_TAG, getStringAttribute(element, UNIT_TAG));
-        this.unit = getChild(game, element, 0, true, Unit.class);
+        this.unit = getChild(game, element, 0, false, Unit.class);
     }
 
     /**
@@ -136,14 +136,26 @@ public class AnimateMoveMessage extends ObjectMessage {
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
         final Player player = freeColClient.getMyPlayer();
-        final Unit unit = getUnit(game);
         final Tile oldTile = getOldTile(game);
         final Tile newTile = getNewTile(game);
+        Unit unit = getUnit(game);
 
         if (unit == null) {
-            logger.warning("Animation for: " + player.getId()
-                + " missing Unit.");
-            return;
+            String uid = getStringAttribute(UNIT_TAG);
+            if (this.unit == null) {
+                logger.warning("Move animation for: " + player.getId()
+                    + " missing unit with identifier: " + uid);
+                return;
+            }
+            unit = this.unit;
+            if (!unit.getId().equals(uid)) { // actually on carrier
+                unit = unit.getCarriedUnitById(uid);
+                if (unit == null) {
+                    logger.warning("Move animation for: " + player.getId()
+                        + " missing moving unit with identifier: " + uid);
+                    return;
+                }
+            }
         }
         if (oldTile == null) {
             logger.warning("Animation for: " + player.getId()
