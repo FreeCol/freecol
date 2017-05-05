@@ -2524,14 +2524,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 xw.writeAttribute(COPIED_TAG, t != this);
                 if (t != this) {
                     // Only write copied tiles, with limited scope.
-                    FreeColXMLWriter.WriteScope scope = xw.getWriteScope();
+                    FreeColXMLWriter.WriteScope ws
+                        = xw.replaceScope(FreeColXMLWriter.WriteScope.toClient(p));
                     try {
-                        xw.setWriteScope(FreeColXMLWriter.WriteScope.toClient(p));
                         // Do not call toXML!  It will look for a cached tile
                         // inside t which is already a cached copy!
                         t.internalToXML(xw, TAG);
                     } finally {
-                        xw.setWriteScope(scope);
+                        xw.replaceScope(ws);
                     }
                 }
 

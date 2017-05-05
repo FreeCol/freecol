@@ -238,6 +238,18 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     /**
+     * Replace the scope.
+     *
+     * @param newWriteScope The {@code WriteScope} to push.
+     * @return The previous {@code WriteScope}.
+     */
+    public WriteScope replaceScope(WriteScope newWriteScope) {
+        WriteScope ret = this.writeScope;
+        this.writeScope = newWriteScope;
+        return ret;
+    }
+
+    /**
      * Closes both the {@code XMLStreamWriter} and
      * the underlying stream if any.
      *

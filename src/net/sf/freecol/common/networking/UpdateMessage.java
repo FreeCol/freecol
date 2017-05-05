@@ -207,20 +207,22 @@ public class UpdateMessage extends ObjectMessage {
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         WriteScope ws = null;
         if (this.destination != null) {
-            ws = xw.getWriteScope();
-            xw.setWriteScope(WriteScope.toClient(this.destination));
+            ws = xw.replaceScope(WriteScope.toClient(this.destination));
         }
-        final int n = this.fcgos.size();
-        for (int i = 0; i < n; i++) {
-            FreeColGameObject fcgo = this.fcgos.get(i);
-            List<String> parts = this.fields.get(i);
-            if (parts == null) {
-                fcgo.toXML(xw);
-            } else {
-                fcgo.toXMLPartial(xw, parts);
+        try {
+            final int n = this.fcgos.size();
+            for (int i = 0; i < n; i++) {
+                FreeColGameObject fcgo = this.fcgos.get(i);
+                List<String> parts = this.fields.get(i);
+                if (parts == null) {
+                    fcgo.toXML(xw);
+                } else {
+                    fcgo.toXMLPartial(xw, parts);
+                }
             }
+        } finally {
+            if (ws != null) xw.replaceScope(ws);
         }
-        if (ws != null) xw.setWriteScope(ws);
     }
 
     /**

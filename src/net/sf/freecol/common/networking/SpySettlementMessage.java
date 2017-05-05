@@ -178,10 +178,12 @@ public class SpySettlementMessage extends ObjectMessage {
     @Override
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         if (this.spyTile != null) {
-            WriteScope ws = xw.getWriteScope();
-            xw.setWriteScope(WriteScope.toServer());
-            this.spyTile.toXML(xw);
-            xw.setWriteScope(ws);
+            WriteScope ws = xw.replaceScope(WriteScope.toServer());
+            try {
+                this.spyTile.toXML(xw);
+            } finally {
+                xw.replaceScope(ws);
+            }
         }
     }
 
