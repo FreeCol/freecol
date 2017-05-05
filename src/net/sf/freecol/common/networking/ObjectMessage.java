@@ -79,7 +79,7 @@ public class ObjectMessage extends AttributeMessage {
     public ObjectMessage(Game game, Element element) {
         this(element.getTagName());
 
-        this.objects.addAll(DOMUtils.getChildren(game, element));
+        this.objects.addAll(DOMUtils.getChildren(game, element, true));
     }
 
     /**

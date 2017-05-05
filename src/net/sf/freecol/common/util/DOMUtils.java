@@ -436,12 +436,15 @@ public class DOMUtils {
      * @param <T> The actual list member return type.
      * @param game The {@code Game} to instantiate within.
      * @param element The parent {@code Element}.
+     * @param intern Whether to intern instantiated objects.
      * @return A list of new instances of the return class.
      */
-    public static List<FreeColObject> getChildren(Game game, Element element) {
+    public static List<FreeColObject> getChildren(Game game, Element element,
+                                                  boolean intern) {
         List<FreeColObject> ret = new ArrayList<>();
         for (Element e : getChildElementList(element)) {
-            FreeColObject fco = readElement(game, e, true);
+            FreeColObject fco = readElement(game, e,
+                intern || e.hasAttribute(FreeColObject.PARTIAL_ATTRIBUTE_TAG));
             if (fco != null) ret.add(fco);
         }
         return ret;

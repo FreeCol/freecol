@@ -83,7 +83,7 @@ public class FeatureChangeMessage extends ObjectMessage {
               ADD_TAG, getStringAttribute(element, ADD_TAG));
 
         this.fcos.clear();
-        this.fcos.addAll(DOMUtils.getChildren(game, element));
+        this.fcos.addAll(DOMUtils.getChildren(game, element, true));
     }
 
     /**

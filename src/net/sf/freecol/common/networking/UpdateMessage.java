@@ -122,7 +122,7 @@ public class UpdateMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateMessage(Game game, Element element) {
-        this((ServerPlayer)null, DOMUtils.getChildren(game, element));
+        this((ServerPlayer)null, DOMUtils.getChildren(game, element, true));
     }
 
     /**
