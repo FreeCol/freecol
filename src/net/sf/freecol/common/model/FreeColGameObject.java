@@ -124,6 +124,13 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
+     * Intern this object.
+     */
+    public void intern() {
+        internId(getId());
+    }
+        
+    /**
      * Has this object been initialized?
      *
      * @return True if this object is initialized.

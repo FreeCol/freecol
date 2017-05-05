@@ -103,8 +103,8 @@ public class AnimateAttackMessage extends ObjectMessage {
         // Not necessarily correct, but we are using interning reads
         // to whatever is here will go into the client game, and then
         // getAttacker/Defender will work as they use the correct identifiers.
-        this.attacker = getChild(game, element, 0, true, Unit.class);
-        this.defender = getChild(game, element, 1, true, Unit.class);
+        this.attacker = getChild(game, element, 0, false, Unit.class);
+        this.defender = getChild(game, element, 1, false, Unit.class);
     }
 
     /**
@@ -162,19 +162,47 @@ public class AnimateAttackMessage extends ObjectMessage {
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
         final Player player = freeColClient.getMyPlayer();
-        final Unit attacker = getAttacker(game);
-        final Unit defender = getDefender(game);
         final Tile attackerTile = getAttackerTile(game);
         final Tile defenderTile = getDefenderTile(game);
         final boolean result = getResult();
+        Unit attacker = getAttacker(game);
+        Unit defender = getDefender(game);
 
         if (attacker == null) {
-            logger.warning("Attack animation for: " + player.getId()
-                + " missing attacker.");
+            if (this.attacker == null) {
+                logger.warning("Attack animation for: " + player.getId()
+                    + " missing attacker.");
+                return;
+            }
+            attacker = this.attacker;
+            attacker.intern();
+            String att = getStringAttribute(ATTACKER_TAG);
+            if (!attacker.getId().equals(att)) { // actually on carrier
+                attacker = attacker.getCarriedUnitById(att);
+                if (attacker == null) {
+                    logger.warning("Attack animation for: " + player.getId()
+                        + " missing attacker with identifier: " + att);
+                    return;
+                }
+            }
         }
         if (defender == null) {
-            logger.warning("Attack animation for: " + player.getId()
-                + " omitted defender.");
+            if (this.defender == null) {
+                logger.warning("Attack animation for: " + player.getId()
+                    + " omitted defender.");
+                return;
+            }
+            defender = this.defender;
+            defender.intern();
+            String def = getStringAttribute(DEFENDER_TAG);
+            if (!defender.getId().equals(def)) { // actually on carrier
+                defender = defender.getCarriedUnitById(def);
+                if (defender == null) {
+                    logger.warning("Attack animation for: " + player.getId()
+                        + " missing defender with identifier: " + def);
+                    return;
+                }
+            }                
         }
         if (attackerTile == null) {
             logger.warning("Attack animation for: " + player.getId()

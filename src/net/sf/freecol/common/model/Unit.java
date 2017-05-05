@@ -1075,6 +1075,20 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get a carried unit by identifier.
+     *
+     * @param id The identifier of the carried unit.
+     * @return The {@code Unit} found, or null if not present.
+     */
+    public Unit getCarriedUnitById(String id) {
+        if (id == null) return null;
+        for (Unit u : getUnitList()) {
+            if (id.equals(u.getId())) return u;
+        }
+        return null;
+    }
+
+    /**
      * Sets the moves left this turn.
      *
      * @param moves The new amount of moves left this {@code Unit}
