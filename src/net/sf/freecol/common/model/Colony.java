@@ -57,6 +57,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
+    /** Class index for colonies. */
+    private static final int COLONY_CLASS_INDEX = 20;
+
     public static final String TAG = "colony";
 
     public static final String REARRANGE_COLONY = "rearrangeColony";
@@ -66,11 +69,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
     /** The number of turns of advanced warning of starvation. */
     public static final int FAMINE_TURNS = 3;
-
-    /**
-     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
-     */
-    protected int classindex = 20;
 
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,
@@ -2864,6 +2862,17 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         int result = super.checkIntegrity(fix, lb);
 
         return Math.min(result, checkBuildQueueIntegrity(fix, lb));
+    }
+
+
+    // Override FreeColObject
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getClassIndex () {
+        return COLONY_CLASS_INDEX;
     }
 
 

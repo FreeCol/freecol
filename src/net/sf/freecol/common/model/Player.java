@@ -65,12 +65,10 @@ public class Player extends FreeColGameObject implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
+    /** Class index for a player. */
+    private static final int PLAYER_CLASS_INDEX = 10;
+    
     public static final String TAG = "player";
-
-    /**
-     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
-     */
-    protected int classindex = 10;
 
     //
     // Types
@@ -3779,6 +3777,14 @@ public class Player extends FreeColGameObject implements Nameable {
     @Override
     public final FeatureContainer getFeatureContainer() {
         return featureContainer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getClassIndex () {
+        return PLAYER_CLASS_INDEX;
     }
 
 

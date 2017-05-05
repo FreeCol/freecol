@@ -71,22 +71,12 @@ public abstract class FreeColObject
                 }
             };
 
+
     public static final int INFINITY = Integer.MAX_VALUE;
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
-    /**
-     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
-     */
-    protected int classindex = 1000;
-
-    /**
-     * Public assessor for {@code classindex} field
-     *
-     * @return The integer.
-     */
-    public int getClassIndex () {
-        return this.classindex;
-    }
+    /** Fallback class index. */
+    protected static final int DEFAULT_CLASS_INDEX = 1000;
 
 
     /** The identifier of an object. */
@@ -232,6 +222,16 @@ public abstract class FreeColObject
         int cmp = fco1.getIdType().compareTo(fco2.getIdType());
         return (cmp > 0) ? 1 : (cmp < 0) ? -1
             : Utils.compareTo(fco1.getIdNumber(), fco2.getIdNumber());
+    }
+
+    /**
+     * Accessor for the class index.
+     *
+     * @return The class index used by
+     *      {@link net.sf.freecol.client.ClientOptions}.
+     */
+    public int getClassIndex () {
+        return DEFAULT_CLASS_INDEX;
     }
 
 

@@ -62,6 +62,9 @@ public class Unit extends GoodsLocation
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
+    /** Class index for units. */
+    private static final int UNIT_CLASS_INDEX = 40;
+
     public static final String TAG = "unit";
 
     /**
@@ -73,11 +76,6 @@ public class Unit extends GoodsLocation
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
     public static final String MOVE_CHANGE = "MOVE_CHANGE";
     public static final String ROLE_CHANGE = "ROLE_CHANGE";
-
-    /**
-     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
-     */
-    protected int classindex = 40;
 
     /** Compare units by location. */
     public static final Comparator<Unit> locComparator
@@ -4270,6 +4268,14 @@ public class Unit extends GoodsLocation
                       owner.getModifiers(id, fcgot, turn),
                       // Role modifiers apply.
                       role.getModifiers(id, fcgot, turn));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getClassIndex () {
+        return UNIT_CLASS_INDEX;
     }
 
 

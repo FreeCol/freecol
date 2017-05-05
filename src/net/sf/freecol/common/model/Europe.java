@@ -53,6 +53,9 @@ public class Europe extends UnitLocation
 
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
+    /** Class index for Europe. */
+    private static final int EUROPE_CLASS_INDEX = 30;
+
     public static final String TAG = "europe";
 
     /** The initial recruit price. */
@@ -65,11 +68,6 @@ public class Europe extends UnitLocation
 
     public static final Ability ABILITY_DRESS_MISSIONARY
         = new Ability(Ability.DRESS_MISSIONARY, true);
-
-    /**
-     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
-     */
-    protected int classindex = 30;
 
     /**
      * Migration handling.
@@ -516,6 +514,14 @@ public class Europe extends UnitLocation
             ((id == null || Ability.DRESS_MISSIONARY.equals(id))
                 ? Stream.of(ABILITY_DRESS_MISSIONARY)
                 : Stream.<Ability>empty()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getClassIndex () {
+        return EUROPE_CLASS_INDEX;
     }
 
 

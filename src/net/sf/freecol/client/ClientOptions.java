@@ -490,17 +490,16 @@ public class ClientOptions extends OptionGroup {
         }
 
         /**
-         * Determine the {@link FreeColObject#classindex} of a given {@code FreeColObject}
+         * Determine the class index of an object.
          *
          * @param object The object to check
-         * @return The object's classindex or 1000, if object is not a part of FreeCol
+         * @return The object's class index or the default if the
+         *     object is not a {@code FreeColObject}.
          */
         private int getClassIndex(Object object) {
-            if (object instanceof FreeColObject) {
-                return ((FreeColObject) object).getClassIndex();
-            } else {
-                return 1000;
-            }
+            return (object instanceof FreeColObject)
+                ? ((FreeColObject)object).getClassIndex()
+                : FreeColObject.DEFAULT_CLASS_INDEX;
         }
     }
 

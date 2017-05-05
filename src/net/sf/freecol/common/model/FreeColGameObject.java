@@ -46,6 +46,9 @@ public abstract class FreeColGameObject extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(FreeColGameObject.class.getName());
 
+    /** Default class index for FreeColGameObjects. */
+    private static final int FREECOL_GAME_OBJECT_CLASS_INDEX = 50;
+
     /** The game this object belongs to. */
     private Game game;
 
@@ -54,11 +57,6 @@ public abstract class FreeColGameObject extends FreeColObject {
 
     /** Has this object been initialized? */
     protected boolean initialized;
-
-    /**
-     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
-     */
-    protected int classindex = 50;
 
 
     /**
@@ -272,6 +270,14 @@ public abstract class FreeColGameObject extends FreeColObject {
     public void setGame(Game game) {
         if (game == null) throw new RuntimeException("Null game");
         this.game = game;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getClassIndex () {
+        return FREECOL_GAME_OBJECT_CLASS_INDEX;
     }
 
 
