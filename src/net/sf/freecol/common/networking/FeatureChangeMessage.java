@@ -52,8 +52,6 @@ public class FeatureChangeMessage extends ObjectMessage {
     private static final String ADD_TAG = "add";
     private static final String ID_TAG = FreeColObject.ID_ATTRIBUTE_TAG;
 
-    private final List<FreeColObject> fcos = new ArrayList<>();
-
 
     /**
      * Create a new {@code FeatureChangeMessage} for the game object
@@ -68,7 +66,7 @@ public class FeatureChangeMessage extends ObjectMessage {
         super(TAG, ID_TAG, fcgo.getId(),
               ADD_TAG, String.valueOf(add));
 
-        this.fcos.add(fco);
+        add1(fco);
     }
 
     /**
@@ -82,8 +80,7 @@ public class FeatureChangeMessage extends ObjectMessage {
         super(TAG, ID_TAG, getStringAttribute(element, ID_TAG),
               ADD_TAG, getStringAttribute(element, ADD_TAG));
 
-        this.fcos.clear();
-        this.fcos.addAll(DOMUtils.getChildren(game, element, true));
+        addAll(DOMUtils.getChildren(game, element, true));
     }
 
     /**
@@ -97,29 +94,53 @@ public class FeatureChangeMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, ID_TAG, ADD_TAG);
 
-        this.fcos.clear();
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            FreeColObject fco = null;
-            if (Ability.TAG.equals(tag)) {
-                fco = xr.readFreeColObject(game, Ability.class);
-            } else if (Modifier.TAG.equals(tag)) {
-                fco = xr.readFreeColObject(game, Modifier.class);
-            } else if (HistoryEvent.TAG.equals(tag)) {
-                fco = xr.readFreeColObject(game, HistoryEvent.class);
-            } else if (LastSale.TAG.equals(tag)) {
-                fco = xr.readFreeColObject(game, LastSale.class);
-            } else if (ModelMessage.TAG.equals(tag)) {
-                fco = xr.readFreeColObject(game, ModelMessage.class);
-            } else {
-                expected("Feature", tag);
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                FreeColObject fco = null;
+                if (Ability.TAG.equals(tag)) {
+                    fco = xr.readFreeColObject(game, Ability.class);
+                } else if (Modifier.TAG.equals(tag)) {
+                    fco = xr.readFreeColObject(game, Modifier.class);
+                } else if (HistoryEvent.TAG.equals(tag)) {
+                    fco = xr.readFreeColObject(game, HistoryEvent.class);
+                } else if (LastSale.TAG.equals(tag)) {
+                    fco = xr.readFreeColObject(game, LastSale.class);
+                } else if (ModelMessage.TAG.equals(tag)) {
+                    fco = xr.readFreeColObject(game, ModelMessage.class);
+                } else {
+                    expected("Feature", tag);
+                }
+                add1(fco);
+                xr.expectTag(tag);
             }
-            this.fcos.add(fco);
-            xr.expectTag(tag);
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
     }
 
+
+    /**
+     * Get the parent object to add/remove to.
+     *
+     * @param game The {@code Game} to look in.
+     * @return The parent {@code FreeColGameObject}.
+     */
+    private FreeColGameObject getParent(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(ID_TAG));
+    }
+
+    /**
+     * Get the add/remove state.
+     *
+     * @return True if the child object should be added to the parent.
+     */
+    private boolean getAdd() {
+        return getBooleanAttribute(ADD_TAG, false);
+    }
 
     /**
      * {@inheritDoc}
@@ -157,55 +178,5 @@ public class FeatureChangeMessage extends ObjectMessage {
         }
 
         igc(freeColClient).featureChangeHandler(parent, children, add);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        for (FreeColObject fco : this.fcos) fco.toXML(xw);
-    }
-        
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            ID_TAG, getStringAttribute(ID_TAG),
-            ADD_TAG, getStringAttribute(ADD_TAG))
-            .add(this.fcos).toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Get the parent object to add/remove to.
-     *
-     * @param game The {@code Game} to look in.
-     * @return The parent {@code FreeColGameObject}.
-     */
-    public FreeColGameObject getParent(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(ID_TAG));
-    }
-
-    /**
-     * Get the child object to add/remove.
-     *
-     * @return The child {@code FreeColObject}.
-     */
-    public List<FreeColObject> getChildren() {
-        return this.fcos;
-    }
-
-    /**
-     * Get the add/remove state.
-     *
-     * @return True if the child object should be added to the parent.
-     */
-    public boolean getAdd() {
-        return getBooleanAttribute(ADD_TAG, false);
     }
 }
