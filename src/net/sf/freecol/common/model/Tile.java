@@ -2624,31 +2624,34 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             boolean copied = xr.getAttribute(COPIED_TAG, false);
 
             if (copied) { // Tile needs to be read
-                FreeColXMLReader.ReadScope scope = xr.getReadScope();
-                xr.setReadScope(FreeColXMLReader.ReadScope.NOINTERN);
-                xr.nextTag();
-                xr.expectTag(Tile.TAG);
-                Tile tile = xr.readFreeColObject(game, Tile.class);
+                FreeColXMLReader.ReadScope rs
+                    = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+                try {
+                    xr.nextTag();
+                    xr.expectTag(Tile.TAG);
+                    Tile tile = xr.readFreeColObject(game, Tile.class);
 
-                // Temporary workaround for BR#2618 on input
-                Colony colony = tile.getColony();
-                if (colony != null && colony.getDisplayUnitCount() <= 0) {
-                    logger.warning("Copied colony " + colony.getId()
-                        + " display unit count set to 1 from corrupt: "
-                        + colony.getDisplayUnitCount());
-                    colony.setDisplayUnitCount(1);
-                }
-                // end workaround
+                    // Temporary workaround for BR#2618 on input
+                    Colony colony = tile.getColony();
+                    if (colony != null && colony.getDisplayUnitCount() <= 0) {
+                        logger.warning("Copied colony " + colony.getId()
+                            + " display unit count set to 1 from corrupt: "
+                            + colony.getDisplayUnitCount());
+                        colony.setDisplayUnitCount(1);
+                    }
+                    // end workaround
 
-                IndianSettlement is = tile.getIndianSettlement();
-                if (is == null) {
-                    removeIndianSettlementInternals(player);
-                } else {
-                    setIndianSettlementInternals(player,
-                        is.getLearnableSkill(), is.getWantedGoods());
+                    IndianSettlement is = tile.getIndianSettlement();
+                    if (is == null) {
+                        removeIndianSettlementInternals(player);
+                    } else {
+                        setIndianSettlementInternals(player,
+                            is.getLearnableSkill(), is.getWantedGoods());
+                    }
+                    setCachedTile(player, tile);
+                } finally {
+                    xr.replaceScope(rs);
                 }
-                setCachedTile(player, tile);
-                xr.setReadScope(scope);
             } else {
                 setCachedTile(player, this);
             }

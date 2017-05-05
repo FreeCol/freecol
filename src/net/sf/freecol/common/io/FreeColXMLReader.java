@@ -196,6 +196,18 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
+     * Replace a the scope.
+     *
+     * @param newReadScope The {@code ReadScope} to push.
+     * @return The previous {@code ReadScope}.
+     */
+    public ReadScope replaceScope(ReadScope newReadScope) {
+        ReadScope ret = this.readScope;
+        this.readScope = newReadScope;
+        return ret;
+    }
+
+    /**
      * Look up an identifier in an enclosing game.  If not interning
      * prefer an non-interned result.
      *
