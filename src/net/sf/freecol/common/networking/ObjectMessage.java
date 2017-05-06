@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -123,7 +125,9 @@ public abstract class ObjectMessage extends AttributeMessage {
      */
     @Override
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        for (FreeColObject fco : getChildren()) fco.toXML(xw);
+        for (FreeColObject fco : getChildren()) {
+            if (fco != null) fco.toXML(xw);
+        }
     }
 
     /**
@@ -135,6 +139,38 @@ public abstract class ObjectMessage extends AttributeMessage {
                                       getChildren());
     }
 
+
+    /**
+     * Get a child object.
+     *
+     * @param T The actual class of {@code FreeColObject} to get.
+     * @param index The index of the child to get.
+     * @param returnClass The expected class of child.
+     * @return The child object found, or null if the index is invalid or
+     *     return class incorrect.
+     */
+    protected <T extends FreeColObject> T getChild(int index,
+                                                   Class<T> returnClass) {
+        if (index >= this.objects.size()) return (T)null;
+        FreeColObject fco = this.objects.get(index);
+        try {
+            return returnClass.cast(fco);
+        } catch (ClassCastException cce) {
+            logger.log(Level.WARNING, "Cast fail", cce);
+            return null;
+        }
+    }
+
+    /**
+     * Set a child object.
+     *
+     * @param T The actual class of {@code FreeColObject} to set.
+     * @param index The index of the child to set.
+     * @param fco The new child object.
+     */
+    protected <T extends FreeColObject> void setChild(int index, T fco) {
+        if (index < this.objects.size()) this.objects.set(index, fco);
+    }
 
     /**
      * Add another child object.

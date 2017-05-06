@@ -289,6 +289,7 @@ public class DOMUtils {
         Document doc = createDocument(tag, map);
         Element root = doc.getDocumentElement();
         for (FreeColObject fco : objects) {
+            if (fco == null) continue;
             root.appendChild(doc.importNode(toXMLElement(fco,doc,(Player)null),
                                             true));
         }
