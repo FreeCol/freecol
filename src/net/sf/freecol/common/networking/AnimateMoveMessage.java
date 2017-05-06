@@ -47,12 +47,6 @@ public class AnimateMoveMessage extends ObjectMessage {
     private static final String OLD_TILE_TAG = "oldTile";
     private static final String UNIT_TAG = "unit";
 
-    /**
-     * The unit to move *if* it is not currently visible, or its carrier
-     * if on a carrier.
-     */
-    private Unit unit = null;
-
 
     /**
      * Create a new {@code AnimateMoveMessage} for the supplied unit and
@@ -65,8 +59,9 @@ public class AnimateMoveMessage extends ObjectMessage {
                               boolean appears) {
         super(TAG, UNIT_TAG, unit.getId(),
               NEW_TILE_TAG, newTile.getId(), OLD_TILE_TAG, oldTile.getId());
+
         if (appears) {
-            this.unit = (unit.isOnCarrier()) ? unit.getCarrier() : unit;
+            add1((unit.isOnCarrier()) ? unit.getCarrier() : unit);
         }
     }
 
@@ -81,7 +76,9 @@ public class AnimateMoveMessage extends ObjectMessage {
         super(TAG, NEW_TILE_TAG, getStringAttribute(element, NEW_TILE_TAG),
               OLD_TILE_TAG, getStringAttribute(element, OLD_TILE_TAG),
               UNIT_TAG, getStringAttribute(element, UNIT_TAG));
-        this.unit = getChild(game, element, 0, false, Unit.class);
+
+        Unit u = getChild(game, element, 0, false, Unit.class);
+        if (u != null) add1(u);
     }
 
     /**
@@ -95,23 +92,75 @@ public class AnimateMoveMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, NEW_TILE_TAG, OLD_TILE_TAG, UNIT_TAG);
 
-        this.unit = null;
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            if (Unit.TAG.equals(tag)) {
-                if (this.unit == null) {
-                    this.unit = xr.readFreeColObject(game, Unit.class);
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        Unit unit = null;
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (Unit.TAG.equals(tag)) {
+                    if (unit == null) {
+                        unit = xr.readFreeColObject(game, Unit.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
                 } else {
-                    expected(TAG, tag);
+                    expected(Unit.TAG, tag);
                 }
-            } else {
-                expected(Unit.TAG, tag);
+                xr.expectTag(tag);
             }
-            xr.expectTag(tag);
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
+        if (unit != null) add1(unit);
     }
 
+
+    /**
+     * Get the unit that is moving.
+     *
+     * @return The {@code Unit} that moves.
+     */
+    private Unit getUnit(Game game) {
+        final String uid = getStringAttribute(UNIT_TAG);
+        Unit unit = game.getFreeColGameObject(uid, Unit.class);
+        if (unit == null) {
+            if ((unit = getChild(0, Unit.class)) == null) {
+                logger.warning("Move animation missing unit: " + uid);
+            } else {
+                unit.intern();
+                if (!unit.getId().equals(uid)) { // actually on carrier
+                    unit = unit.getCarriedUnitById(uid);
+                    if (unit == null) {
+                        logger.warning("Move animation missing carried unit: "
+                            + uid);
+                    }
+                }
+            }
+        }
+        return unit;
+    }
+
+    /**
+     * Get the tile to move to.
+     *
+     * @return The new {@code Tile}.
+     */
+    private Tile getNewTile(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(NEW_TILE_TAG),
+                                         Tile.class);
+    }
+
+    /**
+     * Get the tile to move from.
+     *
+     * @return The old {@code Tile}.
+     */
+    private Tile getOldTile(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(OLD_TILE_TAG),
+                                         Tile.class);
+    }
 
     /**
      * {@inheritDoc}
@@ -138,25 +187,9 @@ public class AnimateMoveMessage extends ObjectMessage {
         final Player player = freeColClient.getMyPlayer();
         final Tile oldTile = getOldTile(game);
         final Tile newTile = getNewTile(game);
-        Unit unit = getUnit(game);
+        final Unit unit = getUnit(game);
 
-        if (unit == null) {
-            String uid = getStringAttribute(UNIT_TAG);
-            if (this.unit == null) {
-                logger.warning("Move animation for: " + player.getId()
-                    + " missing unit with identifier: " + uid);
-                return;
-            }
-            unit = this.unit;
-            if (!unit.getId().equals(uid)) { // actually on carrier
-                unit = unit.getCarriedUnitById(uid);
-                if (unit == null) {
-                    logger.warning("Move animation for: " + player.getId()
-                        + " missing moving unit with identifier: " + uid);
-                    return;
-                }
-            }
-        }
+        if (unit == null) return;
         if (oldTile == null) {
             logger.warning("Animation for: " + player.getId()
                 + " missing old Tile.");
@@ -171,58 +204,5 @@ public class AnimateMoveMessage extends ObjectMessage {
         // This only performs animation, if required.  It does not
         // actually change unit positions, which happens in an "update".
         igc(freeColClient).animateMoveHandler(unit, oldTile, newTile);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.unit != null) this.unit.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            NEW_TILE_TAG, getStringAttribute(NEW_TILE_TAG),
-            OLD_TILE_TAG, getStringAttribute(OLD_TILE_TAG),
-            UNIT_TAG, getStringAttribute(UNIT_TAG))
-            .add(this.unit).toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Get the unit that is moving.
-     *
-     * @return The {@code Unit} that moves.
-     */
-    public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(UNIT_TAG),
-                                         Unit.class);
-    }
-
-    /**
-     * Get the tile to move to.
-     *
-     * @return The new {@code Tile}.
-     */
-    public Tile getNewTile(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(NEW_TILE_TAG),
-                                         Tile.class);
-    }
-
-    /**
-     * Get the tile to move from.
-     *
-     * @return The old {@code Tile}.
-     */
-    public Tile getOldTile(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(OLD_TILE_TAG),
-                                         Tile.class);
     }
 }
