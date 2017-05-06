@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ import org.w3c.dom.Element;
 /**
  * The basic message with optional objects.
  */
-public class ObjectMessage extends AttributeMessage {
+public abstract class ObjectMessage extends AttributeMessage {
 
     /** The attached FreeColObjects. */
     private final List<FreeColObject> objects = new ArrayList<>();
@@ -79,7 +80,8 @@ public class ObjectMessage extends AttributeMessage {
     public ObjectMessage(Game game, Element element) {
         this(element.getTagName());
 
-        this.objects.addAll(DOMUtils.getChildren(game, element, true));
+        // Do not read the element structure, the subclasses must do that
+        // because they define whether to use interning reads or not.
     }
 
     /**
@@ -120,11 +122,39 @@ public class ObjectMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        for (FreeColObject fco : getChildren()) fco.toXML(xw);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Element toXMLElement() {
         return DOMUtils.createElement(getType(), getStringAttributes(),
                                       getChildren());
     }
 
+
+    /**
+     * Add another child object.
+     *
+     * @param T The actual class of {@code FreeColObject} to add.
+     * @param fco The {@code FreeColObject} to add.
+     */
+    protected <T extends FreeColObject> void add1(T fco) {
+        this.objects.add(fco);
+    }
+
+    /**
+     * Add many child objects.
+     *
+     * @param T The actual class of {@code FreeColObject} to add.
+     * @param fcos A collection of {@code FreeColObject}s to add.
+     */
+    protected <T extends FreeColObject> void addAll(Collection<T> fcos) {
+        this.objects.addAll(fcos);
+    }
 
     /**
      * Complain about finding the wrong XML element.

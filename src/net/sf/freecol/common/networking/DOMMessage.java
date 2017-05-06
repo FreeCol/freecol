@@ -124,35 +124,35 @@ public class DOMMessage extends Message {
         return this.document.getDocumentElement();
     }
 
-    public DOMMessage add(Element e) {
+    protected DOMMessage add(Element e) {
         if (e != null) getElement().appendChild(this.document.importNode(e, true));
         return this;
     }
-    public DOMMessage add(FreeColObject fco) {
+    protected DOMMessage add(FreeColObject fco) {
         if (fco != null) add(DOMUtils.toXMLElement(fco, this.document, (Player)null));
         return this;
     }
-    public DOMMessage add(FreeColObject fco, List<String> fields) {
+    protected DOMMessage add(FreeColObject fco, List<String> fields) {
         if (fco != null) add(DOMUtils.toXMLElementPartial(fco, this.document, fields));
         return this;
     }
-    public DOMMessage add(FreeColObject fco, Player player) {
+    protected DOMMessage add(FreeColObject fco, Player player) {
         if (fco != null) add(DOMUtils.toXMLElement(fco, this.document, player));
         return this;
     }
-    public DOMMessage add(List<? extends FreeColObject> fcos) {
+    protected DOMMessage add(List<? extends FreeColObject> fcos) {
         if (fcos != null) for (FreeColObject fco : fcos) add(fco);
         return this;
     }
-    public DOMMessage add(List<? extends FreeColObject> fcos, Player player) {
+    protected DOMMessage add(List<? extends FreeColObject> fcos, Player player) {
         if (fcos != null) for (FreeColObject fco : fcos) add(fco, player);
         return this;
     }
-    public DOMMessage add(DOMMessage msg) {
+    protected DOMMessage add(DOMMessage msg) {
         if (msg != null) add(msg.toXMLElement());
         return this;
     }
-    public DOMMessage addMessages(List<DOMMessage> msgs) {
+    protected DOMMessage addMessages(List<DOMMessage> msgs) {
         if (msgs != null) for (DOMMessage msg : msgs) add(msg);
         return this;
     }
