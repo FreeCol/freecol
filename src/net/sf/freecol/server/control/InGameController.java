@@ -1832,10 +1832,11 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         TradeStatus status = agreement.getStatus();
         DiplomacySession session
-            = Session.lookup(DiplomacySession.class, ourUnit, otherColony);
+            = Session.lookup(DiplomacySession.class,
+                DiplomacySession.makeDiplomacySessionKey(ourUnit, otherColony));
         if (session == null) {
             if (status != TradeStatus.PROPOSE_TRADE) {
-                return serverPlayer.clientError("Mission uc-diplomacy session for "
+                return serverPlayer.clientError("Missing uc-diplomacy session for "
                     + ourUnit.getId() + "/" + otherColony.getId()
                     + " with " + agreement);
             }
@@ -1864,9 +1865,10 @@ public final class InGameController extends Controller {
                                Unit otherUnit, DiplomaticTrade agreement) {
         ChangeSet cs = new ChangeSet();
         DiplomacySession session
-            = Session.lookup(DiplomacySession.class, otherUnit, ourColony);
+            = Session.lookup(DiplomacySession.class,
+                DiplomacySession.makeDiplomacySessionKey(otherUnit, ourColony));
         if (session == null) {
-            return serverPlayer.clientError("Mission cu-diplomacy session for "
+            return serverPlayer.clientError("Missing cu-diplomacy session for "
                 + otherUnit.getId() + "/" + ourColony.getId()
                 + " with " + agreement);
         } else {

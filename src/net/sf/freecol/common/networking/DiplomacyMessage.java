@@ -49,12 +49,6 @@ public class DiplomacyMessage extends ObjectMessage {
     private static final String OTHER_ID_TAG = "otherId";
     private static final String OUR_ID_TAG = "ourId";
 
-    /** The agreement being negotiated. */
-    private DiplomaticTrade agreement = null;
-
-    /** An extra unit if needed (when a scout is on board a ship). */
-    private Unit extraUnit = null;
-
 
     /**
      * Create a new {@code DiplomacyMessage}.
@@ -67,8 +61,7 @@ public class DiplomacyMessage extends ObjectMessage {
                             DiplomaticTrade agreement) {
         super(TAG, OUR_ID_TAG, our.getId(), OTHER_ID_TAG, other.getId());
 
-        this.agreement = agreement;
-        this.extraUnit = null;
+        add1(agreement);
     }
 
     /**
@@ -119,8 +112,8 @@ public class DiplomacyMessage extends ObjectMessage {
         super(TAG, OUR_ID_TAG, getStringAttribute(element, OUR_ID_TAG),
               OTHER_ID_TAG, getStringAttribute(element, OTHER_ID_TAG));
 
-        this.agreement = getChild(game, element, 0, false, DiplomaticTrade.class);
-        this.extraUnit = getChild(game, element, 1, true, Unit.class);
+        add1(getChild(game, element, 0, false, DiplomaticTrade.class));
+        add1(getChild(game, element, 1, false, Unit.class));
     }
 
     /**
@@ -133,29 +126,89 @@ public class DiplomacyMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, OUR_ID_TAG, OTHER_ID_TAG);
 
-        this.agreement = null;
-        this.extraUnit = null;
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            if (DiplomaticTrade.TAG.equals(tag)) {
-                if (this.agreement == null) {
-                    this.agreement = xr.readFreeColObject(game, DiplomaticTrade.class);
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        DiplomaticTrade agreement = null;
+        Unit extraUnit = null;
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (DiplomaticTrade.TAG.equals(tag)) {
+                    if (agreement == null) {
+                        agreement = xr.readFreeColObject(game, DiplomaticTrade.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
+                } else if (Unit.TAG.equals(tag)) {
+                    if (extraUnit == null) {
+                        extraUnit = xr.readFreeColObject(game, Unit.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
                 } else {
-                    expected(TAG, tag);
+                    expected((agreement == null) ? DiplomaticTrade.TAG : Unit.TAG,
+                        tag);
                 }
-            } else if (Unit.TAG.equals(tag)) {
-                if (this.extraUnit == null) {
-                    this.extraUnit = xr.readFreeColObject(game, Unit.class);
-                } else {
-                    expected(TAG, tag);
-                }
-            } else {
-                expected((this.agreement == null) ? DiplomaticTrade.TAG : Unit.TAG, tag);
+                xr.expectTag(tag);
             }
-            xr.expectTag(tag);
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
+        add1(agreement);
+        add1(extraUnit);
     }
+
+
+    /**
+     * Get our FCGO.
+     *
+     * @param game The {@code Game} to extract the FCGO from.
+     * @return Our {@code FreeColGameObject}.
+     */
+    private FreeColGameObject getOurFCGO(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(OUR_ID_TAG));
+    }
+
+    /**
+     * Get the other FCGO.
+     *
+     * @param game The {@code Game} to extract the FCGO from.
+     * @return The other {@code FreeColGameObject}.
+     */
+    private FreeColGameObject getOtherFCGO(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(OTHER_ID_TAG));
+    }
+
+    /**
+     * Get the agreement (a {@code DiplomaticTrade}) in this message.
+     *
+     * @return The agreement in this message.
+     */
+    private DiplomaticTrade getAgreement() {
+        return getChild(0, DiplomaticTrade.class);
+    }
+
+    /**
+     * Set the agreement (a {@code DiplomaticTrade}) in this message.
+     *
+     * @param agreement The {@code DiplomaticTrade} to set.
+     * @return This message.
+     */
+    private DiplomacyMessage setAgreement(DiplomaticTrade agreement) {
+        setChild(0, agreement);
+        return this;
+    }
+
+    /**
+     * Get the extra {@code Unit}.
+     *
+     * @return The extra {@code Unit}, or null if none.
+     */
+    private Unit getExtraUnit() {
+        return getChild(1, Unit.class);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -187,7 +240,8 @@ public class DiplomacyMessage extends ObjectMessage {
         final DiplomaticTrade agreement = getAgreement();
         final FreeColGameObject our = getOurFCGO(game);
         final FreeColGameObject other = getOtherFCGO(game);
-
+        final Unit extraUnit = getExtraUnit();
+        
         if (our == null) {
             logger.warning("Our FCGO omitted from diplomacy message.");
             return;
@@ -196,6 +250,7 @@ public class DiplomacyMessage extends ObjectMessage {
             logger.warning("Other FCGO omitted from diplomacy message.");
             return;
         }
+        if (extraUnit != null) extraUnit.intern();
 
         igc(freeColClient).diplomacyHandler(our, other, agreement);
     }
@@ -207,8 +262,9 @@ public class DiplomacyMessage extends ObjectMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Game game = freeColServer.getGame();
+        final DiplomaticTrade agreement = getAgreement();
 
-        if (this.agreement == null) {
+        if (agreement == null) {
             return serverPlayer.clientError("Null diplomatic agreement");
         }
 
@@ -287,8 +343,8 @@ public class DiplomacyMessage extends ObjectMessage {
             return serverPlayer.clientError("Both units null");
         }
 
-        Player senderPlayer = this.agreement.getSender();
-        Player recipientPlayer = this.agreement.getRecipient();
+        Player senderPlayer = agreement.getSender();
+        Player recipientPlayer = agreement.getRecipient();
         if (senderPlayer == null) {
             cs = serverPlayer.clientError("Null sender in agreement.");
         } else if (recipientPlayer == null) {
@@ -299,10 +355,10 @@ public class DiplomacyMessage extends ObjectMessage {
         if (cs != null) return cs;
 
         final InGameController igc = freeColServer.getInGameController();
-        switch (this.agreement.getContext()) {
+        switch (agreement.getContext()) {
         case CONTACT:
             cs = igc.europeanFirstContact(serverPlayer, ourUnit, ourColony,
-                otherUnit, otherColony, this.agreement);
+                otherUnit, otherColony, agreement);
             break;
         case DIPLOMATIC:
             cs = (ourUnit != null) 
@@ -312,12 +368,12 @@ public class DiplomacyMessage extends ObjectMessage {
                     : (otherColony == null)
                     ? serverPlayer.clientError("Null other settlement")
                     : igc.diplomacy(serverPlayer, ourUnit, otherColony,
-                                    this.agreement))
+                                    agreement))
                 : ((!otherUnit.hasAbility(Ability.NEGOTIATE))
                     ? serverPlayer.clientError("Unit lacks ability"
                         + " to negotiate: " + otherUnit)
                     : igc.diplomacy(serverPlayer, ourColony, otherUnit,
-                                    this.agreement));
+                                    agreement));
             break;
         case TRADE:
             cs = (ourUnit != null)
@@ -330,7 +386,7 @@ public class DiplomacyMessage extends ObjectMessage {
                     : (otherColony == null)
                     ? serverPlayer.clientError("Null other settlement")
                     : igc.diplomacy(serverPlayer, ourUnit, otherColony,
-                                    this.agreement))
+                                    agreement))
                 : ((!otherUnit.isCarrier())
                     ? serverPlayer.clientError("Unit is not a carrier: "
                         + otherUnit)
@@ -338,7 +394,7 @@ public class DiplomacyMessage extends ObjectMessage {
                     ? serverPlayer.clientError("Player lacks ability"
                         + " to trade with other Europeans: " + otherPlayer)
                     : igc.diplomacy(serverPlayer, ourColony, otherUnit,
-                                    this.agreement));
+                                    agreement));
             break;
         case TRIBUTE:
             cs = (ourUnit != null)
@@ -348,93 +404,18 @@ public class DiplomacyMessage extends ObjectMessage {
                     : (otherColony == null)
                     ? serverPlayer.clientError("Null other settlement")
                     : igc.diplomacy(serverPlayer, ourUnit, otherColony,
-                                    this.agreement))
+                                    agreement))
                 : ((!otherUnit.isOffensiveUnit() || otherUnit.isNaval())
                     ? serverPlayer.clientError("Unit is not an offensive"
                         + " land unit: " + otherUnit)
                     : igc.diplomacy(serverPlayer, ourColony, otherUnit,
-                                    this.agreement));
+                                    agreement));
             break;
         default:
             break;
         }
         if (cs == null) cs = serverPlayer.clientError("Invalid diplomacy for "
-            + this.agreement.getContext());
+            + agreement.getContext());
         return cs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.agreement != null) this.agreement.toXML(xw);
-        if (this.extraUnit != null) this.extraUnit.toXML(xw);
-    }
-
-    /**
-     * Convert this DiplomacyMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            OUR_ID_TAG, getStringAttribute(OUR_ID_TAG),
-            OTHER_ID_TAG, getStringAttribute(OTHER_ID_TAG))
-            .add(this.agreement)
-            .add(this.extraUnit).toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Get our FCGO.
-     *
-     * @param game The {@code Game} to extract the FCGO from.
-     * @return Our {@code FreeColGameObject}.
-     */
-    public FreeColGameObject getOurFCGO(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(OUR_ID_TAG));
-    }
-
-    /**
-     * Get the other FCGO.
-     *
-     * @param game The {@code Game} to extract the FCGO from.
-     * @return The other {@code FreeColGameObject}.
-     */
-    public FreeColGameObject getOtherFCGO(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(OTHER_ID_TAG));
-    }
-
-    /**
-     * Get the agreement (a {@code DiplomaticTrade}) in this message.
-     *
-     * @return The agreement in this message.
-     */
-    public DiplomaticTrade getAgreement() {
-        return this.agreement;
-    }
-
-    /**
-     * Set the agreement (a {@code DiplomaticTrade}) in this message.
-     *
-     * @param agreement The {@code DiplomaticTrade} to set.
-     * @return This message.
-     */
-    public DiplomacyMessage setAgreement(DiplomaticTrade agreement) {
-        this.agreement = agreement;
-        return this;
-    }
-
-    /**
-     * Get the extra {@code Unit}.
-     *
-     * @return The extra {@code Unit}, or null if none.
-     */
-    public Unit getExtraUnit() {
-        return this.extraUnit;
     }
 }

@@ -231,6 +231,18 @@ public abstract class Session {
     public static <T extends Session> T lookup(Class<T> type,
                                                String s1, String s2) {
         String key = makeSessionKey(type, s1, s2);
+        return lookup(type, key);
+    }
+
+    /**
+     * Look up a session given its key.
+     *
+     * @param <T> The actual session class found.
+     * @param type The class of session.
+     * @param key The session key.
+     * @return A session of the specified type, or null if not found.
+     */
+    public static <T extends Session> T lookup(Class<T> type, String key) {
         Session ts = getSession(key);
         if (ts != null && ts.isComplete()) {
             synchronized (sessionLock) {

@@ -85,6 +85,7 @@ public class DiplomacySession extends TimedSession {
      */
     public DiplomacySession(Unit unit, Unit otherUnit, long timeout) {
         super(makeDiplomacySessionKey(unit, otherUnit), timeout);
+
         this.agreement = null;
         this.unit = unit;
         this.settlement = null;
@@ -98,7 +99,7 @@ public class DiplomacySession extends TimedSession {
      * @param o2 The second {@code Ownable}.
      * @return A diplomacy session key.
      */
-    private static String makeDiplomacySessionKey(Ownable o1, Ownable o2) {
+    public static String makeDiplomacySessionKey(Ownable o1, Ownable o2) {
         return makeSessionKey(DiplomacySession.class,
                               o1.getOwner(), o2.getOwner());
     }
