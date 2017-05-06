@@ -49,16 +49,6 @@ public class AnimateAttackMessage extends ObjectMessage {
     private static final String DEFENDER_TILE_TAG = "defenderTile";
     private static final String SUCCESS_TAG = "success";
 
-    /**
-     * The attacker unit *if* it is not currently visible, or on a carrier.
-     */
-    private Unit attacker = null;
-
-    /**
-     * The defender unit *if* it is not currently visible, or on a carrier.
-     */
-    private Unit defender = null;
-    
 
     /**
      * Create a new {@code AnimateAttackMessage} for the supplied attacker,
@@ -78,12 +68,12 @@ public class AnimateAttackMessage extends ObjectMessage {
               DEFENDER_TILE_TAG, defender.getTile().getId(),
               SUCCESS_TAG, Boolean.toString(result));
 
-        this.attacker = (addAttacker)
-            ? ((attacker.isOnCarrier()) ? attacker.getCarrier() : attacker)
-            : null;
-        this.defender = (addDefender)
-            ? ((defender.isOnCarrier()) ? defender.getCarrier() : defender)
-            : null;
+        if (addAttacker) {
+            add1((attacker.isOnCarrier()) ? attacker.getCarrier() : attacker);
+        }
+        if (addDefender) {
+            add1((defender.isOnCarrier()) ? defender.getCarrier() : defender);
+        }
     }
 
     /**
@@ -100,11 +90,8 @@ public class AnimateAttackMessage extends ObjectMessage {
               DEFENDER_TILE_TAG, getStringAttribute(element, DEFENDER_TILE_TAG),
               SUCCESS_TAG, getStringAttribute(element, SUCCESS_TAG));
 
-        // Not necessarily correct, but we are using interning reads
-        // to whatever is here will go into the client game, and then
-        // getAttacker/Defender will work as they use the correct identifiers.
-        this.attacker = getChild(game, element, 0, false, Unit.class);
-        this.defender = getChild(game, element, 1, false, Unit.class);
+        addUnits(getChild(game, element, 0, false, Unit.class),
+                 getChild(game, element, 1, false, Unit.class));
     }
 
     /**
@@ -119,25 +106,124 @@ public class AnimateAttackMessage extends ObjectMessage {
         super(TAG, xr, ATTACKER_TAG, ATTACKER_TILE_TAG,
               DEFENDER_TAG, DEFENDER_TILE_TAG, SUCCESS_TAG);
 
-        this.attacker = this.defender = null;
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            if (Unit.TAG.equals(tag)) {
-                if (this.attacker == null) {
-                    this.attacker = xr.readFreeColObject(game, Unit.class);
-                } else if (this.defender == null) {
-                    this.defender = xr.readFreeColObject(game, Unit.class);
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        Unit attacker = null, defender = null;
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (Unit.TAG.equals(tag)) {
+                    if (attacker == null) {
+                        attacker = xr.readFreeColObject(game, Unit.class);
+                    } else if (defender == null) {
+                        defender = xr.readFreeColObject(game, Unit.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
                 } else {
-                    expected(TAG, tag);
+                    expected(Unit.TAG, tag);
                 }
-            } else {
-                expected(Unit.TAG, tag);
+                xr.expectTag(tag);
             }
-            xr.expectTag(tag);
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
+        addUnits(attacker, defender);
     }
 
+
+    /**
+     * Add the units.
+     *
+     * @param u0 The first {@code Unit} found.
+     * @param u1 The second {@code Unit} found.
+     */
+    private void addUnits(Unit u0, Unit u1) {
+        if (u1 == null && u0.getId().equals(getStringAttribute(DEFENDER_TAG))) {
+            u1 = u0;
+            u0 = null;
+        }
+        add1(u0);
+        add1(u1);
+    }
+        
+    /**
+     * Get the attacker unit.
+     *
+     * @return The attacker {@code Unit}.
+     */
+    private Unit getAttacker(Game game) {
+        final String att = getStringAttribute(ATTACKER_TAG);
+        Unit unit = game.getFreeColGameObject(att, Unit.class);
+        if (unit == null) {
+            if ((unit = getChild(0, Unit.class)) == null) {
+                logger.warning("Attack animation missing attacker: " + att);
+            } else {
+                unit.intern();
+                if (!unit.getId().equals(att)) { // actually on carrier
+                    unit = unit.getCarriedUnitById(att);
+                    if (unit == null) {
+                        logger.warning("Attack animation missing carried attacker: " + att);
+                    }
+                }
+            }
+        }
+        return unit;
+    }
+
+    /**
+     * Get the defender unit.
+     *
+     * @return The defender {@code Unit}.
+     */
+    private Unit getDefender(Game game) {
+        final String def = getStringAttribute(DEFENDER_TAG);
+        Unit unit = game.getFreeColGameObject(def, Unit.class);
+        if (unit == null) {
+            if ((unit = getChild(1, Unit.class)) == null) {
+                logger.warning("Attack animation missing defender: " + def);
+            } else {
+                unit.intern();
+                if (!unit.getId().equals(def)) { // actually on carrier
+                    unit = unit.getCarriedUnitById(def);
+                    if (unit == null) {
+                        logger.warning("Attack animation missing carried defender: " + def);
+                    }
+                }
+            }
+        }
+        return unit;
+    }
+
+    /**
+     * Get the attacker tile.
+     *
+     * @return The attacker {@code Tile}.
+     */
+    private Tile getAttackerTile(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(ATTACKER_TILE_TAG),
+                                         Tile.class);
+    }
+
+    /**
+     * Get the defender tile.
+     *
+     * @return The defender {@code Tile}.
+     */
+    private Tile getDefenderTile(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(DEFENDER_TILE_TAG),
+                                         Tile.class);
+    }
+
+    /**
+     * Get the result of the attack.
+     *
+     * @return The result.
+     */
+    private boolean getResult() {
+        return getBooleanAttribute(SUCCESS_TAG, false);
+    }
 
     /**
      * {@inheritDoc}
@@ -165,45 +251,10 @@ public class AnimateAttackMessage extends ObjectMessage {
         final Tile attackerTile = getAttackerTile(game);
         final Tile defenderTile = getDefenderTile(game);
         final boolean result = getResult();
-        Unit attacker = getAttacker(game);
-        Unit defender = getDefender(game);
+        final Unit attacker = getAttacker(game);
+        final Unit defender = getDefender(game);
 
-        if (attacker == null) {
-            if (this.attacker == null) {
-                logger.warning("Attack animation for: " + player.getId()
-                    + " missing attacker.");
-                return;
-            }
-            attacker = this.attacker;
-            attacker.intern();
-            String att = getStringAttribute(ATTACKER_TAG);
-            if (!attacker.getId().equals(att)) { // actually on carrier
-                attacker = attacker.getCarriedUnitById(att);
-                if (attacker == null) {
-                    logger.warning("Attack animation for: " + player.getId()
-                        + " missing attacker with identifier: " + att);
-                    return;
-                }
-            }
-        }
-        if (defender == null) {
-            if (this.defender == null) {
-                logger.warning("Attack animation for: " + player.getId()
-                    + " omitted defender.");
-                return;
-            }
-            defender = this.defender;
-            defender.intern();
-            String def = getStringAttribute(DEFENDER_TAG);
-            if (!defender.getId().equals(def)) { // actually on carrier
-                defender = defender.getCarriedUnitById(def);
-                if (defender == null) {
-                    logger.warning("Attack animation for: " + player.getId()
-                        + " missing defender with identifier: " + def);
-                    return;
-                }
-            }                
-        }
+        if (attacker == null || defender == null) return;
         if (attackerTile == null) {
             logger.warning("Attack animation for: " + player.getId()
                 + " omitted attacker tile.");
@@ -218,80 +269,5 @@ public class AnimateAttackMessage extends ObjectMessage {
         igc(freeColClient)
             .animateAttackHandler(attacker, defender,
                                   attackerTile, defenderTile, result);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.attacker != null) this.attacker.toXML(xw);
-        if (this.defender != null) this.defender.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            ATTACKER_TAG, getStringAttribute(ATTACKER_TAG),
-            ATTACKER_TILE_TAG, getStringAttribute(ATTACKER_TILE_TAG),
-            DEFENDER_TAG, getStringAttribute(DEFENDER_TAG),
-            DEFENDER_TILE_TAG, getStringAttribute(DEFENDER_TILE_TAG),
-            SUCCESS_TAG, getStringAttribute(SUCCESS_TAG))
-            .add(this.attacker).add(this.defender).toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Get the attacker unit.
-     *
-     * @return The attacker {@code Unit}.
-     */
-    public Unit getAttacker(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(ATTACKER_TAG),
-                                         Unit.class);
-    }
-
-    /**
-     * Get the defender unit.
-     *
-     * @return The defender {@code Unit}.
-     */
-    public Unit getDefender(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(DEFENDER_TAG),
-                                         Unit.class);
-    }
-
-    /**
-     * Get the attacker tile.
-     *
-     * @return The attacker {@code Tile}.
-     */
-    public Tile getAttackerTile(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(ATTACKER_TILE_TAG),
-                                         Tile.class);
-    }
-
-    /**
-     * Get the defender tile.
-     *
-     * @return The defender {@code Tile}.
-     */
-    public Tile getDefenderTile(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(DEFENDER_TILE_TAG),
-                                         Tile.class);
-    }
-
-    /**
-     * Get the result of the attack.
-     *
-     * @return The result.
-     */
-    public boolean getResult() {
-        return getBooleanAttribute(SUCCESS_TAG, false);
     }
 }
