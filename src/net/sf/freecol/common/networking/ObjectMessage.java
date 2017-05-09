@@ -151,7 +151,7 @@ public abstract class ObjectMessage extends AttributeMessage {
      */
     protected <T extends FreeColObject> T getChild(int index,
                                                    Class<T> returnClass) {
-        if (index >= this.objects.size()) return (T)null;
+        if (index >= objectCount()) return (T)null;
         FreeColObject fco = this.objects.get(index);
         try {
             return returnClass.cast(fco);
@@ -207,6 +207,15 @@ public abstract class ObjectMessage extends AttributeMessage {
      */
     protected <T extends FreeColObject> void addAll(Collection<T> fcos) {
         this.objects.addAll(fcos);
+    }
+
+    /**
+     * Get the object count.
+     *
+     * @return The number of objects.
+     */
+    protected int objectCount() {
+        return this.objects.size();
     }
 
     /**

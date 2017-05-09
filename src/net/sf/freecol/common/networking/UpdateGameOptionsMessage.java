@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -42,31 +43,71 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
 
     public static final String TAG = "updateGameOptions";
 
-    /** The options. */
-    private final OptionGroup options;
-
 
     /**
-     * Create a new {@code UpdateGameOptionsMessage} with the
-     * supplied name.
+     * Create a new {@code UpdateGameOptionsMessage} with the supplied name.
      *
-     * @param options The game options {@code OptionGroup}.
+     * @param optionGroup The game options {@code OptionGroup}.
      */
-    public UpdateGameOptionsMessage(OptionGroup options) {
+    public UpdateGameOptionsMessage(OptionGroup optionGroup) {
         super(TAG);
 
-        this.options = options;
+        add1(optionGroup);
     }
 
     /**
-     * Create a new {@code UpdateGameOptionsMessage} from a
-     * supplied element.
+     * Create a new {@code UpdateGameOptionsMessage} from a supplied element.
      *
      * @param game The {@code Game} this message belongs to.
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateGameOptionsMessage(Game game, Element element) {
         this(DOMUtils.getChild(game, element, 0, false, OptionGroup.class));
+    }
+
+    /**
+     * Create a new {@code UpdateGameOptionsMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public UpdateGameOptionsMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        this(null);
+
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        OptionGroup optionGroup = null;
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (OptionGroup.TAG.equals(tag)) {
+                    if (optionGroup == null) {
+                        optionGroup = xr.readFreeColObject(game, OptionGroup.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
+                } else {
+                    expected(OptionGroup.TAG, tag);
+                }
+                xr.expectTag(tag);
+            }
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
+        }
+        add1(optionGroup);
+    }
+
+
+    /**
+     * Get the associated option group.
+     *
+     * @return The options.
+     */
+    private OptionGroup getGameOptions() {
+        return getChild(0, OptionGroup.class);
     }
 
 
@@ -90,7 +131,7 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
         if (freeColClient.isInGame()) {
             ; // Ignored
         } else {
-            pgc(freeColClient).updateGameOptionsHandler(getGameOptions());
+            pgc(freeColClient).updateGameOptionsHandler(gameOptions);
         }
     }
 
@@ -103,43 +144,18 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
         if (serverPlayer == null || !serverPlayer.isAdmin()) {
             return serverPlayer.clientError("Not an admin: " + serverPlayer);
         }
+        if (freeColServer.getServerState() != FreeColServer.ServerState.PRE_GAME) {
+            return serverPlayer.clientError("Can not change game options, "
+                + "server state = " + freeColServer.getServerState());
+        }
+
         final Specification spec = freeColServer.getGame().getSpecification();
-        final OptionGroup optionGroup = getGameOptions();
-        if (optionGroup == null) {
+        final OptionGroup gameOptions = getGameOptions();
+        if (gameOptions == null) {
             return serverPlayer.clientError("No game options to merge");
         }
 
         return pgc(freeColServer)
-            .updateGameOptions(serverPlayer, optionGroup);
+            .updateGameOptions(serverPlayer, gameOptions);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.options != null) this.options.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .add(this.options).toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Get the associated option group.
-     *
-     * @return The options.
-     */
-    public OptionGroup getGameOptions() {
-        return this.options;
-    }
-
 }

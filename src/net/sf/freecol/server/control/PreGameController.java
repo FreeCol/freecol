@@ -223,14 +223,15 @@ public final class PreGameController extends Controller {
      */
     public ChangeSet updateGameOptions(ServerPlayer serverPlayer,
                                        OptionGroup options) {
-        final Game game = getFreeColServer().getGame();
+        final FreeColServer fcs = getFreeColServer();
+        final Game game = fcs.getGame();
         final Specification spec = game.getSpecification();
 
         if (!spec.mergeGameOptions(options, "server")) {
             return serverPlayer.clientError("Game option merge failed");
         }
-        getFreeColServer().sendToAll(new UpdateGameOptionsMessage(spec.getGameOptions()),
-                                     serverPlayer);
+        fcs.sendToAll(new UpdateGameOptionsMessage(spec.getGameOptions()),
+                                                   serverPlayer);
         return null;
     }
 
@@ -244,14 +245,15 @@ public final class PreGameController extends Controller {
      */
     public ChangeSet updateMapGeneratorOptions(ServerPlayer serverPlayer,
                                                OptionGroup options) {
-        final Game game = getFreeColServer().getGame();
+        final FreeColServer fcs = getFreeColServer();
+        final Game game = fcs.getGame();
         final Specification spec = game.getSpecification();
         
         if (!spec.mergeMapGeneratorOptions(options, "server")) {
             return serverPlayer.clientError("Map option merge failed");
         }
-        getFreeColServer().sendToAll(new UpdateMapGeneratorOptionsMessage(spec.getMapGeneratorOptions()),
-                                     serverPlayer);
+        fcs.sendToAll(new UpdateMapGeneratorOptionsMessage(spec.getMapGeneratorOptions()),
+                                                           serverPlayer);
         return null;
     }
 
