@@ -3177,8 +3177,7 @@ public final class InGameController extends Controller {
      */
     public ChangeSet newTradeRoute(ServerPlayer serverPlayer) {
         return ChangeSet.simpleChange(serverPlayer,
-            new NewTradeRouteMessage()
-                .setTradeRoute(serverPlayer.newTradeRoute()));
+            new NewTradeRouteMessage(serverPlayer.newTradeRoute()));
     }
 
 

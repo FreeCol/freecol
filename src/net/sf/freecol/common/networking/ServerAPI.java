@@ -753,7 +753,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean newTradeRoute() {
-        return ask(new NewTradeRouteMessage());
+        return ask(new NewTradeRouteMessage(null));
     }
 
     /**

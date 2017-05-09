@@ -41,16 +41,17 @@ public class NewTradeRouteMessage extends ObjectMessage {
 
     public static final String TAG = "newTradeRoute";
 
-    /** The new trade route. */
-    private TradeRoute tradeRoute = null;
-
 
     /**
      * Create a new {@code NewTradeRouteMessage} with the given
      * message identifier and message.
+     *
+     * @param tradeRoute An optional new {@code TradeRoute}.
      */
-    public NewTradeRouteMessage() {
+    public NewTradeRouteMessage(TradeRoute tradeRoute) {
         super(TAG);
+
+        add1(tradeRoute);
     }
 
     /**
@@ -61,9 +62,7 @@ public class NewTradeRouteMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NewTradeRouteMessage(Game game, Element element) {
-        this();
-
-        this.tradeRoute = getChild(game, element, 0, true, TradeRoute.class);
+        this(getChild(game, element, 0, true, TradeRoute.class));
     }
 
     /**
@@ -75,23 +74,40 @@ public class NewTradeRouteMessage extends ObjectMessage {
      */
     public NewTradeRouteMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
-        this();
+        this(null);
 
-        this.tradeRoute = null;
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            if (TradeRoute.TAG.equals(tag)) {
-                if (this.tradeRoute == null) {
-                    this.tradeRoute = xr.readFreeColObject(game, TradeRoute.class);
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        TradeRoute tradeRoute = null;
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (TradeRoute.TAG.equals(tag)) {
+                    if (tradeRoute == null) {
+                        tradeRoute = xr.readFreeColObject(game, TradeRoute.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
                 } else {
-                    expected(TAG, tag);
+                    expected(TradeRoute.TAG, tag);
                 }
-            } else {
-                expected(TradeRoute.TAG, tag);
+                xr.expectTag(tag);
             }
-            xr.expectTag(tag);
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
+        add1(tradeRoute);
+    }
+
+
+    /**
+     * Get the new trade route.
+     *
+     * @return The {@code TradeRoute} attached to this message.
+     */
+    private TradeRoute getTradeRoute() {
+        return getChild(0, TradeRoute.class);
     }
 
 
@@ -128,6 +144,7 @@ public class NewTradeRouteMessage extends ObjectMessage {
         final TradeRoute tr = getTradeRoute();
 
         if (tr == null) return;
+        tr.intern();
 
         igc(freeColClient).newTradeRouteHandler(tr);
     }
@@ -142,36 +159,8 @@ public class NewTradeRouteMessage extends ObjectMessage {
             .newTradeRoute(serverPlayer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.tradeRoute != null) this.tradeRoute.toXML(xw);
-    }
-
-    /**
-     * Convert this NewTradeRouteMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .add(this.tradeRoute).toXMLElement();
-    }
-
 
     // Public interface
-
-    /**
-     * Get the new trade route.
-     *
-     * @return The {@code TradeRoute} attached to this message.
-     */
-    public TradeRoute getTradeRoute() {
-        return this.tradeRoute;
-    }
 
     /**
      * Set the new trade route.
@@ -180,7 +169,7 @@ public class NewTradeRouteMessage extends ObjectMessage {
      * @return This message.
      */
     public NewTradeRouteMessage setTradeRoute(TradeRoute tradeRoute) {
-        this.tradeRoute = tradeRoute;
+        setChild(0, tradeRoute);
         return this;
     }
 }
