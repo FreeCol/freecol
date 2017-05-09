@@ -140,7 +140,8 @@ public class AnimateAttackMessage extends ObjectMessage {
      * @param u1 The second {@code Unit} found.
      */
     private void addUnits(Unit u0, Unit u1) {
-        if (u1 == null && u0.getId().equals(getStringAttribute(DEFENDER_TAG))) {
+        if (u0 != null && u1 == null
+            && u0.getId().equals(getStringAttribute(DEFENDER_TAG))) {
             u1 = u0;
             u0 = null;
         }
