@@ -43,9 +43,6 @@ public class DeliverGiftMessage extends ObjectMessage {
     private static final String SETTLEMENT_TAG = "settlement";
     private static final String UNIT_TAG = "unit";
 
-    /** The goods to be delivered. */
-    private Goods goods = null;
-
 
     /**
      * Create a new {@code DeliverGiftMessage}.
@@ -57,7 +54,7 @@ public class DeliverGiftMessage extends ObjectMessage {
     public DeliverGiftMessage(Unit unit, IndianSettlement is, Goods goods) {
         super(TAG, UNIT_TAG, unit.getId(), SETTLEMENT_TAG, is.getId());
 
-        this.goods = goods;
+        add1(goods);
     }
 
     /**
@@ -68,9 +65,10 @@ public class DeliverGiftMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DeliverGiftMessage(Game game, Element element) {
-        super(TAG);
+        super(TAG, UNIT_TAG, element.getAttribute(UNIT_TAG),
+              SETTLEMENT_TAG, element.getAttribute(SETTLEMENT_TAG));
 
-        this.goods = getChild(game, element, 0, Goods.class);
+        add1(getChild(game, element, 0, Goods.class));
     }
 
     /**
@@ -84,12 +82,12 @@ public class DeliverGiftMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, UNIT_TAG, SETTLEMENT_TAG);
 
-        this.goods = null;
+        Goods goods = null;
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (Goods.TAG.equals(tag)) {
-                if (this.goods == null) {
-                    this.goods = xr.readFreeColObject(game, Goods.class);
+                if (goods == null) {
+                    goods = xr.readFreeColObject(game, Goods.class);
                 } else {
                     expected(TAG, tag);
                 }
@@ -99,8 +97,45 @@ public class DeliverGiftMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
+        add1(goods);
     }
     
+
+    /**
+     * Get the {@code Unit} which is delivering the gift.  This
+     * is a helper routine to be called in-client as it blindly trusts
+     * its field.
+     *
+     * @param game The {@code Game} to lookup the unit in.
+     * @return The {@code Unit}, or null if none.
+     */
+    private Unit getUnit(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(UNIT_TAG),
+                                         Unit.class);
+    }
+
+    /**
+     * Get the {@code Settlement} which is receiving the gift.
+     * This is a helper routine to be called in-client as it blindly trusts
+     * its field.
+     *
+     * @param game The {@code Game} to lookup the unit in.
+     * @return The {@code Settlement}, or null if none.
+     */
+    private IndianSettlement getSettlement(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(SETTLEMENT_TAG),
+                                         IndianSettlement.class);
+    }
+
+    /**
+     * Get the {@code Goods} delivered as a gift.
+     *
+     * @return The {@code Goods}, or null if none.
+     */
+    private Goods getGoods() {
+        return getChild(0, Goods.class);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -140,75 +175,17 @@ public class DeliverGiftMessage extends ObjectMessage {
             return serverPlayer.clientError(e.getMessage());
         }
 
-        if (this.goods == null) {
+        Goods goods = getGoods();
+        if (goods == null) {
             return serverPlayer.clientError("No goods found");
-        } else if (this.goods.getLocation() != unit) {
+        } else if (goods.getLocation() != unit) {
             // Make sure we are trying to deliver something that is there
-            return serverPlayer.clientError("Gift " + this.goods.getId()
+            return serverPlayer.clientError("Gift " + goods.getId()
                 + " is not with unit " + unitId);
         }
 
         // Proceed to deliver.
         return igc(freeColServer)
-            .deliverGiftToSettlement(serverPlayer, unit, is, this.goods);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.goods != null) this.goods.toXML(xw);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            UNIT_TAG, getStringAttribute(UNIT_TAG),
-            SETTLEMENT_TAG, getStringAttribute(SETTLEMENT_TAG))
-            .add(this.goods).toXMLElement();
-    }
-    
-    
-    // Public interface
-
-    /**
-     * Get the {@code Unit} which is delivering the gift.  This
-     * is a helper routine to be called in-client as it blindly trusts
-     * its field.
-     *
-     * @param game The {@code Game} to lookup the unit in.
-     * @return The {@code Unit}, or null if none.
-     */
-    public Unit getUnit(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(UNIT_TAG),
-                                         Unit.class);
-    }
-
-    /**
-     * Get the {@code Settlement} which is receiving the gift.
-     * This is a helper routine to be called in-client as it blindly trusts
-     * its field.
-     *
-     * @param game The {@code Game} to lookup the unit in.
-     * @return The {@code Settlement}, or null if none.
-     */
-    public IndianSettlement getSettlement(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(SETTLEMENT_TAG),
-                                         IndianSettlement.class);
-    }
-
-    /**
-     * Get the {@code Goods} delivered as a gift.  This is a
-     * helper routine to be called in-client as it blindly trusts its
-     * field.
-     *
-     * @return The {@code Goods}, or null if none.
-     */
-    public Goods getGoods() {
-        return this.goods;
+            .deliverGiftToSettlement(serverPlayer, unit, is, goods);
     }
 }
