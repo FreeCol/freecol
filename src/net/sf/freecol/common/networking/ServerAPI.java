@@ -532,7 +532,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean getHighScores(String key) {
-        return ask(new HighScoreMessage(key));
+        return ask(new HighScoreMessage(key, null));
     }
 
     /**

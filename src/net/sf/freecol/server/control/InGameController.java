@@ -2406,7 +2406,7 @@ public final class InGameController extends Controller {
      */
     public ChangeSet getHighScores(ServerPlayer serverPlayer, String key) {
         return ChangeSet.simpleChange(serverPlayer,
-            new HighScoreMessage(key).setScores(HighScore.loadHighScores()));
+            new HighScoreMessage(key, HighScore.loadHighScores()));
     }
 
 

@@ -44,20 +44,18 @@ public class HighScoreMessage extends ObjectMessage {
     public static final String TAG = "highScore";
     private static final String KEY_TAG = "key";
 
-    /** The high scores. */
-    private final List<HighScore> scores = new ArrayList<>();
-    
 
     /**
      * Create a new {@code HighScoreMessage} in request form (no
      * scores attached).
      *
      * @param key A message key for the final display.
+     * @param scores The list of high scores, or null.
      */
-    public HighScoreMessage(String key) {
+    public HighScoreMessage(String key, List<HighScore> scores) {
         super(TAG, KEY_TAG, key);
 
-        this.scores.clear();
+        if (scores != null) addAll(scores);
     }
 
     /**
@@ -67,9 +65,8 @@ public class HighScoreMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public HighScoreMessage(Game game, Element element) {
-        this(getStringAttribute(element, KEY_TAG));
-
-        setScores(DOMUtils.getChildren(game, element, HighScore.class));
+        this(getStringAttribute(element, KEY_TAG),
+             DOMUtils.getChildren(game, element, HighScore.class));
     }
 
     /**
@@ -83,18 +80,38 @@ public class HighScoreMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, KEY_TAG);
 
-        this.scores.clear();
+        List<HighScore> scores = new ArrayList<>();
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (HighScore.TAG.equals(tag)) {
                 HighScore hs = xr.readFreeColObject(game, HighScore.class);
-                if (hs != null) this.scores.add(hs);
+                if (hs != null) scores.add(hs);
             } else {
                 expected(HighScore.TAG, tag);
             }
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
+        addAll(scores);
+    }
+
+
+    /**
+     * Accessor for the key.
+     *
+     * @return The key.
+     */
+    private String getKey() {
+        return getStringAttribute(KEY_TAG);
+    }
+
+    /**
+     * Accessor for the scores list.
+     *
+     * @return The list of {@code HighScore}s.
+     */
+    private List<HighScore> getScores() {
+        return getChildren(HighScore.class);
     }
 
 
@@ -125,56 +142,5 @@ public class HighScoreMessage extends ObjectMessage {
                                    ServerPlayer serverPlayer) {
         return igc(freeColServer)
             .getHighScores(serverPlayer, getKey());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        for (HighScore hs : this.scores) hs.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            KEY_TAG, getKey())
-            .add(this.scores).toXMLElement();
-    }
-
-    
-    // Public interface
-
-    /**
-     * Accessor for the key.
-     *
-     * @return The key.
-     */
-    public String getKey() {
-        return getStringAttribute(KEY_TAG);
-    }
-
-    /**
-     * Accessor for the scores list.
-     *
-     * @return The list of {@code HighScore}s.
-     */
-    public List<HighScore> getScores() {
-        return this.scores;
-    }
-
-    /**
-     * Set the scores for this message.
-     *
-     * @param scores A list of {@code HighScore}s to add.
-     * @return This message.
-     */
-    public HighScoreMessage setScores(List<HighScore> scores) {
-        this.scores.clear();
-        this.scores.addAll(scores);
-        return this;
     }
 }
