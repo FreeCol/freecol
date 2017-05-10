@@ -48,12 +48,6 @@ public class SpySettlementMessage extends ObjectMessage {
     private static final String SETTLEMENT_TAG = "settlement";
     private static final String UNIT_TAG = "unit";
 
-    /**
-     * A copy of the tile with the settlement on it, but including all
-     * the extra (normally invisible) information.
-     */
-    private Tile spyTile;
-
 
     /**
      * Create a new {@code SpySettlementMessage} request with the
@@ -65,7 +59,7 @@ public class SpySettlementMessage extends ObjectMessage {
     public SpySettlementMessage(Unit unit, Settlement settlement) {
         super(TAG, SETTLEMENT_TAG, settlement.getId(), UNIT_TAG, unit.getId());
 
-        this.spyTile = settlement.getTile();
+        add1(settlement.getTile());
     }
 
     /**
@@ -79,7 +73,7 @@ public class SpySettlementMessage extends ObjectMessage {
         super(TAG, SETTLEMENT_TAG, getStringAttribute(element, SETTLEMENT_TAG),
               UNIT_TAG, getStringAttribute(element, UNIT_TAG));
 
-        this.spyTile = getChild(game, element, 0, false, Tile.class);
+        add1(getChild(game, element, 0, false, Tile.class));
     }
 
     /**
@@ -93,23 +87,44 @@ public class SpySettlementMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, SETTLEMENT_TAG, UNIT_TAG);
 
-        this.spyTile = null;
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            if (Tile.TAG.equals(tag)) {
-                if (this.spyTile == null) {
-                    this.spyTile = xr.readFreeColObject(game, Tile.class);
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        Tile spyTile = null;
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (Tile.TAG.equals(tag)) {
+                    if (spyTile == null) {
+                        spyTile = xr.readFreeColObject(game, Tile.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
                 } else {
-                    expected(TAG, tag);
+                    expected(Tile.TAG, tag);
                 }
-            } else {
-                expected(Tile.TAG, tag);
+                xr.expectTag(tag);
             }
-            xr.expectTag(tag);
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
+        add1(spyTile);
     }
 
+
+    private Tile getSpyTile() {
+        return getChild(0, Tile.class);
+    }
+
+    private Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG),
+                                              Unit.class);
+    }
+
+    private Colony getColony(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(SETTLEMENT_TAG),
+                                         Colony.class);
+    }
 
     /**
      * {@inheritDoc}
@@ -123,8 +138,26 @@ public class SpySettlementMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        Tile spyTile = getSpyTile();
+        if (spyTile != null) {
+            FreeColXMLWriter.WriteScope ws = xw.getWriteScope();
+            if (ws.getClient() != null) { // Override scope to client
+                ws = xw.replaceScope(FreeColXMLWriter.WriteScope.toServer());
+            }
+            try {
+                spyTile.toXML(xw);
+            } finally {
+                xw.replaceScope(ws);
+            }
+        }            
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
         final Tile spyTile = getSpyTile();
 
         igc(freeColClient).spySettlementHandler(spyTile);
@@ -170,49 +203,5 @@ public class SpySettlementMessage extends ObjectMessage {
         // Spy on the settlement
         return igc(freeColServer)
             .spySettlement(serverPlayer, unit, colony);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.spyTile != null) {
-            WriteScope ws = xw.replaceScope(WriteScope.toServer());
-            try {
-                this.spyTile.toXML(xw);
-            } finally {
-                xw.replaceScope(ws);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            UNIT_TAG, getStringAttribute(UNIT_TAG),
-            SETTLEMENT_TAG, getStringAttribute(SETTLEMENT_TAG))
-            .add(this.spyTile).toXMLElement();
-        
-    }
-
-
-    // Public interface
-
-    public Tile getSpyTile() {
-        return this.spyTile;
-    }
-
-    public Unit getUnit(Player player) {
-        return player.getOurFreeColGameObject(getStringAttribute(UNIT_TAG),
-                                              Unit.class);
-    }
-
-    public Colony getColony(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(SETTLEMENT_TAG),
-                                         Colony.class);
     }
 }
