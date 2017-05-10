@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -42,20 +43,17 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
 
     public static final String TAG = "updateMapGeneratorOptions";
 
-    /** The options. */
-    private final OptionGroup options;
-
 
     /**
      * Create a new {@code UpdateMapGeneratorOptionsMessage} with the
      * supplied name.
      *
-     * @param options The map generator options {@code OptionGroup}.
+     * @param mapGeneratorOptions The map generator {@code OptionGroup}.
      */
-    public UpdateMapGeneratorOptionsMessage(OptionGroup options) {
+    public UpdateMapGeneratorOptionsMessage(OptionGroup mapGeneratorOptions) {
         super(TAG);
 
-        this.options = options;
+        add1(mapGeneratorOptions);
     }
 
     /**
@@ -67,6 +65,51 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
      */
     public UpdateMapGeneratorOptionsMessage(Game game, Element element) {
         this(DOMUtils.getChild(game, element, 0, false, OptionGroup.class));
+    }
+
+    /**
+     * Create a new {@code UpdateMapGeneratorOptionsMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public UpdateMapGeneratorOptionsMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        this(null);
+
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        OptionGroup optionGroup = null;
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (OptionGroup.TAG.equals(tag)) {
+                    if (optionGroup == null) {
+                        optionGroup = xr.readFreeColObject(game, OptionGroup.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
+                } else {
+                    expected(OptionGroup.TAG, tag);
+                }
+                xr.expectTag(tag);
+            }
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
+        }
+        add1(optionGroup);
+    }
+
+
+    /**
+     * Get the associated option group.
+     *
+     * @return The options.
+     */
+    private OptionGroup getMapGeneratorOptions() {
+        return getChild(0, OptionGroup.class);
     }
 
 
@@ -103,42 +146,17 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
         if (serverPlayer == null || !serverPlayer.isAdmin()) {
             return serverPlayer.clientError("Not an admin: " + serverPlayer);
         }
+        if (freeColServer.getServerState() != FreeColServer.ServerState.PRE_GAME) {
+            return serverPlayer.clientError("Can not change map generator options, "
+                + "server state = " + freeColServer.getServerState());
+        }
         final Specification spec = freeColServer.getGame().getSpecification();
-        final OptionGroup optionGroup = getMapGeneratorOptions();
-        if (optionGroup == null) {
-            return serverPlayer.clientError("No game options to merge");
+        final OptionGroup mapOptions = getMapGeneratorOptions();
+        if (mapOptions == null) {
+            return serverPlayer.clientError("No map generator options to merge");
         }
 
         return pgc(freeColServer)
-            .updateMapGeneratorOptions(serverPlayer, optionGroup);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.options != null) this.options.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .add(this.options).toXMLElement();
-    }
-
-    
-    // Public interface
-
-    /**
-     * Get the associated option group.
-     *
-     * @return The options.
-     */
-    public OptionGroup getMapGeneratorOptions() {
-        return this.options;
+            .updateMapGeneratorOptions(serverPlayer, mapOptions);
     }
 }
