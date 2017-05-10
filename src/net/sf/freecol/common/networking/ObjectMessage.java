@@ -179,7 +179,7 @@ public abstract class ObjectMessage extends AttributeMessage {
      * @param fco The {@code FreeColObject} to add.
      */
     protected <T extends FreeColObject> void add1(T fco) {
-        this.objects.add(fco);
+        if (fco != null) this.objects.add(fco);
     }
 
     /**
