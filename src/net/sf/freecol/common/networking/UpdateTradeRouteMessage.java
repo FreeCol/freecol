@@ -37,9 +37,6 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
 
     public static final String TAG = "updateTradeRoute";
 
-    /** The trade route to update. */
-    private final TradeRoute tradeRoute;
-
 
     /**
      * Create a new {@code UpdateTradeRouteMessage} with the
@@ -50,7 +47,7 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
     public UpdateTradeRouteMessage(TradeRoute tradeRoute) {
         super(TAG);
 
-        this.tradeRoute = tradeRoute;
+        add1(tradeRoute);
     }
 
     /**
@@ -63,9 +60,18 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
     public UpdateTradeRouteMessage(Game game, Element element) {
         super(TAG);
 
-        this.tradeRoute = getChild(game, element, 0, false, TradeRoute.class);
+        add1(getChild(game, element, 0, false, TradeRoute.class));
     }
 
+
+    /**
+     * Accessor for the trade route.
+     *
+     * @return The attached {@code TradeRoute}.
+     */
+    private TradeRoute getTradeRoute() {
+        return getChild(0, TradeRoute.class);
+    }
 
     /**
      * {@inheritDoc}
@@ -80,24 +86,12 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
+        TradeRoute tradeRoute = getTradeRoute();
+        if (tradeRoute == null) {
+            return serverPlayer.clientError("No trade route to update.");
+        }
+        
         return igc(freeColServer)
-            .updateTradeRoute(serverPlayer, this.tradeRoute);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.tradeRoute != null) this.tradeRoute.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .add(this.tradeRoute).toXMLElement();
+            .updateTradeRoute(serverPlayer, tradeRoute);
     }
 }
