@@ -43,9 +43,6 @@ public class ErrorMessage extends ObjectMessage {
     public static final String TAG = "error";
     private static final String MESSAGE_TAG = "message";
 
-    /** A template to present to the client. */
-    private StringTemplate template = null;
-
 
     /**
      * Create a new {@code ErrorMessage} with the given template
@@ -57,7 +54,7 @@ public class ErrorMessage extends ObjectMessage {
     public ErrorMessage(StringTemplate template, String message) {
         super(TAG, MESSAGE_TAG, message);
 
-        this.template = template;
+        add1(template);
     }
 
     /**
@@ -68,7 +65,7 @@ public class ErrorMessage extends ObjectMessage {
     public ErrorMessage(StringTemplate template) {
         super(TAG);
 
-        this.template = template;
+        add1(template);
     }
 
     /**
@@ -114,7 +111,7 @@ public class ErrorMessage extends ObjectMessage {
     public ErrorMessage(Game game, Element element) {
         super(TAG, MESSAGE_TAG, element.getAttribute(MESSAGE_TAG));
 
-        this.template = getChild(game, element, 0, StringTemplate.class);
+        add1(getChild(game, element, 0, StringTemplate.class));
     }
 
     /**
@@ -128,12 +125,12 @@ public class ErrorMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, MESSAGE_TAG);
 
-        this.template = null;
+        StringTemplate template = null;
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (StringTemplate.TAG.equals(tag)) {
-                if (this.template == null) {
-                    this.template = xr.readFreeColObject(game, StringTemplate.class);
+                if (template == null) {
+                    template = xr.readFreeColObject(game, StringTemplate.class);
                 } else {
                     expected(TAG, tag);
                 }
@@ -142,8 +139,27 @@ public class ErrorMessage extends ObjectMessage {
             }
         }
         xr.expectTag(TAG);
+        add1(template);
+    }
+
+
+    /**
+     * Get the template.
+     *
+     * @return The template.
+     */
+    private StringTemplate getTemplate() {
+        return getChild(0, StringTemplate.class);
     }
     
+    /**
+     * Get the non-i18n message.
+     *
+     * @return The message.
+     */
+    private String getMessage() {
+        return getStringAttribute(MESSAGE_TAG);
+    }
 
     /**
      * {@inheritDoc}
@@ -174,55 +190,5 @@ public class ErrorMessage extends ObjectMessage {
         } else {
             pgc(freeColClient).errorHandler(template, message);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.template != null) this.template.toXML(xw);
-    }
-
-    /**
-     * Convert this ErrorMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            MESSAGE_TAG, getMessage())
-            .add(this.template).toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Get the template.
-     *
-     * @return The template.
-     */
-    public StringTemplate getTemplate() {
-        return this.template;
-    }
-    
-    /**
-     * Set the template.
-     *
-     * @param template The new template.
-     */
-    public void setTemplate(StringTemplate template) {
-        this.template = template;
-    }
-    
-    /**
-     * Get the non-i18n message.
-     *
-     * @return The message.
-     */
-    public String getMessage() {
-        return getStringAttribute(MESSAGE_TAG);
     }
 }
