@@ -162,6 +162,23 @@ public abstract class ObjectMessage extends AttributeMessage {
     }
 
     /**
+     * Get the child objects.
+     *
+     * @param T The actual class of {@code FreeColObject} to get.
+     * @param returnClass The expected class of children.
+     * @return The children with the expected class.
+     */
+    protected <T extends FreeColObject> List<T> getChildren(Class<T> returnClass) {
+        List<T> ret = new ArrayList<>();
+        for (FreeColObject fco : this.objects) {
+            try {
+                ret.add(returnClass.cast(fco));
+            } catch (ClassCastException cce) {}
+        }
+        return ret;
+    }
+            
+    /**
      * Set a child object.
      *
      * @param T The actual class of {@code FreeColObject} to set.
