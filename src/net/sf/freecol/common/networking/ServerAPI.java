@@ -543,7 +543,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean nationSummary(Player self, Player player) {
-        return ask(new NationSummaryMessage(player));
+        return ask(new NationSummaryMessage(player, null));
     }
 
     /**

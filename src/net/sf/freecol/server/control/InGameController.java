@@ -2885,8 +2885,8 @@ public final class InGameController extends Controller {
      */
     public ChangeSet nationSummary(ServerPlayer serverPlayer, Player player) {
         return ChangeSet.simpleChange(serverPlayer,
-            new NationSummaryMessage(player)
-                .setNationSummary(new NationSummary(player, serverPlayer)));
+            new NationSummaryMessage(player,
+                                     new NationSummary(player, serverPlayer)));
     }
 
 
@@ -3419,9 +3419,8 @@ public final class InGameController extends Controller {
         csVisit(serverPlayer, is, -1, cs);
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
-        cs.add(See.only(serverPlayer),
-               new NationSummaryMessage(owner)
-                   .setNationSummary(new NationSummary(owner, serverPlayer)));
+        cs.add(See.only(serverPlayer), new NationSummaryMessage(owner,
+                new NationSummary(owner, serverPlayer)));
 
         // This is private.
         return cs;

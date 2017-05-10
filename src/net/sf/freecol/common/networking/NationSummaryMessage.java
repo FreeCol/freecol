@@ -42,20 +42,18 @@ public class NationSummaryMessage extends ObjectMessage {
     public static final String TAG = "nationSummary";
     private static final String PLAYER_TAG = "player";
 
-    /** The summary. */
-    private NationSummary summary = null;
-
 
     /**
      * Create a new {@code NationSummaryMessage} for the
      * specified player.
      *
      * @param player The {@code Player} to summarize.
+     * @param nationSummary An optional {@code NationSummary} to attach.
      */
-    public NationSummaryMessage(Player player) {
+    public NationSummaryMessage(Player player, NationSummary nationSummary) {
         super(TAG, PLAYER_TAG, player.getId());
 
-        this.summary = null;
+        add1(nationSummary);
     }
 
     /**
@@ -68,7 +66,7 @@ public class NationSummaryMessage extends ObjectMessage {
     public NationSummaryMessage(Game game, Element element) {
         super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG));
         
-        this.summary = getChild(game, element, 0, NationSummary.class);
+        add1(getChild(game, element, 0, NationSummary.class));
     }
 
     /**
@@ -82,12 +80,12 @@ public class NationSummaryMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, PLAYER_TAG);
 
-        this.summary = null;
+        NationSummary ns = null;
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (NationSummary.TAG.equals(tag)) {
-                if (this.summary == null) {
-                    this.summary = xr.readFreeColObject(game, NationSummary.class);
+                if (ns == null) {
+                    ns = xr.readFreeColObject(game, NationSummary.class);
                 } else {
                     expected(TAG, tag);
                 }
@@ -97,8 +95,29 @@ public class NationSummaryMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
+        add1(ns);
     }
 
+
+    /**
+     * Client side helper to get the player.
+     *
+     * @param game The {@code Game} to look for a player within.
+     * @return The player.
+     */
+    private Player getPlayer(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG),
+                                         Player.class);
+    }
+
+    /**
+     * Client side helper to get the summary.
+     *
+     * @return The summary.
+     */
+    private NationSummary getNationSummary() {
+        return getChild(0, NationSummary.class);
+    }
 
     /**
      * {@inheritDoc}
@@ -149,59 +168,5 @@ public class NationSummaryMessage extends ObjectMessage {
 
         return igc(freeColServer)
             .nationSummary(serverPlayer, player);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.summary != null) this.summary.toXML(xw);
-    }
-
-    /**
-     * Convert this NationSummaryMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            PLAYER_TAG, getStringAttribute(PLAYER_TAG))
-            .add(this.summary).toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Client side helper to get the player.
-     *
-     * @param game The {@code Game} to look for a player within.
-     * @return The player.
-     */
-    public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(PLAYER_TAG),
-                                         Player.class);
-    }
-
-    /**
-     * Client side helper to get the summary.
-     *
-     * @return The summary.
-     */
-    public NationSummary getNationSummary() {
-        return this.summary;
-    }
-
-    /**
-     * Set the nation summary.
-     *
-     * @param ns The new {@code NationSummary}.
-     * @return This message.
-     */
-    public NationSummaryMessage setNationSummary(NationSummary ns) {
-        this.summary = ns;
-        return this;
     }
 }
