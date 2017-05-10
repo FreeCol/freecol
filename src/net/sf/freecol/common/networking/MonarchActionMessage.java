@@ -46,9 +46,6 @@ public class MonarchActionMessage extends ObjectMessage {
     private static final String RESULT_TAG = "result";
     private static final String TAX_TAG = "tax";
 
-    /** A template describing the action. */
-    private StringTemplate template = null;
-
 
     /**
      * Create a new {@code MonarchActionMessage} with the given action
@@ -62,7 +59,7 @@ public class MonarchActionMessage extends ObjectMessage {
                                 StringTemplate template, String monarchKey) {
         super(TAG, ACTION_TAG, action.toString(), MONARCH_TAG, monarchKey);
 
-        this.template = template;
+        add1(template);
     }
 
     /**
@@ -78,7 +75,7 @@ public class MonarchActionMessage extends ObjectMessage {
               TAX_TAG, getStringAttribute(element, TAX_TAG),
               RESULT_TAG, getStringAttribute(element, RESULT_TAG));
         
-        this.template = getChild(game, element, 0, StringTemplate.class);
+        add1(getChild(game, element, 0, StringTemplate.class));
     }
 
     /**
@@ -92,12 +89,12 @@ public class MonarchActionMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, ACTION_TAG, MONARCH_TAG, TAX_TAG, RESULT_TAG);
 
-        this.template = null;
+        StringTemplate template = null;
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (StringTemplate.TAG.equals(tag)) {
-                if (this.template == null) {
-                    this.template = xr.readFreeColObject(game, StringTemplate.class);
+                if (template == null) {
+                    template = xr.readFreeColObject(game, StringTemplate.class);
                 } else {
                     expected(TAG, tag);
                 }
@@ -107,8 +104,55 @@ public class MonarchActionMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
+        add1(template);
     }
 
+
+    /**
+     * Gets the monarch action type of this message.
+     *
+     * @return The monarch action type.
+     */
+    private MonarchAction getAction() {
+        return getEnumAttribute(ACTION_TAG, MonarchAction.class,
+                                (MonarchAction)null);
+    }
+
+    /**
+     * Gets the template of this message.
+     *
+     * @return The template.
+     */
+    private StringTemplate getTemplate() {
+        return getChild(0, StringTemplate.class);
+    }
+
+    /**
+     * Gets the monarch key.
+     *
+     * @return The monarch key.
+     */
+    private String getMonarchKey() {
+        return getStringAttribute(MONARCH_TAG);
+    }
+
+    /**
+     * Gets the tax amount attached to this message.
+     *
+     * @return The tax amount, or negative if none present.
+     */
+    private int getTax() {
+        return getIntegerAttribute(TAX_TAG, -1);
+    }
+
+    /**
+     * Gets the result.
+     *
+     * @return The result.
+     */
+    private Boolean getResult() {
+        return getBooleanAttribute(RESULT_TAG, (Boolean)null);
+    }
 
     /**
      * {@inheritDoc}
@@ -180,66 +224,8 @@ public class MonarchActionMessage extends ObjectMessage {
             .monarchAction(serverPlayer, getAction(), getResult());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.template != null) this.template.toXML(xw);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            ACTION_TAG, getStringAttribute(ACTION_TAG),
-            MONARCH_TAG, getStringAttribute(MONARCH_TAG),
-            TAX_TAG, getStringAttribute(TAX_TAG),
-            RESULT_TAG, getStringAttribute(RESULT_TAG))
-            .add(this.template).toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Gets the monarch action type of this message.
-     *
-     * @return The monarch action type.
-     */
-    public MonarchAction getAction() {
-        return getEnumAttribute(ACTION_TAG, MonarchAction.class,
-                                (MonarchAction)null);
-    }
-
-    /**
-     * Gets the template of this message.
-     *
-     * @return The template.
-     */
-    public StringTemplate getTemplate() {
-        return this.template;
-    }
-
-    /**
-     * Gets the monarch key.
-     *
-     * @return The monarch key.
-     */
-    public String getMonarchKey() {
-        return getStringAttribute(MONARCH_TAG);
-    }
-
-    /**
-     * Gets the tax amount attached to this message.
-     *
-     * @return The tax amount, or negative if none present.
-     */
-    public int getTax() {
-        return getIntegerAttribute(TAX_TAG, -1);
-    }
+    // Public modifiers
 
     /**
      * Sets the tax amount attached to this message.
@@ -250,15 +236,6 @@ public class MonarchActionMessage extends ObjectMessage {
     public MonarchActionMessage setTax(int tax) {
         setStringAttribute(TAX_TAG, Integer.toString(tax));
         return this;
-    }
-
-    /**
-     * Gets the result.
-     *
-     * @return The result.
-     */
-    public Boolean getResult() {
-        return getBooleanAttribute(RESULT_TAG, (Boolean)null);
     }
 
     /**
