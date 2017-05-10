@@ -41,9 +41,6 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
     public static final String TAG = "setGoodsLevels";
     private static final String COLONY_TAG = "colony";
 
-    /** The new ExportData. */
-    private ExportData data = null;
-
 
     /**
      * Create a new {@code SetGoodsLevelsMessage} with the
@@ -55,7 +52,7 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
     public SetGoodsLevelsMessage(Colony colony, ExportData data) {
         super(TAG, COLONY_TAG, colony.getId());
 
-        this.data = data;
+        add1(data);
     }
 
     /**
@@ -68,7 +65,7 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
     public SetGoodsLevelsMessage(Game game, Element element) {
         super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
 
-        this.data = getChild(game, element, 0, ExportData.class);
+        add1(getChild(game, element, 0, ExportData.class));
     }
 
     /**
@@ -82,21 +79,38 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, COLONY_TAG);
 
-        this.data = null;
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            if (ExportData.TAG.equals(tag)) {
-                if (this.data == null) {
-                    this.data = xr.readFreeColObject(game, ExportData.class);
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        ExportData data = null;
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (ExportData.TAG.equals(tag)) {
+                    if (data == null) {
+                        data = xr.readFreeColObject(game, ExportData.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
                 } else {
-                    expected(TAG, tag);
+                    expected(ExportData.TAG, tag);
                 }
-            } else {
-                expected(ExportData.TAG, tag);
+                xr.expectTag(tag);
             }
-            xr.expectTag(tag);
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
+        add1(data);
+    }
+
+
+    /**
+     * Get the export data.
+     *
+     * @return The {@code ExportData}.
+     */
+    private ExportData getExportData() {
+        return getChild(0, ExportData.class);
     }
 
 
@@ -128,28 +142,13 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage());
         }
+        ExportData exportData = getExportData();
+        if (exportData == null) {
+            return serverPlayer.clientError("No export data present.");
+        }
 
         // Proceed to set.
         return igc(freeColServer)
-            .setGoodsLevels(serverPlayer, colony, this.data);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeAttributes(FreeColXMLWriter xw)
-        throws XMLStreamException {
-        if (this.data != null) this.data.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            COLONY_TAG, getStringAttribute(COLONY_TAG))
-            .add(this.data).toXMLElement();
+            .setGoodsLevels(serverPlayer, colony, exportData);
     }
 }
