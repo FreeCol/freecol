@@ -48,9 +48,6 @@ public class LootCargoMessage extends ObjectMessage {
     private static final String LOSER_TAG = "loser";
     private static final String WINNER_TAG = "winner";
 
-    /** The goods to be looted. */
-    private List<Goods> goods = new ArrayList<>();
-
 
     /**
      * Create a new {@code LootCargoMessage}.
@@ -61,8 +58,6 @@ public class LootCargoMessage extends ObjectMessage {
      */
     public LootCargoMessage(Unit winner, String loserId, List<Goods> goods) {
         super(TAG, WINNER_TAG, winner.getId(), LOSER_TAG, loserId);
-
-        this.goods.clear();
     }
 
     /**
@@ -76,7 +71,7 @@ public class LootCargoMessage extends ObjectMessage {
         super(TAG, WINNER_TAG, getStringAttribute(element, WINNER_TAG),
               LOSER_TAG, getStringAttribute(element, LOSER_TAG));
 
-        this.goods.addAll(DOMUtils.getChildren(game, element, Goods.class));
+        addAll(DOMUtils.getChildren(game, element, Goods.class));
     }
 
     /**
@@ -90,13 +85,13 @@ public class LootCargoMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, WINNER_TAG, LOSER_TAG);
 
-        this.goods.clear();
+        List<Goods> goods = new ArrayList<>();
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (Goods.TAG.equals(tag)) {
-                if (this.goods == null) {
+                if (goods == null) {
                     Goods g = xr.readFreeColObject(game, Goods.class);
-                    if (g != null) this.goods.add(g);
+                    if (g != null) goods.add(g);
                 } else {
                     expected(TAG, tag);
                 }
@@ -106,8 +101,38 @@ public class LootCargoMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
+        addAll(goods);
     }
 
+
+    /**
+     * Accessor for the winning unit.
+     *
+     * @param game The {@code Game} to look for the unit in.
+     * @return The winner unit.
+     */
+    private Unit getWinner(Game game) {
+        return game.getFreeColGameObject(getStringAttribute(WINNER_TAG),
+                                         Unit.class);
+    }
+
+    /**
+     * Accessor for the losing unit identifier.
+     *
+     * @return The loser unit object Identifier.
+     */
+    private String getLoserId() {
+        return getStringAttribute(LOSER_TAG);
+    }
+
+    /**
+     * Accessor for the goods to loot.
+     *
+     * @return The goods to loot.
+     */
+    private List<Goods> getGoods() {
+        return getChildren(Goods.class);
+    }
 
     /**
      * {@inheritDoc}
@@ -166,57 +191,5 @@ public class LootCargoMessage extends ObjectMessage {
         // Try to loot.
         return igc(freeColServer)
             .lootCargo(serverPlayer, winner, getLoserId(), getGoods());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        for (Goods g : this.goods) g.toXML(xw);
-    }
-
-    /**
-     * Convert this LootCargoMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG,
-            WINNER_TAG, getStringAttribute(WINNER_TAG),
-            LOSER_TAG, getLoserId())
-            .add(getGoods()).toXMLElement();
-    }
-
-    // Public interface
-
-    /**
-     * Public accessor to help the client in game controller.
-     *
-     * @param game The {@code Game} to look for the unit in.
-     * @return The winner unit.
-     */
-    public Unit getWinner(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(WINNER_TAG),
-                                         Unit.class);
-    }
-
-    /**
-     * Public accessor to help the client in game controller.
-     *
-     * @return The loser unit object Identifier.
-     */
-    public String getLoserId() {
-        return getStringAttribute(LOSER_TAG);
-    }
-
-    /**
-     * Public accessor to help the client in game controller.
-     *
-     * @return The goods to loot.
-     */
-    public List<Goods> getGoods() {
-        return this.goods;
     }
 }
