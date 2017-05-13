@@ -301,7 +301,7 @@ public class FreeColDirectories {
      * @param dir The {@code File} specifying the required directory.
      * @return The required directory, or null on failure.
      */
-    private static File requireDir(File dir) {
+    private static File requireDirectory(File dir) {
         if (dir.exists()) {
             if (dir.isDirectory() && dir.canWrite()) return dir;
         } else {
@@ -369,24 +369,24 @@ public class FreeColDirectories {
             : new File(home, XDG_CONFIG_HOME_DEFAULT);
         if (!isGoodDirectory(d)) return badDir(d);
         File f = new File(d, FREECOL_DIRECTORY);
-        if (!isGoodDirectory(f)) return badConfig(f);
-        dirs[0] = f;
+        if ((d = requireDirectory(f)) == null) return badConfig(f);
+        dirs[0] = d;
 
         env = System.getenv(XDG_DATA_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_DATA_HOME_DEFAULT);
         if (!isGoodDirectory(d)) return badDir(d);
         f = new File(d, FREECOL_DIRECTORY);
-        if (!isGoodDirectory(f)) return badData(f);
-        dirs[1] = f;
+        if ((d = requireDirectory(f)) == null) return badData(f);
+        dirs[1] = d;
 
         env = System.getenv(XDG_CACHE_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_CACHE_HOME_DEFAULT);
         if (!isGoodDirectory(d)) return badDir(d);
         f = new File(d, FREECOL_DIRECTORY);
-        if (!isGoodDirectory(f)) return badCache(f);
-        dirs[2] = f;
+        if ((d = requireDirectory(f)) == null) return badCache(f);
+        dirs[2] = d;
 
         return null;
     }
@@ -415,8 +415,9 @@ public class FreeColDirectories {
         File appsDir = new File(libDir, "Application Support");
         if (!isGoodDirectory(appsDir)) return badDir(appsDir);
         d = new File(appsDir, FREECOL_DIRECTORY);
-        if (!isGoodDirectory(d)) return badData(d);
-        dirs[1] = dirs[2] = d;
+        File d2 = requireDirectory(d);
+        if (d2 == null) return badData(d);
+        dirs[1] = dirs[2] = d2;
 
         return null;
     }
@@ -441,7 +442,8 @@ public class FreeColDirectories {
         if (home == null) return badHome();
 
         File d = new File(home, FREECOL_DIRECTORY);
-        if (!isGoodDirectory(d)) return badDir(d);
+        File d2 = requireDirectory(d);
+        if (d2 == null) return badDir(d);
         dirs[0] = dirs[1] = dirs[2] = d;
         return null;
     }
