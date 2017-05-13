@@ -818,10 +818,11 @@ is used as a secondary key, and vice versa.
 
 \end{itemize}
 
-Beware that some Java implementations have bugs that cause high CPU
-load and very slow performance if animation is enabled. If this
-happens, either disable animation or experiment with the
-\texttt{-Dsun.java2d.pmoffscreen=false} Java command line option.
+Beware that some combination of Java implementation and underlying
+graphics drivers have bugs that cause high CPU load and very slow
+performance if animation is enabled. If this happens, either disable
+animation, try changing the pixmaps client option, or experiment with
+the \texttt{-Dsun.java2d.pmoffscreen=false} Java command line option.
 
 
 \hypertarget{translations}{\subsection{Translations}}
