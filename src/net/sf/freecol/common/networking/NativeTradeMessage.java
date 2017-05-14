@@ -95,20 +95,26 @@ public class NativeTradeMessage extends ObjectMessage {
         super(TAG, xr, ACTION_TAG);
 
         NativeTrade nt = null;
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            if (NativeTrade.TAG.equals(tag)) {
-                if (nt == null) {
-                    nt = xr.readFreeColObject(game, NativeTrade.class);
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (NativeTrade.TAG.equals(tag)) {
+                    if (nt == null) {
+                        nt = xr.readFreeColObject(game, NativeTrade.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
                 } else {
-                    expected(TAG, tag);
+                    expected(NativeTrade.TAG, tag);
                 }
-            } else {
-                expected(NativeTrade.TAG, tag);
+                xr.expectTag(tag);
             }
-            xr.expectTag(tag);
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
         add1(nt);
     }
 

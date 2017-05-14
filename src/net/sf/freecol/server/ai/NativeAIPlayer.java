@@ -814,7 +814,6 @@ public class NativeAIPlayer extends MissionAIPlayer {
             modifiers.addAll(getShipTradePenalties(true));
         }
         for (NativeTradeItem nti : nt.getUnitToSettlement()) {
-            if (nti.priceIsSet()) continue;
             int price = (int)FeatureContainer.applyModifiers(1.0f / anger
                 * is.getPriceToBuy(nti.getGoods()), turn, modifiers);
             for (int h = nti.getHaggleCount(); h >= 0; h--) {
