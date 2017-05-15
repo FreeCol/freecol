@@ -70,7 +70,7 @@ public class AddPlayerMessage extends ObjectMessage {
         // This implicitly updates the game.
         // TODO: should this do a non-interning read and have the client
         // handlers do more checking?
-        this.players.addAll(DOMUtils.getChildren(game, element, Player.class));
+        this.players.addAll(DOMUtils.getChildren(game, element, true, Player.class));
     }
 
     /**

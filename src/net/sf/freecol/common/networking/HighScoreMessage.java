@@ -66,7 +66,7 @@ public class HighScoreMessage extends ObjectMessage {
      */
     public HighScoreMessage(Game game, Element element) {
         this(getStringAttribute(element, KEY_TAG),
-             DOMUtils.getChildren(game, element, HighScore.class));
+             DOMUtils.getChildren(game, element, false, HighScore.class));
     }
 
     /**

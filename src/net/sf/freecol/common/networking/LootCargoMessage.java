@@ -71,7 +71,7 @@ public class LootCargoMessage extends ObjectMessage {
         super(TAG, WINNER_TAG, getStringAttribute(element, WINNER_TAG),
               LOSER_TAG, getStringAttribute(element, LOSER_TAG));
 
-        addAll(DOMUtils.getChildren(game, element, Goods.class));
+        addAll(DOMUtils.getChildren(game, element, false, Goods.class));
     }
 
     /**
