@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
@@ -44,17 +45,16 @@ public class AddPlayerMessage extends ObjectMessage {
 
     public static final String TAG = "addPlayer";
 
-    /** The players to add. */
-    private final List<Player> players = new ArrayList<>();
-
 
     /**
      * Create a new {@code AddPlayerMessage}.
+     *
+     * @param players A list of {@code Player}s to add.
      */
-    public AddPlayerMessage() {
+    public AddPlayerMessage(List<? extends Player> players) {
         super(TAG);
 
-        this.players.clear();
+        addAll(players);
     }
 
     /**
@@ -65,12 +65,7 @@ public class AddPlayerMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AddPlayerMessage(Game game, Element element) {
-        this();
-
-        // This implicitly updates the game.
-        // TODO: should this do a non-interning read and have the client
-        // handlers do more checking?
-        this.players.addAll(DOMUtils.getChildren(game, element, true, Player.class));
+        this(DOMUtils.getChildren(game, element, true, Player.class));
     }
 
     /**
@@ -82,21 +77,32 @@ public class AddPlayerMessage extends ObjectMessage {
      */
     public AddPlayerMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
-        this();
+        super(TAG);
 
+        List<Player> players = new ArrayList<>();
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (Player.TAG.equals(tag)) {
                 Player p = xr.readFreeColObject(game, Player.class);
-                if (p != null) this.players.add(p);
+                if (p != null) players.add(p);
             } else {
                 expected(Player.TAG, tag);
             }
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
+        addAll(players);
     }
 
+
+    /**
+     * Get the attached players.
+     *
+     * @return The list of {@code Player}s to add.
+     */
+    private List<Player> getPlayers() {
+        return getChildren(Player.class);
+    }
 
     /**
      * {@inheritDoc}
@@ -119,51 +125,13 @@ public class AddPlayerMessage extends ObjectMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
+        List<Player> players = getPlayers();
+        
         if (freeColClient.isInGame()) {
-            // Do not need to do anything, an interning read of the
-            // player does enough for now.
+            // Interning is sufficient
         } else {
+            // Interning is sufficient
             pgc(freeColClient).addPlayerHandler();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        for (Player p : this.players) p.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .add(this.players).toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Get the attached players.
-     *
-     * @return The list of {@code Player}s to add.
-     */
-    public List<Player> getPlayers() {
-        return this.players;
-    }
-
-    /**
-     * Add a player to the message.
-     *
-     * @param p The {@code Player} to add.
-     * @return This message.
-     */
-    public AddPlayerMessage addPlayer(Player p) {
-        this.players.add(p);
-        return this;
     }
 }
