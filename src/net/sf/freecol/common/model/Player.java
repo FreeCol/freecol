@@ -2658,8 +2658,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Tile getFallbackTile() {
         Settlement settlement = first(getSettlements());
-        return (settlement != null) ? settlement.getTile()
-            : getEntryLocation().getTile();
+        Location loc = (settlement != null) ? settlement : getEntryLocation();
+        return (loc == null) ? null : loc.getTile();
     }
 
     /**
