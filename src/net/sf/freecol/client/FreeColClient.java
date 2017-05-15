@@ -532,7 +532,7 @@ public final class FreeColClient {
      * @see #setMyPlayer(Player)
      */
     public Player getMyPlayer() {
-        return player;
+        return this.player;
     }
 
     /**
@@ -718,7 +718,7 @@ public final class FreeColClient {
      * @return True if the client is the game admin and the game has begun.
      */
     public boolean isAdmin() {
-        return player != null && player.isAdmin();
+        return this.player != null && this.player.isAdmin();
     }
 
     /**

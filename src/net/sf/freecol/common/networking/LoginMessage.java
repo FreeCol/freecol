@@ -54,9 +54,6 @@ public class LoginMessage extends ObjectMessage {
     private static final String USER_NAME_TAG = "userName";
     private static final String VERSION_TAG = "version";
     
-    /** The game. */
-    private Game game;
-
         
     /**
      * Create a new {@code LoginMessage} with the supplied parameters.
@@ -75,7 +72,7 @@ public class LoginMessage extends ObjectMessage {
               CURRENT_PLAYER_TAG, Boolean.toString(currentPlayer));
 
         if (state != null) setStringAttribute(STATE_TAG, state.toString());
-        this.game = game;
+        if (game != null) add1(game);
     }
 
     /**
@@ -91,7 +88,7 @@ public class LoginMessage extends ObjectMessage {
                               ServerState.class, (ServerState)null),
              getBooleanAttribute(e, SINGLE_PLAYER_TAG, true),
              getBooleanAttribute(e, CURRENT_PLAYER_TAG, false),
-             getChild(game, e, 0, Game.class));
+             getChild(game, e, 0, true, Game.class));
     }
 
     /**
@@ -102,22 +99,58 @@ public class LoginMessage extends ObjectMessage {
      * @param xr The {@code FreeColXMLReader} to read the message from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public LoginMessage(@SuppressWarnings("unused")Game game,
-                        FreeColXMLReader xr)
+    public LoginMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, USER_NAME_TAG, VERSION_TAG, STATE_TAG,
               SINGLE_PLAYER_TAG, CURRENT_PLAYER_TAG);
-        
-        this.game = null;
+
+        game = null;
         while (xr.moreTags()) {
             final String tag = xr.getLocalName();
             if (Game.TAG.equals(tag)) {
-                this.game = new Game(null, xr);
+                game = new Game(null, xr);
             } else {
                 expected(Game.TAG, tag);
             }
         }
         xr.expectTag(TAG);
+        add1(game);
+    }
+
+
+    private String getUserName() {
+        return getStringAttribute(USER_NAME_TAG);
+    }
+
+    private String getVersion() {
+        return getStringAttribute(VERSION_TAG);
+    }
+
+    private ServerState getState() {
+        return getEnumAttribute(STATE_TAG, ServerState.class,
+                                (ServerState)null);
+    }
+
+    private boolean getSinglePlayer() {
+        return getBooleanAttribute(SINGLE_PLAYER_TAG, false);
+    }
+
+    private boolean getCurrentPlayer() {
+        return getBooleanAttribute(CURRENT_PLAYER_TAG, false);
+    }
+
+    private Game getGame() {
+        return getChild(0, Game.class);
+    }
+
+    /**
+     * Get the player (if any) with the current name in a given game.
+     *
+     * @param game The {@code Game} to look up.
+     * @return The {@code ServerPlayer} found.
+     */
+    public ServerPlayer getPlayer(Game game) {
+        return (ServerPlayer)game.getPlayerByName(getUserName());
     }
 
 
@@ -134,8 +167,9 @@ public class LoginMessage extends ObjectMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
+        Game game = getGame();
         freeColClient.getConnectController()
-            .login(getState(), this.game, getUserName(),
+            .login(getState(), game, getUserName(),
                    getSinglePlayer(), getCurrentPlayer());
     }
 
@@ -379,65 +413,20 @@ public class LoginMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (this.game != null) this.game.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Element toXMLElement() {
-        Player player = (this.game == null || getUserName() == null) ? null
-            : getPlayer(this.game);
+        final Game game = getGame();
+        final Player player = (game == null || getUserName() == null) ? null
+            : getPlayer(game);
+        final ServerState state = getState();
         DOMMessage ret = new DOMMessage(TAG,
             USER_NAME_TAG, getUserName(),
             VERSION_TAG, getVersion(),
             SINGLE_PLAYER_TAG, Boolean.toString(getSinglePlayer()),
             CURRENT_PLAYER_TAG, Boolean.toString(getCurrentPlayer()))
-            .add(this.game, player);
-        ServerState state = getState();
+            .add(game, player);
         if (state != null) {
             ret.setStringAttribute(STATE_TAG, state.toString());
         }
         return ret.toXMLElement();
-    }
-
-
-    // Public interface
-
-    public String getUserName() {
-        return getStringAttribute(USER_NAME_TAG);
-    }
-
-    public String getVersion() {
-        return getStringAttribute(VERSION_TAG);
-    }
-
-    public ServerState getState() {
-        return getEnumAttribute(STATE_TAG, ServerState.class,
-                                (ServerState)null);
-    }
-
-    public boolean getSinglePlayer() {
-        return getBooleanAttribute(SINGLE_PLAYER_TAG, false);
-    }
-
-    public boolean getCurrentPlayer() {
-        return getBooleanAttribute(CURRENT_PLAYER_TAG, false);
-    }
-
-    public Game getGame() {
-        return this.game;
-    }
-
-    /**
-     * Get the player (if any) with the current name in a given game.
-     *
-     * @param game The {@code Game} to look up.
-     * @return The {@code ServerPlayer} found.
-     */
-    public ServerPlayer getPlayer(Game game) {
-        return (ServerPlayer)game.getPlayerByName(getUserName());
     }
 }
