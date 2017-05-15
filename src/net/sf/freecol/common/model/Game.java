@@ -423,8 +423,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Registers a new {@code FreeColGameObject} with a given
-     * identifier.
+     * Registers a new {@code FreeColGameObject} with a given identifier.
      *
      * @param id The object identifier.
      * @param fcgo The {@code FreeColGameObject} to add to this

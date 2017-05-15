@@ -133,6 +133,24 @@ public class CollectionUtils {
     }
 
     /**
+     * Make a map from a flat list of key,value pairs.
+     *
+     * Tolerates odd lists.  Perhaps this should be an error.
+     *
+     * @param <T> The value type.
+     * @param values The list of values.
+     * @return A map derived from the values.
+     */
+    @SafeVarargs
+    public static <T> Map<T, T> asMap(T... values) {
+        Map<T, T> ret = new HashMap<>();
+        for (int i = 0; i < values.length-1; i++) {
+            ret.put(values[i], values[i+1]);
+        }
+        return ret;
+    }
+        
+    /**
      * Appends a value to a list member of a map with a given key.
      *
      * @param <T> The map value collection member type.

@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import net.sf.freecol.common.model.Ability;
@@ -754,9 +756,10 @@ public class ChangeSet {
     /**
      * Encapsulate a partial update of a FreeColGameObject.
      */
-    private static class PartialObjectChange extends ObjectChange {
+    private static class PartialObjectChange<T extends FreeColGameObject>
+        extends Change<PartialMessage> {
 
-        private final List<String> fields;
+        private final Map<String, String> map;
 
 
         /**
@@ -764,13 +767,13 @@ public class ChangeSet {
          *
          * @param see The visibility of this change.
          * @param fcgo The {@code FreeColGameObject} to update.
-         * @param fields The fields to update.
+         * @param map A map of the field to update to the value to use.
          */
-        public PartialObjectChange(See see, FreeColGameObject fcgo,
-                                   List<String> fields) {
-            super(see, fcgo);
+        public PartialObjectChange(See see, T fcgo, Map<String,String> map) {
+            super(see);
 
-            this.fields = fields;
+            this.map = map;
+            this.map.put(PartialMessage.ID_TAG, fcgo.getId());
         }
 
 
@@ -778,8 +781,8 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public UpdateMessage toMessage(ServerPlayer serverPlayer) {
-            return new UpdateMessage(serverPlayer, this.fcgo, this.fields);
+        public PartialMessage toMessage(ServerPlayer serverPlayer) {
+            return new PartialMessage(this.map);
         }
 
 
@@ -792,9 +795,11 @@ public class ChangeSet {
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(getClass().getName())
-                .append(' ').append(see)
-                .append(' ').append(fcgo.getId());
-            for (String f : fields) sb.append(' ').append(f);
+                .append(' ').append(see);
+            for (Entry<String, String> e : this.map.entrySet()) {
+                sb.append(' ').append(e.getKey())
+                    .append('=').append(e.getValue());
+            }
             sb.append(']');
             return sb.toString();
         }
@@ -1385,10 +1390,9 @@ public class ChangeSet {
      * @param fields The fields to update.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addPartial(See see, FreeColGameObject fcgo,
-                                String... fields) {
-        changes.add(new PartialObjectChange(see, fcgo,
-                new ArrayList<>(Arrays.asList(fields))));
+    public <T extends FreeColGameObject> ChangeSet addPartial(See see, T fcgo,
+                                                              String... fields) {
+        changes.add(new PartialObjectChange<T>(see, fcgo, asMap(fields)));
         return this;
     }
 

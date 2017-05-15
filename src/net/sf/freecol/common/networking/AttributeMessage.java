@@ -42,7 +42,7 @@ public class AttributeMessage extends TrivialMessage {
     public static final String TAG = "attribute";
 
     /** The key,value attribute pairs. */
-    private final Map<String,String> attributes = new HashMap<>();
+    protected final Map<String,String> attributes = new HashMap<>();
 
     /** Whether this message is trivially mergeable. */
     private boolean mergeable = false;

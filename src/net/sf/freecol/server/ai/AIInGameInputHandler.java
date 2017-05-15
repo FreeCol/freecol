@@ -76,6 +76,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.NewTurnMessage;
+import net.sf.freecol.common.networking.PartialMessage;
 import net.sf.freecol.common.networking.ReconnectMessage;
 import net.sf.freecol.common.networking.RemoveMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
@@ -255,6 +256,7 @@ public final class AIInGameInputHandler extends FreeColServerHolder
             case NativeGiftMessage.TAG:
             case NewTurnMessage.TAG:
             case NewTradeRouteMessage.TAG:
+            case PartialMessage.TAG:
             case RemoveMessage.TAG:
             case ScoutSpeakToChiefMessage.TAG:
             case SetDeadMessage.TAG:

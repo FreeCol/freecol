@@ -83,6 +83,7 @@ import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.NewTurnMessage;
 import net.sf.freecol.common.networking.ReconnectMessage;
 import net.sf.freecol.common.networking.RemoveMessage;
+import net.sf.freecol.common.networking.PartialMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetAIMessage;
 import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
@@ -201,6 +202,9 @@ public final class InGameInputHandler extends ClientInputHandler {
         register(NewTradeRouteMessage.TAG,
             (Connection c, Element e) ->
                 new NewTradeRouteMessage(getGame(), e).clientHandler(freeColClient));
+        register(PartialMessage.TAG,
+            (Connection c, Element e) ->
+                new PartialMessage(getGame(), e).clientHandler(freeColClient));
         register(ReconnectMessage.TAG,
             (Connection c, Element e) ->
                 TrivialMessage.reconnectMessage.clientHandler(freeColClient));

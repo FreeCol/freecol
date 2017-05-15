@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -109,6 +110,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
@@ -4244,6 +4246,31 @@ public final class InGameController extends FreeColClientHolder {
      */
     public boolean nextModelMessage() {
         return displayModelMessages(false, false);
+    }
+
+    /**
+     * Handle partial updates.
+     *
+     * @param fcgo The {@code FreeColGameObject} to update.
+     * @param fields A map of fields to update.
+     */
+    public void partialHandler(FreeColGameObject fcgo,
+        java.util.Map<String, String> fields) {
+        for (Entry<String, String> e : fields.entrySet()) {
+            try {
+                Introspector intro = new Introspector(fcgo.getClass(), e.getKey());
+                intro.setter(fcgo, e.getValue()); // Possible -vis(player)
+            } catch (Introspector.IntrospectorException ie) {
+                logger.log(Level.WARNING, "Partial update setter fail: "
+                    + fcgo.getId() + "/" + e.getKey() + "=" + e.getValue(), ie);
+            }
+        }
+
+        final Player player = getMyPlayer();
+        if ((fcgo instanceof Player && (fcgo == player))
+            || ((fcgo instanceof Ownable) && player.owns((Ownable)fcgo))) {
+            player.invalidateCanSeeTiles();//+vis(player)
+        }
     }
 
     /**
