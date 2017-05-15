@@ -3050,7 +3050,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                     + " id=" + getId()
                     + " unitCount=" + getUnitCount()
                     + " scope=" + xw.getWriteScope()
-                    + "/" + xw.getWriteScope().getClient());
+                    + "/" + xw.getClientPlayer());
             }
             xw.writeAttribute(UNIT_COUNT_TAG, uc);
         }

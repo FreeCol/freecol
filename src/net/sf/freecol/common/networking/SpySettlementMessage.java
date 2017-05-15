@@ -142,7 +142,7 @@ public class SpySettlementMessage extends ObjectMessage {
         Tile spyTile = getSpyTile();
         if (spyTile != null) {
             FreeColXMLWriter.WriteScope ws = xw.getWriteScope();
-            if (ws.getClient() != null) { // Override scope to client
+            if (xw.getClientPlayer() != null) { // Override scope to client
                 ws = xw.replaceScope(FreeColXMLWriter.WriteScope.toServer());
             }
             try {
