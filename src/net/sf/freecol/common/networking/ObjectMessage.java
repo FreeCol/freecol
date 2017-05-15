@@ -117,7 +117,7 @@ public abstract class ObjectMessage extends AttributeMessage {
     @Override
     public void setChildren(List<? extends FreeColObject> fcos) {
         this.objects.clear();
-        if (objects != null) this.objects.addAll(fcos);
+        this.objects.addAll(fcos);
     }
 
     /**
