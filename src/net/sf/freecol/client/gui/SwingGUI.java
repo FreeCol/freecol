@@ -1139,7 +1139,9 @@ public class SwingGUI extends GUI {
                 updateMapControls();
             }
         }
-        if (!getFreeColClient().isInGame()) showMainPanel(null);
+        FreeColClient freeColClient = getFreeColClient();
+        if (!freeColClient.isInGame() && !freeColClient.isMapEditor())
+            showMainPanel(null);
     }
 
     /**

@@ -72,7 +72,7 @@ public final class FullScreenFrameListener implements WindowListener {
      */
     @Override
     public void windowClosing(WindowEvent event) {
-        if (freeColClient.isInGame()) {
+        if (freeColClient.isInGame() || freeColClient.isMapEditor()) {
             freeColClient.askToQuit();
         } else {
             freeColClient.quit();

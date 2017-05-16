@@ -41,7 +41,7 @@ public final class WindowedFrameListener extends FreeColClientHolder
     public WindowedFrameListener(FreeColClient freeColClient) {
         super(freeColClient);
     }
-    
+
     /**
      * Invoked when the window gets activated.
      *
@@ -50,7 +50,7 @@ public final class WindowedFrameListener extends FreeColClientHolder
     @Override
     public void windowActivated(WindowEvent event) {
     }
-    
+
     /**
      * Invoked when the window gets closed.
      *
@@ -59,7 +59,7 @@ public final class WindowedFrameListener extends FreeColClientHolder
     @Override
     public void windowClosed(WindowEvent event) {
     }
-    
+
     /**
      * Invoked when the window is closing.
      *
@@ -67,13 +67,14 @@ public final class WindowedFrameListener extends FreeColClientHolder
      */
     @Override
     public void windowClosing(WindowEvent event) {
-        if (getFreeColClient().isInGame()) {
-            getFreeColClient().askToQuit();
+        FreeColClient freeColClient = getFreeColClient();
+        if (freeColClient.isInGame() || freeColClient.isMapEditor()) {
+            freeColClient.askToQuit();
         } else {
-            getFreeColClient().quit();
+            freeColClient.quit();
         }
     }
-    
+
     /**
      * Invoked when the window gets deactivated.
      *
@@ -82,7 +83,7 @@ public final class WindowedFrameListener extends FreeColClientHolder
     @Override
     public void windowDeactivated(WindowEvent event) {
     }
-    
+
     /**
      * Invoked when the window gets deiconified.
      *
@@ -91,7 +92,7 @@ public final class WindowedFrameListener extends FreeColClientHolder
     @Override
     public void windowDeiconified(WindowEvent event) {
     }
-    
+
     /**
      * Invoked when the window gets iconified.
      *
@@ -100,7 +101,7 @@ public final class WindowedFrameListener extends FreeColClientHolder
     @Override
     public void windowIconified(WindowEvent event) {
     }
-    
+
     /**
      * Invoked when the window gets opened.
      *
