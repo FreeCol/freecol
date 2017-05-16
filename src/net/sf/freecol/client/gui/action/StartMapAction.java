@@ -55,7 +55,10 @@ public class StartMapAction extends FreeColAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if (!freeColClient.isMapEditor()) return;
+        if (!freeColClient.isMapEditor() ||
+                freeColClient.getGame()==null ||
+                freeColClient.getGame().getMap()==null)
+            return;
         File startFile = FreeColDirectories.getStartMapFile();
         freeColClient.getMapEditorController()
             .saveMapEditorGame(startFile);
