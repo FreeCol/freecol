@@ -5009,10 +5009,20 @@ public final class InGameController extends FreeColClientHolder {
      * @param objects The {@code FreeColObject}s to update.
      */
     public void updateHandler(List<FreeColObject> objects) {
+        final Game game = getGame();
         final Player player = getMyPlayer();
         boolean visibilityChange = false;
 
         for (FreeColObject fco : objects) {
+            if (fco == null) continue;
+            FreeColGameObject real = game.getFreeColGameObject(fco.getId());
+            if (real == null) {
+                logger.warning("Update of missing object: " + fco.getId());
+                continue;
+            }
+            real.copyIn(fco);
+            real.intern();
+            
             if ((fco instanceof Player && (fco == player))
                 || ((fco instanceof Ownable) && player.owns((Ownable)fco))) {
                 visibilityChange = true;//-vis(player)

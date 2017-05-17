@@ -73,7 +73,7 @@ public class UpdateMessage extends ObjectMessage {
                          FreeColObject fco) {
         this(destination);
 
-        add1(fco);
+        if (fco != null) add1(fco);
     }
 
     /**
@@ -97,7 +97,7 @@ public class UpdateMessage extends ObjectMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateMessage(Game game, Element element) {
-        this((ServerPlayer)null, DOMUtils.getChildren(game, element, true));
+        this((ServerPlayer)null, DOMUtils.getChildren(game, element, false));
     }
 
     /**
@@ -111,12 +111,20 @@ public class UpdateMessage extends ObjectMessage {
         throws XMLStreamException {
         this((ServerPlayer)null);
 
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            add1(xr.readFreeColObject(game));
-            xr.expectTag(tag);
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        List<FreeColObject> fcos = new ArrayList<>();
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                fcos.add(xr.readFreeColObject(game));
+                xr.expectTag(tag);
+            }
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
+        addAll(fcos);
     }
 
 
@@ -158,24 +166,6 @@ public class UpdateMessage extends ObjectMessage {
             igc(freeColClient).updateHandler(getChildren());
         } else {
             pgc(freeColClient).updateHandler(getChildren());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        WriteScope ws = null;
-        if (this.destination != null) {
-            ws = xw.replaceScope(WriteScope.toClient(this.destination));
-        }
-        try {
-            for (FreeColObject fco : getChildren()) {
-                fco.toXML(xw);
-            }
-        } finally {
-            if (ws != null) xw.replaceScope(ws);
         }
     }
 
