@@ -69,15 +69,18 @@ final class UnitMoveAnimation extends FreeColClientHolder {
 
     /**
      * Do the animation.
+     *
+     * @return False if there was an error.
      */
-    public void animate() {
+    public boolean animate() {
         final int movementSpeed
             = getFreeColClient().getAnimationSpeed(unit.getOwner());
+        if (movementSpeed <= 0) return true;
+        
         final SwingGUI gui = (SwingGUI)getGUI();
         final Point srcP = gui.getTilePosition(sourceTile);
         final Point dstP = gui.getTilePosition(destinationTile);
-        
-        if (srcP == null || dstP == null || movementSpeed <= 0) return;
+        if (srcP == null || dstP == null) return false;
 
         float scale = gui.getMapScale();
         final int movementRatio = (int)(Math.pow(2, movementSpeed + 1) * scale);
@@ -134,5 +137,6 @@ final class UnitMoveAnimation extends FreeColClientHolder {
                     }
                 }
             });
+        return true;
     }
 }

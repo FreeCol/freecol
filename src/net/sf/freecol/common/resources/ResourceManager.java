@@ -228,6 +228,10 @@ public class ResourceManager {
         return mergedContainer.containsColorKey(key);
     }
 
+    public static synchronized boolean hasSZAResource(final String key) {
+        return mergedContainer.containsSZAKey(key);
+    }
+    
     public static synchronized Map<String, Resource> getResources() {
         return mergedContainer.getResources();
     }
@@ -255,7 +259,7 @@ public class ResourceManager {
      * @return a list of all resulting keys
      */
     public static synchronized List<String> getImageKeys(String prefix,
-                                                              String suffix) {
+                                                         String suffix) {
         return mergedContainer.getImageKeys(prefix, suffix);
     }
 

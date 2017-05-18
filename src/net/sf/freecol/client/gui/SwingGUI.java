@@ -654,8 +654,11 @@ public class SwingGUI extends GUI {
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
         requireFocus(attackerTile);
-        Animations.unitAttack(getFreeColClient(), attacker, defender,
-                              attackerTile, defenderTile, success);
+        if (!Animations.unitAttack(getFreeColClient(), attacker, defender,
+                                   attackerTile, defenderTile, success)) {
+            logger.warning("Attack animation failure: " + attacker
+                + " v " + defender);
+        }
     }
 
     /**
@@ -664,7 +667,10 @@ public class SwingGUI extends GUI {
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
         requireFocus(srcTile);
-        Animations.unitMove(getFreeColClient(), unit, srcTile, dstTile);
+        if (!Animations.unitMove(getFreeColClient(), unit, srcTile, dstTile)) {
+            logger.warning("Move animation failure: " + unit + " " + srcTile
+                + " " + dstTile);
+        }
     }
 
 

@@ -103,7 +103,7 @@ public enum Direction implements Named {
      *     (-#directions &le; n &le; #directions).
      * @return The rotated direction.
      */
-    private Direction rotate(int n) {
+    public Direction rotate(int n) {
         return values()[(ordinal() + n + NUMBER_OF_DIRECTIONS)
                         % NUMBER_OF_DIRECTIONS];
     }
@@ -141,7 +141,7 @@ public enum Direction implements Named {
      * @return The mirrored {@code Direction}.
      */
     public Direction getEWMirroredDirection() {
-        switch(this) {
+        switch (this) {
         case NW: return Direction.NE;
         case W: return Direction.E;
         case SW: return Direction.SE;

@@ -248,6 +248,10 @@ public final class ResourceMapping {
         return imageResources.containsKey(key);
     }
 
+    public boolean containsSZAKey(String key) {
+        return szaResources.containsKey(key);
+    }
+    
     /**
      * Gets the {@code Resource} by identifier.
      *

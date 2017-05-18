@@ -36,10 +36,11 @@ public class Animations {
      * @param unit The {@code Unit} to be animated.
      * @param source The source {@code Tile} for the unit.
      * @param destination The destination {@code Tile} for the unit.
+     * @return False if there was a problem.
      */
-    public static void unitMove(FreeColClient freeColClient, Unit unit,
-                                Tile source, Tile destination) {
-        new UnitMoveAnimation(freeColClient, unit, source, destination)
+    public static boolean unitMove(FreeColClient freeColClient, Unit unit,
+                                   Tile source, Tile destination) {
+        return new UnitMoveAnimation(freeColClient, unit, source, destination)
             .animate();
     }
     
@@ -52,13 +53,14 @@ public class Animations {
      * @param attackerTile The {@code Tile} the attack comes from.
      * @param defenderTile The {@code Tile} the attack goes to.
      * @param success Did the attack succeed?
+     * @return False if there was a problem.
      */
-    public static void unitAttack(FreeColClient freeColClient,
-                                  Unit attacker, Unit defender,
-                                  Tile attackerTile, Tile defenderTile,
-                                  boolean success) {
-        new UnitAttackAnimation(freeColClient, attacker, defender,
-                                attackerTile, defenderTile, success)
+    public static boolean unitAttack(FreeColClient freeColClient,
+                                     Unit attacker, Unit defender,
+                                     Tile attackerTile, Tile defenderTile,
+                                     boolean success) {
+        return new UnitAttackAnimation(freeColClient, attacker, defender,
+                                       attackerTile, defenderTile, success)
             .animate();
     }
 

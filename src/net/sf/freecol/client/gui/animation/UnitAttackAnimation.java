@@ -39,6 +39,9 @@ final class UnitAttackAnimation extends FreeColClientHolder {
     private final Tile attackerTile;
     private final Tile defenderTile;
     private final boolean success;
+
+    // Local members to load the animation information into.
+    private SimpleZippedAnimation sza = null;
     private boolean mirror = false;
 
 
@@ -65,24 +68,34 @@ final class UnitAttackAnimation extends FreeColClientHolder {
         this.success = success;
     }
 
-    private SimpleZippedAnimation getAnimation(String startStr,
-                                               float scale,
-                                               Direction direction) {
-        SimpleZippedAnimation sza;
+
+    /**
+     * Low level animation search.
+     *
+     * @param startStr The prefix for the animation resource.
+     * @param scale The gui scale.
+     * @param direction The {@code Direction} of the attack.
+     * @return True if the animation is loaded.
+     */
+    private boolean loadAnimation(String startStr, float scale,
+                                  Direction direction) {
         String specialId = startStr + direction.toString().toLowerCase();
-        sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
-        if(sza != null) {
-            mirror = false;
-            return sza;
+        if (ResourceManager.hasSZAResource(specialId)) {
+            this.sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
+            this.mirror = false;
+            return true;
         }
 
-        specialId = startStr + direction.getEWMirroredDirection().toString().toLowerCase();
-        sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
-        if(sza != null) {
-            mirror = true;
-            return sza;
+        Direction mirrored = direction.getEWMirroredDirection();
+        if (mirrored != direction) {
+            specialId = startStr + mirrored.toString().toLowerCase();
+            if (ResourceManager.hasSZAResource(specialId)) {
+                this.sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
+                this.mirror = true;
+                return true;
+            }
         }
-        return null;
+        return false;
     }
 
     /**
@@ -90,67 +103,76 @@ final class UnitAttackAnimation extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} to animate.
      * @param direction The {@code Direction} of the attack.
-     * @return An animation, if available.
+     * @return True if the animation is loaded.
      */
-    private SimpleZippedAnimation getAnimation(Unit unit,
-                                               Direction direction) {
+    private boolean loadAnimation(Unit unit, Direction direction) {
         float scale = ((SwingGUI)getGUI()).getMapScale();
         String roleStr = (unit.hasDefaultRole()) ? ""
             : "." + unit.getRoleSuffix();
         String startStr = "animation.unit." + unit.getType().getId() + roleStr
                         + ".attack.";
 
-        SimpleZippedAnimation sza;
-        sza = getAnimation(startStr, scale, direction);
-        if(sza != null) return sza;
-
-        sza = getAnimation(startStr, scale, direction.getNextDirection());
-        if(sza != null) return sza;
-        sza = getAnimation(startStr, scale, direction.getPreviousDirection());
-        if(sza != null) return sza;
-
-        sza = getAnimation(startStr, scale, direction.getNextDirection()
-                                                     .getNextDirection());
-        if(sza != null) return sza;
-        sza = getAnimation(startStr, scale, direction.getPreviousDirection()
-                                                     .getPreviousDirection());
-        if(sza != null) return sza;
-
-        sza = getAnimation(startStr, scale, direction.getNextDirection()
-                                                     .getNextDirection()
-                                                     .getNextDirection());
-        if(sza != null) return sza;
-        sza = getAnimation(startStr, scale, direction.getPreviousDirection()
-                                                     .getPreviousDirection()
-                                                     .getPreviousDirection());
-        if(sza != null) return sza;
-
-        sza = getAnimation(startStr, scale, direction.getReverseDirection());
-        return sza;
+        // Only check directions not covered by the EW mirroring.
+        // Favour East and West animations.
+        if (loadAnimation(startStr, scale, direction)) return true;
+        switch (direction) {
+        case N: case S:
+            return loadAnimation(startStr, scale, direction.getNextDirection())
+                || loadAnimation(startStr, scale, direction.rotate(2))
+                || loadAnimation(startStr, scale, direction.rotate(3))
+                || loadAnimation(startStr, scale, direction.rotate(-3));
+        case NE: case SW:
+            return loadAnimation(startStr, scale, direction.getNextDirection())
+                || loadAnimation(startStr, scale, direction.getPreviousDirection())
+                || loadAnimation(startStr, scale, direction.rotate(2))
+                || loadAnimation(startStr, scale, direction.rotate(3));
+        case NW: case SE:
+            return loadAnimation(startStr, scale, direction.getPreviousDirection())
+                || loadAnimation(startStr, scale, direction.getNextDirection())
+                || loadAnimation(startStr, scale, direction.rotate(-2))
+                || loadAnimation(startStr, scale, direction.rotate(-3));
+        case E: case W:
+            return loadAnimation(startStr, scale, direction.getNextDirection())
+                || loadAnimation(startStr, scale, direction.getPreviousDirection())
+                || loadAnimation(startStr, scale, direction.rotate(2))
+                || loadAnimation(startStr, scale, direction.rotate(-2));
+        default:
+            break;
+        }
+        return false;           
     }
 
     /**
      * Do the animation.
+     *
+     * @return True if the required animations were found and executed,
+     *     false on error.
      */
-    public void animate() {
+    public boolean animate() {
+        Direction direction = this.attackerTile.getDirection(this.defenderTile);
+        if (direction == null) return false; // Fail fast
+
+        final FreeColClient fcc = getFreeColClient();
         final SwingGUI gui = (SwingGUI)getGUI();
-        Direction direction = attackerTile.getDirection(defenderTile);
-        SimpleZippedAnimation sza;
+        boolean ret = true;
 
-        if (getFreeColClient().getAnimationSpeed(attacker.getOwner()) > 0) {
-            if ((sza = getAnimation(attacker, direction)) != null) {
-                new UnitImageAnimation(gui, attacker, attackerTile, sza, mirror)
-                    .animate();
+        if (fcc.getAnimationSpeed(this.attacker.getOwner()) > 0) {
+            if (loadAnimation(this.attacker, direction)) {
+                new UnitImageAnimation(gui, this.attacker, this.attackerTile,
+                                       this.sza, this.mirror).animate();
+            } else {
+                ret = false;
             }
         }
 
-        if (!success
-            && getFreeColClient().getAnimationSpeed(defender.getOwner()) > 0) {
-            direction = direction.getReverseDirection();
-            if ((sza = getAnimation(defender, direction)) != null) {
-                new UnitImageAnimation(gui, defender, defenderTile, sza, mirror)
-                    .animate();
+        if (!success && fcc.getAnimationSpeed(this.defender.getOwner()) > 0) {
+            if (loadAnimation(this.defender, direction.getReverseDirection())) {
+                new UnitImageAnimation(gui, this.defender, this.defenderTile,
+                                       this.sza, this.mirror).animate();
+            } else {
+                ret = false;
             }
         }
+        return ret;
     }
 }
