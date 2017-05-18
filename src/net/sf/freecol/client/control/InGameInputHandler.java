@@ -118,11 +118,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
-    private final Runnable displayModelMessagesRunnable = () -> {
-        igc().displayModelMessages(false);
-    };
-
-
     /**
      * The constructor to use.
      *
@@ -235,25 +230,6 @@ public final class InGameInputHandler extends ClientInputHandler {
                 new UpdateMessage(getGame(), e).clientHandler(freeColClient));
     }
 
-
-    /**
-     * Shorthand to run in the EDT and wait.
-     *
-     * @param runnable The {@code Runnable} to run.
-     */
-    private void invokeAndWait(Runnable runnable) {
-        getGUI().invokeNowOrWait(runnable);
-    }
-    
-    /**
-     * Shorthand to run in the EDT eventually.
-     *
-     * @param runnable The {@code Runnable} to run.
-     */
-    private void invokeLater(Runnable runnable) {
-        getGUI().invokeNowOrLater(runnable);
-    }
-    
 
     // Override ClientInputHandler
 
