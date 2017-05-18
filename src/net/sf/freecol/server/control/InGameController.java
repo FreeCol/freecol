@@ -2450,7 +2450,6 @@ public final class InGameController extends Controller {
                     .addStringTemplate("%player%",
                         enemyPlayer.getNationLabel())
                     .addAmount("%amount%", goldToPay));
-            cs.addAttribute(See.only(serverPlayer), "gold", "0");
             unit.setMovesLeft(0);
             cs.addPartial(See.only(serverPlayer), unit,
                 "movesLeft", String.valueOf(unit.getMovesLeft()));
@@ -2462,8 +2461,6 @@ public final class InGameController extends Controller {
                 Tension.WAR_MODIFIER, cs);//+til
             enemyPlayer.csModifyTension(serverPlayer,
                 Tension.TENSION_ADD_WAR_INCITER, cs);//+til
-            cs.addAttribute(See.only(serverPlayer),
-                            "gold", Integer.toString(gold));
             serverPlayer.modifyGold(-gold);
             nativePlayer.modifyGold(gold);
             cs.addMessage(serverPlayer,

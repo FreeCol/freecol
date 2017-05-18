@@ -153,11 +153,7 @@ public class InciteMessage extends AttributeMessage {
                 + is.getName() + ": " + type.whyIllegal());
         }
 
-        int gold = getGold();
-        if (gold < 0) {
-            return serverPlayer.clientError("Bad gold: "
-                + getStringAttribute(GOLD_TAG));
-        }
+        final int gold = getGold(); // Negative gold is the initial query
 
         // Valid, proceed to incite.
         return igc(freeColServer)
