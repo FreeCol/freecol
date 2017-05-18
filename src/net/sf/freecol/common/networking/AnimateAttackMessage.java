@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
@@ -33,6 +36,7 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
+import net.sf.freecol.common.util.DOMUtils;
 
 import org.w3c.dom.Element;
 
@@ -90,8 +94,7 @@ public class AnimateAttackMessage extends ObjectMessage {
               DEFENDER_TILE_TAG, getStringAttribute(element, DEFENDER_TILE_TAG),
               SUCCESS_TAG, getStringAttribute(element, SUCCESS_TAG));
 
-        addUnits(getChild(game, element, 0, false, Unit.class),
-                 getChild(game, element, 1, false, Unit.class));
+        addAll(DOMUtils.getChildren(game, element, false, Unit.class));
     }
 
     /**
@@ -108,18 +111,12 @@ public class AnimateAttackMessage extends ObjectMessage {
 
         FreeColXMLReader.ReadScope rs
             = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
-        Unit attacker = null, defender = null;
+        List<Unit> units = new ArrayList<>();
         try {
             while (xr.moreTags()) {
                 String tag = xr.getLocalName();
                 if (Unit.TAG.equals(tag)) {
-                    if (attacker == null) {
-                        attacker = xr.readFreeColObject(game, Unit.class);
-                    } else if (defender == null) {
-                        defender = xr.readFreeColObject(game, Unit.class);
-                    } else {
-                        expected(TAG, tag);
-                    }
+                    add1(xr.readFreeColObject(game, Unit.class));
                 } else {
                     expected(Unit.TAG, tag);
                 }
@@ -129,72 +126,53 @@ public class AnimateAttackMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        addUnits(attacker, defender);
     }
 
 
     /**
-     * Add the units.
+     * Get a unit by key.
      *
-     * @param u0 The first {@code Unit} found.
-     * @param u1 The second {@code Unit} found.
+     * @param game The {@code Game} to look up the unit in.
+     * @return The attacker {@code Unit}.
      */
-    private void addUnits(Unit u0, Unit u1) {
-        if (u0 != null && u1 == null
-            && u0.getId().equals(getStringAttribute(DEFENDER_TAG))) {
-            u1 = u0;
-            u0 = null;
-        }
-        add1(u0);
-        add1(u1);
-    }
+    private Unit getUnit(Game game, String key) {
+        final String id = getStringAttribute(key);
+        if (id == null) return null;
         
+        Unit unit = game.getFreeColGameObject(id, Unit.class);
+        if (unit != null) return unit;
+        
+        for (Unit u : getChildren(Unit.class)) {
+            if (id.equals(u.getId())) {
+                u.intern();
+                return u;
+            }
+            if ((u = u.getCarriedUnitById(id)) != null) {
+                u.intern();
+                return u;
+            }
+        }  
+        return null;
+    }
+
     /**
      * Get the attacker unit.
      *
+     * @param game The {@code Game} to look up the unit in.
      * @return The attacker {@code Unit}.
      */
     private Unit getAttacker(Game game) {
-        final String att = getStringAttribute(ATTACKER_TAG);
-        Unit unit = game.getFreeColGameObject(att, Unit.class);
-        if (unit == null) {
-            if ((unit = getChild(0, Unit.class)) == null) {
-                logger.warning("Attack animation missing attacker: " + att);
-            } else {
-                unit.intern();
-                if (!unit.getId().equals(att)) { // actually on carrier
-                    unit = unit.getCarriedUnitById(att);
-                    if (unit == null) {
-                        logger.warning("Attack animation missing carried attacker: " + att);
-                    }
-                }
-            }
-        }
-        return unit;
+        return getUnit(game, ATTACKER_TAG);
     }
-
+    
     /**
      * Get the defender unit.
      *
+     * @param game The {@code Game} to look up the unit in.
      * @return The defender {@code Unit}.
      */
     private Unit getDefender(Game game) {
-        final String def = getStringAttribute(DEFENDER_TAG);
-        Unit unit = game.getFreeColGameObject(def, Unit.class);
-        if (unit == null) {
-            if ((unit = getChild(1, Unit.class)) == null) {
-                logger.warning("Attack animation missing defender: " + def);
-            } else {
-                unit.intern();
-                if (!unit.getId().equals(def)) { // actually on carrier
-                    unit = unit.getCarriedUnitById(def);
-                    if (unit == null) {
-                        logger.warning("Attack animation missing carried defender: " + def);
-                    }
-                }
-            }
-        }
-        return unit;
+        return getUnit(game, DEFENDER_TAG);
     }
 
     /**
@@ -255,7 +233,14 @@ public class AnimateAttackMessage extends ObjectMessage {
         final Unit attacker = getAttacker(game);
         final Unit defender = getDefender(game);
 
-        if (attacker == null || defender == null) return;
+        if (attacker == null) {
+            logger.warning("Attack animation missing attacker unit.");
+            return;
+        }
+        if (defender == null) {
+            logger.warning("Attack animation missing defender unit.");
+            return;
+        }
         if (attackerTile == null) {
             logger.warning("Attack animation for: " + player.getId()
                 + " omitted attacker tile.");
