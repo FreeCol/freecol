@@ -120,6 +120,16 @@ public class ServerGame extends Game implements TurnTaker {
 
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getNextId() {
+        int ret = this.nextId;
+        this.nextId++;
+        return ret;
+    }
+
+    /**
      * Get a list of connected server players, optionally excluding
      * supplied ones.
      *
@@ -229,18 +239,6 @@ public class ServerGame extends Game implements TurnTaker {
     public void changeAI(ServerPlayer serverPlayer, boolean ai) {
         serverPlayer.setAI(ai);
         sendToAll(ChangeSet.aiChange(serverPlayer, ai));
-    }
-
-    /**
-     * Get a unique identifier to identify a {@code FreeColGameObject}.
-     * 
-     * @return A unique identifier.
-     */
-    @Override
-    public int getNextId() {
-        int ret = this.nextId;
-        this.nextId++;
-        return ret;
     }
 
     /**

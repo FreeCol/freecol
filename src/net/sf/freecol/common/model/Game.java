@@ -1371,7 +1371,7 @@ public class Game extends FreeColGameObject {
         Game o = copyInCast(other, Game.class);
         if (o == null) return false;
         this.specification = o.getSpecification();
-        this.nextId = o.getNextId();
+        // Do not update nextId, it is not meaningful in the client.
         this.uuid = o.getUUID();
         this.clientUserName = o.getClientUserName();
         this.players.clear();
