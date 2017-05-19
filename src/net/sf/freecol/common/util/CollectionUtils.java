@@ -144,7 +144,7 @@ public class CollectionUtils {
     @SafeVarargs
     public static <T> Map<T, T> asMap(T... values) {
         Map<T, T> ret = new HashMap<>();
-        for (int i = 0; i < values.length-1; i++) {
+        for (int i = 0; i < values.length-1; i += 2) {
             ret.put(values[i], values[i+1]);
         }
         return ret;
