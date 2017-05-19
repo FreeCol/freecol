@@ -1711,10 +1711,7 @@ public class Unit extends GoodsLocation
      *     carrying unit.
      */
     public int getTreasureAmount() {
-        if (!canCarryTreasure()) {
-            throw new IllegalStateException("Unit can not carry treasure");
-        }
-        return treasureAmount;
+        return this.treasureAmount;
     }
 
     /**
@@ -1723,9 +1720,6 @@ public class Unit extends GoodsLocation
      * @param amount The new amount of treasure.
      */
     public void setTreasureAmount(int amount) {
-        if (!canCarryTreasure()) {
-            throw new IllegalStateException("Unit can not carry treasure");
-        }
         this.treasureAmount = amount;
     }
 
