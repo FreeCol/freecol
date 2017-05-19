@@ -25,9 +25,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -419,7 +421,7 @@ public abstract class Message {
      *
      * @return True if this message is trivially mergeable.
      */
-    public boolean canMergeAttributes() {
+    public boolean canMerge() {
         return false;
     }
 
@@ -430,11 +432,15 @@ public abstract class Message {
      * @return True if the other message was merged.
      */
     public boolean merge(Message message) {
-        if (message.canMergeAttributes()) {
-            this.setStringAttributes(message.getStringAttributes());
-            return true;
-        }
-        return false;             
+        if (!message.canMerge()) return false;
+
+        Map<String,String> map = this.getStringAttributes();
+        map.putAll(message.getStringAttributes());
+        this.setStringAttributes(map);
+        Set<FreeColObject> objs = new HashSet<>(this.getChildren());
+        objs.addAll(message.getChildren());
+        this.setChildren(toList(objs));
+        return true;
     }
 
     /**

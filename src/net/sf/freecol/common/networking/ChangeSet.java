@@ -1535,11 +1535,11 @@ public class ChangeSet {
         for (Change c : this.changes) {
             if (!c.isNotifiable(serverPlayer)) continue;
             Message m = c.toMessage(serverPlayer);
-            List<Message> onto = (m.canMergeAttributes()) ? diverted : messages;
+            List<Message> onto = (m.canMerge()) ? diverted : messages;
             onto.add(m);
             if ((c = c.consequence(serverPlayer)) != null) {
                 m = c.toMessage(serverPlayer);
-                onto = (m.canMergeAttributes()) ? diverted : messages;
+                onto = (m.canMerge()) ? diverted : messages;
                 onto.add(m);
             }
         }

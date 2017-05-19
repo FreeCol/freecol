@@ -155,7 +155,7 @@ public class AttributeMessage extends TrivialMessage {
      * {@inheritDoc}
      */
     @Override
-    public boolean canMergeAttributes() {
+    public boolean canMerge() {
         return this.mergeable;
     }
 
