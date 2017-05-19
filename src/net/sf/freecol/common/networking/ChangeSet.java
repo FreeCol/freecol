@@ -1565,7 +1565,7 @@ public class ChangeSet {
         Message ret;
         switch (messages.size()) {
         case 0:
-            ret = null;
+            ret = (diverted.isEmpty()) ? new MultipleMessage() : null;
             break;
         case 1:
             ret = messages.get(0);
@@ -1578,10 +1578,7 @@ public class ChangeSet {
         }
             
         // Merge in the diverted messages.
-        if (!diverted.isEmpty()) {
-            if (ret == null) ret = new UpdateMessage(null, (FreeColObject)null);
-            for (Message m : diverted) ret.merge(m);
-        }
+        for (Message m : diverted) ret.merge(m);
 
         return ret;
     }
