@@ -2634,7 +2634,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see Unit#getEntryLocation
      */
     public Location getEntryLocation() {
-        return entryLocation;
+        return this.entryLocation;
     }
 
     /**

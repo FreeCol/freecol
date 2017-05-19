@@ -514,7 +514,7 @@ public final class InGameController extends Controller {
         if (teleport) { // Teleport in the units.
             Set<Tile> seen = new HashSet<>();
             for (Unit u : transform(serverPlayer.getUnits(), Unit::isNaval)) {
-                Tile entry = u.getEntryLocation().getTile();
+                Tile entry = u.getFullEntryLocation();
                 u.setLocation(entry);//-vis(serverPlayer)
                 u.setWorkLeft(-1);
                 u.setState(Unit.UnitState.ACTIVE);
@@ -530,7 +530,7 @@ public final class InGameController extends Controller {
             // Put navy on the high seas, with 1-turn sail time
             for (Unit u : transform(serverPlayer.getUnits(), Unit::isNaval)) {
                 u.setWorkLeft(1);
-                u.setDestination(u.getEntryLocation());
+                u.setDestination(u.getFullEntryLocation());
                 u.setLocation(u.getOwner().getHighSeas());//-vis: safe!map
             }
         }

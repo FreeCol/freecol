@@ -1059,7 +1059,7 @@ public class ServerUnit extends Unit implements TurnTaker {
                     if (!(result instanceof Tile)) {
                         logger.warning("Unit has unsupported destination: "
                             + dst + " -> " + result);
-                        result = getEntryLocation().getTile();
+                        result = getFullEntryLocation();
                     }
                     Tile tile = result.getTile().getSafeTile(owner, random);
                     lb.add(" arrives in America at ", tile);

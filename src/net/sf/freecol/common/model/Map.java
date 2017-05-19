@@ -811,7 +811,7 @@ public class Map extends FreeColGameObject implements Location {
             } else if (end instanceof Europe) {
                 return end;
             } else if (end instanceof Map) {
-                end = unit.getEntryLocation();
+                end = unit.getFullEntryLocation();
             } else if (end.getTile() != null) {
                 return end.getTile();
             } else if (unit != null) {
@@ -1159,7 +1159,7 @@ public class Map extends FreeColGameObject implements Location {
                 // This is suboptimal.  We do not know where to enter from
                 // Europe, so start with the standard entry location...
             } else if ((p = searchMap(unit,
-                        (Tile)offMapUnit.getEntryLocation(),
+                        (Tile)offMapUnit.getFullEntryLocation(),
                         goalDecider, costDecider, maxTurns, carrier,
                         null, lb)) == null) {
                 path = null;
