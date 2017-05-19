@@ -2920,7 +2920,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The set of banned players.
      */
     protected Set<Player> getBannedMissions() {
-        return this.bannedMissions;
+        return (this.bannedMissions == null) ? Collections.<Player>emptySet()
+            : this.bannedMissions;
     }
         
     /**
@@ -2929,7 +2930,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param bannedMissions The new set of banned players.
      */
     protected void setBannedMissions(Set<Player> bannedMissions) {
-        this.bannedMissions.clear();
+        if (this.bannedMissions == null) {
+            this.bannedMissions = new HashSet<>();
+        } else {
+            this.bannedMissions.clear();
+        }
         this.bannedMissions.addAll(bannedMissions);
     }
         
@@ -2940,7 +2945,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the given player is banned.
      */
     public boolean missionsBanned(Player player) {
-        return bannedMissions != null && bannedMissions.contains(player);
+        return this.bannedMissions != null
+            && this.bannedMissions.contains(player);
     }
 
     /**
@@ -2949,8 +2955,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param player The {@code Player} to ban.
      */
     public void addMissionBan(Player player) {
-        if (bannedMissions == null) bannedMissions = new HashSet<>();
-        bannedMissions.add(player);
+        if (this.bannedMissions == null) this.bannedMissions = new HashSet<>();
+        this.bannedMissions.add(player);
     }
 
     /**
@@ -2959,7 +2965,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param player The {@code Player} to clear the ban for.
      */
     public void removeMissionBan(Player player) {
-        if (bannedMissions != null) bannedMissions.remove(player);
+        if (this.bannedMissions != null) this.bannedMissions.remove(player);
     }
 
     /**
