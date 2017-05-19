@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.Nation;
@@ -317,15 +317,15 @@ public final class PreGameController extends FreeColClientHolder {
     /**
      * Handles an update.
      *
-     * @param objects The {@code FreeColGameObject}s to update.
+     * @param objects The {@code FreeColObject}s to update.
      */
-    public void updateHandler(List<FreeColGameObject> objects) {
-        for (FreeColGameObject fcgo : objects) {
-            if (fcgo instanceof Game) {
+    public void updateHandler(List<FreeColObject> objects) {
+        for (FreeColObject fco : objects) {
+            if (fco instanceof Game) {
                 final FreeColClient fcc = getFreeColClient();
-                fcc.addSpecificationActions(((Game)fcgo).getSpecification());
+                fcc.addSpecificationActions(((Game)fco).getSpecification());
             } else {
-                logger.warning("Game node expected: " + fcgo.getId());
+                logger.warning("Game node expected: " + fco.getId());
             }
         }
     }

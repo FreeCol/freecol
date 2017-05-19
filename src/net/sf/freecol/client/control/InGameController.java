@@ -5006,15 +5006,15 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Handle updates.
      *
-     * @param objects The {@code FreeColGameObject}s to update.
+     * @param objects The {@code FreeColObject}s to update.
      */
-    public void updateHandler(List<FreeColGameObject> objects) {
+    public void updateHandler(List<FreeColObject> objects) {
         final Player player = getMyPlayer();
         boolean visibilityChange = false;
 
-        for (FreeColGameObject fcgo : objects) {
-            if ((fcgo instanceof Player && (fcgo == player))
-                || ((fcgo instanceof Ownable) && player.owns((Ownable)fcgo))) {
+        for (FreeColObject fco : objects) {
+            if ((fco instanceof Player && (fco == player))
+                || ((fco instanceof Ownable) && player.owns((Ownable)fco))) {
                 visibilityChange = true;//-vis(player)
             }
         }

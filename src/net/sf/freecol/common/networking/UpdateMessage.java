@@ -50,12 +50,6 @@ public class UpdateMessage extends ObjectMessage {
     /** The player to specialize the objects for. */
     private final ServerPlayer destination;
 
-    /** The objects to update. */
-    private final List<FreeColGameObject> fcgos = new ArrayList<>();
-
-    /** Limited fields for partial objects. */
-    private final List<List<String>> fields = new ArrayList<>();
-
 
     /**
      * Create a new {@code UpdateMessage}.
@@ -66,8 +60,6 @@ public class UpdateMessage extends ObjectMessage {
         super(TAG);
 
         this.destination = destination;
-        this.fcgos.clear();
-        this.fields.clear();
     }
     
     /**
@@ -81,7 +73,7 @@ public class UpdateMessage extends ObjectMessage {
                          FreeColObject fco) {
         this(destination);
 
-        append(fco, null);
+        add1(fco);
     }
 
     /**
@@ -94,24 +86,7 @@ public class UpdateMessage extends ObjectMessage {
                          List<FreeColObject> fcos) {
         this(destination);
 
-        if (fcos != null) {
-            for (FreeColObject fco : fcos) append(fco, null);
-        }
-    }
-
-    /**
-     * Create a new {@code UpdateMessage}.
-     *
-     * @param destination The destination {@code ServerPlayer}.
-     * @param fco A {@code FreeColObject}s to add (FIXME: currently
-     *     only {@code FreeColGameObject}s are actually allowed).
-     * @param flds A list of fields to update.
-     */
-    public UpdateMessage(ServerPlayer destination,
-                         FreeColObject fco, List<String> flds) {
-        this(destination);
-
-        append(fco, flds);
+        if (fcos != null) addAll(fcos);
     }
 
     /**
@@ -138,25 +113,12 @@ public class UpdateMessage extends ObjectMessage {
 
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
-            this.fcgos.addAll(xr.readFreeColObject(game));
+            add1(xr.readFreeColObject(game));
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
     }
 
-    /**
-     * Append another object and optional partial fields to update.
-     *
-     * @param fco The {@code FreeColObject} to update.
-     * @param flds An optional list of fields to update.
-     */
-    private void append(FreeColObject fco, List<String> flds) {
-        if (fco != null
-            && FreeColGameObject.class.isAssignableFrom(fco.getClass())) {
-            this.fcgos.add((FreeColGameObject)fco);
-            this.fields.add(flds);
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -173,8 +135,7 @@ public class UpdateMessage extends ObjectMessage {
     public boolean merge(Message message) {
         if (message instanceof UpdateMessage) {
             UpdateMessage other = (UpdateMessage)message;
-            this.fcgos.addAll(other.getObjects());
-            this.fields.addAll(other.getFields());
+            addAll(other.getChildren());
             return true;
         }
         return false;
@@ -194,9 +155,9 @@ public class UpdateMessage extends ObjectMessage {
     @Override
     public void clientHandler(FreeColClient freeColClient) {
         if (freeColClient.isInGame()) {
-            igc(freeColClient).updateHandler(getObjects());
+            igc(freeColClient).updateHandler(getChildren());
         } else {
-            pgc(freeColClient).updateHandler(getObjects());
+            pgc(freeColClient).updateHandler(getChildren());
         }
     }
 
@@ -210,15 +171,8 @@ public class UpdateMessage extends ObjectMessage {
             ws = xw.replaceScope(WriteScope.toClient(this.destination));
         }
         try {
-            final int n = this.fcgos.size();
-            for (int i = 0; i < n; i++) {
-                FreeColGameObject fcgo = this.fcgos.get(i);
-                List<String> parts = this.fields.get(i);
-                if (parts == null) {
-                    fcgo.toXML(xw);
-                } else {
-                    fcgo.toXMLPartial(xw, parts);
-                }
+            for (FreeColObject fco : getChildren()) {
+                fco.toXML(xw);
             }
         } finally {
             if (ws != null) xw.replaceScope(ws);
@@ -231,36 +185,9 @@ public class UpdateMessage extends ObjectMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage message = new DOMMessage(TAG);
-        final int n = this.fcgos.size();
-        for (int i = 0; i < n; i++) {
-            List<String> part = this.fields.get(i);
-            if (part == null) {
-                message.add(this.fcgos.get(i), this.destination);
-            } else {
-                message.add(this.fcgos.get(i), part);
-            }
+        for (FreeColObject fco : getChildren()) {
+            message.add(fco, this.destination);
         }
         return message.toXMLElement();
-    }
-
-
-    // Public interface
-
-    /**
-     * Get the objects attached to this message.
-     *
-     * @return The list of {@code FreeColGameObject}s.
-     */
-    public List<FreeColGameObject> getObjects() {
-        return this.fcgos;
-    }
-
-    /**
-     * Get the attribute fields attached to this message.
-     *
-     * @return The list of fields lists.
-     */
-    public List<List<String>> getFields() {
-        return this.fields;
     }
 }

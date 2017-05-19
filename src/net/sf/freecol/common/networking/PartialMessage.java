@@ -84,15 +84,6 @@ public class PartialMessage extends AttributeMessage {
     }
 
     /**
-     * Get the attribute map for this message.
-     *
-     * @return The attribute map.
-     */
-    private Map<String, String> getAttributeMap() {
-        return this.attributes;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -127,7 +118,7 @@ public class PartialMessage extends AttributeMessage {
         }
                 
         if (freeColClient.isInGame()) {
-            igc(freeColClient).partialHandler(fcgo, getAttributeMap());
+            igc(freeColClient).partialHandler(fcgo, getStringAttributes());
         } else {
             logger.warning("Partial update when not in game.");
         }
