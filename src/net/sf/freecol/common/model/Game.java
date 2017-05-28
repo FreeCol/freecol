@@ -423,34 +423,50 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Registers a new {@code FreeColGameObject} with a given identifier.
+     * Set the mapping between object identifier and object.
      *
      * @param id The object identifier.
-     * @param fcgo The {@code FreeColGameObject} to add to this
-     *     {@code Game}.
-     * @exception IllegalArgumentException If either the identifier or
-     *     object are null.
+     * @param fcgo The {@code FreeColGameObject} to add to this {@code Game}.
+     * @exception RuntimeArgumentException If the identifier is null or empty,
+     *     or the object is null.
      */
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (id == null || id.isEmpty()) {
-            throw new IllegalArgumentException("Null/empty id.");
+            throw new RuntimeException("Null or empty identifier");
+        } else  if (fcgo == null) {
+            throw new RuntimeException("Null FreeColGameObject");
+        }
+
+        final WeakReference<FreeColGameObject> wr = new WeakReference<>(fcgo);
+        synchronized (this.freeColGameObjects) {
+            this.freeColGameObjects.put(id, wr);
+        }
+    }
+        
+    /**
+     * Add a new {@code FreeColGameObject} with a given identifier.
+     *
+     * @param id The object identifier.
+     * @param fcgo The {@code FreeColGameObject} to add to this {@code Game}.
+     * @exception RuntimeArgumentException If either the identifier or
+     *     object are null, or there is already an object with present with
+     *     the given identifier.
+     */
+    public void addFreeColGameObject(String id, FreeColGameObject fcgo) {
+        if (id == null || id.isEmpty()) {
+            throw new RuntimeException("Null/empty id.");
         } else if (fcgo == null) {
-            throw new IllegalArgumentException("Null FreeColGameObject.");
+            throw new RuntimeException("Null FreeColGameObject.");
         }
 
         final FreeColGameObject old = getFreeColGameObject(id);
         if (old != null) {
-            throw new IllegalArgumentException("Tried to replace FCGO "
+            throw new RuntimeException("Tried to replace FCGO "
                 + id + " : " + old.getClass()
                 + " with " + fcgo.getId() + " : " + fcgo.getClass());
         }
 
-        //logger.finest("Added FCGO: " + id);
-        final WeakReference<FreeColGameObject> wr
-            = new WeakReference<>(fcgo);
-        synchronized (freeColGameObjects) {
-            freeColGameObjects.put(id, wr);
-        }
+        setFreeColGameObject(id, fcgo);
         notifySetFreeColGameObject(id, fcgo);
     }
 

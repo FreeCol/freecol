@@ -152,6 +152,15 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void intern() {
+        super.intern();
+        for (Unit u : getUnitList()) u.intern();
+    }
+    
+    /**
      * Internal addition of a unit to this location.
      *
      * @param u The {@code Unit} to add.

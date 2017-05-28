@@ -109,12 +109,15 @@ public abstract class FreeColGameObject extends FreeColObject {
         final Game game = getGame();
         if (game != null && newId != null && isInternable()) {
             final String oldId = getId();
-            if (!newId.equals(oldId)) {
+            if (newId.equals(oldId)) {
+                // This happens when the client receives an update.
+                game.setFreeColGameObject(newId, this);
+            } else {
                 if (oldId != null) {
                     game.removeFreeColGameObject(oldId, "override");
                 }
                 setId(newId);
-                game.setFreeColGameObject(newId, this);
+                game.addFreeColGameObject(newId, this);
             }
         } else {
             setId(newId);
