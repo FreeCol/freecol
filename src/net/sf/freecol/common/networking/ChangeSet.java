@@ -589,8 +589,8 @@ public class ChangeSet {
             return serverPlayer.owns(unit)
                 || (oldTile != null
                     && serverPlayer.canSee(oldTile)
-                    && !oldTile.hasSettlement()
-                    && !(oldLocation instanceof Unit));
+                    && !(oldTile.hasSettlement()
+                        || (oldLocation instanceof Unit)));
         }
 
         /**
@@ -635,9 +635,10 @@ public class ChangeSet {
         @Override
         public AnimateMoveMessage toMessage(ServerPlayer serverPlayer) {
             if (!isNotifiable(serverPlayer)) return null;
-            Unit u = (serverPlayer.owns(unit)) ? unit
+            final Tile oldTile = oldLocation.getTile();
+            final Unit u = (serverPlayer.owns(unit)) ? unit
                 : unit.reduceVisibility(oldLocation.getTile(), serverPlayer);
-            return new AnimateMoveMessage(u, oldLocation.getTile(), newTile,
+            return new AnimateMoveMessage(u, oldTile, newTile,
                                           !seeOld(serverPlayer));
         }
 
