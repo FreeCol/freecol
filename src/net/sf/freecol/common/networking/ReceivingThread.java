@@ -320,23 +320,14 @@ final class ReceivingThread extends Thread {
             // A question.  Build a thread to handle it and send a reply.
 
             replyId = this.connection.getReplyId();
-            if (false) { // DISABLED FOR NOW
-                Message m = null;
-                try {
-                    m = this.connection.reader();
-                } catch (FreeColException|XMLStreamException ex) {
-                    // Just log for now, fall through to DOM-based code
-                    logger.log(Level.FINEST, getName() + ": question fail", ex);
-                }
-                if (m != null) {
-                    assert m instanceof QuestionMessage;
-                    t = messageQuestion((QuestionMessage)m, replyId);
-                    break;
-                }
+            try {
+                Message m = this.connection.reader();
+                assert m instanceof QuestionMessage;
+                t = messageQuestion((QuestionMessage)m, replyId);
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, getName() + ": question fail", ex);
+                askToStop("listen-question-fail");
             }
-
-            dm = this.connection.domReader();
-            t = domQuestion(dm, replyId);
             break;
             
         default:
