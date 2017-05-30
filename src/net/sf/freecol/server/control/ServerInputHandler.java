@@ -178,7 +178,8 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     /**
      * {@inheritDoc}
      */
-    public final Element handle(Connection connection, Element element) {
+    public final Element handle(Connection connection, Element element)
+        throws FreeColException {
         if (element == null) return null;
 
         final String logMe = "Server("
@@ -186,9 +187,8 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         final String tag = element.getTagName();
         final DOMNetworkRequestHandler handler = handlerMap.get(tag);
         if (handler == null) {
-            throw new RuntimeException(logMe + "missing for " + tag);
+            throw new FreeColException(logMe + "missing for " + tag);
         }
-
         Element ret = null;
         try {
             ret = handler.handle(connection, element);

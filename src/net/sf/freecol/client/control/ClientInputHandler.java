@@ -153,14 +153,15 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
-    public Element handle(Connection connection, Element element) {
+    public Element handle(Connection connection, Element element)
+        throws FreeColException {
         if (element == null) return null;
 
         final String logMe = "Client handler ";
         final String tag = element.getTagName();
         DOMClientNetworkRequestHandler handler = domHandlerMap.get(tag);
         if (handler == null) {
-            throw new RuntimeException(logMe + "missing for " + tag);
+            throw new FreeColException(logMe + "missing for " + tag);
         }
 
         try {

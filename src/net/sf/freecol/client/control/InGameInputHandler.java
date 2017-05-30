@@ -241,7 +241,8 @@ public final class InGameInputHandler extends ClientInputHandler {
      * {@inheritDoc}
      */
     @Override
-    public Element handle(Connection connection, Element element) {
+    public Element handle(Connection connection, Element element)
+        throws FreeColException {
         if (element == null) return null;
 
         Element reply = super.handle(connection, element);
