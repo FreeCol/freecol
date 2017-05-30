@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.DOMMessageHandler;
 
 import org.w3c.dom.Element;
@@ -144,6 +145,44 @@ public final class DummyConnection extends Connection {
             reply = null;
         }
         return reply;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean sendMessage(Message message) throws IOException {
+        DummyConnection other = getOtherConnection();
+        if (other == null) return false;
+        if (message == null) return true;
+        final String tag = message.getType();
+        try {
+            Message reply = other.handle(message);
+            log(message, reply);
+            return true;
+        } catch (FreeColException fce) {
+            logger.log(Level.WARNING, "Dummy sendMessage fail: " + tag, fce);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Message askMessage(Message message) throws IOException {
+        DummyConnection other = getOtherConnection();
+        if (other == null) return null;
+        if (message == null) return null;
+        final String tag = message.getType();
+        try {
+            Message response = other.handle(message);
+            log(message, response);
+            return response;
+        } catch (FreeColException fce) {
+            logger.log(Level.WARNING, "Dummy askMessage fail: " + tag, fce);
+        }
+        return null;
     }
 
 

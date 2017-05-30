@@ -701,53 +701,71 @@ public class Connection implements Closeable {
         return ((ReplyMessage)response).getMessage();
     }
 
-    // ask-with-logging
-    private Message askMessage(Message message) throws IOException {
+    /**
+     * Send a message, and return the response.  Log both.
+     *
+     * @param message The {@code Message} to send.
+     * @return The response.
+     * @exception IOException on failure to send.
+     */
+    protected Message askMessage(Message message) throws IOException {
         if (message == null) return null;
         Message response = askMessageInternal(message);
-        if (this.logWriter != null) {
-            try {
-                synchronized (this.logWriter) {
-                    this.lw.writeComment(this.name + SEND_SUFFIX);
-                    message.toXML(this.lw);
-                    this.lw.writeComment(this.name + REPLY_SUFFIX);
-                    if (response != null) response.toXML(this.lw);
-                    this.lw.flush();
-                }
-            } catch (XMLStreamException xse) {} // Ignore log failure
-        }
+        log(message, response);
         return response;
     }
     
     // lowest level send
     private boolean sendMessageInternal(Message message) throws IOException {
+        final String tag = message.getType();
         try {
             synchronized (this.outputLock) {
                 if (this.xw == null) return false;
                 message.toXML(xw);
             }
         } catch (Exception ex) {
-            throw new IOException("sendMessageInternal fail", ex);
+            throw new IOException("sendMessageInternal fail: " + tag, ex);
         }
         return true;
     }
 
-    // send-with-logging, called from ReceivingThread
+    /**
+     * Send a message, do not consider a response.
+     *
+     * Public as this is called from ReceivingThread.
+     *
+     * @param message The {@code Message} to send.
+     * @return True if the message was null or successfully sent.
+     * @exception IOException on failure to send.
+     */
     public boolean sendMessage(Message message) throws IOException {
         if (message == null) return true;
         sendMessageInternal(message);
-        if (this.logWriter != null) {
-            try {
-                synchronized (this.logWriter) {
-                    this.lw.writeComment(this.name + SEND_SUFFIX);
-                    message.toXML(this.lw);
-                    this.lw.flush();
-                }
-            } catch (XMLStreamException xse) {} // Ignore logging failure
-        }
+        log(message, null);
         return true;
     }
 
+    /**
+     * Log a message request/response cycle.
+     *
+     * @param request The initial request {@code Message}.
+     * @param response An optional response {@code Message}.
+     */
+    protected void log(Message request, Message response) {
+        synchronized (this.logWriter) {
+            if (this.logWriter == null) return;
+            try {
+                this.lw.writeComment(this.name + SEND_SUFFIX);
+                request.toXML(this.lw);
+                if (response != null) {
+                    this.lw.writeComment(this.name + REPLY_SUFFIX);
+                    response.toXML(this.lw);
+                }
+                this.lw.flush();
+            } catch (XMLStreamException xse) {} // Ignore log failure
+        }
+    }
+    
 
     // MessageHandler support
 
