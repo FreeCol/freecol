@@ -58,6 +58,8 @@ public class LootCargoMessage extends ObjectMessage {
      */
     public LootCargoMessage(Unit winner, String loserId, List<Goods> goods) {
         super(TAG, WINNER_TAG, winner.getId(), LOSER_TAG, loserId);
+
+        addAll(goods);
     }
 
     /**
