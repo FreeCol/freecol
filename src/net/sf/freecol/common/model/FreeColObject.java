@@ -884,6 +884,7 @@ public abstract class FreeColObject
      * @return True if the save proceeded without error.
      */
     public boolean save(OutputStream out, WriteScope scope, boolean pretty) {
+        boolean ret = false;
         if (scope == null) scope = FreeColXMLWriter.WriteScope.toSave();
         try (
             FreeColXMLWriter xw = new FreeColXMLWriter(out, scope, pretty);
@@ -894,39 +895,14 @@ public abstract class FreeColObject
 
             xw.writeEndDocument();
 
-            xw.flush();
-
-            return true;
+            ret = true;
         } catch (XMLStreamException xse) {
             logger.log(Level.WARNING, "Exception writing object.", xse);
 
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
         }
-        return false;
-    }
-
-    /**
-     * Serialize this FreeColObject to a string.
-     *
-     * @param scope The write scope to use.
-     * @return The serialized object, or null if the stream could not be
-     *     created.
-     * @exception XMLStreamException if there are any problems writing
-     *     to the stream.
-     */
-    public String serialize(WriteScope scope) throws XMLStreamException {
-        StringWriter sw = new StringWriter();
-        try (
-            FreeColXMLWriter xw = new FreeColXMLWriter(sw, scope);
-        ) {
-            this.toXML(xw);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
-            return null;
-        }
-
-        return sw.toString();
+        return ret;
     }
 
     /**
@@ -952,6 +928,49 @@ public abstract class FreeColObject
      */
     public String serialize(Player player) throws XMLStreamException {
         return serialize(WriteScope.toClient(player));
+    }
+
+    /**
+     * Serialize this FreeColObject to a string.
+     *
+     * @param scope The write scope to use.
+     * @return The serialized object, or null if the stream could not be
+     *     created.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public String serialize(WriteScope scope) throws XMLStreamException {
+        return serialize(scope, null);
+    }
+
+    /**
+     * Serialize this FreeColObject to a string, possibly partially.
+     *
+     * @param scope The write scope to use.
+     * @param fields A list of field names, which if non-null indicates this
+     *     should be a partial write.
+     * @return The serialized object, or null if the stream could not be
+     *     created.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public String serialize(WriteScope scope, List<String> fields)
+        throws XMLStreamException {
+        StringWriter sw = new StringWriter();
+        try (
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw, scope);
+        ) {
+            if (fields == null) {
+                this.toXML(xw);
+            } else {
+                this.toXMLPartial(xw, fields);
+            }
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
+            return null;
+        }
+
+        return sw.toString();
     }
 
     /**
