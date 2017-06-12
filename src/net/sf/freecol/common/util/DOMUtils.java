@@ -624,42 +624,28 @@ public class DOMUtils {
     private static Element toXMLElement(FreeColObject fco, Document document,
                                         WriteScope writeScope,
                                         List<String> fields) {
-        StringWriter sw = new StringWriter();
-        FreeColXMLWriter xw = null;
+        String str;
         try {
-            xw = new FreeColXMLWriter(sw, writeScope);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
-            return null;
+            str = fco.serialize(writeScope, fields);
+            if (str == null) {
+                throw new RuntimeException("toXMLElement unable to serialize "
+                    + fco);
+            }
+        } catch (XMLStreamException xse) {
+            throw new RuntimeException("toXMLElement failed on " + fco, xse);
         }
 
         try {
-            if (fields == null) {
-                try {
-                    fco.toXML(xw);
-                } catch (XMLStreamException xse) {
-                    throw new RuntimeException("toXML failed on " + fco, xse);
-                }
-            } else {
-                try {
-                    fco.toXMLPartial(xw, fields);
-                } catch (XMLStreamException xse) {
-                    throw new RuntimeException("toXML[" + join(",", fields)
-                        + "] failed on " + fco, xse);
-                }
-            }
             DocumentBuilderFactory factory
                 = DocumentBuilderFactory.newInstance();
-            Document tempDocument = null;
+            Document tmpDocument = null;
             DocumentBuilder builder = factory.newDocumentBuilder();
-            tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));
-            return (Element)document.importNode(tempDocument.getDocumentElement(), true);
+            tmpDocument = builder.parse(new InputSource(new StringReader(str)));
+            return (Element)document.importNode(tmpDocument.getDocumentElement(), true);
         } catch (Exception ex) {
             // Catch unexpected fail in Java libraries as well as
             // expected ParserConfigurationException and SAXException
             throw new RuntimeException("Parse fail at " + fco, ex);
-        } finally {
-            xw.close();
         }
     }
 
