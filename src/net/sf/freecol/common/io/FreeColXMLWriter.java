@@ -126,13 +126,17 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
 
-    /** The stream to write to. */
+    /** The internal XML writer to write XML to. */
     private final XMLStreamWriter xmlStreamWriter;
 
-    /** Internal writer to accumulate into when pretty printing. */
-    private StringWriter stringWriter = null;
-    /** The final output writer to use when pretty printing. */
-    private Writer outputWriter = null;
+    /** An internal writer to accumulate XML into. */
+    private final StringWriter stringWriter;
+
+    /** An optional transformer to handle indentation. */
+    private final Transformer transformer;
+
+    /** The writer that receives the final output. */
+    private final Writer outputWriter;
 
     /** A write scope to use for FreeCol object writes. */
     private WriteScope writeScope;
@@ -157,7 +161,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     /**
      * Creates a new {@code FreeColXMLWriter}.
      *
-     * @param writer A {@code Writer} to create an
+     * @param writer A {@code Writer} to create an 
      *     {@code FreeColXMLWriter} for.
      * @exception IOException if there is a problem while creating the
      *     {@code FreeColXMLWriter}.
@@ -171,12 +175,12 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      *
      * @param writer A {@code Writer} to create an
      *     {@code FreeColXMLWriter} for.
-     * @param scope The {@code WriteScope} to use for FreeCol
-     *     object writes.
+     * @param scope The {@code WriteScope} to use for FreeCol objects.
      * @exception IOException if there is a problem while creating the
      *     {@code FreeColXMLWriter}.
      */
-    public FreeColXMLWriter(Writer writer, WriteScope scope) throws IOException {
+    public FreeColXMLWriter(Writer writer,
+                            WriteScope scope) throws IOException {
         this(writer, scope, false);
     }
 
@@ -185,27 +189,23 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      *
      * @param writer A {@code Writer} to create an
      *     {@code FreeColXMLWriter} for.
-     * @param scope The {@code WriteScope} to use for FreeCol
-     *     object writes.
+     * @param scope The {@code WriteScope} to use for FreeCol objects.
      * @param indent If true, produce indented output if supported.
      * @exception IOException if there is a problem while creating the
      *     {@code FreeColXMLWriter}.
      */
     public FreeColXMLWriter(Writer writer, WriteScope scope,
                             boolean indent) throws IOException {
+        this.outputWriter = writer;
         try {
-            if (indent) {
-                this.outputWriter = writer;
-                this.stringWriter = new StringWriter(1024);
-                this.xmlStreamWriter = getFactory()
-                    .createXMLStreamWriter(this.stringWriter);
-            } else {
-                this.xmlStreamWriter = getFactory()
-                    .createXMLStreamWriter(writer);
-            }
+            this.stringWriter = new StringWriter(1024);
+            this.xmlStreamWriter = getFactory()
+                .createXMLStreamWriter(this.stringWriter);
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
+        this.transformer = (indent) ? Utils.makeTransformer(false, true)
+            : null;
         this.writeScope = (scope == null) ? WriteScope.toSave() : scope;
     }
 
@@ -250,13 +250,59 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     /**
-     * Closes both the {@code XMLStreamWriter} and
-     * the underlying stream if any.
+     * Internal flush, returning what was written.
      *
-     * Implement interface Closeable.
+     * @return The internal buffer containing the flushed data.
+     */
+    public StringBuffer flushBuffer() throws XMLStreamException {
+        this.xmlStreamWriter.flush();
+
+        StringBuffer sb = this.stringWriter.getBuffer();
+        if (sb.length() > 0) {
+            String str = sb.toString();
+            if (this.transformer == null) {
+                try {
+                    this.outputWriter.write(str);
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Flush-write fail:" + str, ioe);
+                }
+            } else {
+                StreamSource source = new StreamSource(new StringReader(str));
+                StreamResult result = new StreamResult(this.outputWriter);
+                try {
+                    this.transformer.transform(source, result);
+                } catch (TransformerException te) {
+                    logger.log(Level.WARNING, "Transform fail:" + str, te);
+                }
+            }
+
+            try {
+                this.outputWriter.flush();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Flush fail", ioe);
+            }
+        }
+        return sb;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void flush() throws XMLStreamException {
+        // Clear the underlying buffer after flushing it
+        flushBuffer().setLength(0);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public void close() {
+        try {
+            flush();
+        } catch (XMLStreamException xse) {} // Ignore flush fail on close
+        
         if (this.xmlStreamWriter != null) {
             try {
                 this.xmlStreamWriter.close();
@@ -264,24 +310,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
                 logger.log(Level.WARNING, "Error closing stream.", xse);
             }
         }
-
-        if (this.outputWriter != null) {
-            StreamSource source = new StreamSource(new StringReader(this.stringWriter.toString()));
-            StreamResult result = new StreamResult(this.outputWriter);
-            Transformer transformer = Utils.makeTransformer(true, true);
-            try {
-                transformer.transform(source, result);
-            } catch (TransformerException te) {
-                logger.log(Level.WARNING, "Transform fail", te);
-            }
-            try {
-                this.outputWriter.flush();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Flush fail", ioe);
-            }
-        }
     }
-
 
     /**
      * Write a boolean attribute to the stream.
@@ -290,7 +319,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * @param value A boolean to write.
      * @exception XMLStreamException if a write error occurs.
      */
-    public void writeAttribute(String attributeName, boolean value) throws XMLStreamException {
+    public void writeAttribute(String attributeName, boolean value)
+        throws XMLStreamException {
         xmlStreamWriter.writeAttribute(attributeName, String.valueOf(value));
     }
 
@@ -301,7 +331,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * @param value A float to write.
      * @exception XMLStreamException if a write error occurs.
      */
-    public void writeAttribute(String attributeName, float value) throws XMLStreamException {
+    public void writeAttribute(String attributeName, float value)
+        throws XMLStreamException {
         xmlStreamWriter.writeAttribute(attributeName, String.valueOf(value));
     }
 
@@ -312,7 +343,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * @param value An integer to write.
      * @exception XMLStreamException if a write error occurs.
      */
-    public void writeAttribute(String attributeName, int value) throws XMLStreamException {
+    public void writeAttribute(String attributeName, int value)
+        throws XMLStreamException {
         xmlStreamWriter.writeAttribute(attributeName, String.valueOf(value));
     }
 
@@ -323,7 +355,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * @param value A long to write.
      * @exception XMLStreamException if a write error occurs.
      */
-    public void writeAttribute(String attributeName, long value) throws XMLStreamException {
+    public void writeAttribute(String attributeName, long value)
+        throws XMLStreamException {
         xmlStreamWriter.writeAttribute(attributeName, String.valueOf(value));
     }
 
@@ -334,7 +367,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * @param value The {@code Enum} to write.
      * @exception XMLStreamException if a write error occurs.
      */
-    public void writeAttribute(String attributeName, Enum<?> value) throws XMLStreamException {
+    public void writeAttribute(String attributeName, Enum<?> value)
+        throws XMLStreamException {
         xmlStreamWriter.writeAttribute(attributeName,
             value.toString().toLowerCase(Locale.US));
     }
@@ -346,7 +380,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * @param value The {@code Object} to write.
      * @exception XMLStreamException if a write error occurs.
      */
-    public void writeAttribute(String attributeName, Object value) throws XMLStreamException {
+    public void writeAttribute(String attributeName, Object value)
+        throws XMLStreamException {
         xmlStreamWriter.writeAttribute(attributeName, String.valueOf(value));
     }
 
@@ -357,7 +392,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * @param value The {@code FreeColObject} to write the identifier of.
      * @exception XMLStreamException if a write error occurs.
      */
-    public void writeAttribute(String attributeName, FreeColObject value) throws XMLStreamException {
+    public void writeAttribute(String attributeName, FreeColObject value)
+        throws XMLStreamException {
         if (value != null) {
             String id = value.getId();
             if (id != null) {
@@ -373,7 +409,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * @param value The {@code Location} to write the identifier of.
      * @exception XMLStreamException if a write error occurs.
      */
-    public void writeLocationAttribute(String attributeName, Location value) throws XMLStreamException {
+    public void writeLocationAttribute(String attributeName, Location value)
+        throws XMLStreamException {
         writeAttribute(attributeName, (FreeColObject)value);
     }
 
@@ -403,6 +440,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
         writeEndElement();
     }
 
+
     // Delegations to the WriteScope.
 
     public Player getClientPlayer() {
@@ -421,13 +459,9 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
         return writeScope.validFor(player);
     }
 
-    // Simple delegations to the XMLStreamWriter.  All should be
-    // present here except close which is supplied above.
 
-    @Override
-    public void flush() throws XMLStreamException {
-        xmlStreamWriter.flush();
-    }
+    // Simple delegations to the XMLStreamWriter.  All should be
+    // present here except close and flush which are supplied above.
 
     @Override
     public NamespaceContext getNamespaceContext() {
@@ -450,7 +484,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     @Override
-    public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
+    public void setNamespaceContext(NamespaceContext context)
+        throws XMLStreamException {
         xmlStreamWriter.setNamespaceContext(context);
     }
 
@@ -460,17 +495,21 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     @Override
-    public void writeAttribute(String localName, String value) throws XMLStreamException {
+    public void writeAttribute(String localName, String value)
+        throws XMLStreamException {
         xmlStreamWriter.writeAttribute(localName, value);
     }
 
     @Override
-    public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
+    public void writeAttribute(String namespaceURI, String localName,
+                               String value) throws XMLStreamException {
         xmlStreamWriter.writeAttribute(namespaceURI, localName, value);
     }
 
     @Override
-    public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
+    public void writeAttribute(String prefix, String namespaceURI,
+                               String localName, String value)
+        throws XMLStreamException {
         xmlStreamWriter.writeAttribute(prefix, namespaceURI, localName, value);
     }
 
@@ -480,7 +519,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     @Override
-    public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
+    public void writeCharacters(char[] text, int start, int len)
+        throws XMLStreamException {
         xmlStreamWriter.writeCharacters(text, start, len);
     }
 
@@ -495,7 +535,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     @Override
-    public void writeDefaultNamespace(String namespaceURI) throws XMLStreamException {
+    public void writeDefaultNamespace(String namespaceURI)
+        throws XMLStreamException {
         xmlStreamWriter.writeDefaultNamespace(namespaceURI);
     }
 
@@ -510,12 +551,15 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     @Override
-    public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
+    public void writeEmptyElement(String namespaceURI, String localName)
+        throws XMLStreamException {
         xmlStreamWriter.writeEmptyElement(namespaceURI, localName);
     }
 
     @Override
-    public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+    public void writeEmptyElement(String prefix, String localName,
+                                  String namespaceURI)
+        throws XMLStreamException {
         xmlStreamWriter.writeEmptyElement(prefix, localName, namespaceURI);
     }
 
@@ -535,17 +579,20 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     @Override
-    public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
+    public void writeNamespace(String prefix, String namespaceURI)
+        throws XMLStreamException {
         xmlStreamWriter.writeNamespace(prefix, namespaceURI);
     }
 
     @Override
-    public void writeProcessingInstruction(String target) throws XMLStreamException {
+    public void writeProcessingInstruction(String target)
+        throws XMLStreamException {
         xmlStreamWriter.writeProcessingInstruction(target);
     }
 
     @Override
-    public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
+    public void writeProcessingInstruction(String target, String data)
+        throws XMLStreamException {
         xmlStreamWriter.writeProcessingInstruction(target, data);
     }
 
@@ -560,7 +607,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     @Override
-    public void writeStartDocument(String encoding, String version) throws XMLStreamException {
+    public void writeStartDocument(String encoding, String version)
+        throws XMLStreamException {
         xmlStreamWriter.writeStartDocument(encoding, version);
     }
 
@@ -570,12 +618,15 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     @Override
-    public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
+    public void writeStartElement(String namespaceURI, String localName)
+        throws XMLStreamException {
         xmlStreamWriter.writeStartElement(namespaceURI, localName);
     }
 
     @Override
-    public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+    public void writeStartElement(String prefix, String localName,
+                                  String namespaceURI)
+        throws XMLStreamException {
         xmlStreamWriter.writeStartElement(prefix, localName, namespaceURI);
     }
 }
