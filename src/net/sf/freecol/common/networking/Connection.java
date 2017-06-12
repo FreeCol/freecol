@@ -101,7 +101,9 @@ public class Connection implements Closeable {
 
     /** Main message writer. */
     private FreeColXMLWriter xw;
-    
+
+    /** A lock for the logging routines. */
+    private final Object logLock = new Object();
     /** The transformer for logging, also used as a lock for logWriter. */
     private final Transformer logTransformer;
     /** The Writer to write logging messages to. */
@@ -424,8 +426,8 @@ public class Connection implements Closeable {
      * @param send True if sending (else replying).
      */
     protected void log(Element element, boolean send) {
-        if (this.logWriter == null) return;
-        synchronized (this.logWriter) {
+        synchronized (this.logLock) {
+            if (this.logWriter == null) return;
             StringWriter sw
                 = elementToStringWriter(this.logTransformer, element);
             if (sw == null) return;
@@ -752,8 +754,8 @@ public class Connection implements Closeable {
      * @param response An optional response {@code Message}.
      */
     protected void log(Message request, Message response) {
-        synchronized (this.logWriter) {
-            if (this.logWriter == null) return;
+        synchronized (this.logLock) {
+            if (this.lw == null) return;
             try {
                 this.lw.writeComment(this.name + SEND_SUFFIX);
                 request.toXML(this.lw);
