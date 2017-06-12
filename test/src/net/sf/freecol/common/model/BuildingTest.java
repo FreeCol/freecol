@@ -670,15 +670,10 @@ public class BuildingTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(6);
         for (Building building : colony.getBuildings()) {
-            try {
-                StringWriter sw = new StringWriter();
+            try (StringWriter sw = new StringWriter();
                 FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                    FreeColXMLWriter.WriteScope.toSave(), false);
-
+                    FreeColXMLWriter.WriteScope.toSave(), false)) {
                 building.toXML(xw);
-
-                xw.close();
-
             } catch (Exception e) {
                 fail(e.toString());
             }

@@ -132,22 +132,19 @@ public class Connection implements Closeable {
 
         // Make a (pretty printing) transformer, but only make the log
         // writer in COMMS-debug mode.
+        FreeColXMLWriter lw = null;
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
             this.logWriter = Utils.getUTF8Writer(System.err);
             this.logTransformer = Utils.makeTransformer(true, true);
-            FreeColXMLWriter lw;
             try {
                 lw = new FreeColXMLWriter(this.logWriter,
                     FreeColXMLWriter.WriteScope.toSave(), true);
-            } catch (IOException ioe) {
-                lw = null;
-            }
-            this.lw = lw;
+            } catch (IOException ioe) {} // Ignore failure, just do not log
         } else {
             this.logWriter = null;
             this.logTransformer = null;
-            this.lw = null;
         }
+        this.lw = lw;
     }
 
     /**

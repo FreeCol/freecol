@@ -850,9 +850,9 @@ public final class FreeColServer {
             // save the actual game data
             fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_FILE));
             try (
+                // throws IOException                 
                 FreeColXMLWriter xw = new FreeColXMLWriter(fos,
-                    FreeColXMLWriter.WriteScope.toSave(), false);
-            ) {
+                    FreeColXMLWriter.WriteScope.toSave(), false)) {
                 xw.writeStartDocument("UTF-8", "1.0");
 
                 xw.writeComment(FreeCol.getConfiguration().toString());
@@ -888,7 +888,6 @@ public final class FreeColServer {
 
                 xw.writeEndElement();
                 xw.writeEndDocument();
-                xw.flush();
             }
             fos.closeEntry();
         } catch (XMLStreamException e) {

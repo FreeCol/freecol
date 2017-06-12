@@ -36,14 +36,9 @@ public class MonarchTest extends FreeColTestCase {
         Game game = getStandardGame();
         Player dutch = game.getPlayerByNationId("model.nation.dutch");
 
-        try {
-            StringWriter sw = new StringWriter();
-            FreeColXMLWriter xw = new FreeColXMLWriter(sw);
-
+        try (StringWriter sw = new StringWriter();
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw)) {
             dutch.getMonarch().toXML(xw);
-
-            xw.close();
-
         } catch (Exception e) {
             fail(e.toString());
         }

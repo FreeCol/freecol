@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
@@ -157,11 +158,11 @@ public class SerializationTest extends FreeColTestCase {
             String filename = "test/data/specification.xml";
             Validator validator = buildValidator("schema/specification-schema.xsd");
             FileOutputStream fos = new FileOutputStream(filename);
-            FreeColXMLWriter xw = new FreeColXMLWriter(fos, null, false);
-
-            spec().toXML(xw);
-
-            xw.close();
+            try (FreeColXMLWriter xw = new FreeColXMLWriter(fos, null, false)) {
+                spec().toXML(xw);
+            } catch (IOException ioe) {
+                fail(ioe.getMessage());
+            }
 
             validator.validate(new StreamSource(new FileReader(filename)));
         } catch (SAXParseException e) {
@@ -180,12 +181,12 @@ public class SerializationTest extends FreeColTestCase {
             spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
-            FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                FreeColXMLWriter.WriteScope.toSave());
-
-            spec1.toXML(xw);
-
-            xw.close();
+            try (FreeColXMLWriter xw = new FreeColXMLWriter(sw,
+                    FreeColXMLWriter.WriteScope.toSave())) {
+                spec1.toXML(xw);
+            } catch (IOException ioe) {
+                fail(ioe.getMessage());
+            }
 
             spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
         } catch (Exception e) {
@@ -217,12 +218,12 @@ public class SerializationTest extends FreeColTestCase {
             spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
-            FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                FreeColXMLWriter.WriteScope.toSave(), false);
-
-            spec1.toXML(xw);
-
-            xw.close();
+            try (FreeColXMLWriter xw = new FreeColXMLWriter(sw,
+                    FreeColXMLWriter.WriteScope.toSave(), false)) {
+                spec1.toXML(xw);
+            } catch (IOException ioe) {
+                fail(ioe.getMessage());
+            }
 
             spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
         } catch (Exception e) {
