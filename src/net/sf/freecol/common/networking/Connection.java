@@ -917,7 +917,7 @@ public class Connection implements Closeable {
      */
     public void close() {
         if (this.receivingThread != null) {
-            this.receivingThread.askToStop();
+            this.receivingThread.askToStop("connection closing");
             this.receivingThread = null;
         }
 

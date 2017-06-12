@@ -69,7 +69,7 @@ final class ReceivingThread extends Thread {
      * @param threadName The base name for the thread.
      */
     public ReceivingThread(Connection connection, String threadName) {
-        super(threadName + "-ReceivingThread-" + connection);
+        super("ReceivingThread-" + threadName);
 
         this.connection = connection;
         this.shouldRun = true;
@@ -128,11 +128,12 @@ final class ReceivingThread extends Thread {
         
     /**
      * Ask this thread to stop work.
+     *
+     * @param reason A brief description of why the thread should stop.
      */
-    public void askToStop() {
+    public void askToStop(String reason) {
         if (stopThread()) {
-            logger.info("Stopped receiving thread for "
-                + this.connection.getName());
+            logger.info(getName() + ": stopped receiving thread: " + reason);
         }
     }
 
@@ -140,7 +141,7 @@ final class ReceivingThread extends Thread {
      * Disconnects this thread.
      */
     private void disconnect() {
-        askToStop();
+        askToStop("disconnect");
         connection.sendDisconnect();
     }
 
@@ -148,19 +149,18 @@ final class ReceivingThread extends Thread {
     // Individual parts of listen().  Work in progress
 
     private Thread domQuestion(final DOMMessage msg, final int replyId) {
-        return new Thread(this.connection.getName() + "-question-" + replyId
-                          + "-" + msg.getType()) {
+        final String name = getName() + "-question-" + replyId
+            + "-" + msg.getType();
+        return new Thread(name) {
             @Override
             public void run() {
                 final String tag = msg.getType();
                 try {
                     ReceivingThread.this.connection.handleQuestion(msg, replyId);
                 } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, "Question " + replyId
-                        + " handler for " + tag + " failed", fce);
+                    logger.log(Level.WARNING, name + ": handler failed", fce);
                 } catch (IOException ioe) {
-                    logger.log(Level.WARNING, "Question " + replyId
-                        + " response send for " + tag + " failed", ioe);
+                    logger.log(Level.WARNING, name + ": send failed", ioe);
                 }
             }
         };
@@ -172,16 +172,16 @@ final class ReceivingThread extends Thread {
         final Message query = qm.getMessage();
         if (query == null) return null;
         final String tag = query.getType();
+        final String name = getName() + "-question-" + replyId + "-" + tag;
 
-        return new Thread(conn.getName() + "-question-" + replyId + "-" + tag) {
+        return new Thread(name) {
             @Override
             public void run() {
                 Message reply;
                 try {
                     reply = conn.handle(query);
                 } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, "Question " + replyId
-                               + " handler fail: " + tag, fce);
+                    logger.log(Level.WARNING, name + ": handler fail", fce);
                     return;
                 }
 
@@ -189,12 +189,10 @@ final class ReceivingThread extends Thread {
                     : reply.getType();
                 try {
                     conn.sendMessage(new ReplyMessage(replyId, reply));
-                    logger.log(Level.FINEST, "Question " + replyId + " " + tag
-                               + " -> " + replyTag);
+                    logger.log(Level.FINEST, name + " -> " + replyTag);
                 } catch (IOException ioe) {
-                    logger.log(Level.WARNING, "Question " + replyId
-                               + " response fail " + tag + " -> " + replyTag,
-                               ioe);
+                    logger.log(Level.WARNING, name + ": response " + replyTag
+                        + "fail", ioe);
                     return;
                 }
             }
@@ -205,25 +203,25 @@ final class ReceivingThread extends Thread {
     private void reply(Message message, int replyId) {
         NetworkReplyObject nro = waitingThreads.remove(replyId);
         if (nro == null) {
-            logger.warning("Could not find reply: " + replyId);
+            logger.warning(getName() + ": not find reply " + replyId);
         } else {
             nro.setResponse(message);
         }
     }
 
     private Thread domUpdate(DOMMessage msg) {
-        return new Thread(this.connection.getName() + "-update-"
-                          + msg.getType()) {
+        final String name = getName() + "-update-" + msg.getType();
+
+        return new Thread(name) {
             @Override
             public void run() {
                 final String tag = msg.getType();
                 try {
                     ReceivingThread.this.connection.handleUpdate(msg);
                 } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, "Update handler fail: " + tag,
-                               fce);
+                    logger.log(Level.WARNING, name + ": handler fail", fce);
                 } catch (IOException ioe) {
-                    logger.log(Level.WARNING, "Update send fail: " + tag, ioe);
+                    logger.log(Level.WARNING, name + ": send fail", ioe);
                 }
             }
         };
@@ -233,16 +231,16 @@ final class ReceivingThread extends Thread {
         if (message == null) return null;
         final String inTag = message.getType();
         final Connection conn = this.connection;
-
-        return new Thread(conn.getName() + "-update-" + inTag) {
+        final String name = getName() + "-update-" + inTag;
+        
+        return new Thread(name) {
             @Override
             public void run() {
                 Message reply;
                 try {
                     reply = conn.handle(message);
                 } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, "Update handler fail: " + inTag,
-                               fce);
+                    logger.log(Level.WARNING, name + ": handler fail", fce);
                     return;
                 }
 
@@ -250,12 +248,9 @@ final class ReceivingThread extends Thread {
                     : reply.getType();
                 try {
                     conn.sendMessage(reply);
-                    logger.log(Level.FINEST, "Update: " + inTag
-                               + " -> " + outTag);
+                    logger.log(Level.FINEST, name + " -> " + outTag);
                 } catch (IOException ioe) {
-                    logger.log(Level.WARNING, "Update send fail: " + inTag,
-                               ioe);
-                    return;
+                    logger.log(Level.WARNING, name + ": send fail", ioe);
                 }
             }
         };
@@ -275,7 +270,8 @@ final class ReceivingThread extends Thread {
         try {
             tag = this.connection.startListen();
         } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "Listen failure", xse);
+            if (!shouldRun()) return; // Connection shutdown, fail expected
+            logger.log(Level.WARNING, getName() + ": listen fail", xse);
             tag = DisconnectMessage.TAG;
         }
 
@@ -288,7 +284,7 @@ final class ReceivingThread extends Thread {
             // due to end-of-stream.
             dm = TrivialMessage.disconnectMessage;
             t = domUpdate(dm);
-            askToStop();
+            askToStop("listen-disconnect");
             break;
 
         case Connection.REPLY_TAG:
@@ -302,7 +298,7 @@ final class ReceivingThread extends Thread {
                     m = this.connection.reader();
                 } catch (FreeColException|XMLStreamException ex) {
                     // Just log for now, fall through to DOM-based code
-                    logger.log(Level.FINEST, "ReceivingThread.reply", ex);
+                    logger.log(Level.FINEST, getName() + ": reply fail", ex);
                 }
                 if (m != null) {
                     assert m instanceof ReplyMessage;
@@ -330,7 +326,7 @@ final class ReceivingThread extends Thread {
                     m = this.connection.reader();
                 } catch (FreeColException|XMLStreamException ex) {
                     // Just log for now, fall through to DOM-based code
-                    logger.log(Level.FINEST, "ReceivingThread.question", ex);
+                    logger.log(Level.FINEST, getName() + ": question fail", ex);
                 }
                 if (m != null) {
                     assert m instanceof QuestionMessage;
@@ -353,7 +349,7 @@ final class ReceivingThread extends Thread {
                     m = this.connection.reader();
                 } catch (FreeColException|XMLStreamException ex) {
                     // Just log for now, fall through to DOM-based code
-                    logger.log(Level.FINEST, "ReceivingThread." + tag, ex);
+                    logger.log(Level.FINEST, getName() + ": fail", ex);
                 }
                 if (m != null) {
                     t = messageUpdate(m);
@@ -391,22 +387,22 @@ final class ReceivingThread extends Thread {
                     timesFailed = 0;
                 } catch (SAXException|XMLStreamException ex) {
                     if (!shouldRun()) break;
-                    logger.log(Level.WARNING, "XML fail", ex);
+                    logger.log(Level.WARNING, getName() + ": XML fail", ex);
                     if (++timesFailed > MAXIMUM_RETRIES) {
                         disconnect();
                     }
                 } catch (IOException ioe) {
                     if (!shouldRun()) break;
-                    logger.log(Level.WARNING, "IO fail", ioe);
+                    logger.log(Level.WARNING, getName() + ": IO fail", ioe);
                     disconnect();
                 }
             }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Unexpected exception.", e);
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, getName() + ": unexpected fail", ex);
         } finally {
-            askToStop();
+            askToStop("run complete");
         }
         connection.close();
-        logger.info("Finished: " + getName());
+        logger.info(getName() + ": finished");
     }
 }
