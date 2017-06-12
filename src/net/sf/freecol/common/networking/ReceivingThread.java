@@ -147,7 +147,7 @@ final class ReceivingThread extends Thread {
 
     // Individual parts of listen().  Work in progress
 
-    private Thread domQuestion(DOMMessage msg, final int replyId) {
+    private Thread domQuestion(final DOMMessage msg, final int replyId) {
         return new Thread(this.connection.getName() + "-question-" + replyId
                           + "-" + msg.getType()) {
             @Override
@@ -271,13 +271,12 @@ final class ReceivingThread extends Thread {
      */
     private void listen() throws IOException, SAXException, XMLStreamException {
         String tag;
-        int replyId;
+        int replyId = -1;
         try {
             tag = this.connection.startListen();
-            replyId = this.connection.getReplyId();
         } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Listen failure", xse);
             tag = DisconnectMessage.TAG;
-            replyId = -1;
         }
 
         // Read the message, optionally create a thread to handle it
@@ -296,6 +295,7 @@ final class ReceivingThread extends Thread {
             // A reply.  Always respond, even when failing, so as to
             // unblock the waiting thread.
 
+            replyId = this.connection.getReplyId();
             if (false) { // DISABLED FOR NOW
                 Message m = null;
                 try {
@@ -323,6 +323,7 @@ final class ReceivingThread extends Thread {
         case Connection.QUESTION_TAG:
             // A question.  Build a thread to handle it and send a reply.
 
+            replyId = this.connection.getReplyId();
             if (false) { // DISABLED FOR NOW
                 Message m = null;
                 try {
