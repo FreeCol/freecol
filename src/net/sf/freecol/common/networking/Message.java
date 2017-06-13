@@ -531,6 +531,7 @@ public abstract class Message {
     public static Message read(Game game, FreeColXMLReader xr)
         throws FreeColException {
         final String tag = xr.getLocalName();
+        Message ret = null;
         Constructor<? extends Message> mb = builders.get(tag);
         if (mb == null) {
             final String className = "net.sf.freecol.common.networking."
@@ -551,10 +552,12 @@ public abstract class Message {
             }
             builders.put(tag, mb);
         }
+
         try {
-            return Introspector.construct(mb, new Object[] { game, xr });
+            ret = Introspector.construct(mb, new Object[] { game, xr });
         } catch (Introspector.IntrospectorException ie) {
             throw new FreeColException(ie.getMessage(), ie.getCause());
         }
+        return ret;
     }
 }
