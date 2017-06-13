@@ -776,16 +776,16 @@ public class Connection implements Closeable {
      * @exception FreeColException if the message is corrupt.
      */
     public Message handle(Message message) throws FreeColException {
-        if (message == null) return null;
-        final MessageHandler mh = getMessageHandler();
-
-        // FIXME: Temporary hack
-        if (mh == null) {
-            throw new FreeColException("No handler for " + message.getType())
-                .preserveDebug();
+        Message ret = null;
+        if (message != null) {
+            final MessageHandler mh = getMessageHandler();
+            if (mh == null) { // FIXME: Temporary hack
+                throw new FreeColException(getName() + " has no handler for "
+                    + message.getType()).preserveDebug();
+            }
+            ret = mh.handle(message);
         }
-
-        return mh.handle(message);
+        return ret;
     }
 
     /**
@@ -804,7 +804,6 @@ public class Connection implements Closeable {
             throw new FreeColException("No handler at " + xr.getLocalName())
                 .preserveDebug();
         }
-
         return mh.read(this);
     }
 
