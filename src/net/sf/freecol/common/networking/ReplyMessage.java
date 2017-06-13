@@ -55,7 +55,5 @@ public class ReplyMessage extends WrapperMessage {
     public ReplyMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException, FreeColException {
         super(TAG, game, xr);
-
-        xr.expectTag(TAG);
     }
 }

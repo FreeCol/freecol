@@ -69,10 +69,14 @@ public abstract class WrapperMessage extends AttributeMessage {
         throws XMLStreamException, FreeColException {
         super(tag, REPLY_ID_TAG, xr.getAttribute(REPLY_ID_TAG, (String)null));
 
-        if (xr.moreTags()) {
-            String mt = xr.getLocalName();
-            this.message = Message.read(game, xr);
-            xr.closeTag(mt);
+        this.message = null;
+        while (xr.moreTags()) {
+            final String mt = xr.getLocalName();
+            if (this.message == null) {
+                this.message = Message.read(game, xr);
+            } else {
+                xr.expectTag(tag);
+            }
         }
         xr.expectTag(tag);
     }
@@ -123,15 +127,6 @@ public abstract class WrapperMessage extends AttributeMessage {
     // Public interface
 
     /**
-     * Get the reply identifier.
-     *
-     * @return The reply identifier.
-     */
-    public int getReplyId() {
-        return getIntegerAttribute(REPLY_ID_TAG, -1);
-    }
-
-    /**
      * Get the wrapped message.
      *
      * @return The {@code Message}.
@@ -141,9 +136,7 @@ public abstract class WrapperMessage extends AttributeMessage {
     }
 
     /**
-     * Get the type of the wrapped message.
-     *
-     * @return The subtype, or null if no message.
+     * {@inheritDoc}
      */
     public String getSubType() {
         return (this.message == null) ? null : this.message.getType();

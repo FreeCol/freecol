@@ -154,7 +154,7 @@ public abstract class Message {
     public boolean isType(String type) {
         return getType().equals(type);
     }
-
+        
     /**
      * Should this message only be sent to a server by the current player?
      *
