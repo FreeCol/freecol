@@ -88,6 +88,16 @@ public class GameStateMessage extends AttributeMessage {
         
 
     /**
+     * Get the game state.
+     *
+     * @return The game state, if present.
+     */
+    private ServerState getState() {
+        return getEnumAttribute(STATE_TAG, ServerState.class,
+                                (ServerState)null);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -114,13 +124,5 @@ public class GameStateMessage extends AttributeMessage {
         // being defined
         return igc(freeColServer)
             .gameState();
-    }
-
-
-    // Public interface
-
-    public ServerState getState() {
-        return getEnumAttribute(STATE_TAG, ServerState.class,
-                                (ServerState)null);
     }
 }
