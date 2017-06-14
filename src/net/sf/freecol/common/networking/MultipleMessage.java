@@ -97,6 +97,7 @@ public class MultipleMessage extends ObjectMessage {
     @Override
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
         final Connection conn = aiPlayer.getConnection();
+        if (conn == null) return;
         Message msg = DOMUtils.handleList(conn.getDOMMessageHandler(),
                                           conn, this.elements);
         if (msg != null) {
