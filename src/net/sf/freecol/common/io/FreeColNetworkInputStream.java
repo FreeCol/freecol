@@ -99,10 +99,10 @@ public class FreeColNetworkInputStream extends BufferedInputStream {
      * @exception IOException is thrown by the underlying read.
      * @exception IllegalStateException if the buffer is not empty.
      */
-    private boolean fill() throws IOException {
+    public boolean fill() throws IOException {
         if (this.bSize != 0) throw new IllegalStateException("Not empty.");
 
-        int r = super.read(buffer, 0, buffer.length);
+        int r = super.read(this.buffer, 0, this.buffer.length);
         if (r <= 0) return false;
 
         this.bStart = 0;
@@ -147,7 +147,7 @@ public class FreeColNetworkInputStream extends BufferedInputStream {
                 }
             }
 
-            byte value = buffer[this.bStart];
+            byte value = this.buffer[this.bStart];
             this.bStart++;
             this.bSize--;
             if (value == (byte)Connection.END_OF_STREAM) {
@@ -177,12 +177,6 @@ public class FreeColNetworkInputStream extends BufferedInputStream {
      */
     @Override
     public void mark(int readLimit) {
-        if (this.bSize == 0) { // Make sure there is something to mark
-            try {
-                fill();
-            } catch (IOException ioe) {}
-        }
-                
         this.markStart = this.bStart;
         this.markSize = this.bSize;
     }
@@ -200,7 +194,7 @@ public class FreeColNetworkInputStream extends BufferedInputStream {
      */
     @Override
     public void close() {
-        ; // Do nothing
+        this.bStart = 0;
+        this.bSize = 0;
     }
 }
-

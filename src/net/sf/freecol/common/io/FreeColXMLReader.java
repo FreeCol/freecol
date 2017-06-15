@@ -306,6 +306,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 "EntityReference", "Namespace", "NotationDeclaration",
                 "ProcessingInstruction", "Space", "StartDocument",
                 "StartElement" });
+
     /**
      * {@inheritDoc}
      */

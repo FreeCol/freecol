@@ -309,8 +309,11 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
             } catch (XMLStreamException xse) {
                 logger.log(Level.WARNING, "Error closing stream.", xse);
             }
+            // TODO: Do not set this.xmlStreamWriter = null.  Need to build
+            // robustness.
         }
     }
+
 
     /**
      * Write a boolean attribute to the stream.

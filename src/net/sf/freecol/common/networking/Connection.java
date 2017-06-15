@@ -63,6 +63,7 @@ public class Connection implements Closeable {
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
 
     public static final char END_OF_STREAM = '\n';
+    private static final char[] END_OF_STREAM_ARRAY = { END_OF_STREAM };
     public static final int BUFFER_SIZE = 1 << 14;
     
     public static final String NETWORK_REPLY_ID_TAG = "networkReplyId";
@@ -612,6 +613,12 @@ public class Connection implements Closeable {
 
     public String startListen() throws XMLStreamException {
         this.fcnis.enable();
+        try {
+            this.fcnis.fill();
+        } catch (IOException ioe) {
+            throw new XMLStreamException("Fill failure: " + ioe.getMessage());
+        }
+        
         this.fcnis.mark(Connection.BUFFER_SIZE);
         try {
             this.xr = new FreeColXMLReader(this.fcnis); //.setTracing(true);
@@ -628,10 +635,7 @@ public class Connection implements Closeable {
     }
 
     public void endListen() {
-        if (this.xr != null) {
-            this.xr.close();
-            this.xr = null;
-        }
+        if (this.fcnis != null) this.fcnis.close(); // Just clears the data
     }
 
     public DOMMessage domReader()
@@ -660,7 +664,7 @@ public class Connection implements Closeable {
         msg = new DOMMessage(REPLY_TAG,
             NETWORK_REPLY_ID_TAG, Integer.toString(replyId));
         if (reply != null) msg.add(reply);
-        send(msg);
+        sendElement(msg.toXMLElement());
     }
 
     /**
@@ -720,7 +724,10 @@ public class Connection implements Closeable {
         try {
             synchronized (this.outputLock) {
                 if (this.xw == null) return false;
-                message.toXML(xw);
+                message.toXML(this.xw);
+                this.xw.writeCharacters(END_OF_STREAM_ARRAY, 0,
+                                        END_OF_STREAM_ARRAY.length);
+                this.xw.flush();
             }
         } catch (Exception ex) {
             throw new IOException("sendMessageInternal fail: " + tag, ex);
@@ -860,24 +867,35 @@ public class Connection implements Closeable {
      */
     public boolean request(Message message) {
         if (message == null) return true;
-        boolean ret;
 
         // Try Message-based routine
+        final String tag = message.getType();
+        boolean ret = false;
         if (false) { // DISABLED FOR NOW
-            final String tag = message.getType();
             try {
-                if (requestMessage(message)) return true;
+                ret = requestMessage(message);
             } catch (IOException ioe) {
-                logger.log(Level.FINEST, "Client request(" + tag + ") fail",
-                           ioe);
+                logger.log(Level.FINEST, this.name + " request("
+                    + tag + ") fail", ioe);
+                ret = false;
             }
         }
         
         // Temporary fall back to using DOMMessage
-        if (message instanceof DOMMessage) {
-            return requestElement(((DOMMessage)message).toXMLElement());
+        if (!ret) {
+            //logger.warning(this.name + " fallback-request(" +  tag + ") "
+            //    + (message instanceof DOMMessage));
+            if (message instanceof DOMMessage) {
+                ret = requestElement(((DOMMessage)message).toXMLElement());
+            }
         }
-        return false;
+
+        if (ret) {
+            logger.finest(this.name + " request( " + tag + ") ok");
+        } else {
+            logger.warning(this.name + " request( " + tag + ") failed");
+        }            
+        return ret;
     }
         
     /**
@@ -890,23 +908,33 @@ public class Connection implements Closeable {
         if (message == null) return true;
 
         // Try Message-based routine
-        if (false) { // DISABLED FOR NOW
-            final String tag = message.getType();
+        final String tag = message.getType();
+        boolean ret = false;
+        if (true) {
             try {
-                if (sendMessage(message)) {
-                    logger.finest("Client send: " + tag);
-                    return true;
-                }
+                ret = sendMessage(message);
             } catch (IOException ioe) {
-                logger.log(Level.FINEST, "Client send(" + tag + ") fail", ioe);
+                logger.log(Level.WARNING, this.name + " send("
+                    + tag + ") exception", ioe);
+                ret = false;
             }
         }
 
-        // Temporary fall back to using DOMMessage
-        if (message instanceof DOMMessage) {
-            return sendElement(((DOMMessage)message).toXMLElement());
+        // Fallback to using DOMMessage
+        if (!ret) {
+            logger.warning(this.name + " fallback-send(" +  tag + ") "
+                + (message instanceof DOMMessage));
+            if (message instanceof DOMMessage) {
+                ret = sendElement(((DOMMessage)message).toXMLElement());
+            }
         }
-        return false;
+
+        if (ret) {
+            logger.finest(this.name + " send(" + tag + ") ok");
+        } else {
+            logger.warning(this.name + " send(" + tag + ") failed");
+        }
+        return ret;
     }
     
 
