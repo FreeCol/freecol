@@ -149,7 +149,7 @@ final class ReceivingThread extends Thread {
     // Individual parts of listen().  Work in progress
 
     private Thread domQuestion(final DOMMessage msg, final int replyId) {
-        final String name = getName() + "-question-" + replyId
+        final String name = getName() + "-domQuestion-" + replyId
             + "-" + msg.getType();
         return new Thread(name) {
             @Override
@@ -210,7 +210,7 @@ final class ReceivingThread extends Thread {
     }
 
     private Thread domUpdate(DOMMessage msg) {
-        final String name = getName() + "-update-" + msg.getType();
+        final String name = getName() + "-domUpdate-" + msg.getType();
 
         return new Thread(name) {
             @Override

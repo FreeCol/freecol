@@ -68,7 +68,7 @@ public class MoveTest extends FreeColTestCase {
             Unit hardyPioneer = new ServerUnit(game, plain1, dutch,
                                                pioneerType);
     
-            client.getPreGameController().startGame();
+            client.getPreGameController().startGameHandler();
             assertEquals(plain1.getNeighbourOrNull(Direction.NE), plain2);
             client.getInGameController().moveDirection(hardyPioneer,
                 Direction.NE, false);

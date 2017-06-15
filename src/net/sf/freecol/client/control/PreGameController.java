@@ -238,27 +238,37 @@ public final class PreGameController extends FreeColClientHolder {
     }
 
     /**
-     * Start the game.
+     * Handle starting the game.
+     *
+     * Wait until map is received from server (sometimes a startGame
+     * message arrives arrives when map is still null).  Make sure we
+     * do this in a new thread so as not to block the input handler
+     * from receiving the map!
      */
-    public void startGame() {
+    public void startGameHandler() {
         new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
                 @Override
                 public void run() {
-                    // Wait until map is received from server
-                    // (sometimes a startGame message arrives arrives
-                    // when map is still null).  Make sure we do this
-                    // in a new thread so as not to block the input handler
-                    // from receiving the map!
-                    Game game;
-                    for (;;) {
+                    logger.info("Client starting game");
+                    Game game = null;
+                    for (int tries = 50; tries >= 0; tries--) {
                         game = getGame();
                         if (game != null && game.getMap() != null) break;
                         Utils.delay(200, "StartGame has been interupted.");
                     }
-
-                    SwingUtilities.invokeLater(() -> {
-                            startGameInternal();
-                        });
+                    if (game != null && game.getMap() != null) {
+                        SwingUtilities.invokeLater(() -> {
+                                startGameInternal();
+                            });
+                        return;
+                    }
+                    final GUI gui = getGUI();
+                    String err = (game == null) ? "client.noGame"
+                        : "client.noMap";
+                    gui.closeMainPanel();
+                    gui.closeMenus();
+                    gui.closeStatusPanel();
+                    gui.showMainPanel(Messages.message(StringTemplate.template(err)));
                 }
         }.start();
     }

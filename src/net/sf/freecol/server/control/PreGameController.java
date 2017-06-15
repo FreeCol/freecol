@@ -112,7 +112,11 @@ public final class PreGameController extends Controller {
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet requestLaunch(ServerPlayer serverPlayer) {
-        if (setLaunching(true)) return null;
+        logger.info("Launching for " + serverPlayer);
+        if (setLaunching(true)) {
+            logger.warning("Already launching");
+            return null;
+        }
 
         final FreeColServer freeColServer = getFreeColServer();
         final Game game = getGame();

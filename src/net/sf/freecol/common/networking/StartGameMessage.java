@@ -72,6 +72,6 @@ public class StartGameMessage extends TrivialMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        pgc(freeColClient).startGame();
+        pgc(freeColClient).startGameHandler();
     }
 }

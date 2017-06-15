@@ -728,6 +728,7 @@ public final class FreeColServer {
      * @exception FreeColException if there is a problem creating the game.
      */
     public void startGame() throws FreeColException {
+        logger.info("Server starting game: " + this.serverState);
         final Game game = buildGame();
 
         switch (this.serverState) {
