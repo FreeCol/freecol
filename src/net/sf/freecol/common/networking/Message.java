@@ -451,8 +451,10 @@ public abstract class Message {
      * 
      * @param freeColServer The {@code FreeColServer} handling the request.
      * @param aiPlayer The {@code AIPlayer} the message was sent to.
+     * @exception FreeColException if there is a problem handling the message.
      */
-    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer)
+        throws FreeColException {
         throw new RuntimeException("NYI aiHandler for: " + getType());
     }
 

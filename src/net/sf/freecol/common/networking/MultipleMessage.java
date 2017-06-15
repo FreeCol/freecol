@@ -22,10 +22,14 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -44,8 +48,11 @@ public class MultipleMessage extends ObjectMessage {
 
     public static final String TAG = "multiple";
 
-    /** The list of messages. */
+    /** (Deprecated) The list of elements containing messages. */
     private List<Element> elements = new ArrayList<>();
+
+    /** The list of messages. */
+    private final List<Message> messages = new ArrayList<>();
 
 
     /**
@@ -55,6 +62,7 @@ public class MultipleMessage extends ObjectMessage {
         super(TAG);
 
         this.elements.clear();
+        this.messages.clear();
     }
 
     /**
@@ -66,6 +74,27 @@ public class MultipleMessage extends ObjectMessage {
         this();
 
         if (elements != null) this.elements.addAll(elements);
+    }
+
+    /**
+     * Create a new {@code MultipleMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
+     * @exception FreeColException if the internal message can not be read.
+     */
+    public MultipleMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException, FreeColException {
+        this();
+        
+        this.messages.clear();
+        while (xr.moreTags()) {
+            final String mt = xr.getLocalName();
+            Message m = Message.read(game, xr);
+            if (m != null) this.messages.add(m);
+        }
+        xr.expectTag(TAG);
     }
 
     /**
@@ -95,29 +124,53 @@ public class MultipleMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
-    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer)
+        throws FreeColException {
         final Connection conn = aiPlayer.getConnection();
-        if (conn == null) return;
-        Message msg = DOMUtils.handleList(conn.getDOMMessageHandler(),
-                                          conn, this.elements);
-        if (msg != null) {
-            logger.warning("Multiple AI message -> " + msg.getType());
+
+        if (!this.elements.isEmpty()) {
+            Message msg = DOMUtils.handleList(conn.getDOMMessageHandler(),
+                                              conn, this.elements);
+            if (msg != null) {
+                logger.warning("Multiple AI message -> " + msg.getType());
+            }
+            return;
+        }
+
+        if (!this.messages.isEmpty()) {
+            for (Message m : this.messages) {
+                Message ret = conn.handle(m);
+                assert ret == null;
+            }
         }
     }
-
+ 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void clientHandler(FreeColClient freeColClient) {
+    public void clientHandler(FreeColClient freeColClient)
+        throws FreeColException {
         final Connection conn = freeColClient.askServer().getConnection();
-        Message msg = DOMUtils.handleList(freeColClient.getInGameInputHandler(),
-                                          conn, this.elements);
-        if (msg != null) {
-            logger.warning("Multiple client message -> " + msg.getType());
+        if (conn == null) return;
+
+        if (!this.elements.isEmpty()) {
+            Message msg = DOMUtils.handleList(freeColClient.getInGameInputHandler(),
+                                              conn, this.elements);
+            if (msg != null) {
+                logger.warning("Multiple client message -> " + msg.getType());
+            }
+            return;
         }
+        
+        if (!this.messages.isEmpty()) {
+            for (Message m : this.messages) {
+                Message ret = conn.handle(m);
+                assert ret == null;
+            }
+        }                 
     }
-            
+
     /**
      * {@inheritDoc}
      */
@@ -125,10 +178,29 @@ public class MultipleMessage extends ObjectMessage {
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
         final Connection conn = serverPlayer.getConnection();
-        Message msg = DOMUtils.handleList((DOMMessageHandler)freeColServer.getInputHandler(),
-                                          conn, this.elements);
-        return (msg == null) ? null
-            : ChangeSet.simpleChange(serverPlayer, (DOMMessage)msg);
+        if (conn == null) return null;
+
+        if (!this.elements.isEmpty()) {
+            Message msg = DOMUtils.handleList((DOMMessageHandler)freeColServer.getInputHandler(),
+                                              conn, this.elements);
+            return (msg == null) ? null
+                : ChangeSet.simpleChange(serverPlayer, (DOMMessage)msg);
+        }
+
+        if (!this.messages.isEmpty()) {
+            ChangeSet cs = new ChangeSet();
+            for (Message m : this.messages) {
+                try {
+                    Message r = conn.handle(m);
+                    if (r != null) cs.add(ChangeSet.See.only(serverPlayer), r);
+                } catch (FreeColException fce) {
+                    logger.log(Level.WARNING, "MultipleMessage server fail", fce);
+                }
+            }
+            return (cs.isEmpty()) ? null : cs;
+        }
+
+        return null;
     }
             
     /**
