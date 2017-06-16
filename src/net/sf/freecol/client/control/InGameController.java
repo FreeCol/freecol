@@ -5013,16 +5013,9 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = getMyPlayer();
         boolean visibilityChange = false;
 
+        // Currently, interning was handled as the objects were read,
+        // so all we have to do is the visibility check
         for (FreeColObject fco : objects) {
-            if (fco == null) continue;
-            FreeColGameObject real = game.getFreeColGameObject(fco.getId());
-            if (real == null) {
-                logger.warning("Update of missing object: " + fco.getId());
-                continue;
-            }
-            real.copyIn(fco);
-            real.intern();
-            
             if ((fco instanceof Player && (fco == player))
                 || ((fco instanceof Ownable) && player.owns((Ownable)fco))) {
                 visibilityChange = true;//-vis(player)
