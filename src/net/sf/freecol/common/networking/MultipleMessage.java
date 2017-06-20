@@ -127,6 +127,7 @@ public class MultipleMessage extends ObjectMessage {
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer)
         throws FreeColException {
         final Connection conn = aiPlayer.getConnection();
+        if (conn == null) return;
 
         if (!this.elements.isEmpty()) {
             Message msg = DOMUtils.handleList(conn.getDOMMessageHandler(),
