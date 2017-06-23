@@ -245,4 +245,13 @@ public class MultipleMessage extends ObjectMessage {
         Message m = applyHandler(connection.getDOMMessageHandler(), connection);
         return (m == null) ? null : ((DOMMessage)m).toXMLElement();
     }
+
+    /**
+     * Is there anything attached?
+     *
+     * @return True if this message is empty.
+     */
+    public boolean isEmpty() {
+        return this.messages.isEmpty() && this.elements.isEmpty();
+    }
 }

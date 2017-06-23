@@ -1581,6 +1581,10 @@ public class ChangeSet {
         // Merge in the diverted messages.
         for (Message m : diverted) ret.merge(m);
 
+        // Check for degenerate multiple message
+        if (ret instanceof MultipleMessage
+            && ((MultipleMessage)ret).isEmpty()) ret = null;
+
         return ret;
     }
 
