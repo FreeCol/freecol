@@ -69,8 +69,8 @@ public class Connection implements Closeable {
     public static final String NETWORK_REPLY_ID_TAG = "networkReplyId";
     public static final String QUESTION_TAG = "question";
     public static final String REPLY_TAG = "reply";
-    public static final String SEND_SUFFIX = "-send\n";
-    public static final String REPLY_SUFFIX = "-reply\n";
+    public static final String SEND_SUFFIX = "-send";
+    public static final String REPLY_SUFFIX = "-reply";
 
     private static final int TIMEOUT = 5000; // 5s
 
@@ -431,6 +431,7 @@ public class Connection implements Closeable {
             if (sw == null) return;
             StringBuffer sb = sw.getBuffer();
             try {
+                sb.insert(0, "\n");
                 sb.insert(0, (send) ? SEND_SUFFIX : REPLY_SUFFIX);
                 sb.insert(0, name);
                 this.logWriter.write(sb.toString());
