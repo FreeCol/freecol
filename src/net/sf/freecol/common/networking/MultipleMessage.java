@@ -68,12 +68,36 @@ public class MultipleMessage extends ObjectMessage {
     /**
      * Create a new {@code MultipleMessage}.
      *
-     * @param elements A list of sub-{@code Element}s.
+     * @param element An element containing the sub-{@code Element}s.
      */
-    public MultipleMessage(List<Element> elements) {
+    public MultipleMessage(Element element) {
         this();
 
-        if (elements != null) this.elements.addAll(elements);
+        this.elements.addAll(DOMUtils.mapChildren(element, Function.identity()));
+    }
+
+    /**
+     * Create a new {@code MultipleMessage} from a
+     * supplied element.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
+     */
+    public MultipleMessage(Game game, Element element) {
+        this();
+
+        this.elements.addAll(DOMUtils.mapChildren(element, Function.identity()));
+    }
+
+    /**
+     * Create a new {@code MultipleMessage} with the given messages.
+     *
+     * @param messages The {@code Message}s to add.
+     */
+    public MultipleMessage(List<Message> messages) {
+        this();
+        
+        if (messages != null) this.messages.addAll(messages);
     }
 
     /**
@@ -93,30 +117,9 @@ public class MultipleMessage extends ObjectMessage {
             final String mt = xr.getLocalName();
             Message m = Message.read(game, xr);
             if (m != null) this.messages.add(m);
+            xr.expectTag(mt);
         }
         xr.expectTag(TAG);
-    }
-
-    /**
-     * Create a new {@code MultipleMessage}.
-     *
-     * @param element An element containing the sub-{@code Element}s.
-     */
-    public MultipleMessage(Element element) {
-        this(DOMUtils.mapChildren(element, Function.identity()));
-    }
-
-    /**
-     * Create a new {@code MultipleMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public MultipleMessage(Game game, Element element) {
-        this();
-
-        this.elements.addAll(DOMUtils.mapChildren(element, Function.identity()));
     }
 
 
@@ -231,12 +234,21 @@ public class MultipleMessage extends ObjectMessage {
     // Public interface
 
     /**
+     * Add another element.
+     *
+     * @param element The {@code Element} to add.
+     */
+    public void addElement(Element element) {
+        this.elements.add(element);
+    }
+
+    /**
      * Add another message.
      *
      * @param message The {@code DOMMessage} to add.
      */
     public void addMessage(DOMMessage message) {
-        this.elements.add(message.toXMLElement());
+        addElement(message.toXMLElement());
     }
 
     /**

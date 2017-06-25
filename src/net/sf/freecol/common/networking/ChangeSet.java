@@ -1573,9 +1573,7 @@ public class ChangeSet {
             ret = messages.get(0);
             break;
         default:
-            MultipleMessage mm = new MultipleMessage();
-            for (Message m : messages) mm.addMessage((DOMMessage)m);
-            ret = mm;
+            ret = new MultipleMessage(messages);
             break;
         }
             

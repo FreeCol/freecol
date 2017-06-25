@@ -358,7 +358,10 @@ public class DOMUtils {
             }
             i++;
         }
-        return (results.isEmpty()) ? null : new MultipleMessage(results);
+        if (results.isEmpty()) return null;
+        MultipleMessage ret = new MultipleMessage();
+        for (Element e : results) ret.addElement(e);
+        return ret;
     }    
     
     /**
