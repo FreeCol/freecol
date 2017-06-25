@@ -292,9 +292,12 @@ public class LoginMessage extends ObjectMessage {
                 serverGame.setCurrentPlayer(present);
             }
 
-            // Add the connection, send back the game
+            // Add the connection, send back the game.
+            // Note use of "serverPlayer" for the visibility (*not* "present"),
+            // we need to return a change with respect to the dummy player
+            // object that the calling ServerInputHandler is using.
             freeColServer.addPlayerConnection(conn);
-            ret = ChangeSet.simpleChange(present,
+            ret = ChangeSet.simpleChange(serverPlayer,
                 new LoginMessage(userName, getVersion(),
                     freeColServer.getServerState(),
                     freeColServer.getSinglePlayer(),
