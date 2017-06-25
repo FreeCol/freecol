@@ -211,6 +211,14 @@ public class MultipleMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        for (Message m : this.messages) m.toXML(xw);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String pretty() {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[');
