@@ -95,6 +95,9 @@ public abstract class TrivialMessage extends DOMMessage {
     /**
      * Create a new {@code TrivialMessage} from a stream.
      *
+     * Note: only call this from direct subclasses of TrivialMessage as it
+     * consumes the whole message.
+     *
      * @param tag The message tag.
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
@@ -106,7 +109,7 @@ public abstract class TrivialMessage extends DOMMessage {
         throws FreeColException, XMLStreamException {
         this(tag);
 
-        xr.expectTag(tag);
+        xr.closeTag(tag);
     }
 
 
