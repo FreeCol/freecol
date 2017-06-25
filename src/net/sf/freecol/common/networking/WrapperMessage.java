@@ -85,6 +85,13 @@ public abstract class WrapperMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
+    public boolean isEmpty() {
+        return super.isEmpty() && this.message == null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSourcePlayer(ServerPlayer serverPlayer) {
         super.setSourcePlayer(serverPlayer);

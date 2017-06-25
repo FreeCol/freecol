@@ -426,6 +426,15 @@ public abstract class Message {
     }
 
     /**
+     * Is this message vacuous?
+     *
+     * @return True if there are no attributes or children present.
+     */
+    public boolean isEmpty() {
+        return getStringAttributes().isEmpty() && getChildren().isEmpty();
+    }
+
+    /**
      * Merge another message into this message if possible.
      *
      * @param message The {@code Message} to merge.

@@ -126,6 +126,14 @@ public class MultipleMessage extends ObjectMessage {
     /**
      * {@inheritDoc}
      */
+    public boolean isEmpty() {
+        return super.isEmpty() && this.messages.isEmpty()
+            && this.elements.isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer)
         throws FreeColException {
@@ -277,14 +285,5 @@ public class MultipleMessage extends ObjectMessage {
     public Element handle(FreeColServer freeColServer, Connection connection) {
         Message m = applyHandler(connection.getDOMMessageHandler(), connection);
         return (m == null) ? null : ((DOMMessage)m).toXMLElement();
-    }
-
-    /**
-     * Is there anything attached?
-     *
-     * @return True if this message is empty.
-     */
-    public boolean isEmpty() {
-        return this.messages.isEmpty() && this.elements.isEmpty();
     }
 }
