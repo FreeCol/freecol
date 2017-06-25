@@ -93,10 +93,10 @@ public abstract class ObjectMessage extends AttributeMessage {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @param attributes The attributes to read.
      * @exception XMLStreamException if the stream is corrupt.
-     * @exception FreeColException if the internal message can not be read.
      */
     protected ObjectMessage(String type, FreeColXMLReader xr,
-                            String... attributes) {
+                            String... attributes)
+        throws XMLStreamException {
         super(type, xr.getAttributeMap(attributes));
 
         this.objects.clear();
