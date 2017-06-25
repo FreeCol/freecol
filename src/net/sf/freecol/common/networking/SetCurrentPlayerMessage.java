@@ -52,18 +52,6 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
     }
 
     /**
-     * Create a new {@code SetCurrentPlayerMessage} from a stream.
-     *
-     * @param game The {@code Game} to read within.
-     * @param xr The {@code FreeColXMLReader} to read from.
-     * @exception XMLStreamException if the stream is corrupt.
-     */
-    public SetCurrentPlayerMessage(Game game, FreeColXMLReader xr)
-        throws XMLStreamException {
-        super(TAG, PLAYER_TAG, xr.getAttribute(PLAYER_TAG, (String)null));
-    }
-        
-    /**
      * Create a new {@code SetCurrentPlayerMessage} from a supplied element.
      *
      * @param game The {@code Game} this message belongs to.
@@ -73,6 +61,18 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
         super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG));
     }
 
+    /**
+     * Create a new {@code SetCurrentPlayerMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
+     */
+    public SetCurrentPlayerMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, PLAYER_TAG);
+    }
+        
 
     /**
      * {@inheritDoc}
