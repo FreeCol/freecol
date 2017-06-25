@@ -208,6 +208,19 @@ public class MultipleMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public String pretty() {
+        StringBuilder sb = new StringBuilder(64);
+        sb.append('[');
+        pretty(sb, getType(), getStringAttributes(), null);
+        for (Message m : this.messages) sb.append(' ').append(m.pretty());
+        sb.append(']');
+        return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(TAG);
         for (Element e : this.elements) result.add(e);
