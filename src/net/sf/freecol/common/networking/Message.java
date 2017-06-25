@@ -562,4 +562,40 @@ public abstract class Message {
         }
         return ret;
     }
+
+    /**
+     * Pretty print the components of a message to a string builder.
+     *
+     * @param sb The {@code StringBuilder} to print to.
+     * @param type The type of the message.
+     * @param attributes A map of key,value attribute pairs.
+     * @param children The attached child {@code FreeColObject}s.
+     */
+    public static void pretty(StringBuilder sb, String type,
+                              Map<String, String> attributes,
+                              List<FreeColObject> children) {
+        sb.append(type);
+        if (attributes != null) {
+            for (Entry<String,String> e : attributes.entrySet()) {
+                sb.append(' ').append(e.getKey())
+                    .append('=').append(e.getValue());
+            }
+        }
+        if (children != null) {
+            for (FreeColObject fco : children) {
+                sb.append(' ').append(fco.getId());
+            }
+        }
+    }
+
+    /**
+     * This will become the toString() method when DOMMessage goes away.
+     */
+    public String pretty() {
+        StringBuilder sb = new StringBuilder(32);
+        sb.append('[');
+        pretty(sb, getType(), getStringAttributes(), getChildren());
+        sb.append(']');
+        return sb.toString();
+    }
 }
