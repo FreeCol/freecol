@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
@@ -75,8 +77,10 @@ public class ClaimLandMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public ClaimLandMessage(Game game, FreeColXMLReader xr) {
+    public ClaimLandMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, TILE_TAG, CLAIMANT_TAG, PRICE_TAG);
     }
 

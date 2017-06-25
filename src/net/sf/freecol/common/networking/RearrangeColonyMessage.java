@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColObject;
@@ -221,8 +223,10 @@ public class RearrangeColonyMessage extends AttributeMessage {
      *
      * @param game The {@code Game} to read within.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public RearrangeColonyMessage(Game game, FreeColXMLReader xr) {
+    public RearrangeColonyMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, getAttributeMap(xr));
     }
 

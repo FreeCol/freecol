@@ -18,6 +18,9 @@
  */
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
@@ -62,6 +65,18 @@ public class EquipForRoleMessage extends AttributeMessage {
         super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
               ROLE_TAG, getStringAttribute(element, ROLE_TAG),
               COUNT_TAG, getStringAttribute(element, COUNT_TAG));
+    }
+
+    /**
+     * Create a new {@code EquipForRoleMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
+     */
+    public EquipForRoleMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr, UNIT_TAG, ROLE_TAG, COUNT_TAG);
     }
 
 

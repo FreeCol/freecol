@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
@@ -82,8 +84,10 @@ public class IndianDemandMessage extends AttributeMessage {
      *
      * @param game The {@code Game} to read within.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public IndianDemandMessage(Game game, FreeColXMLReader xr) {
+    public IndianDemandMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, UNIT_TAG, COLONY_TAG, TYPE_TAG, AMOUNT_TAG, RESULT_TAG);
     }
 

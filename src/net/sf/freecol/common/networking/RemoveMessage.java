@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -81,8 +83,10 @@ public class RemoveMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr A {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public RemoveMessage(Game game, FreeColXMLReader xr) {
+    public RemoveMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, getAttributeMap(xr));
     }
 

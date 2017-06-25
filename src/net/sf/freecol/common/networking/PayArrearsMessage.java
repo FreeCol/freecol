@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
@@ -64,8 +66,10 @@ public class PayArrearsMessage extends AttributeMessage {
      *
      * @param game The {@code Game} to read within.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public PayArrearsMessage(Game game, FreeColXMLReader xr) {
+    public PayArrearsMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, GOODS_TYPE_TAG);
     }
 

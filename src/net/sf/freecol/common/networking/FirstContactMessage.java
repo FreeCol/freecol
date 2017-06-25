@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -79,8 +81,10 @@ public class FirstContactMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public FirstContactMessage(Game game, FreeColXMLReader xr) {
+    public FirstContactMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, PLAYER_TAG, OTHER_TAG, TILE_TAG, CAMPS_TAG, RESULT_TAG);
     }
 

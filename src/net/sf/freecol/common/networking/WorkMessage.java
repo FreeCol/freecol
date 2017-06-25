@@ -18,6 +18,8 @@
  */
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -68,8 +70,10 @@ public class WorkMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to (null here).
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public WorkMessage(Game game, FreeColXMLReader xr) {
+    public WorkMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, UNIT_TAG, WORK_LOCATION_TAG);
     }
 

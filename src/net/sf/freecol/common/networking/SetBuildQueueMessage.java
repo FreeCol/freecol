@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
@@ -77,8 +79,10 @@ public class SetBuildQueueMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to (null here).
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException is the stream is corrupt.
      */
-    public SetBuildQueueMessage(Game game, FreeColXMLReader xr) {
+    public SetBuildQueueMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, getAttributeMap(xr));
     }
 

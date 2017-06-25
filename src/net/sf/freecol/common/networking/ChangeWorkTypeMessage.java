@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
@@ -69,8 +71,10 @@ public class ChangeWorkTypeMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public ChangeWorkTypeMessage(Game game, FreeColXMLReader xr) {
+    public ChangeWorkTypeMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, UNIT_TAG, WORK_TYPE_TAG);
     }
 

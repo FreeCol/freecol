@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import java.awt.Color;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
@@ -69,8 +71,10 @@ public class SetColorMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to (null here).
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public SetColorMessage(Game game, FreeColXMLReader xr) {
+    public SetColorMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, NATION_TAG, COLOR_TAG);
     }
 

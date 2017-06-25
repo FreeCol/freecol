@@ -79,7 +79,7 @@ public class GameStateMessage extends AttributeMessage {
      * @param game The {@code Game} to read within (unused, no game
      *     exists at this point).
      * @param xr The {@code FreeColXMLReader} to read from.
-     * @exception XMLStreamException if there is a problem reading the stream.
+     * @exception XMLStreamException if the stream is corrupt.
      */
     public GameStateMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {

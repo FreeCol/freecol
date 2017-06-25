@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -67,8 +69,10 @@ public class DeclareIndependenceMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public DeclareIndependenceMessage(Game game, FreeColXMLReader xr) {
+    public DeclareIndependenceMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, NATION_NAME_TAG, COUNTRY_NAME_TAG);
     }
 

@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
@@ -67,8 +69,10 @@ public class SetAIMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr A {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public SetAIMessage(Game game, FreeColXMLReader xr) {
+    public SetAIMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, PLAYER_TAG, AI_TAG);
     }
     

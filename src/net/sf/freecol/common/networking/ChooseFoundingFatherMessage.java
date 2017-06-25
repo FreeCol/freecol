@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FoundingFather;
@@ -87,8 +89,10 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public ChooseFoundingFatherMessage(Game game, FreeColXMLReader xr) {
+    public ChooseFoundingFatherMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, FOUNDING_FATHER_TAG);
     }
 

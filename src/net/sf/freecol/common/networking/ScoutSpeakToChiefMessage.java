@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
@@ -79,8 +81,10 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr A {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
      */
-    public ScoutSpeakToChiefMessage(Game game, FreeColXMLReader xr) {
+    public ScoutSpeakToChiefMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(TAG, xr, UNIT_TAG, SETTLEMENT_TAG, RESULT_TAG);
     }
 

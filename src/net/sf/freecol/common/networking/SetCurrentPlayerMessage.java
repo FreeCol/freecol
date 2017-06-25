@@ -56,7 +56,7 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
      *
      * @param game The {@code Game} to read within.
      * @param xr The {@code FreeColXMLReader} to read from.
-     * @exception XMLStreamException if there is a problem reading the stream.
+     * @exception XMLStreamException if the stream is corrupt.
      */
     public SetCurrentPlayerMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
