@@ -1567,7 +1567,7 @@ public class ChangeSet {
         Message ret;
         switch (messages.size()) {
         case 0:
-            ret = (diverted.isEmpty()) ? new MultipleMessage() : null;
+            ret = new MultipleMessage();
             break;
         case 1:
             ret = messages.get(0);
