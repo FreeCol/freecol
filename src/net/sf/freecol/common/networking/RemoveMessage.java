@@ -88,6 +88,8 @@ public class RemoveMessage extends AttributeMessage {
     public RemoveMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, getAttributeMap(xr));
+
+        xr.closeTag(TAG);
     }
 
     /**
