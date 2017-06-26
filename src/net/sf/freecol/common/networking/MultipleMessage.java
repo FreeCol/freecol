@@ -289,4 +289,34 @@ public class MultipleMessage extends AttributeMessage {
         Message m = applyHandler(connection.getDOMMessageHandler(), connection);
         return (m == null) ? null : ((DOMMessage)m).toXMLElement();
     }
+
+    /**
+     * Simplify this message.
+     *
+     * Called from ChangeSet.build with the intent of minimizing traffic.
+     *
+     * @return A simplified {@code Message}.
+     */
+    public Message simplify() {
+        Message ret;
+        switch (this.messages.size()) {
+        case 0:
+            ret = (isEmpty()) ? null : this;
+            break;
+        case 1:
+            ret = this.messages.get(0);
+            if (this.getStringAttributes().isEmpty()) {
+                ; // child is good
+            } else if (ret instanceof AttributeMessage) {
+                ret.setStringAttributes(this.getStringAttributes());
+            } else {
+                ret = this;
+            }
+            break;
+        default:
+            ret = this;
+            break;
+        }
+        return ret;
+    }        
 }

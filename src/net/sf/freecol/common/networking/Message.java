@@ -388,6 +388,15 @@ public abstract class Message {
     abstract public void setChildren(List<? extends FreeColObject> fcos);
 
     /**
+     * Is this message vacuous?
+     *
+     * @return True if there are no attributes or children present.
+     */
+    public boolean isEmpty() {
+        return getStringAttributes().isEmpty() && getChildren().isEmpty();
+    }
+
+    /**
      * Build this message from an input stream.
      *
      * @param inputStream The {@code InputStream} to read.
@@ -423,15 +432,6 @@ public abstract class Message {
      */
     public boolean canMerge() {
         return false;
-    }
-
-    /**
-     * Is this message vacuous?
-     *
-     * @return True if there are no attributes or children present.
-     */
-    public boolean isEmpty() {
-        return getStringAttributes().isEmpty() && getChildren().isEmpty();
     }
 
     /**

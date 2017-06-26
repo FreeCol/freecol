@@ -1564,27 +1564,14 @@ public class ChangeSet {
         }
 
         // Collapse to one message
-        Message ret;
-        switch (messages.size()) {
-        case 0:
-            ret = new MultipleMessage();
-            break;
-        case 1:
-            ret = messages.get(0);
-            break;
-        default:
-            ret = new MultipleMessage(messages);
-            break;
-        }
+        MultipleMessage mm = new MultipleMessage(messages);
+        mm.setMergeable(true);
             
         // Merge in the diverted messages.
-        for (Message m : diverted) ret.merge(m);
+        for (Message m : diverted) mm.merge(m);
 
-        // Check for degenerate multiple message
-        if (ret instanceof MultipleMessage
-            && ((MultipleMessage)ret).isEmpty()) ret = null;
-
-        return ret;
+        // Do not return degenerate multiple messages
+        return mm.simplify();
     }
 
 
