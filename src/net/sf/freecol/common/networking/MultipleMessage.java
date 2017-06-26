@@ -44,7 +44,7 @@ import org.w3c.dom.Element;
 /**
  * The message that contains other messages.
  */
-public class MultipleMessage extends ObjectMessage {
+public class MultipleMessage extends AttributeMessage {
 
     public static final String TAG = "multiple";
 
@@ -243,6 +243,9 @@ public class MultipleMessage extends ObjectMessage {
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(TAG);
         for (Element e : this.elements) result.add(e);
+        for (Message m : this.messages) {
+            if (m instanceof DOMMessage) result.add((DOMMessage)m);
+        }
         return result.toXMLElement();
     }
 
