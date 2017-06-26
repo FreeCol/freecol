@@ -72,6 +72,20 @@ public class PartialMessage extends AttributeMessage {
         super(TAG, DOMUtils.getAttributeMap(element));
     }
 
+    /**
+     * Create a new {@code PartialMessage} from a stream.
+     *
+     * @param game The {@code Game} to read within.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if the stream is corrupt.
+     */
+    public PartialMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, xr.getAllAttributes());
+
+        xr.closeTag(TAG);
+    }
+
 
     /**
      * Get the object to update.
