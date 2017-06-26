@@ -150,7 +150,13 @@ public abstract class TrivialMessage extends DOMMessage {
      * {@inheritDoc}
      */
     @Override
-    public void setStringAttribute(String key, String value) {}
+    public void setStringAttribute(String key, String value) {
+        if (key == null || value == null) {
+            ; // OK to set nothing
+        } else { // Nope
+            throw new RuntimeException("TrivialMessage.setStringAttribute not implemented");
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -173,7 +179,11 @@ public abstract class TrivialMessage extends DOMMessage {
      */
     @Override
     public void setChildren(List<? extends FreeColObject> fcos) {
-        throw new RuntimeException("TrivialMessage.setChildren not implemented");
+        if (fcos == null || fcos.isEmpty()) {
+            ; // OK to set nothing
+        } else { // Nope
+            throw new RuntimeException("TrivialMessage.setChildren not implemented");
+        }
     }
     
     /**
