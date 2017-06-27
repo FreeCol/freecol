@@ -849,29 +849,17 @@ public class Connection implements Closeable {
         // Try Message-based routine
         final String tag = message.getType();
         boolean ret = false;
-        if (false) { // DISABLED FOR NOW
-            try {
-                ret = requestMessage(message);
-            } catch (IOException ioe) {
-                logger.log(Level.FINEST, this.name + " request("
-                    + tag + ") fail", ioe);
-                ret = false;
-            }
+        try {
+            ret = requestMessage(message);
+        } catch (IOException ioe) {
+            logger.log(Level.FINEST, this.name + " request(" + tag + ") fail",
+                ioe);
+            return false;
         }
-        
-        // Temporary fall back to using DOMMessage
-        if (!ret) {
-            //logger.warning(this.name + " fallback-request(" +  tag + ") "
-            //    + (message instanceof DOMMessage));
-            if (message instanceof DOMMessage) {
-                ret = requestElement(((DOMMessage)message).toXMLElement());
-            }
-        }
-
         if (ret) {
-            logger.finest(this.name + " request( " + tag + ") ok");
+            logger.finest(this.name + " request(" + tag + ") ok");
         } else {
-            logger.warning(this.name + " request( " + tag + ") failed");
+            logger.warning(this.name + " request(" + tag + ") failed");
         }            
         return ret;
     }
