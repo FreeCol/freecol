@@ -491,17 +491,28 @@ public class Connection implements Closeable {
                               Integer.toString(networkReplyId));
         question.appendChild(question.getOwnerDocument()
                                      .importNode(element, true));
-
-        NetworkReplyObject nro
-            = this.receivingThread.waitForNetworkReply(networkReplyId);
-        if (!sendInternal(question)) return null;
         log(question, true);
+        if (!sendInternal(question)) return null;
 
         // Wait for response
-        DOMMessage msg = (DOMMessage)nro.getResponse();
-        Element response = (msg == null) ? null : msg.toXMLElement();
+        NetworkReplyObject nro
+            = this.receivingThread.waitForNetworkReply(networkReplyId);
+        Object o = nro.getResponse();
+        Element response;
+        if (o == null) {
+            response = null;
+        } else if (o instanceof ReplyMessage) {
+            Message m = ((ReplyMessage)o).getMessage();
+            response = (m == null) ? null : ((DOMMessage)m).toXMLElement();
+        } else if (o instanceof DOMMessage) {
+            response = ((DOMMessage)o).toXMLElement();
+            if (response != null) response = (Element)response.getFirstChild();
+        } else {
+            throw new RuntimeException("Bad response to " + tag
+                + " " + networkReplyId + ": " + o);
+        }
         log(response, false);
-        return (response == null) ? null : (Element)response.getFirstChild();
+        return response;
     }
     
     /**
@@ -659,11 +670,12 @@ public class Connection implements Closeable {
         }
 
         QuestionMessage qm = new QuestionMessage(replyId, message);
-        NetworkReplyObject nro = this.receivingThread.waitForNetworkReply(replyId);
         log(qm, true);
         if (!sendMessageInternal(qm)) return null;
 
         // Wait for response
+        NetworkReplyObject nro
+            = this.receivingThread.waitForNetworkReply(replyId);
         Object response = nro.getResponse();
         if (!(response instanceof ReplyMessage)) {
             throw new IOException("Bad response to " + tag + ": " + response);

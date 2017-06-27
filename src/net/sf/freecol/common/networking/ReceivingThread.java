@@ -97,7 +97,7 @@ final class ReceivingThread extends Thread {
      */
     public NetworkReplyObject waitForNetworkReply(int networkReplyId) {
         NetworkReplyObject nro = new NetworkReplyObject(networkReplyId);
-        waitingThreads.put(networkReplyId, nro);
+        this.waitingThreads.put(networkReplyId, nro);
         return nro;
     }
 
@@ -175,20 +175,9 @@ final class ReceivingThread extends Thread {
                 } catch (IOException ioe) {
                     logger.log(Level.WARNING, name + ": response " + replyTag
                         + "fail", ioe);
-                    return;
                 }
             }
         };
-    }
-
-    // Works for both Message and DOM code
-    private void reply(Message message, int replyId) {
-        NetworkReplyObject nro = waitingThreads.remove(replyId);
-        if (nro == null) {
-            logger.warning(getName() + ": not find reply " + replyId);
-        } else {
-            nro.setResponse(message);
-        }
     }
 
     private Thread messageUpdate(final Message message) {
@@ -241,7 +230,6 @@ final class ReceivingThread extends Thread {
 
         // Read the message, optionally create a thread to handle it
         Thread t = null;
-        DOMMessage dm = null;
         switch (tag) {
         case DisconnectMessage.TAG:
             // Do not actually read the message, it might be a fake one
@@ -255,27 +243,18 @@ final class ReceivingThread extends Thread {
             // unblock the waiting thread.
 
             replyId = this.connection.getReplyId();
-            if (false) { // DISABLED FOR NOW
-                Message m = null;
-                try {
-                    m = this.connection.reader();
-                } catch (FreeColException|XMLStreamException ex) {
-                    // Just log for now, fall through to DOM-based code
-                    logger.log(Level.FINEST, getName() + ": reply fail", ex);
-                }
-                if (m != null) {
-                    assert m instanceof ReplyMessage;
-                    reply(m, replyId);
-                    break;
-                }
-            }
-
+            Message rm;
             try {
-                dm = this.connection.domReader();
-                reply(dm, replyId);
-            } catch (IOException|SAXException ex) {
-                reply(null, replyId);
-                throw ex;
+                rm = this.connection.reader();
+            } catch (Exception ex) {
+                rm = null;
+                logger.log(Level.WARNING, getName() + ": reply fail", ex);
+            }
+            NetworkReplyObject nro = this.waitingThreads.remove(replyId);
+            if (nro == null) {
+                logger.warning(getName() + ": did not find reply " + replyId);
+            } else {
+                nro.setResponse(rm);
             }
             break;
 
