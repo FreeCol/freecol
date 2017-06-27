@@ -334,22 +334,12 @@ final class ReceivingThread extends Thread {
             // An ordinary update message.
             // Build a thread to handle it and possibly respond.
 
-            if (true) {
-                Message m = null;
-                try {
-                    m = this.connection.reader();
-                } catch (FreeColException|XMLStreamException ex) {
-                    // Just log for now, fall through to DOM-based code
-                    logger.log(Level.FINEST, getName() + ": fail", ex);
-                }
-                if (m != null) {
-                    t = messageUpdate(m);
-                    break;
-                }
+            try {
+                t = messageUpdate(this.connection.reader());
+            } catch (Exception ex) {
+                logger.log(Level.FINEST, getName() + ": fail", ex);
+                askToStop("listen-update-fail");
             }
-
-            dm = this.connection.domReader();
-            t = domUpdate(dm);
             break;
         }
 
