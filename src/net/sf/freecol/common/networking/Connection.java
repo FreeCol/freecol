@@ -907,35 +907,18 @@ public class Connection implements Closeable {
      */
     public boolean send(Message message) {
         if (message == null) return true;
-
-        // Try Message-based routine
         final String tag = message.getType();
-        boolean ret = false;
-        if (true) {
-            try {
-                ret = sendMessage(message);
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, this.name + " send("
-                    + tag + ") exception", ioe);
-                ret = false;
+        try {
+            if (sendMessage(message)) {
+                logger.finest(this.name + " send(" + tag + ") ok");
+                return true;
             }
-        }
-
-        // Fallback to using DOMMessage
-        if (!ret) {
-            logger.warning(this.name + " fallback-send(" +  tag + ") "
-                + (message instanceof DOMMessage));
-            if (message instanceof DOMMessage) {
-                ret = sendElement(((DOMMessage)message).toXMLElement());
-            }
-        }
-
-        if (ret) {
-            logger.finest(this.name + " send(" + tag + ") ok");
-        } else {
             logger.warning(this.name + " send(" + tag + ") failed");
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, this.name + " send("
+                + tag + ") exception", ioe);
         }
-        return ret;
+        return false;
     }
     
 
