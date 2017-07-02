@@ -19,16 +19,21 @@
 
 package net.sf.freecol.common.networking;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +45,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.io.FreeColNetworkInputStream;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.DOMUtils;
@@ -79,8 +83,8 @@ public class Connection implements Closeable {
 
     /** The input stream to read from, derived from the socket. */
     private InputStream in;
-    /** The wrapped version of the input stream. May go away. */
-    private FreeColNetworkInputStream fcnis;
+    /** The wrapped version of the input stream. */
+    private BufferedReader br;
     /** A lock for the input side, including the socket. */
     private final Object inputLock = new Object();
 
@@ -125,7 +129,7 @@ public class Connection implements Closeable {
         setSocket(null);
         this.in = null;
         this.out = null;
-        this.fcnis = null;
+        this.br = null;
         this.xr = null;
         this.receivingThread = null;
         this.domMessageHandler = null;
@@ -165,7 +169,7 @@ public class Connection implements Closeable {
         setSocket(socket);
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
-        this.fcnis = new FreeColNetworkInputStream(this.in);
+        this.br = new BufferedReader(new InputStreamReader(this.in, "UTF-8"));
         this.receivingThread = new ReceivingThread(this, name);
         this.domMessageHandler = domMessageHandler;
         this.xw = new FreeColXMLWriter(this.out,
@@ -271,17 +275,24 @@ public class Connection implements Closeable {
      */
     private void closeInputStream() {
         synchronized (this.inputLock) {
-            if (this.fcnis != null) {
-                this.fcnis.reallyClose();
-                this.fcnis = null;
+            if (this.br != null) {
+                try {
+                    this.br.close();
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Error closing buffered input",
+                        ioe);
+                } finally {
+                    this.br = null;
+                }
             }
-            if (this.in == null) return;
-            try {
-                this.in.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Error closing input", ioe);
-            } finally {
-                this.in = null;
+            if (this.in != null) {
+                try {
+                    this.in.close();
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Error closing input", ioe);
+                } finally {
+                    this.in = null;
+                }
             }
         }
     }
@@ -623,17 +634,21 @@ public class Connection implements Closeable {
         return this.xr;
     }
 
-    public String startListen() throws XMLStreamException {
-        this.fcnis.enable();
+    public String readLine() {
+        String line;
         try {
-            this.fcnis.fill();
+            line = this.br.readLine();
         } catch (IOException ioe) {
-            throw new XMLStreamException("Fill failure: " + ioe.getMessage());
+            line = null;
         }
+        return line;
+    }
         
-        this.fcnis.mark(Connection.BUFFER_SIZE);
+    public String startListen() throws XMLStreamException {
+        String line = readLine();
+        if (line == null) return DisconnectMessage.TAG;
         try {
-            this.xr = new FreeColXMLReader(this.fcnis); //.setTracing(true);
+            this.xr = new FreeColXMLReader(new StringReader(line));
         } catch (Exception ex) {
             return DisconnectMessage.TAG;
         }
@@ -647,14 +662,14 @@ public class Connection implements Closeable {
     }
 
     public void endListen() {
-        if (this.fcnis != null) this.fcnis.close(); // Just clears the data
+        // do nothing
     }
 
     public DOMMessage domReader()
         throws IOException, SAXException {
-        this.fcnis.enable();
-        this.fcnis.reset();
-        return new DOMMessage(this.fcnis);
+        String line = readLine();
+        if (line == null) throw new IOException("EOS");
+        return new DOMMessage(new ByteArrayInputStream(line.getBytes(StandardCharsets.UTF_8)));
     }
 
 
