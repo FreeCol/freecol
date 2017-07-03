@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -215,12 +216,8 @@ public class Messages {
      * @throws IOException on failure to read from the stream.
      */
     public static void loadMessages(InputStream is) throws IOException {
-        InputStreamReader inputReader;
-        try {
-            inputReader = new InputStreamReader(is, "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            return; // We have big problems if UTF-8 is not supported.
-        }
+        InputStreamReader inputReader
+            = new InputStreamReader(is, StandardCharsets.UTF_8);
         BufferedReader in = new BufferedReader(inputReader);
 
         String line = null;

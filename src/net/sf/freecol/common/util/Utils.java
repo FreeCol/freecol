@@ -35,6 +35,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 
 import java.util.List;
 import java.util.Random;
@@ -160,20 +161,7 @@ public class Utils {
                 + file.getPath(), fnfe);
             return null;
         }
-        InputStreamReader isr;
-        try {
-            isr = new InputStreamReader(fis, "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            logger.log(Level.WARNING, "No InputStreamWriter for "
-                + file.getPath(), uee);
-            try {
-                fis.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Failed to close", ioe);
-            }
-            return null;
-        }
-        return isr;
+        return new InputStreamReader(fis, StandardCharsets.UTF_8);
     }
 
     /**
@@ -258,12 +246,7 @@ public class Utils {
      * @return A {@code Writer} for this file.
      */
     public static Writer getUTF8Writer(OutputStream os) {
-        try {
-            return new OutputStreamWriter(os, "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            logger.log(Level.WARNING, "No OutputStreamWriter", uee);
-        }
-        return null;
+        return new OutputStreamWriter(os, StandardCharsets.UTF_8);
     }
 
     /**

@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -155,7 +156,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      */
     public FreeColXMLWriter(OutputStream outputStream, WriteScope scope,
                             boolean indent) throws IOException {
-        this(new OutputStreamWriter(outputStream, "UTF-8"), scope, indent);
+        this(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8),
+             scope, indent);
     }
 
     /**
