@@ -160,11 +160,11 @@ public final class DummyConnection extends Connection {
         Message reply;
         try {
             reply = other.handle(message);
+            assert reply == null;
         } catch (FreeColException fce) {
             logger.log(Level.WARNING, "Dummy sendMessage fail: " + tag, fce);
             return false;
         }
-        log(reply, false);
         return true;
     }
 
