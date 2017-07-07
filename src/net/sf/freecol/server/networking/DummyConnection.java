@@ -155,15 +155,17 @@ public final class DummyConnection extends Connection {
         DummyConnection other = getOtherConnection();
         if (other == null) return false;
         if (message == null) return true;
+        log(message, true);
         final String tag = message.getType();
+        Message reply;
         try {
-            Message reply = other.handle(message);
-            log(message, reply);
-            return true;
+            reply = other.handle(message);
         } catch (FreeColException fce) {
             logger.log(Level.WARNING, "Dummy sendMessage fail: " + tag, fce);
+            return false;
         }
-        return false;
+        log(reply, false);
+        return true;
     }
 
     /**
@@ -174,15 +176,17 @@ public final class DummyConnection extends Connection {
         DummyConnection other = getOtherConnection();
         if (other == null) return null;
         if (message == null) return null;
+        log(message, true);
         final String tag = message.getType();
+        Message response;
         try {
-            Message response = other.handle(message);
-            log(message, response);
-            return response;
+            response = other.handle(message);
         } catch (FreeColException fce) {
             logger.log(Level.WARNING, "Dummy askMessage fail: " + tag, fce);
+            return null;
         }
-        return null;
+        log(response, false);
+        return response;
     }
 
 

@@ -695,6 +695,7 @@ public class Connection implements Closeable {
 
         QuestionMessage qm = new QuestionMessage(replyId, message);
         NetworkReplyObject nro = this.receivingThread.waitForNetworkReply(replyId);
+        log(qm, true);
         if (!sendMessageInternal(qm)) return null;
 
         // Wait for response
@@ -715,7 +716,7 @@ public class Connection implements Closeable {
     protected Message askMessage(Message message) throws IOException {
         if (message == null) return null;
         Message response = askMessageInternal(message);
-        log(message, response);
+        log(response, false);
         return response;
     }
     
@@ -748,26 +749,25 @@ public class Connection implements Closeable {
     public boolean sendMessage(Message message) throws IOException {
         if (message == null) return true;
         sendMessageInternal(message);
-        log(message, null);
+        log(message, true);
         return true;
     }
 
     /**
-     * Log a message request/response cycle.
+     * Log a message.
      *
-     * @param request The initial request {@code Message}.
-     * @param response An optional response {@code Message}.
+     * @param message The {@code Message} to log.
+     * @param send True if this is a send, false if a reply.
      */
-    protected void log(Message request, Message response) {
+    protected void log(Message message, boolean send) {
         synchronized (this.logLock) {
             if (this.lw == null) return;
             try {
-                this.lw.writeComment(this.name + SEND_SUFFIX);
-                request.toXML(this.lw);
-                if (response != null) {
-                    this.lw.writeComment(this.name + REPLY_SUFFIX);
-                    response.toXML(this.lw);
-                }
+                this.lw.writeComment(this.name
+                    + ((send) ? SEND_SUFFIX : REPLY_SUFFIX));
+                if (message != null) message.toXML(this.lw);
+                this.lw.writeCharacters(END_OF_STREAM_ARRAY, 0,
+                                        END_OF_STREAM_ARRAY.length);
                 this.lw.flush();
             } catch (XMLStreamException xse) {} // Ignore log failure
         }
