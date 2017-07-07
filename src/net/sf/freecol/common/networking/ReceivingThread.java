@@ -148,24 +148,6 @@ final class ReceivingThread extends Thread {
 
     // Individual parts of listen().  Work in progress
 
-    private Thread domQuestion(final DOMMessage msg, final int replyId) {
-        final String name = getName() + "-domQuestion-" + replyId
-            + "-" + msg.getType();
-        return new Thread(name) {
-            @Override
-            public void run() {
-                final String tag = msg.getType();
-                try {
-                    ReceivingThread.this.connection.handleQuestion(msg, replyId);
-                } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, name + ": handler failed", fce);
-                } catch (IOException ioe) {
-                    logger.log(Level.WARNING, name + ": send failed", ioe);
-                }
-            }
-        };
-    }
-
     private Thread messageQuestion(final QuestionMessage qm,
                                    final int replyId) {
         final Connection conn = this.connection;
@@ -207,24 +189,6 @@ final class ReceivingThread extends Thread {
         } else {
             nro.setResponse(message);
         }
-    }
-
-    private Thread domUpdate(DOMMessage msg) {
-        final String name = getName() + "-domUpdate-" + msg.getType();
-
-        return new Thread(name) {
-            @Override
-            public void run() {
-                final String tag = msg.getType();
-                try {
-                    ReceivingThread.this.connection.handleUpdate(msg);
-                } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, name + ": handler fail", fce);
-                } catch (IOException ioe) {
-                    logger.log(Level.WARNING, name + ": send fail", ioe);
-                }
-            }
-        };
     }
 
     private Thread messageUpdate(final Message message) {
@@ -282,8 +246,7 @@ final class ReceivingThread extends Thread {
         case DisconnectMessage.TAG:
             // Do not actually read the message, it might be a fake one
             // due to end-of-stream.
-            dm = TrivialMessage.disconnectMessage;
-            t = domUpdate(dm);
+            t = messageUpdate(TrivialMessage.disconnectMessage);
             askToStop("listen-disconnect");
             break;
 

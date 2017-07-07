@@ -646,41 +646,6 @@ public class Connection implements Closeable {
         return new DOMMessage(this.fcnis);
     }
 
-    // DOM handlers for ReceivingThread
-
-    /**
-     * Handle a query (has QUESTION_TAG), with given reply identifier,
-     * and send a reply (has REPLY_TAG and the given reply identifier).
-     * 
-     * @param msg The query {@code DOMMessage}.
-     * @param replyId The reply identifier.
-     * @exception FreeColException if there is a handler problem.
-     * @exception IOException if sending fails.
-     */
-    public void handleQuestion(DOMMessage msg, int replyId)
-        throws FreeColException, IOException {
-        Element element = msg.toXMLElement(), reply;
-        element = (Element)element.getFirstChild();
-        reply = handleElement(element);
-        msg = new DOMMessage(REPLY_TAG,
-            NETWORK_REPLY_ID_TAG, Integer.toString(replyId));
-        if (reply != null) msg.add(reply);
-        sendElement(msg.toXMLElement());
-    }
-
-    /**
-     * Handle an ordinary message, and if the response is non-null send it.
-     * 
-     * @param msg The {@code DOMMessage} to handle.
-     * @exception FreeColException if there is a handler problem.
-     * @exception IOException if sending fails.
-     */
-    public void handleUpdate(DOMMessage msg)
-        throws FreeColException, IOException {
-        Element reply = handleElement(msg.toXMLElement());
-        if (reply != null) sendElement(reply);
-    }
-
 
     // Low level Message routines
     
