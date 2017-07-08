@@ -179,7 +179,8 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     /**
      * {@inheritDoc}
      */
-    public Message handle(Message message) throws FreeColException {
+    public Message handle(@SuppressWarnings("unused") Connection connection,
+                          Message message) throws FreeColException {
         message.clientHandler(getFreeColClient());
 
         if (currentPlayerIsMyPlayer()) {

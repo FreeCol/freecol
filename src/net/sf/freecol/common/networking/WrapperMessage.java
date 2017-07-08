@@ -92,17 +92,6 @@ public abstract class WrapperMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void setSourcePlayer(ServerPlayer serverPlayer) {
-        super.setSourcePlayer(serverPlayer);
-        if (this.message != null) { // Propagate to wrapped message
-            this.message.setSourcePlayer(serverPlayer);
-        }
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
     public void clientHandler(FreeColClient freeColClient)
         throws FreeColException {
         if (this.message != null) {

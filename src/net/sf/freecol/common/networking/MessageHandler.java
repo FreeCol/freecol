@@ -35,11 +35,13 @@ public interface MessageHandler {
     /**
      * Handle an incoming message.
      *
+     * @param connection The {@code Connection} the message arrived on.
      * @param message The {@code Message} to handle.
      * @return A reply message, if any.
      * @exception FreeColException if the message is malformed.
      */
-    public Message handle(Message message) throws FreeColException;
+    public Message handle(Connection connection, Message message)
+        throws FreeColException;
 
     /**
      * Read an incoming Message.

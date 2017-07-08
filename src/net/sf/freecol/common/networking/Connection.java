@@ -739,7 +739,7 @@ public class Connection implements Closeable {
     }
     
 
-    // MessageHandler support
+    // Quasi-MessageHandler behaviour
 
     /**
      * Handle a message using the MessageHandler.
@@ -756,7 +756,7 @@ public class Connection implements Closeable {
                 throw new FreeColException(getName() + " has no handler for "
                     + message.getType()).preserveDebug();
             }
-            ret = mh.handle(message);
+            ret = mh.handle(this, message);
         }
         return ret;
     }

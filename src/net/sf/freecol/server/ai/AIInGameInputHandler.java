@@ -280,7 +280,8 @@ public final class AIInGameInputHandler extends FreeColServerHolder
     /**
      * {@inheritDoc}
      */
-    public Message handle(Message message) throws FreeColException {
+    public Message handle(Connection connection, Message message)
+        throws FreeColException {
         message.aiHandler(getFreeColServer(), getMyAIPlayer());
         return null; 
     }

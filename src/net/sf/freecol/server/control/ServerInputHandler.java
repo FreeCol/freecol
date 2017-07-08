@@ -207,9 +207,20 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     /**
      * {@inheritDoc}
      */
-    public Message handle(Message message) throws FreeColException {
-        return internalHandler(message.currentPlayerMessage(),
-                               message.getSourcePlayer(),
+    public Message handle(Connection connection, Message message)
+        throws FreeColException {
+        ServerPlayer serverPlayer = getServerPlayer(connection);
+        if (serverPlayer == null) {
+            if (message instanceof LoginMessage) {
+                // Very special case of the login question, where
+                // there is no player connection set up yet.  Make a
+                // dummy one with the current connection.
+                serverPlayer = new ServerPlayer(connection);
+            } else {
+                throw new RuntimeException("No server player available: " + message);
+            }
+        }
+        return internalHandler(message.currentPlayerMessage(), serverPlayer,
                                message);
     }
 
@@ -218,22 +229,6 @@ public abstract class ServerInputHandler extends FreeColServerHolder
      */
     public Message read(Connection connection)
         throws FreeColException, XMLStreamException {
-        Message ret = Message.read(getGame(), connection.getFreeColXMLReader());
-        // Messages arriving at the server can be from any player, so we
-        // have to attach the sender to the message.  Other readers are
-        // on the client side and only ever receive messages from the server.
-        // Handle the really special case of a login-question, where there
-        // is no player-connection set up yet; we need to feed a stub player
-        // with the correct connection to the server handler.
-        if (ret != null) {
-            ServerPlayer serverPlayer = getServerPlayer(connection);
-            if (serverPlayer == null
-                && ret instanceof QuestionMessage
-                && LoginMessage.TAG.equals(((QuestionMessage)ret).getSubType())) {
-                serverPlayer = new ServerPlayer(connection);
-            }
-            ret.setSourcePlayer(serverPlayer);
-        }
-        return ret;
+        return Message.read(getGame(), connection.getFreeColXMLReader());
     }
 }
