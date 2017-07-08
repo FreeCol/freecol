@@ -419,7 +419,7 @@ public class LoginMessage extends ObjectMessage {
     public Element toXMLElement() {
         final Game game = getGame();
         final Player player = (game == null || getUserName() == null) ? null
-            : getPlayer(game);
+            : game.getPlayerByName(getUserName());
         final ServerState state = getState();
         DOMMessage ret = new DOMMessage(TAG,
             USER_NAME_TAG, getUserName(),
