@@ -96,13 +96,12 @@ public class ChangeSet {
          *     or INVISIBLE on failure, or SPECIAL if indeterminate.
          */
         public SeeCheck check(ServerPlayer player) {
-            return (player == null)
-                ? ((type == ALL) ? SeeCheck.VISIBLE : SeeCheck.INVISIBLE)
-                : (player == seeNever) ? SeeCheck.INVISIBLE
-                : (player == seeAlways) ? SeeCheck.VISIBLE
-                : (player == seePerhaps) ? SeeCheck.SPECIAL
-                : (type == ALL) ? SeeCheck.VISIBLE
+            return 
+                (player != null && player == seeNever) ? SeeCheck.INVISIBLE
+                : (player != null && player == seeAlways) ? SeeCheck.VISIBLE
+                : (player != null && player == seePerhaps) ? SeeCheck.SPECIAL
                 : (type == ONLY) ? SeeCheck.INVISIBLE
+                : (type == ALL) ? SeeCheck.VISIBLE
                 : SeeCheck.SPECIAL;
         }
 
@@ -827,14 +826,6 @@ public class ChangeSet {
             this.serverPlayers.addAll(serverPlayers);
         }
 
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isNotifiable(ServerPlayer serverPlayer) {
-            return true;
-        }
 
         /**
          * {@inheritDoc}
