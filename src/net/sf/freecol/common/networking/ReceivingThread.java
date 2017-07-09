@@ -65,7 +65,7 @@ final class ReceivingThread extends Thread {
      * The constructor to use.
      * 
      * @param connection The {@code Connection} this
-     *            {@code ReceivingThread} belongs to.
+     *     {@code ReceivingThread} belongs to.
      * @param threadName The base name for the thread.
      */
     public ReceivingThread(Connection connection, String threadName) {
@@ -142,12 +142,16 @@ final class ReceivingThread extends Thread {
      */
     private void disconnect() {
         askToStop("disconnect");
-        connection.sendDisconnect();
+        this.connection.sendDisconnect();
     }
 
-
-    // Individual parts of listen().  Work in progress
-
+    /**
+     * Create a thread to handle an incoming question message.
+     *
+     * @param qm The {@code QuestionMessage} to handle.
+     * @param replyId The network reply.
+     * @return A new {@code Thread} to do the work, or null if none required.
+     */
     private Thread messageQuestion(final QuestionMessage qm,
                                    final int replyId) {
         final Connection conn = this.connection;
@@ -172,14 +176,20 @@ final class ReceivingThread extends Thread {
                 try {
                     conn.sendMessage(new ReplyMessage(replyId, reply));
                     logger.log(Level.FINEST, name + " -> " + replyTag);
-                } catch (IOException ioe) {
+                } catch (Exception ex) {
                     logger.log(Level.WARNING, name + ": response " + replyTag
-                        + "fail", ioe);
+                        + "fail", ex);
                 }
             }
         };
     }
 
+    /**
+     * Create a thread to handle an incoming ordinary message.
+     *
+     * @param message The {@code Message} to handle.
+     * @return A new {@code Thread} to do the work, or null if none required.
+     */
     private Thread messageUpdate(final Message message) {
         if (message == null) return null;
         final String inTag = message.getType();
@@ -202,8 +212,8 @@ final class ReceivingThread extends Thread {
                 try {
                     conn.sendMessage(reply);
                     logger.log(Level.FINEST, name + " -> " + outTag);
-                } catch (IOException ioe) {
-                    logger.log(Level.WARNING, name + ": send fail", ioe);
+                } catch (Exception ex) {
+                    logger.log(Level.WARNING, name + ": send exception", ex);
                 }
             }
         };
@@ -325,7 +335,7 @@ final class ReceivingThread extends Thread {
         } finally {
             askToStop("run complete");
         }
-        connection.close();
+        this.connection.close();
         logger.info(getName() + ": finished");
     }
 }
