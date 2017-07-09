@@ -20,7 +20,6 @@
 package net.sf.freecol.common.networking;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -169,7 +168,7 @@ public class Connection implements Closeable {
         setSocket(socket);
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
-        this.br = new BufferedReader(new InputStreamReader(this.in, "UTF-8"));
+        this.br = new BufferedReader(new InputStreamReader(this.in, StandardCharsets.UTF_8));
         this.receivingThread = new ReceivingThread(this, name);
         this.domMessageHandler = domMessageHandler;
         this.xw = new FreeColXMLWriter(this.out,
@@ -401,232 +400,6 @@ public class Connection implements Closeable {
         close();
     }
 
-    // Element processing.  To go away
-    
-    /**
-     * Write an element into a string writer.
-     *
-     * @param transformer A {@code Transformer} to convert the
-     *     element with.
-     * @param element The {@code Element} to write.
-     * @return A new {@code StringWriter} containing the element, or
-     *     null if the element could not be transformed.
-     */
-    private StringWriter elementToStringWriter(Transformer transformer,
-                                               Element element) {
-        StringWriter sw = new StringWriter(BUFFER_SIZE);
-        DOMSource source = new DOMSource(element);
-        try {
-            transformer.transform(source, new StreamResult(sw));
-            sw.append(END_OF_STREAM);
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Failed to transform element", ex);
-            sw = null;
-        }
-        return sw;
-    }
-
-    /**
-     * Log transfer of a DOMSource.
-     *
-     * FIXME: Convert to not use Element.
-     *
-     * @param element An {@code Element} to log.
-     * @param send True if sending (else replying).
-     */
-    protected void log(Element element, boolean send) {
-        synchronized (this.logLock) {
-            if (this.logWriter == null) return;
-            StringWriter sw
-                = elementToStringWriter(this.logTransformer, element);
-            if (sw == null) return;
-            StringBuffer sb = sw.getBuffer();
-            try {
-                sb.insert(0, "\n");
-                sb.insert(0, (send) ? SEND_SUFFIX : REPLY_SUFFIX);
-                sb.insert(0, name);
-                this.logWriter.write(sb.toString());
-                this.logWriter.flush();
-            } catch (IOException ioe) {
-                ; // Ignore logging failure
-            }
-        }
-    }
-
-    /**
-     * Low level routine to send a message over this Connection.
-     *
-     * @param element The {@code Element} (root element in a
-     *     DOM-parsed XML tree) that holds all the information
-     * @return True if the message was sent.
-     * @exception IOException If an error occur while sending the message.
-     */
-    private boolean sendInternal(Element element) throws IOException {
-        try {
-            synchronized (this.outputLock) {
-                if (this.out == null) return false;
-                StringWriter sw
-                    = elementToStringWriter(this.outTransformer, element);
-                if (sw == null) return false;
-                String buf = sw.toString();
-                this.out.write(buf.getBytes("UTF-8"));
-                this.out.flush();
-            }
-        } catch (IOException ioe) {
-            throw ioe;
-        } catch (Exception ex) {
-            throw new IOException("sendInternal fail", ex);
-        }
-        return true;
-    }
-
-    /**
-     * Low level routine to sends a message and return the reply.
-     *
-     * @param element The element to wrap as a question for the peer.
-     * @return The {@code Element} unwrapped from the reply from the peer.
-     * @exception IOException if an error occur while sending the message.
-     * @see #sendInternal(Element)
-     */
-    private Element askInternal(Element element) throws IOException {
-        if (element == null) return null;
-        final String tag = element.getTagName();
-        int networkReplyId = this.receivingThread.getNextNetworkReplyId();
-
-        if (Thread.currentThread() == this.receivingThread) {
-            throw new IOException("wait(ReceivingThread) for: " + tag);
-        }
-
-        Element question = DOMUtils.createElement(QUESTION_TAG);
-        question.setAttribute(NETWORK_REPLY_ID_TAG,
-                              Integer.toString(networkReplyId));
-        question.appendChild(question.getOwnerDocument()
-                                     .importNode(element, true));
-        log(question, true);
-        if (!sendInternal(question)) return null;
-
-        // Wait for response
-        NetworkReplyObject nro
-            = this.receivingThread.waitForNetworkReply(networkReplyId);
-        Object o = nro.getResponse();
-        Element response;
-        if (o == null) {
-            response = null;
-        } else if (o instanceof ReplyMessage) {
-            Message m = ((ReplyMessage)o).getMessage();
-            response = (m == null) ? null : ((DOMMessage)m).toXMLElement();
-        } else if (o instanceof DOMMessage) {
-            response = ((DOMMessage)o).toXMLElement();
-            if (response != null) response = (Element)response.getFirstChild();
-        } else {
-            throw new RuntimeException("Bad response to " + tag
-                + " " + networkReplyId + ": " + o);
-        }
-        log(response, false);
-        return response;
-    }
-    
-    /**
-     * Main public routine to send a message over this connection.
-     *
-     * @param element The {@code Element} (root element in a
-     *     DOM-parsed XML tree) that holds all the information
-     * @return True if the message was sent or was null.
-     * @see #sendAndWait(Element)
-     * @see #ask(Element)
-     */
-    protected boolean sendElement(Element element) {
-        if (element == null) return true;
-        final String tag = element.getTagName();
-        try {
-            sendInternal(element);
-            log(element, true);
-            logger.fine("Send: " + tag);
-            return true;
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Send fail: " + tag, ioe);
-        }
-        return false;
-    }
-
-    /**
-     * Sends the given message over this connection and waits for
-     * confirmation of reception before returning.
-     *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information
-     * @return True if the message was sent or was null.
-     * @see #send(Element)
-     * @see #ask(Element)
-     */
-    protected boolean sendAndWaitElement(Element element) {
-        if (element == null) return true;
-        final String tag = element.getTagName();
-        try {
-            askInternal(element);
-            logger.fine("SendAndWait: " + tag);
-            return true;
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "SendAndWait fail: " + tag, ioe);
-        }
-        return false;
-    }
-
-    /**
-     * Sends a message to the other peer and returns the reply.
-     *
-     * @param element The question for the peer.
-     * @return The reply from the peer.
-     * @exception IOException if an error occur while sending the message.
-     * @see #send(Element)
-     * @see #sendAndWait(Element)
-     */
-    protected Element askElement(Element element) throws IOException {
-        Element reply = askInternal(element);
-        logger.fine("Ask: " + element.getTagName()
-            + ", reply: " + ((reply == null) ? "null" : reply.getTagName()));
-        return reply;
-    }
-
-    /**
-     * Handle a request.
-     *
-     * @param request The request {@code Element} to handle.
-     * @return The reply from the message handler.
-     * @exception FreeColException if there is a handler problem.
-     */
-    public Element handleElement(Element request) throws FreeColException {
-        return (this.domMessageHandler == null) ? null
-            : this.domMessageHandler.handle(this, request);
-    }
-
-
-    public <T extends DOMMessage> void sendAndWait(T message) throws IOException {
-        sendAndWaitElement(message.toXMLElement());
-    }
-
-    public <T extends DOMMessage> Element ask(T message) throws IOException {
-        try {
-            return askElement(message.toXMLElement());
-        } catch (Exception e) { // Catch undocumented exception in Java libs
-            logger.log(Level.WARNING, "Unexpected exception", e);
-        }
-        return null;
-    }
-
-    /**
-     * Sends the given message over this connection and waits for
-     * confirmation of reception before returning.
-     *
-     * @param message The {@code Message} to send.
-     * @return True if the message was sent or was null.
-     */
-    public boolean sendAndWaitMessage(Message message) {
-        if (message == null) return true;
-        boolean ret = sendAndWaitElement(((DOMMessage)message).toXMLElement());
-        logger.fine("SendAndWait: " + message.getType());
-        return ret;
-    }
 
     // ReceivingThread input support, work in progress
 
@@ -634,18 +407,13 @@ public class Connection implements Closeable {
         return this.xr;
     }
 
-    public String readLine() {
+    public String startListen() throws XMLStreamException {
         String line;
         try {
             line = this.br.readLine();
         } catch (IOException ioe) {
             line = null;
         }
-        return line;
-    }
-        
-    public String startListen() throws XMLStreamException {
-        String line = readLine();
         if (line == null) return DisconnectMessage.TAG;
         try {
             this.xr = new FreeColXMLReader(new StringReader(line));
@@ -665,18 +433,21 @@ public class Connection implements Closeable {
         // do nothing
     }
 
-    public DOMMessage domReader()
-        throws IOException, SAXException {
-        String line = readLine();
-        if (line == null) throw new IOException("EOS");
-        return new DOMMessage(new ByteArrayInputStream(line.getBytes(StandardCharsets.UTF_8)));
-    }
 
-
-    // Low level Message routines
+    // Low level Message routines.  Overridden in DummyConnection
     
-    // lowest level ask
-    private Message askMessageInternal(Message message) throws IOException {
+    /**
+     * Send a message, and return the response.  Log both.
+     *
+     * @param message The {@code Message} to send.
+     * @return The response.
+     * @exception FreeColException on extreme confusion.
+     * @exception IOException on failure to send.
+     * @exception XMLStreamException on stream write error.
+     */
+    protected Message askMessage(Message message)
+        throws FreeColException, IOException, XMLStreamException {
+        if (message == null) return null;
         final String tag = message.getType();
         final int replyId = this.receivingThread.getNextNetworkReplyId();
 
@@ -684,51 +455,24 @@ public class Connection implements Closeable {
             throw new IOException("wait(ReceivingThread) for: " + tag);
         }
 
+        // Send the question
         QuestionMessage qm = new QuestionMessage(replyId, message);
-        log(qm, true);
-        if (!sendMessageInternal(qm)) return null;
+        if (!sendMessage(qm)) return null;
 
         // Wait for response
         NetworkReplyObject nro
             = this.receivingThread.waitForNetworkReply(replyId);
-        Object response = nro.getResponse();
-        if (!(response instanceof ReplyMessage)) {
-            throw new IOException("Bad response to " + tag + ": " + response);
-        }
-        return ((ReplyMessage)response).getMessage();
-    }
+        Object response = nro.getResponse(); // Blocks here
 
-    /**
-     * Send a message, and return the response.  Log both.
-     *
-     * @param message The {@code Message} to send.
-     * @return The response.
-     * @exception IOException on failure to send.
-     */
-    protected Message askMessage(Message message) throws IOException {
-        if (message == null) return null;
-        Message response = askMessageInternal(message);
-        log(response, false);
-        return response;
+        if (!(response instanceof ReplyMessage)) {
+            throw new FreeColException("Bad response to " + replyId + "/" + tag
+                + ": " + response);
+        }
+        ReplyMessage reply = (ReplyMessage)response;
+        logMessage(reply, false);
+        return reply.getMessage();
     }
     
-    // lowest level send
-    private boolean sendMessageInternal(Message message) throws IOException {
-        final String tag = message.getType();
-        try {
-            synchronized (this.outputLock) {
-                if (this.xw == null) return false;
-                message.toXML(this.xw);
-                this.xw.writeCharacters(END_OF_STREAM_ARRAY, 0,
-                                        END_OF_STREAM_ARRAY.length);
-                this.xw.flush();
-            }
-        } catch (Exception ex) {
-            throw new IOException("sendMessageInternal fail: " + tag, ex);
-        }
-        return true;
-    }
-
     /**
      * Send a message, do not consider a response.
      *
@@ -737,11 +481,20 @@ public class Connection implements Closeable {
      * @param message The {@code Message} to send.
      * @return True if the message was null or successfully sent.
      * @exception IOException on failure to send.
+     * @exception XMLStreamException on stream problem.
      */
-    public boolean sendMessage(Message message) throws IOException {
+    public boolean sendMessage(Message message)
+        throws IOException, XMLStreamException {
         if (message == null) return true;
-        sendMessageInternal(message);
-        log(message, true);
+        final String tag = message.getType();
+        synchronized (this.outputLock) {
+            if (this.xw == null) return false;
+            message.toXML(this.xw);
+            this.xw.writeCharacters(END_OF_STREAM_ARRAY, 0,
+                                    END_OF_STREAM_ARRAY.length);
+            this.xw.flush();
+        }
+        logMessage(message, true);
         return true;
     }
 
@@ -751,7 +504,7 @@ public class Connection implements Closeable {
      * @param message The {@code Message} to log.
      * @param send True if this is a send, false if a reply.
      */
-    protected void log(Message message, boolean send) {
+    protected final void logMessage(Message message, boolean send) {
         synchronized (this.logLock) {
             if (this.lw == null || message == null) return;
             try {
@@ -808,48 +561,7 @@ public class Connection implements Closeable {
     }
 
 
-    // Client handling
-
-    // Legacy DOM routine, to go away
-    private boolean requestElement(Element request) {
-        Element reply = null;
-        try {
-            reply = askElement(request);
-        } catch (IOException ioe) {
-            reply = new ErrorMessage("connection.io", ioe).toXMLElement();
-        }
-        if (reply == null) return true;
-
-        final String tag = reply.getTagName();
-        try {
-            Element e = handleElement(reply);
-            assert e == null; // client handlers now all return null
-        } catch (FreeColException fce) {
-            logger.log(Level.WARNING, "Failed to handle: " + tag, fce);
-            return false;
-        }
-        return !ErrorMessage.TAG.equals(tag);
-    }
-
-    // In due course this is to replace request() but should handle
-    // IOException in that form.
-    private boolean requestMessage(Message message) throws IOException {
-        final String outTag = message.getType();
-        Message response = askMessage(message);
-        if (response == null) return true;
-
-        final String inTag = response.getType();
-        try {
-            Message reply = handle(response);
-            assert reply == null; // Client message handlers all return null
-            logger.finest("Client ask: " + outTag + " -> " + inTag);
-            return true;
-        } catch (FreeColException fce) {
-            logger.log(Level.FINEST, "Client ask failure: " + outTag
-                + " -> " + inTag, fce);
-        }
-        return false; // !ErrorMessage.TAG.equals(inTag);
-    }
+    // Client entry points
 
     /**
      * Client request.
@@ -860,29 +572,31 @@ public class Connection implements Closeable {
      */
     public boolean request(Message message) {
         if (message == null) return true;
-
-        // Try Message-based routine
-        final String tag = message.getType();
-        boolean ret = false;
+        final String reqTag = message.getType();
+        String resTag;
         try {
-            ret = requestMessage(message);
-        } catch (IOException ioe) {
-            logger.log(Level.FINEST, this.name + " request(" + tag + ") fail",
-                ioe);
-            return false;
+            Message response = askMessage(message);
+            if (response == null) {
+                resTag = "(null)";
+            } else {
+                resTag = response.getType();
+                Message reply = handle(response);
+                assert reply == null;
+            }
+            logger.finest(this.name + " request(" + reqTag + " -> "
+                + resTag + ") ok");
+            return true;
+        } catch (Exception ex) {
+            logger.log(Level.FINEST, this.name + " request("
+                + reqTag + ") exception", ex);
         }
-        if (ret) {
-            logger.finest(this.name + " request(" + tag + ") ok");
-        } else {
-            logger.warning(this.name + " request(" + tag + ") failed");
-        }            
-        return ret;
+        return false;
     }
         
     /**
      * Client send.
      *
-     * @param message A {@code DOMMessage} to send.
+     * @param message A {@code Message} to send.
      * @return True if the message was sent.
      */
     public boolean send(Message message) {
@@ -894,9 +608,9 @@ public class Connection implements Closeable {
                 return true;
             }
             logger.warning(this.name + " send(" + tag + ") failed");
-        } catch (IOException ioe) {
+        } catch (Exception ex) {
             logger.log(Level.WARNING, this.name + " send("
-                + tag + ") exception", ioe);
+                + tag + ") exception", ex);
         }
         return false;
     }

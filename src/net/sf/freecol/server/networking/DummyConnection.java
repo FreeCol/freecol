@@ -98,64 +98,11 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    protected boolean sendElement(Element element) {
-        return sendAndWaitElement(element);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean sendAndWaitElement(Element request) {
-        DummyConnection other = getOtherConnection();
-        if (other == null) return false;
-        if (request == null) return true;
-        final String tag = request.getTagName();
-        try {
-            log(request, true);
-            Element reply = other.handleElement(request);
-            log(reply, false);
-            return true;
-        } catch (FreeColException fce) {
-            logger.log(Level.WARNING, "Dummy send-handler fail: " + tag, fce);
-        }
-        return false;
-    }
-
-    /**
-     * Sends a message to the other peer and returns the reply.
-     *
-     * @param request The question for the other peer.
-     * @return The reply from the other peer.
-     * @throws IOException If an error occur while sending the message.
-     * @see #send
-     * @see #sendAndWait
-     */
-    @Override
-    protected Element askElement(Element request) throws IOException {
-        if (!isAlive() || request == null) return null;
-        final String tag = request.getTagName();
-        Element reply;
-        try {
-            log(request, true);
-            reply = getOtherConnection().handleElement(request);
-            log(reply, false);            
-        } catch (FreeColException fce) {
-            logger.log(Level.WARNING, "Dummy-ask handler fail: " + tag, fce);
-            reply = null;
-        }
-        return reply;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean sendMessage(Message message) throws IOException {
         DummyConnection other = getOtherConnection();
         if (other == null) return false;
         if (message == null) return true;
-        log(message, true);
+        logMessage(message, true);
         final String tag = message.getType();
         Message reply;
         try {
@@ -176,7 +123,7 @@ public final class DummyConnection extends Connection {
         DummyConnection other = getOtherConnection();
         if (other == null) return null;
         if (message == null) return null;
-        log(message, true);
+        logMessage(message, true);
         final String tag = message.getType();
         Message response;
         try {
@@ -185,7 +132,7 @@ public final class DummyConnection extends Connection {
             logger.log(Level.WARNING, "Dummy askMessage fail: " + tag, fce);
             return null;
         }
-        log(response, false);
+        logMessage(response, false);
         return response;
     }
 
