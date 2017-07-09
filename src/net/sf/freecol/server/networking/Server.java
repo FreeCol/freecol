@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.DOMMessageHandler;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
@@ -173,18 +173,18 @@ public final class Server extends Thread {
     /**
      * Sends a network message to all connections with an optional exception.
      *
-     * @param message The {@code DOMMessage} to send.
+     * @param message The {@code Message} to send.
      * @param exceptConnection An optional {@code Connection} not
      *     to send to.
      */
-    public void sendToAll(DOMMessage message, Connection exceptConnection) {
+    public void sendToAll(Message message, Connection exceptConnection) {
         for (Connection conn : transform(connections.values(),
                                          c -> c != exceptConnection)) {
             if (conn.isAlive()) {
                 try {
-                    conn.sendAndWait(message);
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Unable to send to: " + conn, e);
+                    conn.sendMessage(message);
+                } catch (Exception ex) {
+                    logger.log(Level.WARNING, "Unable to send to: " + conn, ex);
                 }
             } else {
                 logger.log(Level.INFO, "Reap dead connection: " + conn);
@@ -196,9 +196,9 @@ public final class Server extends Thread {
     /**
      * Sends a network message to all connections.
      *
-     * @param message The {@code DOMMessage} to send.
+     * @param message The {@code Message} to send.
      */
-    public void sendToAll(DOMMessage message) {
+    public void sendToAll(Message message) {
         sendToAll(message, null);
     }
     
