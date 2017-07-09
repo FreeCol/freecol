@@ -44,7 +44,6 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.option.GameOptions;
-import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;

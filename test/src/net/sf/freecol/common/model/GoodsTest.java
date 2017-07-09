@@ -24,7 +24,6 @@ import java.util.Locale;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 

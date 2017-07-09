@@ -44,7 +44,6 @@ import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;

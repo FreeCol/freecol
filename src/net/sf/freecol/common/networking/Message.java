@@ -576,7 +576,7 @@ public abstract class Message {
     }
 
     /**
-     * This will become the toString() method when DOMMessage goes away.
+     * FIXME: This will become the toString() method when DOMMessage goes away.
      */
     public String pretty() {
         StringBuilder sb = new StringBuilder(32);

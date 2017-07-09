@@ -264,7 +264,7 @@ public class ChangeSet {
          * Specialize a Change for a particular player.
          *
          * @param serverPlayer The {@code ServerPlayer} to update.
-         * @return A specialized {@code DOMMessage}.
+         * @return A specialized {@code Message}.
          */
         public abstract T toMessage(ServerPlayer serverPlayer);
     }
@@ -1633,11 +1633,11 @@ public class ChangeSet {
      *
      * @param serverPlayer An optional {@code ServerPlayer} to restrict
      *     visibility to.
-     * @param message The message to wrap.
+     * @param message The {@code Message} to wrap.
      * @return A new {@code ChangeSet}.
      */
     public static ChangeSet simpleChange(ServerPlayer serverPlayer,
-                                         DOMMessage message) {
+                                         Message message) {
         See see = (serverPlayer == null) ? See.all() : See.only(serverPlayer);
         return simpleChange(see, message);
     }
@@ -1646,10 +1646,10 @@ public class ChangeSet {
      * Convenience function to create a change set containing a message.
      *
      * @param see The message visibility.
-     * @param message The message to wrap.
+     * @param message The {@code Message} to wrap.
      * @return A new {@code ChangeSet}.
      */
-    public static ChangeSet simpleChange(See see, DOMMessage message) {
+    public static ChangeSet simpleChange(See see, Message message) {
         ChangeSet cs = new ChangeSet();
         cs.add((see == null) ? See.all() : see, message);
         return cs;
