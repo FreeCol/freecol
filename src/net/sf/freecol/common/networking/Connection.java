@@ -738,11 +738,11 @@ public class Connection implements Closeable {
      */
     protected void log(Message message, boolean send) {
         synchronized (this.logLock) {
-            if (this.lw == null) return;
+            if (this.lw == null || message == null) return;
             try {
                 this.lw.writeComment(this.name
                     + ((send) ? SEND_SUFFIX : REPLY_SUFFIX));
-                if (message != null) message.toXML(this.lw);
+                message.toXML(this.lw);
                 this.lw.writeCharacters(END_OF_STREAM_ARRAY, 0,
                                         END_OF_STREAM_ARRAY.length);
                 this.lw.flush();
