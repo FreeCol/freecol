@@ -249,22 +249,22 @@ public class MetaServerUtils {
         try {
             switch (type) {
             case REGISTER:
-                mc.sendAndWait(new RegisterServerMessage(si));
+                mc.sendMessage(new RegisterServerMessage(si));
                 return startTimer(si);
             case REMOVE:
-                mc.sendAndWait(new RemoveServerMessage(si));
+                mc.sendMessage(new RemoveServerMessage(si));
                 return stopTimer(si);
             case SERVERLIST:
-                mc.sendAndWait(new ServerListMessage());
+                mc.sendMessage(new ServerListMessage());
                 break; 
             case UPDATE:
-                mc.sendAndWait(new UpdateServerMessage(si));
+                mc.sendMessage(new UpdateServerMessage(si));
                 return updateTimer(si);
             }
-        } catch (IOException ioe) {
+        } catch (Exception ex) {
             logger.log(Level.WARNING, "Meta-server " + type.toString()
                 + " failed: " + FreeCol.getMetaServerAddress()
-                + ":" + FreeCol.getMetaServerPort(), ioe);
+                + ":" + FreeCol.getMetaServerPort(), ex);
             return false;
         } finally {
             mc.close();
