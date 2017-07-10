@@ -98,20 +98,10 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    public boolean sendMessage(Message message) throws IOException {
-        DummyConnection other = getOtherConnection();
-        if (other == null) return false;
-        if (message == null) return true;
-        logMessage(message, true);
-        final String tag = message.getType();
-        Message reply;
-        try {
-            reply = other.handle(message);
-            assert reply == null;
-        } catch (FreeColException fce) {
-            logger.log(Level.WARNING, "Dummy sendMessage fail: " + tag, fce);
-            return false;
-        }
+    public boolean sendMessage(Message message)
+        throws FreeColException, IOException {
+        Message reply = askMessage(message);
+        assert reply == null;
         return true;
     }
 
@@ -119,21 +109,15 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    protected Message askMessage(Message message) throws IOException {
+    protected Message askMessage(Message message)
+        throws FreeColException, IOException {
         DummyConnection other = getOtherConnection();
         if (other == null) return null;
         if (message == null) return null;
         logMessage(message, true);
-        final String tag = message.getType();
-        Message response;
-        try {
-            response = other.handle(message);
-        } catch (FreeColException fce) {
-            logger.log(Level.WARNING, "Dummy askMessage fail: " + tag, fce);
-            return null;
-        }
-        logMessage(response, false);
-        return response;
+        Message reply = other.handle(message);
+        logMessage(reply, false);
+        return reply;
     }
 
 

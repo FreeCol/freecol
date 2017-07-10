@@ -37,10 +37,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -77,43 +73,36 @@ public class Connection implements Closeable {
 
     private static final int TIMEOUT = 5000; // 5s
 
+    /** The name of the connection. */
+    private String name;
+
     /** The socket connected to the other end of the connection. */
     private Socket socket = null;
 
-    /** The input stream to read from, derived from the socket. */
-    private InputStream in;
-    /** The wrapped version of the input stream. */
-    private BufferedReader br;
-    /** A lock for the input side, including the socket. */
+    /** A lock for the input side. */
     private final Object inputLock = new Object();
+    /** The wrapped version of the input side of the socket. */
+    private BufferedReader br;
+    /** An XML stream wrapping of an input line. */
+    private FreeColXMLReader xr;
 
-    /** The transformer for output. */
-    private final Transformer outTransformer;
-    /** The output stream to write to, derived from the socket. */
-    private OutputStream out;
     /** A lock for the output side. */
     private final Object outputLock = new Object();
-
-    /** A stream wrapping of the input stream (currently transient). */
-    private FreeColXMLReader xr;
-    
-    private ReceivingThread receivingThread;
-
-    private DOMMessageHandler domMessageHandler;
-
-    private String name;
-
     /** Main message writer. */
     private FreeColXMLWriter xw;
 
     /** A lock for the logging routines. */
     private final Object logLock = new Object();
-    /** The transformer for logging, also used as a lock for logWriter. */
-    private final Transformer logTransformer;
-    /** The Writer to write logging messages to. */
-    private final Writer logWriter;
     /** The FreeColXMLWriter to write logging messages to. */
     private final FreeColXMLWriter lw;
+
+    /** The subthread to read the input. */
+    private ReceivingThread receivingThread;
+
+    private DOMMessageHandler domMessageHandler;
+
+    /** Is there an active connection. */
+    private boolean connected = false;
     
 
     /**
@@ -123,11 +112,8 @@ public class Connection implements Closeable {
      */
     protected Connection(String name) {
         this.name = name;
-        this.outTransformer = Utils.makeTransformer(false, false);
 
         setSocket(null);
-        this.in = null;
-        this.out = null;
         this.br = null;
         this.xr = null;
         this.receivingThread = null;
@@ -138,17 +124,14 @@ public class Connection implements Closeable {
         // writer in COMMS-debug mode.
         FreeColXMLWriter lw = null;
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-            this.logWriter = Utils.getUTF8Writer(System.err);
-            this.logTransformer = Utils.makeTransformer(true, true);
             try {
-                lw = new FreeColXMLWriter(this.logWriter,
+                lw = new FreeColXMLWriter(Utils.getUTF8Writer(System.err),
                     FreeColXMLWriter.WriteScope.toSave(), true);
             } catch (IOException ioe) {} // Ignore failure, just do not log
-        } else {
-            this.logWriter = null;
-            this.logTransformer = null;
         }
         this.lw = lw;
+
+        this.connected = false;
     }
 
     /**
@@ -166,14 +149,12 @@ public class Connection implements Closeable {
         this(name);
 
         setSocket(socket);
-        this.in = socket.getInputStream();
-        this.out = socket.getOutputStream();
-        this.br = new BufferedReader(new InputStreamReader(this.in, StandardCharsets.UTF_8));
+        this.br = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
         this.receivingThread = new ReceivingThread(this, name);
         this.domMessageHandler = domMessageHandler;
-        this.xw = new FreeColXMLWriter(this.out,
+        this.xw = new FreeColXMLWriter(socket.getOutputStream(),
             FreeColXMLWriter.WriteScope.toSave(), false);
-
+        this.connected = true;
         this.receivingThread.start();
     }
 
@@ -254,17 +235,9 @@ public class Connection implements Closeable {
      */
     private void closeOutputStream() {
         synchronized (this.outputLock) {
-            if (this.out == null) return;
             if (this.xw != null) {
                 this.xw.close();
                 this.xw = null;
-            }
-            try {
-                this.out.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Error closing output", ioe);
-            } finally {
-                this.out = null;
             }
         }
     }
@@ -282,15 +255,6 @@ public class Connection implements Closeable {
                         ioe);
                 } finally {
                     this.br = null;
-                }
-            }
-            if (this.in != null) {
-                try {
-                    this.in.close();
-                } catch (IOException ioe) {
-                    logger.log(Level.WARNING, "Error closing input", ioe);
-                } finally {
-                    this.in = null;
                 }
             }
         }
@@ -396,6 +360,7 @@ public class Connection implements Closeable {
      * Disconnect this connection.
      */
     public void disconnect() {
+        this.connected = false;
         sendDisconnect();
         close();
     }
@@ -430,7 +395,7 @@ public class Connection implements Closeable {
     }
 
     public void endListen() {
-        // do nothing
+        this.xr = null;
     }
 
 
@@ -449,22 +414,24 @@ public class Connection implements Closeable {
         throws FreeColException, IOException, XMLStreamException {
         if (message == null) return null;
         final String tag = message.getType();
-        final int replyId = this.receivingThread.getNextNetworkReplyId();
-
         if (Thread.currentThread() == this.receivingThread) {
             throw new IOException("wait(ReceivingThread) for: " + tag);
         }
 
-        // Send the question
+        // Build the question message and establish an NRO for it.
+        // *Then* send the message.
+        final int replyId = this.receivingThread.getNextNetworkReplyId();
         QuestionMessage qm = new QuestionMessage(replyId, message);
-        if (!sendMessage(qm)) return null;
-
-        // Wait for response
         NetworkReplyObject nro
             = this.receivingThread.waitForNetworkReply(replyId);
-        Object response = nro.getResponse(); // Blocks here
+        if (!sendMessage(qm)) return null;
 
-        if (!(response instanceof ReplyMessage)) {
+        // Block waiting for the reply to occur.  Expect a reply
+        // message, except on shutdown.
+        Object response = nro.getResponse();
+        if (response == null && !this.connected) {
+            return null;
+        } else if (!(response instanceof ReplyMessage)) {
             throw new FreeColException("Bad response to " + replyId + "/" + tag
                 + ": " + response);
         }
@@ -480,11 +447,12 @@ public class Connection implements Closeable {
      *
      * @param message The {@code Message} to send.
      * @return True if the message was null or successfully sent.
+     * @exception FreeColException on extreme confusion.
      * @exception IOException on failure to send.
      * @exception XMLStreamException on stream problem.
      */
     public boolean sendMessage(Message message)
-        throws IOException, XMLStreamException {
+        throws FreeColException, IOException, XMLStreamException {
         if (message == null) return true;
         final String tag = message.getType();
         synchronized (this.outputLock) {

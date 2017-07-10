@@ -263,10 +263,7 @@ public final class Server extends Thread {
         }
 
         for (Connection c : transform(this.connections.values(),
-                                      Connection::isAlive)) {
-            c.sendDisconnect();
-            c.close();
-        }
+                                      Connection::isAlive)) c.disconnect();
         this.connections.clear();
 
         this.freeColServer.removeFromMetaServer();

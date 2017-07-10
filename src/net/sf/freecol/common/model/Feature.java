@@ -37,6 +37,9 @@ import net.sf.freecol.common.util.Utils;
  * The {@code Feature} class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
  * combat.
+ *
+ * Do not make this a FCSOT because that has a FeatureContainer.  Lumping
+ * features onto features would be incoherent.
  */
 public abstract class Feature extends FreeColSpecObject
     implements Named, Scoped {

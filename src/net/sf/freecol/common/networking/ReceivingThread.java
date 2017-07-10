@@ -223,9 +223,10 @@ final class ReceivingThread extends Thread {
      * Listens to the InputStream and calls the message handler for
      * each message received.
      * 
-     * @throws IOException If thrown by the {@link FreeColNetworkInputStream}.
-     * @throws SAXException if a problem occured during parsing.
-     * @throws XMLStreamException if a problem occured during parsing.
+     * @exception IOException If thrown by the
+     *     {@link FreeColNetworkInputStream}.
+     * @exception SAXException if a problem occured during parsing.
+     * @exception XMLStreamException if a problem occured during parsing.
      */
     private void listen() throws IOException, SAXException, XMLStreamException {
         String tag;
@@ -244,8 +245,8 @@ final class ReceivingThread extends Thread {
         case DisconnectMessage.TAG:
             // Do not actually read the message, it might be a fake one
             // due to end-of-stream.
-            t = messageUpdate(TrivialMessage.disconnectMessage);
             askToStop("listen-disconnect");
+            t = messageUpdate(TrivialMessage.disconnectMessage);
             break;
 
         case Connection.REPLY_TAG:

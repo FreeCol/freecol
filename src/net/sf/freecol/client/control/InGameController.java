@@ -825,6 +825,7 @@ public final class InGameController extends FreeColClientHolder {
         // Check for desync as last thing!
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
             && DebugUtils.checkDesyncAction(getFreeColClient())) {
+            logger.warning("Reconnecting on desync");
             getFreeColClient().getConnectController()
                 .requestLogout(LogoutReason.RECONNECT);
             return false;
