@@ -186,11 +186,30 @@
              excludes="net/sf/freecol/metaserver/**"/>
     </target>
 
-    <!-- Compiles the metaserver and creates a JAR-file. -->
-    <target name="metaserver" depends="init,build,manifest" description="Compiles the metaserver and creates a JAR-file.">
+    <target name="metamanifest" depends="git-revision"
+            description="Creates the Manifest file for the metaserver.">
+        <manifestclasspath property="jar.classpath"
+                           jarfile="${freecol.metaserver.jar.file}">
+            <classpath refid="libraries.classpath" />
+        </manifestclasspath>
+        <manifest file="${basedir}/src/METAMANIFEST.MF">
+            <attribute name="Created-By" value="FreeCol Team"/>
+            <attribute name="Main-Class" value="net.sf.freecol.metaserver.MetaServer"/>
+            <attribute name="Class-Path" value="${jar.classpath}"/>
+            <attribute name="Product-Name" value="FreeCol"/>
+            <attribute name="Package-Title" value="FreeCol"/>
+            <attribute name="Package-Version" value="${FreeCol.Revision}"/>
+            <attribute name="Package-Vendor" value="FreeCol Team"/>
+        </manifest>
+    </target>
+
+    <!-- Compiles the metaserver and creates a JAR-file.
+         FIXME: including everything in common is excessive. -->
+    <target name="metaserver" depends="init,build,metamanifest"
+            description="Compiles the metaserver and creates a JAR-file.">
         <jar jarfile="${freecol.metaserver.jar.file}"
              basedir="${freecol.build.dir}"
-             manifest="${basedir}/src/MANIFEST.MF"
+             manifest="${basedir}/src/METAMANIFEST.MF"
              includes="net/sf/freecol/metaserver/**,
                        net/sf/freecol/common/**,
                        org/**"/>

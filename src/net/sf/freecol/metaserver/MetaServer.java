@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,8 +47,8 @@ public final class MetaServer extends Thread {
     /** The public "well-known" socket to which clients may connect. */
     private final ServerSocket serverSocket;
 
-    /** A hash of Connection objects, keyed by the Socket they relate to. */
-    private final HashMap<Socket, Connection> connections = new HashMap<>();
+    /** A map of Connection objects, keyed by the Socket they relate to. */
+    private final Map<Socket, Connection> connections = new HashMap<>();
 
     /**
      * Whether to keep running the main loop that is awaiting new client
@@ -63,31 +63,6 @@ public final class MetaServer extends Thread {
 
 
     /**
-     * Creates and starts a new {@code MetaServer}.
-     * 
-     * @param args The command-line options.
-     */
-    public static void main(String[] args) {
-        int port = -1;
-        try {
-            port = Integer.parseInt(args[0]);
-        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            System.out.println("Usage: java net.sf.freecol.metaserver.MetaServer PORT_NUMBER");
-            System.exit(-1);
-        }
-
-        MetaServer metaServer = null;
-        try {
-            metaServer = new MetaServer(port);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not create MetaServer!", e);
-            System.exit(-1);
-        }
-
-        metaServer.start();
-    }
-
-    /**
      * Creates a new network server. Use {@link #run metaServer.start()} to
      * start listening for new connections.
      * 
@@ -96,33 +71,9 @@ public final class MetaServer extends Thread {
      */
     public MetaServer(int port) throws IOException {
         this.port = port;
-
         final MetaRegister mr = new MetaRegister();
-        networkHandler = new NetworkHandler(this, mr);
-        serverSocket = new ServerSocket(port);
-    }
-
-    /**
-     * Starts the thread's processing. Contains the loop that is waiting for new
-     * connections to the public socket. When a new client connects to the
-     * server a new {@link Connection} is made, with {@link NetworkHandler} as
-     * the control object.
-     */
-    @Override
-    public void run() {
-        while (running) {
-            Socket clientSocket = null;
-            try {
-                clientSocket = serverSocket.accept();
-                logger.info("Client connection from: "
-                    + clientSocket.getInetAddress().toString());
-                Connection connection = new Connection(clientSocket,
-                    getNetworkHandler(), FreeCol.METASERVER_THREAD);
-                connections.put(clientSocket, connection);
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Meta-run", e);
-            }
-        }
+        this.networkHandler = new NetworkHandler(this, mr);
+        this.serverSocket = new ServerSocket(port);
     }
 
     /**
@@ -131,7 +82,7 @@ public final class MetaServer extends Thread {
      * @return The {@code NetworkHandler}.
      */
     public NetworkHandler getNetworkHandler() {
-        return networkHandler;
+        return this.networkHandler;
     }
 
     /**
@@ -140,36 +91,24 @@ public final class MetaServer extends Thread {
      * @return The TCP port.
      */
     public int getPort() {
-        return port;
-    }
-
-    /**
-     * Gets an iterator of every connection to this server.
-     * 
-     * @return The {@code Iterator}.
-     * @see Connection
-     */
-    public Iterator<Connection> getConnectionIterator() {
-        return connections.values().iterator();
+        return this.port;
     }
 
     /**
      * Shuts down the server thread.
      */
     public void shutdown() {
-        running = false;
+        this.running = false;
 
         try {
-            serverSocket.close();
+            this.serverSocket.close();
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not close the server socket!", e);
         }
 
         Connection c;
-        while ((c = connections.remove(0)) != null) {
-            c.disconnect();
-        }
-        logger.info("Server shutdown.");
+        while ((c = this.connections.remove(0)) != null) c.disconnect();
+        logger.info("Metaserver shutdown.");
     }
 
     /**
@@ -180,7 +119,7 @@ public final class MetaServer extends Thread {
      * @return The {@code Connection}.
      */
     public Connection getConnection(Socket socket) {
-        return connections.get(socket);
+        return this.connections.get(socket);
     }
 
     /**
@@ -189,6 +128,60 @@ public final class MetaServer extends Thread {
      * @param connection The connection that should be removed.
      */
     public void removeConnection(Connection connection) {
-        connections.remove(connection.getSocket());
+        this.connections.remove(connection.getSocket());
+    }
+
+
+    // Override Thread
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void run() {
+        // Starts the thread's processing. Contains the loop that is
+        // waiting for new connections to the public socket. When a
+        // new client connects to the server a new {@link Connection}
+        // is made, with {@link NetworkHandler} as the control object.
+        while (this.running) {
+            Socket clientSocket = null;
+            try {
+                clientSocket = serverSocket.accept();
+                logger.info("Client connection from: "
+                    + clientSocket.getInetAddress().toString());
+                Connection connection = new Connection(clientSocket,
+                    getNetworkHandler(), FreeCol.METASERVER_THREAD);
+                this.connections.put(clientSocket, connection);
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Meta-run", e);
+            }
+        }
+    }
+
+    // Main entry point
+
+    /**
+     * Create and start a new {@code MetaServer}.
+     * 
+     * @param args The command-line options.
+     */
+    public static void main(String[] args) {
+        int port = -1;
+        try {
+            port = Integer.parseInt(args[0]);
+        } catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
+            System.out.println("Usage: " + MetaServer.class.getName()
+                + " PORT_NUMBER");
+            System.exit(1);
+        }
+
+        MetaServer metaServer = null;
+        try {
+            metaServer = new MetaServer(port);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Could not create MetaServer!", e);
+            System.exit(1);
+        }
+        metaServer.start();
     }
 }
