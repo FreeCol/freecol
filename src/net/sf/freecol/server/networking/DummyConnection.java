@@ -28,8 +28,6 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.DOMMessageHandler;
 
-import org.w3c.dom.Element;
-
 
 /**
  * A dummy connection, used for AI players.

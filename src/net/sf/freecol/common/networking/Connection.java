@@ -45,17 +45,10 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.common.util.Utils;
 
-import org.xml.sax.SAXException;
-import org.w3c.dom.Element;
-
 
 /**
  * A network connection.
  * Responsible for both sending and receiving network messages.
- *
- * @see #send(Element)
- * @see #sendAndWait(Element)
- * @see #ask(Element)
  */
 public class Connection implements Closeable {
 
