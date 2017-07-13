@@ -1139,15 +1139,20 @@ public class SwingGUI extends GUI {
         try {
             group = canvas.showClientOptionsDialog();
         } finally {
+            resetMenuBar();
             if (group != null) {
-                resetMenuBar();
                 // Immediately redraw the minimap if that was updated.
                 updateMapControls();
             }
         }
-        FreeColClient freeColClient = getFreeColClient();
-        if (!freeColClient.isInGame() && !freeColClient.isMapEditor())
-            showMainPanel(null);
+        FreeColClient fcc = getFreeColClient();
+        if (fcc.isMapEditor()) {
+            startMapEditorGUI();
+        } else if (fcc.isInGame()) {
+            ; // do nothing
+        } else {
+            showMainPanel(null); // back to the main panel
+        }
     }
 
     /**

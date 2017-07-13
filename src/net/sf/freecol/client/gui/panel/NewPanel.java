@@ -280,7 +280,11 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         cancel.addActionListener(ae -> {
                 final SwingGUI gui = getGUI();
                 gui.removeFromCanvas(this);
-                gui.showMainPanel(null);
+                if (getFreeColClient().isMapEditor()) {
+                    gui.startMapEditorGUI();
+                } else {
+                    gui.showMainPanel(null);
+                }
             });
         setCancelComponent(cancel);
 
