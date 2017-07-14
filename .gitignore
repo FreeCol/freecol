@@ -15,7 +15,7 @@ semantic.cache*
 nbproject
 FreeCol.log
 FreeCol*.jar
-src/MANIFEST.MF
+src/*.MF
 build/
 doc/specification_*.html
 dist/
