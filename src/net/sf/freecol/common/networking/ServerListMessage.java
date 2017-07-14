@@ -92,9 +92,22 @@ public class ServerListMessage extends ObjectMessage {
      * Add information about a server.
      *
      * @param si The {@code ServerInfo} to add.
+     * @return This message.
      */
-    public void addServer(ServerInfo si) {
+    public ServerListMessage addServer(ServerInfo si) {
         this.servers.add(si);
+        return this;
+    }
+
+    /**
+     * Add information about several servers.
+     *
+     * @param lsi The list of {@code ServerInfo} to add.
+     * @return This message.
+     */
+    public ServerListMessage addServers(List<ServerInfo> lsi) {
+        this.servers.addAll(lsi);
+        return this;
     }
 
     

@@ -32,12 +32,14 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DisconnectMessage;
-import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.DOMMessageHandler;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
@@ -45,8 +47,6 @@ import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateServerMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -61,7 +61,7 @@ public class MetaServerUtils {
      * Handle messages sent by the meta-server.
      * Currently, only "serverList".
      */
-    public static class MetaInputHandler implements DOMMessageHandler {
+    public static class MetaInputHandler implements MessageHandler {
 
         private static final Logger logger = Logger.getLogger(MetaInputHandler.class.getName());
         
@@ -81,16 +81,16 @@ public class MetaServerUtils {
         /**
          * {@inheritDoc}
          */
-        public Element handle(Connection connection, Element element)
+        public Message handle(Connection connection, Message message)
             throws FreeColException {
-            if (element == null) return null;
-            final String tag = element.getTagName();
+            if (message == null) return null;
+            final String tag = message.getType();
             switch (tag) {
             case DisconnectMessage.TAG:
-                disconnect();
                 break;
             case ServerListMessage.TAG:
-                serverList(new ServerListMessage(element));
+                ServerListMessage slm = (ServerListMessage)message;
+                this.consumer.accept(slm.getServers());
                 break;
             default:
                 logger.warning("MetaInputHandler does not handle: " + tag);
@@ -100,16 +100,12 @@ public class MetaServerUtils {
         }
 
         /**
-         * Handle a "disconnect"-message.
+         * {@inheritDoc}
          */
-        public void disconnect() {} // Do nothing
-        
-        /**
-         * Handle a "serverList"-message.
-         */
-        public void serverList(ServerListMessage message) {
-            this.consumer.accept(message.getServers());
-        }            
+        public Message read(Connection connection)
+            throws FreeColException, XMLStreamException {
+            return Message.read(null, connection.getFreeColXMLReader());
+        }
     }
 
     /** Client timer update interval. */
@@ -222,9 +218,8 @@ public class MetaServerUtils {
         String host = FreeCol.getMetaServerAddress();
         int port = FreeCol.getMetaServerPort();
         try {
-            Connection ret = new Connection(host, port, FreeCol.SERVER_THREAD);
-            ret.setDOMMessageHandler(new MetaInputHandler(consumer));
-            return ret;
+            return new Connection(host, port, FreeCol.SERVER_THREAD)
+                .setMessageHandler(new MetaInputHandler(consumer));
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not connect to meta-server: "
                 + host + ":" + port, ioe);
@@ -237,17 +232,12 @@ public class MetaServerUtils {
      *
      * @param type The {@code MetaMessageType} to send.
      * @param si The associated {@code ServerInfo}.
-     * @param lsi A list of {@code ServerInfo} records, to be filled
-     *     in by the meta-server.
      * @return True if the operation succeeds.
      */
-    private static boolean metaMessage(MetaMessageType type, ServerInfo si,
-                                       List<ServerInfo> lsi) {
-        Connection mc = getMetaServerConnection(lsi);
-        if (mc == null) return false;
-        si.setConnection(mc.getName(), mc.getHostAddress(), mc.getPort());
-
-        try {
+    private static boolean metaMessage(MetaMessageType type, ServerInfo si) {
+        try (Connection mc = getMetaServerConnection(null)) {
+            if (mc == null) return false;
+            si.setConnection(mc.getName(), mc.getHostAddress(), mc.getPort());
             switch (type) {
             case REGISTER:
                 mc.sendMessage(new RegisterServerMessage(si));
@@ -255,22 +245,19 @@ public class MetaServerUtils {
             case REMOVE:
                 mc.sendMessage(new RemoveServerMessage(si));
                 return stopTimer(si);
-            case SERVERLIST:
-                mc.sendMessage(new ServerListMessage());
-                break; 
             case UPDATE:
                 mc.sendMessage(new UpdateServerMessage(si));
                 return updateTimer(si);
+            default:
+                logger.log(Level.WARNING, "Wrong metaMessage type: " + type);
+                return false;
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Meta-server " + type.toString()
                 + " failed: " + FreeCol.getMetaServerAddress()
                 + ":" + FreeCol.getMetaServerPort(), ex);
-            return false;
-        } finally {
-            mc.close();
         }
-        return true;
+        return false;
     }
 
 
@@ -283,9 +270,14 @@ public class MetaServerUtils {
      */
     public static List<ServerInfo> getServerList() {
         List<ServerInfo> lsi = new ArrayList<>();
-        return (metaMessage(MetaMessageType.SERVERLIST, null, lsi)
-            && !(lsi.size() == 1 && lsi.get(0) == sentinel)) ? lsi
-            : null;
+        try (Connection mc = getMetaServerConnection(lsi)) {
+            if (mc != null
+                && mc.sendMessage(new ServerListMessage().addServers(lsi))
+                && (lsi.size() != 1 && lsi.get(0) != sentinel)) return lsi;
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Failed to send server list", ex);
+        }
+        return null;
     }
 
     /**
@@ -297,7 +289,7 @@ public class MetaServerUtils {
      * @return True if the server was registered.
      */
     public static boolean registerServer(ServerInfo si) {
-        return metaMessage(MetaMessageType.REGISTER, si, null);
+        return metaMessage(MetaMessageType.REGISTER, si);
     }
 
     /**
@@ -306,7 +298,7 @@ public class MetaServerUtils {
      * @return True if the server was removed.
      */
     public static boolean removeServer(ServerInfo si) {
-        return metaMessage(MetaMessageType.REMOVE, si, null);
+        return metaMessage(MetaMessageType.REMOVE, si);
     }
 
     /**
@@ -315,6 +307,6 @@ public class MetaServerUtils {
      * @return True if the server was updated.
      */
     public static boolean updateServer(ServerInfo si) {
-        return metaMessage(MetaMessageType.UPDATE, si, null);
+        return metaMessage(MetaMessageType.UPDATE, si);
     }
 }
