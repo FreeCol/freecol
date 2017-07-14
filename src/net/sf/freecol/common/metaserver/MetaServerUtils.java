@@ -218,7 +218,7 @@ public class MetaServerUtils {
         String host = FreeCol.getMetaServerAddress();
         int port = FreeCol.getMetaServerPort();
         try {
-            return new Connection(host, port, FreeCol.SERVER_THREAD)
+            return new Connection(host, port, "MetaServer")
                 .setMessageHandler(new MetaInputHandler(consumer));
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not connect to meta-server: "
@@ -270,14 +270,33 @@ public class MetaServerUtils {
      */
     public static List<ServerInfo> getServerList() {
         List<ServerInfo> lsi = new ArrayList<>();
-        try (Connection mc = getMetaServerConnection(lsi)) {
-            if (mc != null
-                && mc.sendMessage(new ServerListMessage().addServers(lsi))
-                && (lsi.size() != 1 && lsi.get(0) != sentinel)) return lsi;
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Failed to send server list", ex);
+        List<ServerInfo> ret = null;
+        Connection mc = getMetaServerConnection(lsi);
+        if (mc == null) {
+            logger.warning("Could not connect to metaserver.");
+            return null;
         }
-        return null;
+        try {
+            if (!mc.sendMessage(new ServerListMessage())) {
+                logger.warning("Error querying metaserver.");
+                return null;
+            }
+            final int MAXTRIES = 5;
+            final int SLEEP_TIME = 1000; // 1s
+            for (int n = MAXTRIES; n > 0; n--) {
+                if (lsi.size() != 1 || lsi.get(0) != sentinel) {
+                    ret = new ArrayList<>(lsi);
+                    break;
+                }
+                Thread.sleep(SLEEP_TIME);
+            }
+            if (ret == null) logger.warning("No response from metaserver.");
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Exception getting server list", ex);
+        } finally {
+            mc.close();
+        }
+        return ret;
     }
 
     /**
