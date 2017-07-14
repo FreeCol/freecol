@@ -36,7 +36,7 @@ import net.sf.freecol.common.networking.Connection;
  * The entry point and main controller object for the meta server.
  * 
  * When a new client connects to the meta server a new {@link Connection} is
- * made, with {@link NetworkHandler} as the control object.
+ * made, with {@link MetaServerHandler} as the control object.
  * 
  * @see net.sf.freecol.common.networking
  */
@@ -59,7 +59,7 @@ public final class MetaServer extends Thread {
     /** The TCP port that is beeing used for the public socket. */
     private final int port;
 
-    private final NetworkHandler networkHandler;
+    private final MetaServerHandler metaServerHandler;
 
 
     /**
@@ -72,17 +72,17 @@ public final class MetaServer extends Thread {
     public MetaServer(int port) throws IOException {
         this.port = port;
         final MetaRegister mr = new MetaRegister();
-        this.networkHandler = new NetworkHandler(this, mr);
+        this.metaServerHandler = new MetaServerHandler(this, mr);
         this.serverSocket = new ServerSocket(port);
     }
 
     /**
      * Gets the control object that handles the network requests.
      * 
-     * @return The {@code NetworkHandler}.
+     * @return The {@code MetaServerHandler}.
      */
-    public NetworkHandler getNetworkHandler() {
-        return this.networkHandler;
+    public MetaServerHandler getMetaServerHandler() {
+        return this.metaServerHandler;
     }
 
     /**
@@ -142,7 +142,7 @@ public final class MetaServer extends Thread {
         // Starts the thread's processing. Contains the loop that is
         // waiting for new connections to the public socket. When a
         // new client connects to the server a new {@link Connection}
-        // is made, with {@link NetworkHandler} as the control object.
+        // is made, with {@link MetaServerHandler} as the control object.
         while (this.running) {
             Socket clientSocket = null;
             try {
@@ -150,7 +150,7 @@ public final class MetaServer extends Thread {
                 logger.info("Client connection from: "
                     + clientSocket.getInetAddress().toString());
                 Connection connection = new Connection(clientSocket,
-                    getNetworkHandler(), FreeCol.METASERVER_THREAD);
+                    getMetaServerHandler(), FreeCol.METASERVER_THREAD);
                 this.connections.put(clientSocket, connection);
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Meta-run", e);

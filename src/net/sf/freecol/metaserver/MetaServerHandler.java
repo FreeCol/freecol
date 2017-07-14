@@ -39,8 +39,8 @@ import org.w3c.dom.Element;
 /**
  * Handle network messages sent to the meta-server.
  */
-public final class NetworkHandler implements DOMMessageHandler {
-    private static final Logger logger = Logger.getLogger(NetworkHandler.class.getName());
+public final class MetaServerHandler implements DOMMessageHandler {
+    private static final Logger logger = Logger.getLogger(MetaServerHandler.class.getName());
 
     /** The encapsulated meta-server. */
     private final MetaServer metaServer;
@@ -57,7 +57,7 @@ public final class NetworkHandler implements DOMMessageHandler {
      *     {@code NetworkHandler} has been created for.
      * @param metaRegister An object containing a list of all the servers.
      */
-    public NetworkHandler(MetaServer metaServer, MetaRegister metaRegister) {
+    public MetaServerHandler(MetaServer metaServer, MetaRegister metaRegister) {
         this.metaServer = metaServer;
         this.metaRegister = metaRegister;
     }
