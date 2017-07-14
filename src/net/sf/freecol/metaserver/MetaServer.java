@@ -142,7 +142,7 @@ public final class MetaServer extends Thread {
         // Starts the thread's processing. Contains the loop that is
         // waiting for new connections to the public socket. When a
         // new client connects to the server a new {@link Connection}
-        // is made, with {@link MetaServerHandler} as the control object.
+        // is made, with {@link MetaServerHandler} as the input handler.
         while (this.running) {
             Socket clientSocket = null;
             try {
@@ -150,8 +150,8 @@ public final class MetaServer extends Thread {
                 logger.info("Client connection from: "
                     + clientSocket.getInetAddress().toString());
                 Connection connection = new Connection(clientSocket,
-                    FreeCol.METASERVER_THREAD);
-                connection.setDOMMessageHandler(getMetaServerHandler());
+                    FreeCol.METASERVER_THREAD)
+                    .setMessageHandler(getMetaServerHandler());
                 this.connections.put(clientSocket, connection);
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Meta-run", e);

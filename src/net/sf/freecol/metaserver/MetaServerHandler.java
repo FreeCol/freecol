@@ -22,24 +22,25 @@ package net.sf.freecol.metaserver;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DisconnectMessage;
-import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.DOMMessageHandler;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.RegisterServerMessage;
 import net.sf.freecol.common.networking.RemoveServerMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateServerMessage;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Handle network messages sent to the meta-server.
  */
-public final class MetaServerHandler implements DOMMessageHandler {
+public final class MetaServerHandler implements MessageHandler {
     private static final Logger logger = Logger.getLogger(MetaServerHandler.class.getName());
 
     /** The encapsulated meta-server. */
@@ -62,34 +63,35 @@ public final class MetaServerHandler implements DOMMessageHandler {
         this.metaRegister = metaRegister;
     }
 
-    
+
+    // Implement MessageHandler
+
     /**
-     * Handle a network message.
-     *
-     * @param connection The {@code Connection} the message came from.
-     * @param element The message to be processed.
+     * {@inheritDoc}
      */
     @Override
-    public synchronized Element handle(Connection connection, Element element) {
-        DOMMessage reply = null;
-        final String tag = element.getTagName();
+    public Message handle(Connection connection, Message message)
+        throws FreeColException {
+        if (message == null) return null;
+        Message reply = null;
+        final String tag = message.getType();
         switch (tag) {
         case DisconnectMessage.TAG:
             disconnect(connection);
             break;
         case RegisterServerMessage.TAG:
-            RegisterServerMessage rsm = new RegisterServerMessage(null, element);
+            RegisterServerMessage rsm = (RegisterServerMessage)message;
             rsm.setAddress(connection.getHostAddress()); // Trust the connection
             register(rsm);
             break;
         case RemoveServerMessage.TAG:
-            remove(new RemoveServerMessage(null, element));
+            remove((RemoveServerMessage)message);
             break;
         case ServerListMessage.TAG:
             reply = serverList();
             break;
         case UpdateServerMessage.TAG:
-            UpdateServerMessage usm = new UpdateServerMessage(null, element);
+            UpdateServerMessage usm = (UpdateServerMessage)message;
             usm.setAddress(connection.getHostAddress()); // Trust the connection
             update(usm);
             break;
@@ -97,9 +99,18 @@ public final class MetaServerHandler implements DOMMessageHandler {
             logger.warning("Unknown request: " + tag);
             break;
         }
-        return (reply == null) ? null : reply.toXMLElement();
+        return reply;
     }
-  
+
+    /**
+     * {@inheritDoc}
+     */
+    public Message read(Connection connection)
+        throws FreeColException, XMLStreamException {
+        return Message.read(null, connection.getFreeColXMLReader());
+    }
+
+    // Individual message handlers
 
     /**
      * Handle a "disconnect"-request.
@@ -140,13 +151,8 @@ public final class MetaServerHandler implements DOMMessageHandler {
      * @return A {@code ServerListMessage} with attached {@code ServerInfo}
      *     for each current server known to the meta-register.
      */
-    private DOMMessage serverList() {
-        final ServerListMessage message = new ServerListMessage();
-
-        for (ServerInfo si : metaRegister.getServers()) {
-            message.addServer(si);
-        }
-        return message;
+    private Message serverList() {
+        return new ServerListMessage().addServers(metaRegister.getServers());
     }
 
     /**
