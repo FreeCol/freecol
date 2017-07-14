@@ -211,6 +211,7 @@
              basedir="${freecol.build.dir}"
              manifest="${basedir}/src/METAMANIFEST.MF"
              includes="net/sf/freecol/metaserver/**,
+                       net/sf/freecol/client/ClientOptions.class,
                        net/sf/freecol/common/**,
                        org/**"/>
     </target>
