@@ -19,11 +19,12 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.Connection;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -44,13 +45,14 @@ public class RemoveServerMessage extends ServerInfoMessage {
     }
 
     /**
-     * Create a new {@code RemoveServerMessage} from a supplied element.
+     * Create a new {@code RemoveServerMessage} from a stream.
      *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
+     * @param game The {@code Game}, which is null and ignored.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public RemoveServerMessage(@SuppressWarnings("unused") Game game,
-                               Element element) {
-        super(TAG, element);
+    public RemoveServerMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, game, xr);
     }
 }

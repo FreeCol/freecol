@@ -19,18 +19,18 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.AttributeMessage;
-
-import org.w3c.dom.Element;
 
 
 /**
  * The type of message that contains server information.
  */
-public abstract class ServerInfoMessage extends AttributeMessage {
+public class ServerInfoMessage extends AttributeMessage {
 
     private static final String ADDRESS_TAG = "address";
     private static final String CURRENTLY_PLAYING_TAG = "currentlyPlaying";
@@ -61,21 +61,20 @@ public abstract class ServerInfoMessage extends AttributeMessage {
     }
 
     /**
-     * Create a new {@code ServerInfoMessage} from a supplied element.
+     * Create a new {@code ServerInfoMessage} from a stream.
      *
-     * @param element The {@code Element} to use to create the message.
+     * @param tag The actual message tag.
+     * @param game The {@code Game}, which is null and ignored.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    protected ServerInfoMessage(String tag, Element element) {
-        super(tag,
-              NAME_TAG, getStringAttribute(element, NAME_TAG),
-              ADDRESS_TAG, getStringAttribute(element, ADDRESS_TAG),
-              PORT_TAG, getStringAttribute(element, PORT_TAG),
-              SLOTS_AVAILABLE_TAG, getStringAttribute(element, SLOTS_AVAILABLE_TAG),
-              CURRENTLY_PLAYING_TAG, getStringAttribute(element, CURRENTLY_PLAYING_TAG),
-              IS_GAME_STARTED_TAG, getStringAttribute(element, IS_GAME_STARTED_TAG),
-              VERSION_TAG, getStringAttribute(element, VERSION_TAG),
-              GAME_STATE_TAG, getStringAttribute(element, GAME_STATE_TAG));
+    public ServerInfoMessage(String tag, @SuppressWarnings("unused") Game game,
+                             FreeColXMLReader xr) throws XMLStreamException {
+        super(tag, xr, NAME_TAG, ADDRESS_TAG, PORT_TAG, SLOTS_AVAILABLE_TAG,
+              CURRENTLY_PLAYING_TAG, IS_GAME_STARTED_TAG, VERSION_TAG,
+              GAME_STATE_TAG);
     }
+
 
     // Public interface
 

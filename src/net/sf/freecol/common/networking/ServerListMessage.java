@@ -24,13 +24,12 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.metaserver.ServerInfo;
+import net.sf.freecol.common.model.Game;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.server.FreeColServer;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -55,27 +54,39 @@ public class ServerListMessage extends ObjectMessage {
     }
 
     /**
-     * Create a new {@code ServerListMessage} from a
-     * supplied element.  Used to read the reply.
+     * Create a new {@code ServerListMessage} from a stream.
      *
-     * @param element The {@code Element} to use to create the message.
+     * @param game The {@code Game}, which is null and ignored.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public ServerListMessage(Element element) {
+    public ServerListMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         this();
 
-        this.servers.addAll(DOMUtils.mapChildren(element,
-                e -> new RegisterServerMessage(null, element).getServerInfo()));
+        List<ServerInfo> svs = new ArrayList<>();
+        while (xr.moreTags()) {
+            String tag = xr.getLocalName();
+            if (ServerInfo.TAG.equals(tag)) {
+                svs.add(new ServerInfoMessage(tag, game, xr).getServerInfo());
+            } else {
+                expected(ServerInfo.TAG, tag);
+            }
+        }
+        xr.expectTag(TAG);
+        addServers(svs);
     }
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Suppress toXML for now
-        throw new XMLStreamException(getType() + ".toXML NYI");
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        for (ServerInfo si : servers) {
+            new ServerInfoMessage(ServerInfo.TAG, si).toXML(xw);
+        }
     }
+
 
     // Public interface
 
@@ -108,19 +119,5 @@ public class ServerListMessage extends ObjectMessage {
     public ServerListMessage addServers(List<ServerInfo> lsi) {
         this.servers.addAll(lsi);
         return this;
-    }
-
-    
-    /**
-     * Convert this ServerListMessage to XML.
-     *
-     * @return The XML representation of this message.
-     */
-    @Override
-    public Element toXMLElement() {
-        return new DOMMessage(TAG)
-            .addMessages(transform(this.servers, alwaysTrue(),
-                                   si -> new RegisterServerMessage(si)))
-            .toXMLElement();
     }
 }

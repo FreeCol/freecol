@@ -19,10 +19,11 @@
 
 package net.sf.freecol.common.networking;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Game;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -43,13 +44,14 @@ public class RegisterServerMessage extends ServerInfoMessage {
     }
 
     /**
-     * Create a new {@code RegisterServerMessage} from a supplied element.
+     * Create a new {@code RegisterServerMessage} from a stream.
      *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
+     * @param game The {@code Game}, which is null and ignored.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public RegisterServerMessage(@SuppressWarnings("unused") Game game,
-                                 Element element) {
-        super(TAG, element);
+    public RegisterServerMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(TAG, game, xr);
     }
 }
