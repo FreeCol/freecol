@@ -87,7 +87,7 @@ public class Connection implements Closeable {
     /** A lock for the logging routines. */
     private final Object logLock = new Object();
     /** The FreeColXMLWriter to write logging messages to. */
-    private final FreeColXMLWriter lw;
+    private FreeColXMLWriter lw;
 
     /** The subthread to read the input. */
     private ReceivingThread receivingThread;
@@ -118,15 +118,7 @@ public class Connection implements Closeable {
 
         // Make a (pretty printing) transformer, but only make the log
         // writer in COMMS-debug mode.
-        FreeColXMLWriter lw = null;
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-            try {
-                lw = new FreeColXMLWriter(Utils.getUTF8Writer(System.err),
-                    FreeColXMLWriter.WriteScope.toSave(), true);
-            } catch (IOException ioe) {} // Ignore failure, just do not log
-        }
-        this.lw = lw;
-
+        setLogging(FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS));
         this.connected = false;
     }
 
@@ -334,6 +326,24 @@ public class Connection implements Closeable {
      */
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Set the logging state of this connection.
+     *
+     * @param log If true, enable logging.
+     * @return This {@code Connection}.
+     */
+    public Connection setLogging(boolean log) {
+        FreeColXMLWriter lw = null;
+        if (log) {
+            try {
+                lw = new FreeColXMLWriter(Utils.getUTF8Writer(System.err),
+                    FreeColXMLWriter.WriteScope.toSave(), true);
+            } catch (IOException ioe) {} // Ignore failure, just do not log
+        }
+        this.lw = lw;
+        return this;
     }
 
     /**
