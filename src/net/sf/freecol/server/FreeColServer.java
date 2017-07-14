@@ -486,12 +486,15 @@ public final class FreeColServer {
         ServerState ret = this.serverState;
         switch (this.serverState = serverState) {
         case PRE_GAME: case LOAD_GAME:
+            getServer().setMessageHandlerToAllConnections(this.preGameInputHandler);
             getServer().setDOMMessageHandlerToAllConnections(this.preGameInputHandler);
             break;
         case IN_GAME:
+            getServer().setMessageHandlerToAllConnections(this.inGameInputHandler);
             getServer().setDOMMessageHandlerToAllConnections(this.inGameInputHandler);
             break;
         case END_GAME: default:
+            getServer().setMessageHandlerToAllConnections(null);
             getServer().setDOMMessageHandlerToAllConnections(null);
             break;
         }
@@ -627,8 +630,8 @@ public final class FreeColServer {
      */
     public void addNewUserConnection(Socket socket) throws IOException {
         final String name = socket.getInetAddress() + ":" + socket.getPort();
-        Connection c = new Connection(socket, this.userConnectionHandler,
-                                      FreeCol.SERVER_THREAD + name);
+        Connection c = new Connection(socket, FreeCol.SERVER_THREAD + name)
+            .setMessageHandler(this.userConnectionHandler);
         getServer().addConnection(c);
         // Short delay here improves reliability
         Utils.delay(100, "New connection delay interrupted");
@@ -648,9 +651,11 @@ public final class FreeColServer {
     public void addPlayerConnection(Connection connection) {
         switch (this.serverState) {
         case PRE_GAME: case LOAD_GAME:
+            connection.setMessageHandler(this.preGameInputHandler);
             connection.setDOMMessageHandler(this.preGameInputHandler);
             break;
         case IN_GAME:
+            connection.setMessageHandler(this.inGameInputHandler);
             connection.setDOMMessageHandler(this.inGameInputHandler);
             break;
         case END_GAME: default:
@@ -677,11 +682,11 @@ public final class FreeColServer {
      */
     private void addAIConnection(ServerPlayer aiPlayer) {
         DummyConnection theConnection
-            = new DummyConnection("Server-to-AI-" + aiPlayer.getSuffix(),
-                                  this.inGameInputHandler);
+            = new DummyConnection("Server-to-AI-" + aiPlayer.getSuffix());
+        theConnection.setMessageHandler(this.inGameInputHandler);
         DummyConnection aiConnection
-            = new DummyConnection("AI-" + aiPlayer.getSuffix() + "-to-Server",
-                new AIInGameInputHandler(this, aiPlayer, getAIMain()));
+            = new DummyConnection("AI-" + aiPlayer.getSuffix() + "-to-Server");
+        aiConnection.setMessageHandler(new AIInGameInputHandler(this, aiPlayer, getAIMain()));
         aiConnection.setOtherConnection(theConnection);
         theConnection.setOtherConnection(aiConnection);
         aiPlayer.setConnection(theConnection);

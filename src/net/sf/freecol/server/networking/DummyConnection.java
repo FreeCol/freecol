@@ -44,14 +44,9 @@ public final class DummyConnection extends Connection {
      * Sets up a dummy connection using the specified message handler.
      *
      * @param name A name for this connection.
-     * @param incomingMessageHandler The {@code DOMMessageHandler}
-     *     to call for each message received.
      */
-    public DummyConnection(String name,
-                           DOMMessageHandler incomingMessageHandler) {
+    public DummyConnection(String name) {
         super(name);
-        
-        setDOMMessageHandler(incomingMessageHandler);
     }
 
 

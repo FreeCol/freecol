@@ -114,6 +114,16 @@ public abstract class ServerAPI {
     /**
      * Sets the message handler for the connection.
      *
+     * @param mh The new {@code MessageHandler}.
+     */
+    public void setMessageHandler(MessageHandler mh) {
+        Connection c = getConnection();
+        if (c != null) c.setMessageHandler(mh);
+    }
+    
+    /**
+     * Sets the message handler for the connection.
+     *
      * @param mh The new {@code DOMMessageHandler}.
      */
     public void setDOMMessageHandler(DOMMessageHandler mh) {

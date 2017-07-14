@@ -147,7 +147,7 @@ public final class MetaRegister {
             // Check connection before adding the server:
             Connection mc = null;
             try {
-                mc = new Connection(newSi.getAddress(), newSi.getPort(), null,
+                mc = new Connection(newSi.getAddress(), newSi.getPort(),
                                     FreeCol.METASERVER_THREAD);
                 if (mc == null) {
                     logger.info("Server not found: " + identity);

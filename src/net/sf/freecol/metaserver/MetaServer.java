@@ -150,7 +150,8 @@ public final class MetaServer extends Thread {
                 logger.info("Client connection from: "
                     + clientSocket.getInetAddress().toString());
                 Connection connection = new Connection(clientSocket,
-                    getMetaServerHandler(), FreeCol.METASERVER_THREAD);
+                    FreeCol.METASERVER_THREAD);
+                connection.setDOMMessageHandler(getMetaServerHandler());
                 this.connections.put(clientSocket, connection);
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Meta-run", e);

@@ -222,8 +222,9 @@ public class MetaServerUtils {
         String host = FreeCol.getMetaServerAddress();
         int port = FreeCol.getMetaServerPort();
         try {
-            return new Connection(host, port, new MetaInputHandler(consumer),
-                                  FreeCol.SERVER_THREAD);
+            Connection ret = new Connection(host, port, FreeCol.SERVER_THREAD);
+            ret.setDOMMessageHandler(new MetaInputHandler(consumer));
+            return ret;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not connect to meta-server: "
                 + host + ":" + port, ioe);

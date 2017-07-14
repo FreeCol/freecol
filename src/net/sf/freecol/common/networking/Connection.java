@@ -92,6 +92,8 @@ public class Connection implements Closeable {
     /** The subthread to read the input. */
     private ReceivingThread receivingThread;
 
+    /** The message handler to process incoming messages with. */
+    private MessageHandler messageHandler;
     private DOMMessageHandler domMessageHandler;
 
     /** Is there an active connection. */
@@ -110,6 +112,7 @@ public class Connection implements Closeable {
         this.br = null;
         this.xr = null;
         this.receivingThread = null;
+        this.messageHandler = null;
         this.domMessageHandler = null;
         this.xw = null;
 
@@ -132,19 +135,15 @@ public class Connection implements Closeable {
      * {@code Socket} and {@link MessageHandler}.
      *
      * @param socket The socket to the client.
-     * @param domMessageHandler The {@code DOMMessageHandler} to call
-     *     for each message received.
      * @param name The connection name.
      * @exception IOException if streams can not be derived from the socket.
      */
-    public Connection(Socket socket, DOMMessageHandler domMessageHandler,
-                      String name) throws IOException {
+    public Connection(Socket socket, String name) throws IOException {
         this(name);
 
         setSocket(socket);
         this.br = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
         this.receivingThread = new ReceivingThread(this, name);
-        this.domMessageHandler = domMessageHandler;
         this.xw = new FreeColXMLWriter(socket.getOutputStream(),
             FreeColXMLWriter.WriteScope.toSave(), false);
         this.connected = true;
@@ -157,14 +156,11 @@ public class Connection implements Closeable {
      *
      * @param host The host to connect to.
      * @param port The port to connect to.
-     * @param domMessageHandler The {@code DOMMessageHandler} to call
-     *     for each message received.
      * @param name The name for the connection.
      * @exception IOException if the socket creation is problematic.
      */
-    public Connection(String host, int port, DOMMessageHandler domMessageHandler,
-                      String name) throws IOException {
-        this(createSocket(host, port), domMessageHandler, name);
+    public Connection(String host, int port, String name) throws IOException {
+        this(createSocket(host, port), name);
     }
 
 
@@ -295,17 +291,22 @@ public class Connection implements Closeable {
     /**
      * Gets the message handler for this connection.
      *
-     * Work in progress: we are cutting over the implementers of
-     * the DOMMessageHandler interface to also implement the
-     * MessageHandler interface.  In due course this.domMessageHandler
-     * will become a MessageHandler.
-     *
      * @return The {@code MessageHandler} for this Connection.
      */
-    private MessageHandler getMessageHandler() {
-        return (this.domMessageHandler instanceof MessageHandler)
-            ? (MessageHandler)this.domMessageHandler
-            : null;
+    public MessageHandler getMessageHandler() {
+        return this.messageHandler;
+    }
+
+    /**
+     * Sets the message handler for this connection.
+     *
+     * @param messageHandler The new {@code MessageHandler} for this
+     *     Connection.
+     * @return This {@code Connection}.
+     */
+    public Connection setMessageHandler(MessageHandler messageHandler) {
+        this.messageHandler = messageHandler;
+        return this;
     }
 
     /**
