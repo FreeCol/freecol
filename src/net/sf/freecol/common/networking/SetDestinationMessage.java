@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when the client requests setting a unit destination.
@@ -51,17 +49,6 @@ public class SetDestinationMessage extends AttributeMessage {
     public SetDestinationMessage(Unit unit, Location destination) {
         super(TAG, UNIT_TAG, unit.getId(),
               DESTINATION_TAG, ((destination == null) ? null : destination.getId()));
-    }
-
-    /**
-     * Create a new {@code SetDestinationMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SetDestinationMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              DESTINATION_TAG, getStringAttribute(element, DESTINATION_TAG));
     }
 
     /**

@@ -30,8 +30,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when a native delivers a gift to a Colony.
@@ -51,18 +49,6 @@ public class NativeGiftMessage extends AttributeMessage {
      */
     public NativeGiftMessage(Unit unit, Colony colony) {
         super(TAG, UNIT_TAG, unit.getId(), COLONY_TAG, colony.getId());
-    }
-
-    /**
-     * Create a new {@code NativeGiftMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public NativeGiftMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              COLONY_TAG, getStringAttribute(element, COLONY_TAG));
     }
 
     /**

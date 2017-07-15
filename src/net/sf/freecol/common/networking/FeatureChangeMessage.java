@@ -39,9 +39,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when to add or remove a feature.
@@ -67,20 +64,6 @@ public class FeatureChangeMessage extends ObjectMessage {
               ADD_TAG, String.valueOf(add));
 
         add1(fco);
-    }
-
-    /**
-     * Create a new {@code FeatureChangeMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public FeatureChangeMessage(Game game, Element element) {
-        super(TAG, ID_TAG, getStringAttribute(element, ID_TAG),
-              ADD_TAG, getStringAttribute(element, ADD_TAG));
-
-        addAll(DOMUtils.getChildren(game, element, true));
     }
 
     /**

@@ -35,11 +35,8 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -91,16 +88,6 @@ public class RearrangeColonyMessage extends AttributeMessage {
             }
         }
 
-        public Arrangement readFromElement(Game game, Element e, int i) {
-            init(game,
-                 getStringAttribute(e, unitKey(i)),
-                 getStringAttribute(e, locKey(i)),
-                 getStringAttribute(e, workKey(i)),
-                 getStringAttribute(e, roleKey(i)),
-                 getStringAttribute(e, roleCountKey(i)));
-            return this;
-        }
-
         public static String unitKey(int i) {
             return FreeColObject.arrayKey(i) + "unit";
         }
@@ -147,23 +134,6 @@ public class RearrangeColonyMessage extends AttributeMessage {
             return ret;
         }
 
-        /**
-         * Create new arrangements from an element.
-         *
-         * @param game The {@code Game} to create arrangements in.
-         * @param element The {@code Element} to read from.
-         * @return A list of {@code Arrangement}s found.
-         */
-        public static List<Arrangement> readArrangements(Game game,
-                                                         Element element) {
-            List<Arrangement> ret = new ArrayList<>();
-            int n = getIntegerAttribute(element, FreeColObject.ARRAY_SIZE_TAG, 0);
-            for (int i = 0; i < n; i++) {
-                ret.add(new Arrangement().readFromElement(game, element, i));
-            }
-            return ret;
-        }
-
             
         // Interface Comparable<Arrangement>
 
@@ -203,19 +173,6 @@ public class RearrangeColonyMessage extends AttributeMessage {
         super(TAG, COLONY_TAG, colony.getId());
 
         setArrangementAttributes(Arrangement.getArrangements(colony, workers, scratch));
-    }
-
-    /**
-     * Create a new {@code RearrangeColonyMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public RearrangeColonyMessage(Game game, Element element) {
-        super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
-
-        setArrangementAttributes(Arrangement.readArrangements(game, element));
     }
 
     /**

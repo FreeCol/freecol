@@ -33,8 +33,6 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when scouting a native settlement.
@@ -56,18 +54,6 @@ public class ScoutIndianSettlementMessage extends AttributeMessage {
     public ScoutIndianSettlementMessage(Unit unit, Direction direction) {
         super(TAG, UNIT_TAG, unit.getId(),
               DIRECTION_TAG, String.valueOf(direction));
-    }
-
-    /**
-     * Create a new {@code ScoutIndianSettlementMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ScoutIndianSettlementMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
     }
 
     /**

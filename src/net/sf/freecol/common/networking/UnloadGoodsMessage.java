@@ -30,8 +30,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when unloading goods.
@@ -55,19 +53,6 @@ public class UnloadGoodsMessage extends AttributeMessage {
         super(TAG, TYPE_TAG, goodsType.getId(),
               AMOUNT_TAG, String.valueOf(amount),
               CARRIER_TAG, carrier.getId());
-    }
-
-    /**
-     * Create a new {@code UnloadGoodsMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public UnloadGoodsMessage(Game game, Element element) {
-        super(TAG, TYPE_TAG, getStringAttribute(element, TYPE_TAG),
-              AMOUNT_TAG, getStringAttribute(element, AMOUNT_TAG),
-              CARRIER_TAG, getStringAttribute(element, CARRIER_TAG));
     }
 
     /**

@@ -32,8 +32,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when changing a work improvement type.
@@ -55,18 +53,6 @@ public class ChangeWorkImprovementTypeMessage extends AttributeMessage {
     public ChangeWorkImprovementTypeMessage(Unit unit,
                                             TileImprovementType type) {
         super(TAG, UNIT_TAG, unit.getId(), IMPROVEMENT_TYPE_TAG, type.getId());
-    }
-
-    /**
-     * Create a new {@code ChangeWorkImprovementTypeMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ChangeWorkImprovementTypeMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              IMPROVEMENT_TYPE_TAG, getStringAttribute(element, IMPROVEMENT_TYPE_TAG));
     }
 
     /**

@@ -33,9 +33,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to discover vacant players in a game.
@@ -50,19 +47,6 @@ public class VacantPlayersMessage extends AttributeMessage {
      */
     public VacantPlayersMessage() {
         super(TAG);
-    }
-
-    /**
-     * Create a new {@code VacantPlayersMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public VacantPlayersMessage(Game game, Element element) {
-        super(TAG);
-
-        setArrayAttributes(DOMUtils.getArrayAttributes(element));
     }
 
     /**

@@ -30,8 +30,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message to signal the end of the game.
@@ -52,17 +50,6 @@ public class GameEndedMessage extends AttributeMessage {
     public GameEndedMessage(Player winner, boolean highScore) {
         super(TAG, WINNER_TAG, winner.getId(),
               HIGH_SCORE_TAG, String.valueOf(highScore));
-    }
-
-    /**
-     * Create a new {@code GameEndedMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public GameEndedMessage(Game game, Element element) {
-        super(TAG, WINNER_TAG, getStringAttribute(element, WINNER_TAG),
-              HIGH_SCORE_TAG, getStringAttribute(element, HIGH_SCORE_TAG));
     }
 
     /**

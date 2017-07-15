@@ -29,8 +29,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when the client requests building of a colony.
@@ -51,17 +49,6 @@ public class BuildColonyMessage extends AttributeMessage {
      */
     public BuildColonyMessage(String colonyName, Unit builder) {
         super(TAG, NAME_TAG, colonyName, UNIT_TAG, builder.getId());
-    }
-
-    /**
-     * Create a new {@code BuildColonyMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public BuildColonyMessage(Game game, Element element) {
-        super(TAG, NAME_TAG, getStringAttribute(element, NAME_TAG),
-              UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
     /**

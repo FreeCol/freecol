@@ -29,8 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message that contains a chat string.
@@ -54,20 +52,6 @@ public class ChatMessage extends AttributeMessage {
     public ChatMessage(Player player, String message, boolean privateChat) {
         super(TAG, SENDER_TAG, player.getId(), MESSAGE_TAG, message,
               PRIVATE_TAG, String.valueOf(privateChat));
-    }
-
-    /**
-     * Create a new {@code ChatMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     * @throws IllegalStateException if there is problem with the senderID.
-     */
-    public ChatMessage(Game game, Element element) {
-        super(TAG, SENDER_TAG, getStringAttribute(element, SENDER_TAG),
-              MESSAGE_TAG, getStringAttribute(element, MESSAGE_TAG),
-              PRIVATE_TAG, getStringAttribute(element, PRIVATE_TAG));
     }
 
     /**

@@ -34,9 +34,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to add or update players to the game.
@@ -55,17 +52,6 @@ public class AddPlayerMessage extends ObjectMessage {
         super(TAG);
 
         addAll(players);
-    }
-
-    /**
-     * Create a new {@code AddPlayerMessage} from a supplied
-     * element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public AddPlayerMessage(Game game, Element element) {
-        this(DOMUtils.getChildren(game, element, true, Player.class));
     }
 
     /**

@@ -20,20 +20,8 @@
 package net.sf.freecol.server.control;
 
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.LogoutMessage;
-import net.sf.freecol.common.networking.ReadyMessage;
-import net.sf.freecol.common.networking.RequestLaunchMessage;
-import net.sf.freecol.common.networking.SetAvailableMessage;
-import net.sf.freecol.common.networking.SetColorMessage;
-import net.sf.freecol.common.networking.SetNationMessage;
-import net.sf.freecol.common.networking.SetNationTypeMessage;
-import net.sf.freecol.common.networking.TrivialMessage;
-import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
-import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -50,30 +38,5 @@ public final class PreGameInputHandler extends ServerInputHandler {
      */
     public PreGameInputHandler(FreeColServer freeColServer) {
         super(freeColServer);
-
-        register(ReadyMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                new ReadyMessage(getGame(), e)));
-        register(RequestLaunchMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                TrivialMessage.requestLaunchMessage));
-        register(SetAvailableMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                new SetAvailableMessage(getGame(), e)));
-        register(SetColorMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                new SetColorMessage(getGame(), e)));
-        register(SetNationMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                new SetNationMessage(getGame(), e)));
-        register(SetNationTypeMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                new SetNationTypeMessage(getGame(), e)));
-        register(UpdateGameOptionsMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                new UpdateGameOptionsMessage(getGame(), e)));
-        register(UpdateMapGeneratorOptionsMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                new UpdateMapGeneratorOptionsMessage(getGame(), e)));
     }
 }

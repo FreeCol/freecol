@@ -104,7 +104,6 @@ import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.ChatMessage;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GameEndedMessage;
 import net.sf.freecol.common.networking.GameStateMessage;

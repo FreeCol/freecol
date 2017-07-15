@@ -29,7 +29,6 @@ import java.util.logging.LogRecord;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.OSUtils;
 import net.sf.freecol.common.util.Utils;
 

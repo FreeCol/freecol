@@ -32,9 +32,6 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to update the game options.
@@ -53,16 +50,6 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
         super(TAG);
 
         add1(optionGroup);
-    }
-
-    /**
-     * Create a new {@code UpdateGameOptionsMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public UpdateGameOptionsMessage(Game game, Element element) {
-        this(DOMUtils.getChild(game, element, 0, false, OptionGroup.class));
     }
 
     /**

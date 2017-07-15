@@ -64,7 +64,7 @@ public abstract class TrivialMessage extends Message {
         = new StartGameMessage();
 
     /** The actual message type. */
-    private final String type;
+    private String type;
 
 
     /**
@@ -107,14 +107,10 @@ public abstract class TrivialMessage extends Message {
         return this.type;
     }
 
-    // Do not override DOMMessage.setType, yet
-    ///**
-    // * {@inheritDoc}
-    // */
-    //@Override
-    //public void setType(String type) {
-    //    throw new RuntimeException("Reset of type: " + type);
-    //}
+    @Override
+    public void setType(String type) {
+        this.type = type;
+    }
 
     /**
      * {@inheritDoc}

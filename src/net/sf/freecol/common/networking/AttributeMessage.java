@@ -30,10 +30,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.server.FreeColServer;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -83,19 +80,6 @@ public class AttributeMessage extends TrivialMessage {
         this(type);
 
         setStringAttributes(attributes);
-    }
-
-    /**
-     * Create a new {@code AttributeMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public AttributeMessage(Game game, Element element) {
-        this(element.getTagName());
-
-        this.attributes.putAll(DOMUtils.getAttributeMap(element));
     }
 
     /**
@@ -164,14 +148,6 @@ public class AttributeMessage extends TrivialMessage {
     @Override
     public boolean canMerge() {
         return this.mergeable;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return DOMUtils.createElement(getType(), this.attributes);
     }
 
 

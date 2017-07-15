@@ -33,8 +33,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to handle native trade sessions.
@@ -68,19 +66,6 @@ public class NativeTradeMessage extends ObjectMessage {
         super(TAG, ACTION_TAG, action.toString());
 
         add1(nt);
-    }
-
-    /**
-     * Create a new {@code NativeTradeMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public NativeTradeMessage(Game game, Element element) {
-        super(TAG, ACTION_TAG, getStringAttribute(element, ACTION_TAG));
-
-        add1(getChild(game, element, 0, false, NativeTrade.class));
     }
 
     /**

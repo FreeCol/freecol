@@ -29,8 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when deleting a trade route.
@@ -49,17 +47,6 @@ public class DeleteTradeRouteMessage extends AttributeMessage {
      */
     public DeleteTradeRouteMessage(TradeRoute tradeRoute) {
         super(TAG, TRADE_ROUTE_TAG, tradeRoute.getId());
-    }
-
-    /**
-     * Create a new {@code DeleteTradeRouteMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public DeleteTradeRouteMessage(Game game, Element element) {
-        super(TAG, TRADE_ROUTE_TAG, getStringAttribute(element, TRADE_ROUTE_TAG));
     }
 
     /**

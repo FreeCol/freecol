@@ -31,8 +31,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when naming a new land.
@@ -53,18 +51,6 @@ public class NewLandNameMessage extends AttributeMessage {
      */
     public NewLandNameMessage(Unit unit, String newLandName) {
         super(TAG, UNIT_TAG, unit.getId(), NEW_LAND_NAME_TAG, newLandName);
-    }
-
-    /**
-     * Create a new {@code NewLandNameMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public NewLandNameMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              NEW_LAND_NAME_TAG, getStringAttribute(element, NEW_LAND_NAME_TAG));
     }
 
     /**

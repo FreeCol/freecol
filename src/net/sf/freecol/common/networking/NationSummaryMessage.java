@@ -31,8 +31,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when summarizing a nation.
@@ -54,19 +52,6 @@ public class NationSummaryMessage extends ObjectMessage {
         super(TAG, PLAYER_TAG, player.getId());
 
         add1(nationSummary);
-    }
-
-    /**
-     * Create a new {@code NationSummaryMessage} from a supplied
-     * element.
-     *
-     * @param game The {@code Game} containing the nation to summarize.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public NationSummaryMessage(Game game, Element element) {
-        super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG));
-        
-        add1(getChild(game, element, 0, NationSummary.class));
     }
 
     /**

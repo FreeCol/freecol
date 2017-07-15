@@ -35,10 +35,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 
-import net.sf.freecol.common.util.DOMUtils;
-
-import org.w3c.dom.Element;
-
 
 /**
  * The basic message with optional objects.
@@ -71,19 +67,6 @@ public abstract class ObjectMessage extends AttributeMessage {
         super(type, attributes);
 
         this.objects.clear();
-    }
-
-    /**
-     * Create a new {@code ObjectMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ObjectMessage(Game game, Element element) {
-        this(element.getTagName());
-
-        // Do not read the element structure, the subclasses must do that
-        // because they define whether to use interning reads or not.
     }
 
     /**
@@ -129,16 +112,6 @@ public abstract class ObjectMessage extends AttributeMessage {
             if (fco != null) fco.toXML(xw);
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        return DOMUtils.createElement(getType(), getStringAttributes(),
-                                      getChildren());
-    }
-
 
     /**
      * Get a child object.

@@ -31,8 +31,6 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when inciting a native settlement.
@@ -60,20 +58,6 @@ public class InciteMessage extends AttributeMessage {
                          int gold) {
         super(TAG, UNIT_TAG, unit.getId(), SETTLEMENT_TAG, is.getId(),
               ENEMY_TAG, enemy.getId(), GOLD_TAG, String.valueOf(gold));
-    }
-
-    /**
-     * Create a new {@code InciteMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public InciteMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              SETTLEMENT_TAG, getStringAttribute(element, SETTLEMENT_TAG),
-              ENEMY_TAG, getStringAttribute(element, ENEMY_TAG),
-              GOLD_TAG, getStringAttribute(element, GOLD_TAG));
     }
 
     /**

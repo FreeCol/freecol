@@ -37,8 +37,6 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when executing a diplomatic trade.
@@ -98,22 +96,6 @@ public class DiplomacyMessage extends ObjectMessage {
     public DiplomacyMessage(Colony colony, Unit unit,
                             DiplomaticTrade agreement) {
         this((FreeColGameObject)colony, (FreeColGameObject)unit, agreement);
-    }
-
-    /**
-     * Create a new {@code DiplomacyMessage} from a
-     * supplied element.  The unit is supplied in case it was hidden in
-     * some way, such as aboard a ship.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public DiplomacyMessage(Game game, Element element) {
-        super(TAG, OUR_ID_TAG, getStringAttribute(element, OUR_ID_TAG),
-              OTHER_ID_TAG, getStringAttribute(element, OTHER_ID_TAG));
-
-        add1(getChild(game, element, 0, false, DiplomaticTrade.class));
-        add1(getChild(game, element, 1, false, Unit.class));
     }
 
     /**

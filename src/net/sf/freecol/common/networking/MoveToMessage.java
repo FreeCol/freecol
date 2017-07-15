@@ -29,8 +29,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when moving a unit across the high seas.
@@ -52,18 +50,6 @@ public class MoveToMessage extends AttributeMessage {
     public MoveToMessage(Unit unit, Location destination) {
         super(TAG, UNIT_TAG, unit.getId(),
               DESTINATION_TAG, destination.getId());
-    }
-
-    /**
-     * Create a new {@code MoveToMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public MoveToMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              DESTINATION_TAG, getStringAttribute(element, DESTINATION_TAG));
     }
 
     /**

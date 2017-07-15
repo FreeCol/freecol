@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when disbanding a unit.
@@ -48,17 +46,6 @@ public class DisbandUnitMessage extends AttributeMessage {
      */
     public DisbandUnitMessage(Unit unit) {
         super(TAG, UNIT_TAG, unit.getId());
-    }
-
-    /**
-     * Create a new {@code DisbandUnitMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public DisbandUnitMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
     /**

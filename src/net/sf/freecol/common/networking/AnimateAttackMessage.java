@@ -36,9 +36,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.common.util.DOMUtils;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -78,23 +75,6 @@ public class AnimateAttackMessage extends ObjectMessage {
         if (addDefender) {
             add1((defender.isOnCarrier()) ? defender.getCarrier() : defender);
         }
-    }
-
-    /**
-     * Create a new {@code AnimateAttackMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public AnimateAttackMessage(Game game, Element element) {
-        super(TAG, ATTACKER_TAG, getStringAttribute(element, ATTACKER_TAG),
-              ATTACKER_TILE_TAG, getStringAttribute(element, ATTACKER_TILE_TAG),
-              DEFENDER_TAG, getStringAttribute(element, DEFENDER_TAG),
-              DEFENDER_TILE_TAG, getStringAttribute(element, DEFENDER_TILE_TAG),
-              SUCCESS_TAG, getStringAttribute(element, SUCCESS_TAG));
-
-        addAll(DOMUtils.getChildren(game, element, false, Unit.class));
     }
 
     /**

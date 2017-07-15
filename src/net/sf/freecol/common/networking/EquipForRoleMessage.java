@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to equip a unit for a particular role.
@@ -53,18 +51,6 @@ public class EquipForRoleMessage extends AttributeMessage {
     public EquipForRoleMessage(Unit unit, Role role, int roleCount) {
         super(TAG, UNIT_TAG, unit.getId(), ROLE_TAG, role.getId(),
               COUNT_TAG, String.valueOf(roleCount));
-    }
-
-    /**
-     * Create a new {@code EquipForRoleMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public EquipForRoleMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              ROLE_TAG, getStringAttribute(element, ROLE_TAG),
-              COUNT_TAG, getStringAttribute(element, COUNT_TAG));
     }
 
     /**

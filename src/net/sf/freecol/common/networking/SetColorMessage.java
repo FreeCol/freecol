@@ -31,8 +31,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message that changes the player color.
@@ -53,17 +51,6 @@ public class SetColorMessage extends AttributeMessage {
     public SetColorMessage(Nation nation, Color color) {
         super(TAG, NATION_TAG, nation.getId(),
               COLOR_TAG, String.valueOf(color.getRGB()));
-    }
-
-    /**
-     * Create a new {@code SetColorMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to (null here).
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SetColorMessage(Game game, Element element) {
-        super(TAG, NATION_TAG, getStringAttribute(element, NATION_TAG),
-              COLOR_TAG, getStringAttribute(element, COLOR_TAG));
     }
 
     /**

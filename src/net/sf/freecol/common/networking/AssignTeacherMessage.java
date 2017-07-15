@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when assigning a teacher.
@@ -50,18 +48,6 @@ public class AssignTeacherMessage extends AttributeMessage {
      */
     public AssignTeacherMessage(Unit student, Unit teacher) {
         super(TAG, STUDENT_TAG, student.getId(), TEACHER_TAG, teacher.getId());
-    }
-
-    /**
-     * Create a new {@code AssignTeacherMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public AssignTeacherMessage(Game game, Element element) {
-        super(TAG, STUDENT_TAG, getStringAttribute(element, STUDENT_TAG),
-              TEACHER_TAG, getStringAttribute(element, TEACHER_TAG));
     }
 
     /**

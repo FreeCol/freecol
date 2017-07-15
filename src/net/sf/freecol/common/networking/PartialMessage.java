@@ -38,9 +38,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent by the server to partially update client game objects.
@@ -59,17 +56,6 @@ public class PartialMessage extends AttributeMessage {
      */
     public PartialMessage(Map<String,String> map) {
         super(TAG, map);
-    }
-
-    /**
-     * Create a new {@code PartialMessage} from a supplied
-     * element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public PartialMessage(Game game, Element element) {
-        super(TAG, DOMUtils.getAttributeMap(element));
     }
 
     /**

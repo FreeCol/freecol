@@ -29,8 +29,6 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when changing a unit state.
@@ -51,18 +49,6 @@ public class ChangeStateMessage extends AttributeMessage {
      */
     public ChangeStateMessage(Unit unit, UnitState state) {
         super(TAG, UNIT_TAG, unit.getId(), STATE_TAG, String.valueOf(state));
-    }
-
-    /**
-     * Create a new {@code ChangeStateMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ChangeStateMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              STATE_TAG, getStringAttribute(element, STATE_TAG));
     }
 
     /**

@@ -33,21 +33,11 @@ import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DisconnectMessage;
-import net.sf.freecol.common.networking.ErrorMessage;
-import net.sf.freecol.common.networking.GameStateMessage;
-import net.sf.freecol.common.networking.LoginMessage;
-import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
-import net.sf.freecol.common.networking.MultipleMessage;
-import net.sf.freecol.common.networking.TrivialMessage;
-import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
 import net.sf.freecol.common.util.Introspector;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -62,16 +52,6 @@ public abstract class ClientInputHandler extends FreeColClientHolder
         igc().displayModelMessages(false);
     };
 
-    /**
-     * Handle a DOM request to a client.
-     */
-    public interface DOMClientNetworkRequestHandler {
-        void handle(Connection connection, Element element) throws FreeColException;
-    }
-
-    private final Map<String, DOMClientNetworkRequestHandler> domHandlerMap
-        = Collections.synchronizedMap(new HashMap<String, DOMClientNetworkRequestHandler>());
-
 
     /**
      * The constructor to use.
@@ -80,54 +60,9 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      */
     public ClientInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
-
-        register(DisconnectMessage.TAG, (Connection c, Element e) ->
-            TrivialMessage.disconnectMessage.clientHandler(freeColClient));
-
-        register(ErrorMessage.TAG,
-            (Connection c, Element e) ->
-                new ErrorMessage(getGame(), e).clientHandler(freeColClient));
-
-        register(GameStateMessage.TAG, (Connection c, Element e) ->
-            new GameStateMessage(getGame(), e).clientHandler(freeColClient));
-
-        register(LoginMessage.TAG,
-            (Connection c, Element e) ->
-                new LoginMessage(null, e).clientHandler(freeColClient));
-
-        register(LogoutMessage.TAG,
-            (Connection c, Element e) ->
-                new LogoutMessage(getGame(), e).clientHandler(freeColClient));
-
-        register(MultipleMessage.TAG, (Connection c, Element e) ->
-            new MultipleMessage(getGame(), e).clientHandler(freeColClient));
-
-        register(VacantPlayersMessage.TAG, (Connection c, Element e) ->
-            new VacantPlayersMessage(getGame(), e).clientHandler(freeColClient));
     }
 
-
-   /**
-     * Register a network request handler.
-     * 
-     * @param name The handler name.
-     * @param handler The {@code DOMClientNetworkRequestHandler} to register.
-     */
-    protected final void register(String name, DOMClientNetworkRequestHandler handler) {
-        this.domHandlerMap.put(name, handler);
-    }
-
-    /**
-     * Unregister a network request handler.
-     * 
-     * @param name The handler name.
-     * @param handler The {@code ClienNetworkRequestHandler} to unregister.
-     * @return True if the supplied handler was actually removed.
-     */
-    protected final boolean unregister(String name, DOMClientNetworkRequestHandler handler) {
-        return this.domHandlerMap.remove(name, handler);
-    }
-
+    
     /**
      * Shorthand to run in the EDT and wait.
      *

@@ -33,8 +33,6 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when a missionary establishes/denounces a mission.
@@ -60,19 +58,6 @@ public class MissionaryMessage extends AttributeMessage {
         super(TAG, UNIT_TAG, unit.getId(),
               DIRECTION_TAG, String.valueOf(direction),
               DENOUNCE_TAG, String.valueOf(denounce));
-    }
-
-    /**
-     * Create a new {@code MissionaryMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public MissionaryMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG),
-              DENOUNCE_TAG, getStringAttribute(element, DENOUNCE_TAG));
     }
 
     /**

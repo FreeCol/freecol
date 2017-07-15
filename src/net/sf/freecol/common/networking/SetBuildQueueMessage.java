@@ -35,9 +35,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when setting the build queue.
@@ -62,19 +59,6 @@ public class SetBuildQueueMessage extends AttributeMessage {
     }
 
     /**
-     * Create a new {@code SetBuildQueueMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SetBuildQueueMessage(Game game, Element element) {
-        super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
-
-        setArrayAttributes(DOMUtils.getArrayAttributes(element));
-    }
-
-    /**
      * Create a new {@code SetAvailableMessage} from a stream.
      *
      * @param game The {@code Game} this message belongs to (null here).
@@ -86,6 +70,13 @@ public class SetBuildQueueMessage extends AttributeMessage {
         super(TAG, getAttributeMap(xr));
     }
 
+
+    /**
+     * Get a map of attributes from the reader.
+     *
+     * @param xr The {@code FreeColXMLReader} to query.
+     * @return A map of attributes.
+     */
     private static Map<String, String> getAttributeMap(FreeColXMLReader xr) {
         Map<String, String> ret = xr.getArrayAttributeMap();
         ret.put(COLONY_TAG, xr.getAttribute(COLONY_TAG, (String)null));

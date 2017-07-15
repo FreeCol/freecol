@@ -34,8 +34,6 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to tell a client to show a movement animation.
@@ -63,22 +61,6 @@ public class AnimateMoveMessage extends ObjectMessage {
         if (appears) {
             add1((unit.isOnCarrier()) ? unit.getCarrier() : unit);
         }
-    }
-
-    /**
-     * Create a new {@code AnimateMoveMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public AnimateMoveMessage(Game game, Element element) {
-        super(TAG, NEW_TILE_TAG, getStringAttribute(element, NEW_TILE_TAG),
-              OLD_TILE_TAG, getStringAttribute(element, OLD_TILE_TAG),
-              UNIT_TAG, getStringAttribute(element, UNIT_TAG));
-
-        Unit u = getChild(game, element, 0, false, Unit.class);
-        if (u != null) add1(u);
     }
 
     /**

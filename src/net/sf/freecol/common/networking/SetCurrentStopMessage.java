@@ -29,8 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent updating a unit's current stop.
@@ -51,18 +49,6 @@ public class SetCurrentStopMessage extends AttributeMessage {
      */
     public SetCurrentStopMessage(Unit unit, int index) {
         super(TAG, UNIT_TAG, unit.getId(), INDEX_TAG, String.valueOf(index));
-    }
-
-    /**
-     * Create a new {@code SetCurrentStopMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SetCurrentStopMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              INDEX_TAG, getStringAttribute(element, INDEX_TAG));
     }
 
     /**

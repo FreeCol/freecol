@@ -30,8 +30,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when setting goods levels.
@@ -53,19 +51,6 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
         super(TAG, COLONY_TAG, colony.getId());
 
         add1(data);
-    }
-
-    /**
-     * Create a new {@code SetGoodsLevelsMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SetGoodsLevelsMessage(Game game, Element element) {
-        super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG));
-
-        add1(getChild(game, element, 0, ExportData.class));
     }
 
     /**

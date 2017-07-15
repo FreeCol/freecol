@@ -30,8 +30,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to the clients to signal a stance change.
@@ -55,18 +53,6 @@ public class SetStanceMessage extends AttributeMessage {
         super(TAG, STANCE_TAG, String.valueOf(stance),
               FIRST_TAG, first.getId(),
               SECOND_TAG, second.getId());
-    }
-
-    /**
-     * Create a new {@code SetStanceMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SetStanceMessage(Game game, Element element) {
-        super(TAG, STANCE_TAG, getStringAttribute(element, STANCE_TAG),
-              FIRST_TAG, getStringAttribute(element, FIRST_TAG),
-              SECOND_TAG, getStringAttribute(element, SECOND_TAG));
     }
 
     /**

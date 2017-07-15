@@ -31,8 +31,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when delivering a gift to a Settlement.
@@ -55,20 +53,6 @@ public class DeliverGiftMessage extends ObjectMessage {
         super(TAG, UNIT_TAG, unit.getId(), SETTLEMENT_TAG, is.getId());
 
         add1(goods);
-    }
-
-    /**
-     * Create a new {@code DeliverGiftMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public DeliverGiftMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, element.getAttribute(UNIT_TAG),
-              SETTLEMENT_TAG, element.getAttribute(SETTLEMENT_TAG));
-
-        add1(getChild(game, element, 0, Goods.class));
     }
 
     /**

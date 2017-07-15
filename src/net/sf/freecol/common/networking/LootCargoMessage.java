@@ -35,9 +35,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when looting cargo.
@@ -60,20 +57,6 @@ public class LootCargoMessage extends ObjectMessage {
         super(TAG, WINNER_TAG, winner.getId(), LOSER_TAG, loserId);
 
         addAll(goods);
-    }
-
-    /**
-     * Create a new {@code LootCargoMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public LootCargoMessage(Game game, Element element) {
-        super(TAG, WINNER_TAG, getStringAttribute(element, WINNER_TAG),
-              LOSER_TAG, getStringAttribute(element, LOSER_TAG));
-
-        addAll(DOMUtils.getChildren(game, element, false, Goods.class));
     }
 
     /**

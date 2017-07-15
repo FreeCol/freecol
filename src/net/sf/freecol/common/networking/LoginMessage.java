@@ -39,8 +39,6 @@ import net.sf.freecol.server.FreeColServer.ServerState;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when logging in.
@@ -73,22 +71,6 @@ public class LoginMessage extends ObjectMessage {
 
         if (state != null) setStringAttribute(STATE_TAG, state.toString());
         if (game != null) add1(game);
-    }
-
-    /**
-     * Create a new {@code LoginMessage} from a supplied element.
-     *
-     * @param game A {@code Game} (not used).
-     * @param e The {@code Element} to use to create the message.
-     */
-    public LoginMessage(Game game, Element e) {
-        this(getStringAttribute(e, USER_NAME_TAG),
-             getStringAttribute(e, VERSION_TAG),
-             getEnumAttribute(e, STATE_TAG,
-                              ServerState.class, (ServerState)null),
-             getBooleanAttribute(e, SINGLE_PLAYER_TAG, true),
-             getBooleanAttribute(e, CURRENT_PLAYER_TAG, false),
-             getChild(game, e, 0, true, Game.class));
     }
 
     /**
@@ -410,26 +392,5 @@ public class LoginMessage extends ObjectMessage {
         }
 
         return ret;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        final Game game = getGame();
-        final Player player = (game == null || getUserName() == null) ? null
-            : game.getPlayerByName(getUserName());
-        final ServerState state = getState();
-        DOMMessage ret = new DOMMessage(TAG,
-            USER_NAME_TAG, getUserName(),
-            VERSION_TAG, getVersion(),
-            SINGLE_PLAYER_TAG, Boolean.toString(getSinglePlayer()),
-            CURRENT_PLAYER_TAG, Boolean.toString(getCurrentPlayer()))
-            .add(game, player);
-        if (state != null) {
-            ret.setStringAttribute(STATE_TAG, state.toString());
-        }
-        return ret.toXMLElement();
     }
 }

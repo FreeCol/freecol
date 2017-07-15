@@ -19,79 +19,18 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.DiplomaticTrade;
-import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Market;
-import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.NationSummary;
-import net.sf.freecol.common.model.NativeTrade;
-import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.AddPlayerMessage;
-import net.sf.freecol.common.networking.AnimateAttackMessage;
-import net.sf.freecol.common.networking.AnimateMoveMessage;
-import net.sf.freecol.common.networking.AssignTradeRouteMessage;
-import net.sf.freecol.common.networking.ChatMessage;
-import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
-import net.sf.freecol.common.networking.CloseMessage;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
-import net.sf.freecol.common.networking.DisconnectMessage;
-import net.sf.freecol.common.networking.DiplomacyMessage;
-import net.sf.freecol.common.networking.ErrorMessage;
-import net.sf.freecol.common.networking.FeatureChangeMessage;
-import net.sf.freecol.common.networking.FirstContactMessage;
-import net.sf.freecol.common.networking.FountainOfYouthMessage;
-import net.sf.freecol.common.networking.GameEndedMessage;
-import net.sf.freecol.common.networking.IndianDemandMessage;
-import net.sf.freecol.common.networking.LogoutMessage;
-import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
-import net.sf.freecol.common.networking.MonarchActionMessage;
-import net.sf.freecol.common.networking.MultipleMessage;
-import net.sf.freecol.common.networking.NationSummaryMessage;
-import net.sf.freecol.common.networking.NativeGiftMessage;
-import net.sf.freecol.common.networking.NativeTradeMessage;
-import net.sf.freecol.common.networking.NewLandNameMessage;
-import net.sf.freecol.common.networking.NewRegionNameMessage;
-import net.sf.freecol.common.networking.NewTradeRouteMessage;
-import net.sf.freecol.common.networking.NewTurnMessage;
-import net.sf.freecol.common.networking.PartialMessage;
-import net.sf.freecol.common.networking.ReconnectMessage;
-import net.sf.freecol.common.networking.RemoveMessage;
-import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
-import net.sf.freecol.common.networking.SetAIMessage;
-import net.sf.freecol.common.networking.SetCurrentPlayerMessage;
-import net.sf.freecol.common.networking.SetDeadMessage;
-import net.sf.freecol.common.networking.SetStanceMessage;
-import net.sf.freecol.common.networking.StartGameMessage;
-import net.sf.freecol.common.networking.TrivialMessage;
-import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.FreeColServerHolder;
 import net.sf.freecol.server.model.ServerPlayer;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-
-import org.w3c.dom.Element;
 
 
 /**

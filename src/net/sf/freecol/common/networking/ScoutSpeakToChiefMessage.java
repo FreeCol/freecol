@@ -33,8 +33,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when speaking to a chief.
@@ -61,19 +59,6 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
                                     String result) {
         super(TAG, UNIT_TAG, unit.getId(), SETTLEMENT_TAG, is.getId(),
               RESULT_TAG, result);
-    }
-
-    /**
-     * Create a new {@code ScoutSpeakToChiefMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ScoutSpeakToChiefMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              SETTLEMENT_TAG, getStringAttribute(element, SETTLEMENT_TAG),
-              RESULT_TAG, getStringAttribute(element, RESULT_TAG));
     }
 
     /**

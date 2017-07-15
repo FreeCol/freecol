@@ -29,8 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message that changes the AI state of a player.
@@ -50,18 +48,6 @@ public class SetAIMessage extends AttributeMessage {
      */
     public SetAIMessage(Player player, boolean ai) {
         super(TAG, PLAYER_TAG, player.getId(), AI_TAG, String.valueOf(ai));
-    }
-
-    /**
-     * Create a new {@code SetAIMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SetAIMessage(Game game, Element element) {
-        super(TAG,
-              PLAYER_TAG, getStringAttribute(element, PLAYER_TAG),
-              AI_TAG, getStringAttribute(element, AI_TAG));
     }
 
     /**

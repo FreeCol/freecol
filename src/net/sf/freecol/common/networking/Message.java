@@ -107,17 +107,6 @@ public abstract class Message {
     }
 
     /**
-     * Constructs a new message with data from the given input stream.
-     * 
-     * @param inputStream The {@code InputStream} to read.
-     * @exception IOException if thrown by the {@code InputStream}.
-     * @exception SAXException if thrown during parsing.
-     */
-    public Message(InputStream inputStream) throws SAXException, IOException {
-        readInputStream(inputStream);
-    }
-
-    /**
      * Build a new message with the given type.
      * 
      * @param type The main message type.
@@ -264,7 +253,6 @@ public abstract class Message {
     /**
      * Get all the attributes in this message.
      *
-     * @param element The {@code Element} to extract from.
      * @return A {@code Map} of the attributes.
      */
     abstract public Map<String,String> getStringAttributes();
@@ -373,15 +361,6 @@ public abstract class Message {
     public boolean isEmpty() {
         return getStringAttributes().isEmpty() && getChildren().isEmpty();
     }
-
-    /**
-     * Build this message from an input stream.
-     *
-     * @param inputStream The {@code InputStream} to read.
-     */
-    abstract public void readInputStream(InputStream inputStream)
-        throws IOException, SAXException;
-
 
     /**
      * Get the priority of this type of message.

@@ -39,8 +39,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to choose a founding father.
@@ -66,22 +64,6 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
         super(TAG, FOUNDING_FATHER_TAG, (ff == null) ? null : ff.getId());
 
         setFatherAttributes(fathers);
-    }
-
-    /**
-     * Create a new {@code ChooseFoundingFatherMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ChooseFoundingFatherMessage(Game game, Element element) {
-        super(TAG, FOUNDING_FATHER_TAG, getStringAttribute(element, FOUNDING_FATHER_TAG));
-
-        final Specification spec = game.getSpecification();
-        setFatherAttributes(transform(fatherKeys,
-                k -> element.hasAttribute(k),
-                k -> spec.getFoundingFather(getStringAttribute(element, k))));
     }
 
     /**

@@ -31,8 +31,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to get a new trade route.
@@ -52,17 +50,6 @@ public class NewTradeRouteMessage extends ObjectMessage {
         super(TAG);
 
         add1(tradeRoute);
-    }
-
-    /**
-     * Create a new {@code NewTradeRouteMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public NewTradeRouteMessage(Game game, Element element) {
-        this(getChild(game, element, 0, true, TradeRoute.class));
     }
 
     /**

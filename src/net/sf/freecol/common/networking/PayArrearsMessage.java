@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when paying tax arrears.
@@ -48,17 +46,6 @@ public class PayArrearsMessage extends AttributeMessage {
      */
     public PayArrearsMessage(GoodsType type) {
         super(TAG, GOODS_TYPE_TAG, type.getId());
-    }
-
-    /**
-     * Create a new {@code PayArrearsMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public PayArrearsMessage(Game game, Element element) {
-        super(TAG, GOODS_TYPE_TAG, getStringAttribute(element, GOODS_TYPE_TAG));
     }
 
     /**

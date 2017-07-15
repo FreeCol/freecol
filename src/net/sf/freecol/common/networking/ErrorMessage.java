@@ -32,8 +32,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when an error occurs.
@@ -99,19 +97,6 @@ public class ErrorMessage extends ObjectMessage {
         this(StringTemplate.template(key)
                            .addName("%message%", ex.getMessage()),
              null);
-    }
-
-    /**
-     * Create a new {@code ErrorMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ErrorMessage(Game game, Element element) {
-        super(TAG, MESSAGE_TAG, element.getAttribute(MESSAGE_TAG));
-
-        add1(getChild(game, element, 0, StringTemplate.class));
     }
 
     /**

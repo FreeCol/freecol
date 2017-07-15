@@ -33,8 +33,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when the client requests claiming land.
@@ -58,18 +56,6 @@ public class ClaimLandMessage extends AttributeMessage {
     public ClaimLandMessage(Tile tile, FreeColGameObject claimant, int price) {
         super(TAG, TILE_TAG, tile.getId(), CLAIMANT_TAG, claimant.getId(),
               PRICE_TAG, String.valueOf(price));
-    }
-
-    /**
-     * Create a new {@code ClaimLandMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ClaimLandMessage(Game game, Element element) {
-        super(TAG, TILE_TAG, getStringAttribute(element, TILE_TAG),
-              CLAIMANT_TAG, getStringAttribute(element, CLAIMANT_TAG),
-              PRICE_TAG, getStringAttribute(element, PRICE_TAG));
     }
 
     /**

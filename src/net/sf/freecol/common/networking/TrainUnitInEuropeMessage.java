@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when training a unit in Europe.
@@ -48,17 +46,6 @@ public class TrainUnitInEuropeMessage extends AttributeMessage {
      */
     public TrainUnitInEuropeMessage(UnitType type) {
         super(TAG, UNIT_TYPE_TAG, type.getId());
-    }
-
-    /**
-     * Create a new {@code TrainUnitInEuropeMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public TrainUnitInEuropeMessage(Game game, Element element) {
-        super(TAG, UNIT_TYPE_TAG, getStringAttribute(element, UNIT_TYPE_TAG));
     }
 
     /**

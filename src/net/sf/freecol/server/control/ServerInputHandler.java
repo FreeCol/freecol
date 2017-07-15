@@ -33,7 +33,6 @@ import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
@@ -44,8 +43,6 @@ import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -59,71 +56,14 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     private static final Logger logger = Logger.getLogger(ServerInputHandler.class.getName());
 
     /**
-     * A network request handler knows how to handle in a given request type.
-     */
-    public interface DOMNetworkRequestHandler {
-
-        /**
-         * Handle a request represented by an {@link Element} and
-         * return another {@link Element} or null as the answer.
-         * 
-         * @param connection The message's {@code Connection}.
-         * @param element The root {@code Element} of the message.
-         * @return The reply {@code Element}, which may be null.
-         */
-        Element handle(Connection connection, Element element);
-    };
-
-    /**
-     * The handler map provides named handlers for network
-     * requests.  Each handler deals with a given request type.
-     */
-    private final Map<String, DOMNetworkRequestHandler> handlerMap
-        = Collections.synchronizedMap(new HashMap<String, DOMNetworkRequestHandler>());
-
-
-    /**
      * The constructor to use.
      * 
      * @param freeColServer The main server object.
      */
     public ServerInputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
-
-        register(ChatMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                new ChatMessage(getGame(), e)));
-
-        register(DisconnectMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                TrivialMessage.disconnectMessage));
-
-        register(LogoutMessage.TAG,
-            (Connection conn, Element e) -> handler(false, conn,
-                new LogoutMessage(getGame(), e)));
     }
 
-
-    /**
-     * Register a network request handler.
-     * 
-     * @param name The handler name.
-     * @param handler The {@code DOMNetworkRequestHandler} to register.
-     */
-    protected final void register(String name, DOMNetworkRequestHandler handler) {
-        this.handlerMap.put(name, handler);
-    }
-
-    /**
-     * Unregister a network request handler.
-     * 
-     * @param name The handler name.
-     * @param handler The {@code DOMNetworkRequestHandler} to unregister.
-     * @return True if the supplied handler was actually removed.
-     */
-    protected final boolean unregister(String name, DOMNetworkRequestHandler handler) {
-        return this.handlerMap.remove(name, handler);
-    }
 
     /**
      * Get the server player associated with a connection.
@@ -154,22 +94,6 @@ public abstract class ServerInputHandler extends FreeColServerHolder
                 + " out of turn from player: " + serverPlayer.getNation())
             : message.serverHandler(freeColServer, serverPlayer);
         return (cs == null) ? null : cs.build(serverPlayer);
-    }
-
-    /**
-     * Wrapper for new message handling.
-     *
-     * @param current If true, insist the message is from the current player
-     *     in the game.
-     * @param connection The {@code Connection} the message arrived on.
-     * @param message The {@code DOMMessage} to handle.
-     * @return The resulting reply {@code Element}.
-     */
-    protected Element handler(boolean current, Connection connection,
-                              DOMMessage message) {
-        Message m = internalHandler(current, getServerPlayer(connection),
-                                    message);
-        return (m == null) ? null : ((DOMMessage)m).toXMLElement();
     }
 
 

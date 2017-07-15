@@ -32,8 +32,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when doing a monarch action.
@@ -60,22 +58,6 @@ public class MonarchActionMessage extends ObjectMessage {
         super(TAG, ACTION_TAG, action.toString(), MONARCH_TAG, monarchKey);
 
         add1(template);
-    }
-
-    /**
-     * Create a new {@code MonarchActionMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public MonarchActionMessage(Game game, Element element) {
-        super(TAG, ACTION_TAG, getStringAttribute(element, ACTION_TAG),
-              MONARCH_TAG, getStringAttribute(element, MONARCH_TAG),
-              TAX_TAG, getStringAttribute(element, TAX_TAG),
-              RESULT_TAG, getStringAttribute(element, RESULT_TAG));
-        
-        add1(getChild(game, element, 0, StringTemplate.class));
     }
 
     /**

@@ -65,7 +65,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.Message;
@@ -758,20 +757,20 @@ public final class FreeColServer {
     /**
      * Send a message to all connections.
      *
-     * @param msg The {@code DOMMessage} to send.
+     * @param msg The {@code Message} to send.
      * @param conn An optional {@code Connection} to omit.
      */
-    public void sendToAll(DOMMessage msg, Connection conn) {
+    public void sendToAll(Message msg, Connection conn) {
         getServer().sendToAll(msg, conn);
     }
 
     /**
      * Send a message to all connections.
      *
-     * @param msg The {@code DOMMessage} to send.
+     * @param msg The {@code Message} to send.
      * @param serverPlayer An optional {@code ServerPlayer} to omit.
      */
-    public void sendToAll(DOMMessage msg, ServerPlayer serverPlayer) {
+    public void sendToAll(Message msg, ServerPlayer serverPlayer) {
         sendToAll(msg, (serverPlayer == null) ? null
             : serverPlayer.getConnection());
     }

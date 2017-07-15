@@ -31,8 +31,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message that sets the player nationType.
@@ -53,17 +51,6 @@ public class SetNationTypeMessage extends AttributeMessage {
     public SetNationTypeMessage(Player player, NationType nationType) {
         super(TAG, PLAYER_TAG, (player == null) ? null : player.getId(),
               VALUE_TAG, nationType.getId());
-    }
-
-    /**
-     * Create a new {@code SetNationTypeMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to (null here).
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SetNationTypeMessage(Game game, Element element) {
-        super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG),
-              VALUE_TAG, getStringAttribute(element, VALUE_TAG));
     }
 
     /**

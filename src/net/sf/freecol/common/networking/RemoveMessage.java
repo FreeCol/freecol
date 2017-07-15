@@ -36,9 +36,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when removing a FreeColGameObject.
@@ -62,20 +59,6 @@ public class RemoveMessage extends AttributeMessage {
         
         setArrayAttributes(transform(objects, alwaysTrue(),
                            FreeColObject::getId));
-    }
-
-    /**
-     * Create a new {@code RemoveMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public RemoveMessage(Game game, Element element) {
-        super(TAG);
-
-        setStringAttribute(DIVERT_TAG, getStringAttribute(element, DIVERT_TAG));
-        setArrayAttributes(DOMUtils.getArrayAttributes(element));
     }
 
     /**

@@ -27,8 +27,6 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when updating a trade route.
@@ -48,19 +46,6 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
         super(TAG);
 
         add1(tradeRoute);
-    }
-
-    /**
-     * Create a new {@code UpdateTradeRouteMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public UpdateTradeRouteMessage(Game game, Element element) {
-        super(TAG);
-
-        add1(getChild(game, element, 0, false, TradeRoute.class));
     }
 
 

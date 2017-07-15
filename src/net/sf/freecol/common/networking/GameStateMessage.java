@@ -29,8 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to check the game state.
@@ -59,18 +57,6 @@ public class GameStateMessage extends AttributeMessage {
         if (serverState != null) {
             setStringAttribute(STATE_TAG, serverState.toString());
         }
-    }
-
-    /**
-     * Create a new {@code GameStateMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public GameStateMessage(Game game, Element element) {
-        this(getEnumAttribute(element, STATE_TAG,
-                              ServerState.class, (ServerState)null));
     }
 
     /**

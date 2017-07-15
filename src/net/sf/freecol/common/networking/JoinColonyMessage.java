@@ -29,8 +29,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when a unit joins a colony.
@@ -51,17 +49,6 @@ public class JoinColonyMessage extends AttributeMessage {
      */
     public JoinColonyMessage(Colony colony, Unit builder) {
         super(TAG, COLONY_TAG, colony.getId(), UNIT_TAG, builder.getId());
-    }
-
-    /**
-     * Create a new {@code JoinColonyMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public JoinColonyMessage(Game game, Element element) {
-        super(TAG, COLONY_TAG, getStringAttribute(element, COLONY_TAG),
-              UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
     /**

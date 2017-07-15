@@ -30,8 +30,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when assigning a trade route to a unit.
@@ -54,19 +52,6 @@ public class AssignTradeRouteMessage extends AttributeMessage {
         super(TAG, UNIT_TAG, unit.getId(),
               TRADE_ROUTE_TAG, ((tradeRoute == null) ? null : tradeRoute.getId()));
     }
-
-    /**
-     * Create a new {@code AssignTradeRouteMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public AssignTradeRouteMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              TRADE_ROUTE_TAG, getStringAttribute(element, TRADE_ROUTE_TAG));
-    }
-
     /**
      * Create a new {@code AssignTradeRouteMessage} from a stream.
      *

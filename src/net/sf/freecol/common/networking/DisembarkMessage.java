@@ -29,8 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when disembarking.
@@ -49,17 +47,6 @@ public class DisembarkMessage extends AttributeMessage {
      */
     public DisembarkMessage(Unit unit) {
         super(TAG, UNIT_TAG, unit.getId());
-    }
-
-    /**
-     * Create a new {@code DisembarkMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public DisembarkMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG));
     }
 
     /**

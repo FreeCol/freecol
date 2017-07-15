@@ -32,8 +32,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to resolve natives making demands of a colony.
@@ -62,21 +60,6 @@ public class IndianDemandMessage extends AttributeMessage {
         super(TAG, UNIT_TAG, unit.getId(), COLONY_TAG, colony.getId(),
               TYPE_TAG, (type == null) ? null : type.getId(),
               AMOUNT_TAG, String.valueOf(amount));
-    }
-
-    /**
-     * Create a new {@code IndianDemandMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public IndianDemandMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              COLONY_TAG, getStringAttribute(element, COLONY_TAG),
-              TYPE_TAG, getStringAttribute(element, TYPE_TAG),
-              AMOUNT_TAG, getStringAttribute(element, AMOUNT_TAG),
-              RESULT_TAG, getStringAttribute(element, RESULT_TAG));
     }
 
     /**

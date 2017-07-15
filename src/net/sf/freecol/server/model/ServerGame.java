@@ -67,7 +67,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NewTurnMessage;
 import net.sf.freecol.common.networking.TrivialMessage;

@@ -32,9 +32,6 @@ import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when an highScore occurs.
@@ -56,17 +53,6 @@ public class HighScoreMessage extends ObjectMessage {
         super(TAG, KEY_TAG, key);
 
         if (scores != null) addAll(scores);
-    }
-
-    /**
-     * Create a new {@code HighScoreMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public HighScoreMessage(Game game, Element element) {
-        this(getStringAttribute(element, KEY_TAG),
-             DOMUtils.getChildren(game, element, false, HighScore.class));
     }
 
     /**

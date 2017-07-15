@@ -31,8 +31,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when making first contact between players.
@@ -59,21 +57,6 @@ public class FirstContactMessage extends AttributeMessage {
               TILE_TAG, (tile == null) ? null : tile.getId(),
               CAMPS_TAG, ((other.isEuropean()) ? null
                   : String.valueOf(other.getSettlementCount())));
-    }
-
-    /**
-     * Create a new {@code FirstContactMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public FirstContactMessage(Game game, Element element) {
-        super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG),
-              OTHER_TAG, getStringAttribute(element, OTHER_TAG),
-              TILE_TAG, getStringAttribute(element, TILE_TAG),
-              CAMPS_TAG, getStringAttribute(element, CAMPS_TAG),
-              RESULT_TAG, getStringAttribute(element, RESULT_TAG));
     }
 
     /**

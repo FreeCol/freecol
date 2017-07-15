@@ -29,8 +29,6 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to handle changes in work location.
@@ -52,17 +50,6 @@ public class WorkMessage extends AttributeMessage {
     public WorkMessage(Unit unit, WorkLocation workLocation) {
         super(TAG, UNIT_TAG, unit.getId(),
               WORK_LOCATION_TAG, workLocation.getId());
-    }
-
-    /**
-     * Create a new {@code WorkMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public WorkMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              WORK_LOCATION_TAG, getStringAttribute(element, WORK_LOCATION_TAG));
     }
 
     /**

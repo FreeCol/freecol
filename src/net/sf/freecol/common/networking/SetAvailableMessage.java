@@ -30,8 +30,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message that changes the player availability.
@@ -50,18 +48,6 @@ public class SetAvailableMessage extends AttributeMessage {
     public SetAvailableMessage(Nation nation, NationState state) {
         super(TAG, NATION_TAG, nation.getId(),
               STATE_TAG, state.toString());
-    }
-
-    /**
-     * Create a new {@code SetAvailableMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to (null here).
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SetAvailableMessage(@SuppressWarnings("unused") Game game,
-                               Element element) {
-        super(TAG, NATION_TAG, getStringAttribute(element, NATION_TAG),
-              STATE_TAG, getStringAttribute(element, STATE_TAG));
     }
 
     /**

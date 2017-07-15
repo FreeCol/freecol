@@ -29,8 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message that contains a fountainOfYouth string.
@@ -48,16 +46,6 @@ public class FountainOfYouthMessage extends AttributeMessage {
      */
     public FountainOfYouthMessage(int migrants) {
         super(TAG, MIGRANTS_TAG, String.valueOf(migrants));
-    }
-
-    /**
-     * Create a new {@code FountainOfYouthMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public FountainOfYouthMessage(Game game, Element element) {
-        super(TAG, MIGRANTS_TAG, getStringAttribute(element, MIGRANTS_TAG));
     }
 
     /**

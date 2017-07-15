@@ -36,8 +36,6 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when spying on a settlement.
@@ -60,20 +58,6 @@ public class SpySettlementMessage extends ObjectMessage {
         super(TAG, SETTLEMENT_TAG, settlement.getId(), UNIT_TAG, unit.getId());
 
         add1(settlement.getTile());
-    }
-
-    /**
-     * Create a new {@code SpySettlementMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public SpySettlementMessage(Game game, Element element) {
-        super(TAG, SETTLEMENT_TAG, getStringAttribute(element, SETTLEMENT_TAG),
-              UNIT_TAG, getStringAttribute(element, UNIT_TAG));
-
-        add1(getChild(game, element, 0, false, Tile.class));
     }
 
     /**

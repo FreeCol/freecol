@@ -29,8 +29,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when renaming a FreeColGameObject.
@@ -51,18 +49,6 @@ public class RenameMessage extends AttributeMessage {
      */
     public RenameMessage(FreeColGameObject object, String newName) {
         super(TAG, NAMEABLE_TAG, object.getId(), NAME_TAG, newName);
-    }
-
-    /**
-     * Create a new {@code RenameMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public RenameMessage(Game game, Element element) {
-        super(TAG, NAMEABLE_TAG, getStringAttribute(element, NAMEABLE_TAG),
-              NAME_TAG, getStringAttribute(element, NAME_TAG));
     }
 
     /**

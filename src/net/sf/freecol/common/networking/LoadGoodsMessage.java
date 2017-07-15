@@ -32,8 +32,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when loading goods.
@@ -61,20 +59,6 @@ public class LoadGoodsMessage extends AttributeMessage {
               TYPE_TAG, type.getId(),
               AMOUNT_TAG, String.valueOf(amount),
               CARRIER_TAG, carrier.getId());
-    }
-
-    /**
-     * Create a new {@code LoadGoodsMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public LoadGoodsMessage(Game game, Element element) {
-        super(TAG, LOCATION_TAG, getStringAttribute(element, LOCATION_TAG),
-              TYPE_TAG, getStringAttribute(element, TYPE_TAG),
-              AMOUNT_TAG, getStringAttribute(element, AMOUNT_TAG),
-              CARRIER_TAG, getStringAttribute(element, CARRIER_TAG));
     }
 
     /**

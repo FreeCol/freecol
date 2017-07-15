@@ -33,8 +33,6 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when logging out.
@@ -57,17 +55,6 @@ public class LogoutMessage extends AttributeMessage {
     public LogoutMessage(Player player, LogoutReason reason) {
         super(TAG, PLAYER_TAG, player.getId(),
               REASON_TAG, String.valueOf(reason));
-    }
-
-    /**
-     * Create a new {@code LogoutMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public LogoutMessage(Game game, Element element) {
-        super(TAG, PLAYER_TAG, getStringAttribute(element, PLAYER_TAG),
-              REASON_TAG, getStringAttribute(element, REASON_TAG));
     }
 
     /**

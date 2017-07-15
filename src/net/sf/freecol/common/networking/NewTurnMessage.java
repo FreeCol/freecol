@@ -29,8 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to the clients to signal a new turn.
@@ -49,18 +47,6 @@ public class NewTurnMessage extends AttributeMessage {
      */
     public NewTurnMessage(Turn turn) {
         super(TAG, TURN_TAG, String.valueOf(turn.getNumber()));
-    }
-
-    /**
-     * Create a new {@code NewTurnMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     * @throws IllegalStateException if there is problem with the senderID.
-     */
-    public NewTurnMessage(Game game, Element element) {
-        super(TAG, TURN_TAG, getStringAttribute(element, TURN_TAG));
     }
 
     /**

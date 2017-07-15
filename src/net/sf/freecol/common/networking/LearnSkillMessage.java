@@ -32,8 +32,6 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when learning for the skill taught at a settlement.
@@ -55,18 +53,6 @@ public class LearnSkillMessage extends AttributeMessage {
     public LearnSkillMessage(Unit unit, Direction direction) {
         super(TAG, UNIT_TAG, unit.getId(),
               DIRECTION_TAG, String.valueOf(direction));
-    }
-
-    /**
-     * Create a new {@code LearnSkillMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public LearnSkillMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
     }
 
     /**

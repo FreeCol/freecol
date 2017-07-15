@@ -36,9 +36,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent to update game objects.
@@ -87,17 +84,6 @@ public class UpdateMessage extends ObjectMessage {
         this(destination);
 
         if (fcos != null) addAll(fcos);
-    }
-
-    /**
-     * Create a new {@code UpdateMessage} from a supplied
-     * element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public UpdateMessage(Game game, Element element) {
-        this((ServerPlayer)null, DOMUtils.getChildren(game, element, true));
     }
 
     /**
@@ -180,17 +166,5 @@ public class UpdateMessage extends ObjectMessage {
         } else {
             pgc(freeColClient).updateHandler(getChildren());
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        DOMMessage message = new DOMMessage(TAG);
-        for (FreeColObject fco : getChildren()) {
-            message.add(fco, this.destination);
-        }
-        return message.toXMLElement();
     }
 }

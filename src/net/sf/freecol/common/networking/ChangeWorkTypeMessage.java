@@ -30,8 +30,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when changing the work type of a unit.
@@ -52,18 +50,6 @@ public class ChangeWorkTypeMessage extends AttributeMessage {
      */
     public ChangeWorkTypeMessage(Unit unit, GoodsType workType) {
         super(TAG, UNIT_TAG, unit.getId(), WORK_TYPE_TAG, workType.getId());
-    }
-
-    /**
-     * Create a new {@code ChangeWorkTypeMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ChangeWorkTypeMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              WORK_TYPE_TAG, getStringAttribute(element, WORK_TYPE_TAG));
     }
 
     /**

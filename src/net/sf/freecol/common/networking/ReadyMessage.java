@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message that signals a player is ready.
@@ -50,18 +48,6 @@ public class ReadyMessage extends AttributeMessage {
     public ReadyMessage(Player player, boolean ready) {
         super(TAG, PLAYER_TAG, (player == null) ? null : player.getId(),
               VALUE_TAG, String.valueOf(ready));
-    }
-
-    /**
-     * Create a new {@code ReadyMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public ReadyMessage(Game game, Element element) {
-        super(TAG,
-              PLAYER_TAG, getStringAttribute(element, PLAYER_TAG),
-              VALUE_TAG, getStringAttribute(element, VALUE_TAG));
     }
 
     /**

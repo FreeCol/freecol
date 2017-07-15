@@ -37,9 +37,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import net.sf.freecol.common.util.DOMUtils;
-import org.w3c.dom.Element;
-
 
 /**
  * The message that contains other messages.
@@ -47,9 +44,6 @@ import org.w3c.dom.Element;
 public class MultipleMessage extends AttributeMessage {
 
     public static final String TAG = "multiple";
-
-    /** (Deprecated) The list of elements containing messages. */
-    private List<Element> elements = new ArrayList<>();
 
     /** The list of messages. */
     private final List<Message> messages = new ArrayList<>();
@@ -61,32 +55,7 @@ public class MultipleMessage extends AttributeMessage {
     public MultipleMessage() {
         super(TAG);
 
-        this.elements.clear();
         this.messages.clear();
-    }
-
-    /**
-     * Create a new {@code MultipleMessage}.
-     *
-     * @param element An element containing the sub-{@code Element}s.
-     */
-    public MultipleMessage(Element element) {
-        this();
-
-        this.elements.addAll(DOMUtils.mapChildren(element, Function.identity()));
-    }
-
-    /**
-     * Create a new {@code MultipleMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public MultipleMessage(Game game, Element element) {
-        this();
-
-        this.elements.addAll(DOMUtils.mapChildren(element, Function.identity()));
     }
 
     /**
@@ -127,8 +96,7 @@ public class MultipleMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     public boolean isEmpty() {
-        return super.isEmpty() && this.messages.isEmpty()
-            && this.elements.isEmpty();
+        return super.isEmpty() && this.messages.isEmpty();
     }
 
     /**
@@ -211,39 +179,7 @@ public class MultipleMessage extends AttributeMessage {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(TAG);
-        for (Element e : this.elements) result.add(e);
-        for (Message m : this.messages) {
-            if (m instanceof DOMMessage) result.add((DOMMessage)m);
-        }
-        return result.toXMLElement();
-    }
-
-
     // Public interface
-
-    /**
-     * Add another element.
-     *
-     * @param element The {@code Element} to add.
-     */
-    public void addElement(Element element) {
-        this.elements.add(element);
-    }
-
-    /**
-     * Add another message.
-     *
-     * @param message The {@code DOMMessage} to add.
-     */
-    public void addMessage(DOMMessage message) {
-        addElement(message.toXMLElement());
-    }
 
     /**
      * Simplify this message.

@@ -29,8 +29,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * A message sent to clients to signal that a panel should be closed.
@@ -46,16 +44,6 @@ public class CloseMessage extends AttributeMessage {
      */
     public CloseMessage(String panel) {
         super(TAG, PANEL_TAG, panel);
-    }
-
-    /**
-     * Create a new {@code CloseMessage} from a supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public CloseMessage(Game game, Element element) {
-        super(TAG, PANEL_TAG, getStringAttribute(element, PANEL_TAG));
     }
 
     /**

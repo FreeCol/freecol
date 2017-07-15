@@ -32,8 +32,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when naming a new region.
@@ -60,20 +58,6 @@ public class NewRegionNameMessage extends AttributeMessage {
                                 String newRegionName) {
         super(TAG, REGION_TAG, region.getId(), TILE_TAG, tile.getId(),
               UNIT_TAG, unit.getId(), NEW_REGION_NAME_TAG, newRegionName);
-    }
-
-    /**
-     * Create a new {@code NewRegionNameMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public NewRegionNameMessage(Game game, Element element) {
-        super(TAG, REGION_TAG, getStringAttribute(element, REGION_TAG),
-              TILE_TAG, getStringAttribute(element, TILE_TAG),
-              UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              NEW_REGION_NAME_TAG, getStringAttribute(element, NEW_REGION_NAME_TAG));
     }
 
     /**

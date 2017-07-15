@@ -32,8 +32,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The message sent when embarking.
@@ -57,19 +55,6 @@ public class EmbarkMessage extends AttributeMessage {
     public EmbarkMessage(Unit unit, Unit carrier, Direction direction) {
         super(TAG, UNIT_TAG, unit.getId(), CARRIER_TAG, carrier.getId(),
               DIRECTION_TAG, (direction == null) ? null : String.valueOf(direction));
-    }
-
-    /**
-     * Create a new {@code EmbarkMessage} from a
-     * supplied element.
-     *
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    public EmbarkMessage(Game game, Element element) {
-        super(TAG, UNIT_TAG, getStringAttribute(element, UNIT_TAG),
-              CARRIER_TAG, getStringAttribute(element, CARRIER_TAG),
-              DIRECTION_TAG, getStringAttribute(element, DIRECTION_TAG));
     }
 
     /**
