@@ -336,7 +336,6 @@ final class ReceivingThread extends Thread {
         } finally {
             askToStop("run complete");
         }
-        this.connection.close();
         logger.info(getName() + ": finished");
     }
 }

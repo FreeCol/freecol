@@ -69,6 +69,8 @@ public class Connection implements Closeable {
     /** The name of the connection. */
     private String name;
 
+    /** A lock for access to the socket. */
+    private final Object socketLock = new Object();
     /** The socket connected to the other end of the connection. */
     private Socket socket = null;
 
@@ -178,7 +180,7 @@ public class Connection implements Closeable {
      * @return The current {@code Socket}.
      */
     public Socket getSocket() {
-        synchronized (this.inputLock) {
+        synchronized (this.socketLock) {
             return this.socket;
         }
     }
@@ -189,7 +191,7 @@ public class Connection implements Closeable {
      * @param socket The new {@code Socket}.
      */
     private void setSocket(Socket socket) {
-        synchronized (this.inputLock) {
+        synchronized (this.socketLock) {
             this.socket = socket;
         }
     }
@@ -198,7 +200,7 @@ public class Connection implements Closeable {
      * Close and clear the socket.
      */
     private void closeSocket() {
-        synchronized (this.inputLock) {
+        synchronized (this.socketLock) {
             if (this.socket != null) {
                 try {
                     this.socket.close();
@@ -596,12 +598,15 @@ public class Connection implements Closeable {
     public void close() {
         if (this.receivingThread != null) {
             this.receivingThread.askToStop("connection closing");
+            this.receivingThread.interrupt();
             this.receivingThread = null;
         }
 
-        closeOutputStream();
-        closeInputStream();
+        // Close the socket before the input stream.  Socket closure will
+        // terminate any existing I/O and release the locks.
         closeSocket();
+        closeInputStream();
+        closeOutputStream();
         
         logger.fine("Connection closed for " + this.name);
     }
