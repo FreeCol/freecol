@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.DOMMessageHandler;
 
 
 /**

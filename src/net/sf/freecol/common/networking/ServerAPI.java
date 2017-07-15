@@ -122,16 +122,6 @@ public abstract class ServerAPI {
     }
     
     /**
-     * Sets the message handler for the connection.
-     *
-     * @param mh The new {@code DOMMessageHandler}.
-     */
-    public void setDOMMessageHandler(DOMMessageHandler mh) {
-        Connection c = getConnection();
-        if (c != null) c.setDOMMessageHandler(mh);
-    }
-    
-    /**
      * Convenience utility to check the connection.
      *
      * @return True if the server connection is open.

@@ -56,7 +56,6 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
 import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
-import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FeatureChangeMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
@@ -99,7 +98,7 @@ import org.w3c.dom.Element;
  * Handles the network messages that arrives while in the game.
  */
 public final class AIInGameInputHandler extends FreeColServerHolder
-    implements MessageHandler, DOMMessageHandler {
+    implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
 
@@ -161,117 +160,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      */
     private AIMain getAIMain() {
         return this.aiMain;
-    }
-
-
-    // Implement DOMMessageHandler
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public synchronized Element handle(Connection connection, Element element) {
-        if (element == null) return null;
-
-        final String logMe = "AI(" + getMyPlayer().getId() + ") handler ";
-        final Game game = getGame();
-        final String tag = element.getTagName();
-        try {
-            switch (tag) {
-            case ChooseFoundingFatherMessage.TAG:
-                new ChooseFoundingFatherMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case DiplomacyMessage.TAG:
-                new DiplomacyMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case FirstContactMessage.TAG:
-                new FirstContactMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case FountainOfYouthMessage.TAG:
-                new FountainOfYouthMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case IndianDemandMessage.TAG:
-                new IndianDemandMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case LootCargoMessage.TAG:
-                new LootCargoMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case MonarchActionMessage.TAG:
-                new MonarchActionMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case MultipleMessage.TAG:
-                new MultipleMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case NationSummaryMessage.TAG:
-                new NationSummaryMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case NativeTradeMessage.TAG:
-                new NativeTradeMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case NewLandNameMessage.TAG:
-                new NewLandNameMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case NewRegionNameMessage.TAG:
-                new NewRegionNameMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case ReconnectMessage.TAG:
-                logger.info("Reconnect on illegal operation.");
-                break;
-            case SetAIMessage.TAG:
-                new SetAIMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-            case SetCurrentPlayerMessage.TAG:
-                new SetCurrentPlayerMessage(game, element)
-                    .aiHandler(getFreeColServer(), getMyAIPlayer());
-                break;
-                
-            // Since we're the server, we can see everything.
-            // Therefore most of these messages are useless.
-            // This may change one day.
-            case AddPlayerMessage.TAG:
-            case AnimateAttackMessage.TAG:
-            case AnimateMoveMessage.TAG:
-            case AssignTradeRouteMessage.TAG:
-            case ChatMessage.TAG:
-            case CloseMessage.TAG:
-            case DeleteTradeRouteMessage.TAG:
-            case DisconnectMessage.TAG:
-            case ErrorMessage.TAG:
-            case FeatureChangeMessage.TAG:
-            case GameEndedMessage.TAG:
-            case LogoutMessage.TAG: // Ignored, AIs do not log out
-            case NativeGiftMessage.TAG:
-            case NewTurnMessage.TAG:
-            case NewTradeRouteMessage.TAG:
-            case PartialMessage.TAG:
-            case RemoveMessage.TAG:
-            case ScoutSpeakToChiefMessage.TAG:
-            case SetDeadMessage.TAG:
-            case SetStanceMessage.TAG:
-            case StartGameMessage.TAG:
-            case UpdateMessage.TAG:
-                break;
-            default:
-                throw new RuntimeException(logMe + "missing for " + tag);
-            }
-            //logger.log(Level.FINEST, logMe + tag + " to null");
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, logMe + "failed " + tag, ex);
-        }
-        return null;
     }
 
 

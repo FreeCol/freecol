@@ -42,7 +42,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.DOMUtils;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -96,7 +95,6 @@ public class Connection implements Closeable {
 
     /** The message handler to process incoming messages with. */
     private MessageHandler messageHandler;
-    private DOMMessageHandler domMessageHandler;
 
     /** Is there an active connection. */
     private boolean connected = false;
@@ -115,7 +113,6 @@ public class Connection implements Closeable {
         this.xr = null;
         this.receivingThread = null;
         this.messageHandler = null;
-        this.domMessageHandler = null;
         this.xw = null;
 
         // Make a (pretty printing) transformer, but only make the log
@@ -301,24 +298,6 @@ public class Connection implements Closeable {
     public Connection setMessageHandler(MessageHandler messageHandler) {
         this.messageHandler = messageHandler;
         return this;
-    }
-
-    /**
-     * Gets the message handler for this connection.
-     *
-     * @return The {@code DOMMessageHandler} for this Connection.
-     */
-    public DOMMessageHandler getDOMMessageHandler() {
-        return this.domMessageHandler;
-    }
-
-    /**
-     * Sets the message handler for this connection.
-     *
-     * @param mh The new {@code DOMMessageHandler} for this Connection.
-     */
-    public void setDOMMessageHandler(DOMMessageHandler mh) {
-        this.domMessageHandler = mh;
     }
 
     /**

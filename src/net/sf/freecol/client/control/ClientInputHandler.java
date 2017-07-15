@@ -34,7 +34,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DisconnectMessage;
-import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LoginMessage;
@@ -55,7 +54,7 @@ import org.w3c.dom.Element;
  * Provides common methods for input handlers on the client side.
  */
 public abstract class ClientInputHandler extends FreeColClientHolder
-    implements MessageHandler, DOMMessageHandler {
+    implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(ClientInputHandler.class.getName());
 
@@ -145,32 +144,6 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      */
     protected void invokeLater(Runnable runnable) {
         getGUI().invokeNowOrLater(runnable);
-    }
-
-
-    // Implement DOMMessageHandler
-
-    /**
-     * {@inheritDoc}
-     */
-    public Element handle(Connection connection, Element element)
-        throws FreeColException {
-        if (element == null) return null;
-
-        final String logMe = "Client handler ";
-        final String tag = element.getTagName();
-        DOMClientNetworkRequestHandler handler = domHandlerMap.get(tag);
-        if (handler == null) {
-            throw new FreeColException(logMe + "missing for " + tag);
-        }
-
-        try {
-            handler.handle(connection, element);
-            logger.log(Level.FINEST, logMe + tag + " to null");
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, logMe + "failed " + tag, ex);
-        }
-        return null;
     }
 
 

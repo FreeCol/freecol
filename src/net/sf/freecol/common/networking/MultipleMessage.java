@@ -140,15 +140,6 @@ public class MultipleMessage extends AttributeMessage {
         final Connection conn = aiPlayer.getConnection();
         if (conn == null) return;
 
-        if (!this.elements.isEmpty()) {
-            Message msg = DOMUtils.handleList(conn.getDOMMessageHandler(),
-                                              conn, this.elements);
-            if (msg != null) {
-                logger.warning("Multiple AI message -> " + msg.getType());
-            }
-            return;
-        }
-
         if (!this.messages.isEmpty()) {
             for (Message m : this.messages) {
                 Message ret = conn.handle(m);
@@ -166,15 +157,6 @@ public class MultipleMessage extends AttributeMessage {
         final Connection conn = freeColClient.askServer().getConnection();
         if (conn == null) return;
 
-        if (!this.elements.isEmpty()) {
-            Message msg = DOMUtils.handleList(freeColClient.getInGameInputHandler(),
-                                              conn, this.elements);
-            if (msg != null) {
-                logger.warning("Multiple client message -> " + msg.getType());
-            }
-            return;
-        }
-        
         if (!this.messages.isEmpty()) {
             for (Message m : this.messages) {
                 Message ret = conn.handle(m);
@@ -191,13 +173,6 @@ public class MultipleMessage extends AttributeMessage {
                                    ServerPlayer serverPlayer) {
         final Connection conn = serverPlayer.getConnection();
         if (conn == null) return null;
-
-        if (!this.elements.isEmpty()) {
-            Message msg = DOMUtils.handleList((DOMMessageHandler)freeColServer.getInputHandler(),
-                                              conn, this.elements);
-            return (msg == null) ? null
-                : ChangeSet.simpleChange(serverPlayer, (DOMMessage)msg);
-        }
 
         if (!this.messages.isEmpty()) {
             ChangeSet cs = new ChangeSet();
@@ -268,26 +243,6 @@ public class MultipleMessage extends AttributeMessage {
      */
     public void addMessage(DOMMessage message) {
         addElement(message.toXMLElement());
-    }
-
-    /**
-     * Apply a handler to this message.
-     *
-     * @param handler A {@code DOMMessageHandler} to apply.
-     * @param connection The {@code Connection} message was received on.
-     * @return A collapsed resolution of the submessages.
-     */
-    public Message applyHandler(DOMMessageHandler handler,
-                                Connection connection) {
-        return DOMUtils.handleList(handler, connection, this.elements);
-    }
-
-    /**
-     * About to go away.
-     */
-    public Element handle(FreeColServer freeColServer, Connection connection) {
-        Message m = applyHandler(connection.getDOMMessageHandler(), connection);
-        return (m == null) ? null : ((DOMMessage)m).toXMLElement();
     }
 
     /**

@@ -31,7 +31,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
-import net.sf.freecol.common.networking.DOMMessageHandler;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 
@@ -168,17 +167,6 @@ public final class Server extends Thread {
     public void setMessageHandlerToAllConnections(MessageHandler mh) {
         for (Connection c : this.connections.values()) {
             c.setMessageHandler(mh);
-        }
-    }
-
-    /**
-     * Sets the specified {@code DOMMessageHandler} to all connections.
-     *
-     * @param mh The {@code DOMMessageHandler} to use.
-     */
-    public void setDOMMessageHandlerToAllConnections(DOMMessageHandler mh) {
-        for (Connection c : this.connections.values()) {
-            c.setDOMMessageHandler(mh);
         }
     }
 

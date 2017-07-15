@@ -487,15 +487,12 @@ public final class FreeColServer {
         switch (this.serverState = serverState) {
         case PRE_GAME: case LOAD_GAME:
             getServer().setMessageHandlerToAllConnections(this.preGameInputHandler);
-            getServer().setDOMMessageHandlerToAllConnections(this.preGameInputHandler);
             break;
         case IN_GAME:
             getServer().setMessageHandlerToAllConnections(this.inGameInputHandler);
-            getServer().setDOMMessageHandlerToAllConnections(this.inGameInputHandler);
             break;
         case END_GAME: default:
             getServer().setMessageHandlerToAllConnections(null);
-            getServer().setDOMMessageHandlerToAllConnections(null);
             break;
         }
         return ret;
@@ -652,11 +649,9 @@ public final class FreeColServer {
         switch (this.serverState) {
         case PRE_GAME: case LOAD_GAME:
             connection.setMessageHandler(this.preGameInputHandler);
-            connection.setDOMMessageHandler(this.preGameInputHandler);
             break;
         case IN_GAME:
             connection.setMessageHandler(this.inGameInputHandler);
-            connection.setDOMMessageHandler(this.inGameInputHandler);
             break;
         case END_GAME: default:
             return;

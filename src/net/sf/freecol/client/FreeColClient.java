@@ -60,7 +60,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -583,10 +582,8 @@ public final class FreeColClient {
     public void changeClientState(boolean inGame) {
         if (inGame) {
             setMessageHandler(this.inGameInputHandler);
-            setDOMMessageHandler(this.inGameInputHandler);
         } else {
             setMessageHandler(this.preGameInputHandler);
-            setDOMMessageHandler(this.preGameInputHandler);
         }
         this.inGame = inGame;
     }
@@ -695,16 +692,6 @@ public final class FreeColClient {
      */
     public void setMessageHandler(MessageHandler messageHandler) {
         askServer().setMessageHandler(messageHandler);
-    }
-
-    /**
-     * Set a message handler to handle messages from the server.
-     * Used when switching from pre-game to in-game.
-     *
-     * @param domMessageHandler The new {@code DOMMessageHandler}.
-     */
-    public void setDOMMessageHandler(DOMMessageHandler domMessageHandler) {
-        askServer().setDOMMessageHandler(domMessageHandler);
     }
 
     /**

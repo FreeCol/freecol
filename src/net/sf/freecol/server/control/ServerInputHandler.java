@@ -34,7 +34,6 @@ import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.DOMMessageHandler;
 import net.sf.freecol.common.networking.DisconnectMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LogoutMessage;
@@ -55,7 +54,7 @@ import org.w3c.dom.Element;
  * @see Controller
  */
 public abstract class ServerInputHandler extends FreeColServerHolder
-    implements MessageHandler, DOMMessageHandler {
+    implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(ServerInputHandler.class.getName());
 
@@ -171,34 +170,6 @@ public abstract class ServerInputHandler extends FreeColServerHolder
         Message m = internalHandler(current, getServerPlayer(connection),
                                     message);
         return (m == null) ? null : ((DOMMessage)m).toXMLElement();
-    }
-
-    // Implement DOMMessageHandler
-
-    /**
-     * {@inheritDoc}
-     */
-    public final Element handle(Connection connection, Element element)
-        throws FreeColException {
-        if (element == null) return null;
-
-        final String logMe = "Server("
-            + getFreeColServer().getServerState().toString() + ") handler ";
-        final String tag = element.getTagName();
-        final DOMNetworkRequestHandler handler = handlerMap.get(tag);
-        if (handler == null) {
-            throw new FreeColException(logMe + "missing for " + tag);
-        }
-        Element ret = null;
-        try {
-            ret = handler.handle(connection, element);
-            logger.log(Level.FINEST, logMe + tag + " to "
-                + ((ret == null) ? "null" : ret.getTagName()));
-        } catch (Exception e) {
-            logger.log(Level.WARNING, logMe + "failed " + tag, e);
-            connection.sendReconnect();
-        }
-        return ret;
     }
 
 
