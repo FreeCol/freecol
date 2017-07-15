@@ -36,13 +36,11 @@ import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The basic trivial message, with just a name.
  */
-public abstract class TrivialMessage extends DOMMessage {
+public abstract class TrivialMessage extends Message {
 
     /*
      * True trivial messages have no distinguishing parts, so we might
@@ -78,18 +76,6 @@ public abstract class TrivialMessage extends DOMMessage {
         super(type);
 
         this.type = type;
-    }
-
-    /**
-     * Create a new {@code TrivialMessage} from a supplied element.
-     *
-     * @param tag The message tag.
-     * @param game The {@code Game} this message belongs to.
-     * @param element The {@code Element} to use to create the message.
-     */
-    protected TrivialMessage(String tag, @SuppressWarnings("unused") Game game,
-                             Element element) {
-        this(tag);
     }
 
     /**
@@ -192,22 +178,6 @@ public abstract class TrivialMessage extends DOMMessage {
     @Override
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // FIXME: When TrivialMessage is no longer a DOMMessage this
-        // routine is redundant.
-        xw.writeStartElement(getType());
-
-        writeAttributes(xw);
-
-        writeChildren(xw);
-
-        xw.writeEndElement();
     }
 
 
