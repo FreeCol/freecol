@@ -21,19 +21,26 @@ package net.sf.freecol.server.control;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DisconnectMessage;
+import net.sf.freecol.common.networking.LoginMessage;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
- * Handles a new client connection.  {@link PreGameInputHandler} is
- * set as the message handler when the client has successfully logged
- * on.
+ * Message handler for new client connections.
  */
-public final class UserConnectionHandler extends ServerInputHandler {
+public final class UserConnectionHandler extends FreeColServerHolder
+    implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
 
@@ -41,9 +48,42 @@ public final class UserConnectionHandler extends ServerInputHandler {
     /**
      * Build a new user connection handler.
      *
-     * @param freeColServer The main control object.
+     * @param freeColServer The main server object.
      */
     public UserConnectionHandler(final FreeColServer freeColServer) {
         super(freeColServer);
+    }
+
+
+    // Implement MessageHandler
+
+    /**
+     * {@inheritDoc}
+     */
+    public Message handle(Connection connection, Message message)
+        throws FreeColException {
+        final FreeColServer freeColServer = getFreeColServer();
+        ChangeSet cs = null;
+        switch (message.getType()) {
+        case DisconnectMessage.TAG:
+            break;
+        case LoginMessage.TAG:
+            cs = ((LoginMessage)message).loginHandler(freeColServer, connection);
+            break;
+        default:
+            cs = ChangeSet.clientError((ServerPlayer)null,
+                StringTemplate.template("server.couldNotLogin"));
+            break;
+        }
+        ServerPlayer serverPlayer = freeColServer.getPlayer(connection);
+        return (cs == null) ? null : cs.build(serverPlayer);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Message read(Connection connection)
+        throws FreeColException, XMLStreamException {
+        return Message.read(getGame(), connection.getFreeColXMLReader());
     }
 }

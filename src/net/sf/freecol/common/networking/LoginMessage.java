@@ -159,11 +159,11 @@ public class LoginMessage extends ObjectMessage {
      * Handle login to a completely new game.
      *
      * @param freeColServer The {@code FreeColServer} to log into.
-     * @param serverPlayer The {@code ServerPlayer} that is logging in.
+     * @param connection The incoming {@code Connection} that is logging in.
      * @return A {@code ChangeSet} with the result.
      */
     private ChangeSet preGameLogin(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
+                                   Connection connection) {
         final String userName = getUserName();
         ServerGame serverGame;
         ServerPlayer present;
@@ -187,7 +187,8 @@ public class LoginMessage extends ObjectMessage {
                     .addName("%name%", userName));
 
         } else {
-            // OK, complete initialization...
+            // OK, make a new player and complete initialization...
+            ServerPlayer serverPlayer = new ServerPlayer(connection);
             serverPlayer.initialize(serverGame,
                                     serverGame.getLivePlayerList().isEmpty(),
                                     nation);
@@ -221,11 +222,11 @@ public class LoginMessage extends ObjectMessage {
      * Handle login that loads an existing game.
      *
      * @param freeColServer The {@code FreeColServer} to log into.
-     * @param serverPlayer The {@code ServerPlayer} that is logging in.
+     * @param connection The incoming {@code Connection} that is logging in.
      * @return A {@code ChangeSet} with the result.
      */
     private ChangeSet loadGameLogin(FreeColServer freeColServer,
-                                    ServerPlayer serverPlayer) {
+                                    Connection connection) {
         final String userName = getUserName();
         ServerGame serverGame;
         ServerPlayer present;
@@ -264,10 +265,8 @@ public class LoginMessage extends ObjectMessage {
                     .addName("%name%", userName));
 
         } else {
-            final Connection conn = serverPlayer.getConnection();
-
             // Found the player
-            present.setConnection(conn);
+            present.setConnection(connection);
 
             // Ensure there is a current player.
             if (serverGame.getCurrentPlayer() == null) {
@@ -275,11 +274,8 @@ public class LoginMessage extends ObjectMessage {
             }
 
             // Add the connection, send back the game.
-            // Note use of "serverPlayer" for the visibility (*not* "present"),
-            // we need to return a change with respect to the dummy player
-            // object that the calling ServerInputHandler is using.
-            freeColServer.addPlayerConnection(conn);
-            ret = ChangeSet.simpleChange(serverPlayer,
+            freeColServer.addPlayerConnection(connection);
+            ret = ChangeSet.simpleChange(present,
                 new LoginMessage(userName, getVersion(),
                     freeColServer.getServerState(),
                     freeColServer.getSinglePlayer(),
@@ -293,11 +289,11 @@ public class LoginMessage extends ObjectMessage {
      * Handle login to a running game.
      *
      * @param freeColServer The {@code FreeColServer} to log into.
-     * @param serverPlayer The {@code ServerPlayer} that is logging in.
+     * @param connection The incoming {@code Connection} that is logging in.
      * @return A {@code ChangeSet} with the result.
      */
     private ChangeSet inGameLogin(FreeColServer freeColServer,
-                                  ServerPlayer serverPlayer) {
+                                  Connection connection) {
         final String userName = getUserName();
         ServerGame serverGame;
         ServerPlayer present;
@@ -327,11 +323,10 @@ public class LoginMessage extends ObjectMessage {
             // Join allowed, including over an AI
             if (present.isAI()) serverGame.changeAI(present, false);
 
-            final Connection conn = serverPlayer.getConnection();
-            present.setConnection(conn);
+            present.setConnection(connection);
 
             // Add the connection, send back the game
-            freeColServer.addPlayerConnection(conn);
+            freeColServer.addPlayerConnection(connection);
             ret = ChangeSet.simpleChange(present,
                 new LoginMessage(userName, getVersion(),
                                  freeColServer.getServerState(),
@@ -343,11 +338,13 @@ public class LoginMessage extends ObjectMessage {
     }
 
     /**
-     * {@inheritDoc}
+     * Special purpose handler for the UserConnectionHandler.
+     *
+     * @param freeColServer The server to connect to.
+     * @param connection The incoming {@code Connection}.
      */
-    @Override
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
+    public ChangeSet loginHandler(FreeColServer freeColServer,
+                                  Connection connection) {
         // Note: At this point serverPlayer is just a stub, with only
         // the connection infomation being valid.
         
@@ -374,15 +371,15 @@ public class LoginMessage extends ObjectMessage {
 
         } else switch (freeColServer.getServerState()) {
         case PRE_GAME:
-            ret = preGameLogin(freeColServer, serverPlayer);
+            ret = preGameLogin(freeColServer, connection);
             break;
 
         case LOAD_GAME:
-            ret = loadGameLogin(freeColServer, serverPlayer);
+            ret = loadGameLogin(freeColServer, connection);
             break;
 
         case IN_GAME:
-            ret = inGameLogin(freeColServer, serverPlayer);
+            ret = inGameLogin(freeColServer, connection);
             break;
 
         case END_GAME: default:
