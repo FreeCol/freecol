@@ -32,7 +32,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.io.FreeColNetworkInputStream;
 
 import org.xml.sax.SAXException;
 
