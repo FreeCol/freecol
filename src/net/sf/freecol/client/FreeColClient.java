@@ -34,12 +34,11 @@ import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.control.ClientInputHandler;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.control.InGameInputHandler;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.PreGameController;
-import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.control.SoundController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.SwingGUI;
@@ -81,11 +80,9 @@ public final class FreeColClient {
 
     private final PreGameController preGameController;
 
-    private final PreGameInputHandler preGameInputHandler;
-
     private final InGameController inGameController;
 
-    private final InGameInputHandler inGameInputHandler;
+    private final ClientInputHandler inputHandler;
 
     private final MapEditorController mapEditorController;
 
@@ -197,10 +194,10 @@ public final class FreeColClient {
         // Control.  Controllers expect GUI to be available.
         connectController = new ConnectController(this);
         preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
         inGameController = new InGameController(this);
-        inGameInputHandler = new InGameInputHandler(this);
         mapEditorController = new MapEditorController(this);
+        inputHandler = new ClientInputHandler(this);
+        setMessageHandler(this.inputHandler);
 
         // Load resources.
         //   - base resources
@@ -431,15 +428,6 @@ public final class FreeColClient {
     }
 
     /**
-     * Gets the input handler that will be used when the game has been started.
-     *
-     * @return The {@code InGameInputHandler}.
-     */
-    public InGameInputHandler getInGameInputHandler() {
-        return inGameInputHandler;
-    }
-
-    /**
      * Gets the controller for the map editor, if we are in the map editor.
      *
      * @return The map editor controller, if any.
@@ -580,11 +568,6 @@ public final class FreeColClient {
      * @param inGame If true, change to in-game state.
      */
     public void changeClientState(boolean inGame) {
-        if (inGame) {
-            setMessageHandler(this.inGameInputHandler);
-        } else {
-            setMessageHandler(this.preGameInputHandler);
-        }
         this.inGame = inGame;
     }
         

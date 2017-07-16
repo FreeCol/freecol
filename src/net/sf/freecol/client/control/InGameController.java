@@ -2339,9 +2339,9 @@ public final class InGameController extends FreeColClientHolder {
     // Routines from here on are mostly user commands.  That is they
     // are called directly as a result of keyboard, menu, mouse or
     // panel/dialog actions.  Some though are called indirectly after
-    // a call to the server routes information back through the
-    // InGameInputHandler.  They should all be annotated as such to
-    // confirm where they can come from.
+    // a call to the server routes information back through the input
+    // handler.  They should all be annotated as such to confirm where
+    // they can come from.
     //
     // User command all return a success/failure indication, except if
     // the game is stopped.  Message.clientHandler-initiated routines
