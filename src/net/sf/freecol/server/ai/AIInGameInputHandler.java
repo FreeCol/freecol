@@ -69,18 +69,9 @@ public final class AIInGameInputHandler extends FreeColServerHolder
             throw new NullPointerException("aiMain == null");
         }
 
+        // FIXME: Do not precalculate the AIPlayer, it may still be being initialized
         this.serverPlayer = serverPlayer;
         this.aiMain = aiMain;
-    }
-
-
-    /**
-     * Get player using this handler.
-     *
-     * @return The {@code ServerPlayer}.
-     */
-    private ServerPlayer getMyPlayer() {
-        return this.serverPlayer;
     }
 
     /**
@@ -90,15 +81,6 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      */
     private AIPlayer getMyAIPlayer() {
         return this.aiMain.getAIPlayer(this.serverPlayer);
-    }
-
-    /**
-     * Get the AI main in this handler.
-     *
-     * @return The {@code AIMain}.
-     */
-    private AIMain getAIMain() {
-        return this.aiMain;
     }
 
 
