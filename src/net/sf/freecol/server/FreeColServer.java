@@ -81,9 +81,7 @@ import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.InGameController;
-import net.sf.freecol.server.control.InGameInputHandler;
 import net.sf.freecol.server.control.PreGameController;
-import net.sf.freecol.server.control.PreGameInputHandler;
 import net.sf.freecol.server.control.ServerInputHandler;
 import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.generator.MapGenerator;
@@ -194,13 +192,14 @@ public final class FreeColServer {
     /** The handler for new user connections. */
     private final UserConnectionHandler userConnectionHandler;
 
-    /** The pre-game controller and input handler. */
+    /** The pre-game controller. */
     private final PreGameController preGameController;
-    private final PreGameInputHandler preGameInputHandler;
 
-    /** The in-game controller and input handler. */
+    /** The in-game controller. */
     private final InGameController inGameController;
-    private final InGameInputHandler inGameInputHandler;
+
+    /** The input handler. */
+    private final ServerInputHandler inputHandler;
 
     /** The AI controller. */
     private AIMain aiMain;
@@ -224,9 +223,8 @@ public final class FreeColServer {
         this.server = serverStart(port); // Throws IOException
         this.userConnectionHandler = new UserConnectionHandler(this);
         this.preGameController = new PreGameController(this);
-        this.preGameInputHandler = new PreGameInputHandler(this);
-        this.inGameInputHandler = new InGameInputHandler(this);
         this.inGameController = new InGameController(this);
+        this.inputHandler = new ServerInputHandler(this);
     }
     
     /**
@@ -484,11 +482,8 @@ public final class FreeColServer {
     private ServerState changeServerState(ServerState serverState) {
         ServerState ret = this.serverState;
         switch (this.serverState = serverState) {
-        case PRE_GAME: case LOAD_GAME:
-            getServer().setMessageHandlerToAllConnections(this.preGameInputHandler);
-            break;
-        case IN_GAME:
-            getServer().setMessageHandlerToAllConnections(this.inGameInputHandler);
+        case PRE_GAME: case LOAD_GAME: case IN_GAME:
+            getServer().setMessageHandlerToAllConnections(this.inputHandler);
             break;
         case END_GAME: default:
             getServer().setMessageHandlerToAllConnections(null);
@@ -525,10 +520,8 @@ public final class FreeColServer {
      */
     public ServerInputHandler getInputHandler() {
         switch (this.serverState) {
-        case PRE_GAME: case LOAD_GAME:
-            return this.preGameInputHandler;
-        case IN_GAME:
-            return this.inGameInputHandler;
+        case PRE_GAME: case LOAD_GAME: case IN_GAME:
+            return this.inputHandler;
         default:
             break;
         }
@@ -646,11 +639,8 @@ public final class FreeColServer {
      */
     public void addPlayerConnection(Connection connection) {
         switch (this.serverState) {
-        case PRE_GAME: case LOAD_GAME:
-            connection.setMessageHandler(this.preGameInputHandler);
-            break;
-        case IN_GAME:
-            connection.setMessageHandler(this.inGameInputHandler);
+        case PRE_GAME: case LOAD_GAME: case IN_GAME:
+            connection.setMessageHandler(this.inputHandler);
             break;
         case END_GAME: default:
             return;
@@ -677,7 +667,7 @@ public final class FreeColServer {
     private void addAIConnection(ServerPlayer aiPlayer) {
         DummyConnection theConnection
             = new DummyConnection("Server-to-AI-" + aiPlayer.getSuffix());
-        theConnection.setMessageHandler(this.inGameInputHandler);
+        theConnection.setMessageHandler(this.inputHandler);
         DummyConnection aiConnection
             = new DummyConnection("AI-" + aiPlayer.getSuffix() + "-to-Server");
         aiConnection.setMessageHandler(new AIInGameInputHandler(this, aiPlayer, getAIMain()));

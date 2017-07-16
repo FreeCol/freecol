@@ -55,8 +55,6 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The game enters the state
  * {@link net.sf.freecol.server.FreeColServer.ServerState#IN_GAME}, when the
  *  has successfully been invoked.
- *
- * @see InGameInputHandler
  */
 public final class PreGameController extends Controller {
 

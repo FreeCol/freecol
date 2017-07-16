@@ -2240,8 +2240,7 @@ public class Unit extends GoodsLocation
                             : MoveType.MOVE_NO_ATTACK_MARINE;
                     }
                 } else if (target.hasLostCityRumour() && owner.isEuropean()) {
-                    // Natives do not explore rumours, see:
-                    // server/control/InGameInputHandler.java:move()
+                    // Natives do not explore rumours
                     return MoveType.EXPLORE_LOST_CITY_RUMOUR;
                 } else {
                     return MoveType.MOVE;
