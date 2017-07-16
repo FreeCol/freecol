@@ -92,6 +92,7 @@ public class NewTurnMessage extends AttributeMessage {
         }
 
         igc(freeColClient).newTurnHandler(turn);
+        clientGeneric(freeColClient);
     }
 
 

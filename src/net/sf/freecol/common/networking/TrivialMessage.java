@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -74,8 +76,6 @@ public abstract class TrivialMessage extends Message {
      */
     protected TrivialMessage(String type) {
         super(type);
-
-        this.type = type;
     }
 
     /**
@@ -99,113 +99,143 @@ public abstract class TrivialMessage extends Message {
     }
 
 
+    // Implement Message
+
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getType() {
         return this.type;
     }
 
-    @Override
-    public void setType(String type) {
+    /**
+     * {@inheritDoc}
+     */
+    protected void setType(String type) {
         this.type = type;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public boolean hasAttribute(String key) {
+    protected boolean hasAttribute(String key) {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getStringAttribute(String key) {
+    protected String getStringAttribute(String key) {
         return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void setStringAttribute(String key, String value) {
+    protected void setStringAttribute(String key, String value) {
         if (key == null || value == null) {
-            ; // OK to set nothing
+            ; // Always OK to set nothing
         } else { // Nope
-            throw new RuntimeException("TrivialMessage.setStringAttribute not implemented");
+            throw new RuntimeException(getType() + ".setStringAttribute NYI");
         }
     }
     
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Map<String,String> getStringAttributes() {
+    protected Map<String,String> getStringAttributes() {
         return Collections.<String,String>emptyMap();
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    @Override
-    public List<FreeColObject> getChildren() {
+    protected int getChildCount() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected List<FreeColObject> getChildren() {
         return Collections.<FreeColObject>emptyList();
     }
     
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void setChildren(List<? extends FreeColObject> fcos) {
+    protected void setChildren(List<? extends FreeColObject> fcos) {
         if (fcos == null || fcos.isEmpty()) {
-            ; // OK to set nothing
+            ; // Always OK to set nothing
         } else { // Nope
-            throw new RuntimeException("TrivialMessage.setChildren not implemented");
+            throw new RuntimeException(getType() + ".setChildren NYI");
         }
     }
     
     /**
      * {@inheritDoc}
      */
-    @Override
+    protected <T extends FreeColObject> void appendChild(T fco) {
+        if (fco == null) {
+            ; // Always OK to add nothing
+        } else {
+            throw new RuntimeException(getType() + ".append NYI");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected <T extends FreeColObject> void appendChildren(Collection<T> fcos) {
+        if (fcos == null) {
+            ; // Always OK to add nothing
+        } else {
+            throw new RuntimeException(getType() + ".append NYI");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean currentPlayerMessage() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public MessagePriority getPriority() {
         return Message.MessagePriority.NORMAL;
     }
 
-
-    // Convenience methods for the subclasses
-
-    protected net.sf.freecol.client.control.InGameController
-        igc(FreeColClient freeColClient) {
-        return freeColClient.getInGameController();
+    /**
+     * {@inheritDoc}
+     */
+    public boolean canMerge() {
+        return false;
     }
 
-    protected net.sf.freecol.server.control.InGameController
-        igc(FreeColServer freeColServer) {
-        return freeColServer.getInGameController();
+    /**
+     * {@inheritDoc}
+     */
+    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer)
+        throws FreeColException {
+        throw new FreeColException(getType() + " aiHandler NYI");
     }
 
-    protected void invokeAndWait(FreeColClient freeColClient,
-                                 Runnable runnable) {
-        freeColClient.getGUI().invokeNowOrWait(runnable);
+    /**
+     * {@inheritDoc}
+     */
+    public void clientHandler(FreeColClient freeColClient)
+        throws FreeColException {
+        throw new FreeColException(getType() + " clientHandler NYI");
     }
 
-    protected void invokeLater(FreeColClient freeColClient,
-                               Runnable runnable) {
-        freeColClient.getGUI().invokeNowOrLater(runnable);
-    }
-
-    protected net.sf.freecol.client.control.PreGameController
-        pgc(FreeColClient freeColClient) {
-        return freeColClient.getPreGameController();
-    }
-
-    protected net.sf.freecol.server.control.PreGameController
-        pgc(FreeColServer freeColServer) {
-        return freeColServer.getPreGameController();
+    /**
+     * {@inheritDoc}
+     */
+    public ChangeSet serverHandler(FreeColServer freeColServer,
+                                   ServerPlayer serverPlayer) {
+        return serverPlayer.clientError("Invalid message type: " + getType());
     }
 }

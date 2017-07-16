@@ -45,7 +45,7 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
     public UpdateTradeRouteMessage(TradeRoute tradeRoute) {
         super(TAG);
 
-        add1(tradeRoute);
+        appendChild(tradeRoute);
     }
 
 

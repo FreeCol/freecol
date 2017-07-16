@@ -49,7 +49,7 @@ public class NewTradeRouteMessage extends ObjectMessage {
     public NewTradeRouteMessage(TradeRoute tradeRoute) {
         super(TAG);
 
-        add1(tradeRoute);
+        appendChild(tradeRoute);
     }
 
     /**
@@ -84,7 +84,7 @@ public class NewTradeRouteMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        add1(tradeRoute);
+        appendChild(tradeRoute);
     }
 
 
@@ -134,6 +134,7 @@ public class NewTradeRouteMessage extends ObjectMessage {
         tr.intern();
 
         igc(freeColClient).newTradeRouteHandler(tr);
+        clientGeneric(freeColClient);
     }
 
     /**
@@ -144,19 +145,5 @@ public class NewTradeRouteMessage extends ObjectMessage {
                                    ServerPlayer serverPlayer) {
         return igc(freeColServer)
             .newTradeRoute(serverPlayer);
-    }
-
-
-    // Public interface
-
-    /**
-     * Set the new trade route.
-     *
-     * @param tradeRoute The {@code TradeRoute} to attach.
-     * @return This message.
-     */
-    public NewTradeRouteMessage setTradeRoute(TradeRoute tradeRoute) {
-        setChild(0, tradeRoute);
-        return this;
     }
 }

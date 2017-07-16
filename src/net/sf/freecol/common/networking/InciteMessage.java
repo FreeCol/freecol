@@ -102,6 +102,7 @@ public class InciteMessage extends AttributeMessage {
         final int gold = getGold();
         
         igc(freeColClient).inciteHandler(unit, is, enemy, gold);
+        clientGeneric(freeColClient);
     }
     
     /**

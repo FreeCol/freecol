@@ -52,7 +52,7 @@ public class DeliverGiftMessage extends ObjectMessage {
     public DeliverGiftMessage(Unit unit, IndianSettlement is, Goods goods) {
         super(TAG, UNIT_TAG, unit.getId(), SETTLEMENT_TAG, is.getId());
 
-        add1(goods);
+        appendChild(goods);
     }
 
     /**
@@ -81,7 +81,7 @@ public class DeliverGiftMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
-        add1(goods);
+        appendChild(goods);
     }
     
 

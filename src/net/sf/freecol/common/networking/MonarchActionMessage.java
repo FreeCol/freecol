@@ -57,7 +57,7 @@ public class MonarchActionMessage extends ObjectMessage {
                                 StringTemplate template, String monarchKey) {
         super(TAG, ACTION_TAG, action.toString(), MONARCH_TAG, monarchKey);
 
-        add1(template);
+        appendChild(template);
     }
 
     /**
@@ -86,7 +86,7 @@ public class MonarchActionMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
-        add1(template);
+        appendChild(template);
     }
 
 
@@ -194,6 +194,7 @@ public class MonarchActionMessage extends ObjectMessage {
         final String key = getMonarchKey();
         
         igc(freeColClient).monarchActionHandler(action, template, key);
+        clientGeneric(freeColClient);
     }
 
     /**

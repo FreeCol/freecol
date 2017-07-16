@@ -109,6 +109,7 @@ public class NewRegionNameMessage extends AttributeMessage {
         if (name == null || region == null) return;
 
         igc(freeColClient).newRegionNameHandler(region, tile, unit, name);
+        clientGeneric(freeColClient);
     }
 
     /**

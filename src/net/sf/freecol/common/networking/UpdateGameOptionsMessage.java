@@ -49,7 +49,7 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
     public UpdateGameOptionsMessage(OptionGroup optionGroup) {
         super(TAG);
 
-        add1(optionGroup);
+        appendChild(optionGroup);
     }
 
     /**
@@ -84,7 +84,7 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        add1(optionGroup);
+        appendChild(optionGroup);
     }
 
 
@@ -120,6 +120,7 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
         } else {
             pgc(freeColClient).updateGameOptionsHandler(gameOptions);
         }
+        clientGeneric(freeColClient);
     }
 
     /**

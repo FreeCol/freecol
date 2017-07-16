@@ -131,6 +131,7 @@ public class MultipleMessage extends AttributeMessage {
                 assert ret == null;
             }
         }                 
+        clientGeneric(freeColClient);
     }
 
     /**

@@ -52,7 +52,7 @@ public class HighScoreMessage extends ObjectMessage {
     public HighScoreMessage(String key, List<HighScore> scores) {
         super(TAG, KEY_TAG, key);
 
-        if (scores != null) addAll(scores);
+        appendChildren(scores);
     }
 
     /**
@@ -78,7 +78,7 @@ public class HighScoreMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
-        addAll(scores);
+        appendChildren(scores);
     }
 
 
@@ -118,6 +118,7 @@ public class HighScoreMessage extends ObjectMessage {
         final List<HighScore> scores = getScores();
 
         igc(freeColClient).highScoreHandler(key, scores);
+        clientGeneric(freeColClient);
     }
         
     /**

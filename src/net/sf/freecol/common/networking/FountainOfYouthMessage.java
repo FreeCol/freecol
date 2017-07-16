@@ -92,6 +92,7 @@ public class FountainOfYouthMessage extends AttributeMessage {
         }
 
         igc(freeColClient).fountainOfYouthHandler(n);
+        clientGeneric(freeColClient);
     }
 
 

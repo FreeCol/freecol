@@ -89,8 +89,15 @@ public abstract class ObjectMessage extends AttributeMessage {
     /**
      * {@inheritDoc}
      */
+    protected int getChildCount() {
+        return this.objects.size();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<FreeColObject> getChildren() {
+    protected List<FreeColObject> getChildren() {
         return this.objects;
     }
 
@@ -98,7 +105,7 @@ public abstract class ObjectMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
-    public void setChildren(List<? extends FreeColObject> fcos) {
+    protected void setChildren(List<? extends FreeColObject> fcos) {
         this.objects.clear();
         this.objects.addAll(fcos);
     }
@@ -107,100 +114,15 @@ public abstract class ObjectMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     @Override
-    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        for (FreeColObject fco : getChildren()) {
-            if (fco != null) fco.toXML(xw);
-        }
-    }
-
-    /**
-     * Get a child object.
-     *
-     * @param T The actual class of {@code FreeColObject} to get.
-     * @param index The index of the child to get.
-     * @param returnClass The expected class of child.
-     * @return The child object found, or null if the index is invalid or
-     *     return class incorrect.
-     */
-    protected <T extends FreeColObject> T getChild(int index,
-                                                   Class<T> returnClass) {
-        if (index >= objectCount()) return (T)null;
-        FreeColObject fco = this.objects.get(index);
-        try {
-            return returnClass.cast(fco);
-        } catch (ClassCastException cce) {
-            logger.log(Level.WARNING, "Cast fail", cce);
-            return null;
-        }
-    }
-
-    /**
-     * Get the child objects.
-     *
-     * @param T The actual class of {@code FreeColObject} to get.
-     * @param returnClass The expected class of children.
-     * @return The children with the expected class.
-     */
-    protected <T extends FreeColObject> List<T> getChildren(Class<T> returnClass) {
-        List<T> ret = new ArrayList<>();
-        for (FreeColObject fco : this.objects) {
-            try {
-                ret.add(returnClass.cast(fco));
-            } catch (ClassCastException cce) {}
-        }
-        return ret;
-    }
-            
-    /**
-     * Set a child object.
-     *
-     * @param T The actual class of {@code FreeColObject} to set.
-     * @param index The index of the child to set.
-     * @param fco The new child object.
-     */
-    protected <T extends FreeColObject> void setChild(int index, T fco) {
-        if (index < this.objects.size()) this.objects.set(index, fco);
-    }
-
-    /**
-     * Add another child object.
-     *
-     * @param T The actual class of {@code FreeColObject} to add.
-     * @param fco The {@code FreeColObject} to add.
-     */
-    protected <T extends FreeColObject> void add1(T fco) {
+    protected <T extends FreeColObject> void appendChild(T fco) {
         if (fco != null) this.objects.add(fco);
     }
 
     /**
-     * Add many child objects.
-     *
-     * @param T The actual class of {@code FreeColObject} to add.
-     * @param fcos A collection of {@code FreeColObject}s to add.
+     * {@inheritDoc}
      */
-    protected <T extends FreeColObject> void addAll(Collection<T> fcos) {
-        this.objects.addAll(fcos);
-    }
-
-    /**
-     * Get the object count.
-     *
-     * @return The number of objects.
-     */
-    protected int objectCount() {
-        return this.objects.size();
-    }
-
-    /**
-     * Complain about finding the wrong XML element.
-     *
-     * @param wanted The tag we wanted.
-     * @param got The tag we got.
-     * @exception XMLStreamException is always thrown.
-     */
-    protected void expected(String wanted, String got)
-        throws XMLStreamException {
-        throw new XMLStreamException("In " + getClass().getName()
-            + ", expected " + wanted + " but read: " + got);
+    @Override
+    protected <T extends FreeColObject> void appendChildren(Collection<T> fcos) {
+        if (fcos != null) this.objects.addAll(fcos);
     }
 }

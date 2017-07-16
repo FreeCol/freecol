@@ -51,7 +51,7 @@ public class NationSummaryMessage extends ObjectMessage {
     public NationSummaryMessage(Player player, NationSummary nationSummary) {
         super(TAG, PLAYER_TAG, player.getId());
 
-        add1(nationSummary);
+        appendChild(nationSummary);
     }
 
     /**
@@ -80,7 +80,7 @@ public class NationSummaryMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
-        add1(ns);
+        appendChild(ns);
     }
 
 
@@ -133,6 +133,7 @@ public class NationSummaryMessage extends ObjectMessage {
         final NationSummary ns = getNationSummary();
 
         igc(freeColClient).nationSummaryHandler(other, ns);
+        clientGeneric(freeColClient);
     }
 
     /**

@@ -90,6 +90,7 @@ public class SetDeadMessage extends AttributeMessage {
         }
 
         igc(freeColClient).setDeadHandler(player);
+        clientGeneric(freeColClient);
     }
 
 

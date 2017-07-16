@@ -70,10 +70,12 @@ public class AnimateAttackMessage extends ObjectMessage {
               SUCCESS_TAG, Boolean.toString(result));
 
         if (addAttacker) {
-            add1((attacker.isOnCarrier()) ? attacker.getCarrier() : attacker);
+            appendChild((attacker.isOnCarrier()) ? attacker.getCarrier()
+                : attacker);
         }
         if (addDefender) {
-            add1((defender.isOnCarrier()) ? defender.getCarrier() : defender);
+            appendChild((defender.isOnCarrier()) ? defender.getCarrier()
+                : defender);
         }
     }
 
@@ -96,7 +98,8 @@ public class AnimateAttackMessage extends ObjectMessage {
             while (xr.moreTags()) {
                 String tag = xr.getLocalName();
                 if (Unit.TAG.equals(tag)) {
-                    add1(xr.readFreeColObject(game, Unit.class));
+                    Unit u =  xr.readFreeColObject(game, Unit.class);
+                    if (u != null) units.add(u);
                 } else {
                     expected(Unit.TAG, tag);
                 }
@@ -106,6 +109,7 @@ public class AnimateAttackMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
+        appendChildren(units);
     }
 
 
@@ -235,5 +239,6 @@ public class AnimateAttackMessage extends ObjectMessage {
         igc(freeColClient)
             .animateAttackHandler(attacker, defender,
                                   attackerTile, defenderTile, result);
+        clientGeneric(freeColClient);
     }
 }

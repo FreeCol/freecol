@@ -109,6 +109,7 @@ public class ScoutSpeakToChiefMessage extends AttributeMessage {
         final String result = getResult();
 
         igc(freeColClient).scoutSpeakToChiefHandler(unit, is, result);
+        clientGeneric(freeColClient);
     }
 
     /**

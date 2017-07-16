@@ -59,7 +59,7 @@ public class DiplomacyMessage extends ObjectMessage {
                             DiplomaticTrade agreement) {
         super(TAG, OUR_ID_TAG, our.getId(), OTHER_ID_TAG, other.getId());
 
-        add1(agreement);
+        appendChild(agreement);
     }
 
     /**
@@ -137,8 +137,8 @@ public class DiplomacyMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        add1(agreement);
-        add1(extraUnit);
+        appendChild(agreement);
+        appendChild(extraUnit);
     }
 
 
@@ -169,17 +169,6 @@ public class DiplomacyMessage extends ObjectMessage {
      */
     private DiplomaticTrade getAgreement() {
         return getChild(0, DiplomaticTrade.class);
-    }
-
-    /**
-     * Set the agreement (a {@code DiplomaticTrade}) in this message.
-     *
-     * @param agreement The {@code DiplomaticTrade} to set.
-     * @return This message.
-     */
-    private DiplomacyMessage setAgreement(DiplomaticTrade agreement) {
-        setChild(0, agreement);
-        return this;
     }
 
     /**
@@ -235,6 +224,7 @@ public class DiplomacyMessage extends ObjectMessage {
         if (extraUnit != null) extraUnit.intern();
 
         igc(freeColClient).diplomacyHandler(our, other, agreement);
+        clientGeneric(freeColClient);
     }
 
     /**

@@ -51,7 +51,7 @@ public class AddPlayerMessage extends ObjectMessage {
     public AddPlayerMessage(List<? extends Player> players) {
         super(TAG);
 
-        addAll(players);
+        appendChildren(players);
     }
 
     /**
@@ -77,7 +77,7 @@ public class AddPlayerMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
-        addAll(players);
+        appendChildren(players);
     }
 
 

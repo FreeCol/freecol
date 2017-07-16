@@ -96,6 +96,7 @@ public class NewLandNameMessage extends AttributeMessage {
         if (unit == null || defaultName == null || !unit.hasTile()) return;
 
         igc(freeColClient).newLandNameHandler(unit, defaultName);
+        clientGeneric(freeColClient);
     }
 
     /**

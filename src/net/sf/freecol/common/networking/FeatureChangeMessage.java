@@ -63,7 +63,7 @@ public class FeatureChangeMessage extends ObjectMessage {
         super(TAG, ID_TAG, fcgo.getId(),
               ADD_TAG, String.valueOf(add));
 
-        add1(fco);
+        appendChild(fco);
     }
 
     /**
@@ -96,7 +96,7 @@ public class FeatureChangeMessage extends ObjectMessage {
                 } else {
                     expected("Feature", tag);
                 }
-                add1(fco);
+                appendChild(fco);
                 xr.expectTag(tag);
             }
             xr.expectTag(TAG);
@@ -161,5 +161,6 @@ public class FeatureChangeMessage extends ObjectMessage {
         }
 
         igc(freeColClient).featureChangeHandler(parent, children, add);
+        clientGeneric(freeColClient);
     }
 }

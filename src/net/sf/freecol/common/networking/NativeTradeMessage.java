@@ -65,7 +65,7 @@ public class NativeTradeMessage extends ObjectMessage {
     public NativeTradeMessage(NativeTradeAction action, NativeTrade nt) {
         super(TAG, ACTION_TAG, action.toString());
 
-        add1(nt);
+        appendChild(nt);
     }
 
     /**
@@ -100,7 +100,7 @@ public class NativeTradeMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        add1(nt);
+        appendChild(nt);
     }
 
 
@@ -142,6 +142,7 @@ public class NativeTradeMessage extends ObjectMessage {
         final NativeTrade nt = getNativeTrade();
 
         igc(freeColClient).nativeTradeHandler(action, nt);
+        clientGeneric(freeColClient);
     }
 
     /**

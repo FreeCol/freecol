@@ -70,7 +70,7 @@ public class UpdateMessage extends ObjectMessage {
                          FreeColObject fco) {
         this(destination);
 
-        if (fco != null) add1(fco);
+        appendChild(fco);
     }
 
     /**
@@ -83,7 +83,7 @@ public class UpdateMessage extends ObjectMessage {
                          List<FreeColObject> fcos) {
         this(destination);
 
-        if (fcos != null) addAll(fcos);
+        appendChildren(fcos);
     }
 
     /**
@@ -110,7 +110,7 @@ public class UpdateMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        addAll(fcos);
+        appendChildren(fcos);
     }
 
 
@@ -129,7 +129,7 @@ public class UpdateMessage extends ObjectMessage {
     public boolean merge(Message message) {
         if (message instanceof UpdateMessage) {
             UpdateMessage other = (UpdateMessage)message;
-            addAll(other.getChildren());
+            appendChildren(other.getChildren());
             return true;
         }
         return false;
@@ -163,6 +163,7 @@ public class UpdateMessage extends ObjectMessage {
     public void clientHandler(FreeColClient freeColClient) {
         if (freeColClient.isInGame()) {
             igc(freeColClient).updateHandler(getChildren());
+            clientGeneric(freeColClient);
         } else {
             pgc(freeColClient).updateHandler(getChildren());
         }

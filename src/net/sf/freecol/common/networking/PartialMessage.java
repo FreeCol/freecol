@@ -122,5 +122,6 @@ public class PartialMessage extends AttributeMessage {
         } else {
             logger.warning("Partial update when not in game.");
         }
+        clientGeneric(freeColClient);
     }
 }

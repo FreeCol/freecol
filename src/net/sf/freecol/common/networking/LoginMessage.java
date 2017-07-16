@@ -70,7 +70,7 @@ public class LoginMessage extends ObjectMessage {
               CURRENT_PLAYER_TAG, Boolean.toString(currentPlayer));
 
         if (state != null) setStringAttribute(STATE_TAG, state.toString());
-        if (game != null) add1(game);
+        appendChild(game);
     }
 
     /**
@@ -96,7 +96,7 @@ public class LoginMessage extends ObjectMessage {
             }
         }
         xr.expectTag(TAG);
-        add1(game);
+        appendChild(game);
     }
 
 

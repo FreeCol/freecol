@@ -90,19 +90,6 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     public Message handle(@SuppressWarnings("unused") Connection connection,
                           Message message) throws FreeColException {
         message.clientHandler(getFreeColClient());
-
-        if (currentPlayerIsMyPlayer()) {
-            // Play a sound if specified
-            String sound = message.getStringAttribute("sound");
-            if (sound != null && !sound.isEmpty()) {
-                getGUI().playSound(sound);
-            }
-            // If there is a "flush" attribute present, encourage the
-            // client to display any new messages.
-            if (message.getBooleanAttribute("flush", false)) {
-                invokeLater(displayModelMessagesRunnable);
-            }
-        }
         return null; 
     }
 

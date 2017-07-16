@@ -116,6 +116,7 @@ public class RemoveMessage extends AttributeMessage {
         if (objects.isEmpty()) return;
 
         igc(freeColClient).removeHandler(objects, divert);
+        clientGeneric(freeColClient);
     }
 
 

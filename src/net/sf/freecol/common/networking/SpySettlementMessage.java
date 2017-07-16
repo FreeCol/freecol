@@ -57,7 +57,7 @@ public class SpySettlementMessage extends ObjectMessage {
     public SpySettlementMessage(Unit unit, Settlement settlement) {
         super(TAG, SETTLEMENT_TAG, settlement.getId(), UNIT_TAG, unit.getId());
 
-        add1(settlement.getTile());
+        appendChild(settlement.getTile());
     }
 
     /**
@@ -92,7 +92,7 @@ public class SpySettlementMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        add1(spyTile);
+        appendChild(spyTile);
     }
 
 
@@ -145,6 +145,7 @@ public class SpySettlementMessage extends ObjectMessage {
         final Tile spyTile = getSpyTile();
 
         igc(freeColClient).spySettlementHandler(spyTile);
+        clientGeneric(freeColClient);
     }
 
     /**

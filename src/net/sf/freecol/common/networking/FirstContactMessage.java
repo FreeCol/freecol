@@ -118,6 +118,7 @@ public class FirstContactMessage extends AttributeMessage {
         }
 
         igc(freeColClient).firstContactHandler(player, other, tile, n);
+        clientGeneric(freeColClient);
     }
 
     /**

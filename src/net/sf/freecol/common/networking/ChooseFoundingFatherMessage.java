@@ -127,6 +127,7 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
         final List<FoundingFather> fathers = getFathers(game);
         
         igc(freeColClient).chooseFoundingFatherHandler(fathers);
+        clientGeneric(freeColClient);
     }
 
     /**

@@ -50,7 +50,7 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
     public SetGoodsLevelsMessage(Colony colony, ExportData data) {
         super(TAG, COLONY_TAG, colony.getId());
 
-        add1(data);
+        appendChild(data);
     }
 
     /**
@@ -85,7 +85,7 @@ public class SetGoodsLevelsMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        add1(data);
+        appendChild(data);
     }
 
 

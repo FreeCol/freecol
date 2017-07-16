@@ -52,7 +52,7 @@ public class ErrorMessage extends ObjectMessage {
     public ErrorMessage(StringTemplate template, String message) {
         super(TAG, MESSAGE_TAG, message);
 
-        add1(template);
+        appendChild(template);
     }
 
     /**
@@ -63,7 +63,7 @@ public class ErrorMessage extends ObjectMessage {
     public ErrorMessage(StringTemplate template) {
         super(TAG);
 
-        add1(template);
+        appendChild(template);
     }
 
     /**
@@ -124,7 +124,7 @@ public class ErrorMessage extends ObjectMessage {
             }
         }
         xr.expectTag(TAG);
-        add1(template);
+        appendChild(template);
     }
 
 
@@ -172,6 +172,7 @@ public class ErrorMessage extends ObjectMessage {
         
         if (freeColClient.isInGame()) {
             igc(freeColClient).errorHandler(template, message);
+            clientGeneric(freeColClient);
         } else {
             pgc(freeColClient).errorHandler(template, message);
         }

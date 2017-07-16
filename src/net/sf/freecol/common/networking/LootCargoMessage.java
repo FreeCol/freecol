@@ -56,7 +56,7 @@ public class LootCargoMessage extends ObjectMessage {
     public LootCargoMessage(Unit winner, String loserId, List<Goods> goods) {
         super(TAG, WINNER_TAG, winner.getId(), LOSER_TAG, loserId);
 
-        addAll(goods);
+        appendChildren(goods);
     }
 
     /**
@@ -86,7 +86,7 @@ public class LootCargoMessage extends ObjectMessage {
             xr.expectTag(tag);
         }
         xr.expectTag(TAG);
-        addAll(goods);
+        appendChildren(goods);
     }
 
 
@@ -153,6 +153,7 @@ public class LootCargoMessage extends ObjectMessage {
         if (unit == null || goods == null) return;
 
         igc(freeColClient).lootCargoHandler(unit, goods, loserId);
+        clientGeneric(freeColClient);
     }
 
     /**

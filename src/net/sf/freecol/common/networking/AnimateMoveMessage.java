@@ -59,7 +59,7 @@ public class AnimateMoveMessage extends ObjectMessage {
               NEW_TILE_TAG, newTile.getId(), OLD_TILE_TAG, oldTile.getId());
 
         if (appears) {
-            add1((unit.isOnCarrier()) ? unit.getCarrier() : unit);
+            appendChild((unit.isOnCarrier()) ? unit.getCarrier() : unit);
         }
     }
 
@@ -95,7 +95,7 @@ public class AnimateMoveMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        if (unit != null) add1(unit);
+        appendChild(unit);
     }
 
 
@@ -186,5 +186,6 @@ public class AnimateMoveMessage extends ObjectMessage {
         // This only performs animation, if required.  It does not
         // actually change unit positions, which happens in an "update".
         igc(freeColClient).animateMoveHandler(unit, oldTile, newTile);
+        clientGeneric(freeColClient);
     }
 }

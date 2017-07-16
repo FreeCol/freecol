@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -111,7 +112,7 @@ public abstract class Message {
      * 
      * @param type The main message type.
      */
-    public Message(String type) {
+    protected Message(String type) {
         setType(type);
     }
     
@@ -131,6 +132,135 @@ public abstract class Message {
     abstract protected void setType(String type);
     
     /**
+     * Checks if an attribute is present in this message.
+     * 
+     * @param key The attribute to look for.
+     * @return True if the attribute is present.
+     */
+    abstract protected boolean hasAttribute(String key);
+
+    /**
+     * Get a string attribute value.
+     *
+     * @param key The attribute to look for.
+     * @return The string value found, or null if the attribute was absent.
+     */
+    abstract protected String getStringAttribute(String key);
+
+    /**
+     * Sets an attribute in this message.
+     * 
+     * @param key The attribute to set.
+     * @param value The new value of the attribute.
+     */
+    abstract protected void setStringAttribute(String key, String value);
+
+    /**
+     * Get all the attributes in this message.
+     *
+     * @return A {@code Map} of the attributes.
+     */
+    abstract protected Map<String,String> getStringAttributes();
+
+    /**
+     * Get the number of child objects.
+     *
+     * @return The child count.
+     */
+    abstract protected int getChildCount();
+
+    /**
+     * Get the child objects of this message.
+     *
+     * @return A list of child {@code FreeColObject}s.
+     */
+    abstract protected List<FreeColObject> getChildren();
+        
+    /**
+     * Set the list of objects attached to this message.
+     *
+     * @param fcos The new list of attached {@code FreeColObject}s.
+     */
+    abstract protected void setChildren(List<? extends FreeColObject> fcos);
+
+    /**
+     * Append a new child.
+     *
+     * @param T The child type.
+     * @param fco The new child object.
+     */
+    abstract protected <T extends FreeColObject> void appendChild(T fco);
+    
+    /**
+     * Append a multiple new children.
+     *
+     * @param T The child type.
+     * @param fcos The new child objects.
+     */
+    abstract protected <T extends FreeColObject> void appendChildren(Collection<T> fcos);
+
+    /**
+     * Should this message only be sent to a server by the current player?
+     *
+     * @return True if this is a current-player-only message.
+     */
+    abstract public boolean currentPlayerMessage();
+
+    /**
+     * Get the priority of this type of message.
+     *
+     * @return The message priority.
+     */
+    abstract public MessagePriority getPriority();
+
+
+    /**
+     * Does this message consist only of mergeable attributes?
+     *
+     * @return True if this message is trivially mergeable.
+     */
+    public boolean canMerge() {
+        return false;
+    }
+
+    /**
+     * AI-side handler for this message.
+     *
+     * AI handlers always return null.
+     * FIXME: One day the FreeColServer should devolve to AIMain.
+     * 
+     * @param freeColServer The {@code FreeColServer} handling the request.
+     * @param aiPlayer The {@code AIPlayer} the message was sent to.
+     * @exception FreeColException if there is a problem handling the message.
+     */
+    abstract public void aiHandler(FreeColServer freeColServer,
+                                   AIPlayer aiPlayer) throws FreeColException;
+
+    /**
+     * Client-side handler for this message.
+     *
+     * Client handlers always return null.
+     *
+     * @param freeColClient The {@code FreeColClient} to handle this message.
+     * @exception FreeColException if there is a problem building the message.
+     */
+    abstract public void clientHandler(FreeColClient freeColClient)
+        throws FreeColException;
+
+    /**
+     * Server-side handler for this message.
+     *
+     * @param freeColServer The {@code FreeColServer} handling the request.
+     * @param serverPlayer The {@code ServerPlayer} that sent the request.
+     * @return A {@code ChangeSet} defining the response.
+     */
+    abstract public ChangeSet serverHandler(FreeColServer freeColServer,
+                                            ServerPlayer serverPlayer);
+
+
+    // Utilities derived from the above primitives
+
+    /**
      * Checks if this message is of a given type.
      * 
      * @param type The type you wish to test against.
@@ -141,30 +271,13 @@ public abstract class Message {
     }
         
     /**
-     * Should this message only be sent to a server by the current player?
-     *
-     * @return True if this is a current-player-only message.
-     */
-    public boolean currentPlayerMessage() {
-        return false;
-    }
-
-    /**
-     * Checks if an attribute is present in this message.
-     * 
-     * @param key The attribute to look for.
-     * @return True if the attribute is present.
-     */
-    abstract public boolean hasAttribute(String key);
-
-    /**
      * Get a boolean attribute value.
      *
      * @param key The attribute to look for.
      * @param defaultValue The fallback result.
      * @return The boolean value, or the default value if no boolean is found.
      */
-    public Boolean getBooleanAttribute(String key, Boolean defaultValue) {
+    protected Boolean getBooleanAttribute(String key, Boolean defaultValue) {
         if (hasAttribute(key)) {
             try {
                 return Boolean.parseBoolean(getStringAttribute(key));
@@ -180,7 +293,7 @@ public abstract class Message {
      * @param defaultValue The fallback result.
      * @return The integer value, or the default value if no integer is found.
      */
-    public Integer getIntegerAttribute(String key, int defaultValue) {
+    protected Integer getIntegerAttribute(String key, int defaultValue) {
         if (hasAttribute(key)) {
             try {
                 return Integer.parseInt(getStringAttribute(key));
@@ -198,9 +311,9 @@ public abstract class Message {
      * @param defaultValue The default value.
      * @return The enum attribute value, or the default value if none found.
      */
-    public <T extends Enum<T>> T getEnumAttribute(String key,
-                                                  Class<T> returnClass,
-                                                  T defaultValue) {
+    protected <T extends Enum<T>> T getEnumAttribute(String key,
+                                                     Class<T> returnClass,
+                                                     T defaultValue) {
         T result = defaultValue;
         if (hasAttribute(key)) {
             String kv = getStringAttribute(key);
@@ -215,20 +328,12 @@ public abstract class Message {
     }
             
     /**
-     * Get a string attribute value.
-     *
-     * @param key The attribute to look for.
-     * @return The string value found, or null if the attribute was absent.
-     */
-    abstract public String getStringAttribute(String key);
-
-    /**
      * Sets an attribute in this message with n boolean value.
      *
      * @param key The attribute to set.
      * @param value The value of the attribute.
      */
-    public void setBooleanAttribute(String key, Boolean value) {
+    protected void setBooleanAttribute(String key, Boolean value) {
         if (value != null) setStringAttribute(key, Boolean.toString(value));
     }
 
@@ -238,31 +343,16 @@ public abstract class Message {
      * @param key The attribute to set.
      * @param value The value of the attribute.
      */
-    public void setIntegerAttribute(String key, int value) {
+    protected void setIntegerAttribute(String key, int value) {
         setStringAttribute(key, Integer.toString(value));
     }
 
-    /**
-     * Sets an attribute in this message.
-     * 
-     * @param key The attribute to set.
-     * @param value The new value of the attribute.
-     */
-    abstract public void setStringAttribute(String key, String value);
-
-    /**
-     * Get all the attributes in this message.
-     *
-     * @return A {@code Map} of the attributes.
-     */
-    abstract public Map<String,String> getStringAttributes();
-    
     /**
      * Set all the attributes in a map.
      *
      * @param attributes The map of key,value pairs to set.
      */
-    public void setStringAttributes(Map<String, String> attributes) {
+    protected void setStringAttributes(Map<String, String> attributes) {
         forEachMapEntry(attributes,
                         e -> setStringAttribute(e.getKey(), e.getValue()));
     }
@@ -272,7 +362,7 @@ public abstract class Message {
      *
      * @param attributes A list of alternating key,value pairs.
      */
-    public void setStringAttributes(List<String> attributes) {
+    protected void setStringAttributes(List<String> attributes) {
         for (int i = 0; i < attributes.size()-1; i += 2) {
             String k = attributes.get(i);
             String v = attributes.get(i+1);
@@ -285,7 +375,7 @@ public abstract class Message {
      *
      * @param attributes An array of alternating key,value pairs.
      */
-    public void setStringAttributes(String[] attributes) {
+    protected void setStringAttributes(String[] attributes) {
         for (int i = 0; i < attributes.length; i += 2) {
             if (attributes[i+1] != null) {
                 setStringAttribute(attributes[i], attributes[i+1]);
@@ -298,7 +388,7 @@ public abstract class Message {
      *
      * @return A list of the array attributes found.
      */
-    public List<String> getArrayAttributes() {
+    protected List<String> getArrayAttributes() {
         List<String> ret = new ArrayList<>();
         int n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, -1);
         for (int i = 0; i < n; i++) {
@@ -314,7 +404,7 @@ public abstract class Message {
      *
      * @param attributes A list of attribute values.
      */
-    public void setArrayAttributes(List<String> attributes) {
+    protected void setArrayAttributes(List<String> attributes) {
         if (attributes != null) {
             int i = 0;
             for (String a : attributes) {
@@ -331,7 +421,7 @@ public abstract class Message {
      *
      * @param attributes The array of attributes.
      */
-    public void setArrayAttributes(String[] attributes) {
+    protected void setArrayAttributes(String[] attributes) {
         if (attributes != null) {
             for (int i = 0; i < attributes.length; i++) {
                 setStringAttribute(FreeColObject.arrayKey(i), attributes[i]);
@@ -340,37 +430,50 @@ public abstract class Message {
     }
 
     /**
-     * Get the child objects of this message.
+     * Get a child object.
      *
-     * @return A list of child {@code FreeColObject}s.
+     * @param T The actual class of {@code FreeColObject} to get.
+     * @param index The index of the child to get.
+     * @param returnClass The expected class of child.
+     * @return The child object found, or null if the index is invalid or
+     *     return class incorrect.
      */
-    abstract public List<FreeColObject> getChildren();
-        
-    /**
-     * Set the list of objects attached to this message.
-     *
-     * @param fcos The new list of attached {@code FreeColObject}s.
-     */
-    abstract public void setChildren(List<? extends FreeColObject> fcos);
+    protected <T extends FreeColObject> T getChild(int index,
+                                                   Class<T> returnClass) {
+        if (index >= getChildCount()) return (T)null;
+        FreeColObject fco = getChildren().get(index);
+        try {
+            return returnClass.cast(fco);
+        } catch (ClassCastException cce) {
+            logger.log(Level.WARNING, "Cast fail", cce);
+            return null;
+        }
+    }
 
+    /**
+     * Get the child objects.
+     *
+     * @param T The actual class of {@code FreeColObject} to get.
+     * @param returnClass The expected class of children.
+     * @return The children with the expected class.
+     */
+    protected <T extends FreeColObject> List<T> getChildren(Class<T> returnClass) {
+        List<T> ret = new ArrayList<>();
+        for (FreeColObject fco : getChildren()) {
+            try {
+                ret.add(returnClass.cast(fco));
+            } catch (ClassCastException cce) {}
+        }
+        return ret;
+    }
+            
     /**
      * Is this message vacuous?
      *
      * @return True if there are no attributes or children present.
      */
-    public boolean isEmpty() {
+    protected boolean isEmpty() {
         return getStringAttributes().isEmpty() && getChildren().isEmpty();
-    }
-
-    /**
-     * Get the priority of this type of message.
-     *
-     * To be overridden in the subclasses.
-     *
-     * @return The message priority.
-     */
-    public MessagePriority getPriority() {
-        return MessagePriority.NORMAL;
     }
 
     /**
@@ -380,15 +483,6 @@ public abstract class Message {
      */
     public final int getPriorityLevel() {
         return getPriority().getValue();
-    }
-
-    /**
-     * Does this message consist only of mergeable attributes?
-     *
-     * @return True if this message is trivially mergeable.
-     */
-    public boolean canMerge() {
-        return false;
     }
 
     /**
@@ -410,63 +504,6 @@ public abstract class Message {
     }
 
     /**
-     * AI-side handler for this message.
-     *
-     * AI handlers always return null.
-     * FIXME: One day the FreeColServer should devolve to AIMain.
-     * 
-     * @param freeColServer The {@code FreeColServer} handling the request.
-     * @param aiPlayer The {@code AIPlayer} the message was sent to.
-     * @exception FreeColException if there is a problem handling the message.
-     */
-    public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer)
-        throws FreeColException {
-        throw new RuntimeException("NYI aiHandler for: " + getType());
-    }
-
-    /**
-     * Client-side handler for this message.
-     *
-     * FIXME: Will become abstract in due course.
-     * Client handlers always return null.
-     *
-     * @param freeColClient The {@code FreeColClient} to handle this message.
-     * @exception FreeColException if there is a problem building the message.
-     */
-    public void clientHandler(FreeColClient freeColClient)
-        throws FreeColException {
-        throw new RuntimeException("NYI clientHandler for: " + getType());
-    }
-
-    /**
-     * Server-side handler for this message.
-     *
-     * @param freeColServer The {@code FreeColServer} handling the request.
-     * @param serverPlayer The {@code ServerPlayer} that sent the request.
-     * @return A {@code ChangeSet} defining the response.
-     */
-    public ChangeSet serverHandler(FreeColServer freeColServer,
-                                   ServerPlayer serverPlayer) {
-        return serverPlayer.clientError("Invalid message type: " + getType());
-    }
-
-    /**
-     * Write this message as XML.
-     *
-     * @param xw The {@code FreeColXMLWriter} to write with.
-     * @exception XMLStreamException if there is a problem writing the stream.
-     */
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getType());
-
-        writeAttributes(xw);
-
-        writeChildren(xw);
-
-        xw.writeEndElement();
-    }
-        
-    /**
      * Write any attributes of this message.
      *
      * @param xw The {@code FreeColXMLWriter} to write to.
@@ -487,7 +524,99 @@ public abstract class Message {
      */
     protected void writeChildren(FreeColXMLWriter xw)
         throws XMLStreamException {
+        for (FreeColObject fco : getChildren()) {
+            fco.toXML(xw);
+        }
     }
+
+    /**
+     * Write this message as XML.
+     *
+     * @param xw The {@code FreeColXMLWriter} to write with.
+     * @exception XMLStreamException if there is a problem writing the stream.
+     */
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        xw.writeStartElement(getType());
+
+        writeAttributes(xw);
+
+        writeChildren(xw);
+
+        xw.writeEndElement();
+    }
+        
+
+    // Convenience methods for the subclasses
+
+    protected net.sf.freecol.client.control.InGameController
+        igc(FreeColClient freeColClient) {
+        return freeColClient.getInGameController();
+    }
+
+    protected net.sf.freecol.server.control.InGameController
+        igc(FreeColServer freeColServer) {
+        return freeColServer.getInGameController();
+    }
+
+    protected void invokeAndWait(FreeColClient freeColClient,
+                                 Runnable runnable) {
+        freeColClient.getGUI().invokeNowOrWait(runnable);
+    }
+
+    protected void invokeLater(FreeColClient freeColClient,
+                               Runnable runnable) {
+        freeColClient.getGUI().invokeNowOrLater(runnable);
+    }
+
+    protected net.sf.freecol.client.control.PreGameController
+        pgc(FreeColClient freeColClient) {
+        return freeColClient.getPreGameController();
+    }
+
+    protected net.sf.freecol.server.control.PreGameController
+        pgc(FreeColServer freeColServer) {
+        return freeColServer.getPreGameController();
+    }
+
+    /**
+     * Do some generic client checks that can apply to any message.
+     *
+     * @param freeColClient The client.
+     */
+    protected void clientGeneric(final FreeColClient freeColClient) {
+        if (freeColClient.currentPlayerIsMyPlayer()) {
+            // Play a sound if specified
+            String sound = getStringAttribute("sound");
+            if (sound != null && !sound.isEmpty()) {
+                freeColClient.getGUI().playSound(sound);
+            }
+            // If there is a "flush" attribute present, encourage the
+            // client to display any new messages.
+            if (getBooleanAttribute("flush", false)) {
+                final Runnable displayModelMessagesRunnable = () -> {
+                    freeColClient.getInGameController()
+                        .displayModelMessages(false);
+                };
+                invokeLater(freeColClient, displayModelMessagesRunnable);
+            }
+        }
+    }    
+
+    /**
+     * Complain about finding the wrong XML element.
+     *
+     * @param wanted The tag we wanted.
+     * @param got The tag we got.
+     * @exception XMLStreamException is always thrown.
+     */
+    protected void expected(String wanted, String got)
+        throws XMLStreamException {
+        throw new XMLStreamException("In " + getClass().getName()
+            + ", expected " + wanted + " but read: " + got);
+    }
+
+
+    // Fundamental utility for the input handlers to call
 
     /**
      * Read a new message from a stream.
@@ -529,6 +658,21 @@ public abstract class Message {
         return ret;
     }
 
+
+    // Override Object
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(64);
+        sb.append('[');
+        pretty(sb, getType(), getStringAttributes(), getChildren());
+        sb.append(']');
+        return sb.toString();
+    }
+
     /**
      * Pretty print the components of a message to a string builder.
      *
@@ -537,9 +681,9 @@ public abstract class Message {
      * @param attributes A map of key,value attribute pairs.
      * @param children The attached child {@code FreeColObject}s.
      */
-    public static void pretty(StringBuilder sb, String type,
-                              Map<String, String> attributes,
-                              List<FreeColObject> children) {
+    protected static void pretty(StringBuilder sb, String type,
+                                 Map<String, String> attributes,
+                                 List<FreeColObject> children) {
         sb.append(type);
         if (attributes != null) {
             for (Entry<String,String> e : attributes.entrySet()) {
@@ -552,20 +696,5 @@ public abstract class Message {
                 sb.append(' ').append(fco.getId());
             }
         }
-    }
-
-
-    // Override Object
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(32);
-        sb.append('[');
-        pretty(sb, getType(), getStringAttributes(), getChildren());
-        sb.append(']');
-        return sb.toString();
     }
 }

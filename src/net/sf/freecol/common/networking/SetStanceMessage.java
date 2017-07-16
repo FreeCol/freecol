@@ -104,6 +104,7 @@ public class SetStanceMessage extends AttributeMessage {
         }
 
         igc(freeColClient).setStanceHandler(stance, p1, p2);
+        clientGeneric(freeColClient);
     }
 
 

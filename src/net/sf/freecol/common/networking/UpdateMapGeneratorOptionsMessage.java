@@ -50,7 +50,7 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
     public UpdateMapGeneratorOptionsMessage(OptionGroup mapGeneratorOptions) {
         super(TAG);
 
-        add1(mapGeneratorOptions);
+        appendChild(mapGeneratorOptions);
     }
 
     /**
@@ -85,7 +85,7 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
         } finally {
             xr.replaceScope(rs);
         }
-        add1(optionGroup);
+        appendChild(optionGroup);
     }
 
 

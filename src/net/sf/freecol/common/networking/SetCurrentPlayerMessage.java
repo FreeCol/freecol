@@ -97,6 +97,7 @@ public class SetCurrentPlayerMessage extends AttributeMessage {
         }
 
         igc(freeColClient).setCurrentPlayerHandler(player);
+        clientGeneric(freeColClient);
     }
 
 

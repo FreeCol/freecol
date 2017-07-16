@@ -121,6 +121,7 @@ public class IndianDemandMessage extends AttributeMessage {
         }
 
         igc(freeColClient).indianDemandHandler(unit, colony, goodsType, amount);
+        clientGeneric(freeColClient);
     }
 
     /**

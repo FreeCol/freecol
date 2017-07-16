@@ -106,7 +106,7 @@ public class AttributeMessage extends TrivialMessage {
      * {@inheritDoc}
      */
     @Override
-    public boolean hasAttribute(String key) {
+    protected boolean hasAttribute(String key) {
         return this.attributes.containsKey(key);
     }
 
@@ -114,7 +114,7 @@ public class AttributeMessage extends TrivialMessage {
      * {@inheritDoc}
      */
     @Override
-    public String getStringAttribute(String key) {
+    protected String getStringAttribute(String key) {
         return this.attributes.get(key);
     }
 
@@ -122,15 +122,15 @@ public class AttributeMessage extends TrivialMessage {
      * {@inheritDoc}
      */
     @Override
-    public void setStringAttribute(String key, String value) {
-        if (value != null) this.attributes.put(key, value);
+    protected void setStringAttribute(String key, String value) {
+        if (key != null && value != null) this.attributes.put(key, value);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String,String> getStringAttributes() {
+    protected Map<String,String> getStringAttributes() {
         return this.attributes;
     }
 
