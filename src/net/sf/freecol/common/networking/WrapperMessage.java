@@ -119,19 +119,6 @@ public abstract class WrapperMessage extends AttributeMessage {
         }
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String pretty() {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append('[');
-        pretty(sb, getType(), getStringAttributes(), null);
-        if (this.message != null) sb.append(' ').append(this.message.pretty());
-        sb.append(']');
-        return sb.toString();
-    }
-
 
     // Public interface
 
@@ -149,5 +136,21 @@ public abstract class WrapperMessage extends AttributeMessage {
      */
     public String getSubType() {
         return (this.message == null) ? null : this.message.getType();
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(64);
+        sb.append('[');
+        pretty(sb, getType(), getStringAttributes(), null);
+        if (this.message != null) sb.append(' ').append(this.message);
+        sb.append(']');
+        return sb.toString();
     }
 }

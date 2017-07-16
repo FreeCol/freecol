@@ -166,19 +166,6 @@ public class MultipleMessage extends AttributeMessage {
         for (Message m : this.messages) m.toXML(xw);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String pretty() {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append('[');
-        pretty(sb, getType(), getStringAttributes(), null);
-        for (Message m : this.messages) sb.append(' ').append(m.pretty());
-        sb.append(']');
-        return sb.toString();
-    }
-
     // Public interface
 
     /**
@@ -210,4 +197,20 @@ public class MultipleMessage extends AttributeMessage {
         }
         return ret;
     }        
+
+
+    // Override Object
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(64);
+        sb.append('[');
+        pretty(sb, getType(), getStringAttributes(), null);
+        for (Message m : this.messages) sb.append(' ').append(m);
+        sb.append(']');
+        return sb.toString();
+    }
 }

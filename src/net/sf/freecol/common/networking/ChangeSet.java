@@ -546,7 +546,7 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(lastPart(getClass().getName(), "."))
                 .append(' ').append(see)
-                .append(' ').append(message.pretty())
+                .append(' ').append(message)
                 .append(']');
             return sb.toString();
         }

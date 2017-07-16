@@ -554,10 +554,14 @@ public abstract class Message {
         }
     }
 
+
+    // Override Object
+    
     /**
-     * FIXME: This will become the toString() method when DOMMessage goes away.
+     * {@inheritDoc}
      */
-    public String pretty() {
+    @Override
+    public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append('[');
         pretty(sb, getType(), getStringAttributes(), getChildren());
