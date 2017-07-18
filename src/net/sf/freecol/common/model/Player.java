@@ -3148,6 +3148,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Clear the nation cache entry for a player.
+     *
+     * @param player The {@code Player} to remove the entry for.
+     */
+    public void clearNationSummary(Player player) {
+        nationCache.remove(player);
+    }
+
+    /**
      * Clear the nation cache.
      */
     public void clearNationCache() {

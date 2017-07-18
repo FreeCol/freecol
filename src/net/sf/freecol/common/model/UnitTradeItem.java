@@ -114,7 +114,12 @@ public class UnitTradeItem extends TradeItem {
      */
     public int evaluateFor(Player player) {
         final Unit unit = getUnit();
-        return (!isValid()) ? Integer.MIN_VALUE : unit.evaluateFor(player);
+        return (!isValid()) ? INVALID_TRADE_ITEM
+            : (getSource() == player)
+            ? ((player.isAI() && player.getUnitCount() < 10)
+                ? TradeItem.INVALID_TRADE_ITEM
+                : -unit.evaluateFor(player))
+            : unit.evaluateFor(player);
     }
 
 

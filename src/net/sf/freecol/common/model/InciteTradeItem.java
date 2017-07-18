@@ -110,14 +110,14 @@ public class InciteTradeItem extends TradeItem {
         final Player victim = getVictim();
         switch (player.getStance(victim)) {
         case ALLIANCE:
-            return Integer.MIN_VALUE;
+            return INVALID_TRADE_ITEM;
         case WAR: // Not invalid, other player may not know our stance
             return 0;
         default:
             break;
         }
         // FIXME: magic#, needs rebalancing
-        return (int)Math.round(50.0 / player.getStrengthRatio(victim, false));
+        return -(int)Math.round(50.0 / player.getStrengthRatio(victim, false));
     }
     
 

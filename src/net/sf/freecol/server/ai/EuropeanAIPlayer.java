@@ -2492,14 +2492,13 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                         break;
                     }
                 }
-                if (score == Integer.MIN_VALUE) {
+                if (score == TradeItem.INVALID_TRADE_ITEM) {
                     unacceptable++;
-                } else if (item.getSource() == player) {
-                    score = -score;
+                } else {
+                    value += score;
                 }
                 scores.put(item, score);
                 lb.add(", ", Messages.message(item.getLabel()), " = ", score);
-                if (score != Integer.MIN_VALUE) value += score;
             }
             lb.add(".");
 
@@ -2517,8 +2516,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
        
             if (result == null) {
                 // Dump the unacceptable offers, sum the rest
+                value = 0;
                 for (Entry<TradeItem, Integer> entry : scores.entrySet()) {
-                    if (entry.getValue() == Integer.MIN_VALUE) {
+                    if (entry.getValue() == TradeItem.INVALID_TRADE_ITEM) {
                         agreement.remove(entry.getKey());
                         lb.add("  Dropped invalid ", entry.getKey(), ".");
                     } else {

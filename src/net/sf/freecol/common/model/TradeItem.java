@@ -32,6 +32,9 @@ import net.sf.freecol.common.util.Utils;
  */
 public abstract class TradeItem extends FreeColGameObject {
 
+    /** Flag for validity tests. */
+    public static final int INVALID_TRADE_ITEM = Integer.MIN_VALUE;
+    
     /** The player who is to provide this item. */
     private Player source;
 
@@ -215,7 +218,7 @@ public abstract class TradeItem extends FreeColGameObject {
      * Evaluate this trade item for a given player.
      *
      * @param player The {@code Player} to evaluate for.
-     * @return A value for the player, MIN_VALUE for invalid.
+     * @return A value for the player, INVALID_TRADE_ITEM for invalid.
      */
     public abstract int evaluateFor(Player player);
 

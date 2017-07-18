@@ -118,16 +118,16 @@ public class StanceTradeItem extends TradeItem {
         int value = (int)Math.round(100 * ratio);
         switch (stance) {
         case WAR:
-            if (ratio < 0.33) return Integer.MIN_VALUE;
-            if (ratio < 0.5) value = -value;
+            if (ratio < 0.33) value = INVALID_TRADE_ITEM;
+            else if (ratio < 0.5) value = -value;
             break;
         case PEACE: case CEASE_FIRE: case ALLIANCE:
-            if (ratio > 0.66) return Integer.MIN_VALUE;
-            if (ratio > 0.5) value = -value;
+            if (ratio > 0.66) value = INVALID_TRADE_ITEM;
+            else if (ratio > 0.5) value = -value;
             else if (ratio < 0.33) value = 1000;
             break;
         case UNCONTACTED: default:
-            value = Integer.MIN_VALUE;
+            value = INVALID_TRADE_ITEM;
             break;
         }
         return value;

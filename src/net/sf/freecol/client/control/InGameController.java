@@ -4874,6 +4874,7 @@ public final class InGameController extends FreeColClientHolder {
             logger.log(Level.WARNING, "Illegal stance transition", e);
             return false;
         }
+        player.clearNationSummary(second);
         if (player == first && old == Stance.UNCONTACTED) {
             invokeLater(() ->
                 sound("sound.event.meet." + second.getNationId()));

@@ -117,15 +117,14 @@ public class GoodsTradeItem extends TradeItem {
     public int evaluateFor(Player player) {
         final Market market = player.getMarket();
         final Goods goods = getGoods();
-        return (!isValid())
-            ? Integer.MIN_VALUE
-            : (market == null)
-            ? 2 * goods.getAmount()
+        return (!isValid()) ? INVALID_TRADE_ITEM
             : (getSource() == player)
-            ? market.getBidPrice(goods.getType(), goods.getAmount())
-            : (int)Math.round(market.getSalePrice(goods.getType(),
-                                                  goods.getAmount())
-                * (1.0 - player.getTax() / 100.0));
+            ? ((market == null) ? -2 * goods.getAmount()
+                : market.getBidPrice(goods.getType(), goods.getAmount()))
+            : ((market == null) ? 2 * goods.getAmount()
+                : (int)Math.round(market.getSalePrice(goods.getType(),
+                                                      goods.getAmount())
+                    * (1.0 - player.getTax() / 100.0)));
     }
 
     // Serialization
