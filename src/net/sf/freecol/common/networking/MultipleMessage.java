@@ -184,10 +184,10 @@ public class MultipleMessage extends AttributeMessage {
             break;
         case 1:
             ret = this.messages.get(0);
-            if (this.getStringAttributes().isEmpty()) {
+            if (this.getStringAttributeMap().isEmpty()) {
                 ; // child is good
             } else if (ret instanceof AttributeMessage) {
-                ret.setStringAttributes(this.getStringAttributes());
+                ret.setStringAttributeMap(this.getStringAttributeMap());
             } else {
                 ret = this;
             }
@@ -209,7 +209,7 @@ public class MultipleMessage extends AttributeMessage {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[');
-        pretty(sb, getType(), getStringAttributes(), null);
+        pretty(sb, getType(), getStringAttributeMap(), null);
         for (Message m : this.messages) sb.append(' ').append(m);
         sb.append(']');
         return sb.toString();

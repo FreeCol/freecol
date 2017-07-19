@@ -74,6 +74,7 @@ public abstract class WrapperMessage extends AttributeMessage {
             final String mt = xr.getLocalName();
             if (this.message == null) {
                 this.message = Message.read(game, xr);
+                xr.expectTag(mt);
             } else {
                 xr.expectTag(tag);
             }
@@ -148,7 +149,7 @@ public abstract class WrapperMessage extends AttributeMessage {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[');
-        pretty(sb, getType(), getStringAttributes(), null);
+        pretty(sb, getType(), getStringAttributeMap(), null);
         if (this.message != null) sb.append(' ').append(this.message);
         sb.append(']');
         return sb.toString();

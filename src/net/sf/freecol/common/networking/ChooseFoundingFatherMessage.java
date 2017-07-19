@@ -85,7 +85,7 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      * @param fathers A list of {@code FoundingFather}.
      */
     private void setFatherAttributes(List<FoundingFather> fathers) {
-        setStringAttributes(transform(fathers, alwaysTrue(),
+        setStringAttributeMap(transform(fathers, alwaysTrue(),
                 Function.identity(),
                 Collectors.toMap(ff -> ff.getType().getKey(),
                                  FoundingFather::getId)));

@@ -68,6 +68,8 @@ public class SetBuildQueueMessage extends AttributeMessage {
     public SetBuildQueueMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, getAttributeMap(xr));
+
+        xr.closeTag(TAG);
     }
 
 
@@ -83,6 +85,29 @@ public class SetBuildQueueMessage extends AttributeMessage {
         return ret;
     }
 
+    /**
+     * Get the colony that is building.
+     *
+     * @param player The {@code Player} that owns the colony.
+     * @return The colony.
+     */
+    private Colony getColony(Player player) {
+        return player.getOurFreeColGameObject(getStringAttribute(COLONY_TAG),
+                                              Colony.class);
+    }
+
+    /**
+     * Get the list of buildables defined by the array attributes.
+     *
+     * @param spec A {@code Specification} to use to make the buildable.
+     * @return A list of {@code BuildableType}s.
+     */
+    private List<BuildableType> getQueue(Specification spec) {
+        List<String> aa = getArrayAttributes();
+        return transform(getArrayAttributes(), alwaysTrue(),
+                         id -> spec.getType(id, BuildableType.class),
+                         toListNoNulls());
+    }
 
     /**
      * {@inheritDoc}
@@ -126,31 +151,5 @@ public class SetBuildQueueMessage extends AttributeMessage {
         // Proceed to set the build queue.
         return igc(freeColServer)
             .setBuildQueue(serverPlayer, colony, buildQueue);
-    }
-
-
-    // Public interface
-
-    /**
-     * Get the colony that is building.
-     *
-     * @param player The {@code Player} that owns the colony.
-     * @return The colony.
-     */
-    public Colony getColony(Player player) {
-        return player.getOurFreeColGameObject(getStringAttribute(COLONY_TAG),
-                                              Colony.class);
-    }
-
-    /**
-     * Get the list of buildables defined by the array attributes.
-     *
-     * @param spec A {@code Specification} to use to make the buildable.
-     * @return A list of {@code BuildableType}s.
-     */
-    public List<BuildableType> getQueue(Specification spec) {
-        return transform(getArrayAttributes(), alwaysTrue(),
-                         id -> spec.getType(id, BuildableType.class),
-                         toListNoNulls());
     }
 }

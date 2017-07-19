@@ -350,6 +350,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     public void expectTag(String tag) throws XMLStreamException {
         final String endTag = getLocalName();
         if (!endTag.equals(tag)) {
+net.sf.freecol.FreeCol.trace(logger, "EXP");
             throw new XMLStreamException("Parse error, " + tag
                 + " expected, not: " + endTag);
         }
@@ -678,10 +679,13 @@ public class FreeColXMLReader extends StreamReaderDelegate
     public Map<String, String> getArrayAttributeMap() {
         Map<String, String> ret = new HashMap<>();
         int n = getAttribute(FreeColObject.ARRAY_SIZE_TAG, -1);
-        for (int i = 0; i < n; i++) {
-            String key = FreeColObject.arrayKey(i);
-            if (!hasAttribute(key)) break;
-            ret.put(key, getAttribute(key, (String)null));
+        if (n >= 0) {
+            ret.put(FreeColObject.ARRAY_SIZE_TAG, Integer.toString(n));
+            for (int i = 0; i < n; i++) {
+                String key = FreeColObject.arrayKey(i);
+                if (!hasAttribute(key)) break;
+                ret.put(key, getAttribute(key, (String)null));
+            }
         }
         return ret;
     }

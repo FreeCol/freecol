@@ -156,11 +156,11 @@ public abstract class Message {
     abstract protected void setStringAttribute(String key, String value);
 
     /**
-     * Get all the attributes in this message.
+     * Get a map of all the attributes in this message.
      *
      * @return A {@code Map} of the attributes.
      */
-    abstract protected Map<String,String> getStringAttributes();
+    abstract protected Map<String,String> getStringAttributeMap();
 
     /**
      * Get the number of child objects.
@@ -350,10 +350,10 @@ public abstract class Message {
     /**
      * Set all the attributes in a map.
      *
-     * @param attributes The map of key,value pairs to set.
+     * @param attributeMap The map of key,value pairs to set.
      */
-    protected void setStringAttributes(Map<String, String> attributes) {
-        forEachMapEntry(attributes,
+    protected void setStringAttributeMap(Map<String, String> attributeMap) {
+        forEachMapEntry(attributeMap,
                         e -> setStringAttribute(e.getKey(), e.getValue()));
     }
 
@@ -473,7 +473,7 @@ public abstract class Message {
      * @return True if there are no attributes or children present.
      */
     protected boolean isEmpty() {
-        return getStringAttributes().isEmpty() && getChildren().isEmpty();
+        return getStringAttributeMap().isEmpty() && getChildren().isEmpty();
     }
 
     /**
@@ -494,9 +494,9 @@ public abstract class Message {
     public boolean merge(Message message) {
         if (!message.canMerge()) return false;
 
-        Map<String,String> map = this.getStringAttributes();
-        map.putAll(message.getStringAttributes());
-        this.setStringAttributes(map);
+        Map<String,String> map = this.getStringAttributeMap();
+        map.putAll(message.getStringAttributeMap());
+        this.setStringAttributeMap(map);
         Set<FreeColObject> objs = new HashSet<>(this.getChildren());
         objs.addAll(message.getChildren());
         this.setChildren(toList(objs));
@@ -511,7 +511,7 @@ public abstract class Message {
      */
     protected void writeAttributes(FreeColXMLWriter xw)
         throws XMLStreamException {
-        for (Entry<String,String> e : getStringAttributes().entrySet()) {
+        for (Entry<String,String> e : getStringAttributeMap().entrySet()) {
             xw.writeAttribute(e.getKey(), e.getValue());
         }
     }
@@ -544,7 +544,7 @@ public abstract class Message {
 
         xw.writeEndElement();
     }
-        
+
 
     // Convenience methods for the subclasses
 
@@ -668,7 +668,7 @@ public abstract class Message {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[');
-        pretty(sb, getType(), getStringAttributes(), getChildren());
+        pretty(sb, getType(), getStringAttributeMap(), getChildren());
         sb.append(']');
         return sb.toString();
     }
@@ -678,15 +678,15 @@ public abstract class Message {
      *
      * @param sb The {@code StringBuilder} to print to.
      * @param type The type of the message.
-     * @param attributes A map of key,value attribute pairs.
+     * @param attributeMap A map of key,value attribute pairs.
      * @param children The attached child {@code FreeColObject}s.
      */
     protected static void pretty(StringBuilder sb, String type,
-                                 Map<String, String> attributes,
+                                 Map<String, String> attributeMap,
                                  List<FreeColObject> children) {
         sb.append(type);
-        if (attributes != null) {
-            for (Entry<String,String> e : attributes.entrySet()) {
+        if (attributeMap != null) {
+            for (Entry<String,String> e : attributeMap.entrySet()) {
                 sb.append(' ').append(e.getKey())
                     .append('=').append(e.getValue());
             }

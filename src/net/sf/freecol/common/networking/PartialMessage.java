@@ -118,7 +118,7 @@ public class PartialMessage extends AttributeMessage {
         }
                 
         if (freeColClient.isInGame()) {
-            igc(freeColClient).partialHandler(fcgo, getStringAttributes());
+            igc(freeColClient).partialHandler(fcgo, getStringAttributeMap());
         } else {
             logger.warning("Partial update when not in game.");
         }

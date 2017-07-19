@@ -74,12 +74,12 @@ public class AttributeMessage extends TrivialMessage {
      * Create a new {@code AttributeMessage} of a given type and attributes.
      *
      * @param type The message type.
-     * @param attributes A map of key,value pairs.
+     * @param attributeMap A map of key,value pairs.
      */
-    public AttributeMessage(String type, Map<String, String> attributes) {
+    public AttributeMessage(String type, Map<String, String> attributeMap) {
         this(type);
 
-        setStringAttributes(attributes);
+        setStringAttributeMap(attributeMap);
     }
 
     /**
@@ -130,7 +130,7 @@ public class AttributeMessage extends TrivialMessage {
      * {@inheritDoc}
      */
     @Override
-    protected Map<String,String> getStringAttributes() {
+    protected Map<String,String> getStringAttributeMap() {
         return this.attributes;
     }
 

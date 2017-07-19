@@ -143,7 +143,7 @@ public abstract class TrivialMessage extends Message {
     /**
      * {@inheritDoc}
      */
-    protected Map<String,String> getStringAttributes() {
+    protected Map<String,String> getStringAttributeMap() {
         return Collections.<String,String>emptyMap();
     }
 
