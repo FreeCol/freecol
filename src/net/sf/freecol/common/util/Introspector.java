@@ -38,6 +38,10 @@ import static net.sf.freecol.common.util.StringUtils.*;
 public class Introspector {
 
     public static class IntrospectorException extends ReflectiveOperationException {
+        public IntrospectorException(Throwable cause) {
+            super(cause);
+        }
+
         public IntrospectorException(String err, Throwable cause) {
             super(err, cause);
         }
@@ -76,9 +80,9 @@ public class Introspector {
 
         try {
             return theClass.getMethod(methodName);
-        } catch (NoSuchMethodException | SecurityException e) {
+        } catch (NoSuchMethodException | SecurityException ex) {
             throw new IntrospectorException(theClass.getName()
-                + "." + methodName, e);
+                + "." + methodName, ex);
         }
     }
 
@@ -337,13 +341,7 @@ public class Introspector {
         try {
             instance = constructor.newInstance(params);
         } catch (InvocationTargetException ite) {
-            Throwable cause = ite.getCause();
-            if (cause instanceof Exception) {
-                Exception ex = (Exception)cause;
-                throw new IntrospectorException(ex.getMessage(), ex.getCause());
-            } else {
-                throw new IntrospectorException(ite.getMessage(), cause);
-            }
+            throw new IntrospectorException(ite);
         } catch (IllegalAccessException | InstantiationException ex) {
             instance = null;
         }

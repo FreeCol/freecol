@@ -51,11 +51,15 @@ public class LoginMessage extends ObjectMessage {
     private static final String STATE_TAG = "state";
     private static final String USER_NAME_TAG = "userName";
     private static final String VERSION_TAG = "version";
-    
-        
+
+    /** The player in the attached game, if any. */
+    private Player player = null;
+
+
     /**
      * Create a new {@code LoginMessage} with the supplied parameters.
      *
+     * @param serverPlayer The {@code ServerPlayer} to send to.
      * @param userName The name of the user logging in.
      * @param version The version of FreeCol at the client.
      * @param state The server state.
@@ -63,12 +67,15 @@ public class LoginMessage extends ObjectMessage {
      * @param currentPlayer True if this player is the current player.
      * @param game The entire game.
      */
-    public LoginMessage(String userName, String version, ServerState state,
-                        boolean singlePlayer, boolean currentPlayer, Game game) {
+    public LoginMessage(ServerPlayer serverPlayer, String userName,
+                        String version, ServerState state,
+                        boolean singlePlayer, boolean currentPlayer,
+                        Game game) {
         super(TAG, USER_NAME_TAG, userName, VERSION_TAG, version,
               SINGLE_PLAYER_TAG, Boolean.toString(singlePlayer),
               CURRENT_PLAYER_TAG, Boolean.toString(currentPlayer));
 
+        this.player = serverPlayer;
         if (state != null) setStringAttribute(STATE_TAG, state.toString());
         appendChild(game);
     }
@@ -97,6 +104,7 @@ public class LoginMessage extends ObjectMessage {
         }
         xr.expectTag(TAG);
         appendChild(game);
+        this.player = (game == null) ? null : getPlayer(game);
     }
 
 
@@ -131,8 +139,8 @@ public class LoginMessage extends ObjectMessage {
      * @param game The {@code Game} to look up.
      * @return The {@code ServerPlayer} found.
      */
-    public ServerPlayer getPlayer(Game game) {
-        return (ServerPlayer)game.getPlayerByName(getUserName());
+    private Player getPlayer(Game game) {
+        return game.getPlayerByName(getUserName());
     }
 
 
@@ -153,6 +161,20 @@ public class LoginMessage extends ObjectMessage {
         freeColClient.getConnectController()
             .login(getState(), game, getUserName(),
                    getSinglePlayer(), getCurrentPlayer());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        FreeColXMLWriter.WriteScope ws = null;
+        if (this.player != null) {
+            ws = xw.replaceScope(FreeColXMLWriter.WriteScope
+                .toClient(this.player));
+        }
+        super.toXML(xw);
+        if (this.player != null) xw.replaceScope(ws);
     }
 
     /**
@@ -180,7 +202,7 @@ public class LoginMessage extends ObjectMessage {
             ret = ChangeSet.clientError((ServerPlayer)null,
                 StringTemplate.template("server.maximumPlayers"));
 
-        } else if ((present = getPlayer(serverGame)) != null) {
+        } else if ((present = (ServerPlayer)getPlayer(serverGame)) != null) {
             // Can not use the same name as existing player
             ret = ChangeSet.clientError((ServerPlayer)null,
                 StringTemplate.template("server.userNameInUse")
@@ -209,7 +231,7 @@ public class LoginMessage extends ObjectMessage {
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(serverPlayer.getConnection());
             ret.add(See.only(serverPlayer),
-                new LoginMessage(userName, getVersion(),
+                new LoginMessage(serverPlayer, userName, getVersion(),
                                  freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
                                  serverGame.getCurrentPlayer() == serverPlayer,
@@ -242,7 +264,7 @@ public class LoginMessage extends ObjectMessage {
             ret = ChangeSet.clientError((ServerPlayer)null,
                 StringTemplate.template("server.noSuchGame"));
 
-        } else if ((present = getPlayer(serverGame)) == null) {
+        } else if ((present = (ServerPlayer)getPlayer(serverGame)) == null) {
             // Player not present
             ret = ChangeSet.clientError((ServerPlayer)null,
                 StringTemplate.template("server.userNameNotPresent")
@@ -276,7 +298,7 @@ public class LoginMessage extends ObjectMessage {
             // Add the connection, send back the game.
             freeColServer.addPlayerConnection(connection);
             ret = ChangeSet.simpleChange(present,
-                new LoginMessage(userName, getVersion(),
+                new LoginMessage(present, userName, getVersion(),
                     freeColServer.getServerState(),
                     freeColServer.getSinglePlayer(),
                     serverGame.getCurrentPlayer() == present,
@@ -303,7 +325,7 @@ public class LoginMessage extends ObjectMessage {
             ret = ChangeSet.clientError((ServerPlayer)null,
                 StringTemplate.template("server.noSuchGame"));
 
-        } else if ((present = getPlayer(serverGame)) == null) {
+        } else if ((present = (ServerPlayer)getPlayer(serverGame)) == null) {
             // Player not present
             ret = ChangeSet.clientError((ServerPlayer)null,
                 StringTemplate.template("server.userNameNotPresent")
@@ -328,7 +350,7 @@ public class LoginMessage extends ObjectMessage {
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(connection);
             ret = ChangeSet.simpleChange(present,
-                new LoginMessage(userName, getVersion(),
+                new LoginMessage(present, userName, getVersion(),
                                  freeColServer.getServerState(),
                                  freeColServer.getSinglePlayer(),
                                  serverGame.getCurrentPlayer() == present,

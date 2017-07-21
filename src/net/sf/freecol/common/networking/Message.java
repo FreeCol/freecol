@@ -653,7 +653,7 @@ public abstract class Message {
         try {
             ret = Introspector.construct(mb, new Object[] { game, xr });
         } catch (Introspector.IntrospectorException ie) {
-            throw new FreeColException(ie.getMessage(), ie.getCause());
+            throw new FreeColException(ie);
         }
         return ret;
     }

@@ -48,6 +48,15 @@ public final class FreeColException extends Exception {
         super(message, throwable);
     }
 
+    /**
+     * Build a new FreeCol specific exception with the given message.
+     * 
+     * @param throwable The {@code Throwable} cause for the exception.
+     */
+    public FreeColException(Throwable throwable) {
+        super(throwable);
+    }
+
 
     /**
      * Make this exception *not* cause debug runs to end.

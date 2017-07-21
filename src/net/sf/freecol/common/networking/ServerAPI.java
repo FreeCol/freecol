@@ -624,7 +624,7 @@ public abstract class ServerAPI {
      */
     public boolean login(String userName, String version,
                          boolean single, boolean current) {
-        return ask(new LoginMessage(userName, version, null,
+        return ask(new LoginMessage(null, userName, version, null,
                                     single, current, null));
     }
 

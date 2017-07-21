@@ -2609,6 +2609,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             region = null;
             moveToEurope = null;
             contiguity = -1;
+            owningSettlement = null;
             return;
         }
 

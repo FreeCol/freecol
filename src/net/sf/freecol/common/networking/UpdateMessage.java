@@ -142,7 +142,8 @@ public class UpdateMessage extends ObjectMessage {
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         FreeColXMLWriter.WriteScope ws = null;
         if (this.destination != null) {
-            ws = xw.replaceScope(FreeColXMLWriter.WriteScope.toClient(this.destination));
+            ws = xw.replaceScope(FreeColXMLWriter.WriteScope
+                .toClient(this.destination));
         }
         super.toXML(xw);
         if (this.destination != null) xw.replaceScope(ws);
