@@ -2238,7 +2238,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean hasSettlements() {
         synchronized (this.settlements) {
-            return !settlements.isEmpty();
+            return !this.settlements.isEmpty();
         }
     }
 

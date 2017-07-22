@@ -21,7 +21,9 @@ package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,9 +63,10 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      */
     public ChooseFoundingFatherMessage(List<FoundingFather> fathers,
                                        FoundingFather ff) {
-        super(TAG, FOUNDING_FATHER_TAG, (ff == null) ? null : ff.getId());
+        super(TAG);
 
         setFatherAttributes(fathers);
+        if (ff != null) setStringAttribute(FOUNDING_FATHER_TAG, ff.getId());
     }
 
     /**
@@ -75,7 +78,9 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      */
     public ChooseFoundingFatherMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
-        super(TAG, xr, FOUNDING_FATHER_TAG);
+        super(TAG, getAttributeMap(xr));
+
+        xr.closeTag(TAG);
     }
 
 
@@ -90,6 +95,24 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
                 Collectors.toMap(ff -> ff.getType().getKey(),
                                  FoundingFather::getId)));
     }
+
+    /**
+     * Get a map of attributes from the reader.
+     *
+     * @param xr The {@code FreeColXMLReader} to query.
+     * @return A map of attributes.
+     */
+    private static Map<String, String> getAttributeMap(FreeColXMLReader xr) {
+        Map<String, String> ret = new HashMap<>();
+        for (String key : fatherKeys) {
+            String val = xr.getAttribute(key, (String)null);
+            ret.put(key, val);
+        }
+        String ffk = xr.getAttribute(FOUNDING_FATHER_TAG, (String)null);
+        if (ffk != null) ret.put(FOUNDING_FATHER_TAG, ffk);
+        return ret;
+    }
+
 
     /**
      * {@inheritDoc}
