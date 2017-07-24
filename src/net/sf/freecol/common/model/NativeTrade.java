@@ -432,7 +432,7 @@ public class NativeTrade extends FreeColGameObject {
      * @param nt The {@code NativeTrade} to merge.
      */
     public void mergeFrom(final NativeTrade nt) {
-        if (isCompatible(nt)) {
+        if (isCompatible(nt) && !this.equals(nt)) {
             this.unitToSettlement.clear();
             this.unitToSettlement.addAll(nt.getUnitToSettlement());
             this.settlementToUnit.clear();
