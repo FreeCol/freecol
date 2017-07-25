@@ -85,7 +85,8 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
      *     user interface for
      * @param editable boolean whether user can modify the setting
      */
-    public AbstractUnitOptionUI(final AbstractUnitOption option, boolean editable) {
+    public AbstractUnitOptionUI(final AbstractUnitOption option,
+                                final boolean editable) {
         super(option, editable);
 
         panel = new MigPanel();
@@ -94,11 +95,10 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         IntegerOption numberOption = option.getNumber();
         UnitTypeOption typeOption = option.getUnitType();
         StringOption roleOption = option.getRole();
-
         boolean numberEditable = editable
             && (numberOption.getMaximumValue() > numberOption.getMinimumValue());
         numberUI = new IntegerOptionUI(numberOption, numberEditable);
-        Utility.localizeToolTip(numberUI.getComponent(), "report.numberOfUnits");
+        Utility.localizeToolTip(numberUI.getComponent(), "number");
         panel.add(numberUI.getComponent(), "width 30%");
 
         boolean typeEditable = editable
@@ -120,6 +120,9 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void itemStateChanged(ItemEvent e) {
         JComboBox<String> box = roleUI.getComponent();

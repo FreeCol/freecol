@@ -74,7 +74,7 @@ public class IntegerOption extends AbstractOption<Integer> {
      * @return The minimum value allowed by this option.
      */
     public int getMinimumValue() {
-        return minimumValue;
+        return this.minimumValue;
     }
 
     /**
@@ -92,7 +92,7 @@ public class IntegerOption extends AbstractOption<Integer> {
      * @return The maximum value allowed by this option.
      */
     public int getMaximumValue() {
-        return maximumValue;
+        return this.maximumValue;
     }
 
     /**
@@ -124,8 +124,8 @@ public class IntegerOption extends AbstractOption<Integer> {
     public IntegerOption clone() {
         IntegerOption result = new IntegerOption(getId(), getSpecification());
         result.setValues(this);
-        result.minimumValue = minimumValue;
-        result.maximumValue = maximumValue;
+        result.setMinimumValue(this.minimumValue);
+        result.setMaximumValue(this.maximumValue);
         return result;
     }
 
@@ -134,7 +134,7 @@ public class IntegerOption extends AbstractOption<Integer> {
      */
     @Override
     public Integer getValue() {
-        return value;
+        return this.value;
     }
 
     /**
@@ -202,7 +202,7 @@ public class IntegerOption extends AbstractOption<Integer> {
 
         minimumValue = xr.getAttribute(MINIMUM_VALUE_TAG, Integer.MIN_VALUE);
 
-        this.value = limitValue(this.value);
+        value = limitValue(this.value);
     }
 
     /**
@@ -220,8 +220,14 @@ public class IntegerOption extends AbstractOption<Integer> {
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
         sb.append('[').append(getId())
-            .append(" value=").append(value)
-            .append(']');
+            .append(" value=").append(this.value);
+        if (this.minimumValue > Integer.MIN_VALUE) {
+            sb.append(" min=").append(this.minimumValue);
+        }
+        if (this.maximumValue < Integer.MAX_VALUE) {
+            sb.append(" max=").append(this.maximumValue);
+        }
+        sb.append(']');
         return sb.toString();
     }
 }

@@ -89,7 +89,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * @return True if "none" is a valid choice.
      */
     public final boolean addNone() {
-        return addNone;
+        return this.addNone;
     }
 
     /**
@@ -98,7 +98,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * @return A list of {@code UnitType}s.
      */
     public final List<UnitType> getChoices() {
-        return choices;
+        return this.choices;
     }
 
     /**
@@ -107,7 +107,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * @return The type of choices to generate.
      */
     public final TypeSelector getGenerateChoices() {
-        return selector;
+        return this.selector;
     }
 
 
@@ -118,13 +118,13 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      */
     @Override
     public UnitTypeOption clone() {
-        UnitTypeOption result = new UnitTypeOption(getId(), getSpecification());
-        result.value = value;
-        result.addNone = addNone;
-        result.selector = selector;
-        result.generateChoices();
-        result.isDefined = true;
-        return result;
+        UnitTypeOption ret = new UnitTypeOption(getId(), getSpecification());
+        ret.value = this.value;
+        ret.addNone = this.addNone;
+        ret.selector = this.selector;
+        ret.generateChoices();
+        ret.isDefined = true;
+        return ret;
     }
 
     /**
@@ -150,7 +150,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
         if (value != oldValue && isDefined) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
-        isDefined = true;
+        this.isDefined = true;
     }
 
 
@@ -183,28 +183,29 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      */
     @Override
     public void generateChoices() {
-        if (selector == null) {
-            choices.add(getValue());
+        if (this.selector == null) {
+            this.choices.add(getValue());
         } else {
             List<UnitType> unitTypeList = getSpecification().getUnitTypeList();
-            choices.clear();
-            switch (selector) {
+            this.choices.clear();
+            switch (this.selector) {
             case UNITS:
-                choices.addAll(unitTypeList);
+                this.choices.addAll(unitTypeList);
                 break;
             case IMMIGRANTS:
-                choices.addAll(transform(unitTypeList, UnitType::isRecruitable));
+                this.choices.addAll(transform(unitTypeList,
+                                              UnitType::isRecruitable));
                 break;
             case NAVAL_UNITS:
-                choices.addAll(transform(unitTypeList, UnitType::isNaval));
+                this.choices.addAll(transform(unitTypeList,
+                                              UnitType::isNaval));
                 break;
             case LAND_UNITS:
-                choices.addAll(transform(unitTypeList, ut -> !ut.isNaval()));
+                this.choices.addAll(transform(unitTypeList,
+                                              ut -> !ut.isNaval()));
                 break;
             }
-            if (addNone) {
-                choices.add(0, null);
-            }
+            if (this.addNone) this.choices.add(0, null);
         }
     }
 
@@ -273,7 +274,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        choices.clear();
+        this.choices.clear();
 
         super.readChildren(xr);
     }

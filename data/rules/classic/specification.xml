@@ -4262,7 +4262,7 @@
                          value="true"/>
           <booleanOption id="model.option.expertStartingUnits"
                          value="false" />
-          <unitListOption id="model.option.immigrants" maximumNumber="3">
+          <unitListOption id="model.option.immigrants" maximumNumber="999">
             <template>
               <unitOption id="model.option.immigrants.template">
                 <unitType value="model.unit.freeColonist"
@@ -4270,7 +4270,7 @@
                 <role value="model.role.default" >
                   <choice value="model.role.default" />
                 </role>
-                <number value="1" minimumValue="1" maximumValue="1" />
+                <number value="1" minimumValue="1" maximumValue="999" />
               </unitOption>
             </template>
           </unitListOption>

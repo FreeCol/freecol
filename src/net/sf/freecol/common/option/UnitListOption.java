@@ -31,6 +31,7 @@ public class UnitListOption extends ListOption<AbstractUnit> {
 
     public static final String TAG = "unitListOption";
 
+
     /**
      * Creates a new {@code UnitListOption}.
      *
@@ -49,6 +50,7 @@ public class UnitListOption extends ListOption<AbstractUnit> {
     public UnitListOption(String id, Specification specification) {
         super(id, specification);
     }
+
 
     /**
      * {@inheritDoc}

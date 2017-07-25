@@ -47,11 +47,12 @@ public class EditOptionDialog extends FreeColConfirmDialog {
     public EditOptionDialog(FreeColClient freeColClient, JFrame frame, Option option) {
         super(freeColClient, frame);
 
-        ui = OptionUI.getOptionUI(getGUI(), option, true);
-
+        this.ui = OptionUI.getOptionUI(getGUI(), option, true);
         MigPanel panel = new MigPanel(new MigLayout());
-        if (ui.getJLabel() == null) panel.add(ui.getJLabel(), "split 2");
-        panel.add(ui.getComponent());
+        if (this.ui.getJLabel() == null) {
+            panel.add(this.ui.getJLabel(), "split 2");
+        }
+        panel.add(this.ui.getComponent());
 
         initializeConfirmDialog(frame, true, panel, null, "ok", "cancel");
     }
@@ -63,9 +64,7 @@ public class EditOptionDialog extends FreeColConfirmDialog {
     @Override
     public Boolean getResponse() {
         Boolean result = super.getResponse();
-        if (result && ui != null) {
-            ui.updateOption();
-        }
+        if (result && this.ui != null) this.ui.updateOption();
         return result;
     }
 }

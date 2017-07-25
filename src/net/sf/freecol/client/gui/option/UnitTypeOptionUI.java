@@ -66,10 +66,10 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
         super(option, editable);
 
         List<UnitType> choices = option.getChoices();
-        box.setModel(new DefaultComboBoxModel<>(choices
+        this.box.setModel(new DefaultComboBoxModel<>(choices
                 .toArray(new UnitType[choices.size()])));
-        box.setSelectedItem(option.getValue());
-        box.setRenderer(new ChoiceRenderer());
+        this.box.setSelectedItem(option.getValue());
+        this.box.setRenderer(new ChoiceRenderer());
 
         initialize();
     }
@@ -82,7 +82,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
      */
     @Override
     public JComboBox getComponent() {
-        return box;
+        return this.box;
     }
 
     /**
@@ -90,7 +90,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
      */
     @Override
     public void updateOption() {
-        getOption().setValue((UnitType) box.getSelectedItem());
+        getOption().setValue((UnitType)this.box.getSelectedItem());
     }
 
     /**
@@ -98,6 +98,6 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
      */
     @Override
     public void reset() {
-        box.setSelectedItem(getOption().getValue());
+        this.box.setSelectedItem(getOption().getValue());
     }
 }

@@ -35,29 +35,27 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
 
     private final JSpinner spinner = new JSpinner();
 
+
     /**
-     * Creates a new {@code IntegerOptionUI} for the given {@code IntegerOption}.
+     * Creates a new {@code IntegerOptionUI} for the given
+     * {@code IntegerOption}.
+     *
      * @param option The {@code IntegerOption} to make a user interface for.
      * @param editable boolean whether user can modify the setting
      */
     public IntegerOptionUI(final IntegerOption option, boolean editable) {
         super(option, editable);
 
-        int value = option.getValue();
-        if (editable) {
-            int min = option.getMinimumValue();
-            int max = option.getMaximumValue();
-            if (min > max) {
-                int tmp = min;
-                min = max;
-                max = tmp;
-            }
-            int stepSize = Math.max(1, Math.min((max - min) / 10, 1000));
-            spinner.setModel(new SpinnerNumberModel(value, min, max, stepSize));
-        } else {
-            spinner.setModel(new SpinnerNumberModel(value, value, value, 1));
+        final int value = option.getValue();
+        int min = option.getMinimumValue();
+        int max = option.getMaximumValue();
+        if (min > max) {
+            int tmp = min;
+            min = max;
+            max = tmp;
         }
-
+        final int stepSize = Math.max(1, Math.min((max - min) / 10, 1000));
+        this.spinner.setModel(new SpinnerNumberModel(value, min, max, 1));
         initialize();
     }
 
@@ -69,7 +67,7 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
      */
     @Override
     public JComponent getComponent() {
-        return spinner;
+        return this.spinner;
     }
 
     /**
@@ -77,7 +75,7 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
      */
     @Override
     public void updateOption() {
-        getOption().setValue((Integer) spinner.getValue());
+        getOption().setValue((Integer)this.spinner.getValue());
     }
 
     /**
@@ -85,6 +83,6 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
      */
     @Override
     public void reset() {
-        spinner.setValue(getOption().getValue());
+        this.spinner.setValue(getOption().getValue());
     }
 }

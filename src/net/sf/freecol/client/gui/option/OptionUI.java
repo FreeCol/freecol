@@ -70,8 +70,8 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
 
         String name = Messages.getName(option.getId());
         String text = Messages.getBestDescription(option);
-        label.setText(name);
-        label.setToolTipText(text);
+        this.label.setText(name);
+        this.label.setToolTipText(text);
     }
 
 
@@ -86,7 +86,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
     }
 
     public final T getOption() {
-        return option;
+        return this.option;
     }
 
     public final void setOption(final T newOption) {
@@ -94,12 +94,54 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
     }
 
     public final boolean isEditable() {
-        return editable;
+        return this.editable;
     }
 
     public final void setEditable(final boolean newEditable) {
         this.editable = newEditable;
     }
+
+
+    // Routines to be implemented/overridden
+
+    public JLabel getJLabel() {
+        return this.label;
+    }
+
+    protected void setLabel(JLabel label) {
+        this.label = label;
+    }
+
+    /**
+     * Get a ListCellRenderer suitable for the wrapped Option.
+     *
+     * @return A suitable ListCellRenderer.
+     */
+    public ListCellRenderer getListCellRenderer() {
+        return null;
+    }
+
+    /**
+     * Get the {@code Component} used to set the value of the Option.
+     *
+     * @return a {@code JComponent} value
+     */
+    public abstract JComponent getComponent();
+
+    /**
+     * Update the value of the Option from the UI's component.
+     */
+    @Override
+    public abstract void updateOption();
+
+    /**
+     * Reset the value of the UI's component from the Option.
+     */
+    @Override
+    public abstract void reset();
+
+
+    // Global OptionUI accessor
 
     /**
      * Get an option UI for a given option.
@@ -144,44 +186,4 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
             return null;
         }
     }
-
-
-    // Routines to be implemented/overridden
-
-    public JLabel getJLabel() {
-        return label;
-    }
-
-    protected void setLabel(JLabel label) {
-        this.label = label;
-    }
-
-    /**
-     * Get a ListCellRenderer suitable for the wrapped Option.
-     *
-     * @return A suitable ListCellRenderer.
-     */
-    public ListCellRenderer getListCellRenderer() {
-        return null;
-    }
-
-    /**
-     * Get the {@code Component} used to set the value of the
-     * Option.
-     *
-     * @return a {@code JComponent} value
-     */
-    public abstract JComponent getComponent();
-
-    /**
-     * Update the value of the Option from the UI's component.
-     */
-    @Override
-    public abstract void updateOption();
-
-    /**
-     * Reset the value of the UI's component from the Option.
-     */
-    @Override
-    public abstract void reset();
 }

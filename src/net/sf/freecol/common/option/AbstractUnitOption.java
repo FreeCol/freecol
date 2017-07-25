@@ -47,13 +47,13 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     private AbstractUnit value = null;
 
     /** An Option to determine the UnitType of the AbstractUnit. */
-    private UnitTypeOption unitType = null;
+    private UnitTypeOption unitTypeOption = null;
 
     /** An Option to determine the Role of the AbstractUnit. */
-    private StringOption role = null;
+    private StringOption roleOption = null;
 
     /** An Option to determine the number of the AbstractUnit. */
-    private IntegerOption number = null;
+    private IntegerOption numberOption = null;
 
 
     /**
@@ -76,19 +76,25 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     }
 
 
-    private void requireUnitType() {
-        this.unitType = new UnitTypeOption(getId() + ".unitType",
-                                           getSpecification());
+    private void requireUnitTypeOption() {
+        if (this.unitTypeOption == null) {
+            this.unitTypeOption = new UnitTypeOption(getId() + ".unitType",
+                                                     getSpecification());
+        }
     }
 
-    private void requireRole() {
-        this.role = new StringOption(getId() + ".role",
-                                     getSpecification());
+    private void requireRoleOption() {
+        if (this.roleOption == null) {
+            this.roleOption = new StringOption(getId() + ".role",
+                                               getSpecification());
+        }
     }
 
-    private void requireNumber() {
-        this.number = new IntegerOption(getId() + ".number",
-                                        getSpecification());
+    private void requireNumberOption() {
+        if (this.numberOption == null) {
+            this.numberOption = new IntegerOption(getId() + ".number",
+                                                  getSpecification());
+        }
     }
 
     /**
@@ -97,7 +103,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * @return The {@code UnitTypeOption} containing the unit type.
      */
     public final UnitTypeOption getUnitType() {
-        return unitType;
+        return this.unitTypeOption;
     }
 
     /**
@@ -106,7 +112,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * @return The {@code StringOption} containing the role.
      */
     public final StringOption getRole() {
-        return role;
+        return this.roleOption;
     }
 
     /**
@@ -115,7 +121,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * @return The {@code IntegerOption} containing the number.
      */
     public final IntegerOption getNumber() {
-        return number;
+        return this.numberOption;
     }
 
 
@@ -134,9 +140,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
                 value.getRoleId(), value.getNumber());
             result.setValue(au);
         }
-        if (unitType != null) result.unitType = unitType;
-        if (role != null) result.role = role;
-        if (number != null) result.number = number;
+        if (unitTypeOption != null) result.unitTypeOption = unitTypeOption.clone();
+        if (roleOption != null) result.roleOption = roleOption.clone();
+        if (numberOption != null) result.numberOption = numberOption.clone();
         return result;
     }
 
@@ -145,7 +151,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      */
     @Override
     public AbstractUnit getValue() {
-        return value;
+        return this.value;
     }
 
     /**
@@ -157,21 +163,21 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         final AbstractUnit oldValue = this.value;
         this.value = value;
         if (value == null) {
-            this.unitType = null;
-            this.role = null;
-            this.number = null;
+            this.unitTypeOption = null;
+            this.roleOption = null;
+            this.numberOption = null;
         } else {
-            requireUnitType();
-            this.unitType.setValue(value.getType(spec));
-            requireRole();
-            this.role.setValue(value.getRoleId());
-            requireNumber();
-            this.number.setValue(value.getNumber());
+            requireUnitTypeOption();
+            this.unitTypeOption.setValue(value.getType(spec));
+            requireRoleOption();
+            this.roleOption.setValue(value.getRoleId());
+            requireNumberOption();
+            this.numberOption.setValue(value.getNumber());
         }
 
-        if (isDefined && (((value == null) != (oldValue == null))
-                || (value != null && !value.equals(oldValue)))) {
-            firePropertyChange(VALUE_TAG, oldValue, value);
+        if (isDefined && (((this.value == null) != (oldValue == null))
+                || (this.value != null && !this.value.equals(oldValue)))) {
+            firePropertyChange(VALUE_TAG, oldValue, this.value);
         }
         isDefined = true;
     }
@@ -192,9 +198,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      */
     @Override
     public void generateChoices() {
-        unitType.generateChoices();
-        role.setChoices(transform(getSpecification().getRoles(), alwaysTrue(),
-                                  Role::getId));
+        this.unitTypeOption.generateChoices();
+        this.roleOption.setChoices(transform(getSpecification().getRoles(),
+                                             alwaysTrue(), Role::getId));
     }
 
 
@@ -212,11 +218,11 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        number.toXML(xw, NUMBER_TAG);
+        numberOption.toXML(xw, NUMBER_TAG);
 
-        role.toXML(xw, ROLE_TAG);
+        roleOption.toXML(xw, ROLE_TAG);
 
-        unitType.toXML(xw, UNIT_TYPE_TAG);
+        unitTypeOption.toXML(xw, UNIT_TYPE_TAG);
     }
 
     /**
@@ -227,10 +233,12 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         super.readChildren(xr);
 
         AbstractUnit au = null;
-        if (unitType != null && role != null && number != null) {
-            au = new AbstractUnit(unitType.getValue(),
-                                  role.getValue(),
-                                  number.getValue());
+        if (unitTypeOption != null
+            && roleOption != null
+            && numberOption != null) {
+            au = new AbstractUnit(unitTypeOption.getValue(),
+                                  roleOption.getValue(),
+                                  numberOption.getValue());
         }
         setValue(au);
     }
@@ -242,22 +250,24 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (null != tag) switch (tag) {
+        if (tag != null) {
+            switch (tag) {
             case NUMBER_TAG:
-                requireNumber();
-                number.readFromXML(xr);
+                requireNumberOption();
+                numberOption.readFromXML(xr);
                 break;
             case ROLE_TAG:
-                requireRole();
-                role.readFromXML(xr);
+                requireRoleOption();
+                roleOption.readFromXML(xr);
                 break;
             case UNIT_TYPE_TAG:
-                requireUnitType();
-                unitType.readFromXML(xr);
+                requireUnitTypeOption();
+                unitTypeOption.readFromXML(xr);
                 break;
             default:
                 super.readChild(xr);
                 break;
+            }
         }
     }
 
@@ -277,7 +287,17 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
         sb.append('[').append(getId())
-            .append(' ').append(value).append(']');
+            .append(' ').append(this.value);
+        if (this.unitTypeOption != null) {
+            sb.append(' ').append(this.unitTypeOption);
+        }
+        if (this.roleOption != null) {
+            sb.append(' ').append(this.roleOption);
+        }
+        if (this.numberOption != null) {
+            sb.append(' ').append(this.numberOption);
+        }
+        sb.append(']');
         return sb.toString();
     }
 }
