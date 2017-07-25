@@ -239,8 +239,7 @@ public final class FreeColServer {
      * @exception IOException on failure to open the port.
      */
     private Server serverStart(int firstPort) throws IOException {
-        String host = (this.publicServer) ? "0.0.0.0"
-            : InetAddress.getLoopbackAddress().getHostAddress();
+        final String host = "0.0.0.0";
         int port, tries;
         if (firstPort < 0) {
             port = FreeCol.getServerPort();
