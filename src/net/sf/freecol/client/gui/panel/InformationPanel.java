@@ -167,11 +167,18 @@ public class InformationPanel extends FreeColPanel {
                 "[" + (w-2*10) + "]", "[240]10[20]");
     }
 
+    /**
+     * Get a skin for this panel.
+     *
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @return A skin image.
+     */
     private static BufferedImage getSkin(FreeColClient freeColClient) {
         Player player = freeColClient.getMyPlayer();
-        String key = player.isRebel() ? "image.skin.InformationPanel.rebel"
+        String key = (player == null) ? "image.skin.InformationPanel"
+            : (player.isRebel()) ? "image.skin.InformationPanel.rebel"
             : "image.skin.InformationPanel." + player.getNationResourceKey();
-        if(!ResourceManager.hasImageResource(key))
+        if (!ResourceManager.hasImageResource(key))
             key = "image.skin.InformationPanel";
         return ResourceManager.getImage(key);
     }
