@@ -263,7 +263,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                     .showDifficultyDialog(this.specification, this.difficulty);
                 if (newDifficulty != null) {
                     this.difficulty = newDifficulty;
-                    update(); // Brings in new difficulty if edited
+                    update(true); // Brings in new difficulty if edited
                 }
             });
 
@@ -354,35 +354,47 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     
     /**
      * Update specification and difficulty as needed.
+     *
+     * @param changed If true force an update.
      */
-    private void update() {
-        // If the TC box changed, update the specification.
-        boolean changed = !this.specification.getId().equals(getSelectedTC().getId());
-        if (changed) this.specification = getSpecification();
-            
-        // If the difficulty box changed, update the difficulty.
-        OptionGroup difficulty = getSelectedDifficulty();
-System.err.println("UP this=" + this.difficulty + " other=" + difficulty);
-        if (!this.difficulty.getId().equals(difficulty.getId())) {
-            this.difficulty = difficulty;
-            changed = true;
+    private void update(boolean changed) {
+        if (!changed) return;
+        // If using a custom difficulty, update it within the
+        // spec, otherwise read the difficulty from the new spec.
+        if (this.difficulty.isEditable()) {
+            this.specification.prepare(null, this.difficulty);
+        } else {
+            String oldId = this.difficulty.getId();
+            this.difficulty = this.specification
+                .getDifficultyOptionGroup(oldId);
         }
-
-        // Harmonize the new spec and difficulty if something changed.
-        if (changed) {
-            // If using a custom difficulty, update it within the
-            // spec, otherwise read the difficulty from the new spec.
-            if (this.difficulty.isEditable()) {
-                this.specification.prepare(null, this.difficulty);
-            } else {
-                String oldId = this.difficulty.getId();
-                this.difficulty = this.specification
-                    .getDifficultyOptionGroup(oldId);
-            }
-            updateDifficultyBox();
-        }
+        updateDifficultyBox();
     }
 
+    /**
+     * Check if the TC changed.
+     *
+     * @return True if the TC changed.
+     */
+    private boolean checkTC() {
+        if (this.specification.getId()
+            .equals(getSelectedTC().getId())) return false;
+        this.specification = getSpecification();
+        return true;
+    }
+        
+    /**
+     * Check if the difficulty box changed.
+     *
+     * @return True if the difficulty changed.
+     */
+    private boolean checkDifficulty() {
+        OptionGroup difficulty = getSelectedDifficulty();
+        if (this.difficulty.getId().equals(difficulty.getId())) return false;
+        this.difficulty = difficulty;
+        return true;
+    }
+    
     /**
      * Update just the difficulty box state.
      */
@@ -585,6 +597,6 @@ System.err.println("UP this=" + this.difficulty + " other=" + difficulty);
      */
     @Override
     public void itemStateChanged(ItemEvent e) {
-        update();
+        update(checkTC() || checkDifficulty());
     }
 }
