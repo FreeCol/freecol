@@ -259,9 +259,12 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         this.difficultyBox.addItemListener(this);
         this.difficultyButton = Utility.localizedButton("newPanel.showDifficulty");
         this.difficultyButton.addActionListener(ae -> {
-                this.difficulty = getGUI()
+                OptionGroup newDifficulty = getGUI()
                     .showDifficultyDialog(this.specification, this.difficulty);
-                update(); // Brings in new difficulty if edited
+                if (newDifficulty != null) {
+                    this.difficulty = newDifficulty;
+                    update(); // Brings in new difficulty if edited
+                }
             });
 
         this.joinNameLabel = Utility.localizedLabel("host");
@@ -358,8 +361,10 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         if (changed) this.specification = getSpecification();
             
         // If the difficulty box changed, update the difficulty.
-        if (!this.difficulty.getId().equals(getSelectedDifficulty().getId())) {
-            this.difficulty = getSelectedDifficulty();
+        OptionGroup difficulty = getSelectedDifficulty();
+System.err.println("UP this=" + this.difficulty + " other=" + difficulty);
+        if (!this.difficulty.getId().equals(difficulty.getId())) {
+            this.difficulty = difficulty;
             changed = true;
         }
 
@@ -378,6 +383,9 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         }
     }
 
+    /**
+     * Update just the difficulty box state.
+     */
     private void updateDifficultyBox() {
         // Update the contents of the difficulty level box depending on
         // the specification currently selected.
