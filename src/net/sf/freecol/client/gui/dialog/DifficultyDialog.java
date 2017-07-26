@@ -32,12 +32,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 
 
@@ -70,14 +70,14 @@ public final class DifficultyDialog extends OptionsDialog
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param specification The {@code Specification} to base the
-     *     difficulty on.
+     * @param specification The {@code Specification} to base the difficulty on.
      * @param level An {@code OptionGroup} encapsulating the difficulty
      *     level to display.
      * @param editable Is the dialog editable?
      */
     public DifficultyDialog(FreeColClient freeColClient, JFrame frame,
-            Specification specification, OptionGroup level, boolean editable) {
+                            Specification specification, OptionGroup level,
+                            boolean editable) {
         super(freeColClient, frame, editable, level, "difficultyDialog",
               FreeColDirectories.CUSTOM_DIFFICULTY_FILE_NAME,
               "model.difficulty.custom");
@@ -114,7 +114,7 @@ public final class DifficultyDialog extends OptionsDialog
      */
     @Override
     public Specification getSpecification() {
-        return specification;
+        return this.specification;
     }
 
 
@@ -141,10 +141,15 @@ public final class DifficultyDialog extends OptionsDialog
         button.addActionListener((ActionEvent ae) -> {
                 File dir = FreeColDirectories.getOptionsDirectory();
                 File file = getGUI().showLoadDialog(dir, filters);
-                if (file != null && load(file)) {
-                    invalidate();
-                    validate();
-                    repaint();
+                if (file != null) {
+                    if (load(file)) {
+                        ; // OptionsDialog.load should update the GUI
+                    } else {
+                        StringTemplate err = StringTemplate
+                            .template("error.couldNotLoadDifficulty")
+                            .addName("%name%", file.getPath());
+                        getGUI().showErrorMessage(err);
+                    }
                 }
             });
     }
@@ -171,9 +176,9 @@ public final class DifficultyDialog extends OptionsDialog
      * Initialize the XML file filter.
      */
     private void initializeFilters() {
+        final String desc = Messages.message("filter.xml");
         synchronized (filters) {
             if (filters[0] == null) {
-                String desc = Messages.message("filter.xml");
                 filters[0] = new FileNameExtensionFilter(desc, "xml");
             }
         }
