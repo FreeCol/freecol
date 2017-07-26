@@ -86,10 +86,7 @@ public final class DifficultyDialog extends OptionsDialog
         this.selected = level;
 
         getOptionUI().getTree().addTreeSelectionListener(this);
-
         if (isEditable()) {
-            loadDefaultOptions();
-
             JButton resetButton = Utility.localizedButton("reset");
             addResetAction(resetButton);
             
@@ -206,9 +203,7 @@ public final class DifficultyDialog extends OptionsDialog
     @Override
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();
-        if (value != null) {
-            FreeCol.setDifficulty(value);
-        }
-        return value;
+        return (value == null) ? null // Cancelled
+            : getGroup();
     }
 }

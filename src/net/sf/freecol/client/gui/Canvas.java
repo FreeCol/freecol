@@ -1933,9 +1933,11 @@ public final class Canvas extends JDesktopPane {
      */
     public OptionGroup showDifficultyDialog(Specification spec,
                                             OptionGroup group, boolean editable) {
-        return showFreeColDialog(new DifficultyDialog(freeColClient, frame,
-                spec, group, editable),
-            null);
+        DifficultyDialog dd = new DifficultyDialog(freeColClient, frame,
+                                                   spec, group, editable);
+        OptionGroup ret = showFreeColDialog(dd, null);
+        if (ret != null) FreeCol.setDifficulty(ret);
+        return ret;
     }
 
     /**
