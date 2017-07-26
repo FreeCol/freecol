@@ -65,7 +65,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         DECLARE_WAR,
         SUPPORT_LAND,
         SUPPORT_SEA,
-        MONARCH_MERCENARIES, 
+        MONARCH_MERCENARIES,
         HESSIAN_MERCENARIES,
         DISPLEASURE;
 
@@ -81,7 +81,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         public String getTextKey() {
             return "model." + getKey() + ".text";
         }
-        
+
         public String getYesKey() {
             return "model." + getKey() + ".yes";
         }
@@ -129,7 +129,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     private Force interventionForce;
 
-    
+
     // Caches.  Do not serialize.
     /** The naval unit types suitable for support actions. */
     private List<UnitType> navalTypes = null;
@@ -202,12 +202,12 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The REF {@code Force}.
      */
     public Force getExpeditionaryForce() {
-        if (expeditionaryForce == null) {
+        if (this.expeditionaryForce == null) {
             final Specification spec = getSpecification();
             UnitListOption option = (UnitListOption)spec.getOption(GameOptions.REF_FORCE);
-            expeditionaryForce = new Force(spec, option.getOptionValues(), null);
+            this.expeditionaryForce = new Force(spec, option.getOptionValues(), null);
         }
-        return expeditionaryForce;
+        return this.expeditionaryForce;
     }
 
     /**
@@ -216,12 +216,12 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The intervention {@code Force}.
      */
     public Force getInterventionForce() {
-        if (interventionForce == null) {
+        if (this.interventionForce == null) {
             final Specification spec = getSpecification();
             UnitListOption option = (UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE);
-            interventionForce = new Force(spec, option.getOptionValues(), null);
+            this.interventionForce = new Force(spec, option.getOptionValues(), null);
         }
-        return interventionForce;
+        return this.interventionForce;
     }
 
     /**
@@ -256,7 +256,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return Gets the sea support status.
      */
     public boolean getSupportSea() {
-        return supportSea;
+        return this.supportSea;
     }
 
     /**
@@ -274,7 +274,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return Gets the displeasure status.
      */
     public boolean getDispleasure() {
-        return displeasure;
+        return this.displeasure;
     }
 
     /**
@@ -342,7 +342,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 }
             }
         }
-        
+
     }
 
     /**
@@ -593,7 +593,7 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         final Specification spec = getSpecification();
         List<AbstractUnit> support = new ArrayList<>();
-        
+
         if (naval) {
             support.add(new AbstractUnit(getRandomMember(logger,
                         "Choose naval support", navalTypes, random),
@@ -715,7 +715,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
         return result;
     }
-        
+
     /**
      * Gets some units available as mercenaries.
      *
@@ -829,9 +829,9 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         if (xw.validFor(this.player)) {
 
-            xw.writeAttribute(SUPPORT_SEA_TAG, supportSea);
+            xw.writeAttribute(SUPPORT_SEA_TAG, this.supportSea);
 
-            xw.writeAttribute(DISPLEASURE_TAG, displeasure);
+            xw.writeAttribute(DISPLEASURE_TAG, this.displeasure);
         }
     }
 
@@ -860,9 +860,9 @@ public final class Monarch extends FreeColGameObject implements Named {
         player = xr.findFreeColGameObject(getGame(), PLAYER_TAG,
                                           Player.class, (Player)null, true);
 
-        supportSea = xr.getAttribute(SUPPORT_SEA_TAG, false);
+        this.supportSea = xr.getAttribute(SUPPORT_SEA_TAG, false);
 
-        displeasure = xr.getAttribute(DISPLEASURE_TAG, false);
+        this.displeasure = xr.getAttribute(DISPLEASURE_TAG, false);
     }
 
     /**
@@ -872,8 +872,8 @@ public final class Monarch extends FreeColGameObject implements Named {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         // Provide dummy forces to read into.
-        if (expeditionaryForce == null) expeditionaryForce = new Force(spec);
-        if (interventionForce == null) interventionForce = new Force(spec);
+        if (this.expeditionaryForce == null) this.expeditionaryForce = new Force(spec);
+        if (this.interventionForce == null) this.interventionForce = new Force(spec);
 
         super.readChildren(xr);
     }
@@ -886,10 +886,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         final String tag = xr.getLocalName();
 
         if (EXPEDITIONARY_FORCE_TAG.equals(tag)) {
-            expeditionaryForce.readFromXML(xr);
+            this.expeditionaryForce.readFromXML(xr);
 
         } else if (INTERVENTION_FORCE_TAG.equals(tag)) {
-            interventionForce.readFromXML(xr);
+            this.interventionForce.readFromXML(xr);
 
         // @compat 0.11.5
         // Mercenary force is never updated, and lives in the spec now, so
@@ -897,7 +897,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         } else if (MERCENARY_FORCE_TAG.equals(tag)) {
             new Force(getSpecification()).readFromXML(xr);
         // end @compat 0.11.5
-            
+
         } else {
             super.readChild(xr);
         }
