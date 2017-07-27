@@ -58,6 +58,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.Controller;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -1394,7 +1395,7 @@ public final class FreeCol {
      */
     private static void startServer() {
         logger.info("Starting stand-alone server.");
-        final FreeColServer freeColServer;
+        FreeColServer freeColServer;
         File saveGame = FreeColDirectories.getSavegameFile();
         if (saveGame != null) {
             try {
@@ -1402,33 +1403,40 @@ public final class FreeCol {
                     = new FreeColSavegameFile(saveGame);
                 freeColServer = new FreeColServer(fis, (Specification)null,
                                                   serverPort, serverName);
-                if (checkIntegrity) {
-                    String k;
-                    int ret;
-                    switch (freeColServer.getIntegrity()) {
-                    case 1:
-                        k = "cli.check-savegame.success";
-                        ret = 0;
-                        break;
-                    case 0:
-                        k = "cli.check-savegame.fixed";
-                        ret = 2;
-                        break;
-                    case -1: default:
-                        k = "cli.check-savegame.failure";
-                        ret = 3;
-                        break;
-                    }
-                    gripe(StringTemplate.template(k)
-                        .add("%log%", FreeColDirectories.getLogFilePath()));
-                    System.exit(ret);
-                }
             } catch (Exception e) {
-                if (checkIntegrity) gripe("cli.check-savegame.failure");
+                logger.log(Level.SEVERE, "Load fail", e);
                 fatal(Messages.message(badFile("error.couldNotLoad", saveGame))
-                    + ": " + e.getMessage());
-                return;
+                    + ": " + e);
+                freeColServer = null;
             }
+            
+            if (checkIntegrity) {
+                String k;
+                int ret, check = (freeColServer == null) ? -1
+                    : freeColServer.getIntegrity();
+                switch (check) {
+                case 1:
+                    k = "cli.check-savegame.success";
+                    ret = 0;
+                    break;
+                case 0:
+                    k = "cli.check-savegame.fixed";
+                    ret = 2;
+                    break;
+                case -1: default:
+                    k = "cli.check-savegame.failed";
+                    ret = 3;
+                    break;
+                }
+                if (freeColServer == null) {
+                    logger.warning("Integrity test blocked");
+                }
+                gripe(StringTemplate.template(k)
+                    .add("%log%", FreeColDirectories.getLogFilePath()));
+                System.exit(ret);
+            }
+
+            if (freeColServer == null) return;
         } else {
             Specification spec = FreeCol.getTCSpecification();
             try {
@@ -1446,10 +1454,11 @@ public final class FreeCol {
         }
 
         String quit = FreeCol.SERVER_THREAD + "Quit Game";
+        final Controller controller = freeColServer.getController();
         Runtime.getRuntime().addShutdownHook(new Thread(quit) {
                 @Override
                 public void run() {
-                    freeColServer.getController().shutdown();
+                    controller.shutdown();
                 }
             });
     }
