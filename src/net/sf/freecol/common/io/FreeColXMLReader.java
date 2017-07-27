@@ -350,7 +350,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
     public void expectTag(String tag) throws XMLStreamException {
         final String endTag = getLocalName();
         if (!endTag.equals(tag)) {
-net.sf.freecol.FreeCol.trace(logger, "EXP");
             throw new XMLStreamException("Parse error, " + tag
                 + " expected, not: " + endTag);
         }
