@@ -506,6 +506,10 @@ public final class TileType extends FreeColSpecObjectType
     private static final String TEMPERATURE_MIN_TAG = "temperature-minimum";
     private static final String TEMPERATURE_MAX_TAG = "temperature-maximum";
     private static final String TYPE_TAG = "type";
+    // @compat 0.11.x
+    private static final String PRIMARY_PRODUCTION_TAG = "primary-production";
+    private static final String SECONDARY_PRODUCTION_TAG = "secondary-production";
+    // end @compat 0.11.x
     // @compat 0.11.3
     private static final String OLD_ALTITUDE_MIN_TAG = "altitudeMin";
     private static final String OLD_ALTITUDE_MAX_TAG = "altitudeMax";
@@ -684,6 +688,20 @@ public final class TileType extends FreeColSpecObjectType
                                        (ResourceType)null),
                             xr.getAttribute(PROBABILITY_TAG, 100));
             xr.closeTag(RESOURCE_TAG);
+
+        // @compat 0.11.x
+        // Primary and secondary production was dropped at 0.11.0, but
+        // some saved games slipped through.
+        } else if (PRIMARY_PRODUCTION_TAG.equals(tag)
+            || SECONDARY_PRODUCTION_TAG.equals(tag)) {
+            GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
+                                        GoodsType.class, (GoodsType)null);
+            int amount = xr.getAttribute(VALUE_TAG, 0);
+            ProductionType pt = new ProductionType(null, type, amount);
+            pt.setUnattended(true);
+            this.productionTypes.add(pt);
+            xr.closeTag(tag);
+        // @end compat 0.11.x
 
         } else {
             super.readChild(xr);
