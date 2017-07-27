@@ -755,8 +755,7 @@ public class TileImprovement extends TileItem implements Named {
         final Specification spec = getSpecification();
         final Game game = getGame();
 
-        tile = xr.findFreeColGameObject(game, TILE_TAG,
-                                        Tile.class, (Tile)null, true);
+        tile = xr.makeFreeColObject(game, TILE_TAG, Tile.class, true);
 
         type = xr.getType(spec, TYPE_TAG, TileImprovementType.class,
                           (TileImprovementType)null);
