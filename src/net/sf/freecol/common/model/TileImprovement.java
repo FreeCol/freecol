@@ -772,17 +772,17 @@ public class TileImprovement extends TileItem implements Named {
         if (dirns == null) {
             if (str != null && !str.isEmpty())
                 logger.warning("At " + tile + " ignored nonempty style for "
-                    + type + ": " + str + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+                    + type + ": " + str);
         } else if (str == null) {
             if (!isComplete() || isVirtual()) {
                 ; // Null style OK for incomplete or virtual roads
             } else {
-                logger.warning("At " + tile
-                    + " unexpected null style for " + type + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+                logger.warning("At " + tile + " unexpected null style for "
+                    + type);
             }
         } else if (str.length() != dirns.size()) {
-            logger.warning("At " + tile + " ignored bogus style for " + type
-                + ": " + str + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+            logger.warning("At " + tile + " ignored bogus style for "
+                + type + ": " + str);
         } else {
             style = TileImprovementStyle.getInstance(str);
         }
