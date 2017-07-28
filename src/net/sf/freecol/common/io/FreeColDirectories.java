@@ -291,7 +291,7 @@ public class FreeColDirectories {
      * @return True if the file is a writable directory.
      */
     private static boolean isGoodDirectory(File f) {
-        return f.exists() && f.isDirectory() && f.canWrite();
+        return f != null && f.exists() && f.isDirectory() && f.canWrite();
     }
 
     /**
@@ -475,14 +475,14 @@ public class FreeColDirectories {
 
     /**
      * Derive the directory for the autosave files from the save directory.
+     *
+     * @return The new autosave directory, or null if not possible.
      */
-    private static void deriveAutosaveDirectory() {
+    private static File deriveAutosaveDirectory() {
         File dir;
-        if (autosaveDirectory == null && saveDirectory != null
+        return (isGoodDirectory(saveDirectory)
             && (dir = new File(saveDirectory, AUTOSAVE_DIRECTORY)) != null
-            && insistDirectory(dir)) {
-            autosaveDirectory = dir;
-        }
+            && insistDirectory(dir)) ? dir : null;
     }
 
     /**
@@ -573,7 +573,7 @@ public class FreeColDirectories {
             saveDirectory = new File(getUserDataDirectory(), SAVE_DIRECTORY);
             if (!insistDirectory(saveDirectory)) return badDir(saveDirectory);
         }
-        deriveAutosaveDirectory();
+        autosaveDirectory = deriveAutosaveDirectory();
         userModsDirectory = new File(getUserDataDirectory(), MODS_DIRECTORY);
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
 
@@ -607,6 +607,10 @@ public class FreeColDirectories {
      * @return The autosave directory.
      */
     public static File getAutosaveDirectory() {
+        // Re-establish the autosave directory if it has gone away
+        if (!isGoodDirectory(autosaveDirectory)) {
+            autosaveDirectory = deriveAutosaveDirectory();
+        }
         return autosaveDirectory;
     }
 
@@ -614,10 +618,11 @@ public class FreeColDirectories {
      * Get a specific autosave file.
      *
      * @param fileName The name of the file.
-     * @return The {@code File} found.
+     * @return The {@code File} found, or null on error.
      */
     public static File getAutosaveFile(String fileName) {
-        return new File(getAutosaveDirectory(), sanitize(fileName));
+        File dir = getAutosaveDirectory();
+        return (dir == null) ? null : new File(dir, sanitize(fileName));
     }
 
     /**
@@ -1097,7 +1102,7 @@ public class FreeColDirectories {
         File parent = file.getParentFile();
         if (parent == null) parent = new File(".");
         saveDirectory = parent;
-        deriveAutosaveDirectory();
+        autosaveDirectory = deriveAutosaveDirectory();
         return true;
     }
 
@@ -1125,10 +1130,11 @@ public class FreeColDirectories {
     /**
      * Get the map file to start from, if any.
      *
-     * @return The start map file if any.
+     * @return The start map file, or null on error.
      */
     public static File getStartMapFile() {
-        return new File(getAutosaveDirectory(), START_MAP_NAME);
+        File dir = getAutosaveDirectory();
+        return (dir == null) ? null : new File(dir, START_MAP_NAME);
     }
 
     /**

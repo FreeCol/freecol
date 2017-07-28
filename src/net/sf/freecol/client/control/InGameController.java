@@ -567,23 +567,25 @@ public final class InGameController extends FreeColClientHolder {
         File beforeLastTurnFile
             = FreeColDirectories.getAutosaveFile(beforeLastTurnName);
         // if "last-turn" file exists, shift it to "before-last-turn" file
-        if (lastTurnFile.exists()) {
-            try {
-                if (beforeLastTurnFile.exists()) {
-                    beforeLastTurnFile.delete();
-                }
+        if (lastTurnFile != null) {
+            if (lastTurnFile.exists()) {
                 try {
-                    lastTurnFile.renameTo(beforeLastTurnFile);
-                } catch (SecurityException se) {
-                    logger.log(Level.WARNING, "Could not rename: "
+                    if (beforeLastTurnFile.exists()) {
+                        beforeLastTurnFile.delete();
+                    }
+                    try {
+                        lastTurnFile.renameTo(beforeLastTurnFile);
+                    } catch (SecurityException se) {
+                        logger.log(Level.WARNING, "Could not rename: "
                             + lastTurnFile.getPath(), se);
+                    }
+                } catch (SecurityException se) {
+                    logger.log(Level.WARNING, "Could not delete: "
+                        + beforeLastTurnFile.getPath(), se);
                 }
-            } catch (SecurityException se) {
-                logger.log(Level.WARNING, "Could not delete: "
-                    + beforeLastTurnFile.getPath(), se);
             }
+            saveGame(lastTurnFile);
         }
-        saveGame(lastTurnFile);
 
         // conditional save after user-set period
         int saveGamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
@@ -601,6 +603,7 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if the game was saved.
      */
     private boolean saveGame(final File file) {
+        if (file == null) return false;
         final FreeColServer server = getFreeColServer();
         boolean result = false;
         if (server != null) {
