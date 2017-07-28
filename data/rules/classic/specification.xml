@@ -4265,8 +4265,7 @@
           <unitListOption id="model.option.immigrants" maximumNumber="999">
             <template>
               <unitOption id="model.option.immigrants.template">
-                <unitType value="model.unit.freeColonist"
-                          generate="immigrants" />
+                <unitType value="model.unit.freeColonist" generate="immigrants" />
                 <role value="model.role.default" >
                   <choice value="model.role.default" />
                 </role>
@@ -4328,42 +4327,56 @@
           <unitListOption id="model.option.refSize">
             <template>
               <unitOption id="model.option.refSize.template">
-                <unitType value="model.unit.kingsRegular" generate="units" />
+                <unitType value="model.unit.kingsRegular">
+                  <choice value="model.unit.kingsRegular"/>
+                  <choice value="model.unit.artillery"/>
+                  <choice value="model.unit.manOWar"/>
+                </unitType>
                 <role value="model.role.infantry">
+                  <choice value="model.role.default" />
                   <choice value="model.role.infantry" />
                   <choice value="model.role.cavalry" />
                 </role>
-                <number value="20" minimumValue="0" maximumValue="999" />
+                <number value="1" minimumValue="1" maximumValue="999" />
               </unitOption>
             </template>
             <unitOption id="model.option.refSize.soldiers">
-              <unitType value="model.unit.kingsRegular" generate="units" />
-              <role value="model.role.infantry">
-                <choice value="model.role.infantry" />
-                <choice value="model.role.cavalry" />
-              </role>
+              <unitType value="model.unit.kingsRegular" />
+              <role value="model.role.infantry"/>
               <number value="60" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
-              <unitType value="model.unit.kingsRegular" generate="units" />
-              <role value="model.role.cavalry" >
-                <choice value="model.role.infantry" />
-                <choice value="model.role.cavalry" />
-              </role>
+              <unitType value="model.unit.kingsRegular" />
+              <role value="model.role.cavalry"/>
               <number value="30" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
-              <unitType value="model.unit.artillery" generate="units" />
+              <unitType value="model.unit.artillery" />
               <role value="model.role.default" />
               <number value="30" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.menOfWar">
-              <unitType value="model.unit.manOWar" generate="units" />
+              <unitType value="model.unit.manOWar" />
               <role value="model.role.default" />
               <number value="20" minimumValue="0" maximumValue="999" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.interventionForce">
+            <template>
+              <unitOption id="model.option.interventionForce.template">
+                <unitType value="model.unit.colonialRegular">
+                  <choice value="model.unit.colonialRegular"/>
+                  <choice value="model.unit.artillery"/>
+                  <choice value="model.unit.manOWar"/>
+                </unitType>
+                <role value="model.role.soldier">
+                  <choice value="model.role.default" />
+                  <choice value="model.role.soldier" />
+                  <choice value="model.role.dragoon" />
+                </role>
+                <number value="1" minimumValue="1" maximumValue="999" />
+              </unitOption>
+            </template>
             <unitOption id="model.option.interventionForce.regulars">
               <unitType value="model.unit.colonialRegular" generate="units" />
               <role value="model.role.soldier" />
@@ -4386,6 +4399,21 @@
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.mercenaryForce">
+            <template>
+              <unitOption id="model.option.mercenary.template">
+                <unitType value="model.unit.veteranSoldier">
+                  <choice value="model.unit.veteranSoldier"/>
+                  <choice value="model.unit.artillery"/>
+                  <choice value="model.unit.manOWar"/>
+                </unitType>
+                <role value="model.role.soldier">
+                  <choice value="model.role.default" />
+                  <choice value="model.role.soldier" />
+                  <choice value="model.role.dragoon" />
+                </role>
+                <number value="1" minimumValue="1" maximumValue="999" />
+              </unitOption>
+            </template>
             <unitOption id="model.option.mercenaryForce.regulars">
               <unitType value="model.unit.veteranSoldier" />
               <role value="model.role.soldier" />
@@ -4408,6 +4436,20 @@
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.warSupportForce">
+            <template>
+              <unitOption id="model.option.warSupportForce.template">
+                <unitType value="model.unit.veteranSoldier">
+                  <choice value="model.unit.veteranSoldier"/>
+                  <choice value="model.unit.artillery"/>
+                </unitType>
+                <role value="model.role.soldier">
+                  <choice value="model.role.default" />
+                  <choice value="model.role.soldier" />
+                  <choice value="model.role.dragoon" />
+                </role>
+                <number value="1" minimumValue="1" maximumValue="999" />
+              </unitOption>
+            </template>
             <unitOption id="model.option.warSupportForce.veteranSoldier">
               <unitType value="model.unit.veteranSoldier"/>
               <role value="model.role.soldier"/>

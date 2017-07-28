@@ -59,6 +59,7 @@ public class UnitListOption extends ListOption<AbstractUnit> {
     public UnitListOption clone() {
         UnitListOption ret = new UnitListOption(getId(), getSpecification());
         ret.setValues(this);
+        ret.setListValues(this);
         return ret;
     }
 

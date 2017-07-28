@@ -77,21 +77,39 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
 
 
     /**
-     * Gets the maximum number of allowed values.
-     *
-     * @return The maximum number of allowed values for this option.
-     */
-    public int getMaximumValue() {
-        return maximumNumber;
-    }
-
-    /**
      * Gets the generating template.
      *
      * @return The template.
      */
     public AbstractOption<T> getTemplate() {
-        return template;
+        return this.template;
+    }
+
+    /**
+     * Sets the generating template.
+     *
+     * @param template The template to set.
+     */
+    public void setTemplate(AbstractOption<T> template) {
+        this.template = template;
+    }
+
+    /**
+     * Gets the maximum number of allowed values.
+     *
+     * @return The maximum number of allowed values for this option.
+     */
+    public int getMaximumNumber() {
+        return this.maximumNumber;
+    }
+
+    /**
+     * Sets the maximum number of allowed values.
+     *
+     * @param maximumValue The new maximum number of allowed values.
+     */
+    public void setMaximumNumber(int maximumNumber) {
+        this.maximumNumber = maximumNumber;
     }
 
     /**
@@ -100,7 +118,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      * @return A list of option values.
      */
     public List<T> getOptionValues() {
-        return transform(value, isNotNull(), o -> o.getValue());
+        return transform(this.value, isNotNull(), o -> o.getValue());
     }
 
     /**
@@ -117,8 +135,8 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      *
      * @return True if duplicates are allowed.
      */
-    public boolean allowsDuplicates() {
-        return allowDuplicates;
+    public boolean getAllowDuplicates() {
+        return this.allowDuplicates;
     }
 
     /**
@@ -140,6 +158,18 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
         return (allowDuplicates) ? true : none(value, matchKey(ao));
     }
 
+    /**
+     * Set the list option values from another list option.
+     *
+     * @param T The list option type.
+     * @param lo The other {@code ListOption}.
+     */
+    protected void setListValues(ListOption<T> lo) {
+        this.setMaximumNumber(lo.getMaximumNumber());
+        this.setTemplate(lo.getTemplate());
+        this.setAllowDuplicates(lo.getAllowDuplicates());
+    }
+
 
     // Interface Option
 
@@ -150,7 +180,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      */
     @Override
     public List<AbstractOption<T>> getValue() {
-        return value;
+        return this.value;
     }
 
     /**
@@ -243,29 +273,42 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     /**
      * {@inheritDoc}
      */
-    @Override @SuppressWarnings("unchecked")
+    @Override
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
         switch (tag) {
         case TEMPLATE_TAG:
             xr.nextTag();
-            template = (AbstractOption<T>)readOption(xr);
+            template = readChildOption(xr);
             xr.closeTag(TEMPLATE_TAG);
             break;
         default:
-            AbstractOption<T> op = null;
             try {
-                op = (AbstractOption<T>)readOption(xr);
+                AbstractOption<T> op = readChildOption(xr);
+                if (op != null) addMember(op);
             } catch (XMLStreamException xse) {
                 logger.log(Level.WARNING, "Invalid option at: " + tag, xse);
                 xr.closeTag(tag);
             }
-            if (op != null) addMember(op);
             break;
         }
     }
 
+    /**
+     * Hack to suppress warning when reading a typed option.
+     *
+     * FIXME: Work out how to make this go away.
+     *
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @return A child typed {@code AbstractOption}.
+     */
+    @SuppressWarnings("unchecked")
+    private AbstractOption<T> readChildOption(FreeColXMLReader xr)
+        throws XMLStreamException {
+        return (AbstractOption<T>)readOption(xr);
+    }
+    
 
     // Override Object
 
@@ -276,12 +319,15 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[').append(getId());
-        if (value != null) {
+        if (this.value != null) {
             sb.append(" [");
-            for (AbstractOption<T> ao : value) {
+            for (AbstractOption<T> ao : this.value) {
                 sb.append(' ').append(ao);
             }
             sb.append(" ]");
+        }
+        if (template != null) {
+            sb.append(" template=").append(this.template);
         }
         sb.append(']');
         return sb.toString();

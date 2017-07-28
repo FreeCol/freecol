@@ -279,7 +279,10 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
             xr.nextTag();
         }
 
-        if (option != null) option.readFromXML(xr);
+        if (option != null) {
+            option.readFromXML(xr);
+            option.generateChoices();
+        }
         return option;
     }
 }

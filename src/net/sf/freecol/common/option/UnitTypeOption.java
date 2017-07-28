@@ -106,7 +106,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      *
      * @return The type of choices to generate.
      */
-    public final TypeSelector getGenerateChoices() {
+    public final TypeSelector getSelector() {
         return this.selector;
     }
 
@@ -122,8 +122,8 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
         ret.value = this.value;
         ret.addNone = this.addNone;
         ret.selector = this.selector;
-        ret.generateChoices();
-        ret.isDefined = true;
+        ret.choices.clear();
+        ret.choices.addAll(this.choices);
         return ret;
     }
 
@@ -134,7 +134,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      */
     @Override
     public UnitType getValue() {
-        return value;
+        return this.value;
     }
 
     /**
@@ -184,7 +184,8 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     @Override
     public void generateChoices() {
         if (this.selector == null) {
-            this.choices.add(getValue());
+            UnitType val = getValue();
+            if (this.choices.isEmpty() && val != null) this.choices.add(val);
         } else {
             List<UnitType> unitTypeList = getSpecification().getUnitTypeList();
             this.choices.clear();
@@ -207,6 +208,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
             }
             if (this.addNone) this.choices.add(0, null);
         }
+net.sf.freecol.common.util.CollectionUtils.dump("UTO " + this.selector, this.choices);
     }
 
 
@@ -312,10 +314,12 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[').append(getId())
-            .append(" value=").append(value)
-            .append(" addNone=").append(addNone)
-            .append(" selector=").append(selector)
-            .append(']');
+            .append(" value=").append(this.value)
+            .append(" addNone=").append(this.addNone)
+            .append(" selector=").append(this.selector)
+            .append(" choices=[");
+        for (UnitType choice : this.choices) sb.append(' ').append(choice);
+        sb.append(" ]]");
         return sb.toString();
     }
 }

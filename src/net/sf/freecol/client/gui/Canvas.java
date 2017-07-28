@@ -1956,12 +1956,13 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display the EditOptionDialog.
      *
-     * @param option The {@code Option} to edit.
+     * @param op The {@code Option} to edit.
      * @return The response returned by the dialog.
      */
-    public boolean showEditOptionDialog(Option option) {
-        return showFreeColDialog(new EditOptionDialog(freeColClient, frame, option),
-                                 null);
+    public boolean showEditOptionDialog(Option op) {
+        return (op == null) ? false
+            : showFreeColDialog(new EditOptionDialog(freeColClient, frame, op),
+                                null);
     }
 
     /**

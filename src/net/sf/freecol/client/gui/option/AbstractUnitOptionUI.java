@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.AbstractUnitOption;
@@ -129,10 +130,18 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         DefaultComboBoxModel<String> model;
         boolean enable = false;
         UnitType type = (UnitType)typeUI.getComponent().getSelectedItem();
+        final Specification spec = type.getSpecification();
         if (type.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-            model = new DefaultComboBoxModel<>(roleUI.getOption()
-                .getChoices().toArray(new String[0]));
-            enable = roleEditable;
+            int n = 0;
+            model = new DefaultComboBoxModel<>();
+            for (String ri : roleUI.getOption().getChoices()) {
+                Role role = spec.getRole(ri);
+                if (role.isAvailableTo(type)) {
+                    model.addElement(ri);
+                    n++;
+                }
+            }
+            enable = isEditable() && n > 1;
         } else {
             model = new DefaultComboBoxModel<>(new String[] {
                     Specification.DEFAULT_ROLE_ID });

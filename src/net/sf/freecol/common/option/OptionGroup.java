@@ -639,7 +639,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     @Override
     public void generateChoices() {
         for (Option o : options) {
-            if (o instanceof AbstractOption) {
+            if (o instanceof OptionGroup) {
+                ((OptionGroup)o).generateChoices();
+            } else if (o instanceof AbstractOption) {
                 ((AbstractOption)o).generateChoices();
             }
         }

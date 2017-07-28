@@ -112,28 +112,22 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         if (option.getTemplate() == null) addButton.setEnabled(false);
         
         addButton.addActionListener((ActionEvent ae) -> {
-                AbstractOption<T> oldValue = list.getSelectedValue();
-                if (oldValue == null) oldValue = option.getTemplate();
                 try {
-                    AbstractOption<T> newValue = (oldValue == null) ? null
-                        : oldValue.clone();
-                    if (gui.showEditOptionDialog(newValue)) {
-                        if (option.canAdd(newValue)) {
-                            model.addElement(newValue);
-                            list.setSelectedValue(newValue, true);
-                            list.repaint();
-                        }
+                    AbstractOption<T> ao = option.getTemplate().clone();
+                    if (gui.showEditOptionDialog(ao) && option.canAdd(ao)) {
+                        model.addElement(ao);
+                        list.setSelectedValue(ao, true);
+                        list.repaint();
                     }
-                } catch (CloneNotSupportedException e) {
-                    logger.log(Level.WARNING, "Can not clone: " + oldValue, e);
+                } catch (CloneNotSupportedException cnse) {
+                    logger.log(Level.WARNING, "Can not clone: "
+                        + option.getTemplate(), cnse);
                 }
             });
         editButton.addActionListener((ActionEvent ae) -> {
-                Object object = list.getSelectedValue();
-                if (object != null) {
-                    if (gui.showEditOptionDialog((Option)object)) {
-                        list.repaint();
-                    }
+                AbstractOption<T> ao = list.getSelectedValue();
+                if (gui.showEditOptionDialog(ao)) {
+                    list.repaint();
                 }
             });
         removeButton.addActionListener((ActionEvent ae) -> {

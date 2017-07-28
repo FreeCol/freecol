@@ -62,6 +62,7 @@ public class ModListOption extends ListOption<FreeColModFile> {
     public ModListOption clone() {
         ModListOption ret = new ModListOption(getId(), getSpecification());
         ret.setValues(this);
+        ret.setListValues(this);
         return ret;
     }
 
