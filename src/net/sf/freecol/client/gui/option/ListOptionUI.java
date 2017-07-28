@@ -108,7 +108,9 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
             button.setEnabled(editable);
             this.panel.add(button);
         }
-
+        // Disable add button if there is no template to generate choices with
+        if (option.getTemplate() == null) addButton.setEnabled(false);
+        
         addButton.addActionListener((ActionEvent ae) -> {
                 AbstractOption<T> oldValue = list.getSelectedValue();
                 if (oldValue == null) oldValue = option.getTemplate();
