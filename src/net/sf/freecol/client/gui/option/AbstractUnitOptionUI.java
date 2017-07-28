@@ -66,7 +66,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
         @Override
         public void setLabelValues(JLabel label, String value) {
-            label.setText(Messages.getName(value));
+            label.setText((value == null) ? "" : Messages.getName(value));
         }
     }
 
