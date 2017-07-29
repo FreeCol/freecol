@@ -530,7 +530,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                                              null, cd)) == null) continue;
                 int alarm = Math.max(1, is.getAlarm(c.getOwner()).getValue());
                 nearbyColonies.add(new RandomChoice<>(c,
-                        1000000 / alarm / path.getTotalTurns()));
+                        1000000 / alarm / (1 + path.getTotalTurns())));
             }
 
             // If there are any suitable colonies, pick a random one
