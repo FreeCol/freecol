@@ -4378,22 +4378,22 @@
               </unitOption>
             </template>
             <unitOption id="model.option.interventionForce.regulars">
-              <unitType value="model.unit.colonialRegular" generate="units" />
+              <unitType value="model.unit.colonialRegular" />
               <role value="model.role.soldier" />
               <number value="2" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.interventionForce.dragoons">
-              <unitType value="model.unit.colonialRegular" generate="units" />
+              <unitType value="model.unit.colonialRegular" />
               <role value="model.role.dragoon" />
               <number value="1" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.interventionForce.artillery">
-              <unitType value="model.unit.artillery" generate="units" />
+              <unitType value="model.unit.artillery" />
               <role value="model.role.default" />
               <number value="2" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.interventionForce.menOfWar">
-              <unitType value="model.unit.manOWar" generate="units" />
+              <unitType value="model.unit.manOWar" />
               <role value="model.role.default" />
               <number value="2" minimumValue="0" maximumValue="999" />
             </unitOption>
