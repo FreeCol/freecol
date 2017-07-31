@@ -37,6 +37,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
@@ -1715,8 +1716,10 @@ public final class InGameController extends FreeColClientHolder {
                 || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
                 : moveDiplomacy(unit, direction, agreement);
         } else if (settlement instanceof IndianSettlement) {
-            return !askServer().newNativeTradeSession(unit,
+            boolean ret = !askServer().newNativeTradeSession(unit,
                 (IndianSettlement)settlement);
+            getGUI().setActiveUnit(unit); // Will be deselected on losing moves
+            return ret;
         } else {
             throw new RuntimeException("Bogus settlement: "
                 + settlement.getId());
@@ -3887,6 +3890,7 @@ public final class InGameController extends FreeColClientHolder {
     public void nativeTradeHandler(NativeTradeAction action, NativeTrade nt) {
         if (nt == null) return;
         
+        final GUI gui = getGUI();
         final IndianSettlement is = nt.getIndianSettlement();
         final Unit unit = nt.getUnit();
         if (!getMyPlayer().owns(unit)) {
@@ -3936,12 +3940,12 @@ public final class InGameController extends FreeColClientHolder {
             break;
         case NAK_HAGGLE:
             invokeLater(() ->
-                getGUI().showInformationMessage(StringTemplate
+                gui.showInformationMessage(StringTemplate
                     .template("trade.noTradeHaggle")));
             return;
         case NAK_HOSTILE:
             invokeLater(() ->
-                getGUI().showInformationMessage(StringTemplate
+                gui.showInformationMessage(StringTemplate
                     .template("trade.noTradeHostile")));
             return;
         case NAK_INVALID: // Should not happen, log and fail quietly.
@@ -3953,8 +3957,14 @@ public final class InGameController extends FreeColClientHolder {
         final TradeAction actF = act;
         final NativeTradeItem ntiF = nti;
         final StringTemplate promptF = prompt;
-        invokeLater(() ->
-            nativeTrade(nt, actF, ntiF, promptF));
+        invokeLater(() -> {
+                Unit current = gui.getActiveUnit();
+                gui.setActiveUnit(unit);
+                UnitWas uw = new UnitWas(unit);
+                nativeTrade(nt, actF, ntiF, promptF);
+                uw.fireChanges();
+                gui.setActiveUnit(current);
+            });                
     }
 
     /**
