@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.option.UnitTypeOption.TypeSelector;
@@ -56,6 +57,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
     /** An Option to determine the number of the AbstractUnit. */
     private IntegerOption numberOption = null;
+
+    /** An optional nation type for the unit. */
+    private NationType nationType = null;
 
 
     /**
@@ -126,6 +130,15 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         return this.numberOption;
     }
 
+    /**
+     * Get the nation type.
+     *
+     * @return The optional {@code NationType}.
+     */
+    public final NationType getNationType() {
+        return this.nationType;
+    }
+
 
     // Interface Option
 
@@ -145,6 +158,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         if (unitTypeOption != null) result.unitTypeOption = unitTypeOption.clone();
         if (roleOption != null) result.roleOption = roleOption.clone();
         if (numberOption != null) result.numberOption = numberOption.clone();
+        result.nationType = nationType;
         return result;
     }
 
@@ -211,11 +225,22 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
     // Serialization
 
+    private static final String NATION_TYPE_TAG = "nationType";
     private static final String NUMBER_TAG = "number";
     private static final String ROLE_TAG = "role";
     private static final String UNIT_TYPE_TAG = "unitType";
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        if (nationType != null) xw.writeAttribute(NATION_TYPE_TAG, nationType);
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -230,6 +255,18 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         unitTypeOption.toXML(xw, UNIT_TYPE_TAG);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
+        nationType = xr.getType(spec, NATION_TYPE_TAG,
+                                NationType.class, (NationType)null);
+    }
+    
     /**
      * {@inheritDoc}
      */

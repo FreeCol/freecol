@@ -115,6 +115,7 @@
       0.115: Drop equipment.
       0.116: Mass update to fix neglect of saved game format.
       0.117: Update unit-type-change to include identifier.
+      0.118: Add optional nationType to unitOption.
     </xs:documentation>
   </xs:annotation>
 

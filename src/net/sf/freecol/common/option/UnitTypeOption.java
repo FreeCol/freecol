@@ -208,7 +208,6 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
             }
             if (this.addNone) this.choices.add(0, null);
         }
-net.sf.freecol.common.util.CollectionUtils.dump("UTO " + this.selector, this.choices);
     }
 
 

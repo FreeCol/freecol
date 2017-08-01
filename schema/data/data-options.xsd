@@ -214,6 +214,7 @@
       </xs:choice>
 
       <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="nationType" use="optional" type="NationTypeId"/>
     </xs:complexType>
   </xs:element>
 

@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
@@ -90,32 +91,31 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
                                 final boolean editable) {
         super(option, editable);
 
-        panel = new MigPanel();
-        panel.setLayout(new MigLayout());
+        this.panel = new MigPanel();
+        this.panel.setLayout(new MigLayout());
 
         IntegerOption numberOption = option.getNumber();
         UnitTypeOption typeOption = option.getUnitType();
         StringOption roleOption = option.getRole();
         boolean numberEditable = editable
             && (numberOption.getMaximumValue() > numberOption.getMinimumValue());
-        numberUI = new IntegerOptionUI(numberOption, numberEditable);
-        Utility.localizeToolTip(numberUI.getComponent(), "number");
-        panel.add(numberUI.getComponent(), "width 30%");
+        this.numberUI = new IntegerOptionUI(numberOption, numberEditable);
+        Utility.localizeToolTip(this.numberUI.getComponent(), "number");
+        this.panel.add(this.numberUI.getComponent(), "width 30%");
 
         boolean typeEditable = editable
             && typeOption.getChoices().size() > 1;
-        typeUI = new UnitTypeOptionUI(typeOption, typeEditable);
-
-        Utility.localizeToolTip(typeUI.getComponent(), "unitType");
-        typeUI.getComponent().addItemListener(this);
-        panel.add(typeUI.getComponent(), "width 35%");
+        this.typeUI = new UnitTypeOptionUI(typeOption, typeEditable);
+        Utility.localizeToolTip(this.typeUI.getComponent(), "unitType");
+        this.typeUI.getComponent().addItemListener(this);
+        this.panel.add(this.typeUI.getComponent(), "width 35%");
 
         roleEditable = editable
             && roleOption.getChoices().size() > 1;
-        roleUI = new StringOptionUI(roleOption, roleEditable);
-        Utility.localizeToolTip(roleUI.getComponent(), "model.role.name");
-        roleUI.getComponent().setRenderer(new RoleRenderer());
-        panel.add(roleUI.getComponent(), "width 35%");
+        this.roleUI = new StringOptionUI(roleOption, roleEditable);
+        Utility.localizeToolTip(this.roleUI.getComponent(), "model.role.name");
+        this.roleUI.getComponent().setRenderer(new RoleRenderer());
+        this.panel.add(this.roleUI.getComponent(), "width 35%");
 
         initialize();
     }
@@ -126,17 +126,19 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
      */
     @Override
     public void itemStateChanged(ItemEvent e) {
-        JComboBox<String> box = roleUI.getComponent();
+        // When the unit type changes, we have to reset the role choices
+        JComboBox<String> box = this.roleUI.getComponent();
         DefaultComboBoxModel<String> model;
         boolean enable = false;
-        UnitType type = (UnitType)typeUI.getComponent().getSelectedItem();
-        final Specification spec = type.getSpecification();
-        if (type.hasAbility(Ability.CAN_BE_EQUIPPED)) {
+        UnitType type = (UnitType)this.typeUI.getComponent().getSelectedItem();
+        if (type != null && type.hasAbility(Ability.CAN_BE_EQUIPPED)) {
+            final Specification spec = type.getSpecification();
+            final NationType nt = getOption().getNationType();
             int n = 0;
             model = new DefaultComboBoxModel<>();
-            for (String ri : roleUI.getOption().getChoices()) {
+            for (String ri : getOption().getRole().getChoices()) {
                 Role role = spec.getRole(ri);
-                if (role.isAvailableTo(type)) {
+                if (role.isAvailableTo(type, nt)) {
                     model.addElement(ri);
                     n++;
                 }

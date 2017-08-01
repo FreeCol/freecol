@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.117">
+<freecol-specification id="classic" version="0.118">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -4264,10 +4264,16 @@
                          value="false" />
           <unitListOption id="model.option.immigrants" maximumNumber="999">
             <template>
-              <unitOption id="model.option.immigrants.template">
+              <unitOption id="model.option.immigrants.template"
+                          nationType="model.nationType.default">
                 <unitType value="model.unit.freeColonist" generate="immigrants" />
-                <role value="model.role.default" >
-                  <choice value="model.role.default" />
+                <role value="model.role.default">
+                  <choice value="model.role.default"/>
+                  <choice value="model.role.dragoon"/>
+                  <choice value="model.role.missionary"/>
+                  <choice value="model.role.pioneer"/>
+                  <choice value="model.role.scout"/>
+                  <choice value="model.role.soldier"/>
                 </role>
                 <number value="1" minimumValue="1" maximumValue="999" />
               </unitOption>
@@ -4326,7 +4332,8 @@
                          value="54" minimumValue="20" maximumValue="100" />
           <unitListOption id="model.option.refSize">
             <template>
-              <unitOption id="model.option.refSize.template">
+              <unitOption id="model.option.refSize.template"
+                          nationType="model.nationType.ref">
                 <unitType value="model.unit.kingsRegular">
                   <choice value="model.unit.kingsRegular"/>
                   <choice value="model.unit.artillery"/>
@@ -4363,7 +4370,8 @@
           </unitListOption>
           <unitListOption id="model.option.interventionForce">
             <template>
-              <unitOption id="model.option.interventionForce.template">
+              <unitOption id="model.option.interventionForce.template"
+                          nationType="model.nationType.default">
                 <unitType value="model.unit.colonialRegular">
                   <choice value="model.unit.colonialRegular"/>
                   <choice value="model.unit.artillery"/>
@@ -4400,7 +4408,8 @@
           </unitListOption>
           <unitListOption id="model.option.mercenaryForce">
             <template>
-              <unitOption id="model.option.mercenary.template">
+              <unitOption id="model.option.mercenary.template"
+                          nationType="model.nationType.default">
                 <unitType value="model.unit.veteranSoldier">
                   <choice value="model.unit.veteranSoldier"/>
                   <choice value="model.unit.artillery"/>
@@ -4437,7 +4446,8 @@
           </unitListOption>
           <unitListOption id="model.option.warSupportForce">
             <template>
-              <unitOption id="model.option.warSupportForce.template">
+              <unitOption id="model.option.warSupportForce.template"
+                          nationType="model.nationType.default">
                 <unitType value="model.unit.veteranSoldier">
                   <choice value="model.unit.veteranSoldier"/>
                   <choice value="model.unit.artillery"/>

@@ -92,22 +92,23 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 logger.log(Level.WARNING, "Can not clone " + o.getId(), e);
             }
         }
-        list = new JList<>(this.model);
+        this.list = new JList<>(this.model);
         AbstractOption<T> o = first(option.getValue());
         if (o == null) o = option.getTemplate();
         if (o != null) {
             setCellRenderer(gui, o, editable);
-            list.setSelectedIndex(0);
+            this.list.setSelectedIndex(0);
         }
-        list.setVisibleRowCount(4);
-        JScrollPane pane = new JScrollPane(list);
+        this.list.setVisibleRowCount(4);
+        JScrollPane pane = new JScrollPane(this.list);
         this.panel.add(pane, "grow, spany 5");
-
+        
         for (JButton button : new JButton[] {
                 editButton, addButton, removeButton, upButton, downButton }) {
             button.setEnabled(editable);
             this.panel.add(button);
         }
+
         // Disable add button if there is no template to generate choices with
         if (option.getTemplate() == null) addButton.setEnabled(false);
         
@@ -115,9 +116,9 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 try {
                     AbstractOption<T> ao = option.getTemplate().clone();
                     if (gui.showEditOptionDialog(ao) && option.canAdd(ao)) {
-                        model.addElement(ao);
-                        list.setSelectedValue(ao, true);
-                        list.repaint();
+                        this.model.addElement(ao);
+                        this.list.setSelectedValue(ao, true);
+                        this.list.repaint();
                     }
                 } catch (CloneNotSupportedException cnse) {
                     logger.log(Level.WARNING, "Can not clone: "
@@ -125,32 +126,32 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 }
             });
         editButton.addActionListener((ActionEvent ae) -> {
-                AbstractOption<T> ao = list.getSelectedValue();
+                AbstractOption<T> ao = this.list.getSelectedValue();
                 if (gui.showEditOptionDialog(ao)) {
-                    list.repaint();
+                    this.list.repaint();
                 }
             });
         removeButton.addActionListener((ActionEvent ae) -> {
-                model.removeElementAt(list.getSelectedIndex());
+                this.model.removeElementAt(this.list.getSelectedIndex());
             });
         upButton.addActionListener((ActionEvent ae) -> {
-                if (list.getSelectedIndex() == 0) return;
-                final int index = list.getSelectedIndex();
-                final AbstractOption<T> temp = model.getElementAt(index);
-                model.setElementAt(model.getElementAt(index-1), index);
-                model.setElementAt(temp, index-1);
-                list.setSelectedIndex(index-1);
+                if (this.list.getSelectedIndex() == 0) return;
+                final int index = this.list.getSelectedIndex();
+                final AbstractOption<T> temp = this.model.getElementAt(index);
+                this.model.setElementAt(this.model.getElementAt(index-1), index);
+                this.model.setElementAt(temp, index-1);
+                this.list.setSelectedIndex(index-1);
             });
         downButton.addActionListener((ActionEvent ae) -> {
-                if (list.getSelectedIndex() == model.getSize() - 1) return;
-                final int index = list.getSelectedIndex();
-                final AbstractOption<T> temp = model.getElementAt(index);
-                model.setElementAt(model.getElementAt(index+1), index);
-                model.setElementAt(temp, index+1);
-                list.setSelectedIndex(index+1);
+                if (this.list.getSelectedIndex() == this.model.getSize() - 1) return;
+                final int index = this.list.getSelectedIndex();
+                final AbstractOption<T> temp = this.model.getElementAt(index);
+                this.model.setElementAt(this.model.getElementAt(index+1), index);
+                this.model.setElementAt(temp, index+1);
+                this.list.setSelectedIndex(index+1);
             });
 
-        list.addListSelectionListener(this);
+        this.list.addListSelectionListener(this);
         initialize();
     }
 
@@ -159,13 +160,13 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                                  boolean editable) {
         OptionUI ui = OptionUI.getOptionUI(gui, o, editable);
         if (ui != null && ui.getListCellRenderer() != null) {
-            list.setCellRenderer(ui.getListCellRenderer());
+            this.list.setCellRenderer(ui.getListCellRenderer());
         }
     }
 
     private List<AbstractOption<T>> getValue() {
         List<AbstractOption<T>> result = new ArrayList<>();
-        for (Enumeration<AbstractOption<T>> e = model.elements();
+        for (Enumeration<AbstractOption<T>> e = this.model.elements();
              e.hasMoreElements();) {
             result.add(e.nextElement());
         }
@@ -204,9 +205,9 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      */
     @Override
     public void reset() {
-        model.clear();
+        this.model.clear();
         for (AbstractOption<T> o : getOption().getValue()) {
-            model.addElement(o);
+            this.model.addElement(o);
         }
     }
 
@@ -218,11 +219,14 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting() == false) {
-            boolean enabled = (isEditable() && list.getSelectedValue() != null);
-            editButton.setEnabled(enabled);
-            removeButton.setEnabled(enabled);
-            upButton.setEnabled(enabled);
-            downButton.setEnabled(enabled);
+            boolean enabled = isEditable()
+                && this.list.getSelectedValue() != null;
+            this.editButton.setEnabled(enabled);
+            this.addButton.setEnabled(isEditable()
+                && getOption().getTemplate() != null);
+            this.removeButton.setEnabled(enabled);
+            this.upButton.setEnabled(enabled);
+            this.downButton.setEnabled(enabled);
         }
     }
 }
