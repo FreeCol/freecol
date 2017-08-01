@@ -135,9 +135,31 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * @return True if the buildable is available.
      */
     public boolean isAvailableTo(FreeColObject... fco) {
-        return (requiredAbilities == null) ? true
+        if (false) { // Debug version, may come in useful next time
+            if (requiredAbilities == null) {
+                System.err.println(this + ".isAvailableTo() null -> true");
+                return true;
+            }
+            for (Map.Entry<String, Boolean> e : requiredAbilities.entrySet()) {
+                boolean any = false;
+                for (FreeColObject f : fco) {
+                    System.err.println(this + ".isAvailableTo(" + f + ") on "
+                        + e.getKey() + " = " + f.hasAbility(e.getKey()));
+                    if (f.hasAbility(e.getKey())) { any = true; break; }
+                }
+                if (e.getValue() != any) {
+                    System.err.println(this + ".isAvailableTo() fail on "
+                        + e.getKey() + " expecting " + e.getValue());
+                    return false;
+                }
+            }
+            return true;
+        } else { // Concise version
+            return (requiredAbilities == null) ? true
                 : all(requiredAbilities.entrySet(),
-                e -> e.getValue() == any(fco, o -> o.hasAbility(e.getKey())));
+                    e -> e.getValue() == any(fco,
+                        o -> o != null && o.hasAbility(e.getKey())));
+        }
     }
 
     /**
