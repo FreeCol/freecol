@@ -148,7 +148,7 @@ public class Europe extends UnitLocation
      * This list represents the types of the units that can be
      * recruited in Europe.
      */
-    protected final List<UnitType> recruitables = new ArrayList<>();
+    protected final List<AbstractUnit> recruitables = new ArrayList<>();
 
     /** Prices for trainable or purchasable units. */
     protected final java.util.Map<UnitType, Integer> unitPrices = new HashMap<>();
@@ -196,34 +196,69 @@ public class Europe extends UnitLocation
     /**
      * Get a list of the current recruitables.
      *
-     * @return A list of recruitable {@code UnitType}s.
+     * @return A list of recruitable {@code AbstractUnit}s.
      */
-    public List<UnitType> getRecruitables() {
-        return new ArrayList<>(recruitables);
+    protected List<AbstractUnit> getRecruitables() {
+        return this.recruitables;
+    }
+
+    /**
+     * Get an expanded list of recruitable abstract units, with single counts
+     * and limited to valid indices.
+     *
+     * @return A list of {@code AbstractUnit}s.
+     */
+    public List<AbstractUnit> getExpandedRecruitables() {
+        final Specification spec = getSpecification();
+        List<AbstractUnit> ret = new ArrayList<>();
+        int c = 0;
+        for (AbstractUnit au : this.recruitables) {
+            for (int n = au.getNumber(); n > 0; n--) {
+                if (c >= MigrationType.MIGRANT_COUNT) break;
+                ret.add(new AbstractUnit(au.getType(spec), au.getRoleId(), 1));
+                c++;
+            }
+        }
+        return ret;
     }
 
     /**
      * Set the recruitables list.
      *
-     * @param recruitables The new list of recruitables {@code UnitType}s.
+     * @param recruitables The new list of recruitables {@code AbstractUnit}s.
      */
-    protected void setRecruitables(List<UnitType> recruitables) {
+    protected void setRecruitables(List<AbstractUnit> recruitables) {
         this.recruitables.clear();
         this.recruitables.addAll(recruitables);
+    }
+
+    /**
+     * Add a recruitable abstract unit.
+     *
+     * @param au The recruitable {@code AbstractUnit} to add.
+     * @param force If true, add beyond the standard limit.
+     * @return True if the recruitable was added.
+     */
+    protected boolean addRecruitable(AbstractUnit au, boolean force) {
+        if (force || this.recruitables.size() < MigrationType.MIGRANT_COUNT) {
+            this.recruitables.add(au);
+            return true;
+        }
+        return false;
     }
 
     /**
      * Add a recruitable unit type.
      *
      * @param unitType The recruitable {@code UnitType} to add.
+     * @param force If true, add beyond the standard limit.
      * @return True if the recruitable was added.
      */
-    protected boolean addRecruitable(UnitType unitType) {
-        if (recruitables.size() < MigrationType.MIGRANT_COUNT) {
-            recruitables.add(unitType);
-            return true;
-        }
-        return false;
+    protected boolean addRecruitable(UnitType unitType, boolean force) {
+        Role role = unitType.getDefaultRole();
+        if (role == null) role = getSpecification().getDefaultRole();
+        return addRecruitable(new AbstractUnit(unitType, role.getId(), 1),
+                              force);
     }
 
     /**
@@ -590,12 +625,17 @@ public class Europe extends UnitLocation
 
     private static final String OWNER_TAG = "owner";
     private static final String PRICE_TAG = "price";
-    private static final String RECRUIT_TAG = "recruit";
-    private static final String RECRUIT_ID_TAG = "id";
     private static final String RECRUIT_LOWER_CAP_TAG = "recruitLowerCap";
+    private static final String RECRUIT_NUMBER_TAG = "number";
     private static final String RECRUIT_PRICE_TAG = "recruitPrice";
+    private static final String RECRUIT_ROLE_TAG = "role";
+    private static final String RECRUIT_TAG = "recruit";
+    private static final String RECRUIT_TYPE_TAG = "type";
     private static final String UNIT_PRICE_TAG = "unitPrice";
     private static final String UNIT_TYPE_TAG = "unitType";
+    // @compat 0.11.x
+    private static final String RECRUIT_ID_TAG = "id";
+    // end @compat 0.11.x
 
 
     /**
@@ -641,9 +681,11 @@ public class Europe extends UnitLocation
                 xw.writeEndElement();
             }
 
-            for (UnitType unitType : recruitables) {
+            for (AbstractUnit au : recruitables) {
                 xw.writeStartElement(RECRUIT_TAG);
-                xw.writeAttribute(RECRUIT_ID_TAG, unitType.getId());
+                xw.writeAttribute(RECRUIT_ID_TAG, au.getId());
+                xw.writeAttribute(RECRUIT_ROLE_TAG, au.getRoleId());
+                xw.writeAttribute(RECRUIT_NUMBER_TAG, au.getNumber());
                 xw.writeEndElement();
             }
         }
@@ -696,9 +738,22 @@ public class Europe extends UnitLocation
             addModifier(new Modifier(xr, spec));
 
         } else if (RECRUIT_TAG.equals(tag)) {
-            UnitType unitType = xr.getType(spec, RECRUIT_ID_TAG,
+            UnitType unitType = xr.getType(spec, RECRUIT_TYPE_TAG,
                                            UnitType.class, (UnitType)null);
-            if (unitType != null) addRecruitable(unitType);
+            // @compat 0.11.x
+            if (unitType == null) {
+                unitType = xr.getType(spec, RECRUIT_ID_TAG,
+                                      UnitType.class, (UnitType)null);
+            }
+            // end @compat 0.11.x
+            if (unitType != null) {
+                Role role = xr.getType(spec, RECRUIT_ROLE_TAG, Role.class,
+                                       unitType.getDefaultRole());
+                int n = xr.getAttribute(RECRUIT_NUMBER_TAG, 1);
+                
+                addRecruitable(new AbstractUnit(unitType, role.getId(), n),
+                               true);
+            }
             xr.closeTag(RECRUIT_TAG);
 
         } else if (UNIT_PRICE_TAG.equals(tag)) {

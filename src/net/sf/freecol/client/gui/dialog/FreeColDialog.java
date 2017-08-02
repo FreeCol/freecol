@@ -29,6 +29,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
@@ -424,7 +426,19 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         return new ArrayList<>();
     }
 
+    /**
+     * Helper to get a small single abstract unit image.
+     *
+     * @param au The {@code AbstractUnit} to examine.
+     * @return A suitable {@code BufferedImage}.
+     */
+    public BufferedImage getSmallAbstractUnitImage(AbstractUnit au) {
+        final Specification spec = getSpecification();
+        return getImageLibrary().getSmallUnitImage(au.getType(spec),
+                                                   au.getRoleId(), false);
+    }
 
+        
     // Interface PropertyChangeListener
 
     /**

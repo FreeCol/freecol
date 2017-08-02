@@ -20,6 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -30,10 +32,10 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.UnitType;
 
 
 /**
@@ -43,7 +45,7 @@ public final class RecruitPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(RecruitPanel.class.getName());
 
-    /** The array of recruitable units. */
+    /** The buttons for the recruitable units. */
     private final JButton[] person;
 
     /** Is there at least one recruitable unit? */
@@ -58,12 +60,14 @@ public final class RecruitPanel extends FreeColPanel {
     public RecruitPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "", ""));
 
-        person = new JButton[getMyPlayer().getEurope().getRecruitables().size()];
+        List<AbstractUnit> recruitables = getMyPlayer().getEurope()
+            .getExpandedRecruitables();
+        this.person = new JButton[recruitables.size()];
         for (int i = 0; i < person.length; i++) {
-            person[i] = new JButton();
-            person[i].setActionCommand(String.valueOf(i));
-            person[i].addActionListener(this);
-            person[i].setIconTextGap(MARGIN);
+            this.person[i] = new JButton();
+            this.person[i].setActionCommand(String.valueOf(i));
+            this.person[i].addActionListener(this);
+            this.person[i].setIconTextGap(MARGIN);
         }
         update();
     }
@@ -95,15 +99,15 @@ public final class RecruitPanel extends FreeColPanel {
             "wrap 20");
 
         shouldEnable = false;
-        int i = 0;
-        for (UnitType ut : europe.getRecruitables()) {
+        List<AbstractUnit> recruitables = europe.getExpandedRecruitables();
+        for (int i = 0; i < this.person.length; i++) {
             boolean enable = player.checkGold(recruitPrice);
-            person[i].setText(Messages.getName(ut));
-            person[i].setIcon(new ImageIcon(getImageLibrary().getSmallUnitImage(ut)));
-            person[i].setEnabled(enable);
-            add(person[i], "growx");
+            AbstractUnit au = recruitables.get(i);
+            this.person[i].setText(Messages.message(au.getSingleLabel()));
+            this.person[i].setIcon(new ImageIcon(getSmallAbstractUnitImage(au)));
+            this.person[i].setEnabled(enable);
+            add(this.person[i], "growx");
             shouldEnable |= enable;
-            i++;
         }
 
         okButton.setText(Messages.message("close"));

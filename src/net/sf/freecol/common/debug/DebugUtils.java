@@ -39,6 +39,7 @@ import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -760,8 +761,8 @@ public class DebugUtils {
             forEachMapEntry(units,
                 e -> logEurope(aiMain, lb, e.getKey(), e.getValue()));
             lb.add("\n->", Messages.message("immigrants"), "\n\n");
-            for (UnitType unitType : p.getEurope().getRecruitables()) {
-                lb.add(Messages.getName(unitType), "\n");
+            for (AbstractUnit au : p.getEurope().getExpandedRecruitables()) {
+                lb.add(Messages.message(au.getSingleLabel()), "\n");
             }
             lb.add("\n");
         }

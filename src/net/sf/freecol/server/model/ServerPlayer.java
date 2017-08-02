@@ -2096,14 +2096,14 @@ outer:  for (Effect effect : effects) {
                            ChangeSet cs) {
         // Create the recruit, move it to the docks.
         ServerEurope europe = (ServerEurope)getEurope();
-        UnitType recruitType = europe.extractRecruitable(slot, random);
+        AbstractUnit recruit = europe.extractRecruitable(slot, random);
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         Role role = (spec.getBoolean(GameOptions.EQUIP_EUROPEAN_RECRUITS))
-            ? recruitType.getDefaultRole()
+            ? recruit.getRole(spec)
             : spec.getDefaultRole();
-        Unit unit = new ServerUnit(game, europe, this,
-                                   recruitType, role);//-vis: safe/Europe
+        Unit unit = new ServerUnit(game, europe, this, recruit.getType(spec),
+                                   role);//-vis: safe/Europe
 
         // Handle migration type specific changes.
         switch (type) {

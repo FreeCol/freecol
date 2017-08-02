@@ -24,6 +24,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -41,6 +42,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -230,6 +232,19 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
                 }
             });
     }
+
+    /**
+     * Helper to get a small single abstract unit image.
+     *
+     * @param au The {@code AbstractUnit} to examine.
+     * @return A suitable {@code BufferedImage}.
+     */
+    public BufferedImage getSmallAbstractUnitImage(AbstractUnit au) {
+        final Specification spec = getSpecification();
+        return getImageLibrary().getSmallUnitImage(au.getType(spec),
+                                                   au.getRoleId(), false);
+    }
+
 
     // Interface ActionListener
 

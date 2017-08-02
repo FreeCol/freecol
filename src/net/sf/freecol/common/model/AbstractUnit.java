@@ -120,18 +120,51 @@ public class AbstractUnit extends FreeColObject {
     }
 
     /**
+     * Gets a template describing this abstract unit with a fixed count of 1.
+     *
+     * @return A {@code StringTemplate} describing the abstract unit.
+     */
+    public StringTemplate getSingleLabel() {
+        return Messages.getUnitLabel(null, getId(), 1, null, getRoleId(), null);
+    }
+
+    /**
      * Gets a template describing this abstract unit.
      *
      * @return A {@code StringTemplate} describing the abstract unit.
      */
     public StringTemplate getLabel() {
-        StringTemplate tmpl = Messages.getUnitLabel(null, getId(), getNumber(),
-                                                    null, getRoleId(), null);
-        return StringTemplate.template("model.abstractUnit.label")
-                             .addAmount("%number%", getNumber())
-                             .addStringTemplate("%unit%", tmpl);
+        return getLabel(getId(), getRoleId(), getNumber());
     }
 
+    /**
+     * Gets a template describing an arbitrary single abstract unit.
+     *
+     * @param typeId The unit type identifier.
+     * @param roleId The role identifier.
+     * @return A {@code StringTemplate} describing the abstract unit.
+     */
+    public static StringTemplate getLabel(String typeId, String roleId) {
+        return getLabel(typeId, roleId, 1);
+    }
+        
+    /**
+     * Gets a template describing an arbitrary abstract unit.
+     *
+     * @param typeId The unit type identifier.
+     * @param roleId The role identifier.
+     * @param number The number of units.
+     * @return A {@code StringTemplate} describing the abstract unit.
+     */
+    public static StringTemplate getLabel(String typeId, String roleId,
+                                          int number) {
+        StringTemplate tmpl = Messages.getUnitLabel(null, typeId, number,
+                                                    null, roleId, null);
+        return StringTemplate.template("model.abstractUnit.label")
+                             .addAmount("%number%", number)
+                             .addStringTemplate("%unit%", tmpl);
+    }
+        
     /**
      * Get a description of this abstract unit.
      *
@@ -142,16 +175,6 @@ public class AbstractUnit extends FreeColObject {
     }
 
     /**
-     * Convenience accessor for the role.
-     *
-     * @param spec A {@code Specification} to look up the role in.
-     * @return The {@code Role} of this abstract unit.
-     */
-    public Role getRole(Specification spec) {
-        return spec.getRole(getRoleId());
-    }
-
-    /**
      * Convenience accessor for the unit type.
      *
      * @param spec A {@code Specification} to look up the type in.
@@ -159,6 +182,16 @@ public class AbstractUnit extends FreeColObject {
      */
     public UnitType getType(Specification spec) {
         return spec.getUnitType(getId());
+    }
+
+    /**
+     * Convenience accessor for the role.
+     *
+     * @param spec A {@code Specification} to look up the role in.
+     * @return The {@code Role} of this abstract unit.
+     */
+    public Role getRole(Specification spec) {
+        return spec.getRole(getRoleId());
     }
 
     /**

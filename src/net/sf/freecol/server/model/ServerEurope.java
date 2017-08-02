@@ -123,18 +123,24 @@ public class ServerEurope extends Europe implements TurnTaker {
         final Specification spec = getGame().getSpecification();
         UnitListOption option
             = (UnitListOption)spec.getOption(GameOptions.IMMIGRANTS);
-        UnitType unitType;
         for (AbstractUnit au : option.getOptionValues()) {
-            unitType = au.getType(spec);
-            addRecruitable(au.getType(spec));
+            addRecruitable(au, true);
         }
+        fillRecruitables(random);
+    }
 
-        // Fill out to the full amount of recruits if the above failed
+    /**
+     * Fill out to the full amount of recruits.
+     *
+     * @param random A pseudo-random number source.
+     */
+    public void fillRecruitables(Random random) {
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
+        UnitType unitType;
         do {
             unitType = RandomChoice.getWeightedRandom(logger, "Recruits",
                                                       recruits, random);
-        } while (addRecruitable(unitType));
+        } while (addRecruitable(unitType, false));
     }
 
     /**
@@ -155,21 +161,31 @@ public class ServerEurope extends Europe implements TurnTaker {
      *
      * @param slot The slot to recruit with.
      * @param random A pseudo-random number source.
-     * @return The recruited {@code UnitType}.
+     * @return The recruited {@code AbstractUnit}.
      */
-    public UnitType extractRecruitable(int slot, Random random) {
+    public AbstractUnit extractRecruitable(int slot, Random random) {
         // An invalid slot is normal when the player has no control over
         // recruit type.
+        final Specification spec = getSpecification();
         final int count = MigrationType.getMigrantCount();
         int index = (MigrationType.specificMigrantSlot(slot))
             ? MigrationType.migrantSlotToIndex(slot)
             : randomInt(logger, "Choose emigrant", random, count);
-        UnitType result = recruitables.get(index);
-        for (int i = index; i < count-1; i++) {
-            recruitables.set(i, recruitables.get(i+1));
+        List<AbstractUnit> expanded = getExpandedRecruitables();
+        AbstractUnit result = expanded.remove(index);
+        this.recruitables.clear();
+        AbstractUnit top = expanded.remove(0);
+        this.recruitables.add(top);
+        for (AbstractUnit au : expanded) {
+            if (au.getId().equals(top.getId())
+                && au.getRoleId().equals(top.getRoleId())) {
+                top.setNumber(top.getNumber() + au.getNumber());
+            } else {
+                this.recruitables.add(au);
+                top = au;
+            }
         }
-        recruitables.set(count-1, RandomChoice.getWeightedRandom(logger,
-                "Replace recruit", generateRecruitablesList(), random));
+        fillRecruitables(random);
         return result;
     }
 
@@ -193,17 +209,10 @@ public class ServerEurope extends Europe implements TurnTaker {
      * @return True if any recruit was replaced.
      */
     public boolean replaceRecruits(Random random) {
-        List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
-        boolean result = false;
-        int i = 0;
-        for (UnitType ut : recruitables) {
-            if (hasAbility(Ability.CAN_RECRUIT_UNIT, ut)) continue;
-            UnitType newType = RandomChoice.getWeightedRandom(logger,
-                "Replace recruit", recruits, random);
-            recruitables.set(i, newType);
-            result = true;
-            i++;
-        }
+        final Specification spec = getSpecification();
+        boolean result = removeInPlace(recruitables,
+            au -> !hasAbility(Ability.CAN_RECRUIT_UNIT, au.getType(spec)));
+        fillRecruitables(random);
         return result;
     }
 

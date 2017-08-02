@@ -33,9 +33,9 @@ import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.LostCityRumour;
-import net.sf.freecol.common.model.UnitType;
 
 
 /**
@@ -57,8 +57,8 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
         super(freeColClient, frame);
 
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        final List<UnitType> recruitables
-            = new ArrayList<>(europe.getRecruitables());
+        final List<AbstractUnit> recruitables
+            = new ArrayList<>(europe.getExpandedRecruitables());
 
         JTextArea header
             = Utility.localizedTextArea("emigrationDialog.chooseImmigrant");
@@ -73,12 +73,13 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
 
         List<ChoiceItem<Integer>> c = choices();
         int i = Europe.MigrationType.getDefaultSlot();
-        UnitType u0 = recruitables.remove(0);
-        c.add(new ChoiceItem<>(Messages.getName(u0), i++)
-            .defaultOption().setIcon(new ImageIcon(lib.getSmallUnitImage(u0))));
-        for (UnitType ut : recruitables) {
-            c.add(new ChoiceItem<>(Messages.getName(ut), i++)
-                .setIcon(new ImageIcon(lib.getSmallUnitImage(ut))));
+        AbstractUnit a0 = recruitables.remove(0);
+        c.add(new ChoiceItem<>(Messages.message(a0.getSingleLabel()), i++)
+            .defaultOption()
+            .setIcon(new ImageIcon(getSmallAbstractUnitImage(a0))));
+        for (AbstractUnit au : recruitables) {
+            c.add(new ChoiceItem<>(Messages.message(au.getSingleLabel()), i++)
+                .setIcon(new ImageIcon(getSmallAbstractUnitImage(au))));
         }
 
         initializeChoiceDialog(frame, false, panel, null, null, c);

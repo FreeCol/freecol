@@ -42,6 +42,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;

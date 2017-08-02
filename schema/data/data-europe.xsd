@@ -38,7 +38,14 @@
         </xs:element>
         <xs:element name="recruit">
           <xs:complexType>
+            <!-- @compat 0.11.x -->
             <xs:attribute name="id" type="UnitTypeId" />
+            <!-- end @compat 0.11.x
+              These were added for 0.12.0, make required in 0.13.x -->
+            <xs:attribute name="type" type="UnitTypeId" use="optional"/>
+            <xs:attribute name="role" type="RoleId" use="optional"/>
+            <xs:attribute name="number" type="xs:int" use="optional"/>
+            <!-- end addition -->
           </xs:complexType>
         </xs:element>
         <xs:element ref="ability" />
