@@ -3898,13 +3898,18 @@ public final class InGameController extends FreeColClientHolder {
             return;
         }
 
-        NativeTradeItem nti = null;
-        TradeAction act = null;
-        StringTemplate prompt = null;
+        final NativeTradeItem nti;
+        final TradeAction act;
+        final StringTemplate prompt;
         switch (action) { // Only consider actions returned by server
         case ACK_OPEN:
+            nti = null;
+            act = null;
+            prompt = null;
             break;
         case ACK_BUY:
+            nti = null;
+            act = null;
             prompt = StringTemplate
                 .template("trade.bought")
                 .addNamed("%goodsType%", nt.getItem().getGoods().getType())
@@ -3912,6 +3917,8 @@ public final class InGameController extends FreeColClientHolder {
                 .addName("%settlement%", is.getName());
             break;
         case ACK_SELL:
+            nti = null;
+            act = null;
             prompt = StringTemplate
                 .template("trade.sold")
                 .addNamed("%goodsType%", nt.getItem().getGoods().getType())
@@ -3919,6 +3926,8 @@ public final class InGameController extends FreeColClientHolder {
                 .addName("%settlement%", is.getName());
             break;
         case ACK_GIFT:
+            nti = null;
+            act = null;
             prompt = StringTemplate
                 .template("trade.gave")
                 .addNamed("%goodsType%", nt.getItem().getGoods().getType())
@@ -3928,12 +3937,16 @@ public final class InGameController extends FreeColClientHolder {
         case ACK_BUY_HAGGLE:
             act = TradeAction.BUY;
             nti = nt.getItem();
+            prompt = null;
             break;
         case ACK_SELL_HAGGLE:
             act = TradeAction.SELL;
             nti = nt.getItem();
+            prompt = null;
             break;
         case NAK_GOODS: // Polite refusal, does not end the session
+            nti = null;
+            act = null;
             prompt = StringTemplate
                 .template("trade.noTradeGoods")
                 .addNamed("%goodsType%", nt.getItem().getGoods().getType());
@@ -3954,14 +3967,11 @@ public final class InGameController extends FreeColClientHolder {
             return;
         }
 
-        final TradeAction actF = act;
-        final NativeTradeItem ntiF = nti;
-        final StringTemplate promptF = prompt;
         invokeLater(() -> {
                 Unit current = gui.getActiveUnit();
                 gui.setActiveUnit(unit);
                 UnitWas uw = new UnitWas(unit);
-                nativeTrade(nt, actF, ntiF, promptF);
+                nativeTrade(nt, act, nti, prompt);
                 uw.fireChanges();
                 gui.setActiveUnit(current);
             });                
@@ -3999,8 +4009,8 @@ public final class InGameController extends FreeColClientHolder {
                 if (prompt == null) prompt = base;
                 act = getGUI().getIndianSettlementTradeChoice(is, prompt,
                     nt.canBuy(), nt.canSell(), nt.canGift());
-                prompt = base; // Revert to base after first time through
                 if (act == null) break;
+                prompt = base; // Revert to base after first time through
             }
             switch (act) {
             case BUY:
@@ -4063,6 +4073,7 @@ public final class InGameController extends FreeColClientHolder {
                 nt.setDone();
                 break;
             }
+            nti = null;
         }
         askServer().nativeTrade(NativeTradeAction.CLOSE, nt);
     }
