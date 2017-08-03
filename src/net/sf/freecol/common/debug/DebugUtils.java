@@ -761,7 +761,7 @@ public class DebugUtils {
             forEachMapEntry(units,
                 e -> logEurope(aiMain, lb, e.getKey(), e.getValue()));
             lb.add("\n->", Messages.message("immigrants"), "\n\n");
-            for (AbstractUnit au : p.getEurope().getExpandedRecruitables()) {
+            for (AbstractUnit au : p.getEurope().getExpandedRecruitables(false)) {
                 lb.add(Messages.message(au.getSingleLabel()), "\n");
             }
             lb.add("\n");

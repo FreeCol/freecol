@@ -206,15 +206,17 @@ public class Europe extends UnitLocation
      * Get an expanded list of recruitable abstract units, with single counts
      * and limited to valid indices.
      *
+     * @param full If true, return the full list, otherwise limit to the
+     *     standard number of migrants.
      * @return A list of {@code AbstractUnit}s.
      */
-    public List<AbstractUnit> getExpandedRecruitables() {
+    public List<AbstractUnit> getExpandedRecruitables(boolean full) {
         final Specification spec = getSpecification();
         List<AbstractUnit> ret = new ArrayList<>();
         int c = 0;
         for (AbstractUnit au : this.recruitables) {
             for (int n = au.getNumber(); n > 0; n--) {
-                if (c >= MigrationType.MIGRANT_COUNT) break;
+                if (!full && c >= MigrationType.MIGRANT_COUNT) break;
                 ret.add(new AbstractUnit(au.getType(spec), au.getRoleId(), 1));
                 c++;
             }

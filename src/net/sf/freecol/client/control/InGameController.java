@@ -429,7 +429,7 @@ public final class InGameController extends FreeColClientHolder {
         if (europe == null) return;
 
         for (; n > 0 || player.checkEmigrate() ; n--) {
-            if (!allSame(europe.getExpandedRecruitables())) {
+            if (!allSame(europe.getExpandedRecruitables(false))) {
                 final int nf = n;
                 getGUI().showEmigrationDialog(player, fountainOfYouth,
                     (Integer value) -> { // Value is a valid slot

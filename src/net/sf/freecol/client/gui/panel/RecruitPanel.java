@@ -61,7 +61,7 @@ public final class RecruitPanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap 1", "", ""));
 
         List<AbstractUnit> recruitables = getMyPlayer().getEurope()
-            .getExpandedRecruitables();
+            .getExpandedRecruitables(false);
         this.person = new JButton[recruitables.size()];
         for (int i = 0; i < person.length; i++) {
             this.person[i] = new JButton();
@@ -99,7 +99,7 @@ public final class RecruitPanel extends FreeColPanel {
             "wrap 20");
 
         shouldEnable = false;
-        List<AbstractUnit> recruitables = europe.getExpandedRecruitables();
+        List<AbstractUnit> recruitables = europe.getExpandedRecruitables(false);
         for (int i = 0; i < this.person.length; i++) {
             boolean enable = player.checkGold(recruitPrice);
             AbstractUnit au = recruitables.get(i);

@@ -171,7 +171,7 @@ public class ServerEurope extends Europe implements TurnTaker {
         int index = (MigrationType.specificMigrantSlot(slot))
             ? MigrationType.migrantSlotToIndex(slot)
             : randomInt(logger, "Choose emigrant", random, count);
-        List<AbstractUnit> expanded = getExpandedRecruitables();
+        List<AbstractUnit> expanded = getExpandedRecruitables(true);
         AbstractUnit result = expanded.remove(index);
         this.recruitables.clear();
         AbstractUnit top = expanded.remove(0);
