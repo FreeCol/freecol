@@ -289,6 +289,9 @@ public class ClientOptions extends OptionGroup {
     public static final String SHOW_NOT_BEST_TILE
         = "model.option.guiShowNotBestTile";
 
+    public static final String SHOW_REGION_NAMING
+        = "model.option.guiShowRegionNaming";
+
     /** Option for selecting the compact colony report. */
     public static final String COLONY_REPORT
         = "model.option.colonyReport";

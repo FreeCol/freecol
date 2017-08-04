@@ -210,6 +210,9 @@
       <!-- Show the warnings about poor choice of tile worker. -->
       <booleanOption id="model.option.guiShowNotBestTile"
                      defaultValue="true"/>
+      <!-- Show the Region Naming dialog -->
+      <booleanOption id="model.option.guiShowRegionNaming"
+                     defaultValue="true"/>
       <!-- Type of colony report. -->
       <selectOption id="model.option.colonyReport"
                     defaultValue="0" localizedLabels="true">
