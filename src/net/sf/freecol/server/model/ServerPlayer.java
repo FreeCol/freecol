@@ -1100,15 +1100,17 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @param landUnits A list of land units to put on ships.
      * @param navalUnits A list of ships to put land units on.
-     * @param random A pseudo-random number source.
+     * @param random An optional pseudo-random number source.
      * @return a list of units left over
      */
     public List<Unit> loadShips(List<Unit> landUnits,
                                 List<Unit> navalUnits,
                                 Random random) {
         List<Unit> leftOver = new ArrayList<>();
-        randomShuffle(logger, "Naval load", navalUnits, random);
-        randomShuffle(logger, "Land load", landUnits, random);
+        if (random != null) {
+            randomShuffle(logger, "Naval load", navalUnits, random);
+            randomShuffle(logger, "Land load", landUnits, random);
+        }
         LogBuilder lb = new LogBuilder(256);
         lb.mark();
         for (Unit unit : landUnits) {

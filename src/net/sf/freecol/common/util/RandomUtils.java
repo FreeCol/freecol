@@ -160,6 +160,7 @@ public class RandomUtils {
      */
     public static void randomShuffle(Logger logger, String logMe,
                                      List<?> list, Random random) {
+        if (list.size() <= 1 || random == null) return;
         if (logger != null && logger.isLoggable(Level.FINEST)) {
             logger.finest(logMe + " shuffle.");
         }
