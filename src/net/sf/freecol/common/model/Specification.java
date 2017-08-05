@@ -2329,6 +2329,12 @@ public final class Specification {
             addAbility(uc);
             casas.addAbility(uc);
         }
+
+        // Added mercenary-price to manOWar
+        UnitType mow = getUnitType("model.unit.manOWar");
+        if (mow != null && mow.getMercenaryPrice() < 0) {
+            mow.setMercenaryPrice(10000);
+        }
         // end @compat 0.11.6
     }
 

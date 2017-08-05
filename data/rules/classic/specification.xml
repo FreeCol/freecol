@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.118">
+<freecol-specification id="classic" version="0.119">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -2124,7 +2124,7 @@
       <required-goods id="model.goods.tools"
                       value="100"/>
     </unit-type>
-    <unit-type id="model.unit.manOWar" extends="ship"
+    <unit-type id="model.unit.manOWar" extends="ship" mercenary-price="10000"
                offence="24" defence="24" movement="18"
                line-of-sight="2" space="6" spaceTaken="64" hit-points="6"
                score-value="8">

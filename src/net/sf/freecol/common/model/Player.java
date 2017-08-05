@@ -1864,8 +1864,9 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getMercenaryHirePrice(AbstractUnit au) {
         final Specification spec = getSpecification();
         final UnitType unitType = au.getType(spec);
-        return (unitType.hasPrice()) ? au.getNumber() * unitType.getPrice()
-            : -1;
+        int price = unitType.getMercenaryPrice();
+        if (price < 0) price = unitType.getPrice();
+        return price * au.getNumber();
     }
     
     /**
