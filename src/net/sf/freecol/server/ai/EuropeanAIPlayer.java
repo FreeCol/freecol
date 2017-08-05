@@ -41,6 +41,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants;
@@ -561,7 +562,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             int cost = (bestWish != null)
                 ? europe.getUnitPrice(bestWish.getUnitType())
                 : (player.getImmigration() < player.getImmigrationRequired() / 2)
-                ? player.getRecruitPrice()
+                ? player.getEuropeanRecruitPrice()
                 : INFINITY;
             if (cost != INFINITY) {
                 cheatGold(cost, lb);
@@ -633,18 +634,21 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 if (t != null) target = t.getSettlement();
             }
             if (target != null) {
-                List<Unit> mercs = ((ServerPlayer)player)
-                    .createUnits(player.getMonarch().getMercenaries(air),
-                                 europe);
-                for (Unit u : mercs) {
-                    AIUnit aiu = getAIUnit(u);
-                    if (aiu == null) continue; // Can not happen
-                    player.logCheat("Enlist " + aiu.getUnit());
-                    Mission m = getSeekAndDestroyMission(aiu, target);
-                    if (m != null) {
-                        lb.add("enlisted ", m, ", ");
-                    } else {
-                        lb.add("enlisted ", aiu.getUnit(), ", ");
+                List<AbstractUnit> aMercs = new ArrayList<>();
+                int aPrice = player.getMonarch().loadMercenaries(air, aMercs);
+                if (aPrice > 0) {
+                    List<Unit> mercs = ((ServerPlayer)player)
+                        .createUnits(aMercs, europe);
+                    for (Unit u : mercs) {
+                        AIUnit aiu = getAIUnit(u);
+                        if (aiu == null) continue; // Can not happen
+                        player.logCheat("Enlist " + aiu.getUnit());
+                        Mission m = getSeekAndDestroyMission(aiu, target);
+                        if (m != null) {
+                            lb.add("enlisted ", m, ", ");
+                        } else {
+                            lb.add("enlisted ", aiu.getUnit(), ", ");
+                        }
                     }
                 }
             }

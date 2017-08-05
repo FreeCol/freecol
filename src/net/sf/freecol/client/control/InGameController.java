@@ -4437,7 +4437,7 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = getMyPlayer();
         if (!player.isColonial()) return false;
 
-        if (!player.checkGold(player.getRecruitPrice())) {
+        if (!player.checkGold(player.getEuropeanRecruitPrice())) {
             getGUI().showInformationMessage("info.notEnoughGold");
             return false;
         }

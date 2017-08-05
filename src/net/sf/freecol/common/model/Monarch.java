@@ -720,10 +720,12 @@ public final class Monarch extends FreeColGameObject implements Named {
      * Gets some units available as mercenaries.
      *
      * @param random The {@code Random} number source to use.
-     * @return A troop of mercenaries.
+     * @param mercs A list to load with mercenary {@code AbstractUnit}s.
+     * @return The price the monarch will ask or negative if nothing to offer.
      */
-    public List<AbstractUnit> getMercenaries(Random random) {
+    public int loadMercenaries(Random random, List<AbstractUnit> mercs) {
         initializeCaches();
+        mercs.clear();
 
         final Specification spec = getSpecification();
         final Role defaultRole = spec.getDefaultRole();
@@ -733,7 +735,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         landRoles.add(mountedRole);
 
         // FIXME: magic numbers for 2-4 mercs
-        List<AbstractUnit> mercs = new ArrayList<>();
         int count = randomInt(logger, "Mercenary count", random, 2) + 2;
         int price = 0;
         UnitType unitType = null;
@@ -748,29 +749,67 @@ public final class Monarch extends FreeColGameObject implements Named {
                 : defaultRole;
             int n = randomInt(logger, "Merc count " + unitType,
                               random, Math.min(count, 2)) + 1;
-            AbstractUnit au = new AbstractUnit(unitType, role.getId(), n);
-            for (;;) {
-                int newPrice = player.getPrice(au) * mercPrice / 100;
-                if (player.checkGold(price + newPrice)) {
-                    mercs.add(au);
-                    price += newPrice;
-                    count -= n;
-                    break;
-                }
-                if (--n <= 0) break;
+            AbstractUnit au = new AbstractUnit(unitType, role.getId(), 1);
+            int newPrice = player.getEuropeanPurchasePrice(au);
+            if (newPrice <= 0 || newPrice == INFINITY) break;
+            newPrice *= mercPrice / 100;
+            while (n > 0 && !player.checkGold(price + newPrice * n)) n--;
+            if (n > 0) {
                 au.setNumber(n);
+                mercs.add(au);
+                price += newPrice * n;
+                count -= n;
             }
-            if (count <= 0) break;
         }
-
-        /* Always return something, even if it is not affordable */
-        if (mercs.isEmpty() && unitType != null) {
-            Role r = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
-                ? armedRole : defaultRole;
-            mercs.add(new AbstractUnit(unitType, r.getId(), 1));
-        }
-        return mercs;
+        return price;
     }
+
+    /**
+     * Load the mercenary force, reduced to the point of being
+     * affordable if possible.
+     *
+     * @param random The {@code Random} number source to use.
+     * @param mercs A list to load with mercenary {@code AbstractUnit}s.
+     * @return The price the monarch will ask, or negative if nothing to offer.
+     */
+    public int loadMercenaryForce(Random random, List<AbstractUnit> mercs) {
+        initializeCaches();
+        mercs.clear();
+
+        final Specification spec = getSpecification();
+        
+        mercs.addAll(getMercenaryForce().getUnitList());
+        List<Integer> prices = new ArrayList<>();
+        for (AbstractUnit au : mercs) {
+            int price = player.getMercenaryHirePrice(au) / au.getNumber();
+            prices.add(price);
+        }
+        int i = 0, mercPrice = 0;
+        while (i < mercs.size()) {
+            int price = prices.get(i);
+            if (price <= 0 || price == INFINITY) {
+                prices.remove(i);
+                mercs.remove(i);
+            } else {
+                mercPrice += price * mercs.get(i).getNumber();
+                i++;
+            }
+        }
+        while (!mercs.isEmpty()) {
+            if (player.checkGold(mercPrice)) return mercPrice;
+            int r = randomInt(logger, "merc downsize", random, mercs.size());
+            mercPrice -= prices.get(r);
+            AbstractUnit au = mercs.get(r);
+            if (au.getNumber() > 1) {
+                au.setNumber(au.getNumber() - 1);
+            } else {
+                prices.remove(r);
+                mercs.remove(r);
+            }
+        }
+        return -1;
+    }
+
 
 
     // Interface Named

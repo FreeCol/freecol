@@ -776,10 +776,9 @@ public final class InGameController extends Controller {
                        monarchKey));
             break;
         case MONARCH_MERCENARIES:
-            final List<AbstractUnit> mercenaries
-                = monarch.getMercenaries(random);
-            if (mercenaries.isEmpty()) break;
-            final int mercPrice = serverPlayer.priceMercenaries(mercenaries);
+            final List<AbstractUnit> mercenaries = new ArrayList<>();
+            final int mercPrice = monarch.loadMercenaries(random, mercenaries);
+            if (mercPrice < 0) break;
             cs.add(See.only(serverPlayer),
                    new MonarchActionMessage(action, StringTemplate
                        .template(messageId)
@@ -790,7 +789,10 @@ public final class InGameController extends Controller {
             new MonarchSession(serverPlayer, action, mercenaries, mercPrice);
             break;
         case HESSIAN_MERCENARIES:
-            serverPlayer.csMercenaries(monarch.getMercenaries(random), action,
+            final List<AbstractUnit> hessians = new ArrayList<>();
+            final int hessianPrice = monarch.loadMercenaries(random, hessians);
+            if (hessianPrice <= 0) break;
+            serverPlayer.csMercenaries(hessianPrice, hessians, action,
                                        random, cs);
             break;
         case DISPLEASURE: default:
@@ -1427,7 +1429,8 @@ public final class InGameController extends Controller {
                     .addStringTemplate("%units%", seized));
         }
         serverPlayer.csLoseLocation(europe, cs);
-
+        serverPlayer.reinitialiseMarket();
+        
         // Create the REF.
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
         cs.addPlayers(Collections.singletonList(refPlayer));
@@ -1548,7 +1551,9 @@ public final class InGameController extends Controller {
         }
 
         // Make the mercenary force offer
-        serverPlayer.csMercenaries(monarch.getMercenaryForce().getUnitList(),
+        List<AbstractUnit> mercs = new ArrayList<>();
+        int mercPrice = monarch.loadMercenaryForce(random, mercs);
+        serverPlayer.csMercenaries(mercPrice, mercs,
             Monarch.MonarchAction.HESSIAN_MERCENARIES, random, cs);
         
         // Pity to have to update such a heavy object as the player,

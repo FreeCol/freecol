@@ -1143,18 +1143,6 @@ public class ServerPlayer extends Player implements TurnTaker {
     }
 
     /**
-     * Calculates the price of a group of mercenaries for this player.
-     *
-     * @param mercenaries A list of mercenaries to price.
-     * @return The price.
-     */
-    public int priceMercenaries(List<AbstractUnit> mercenaries) {
-        int mercPrice = sum(mercenaries, au -> getPrice(au));
-        if (!checkGold(mercPrice)) mercPrice = getGold();
-        return mercPrice;
-    }
-
-    /**
      * Flush any market price changes.
      *
      * @param cs A {@code ChangeSet} to update.
@@ -4016,17 +4004,17 @@ outer:  for (Effect effect : effects) {
     /**
      * Add an independent (non-monarch) mercenary offer to the player.
      *
+     * @param price The price to charge for the mercenaries.
      * @param mercenaries A list of mercenary units.
      * @param action The monarch action that caused the offer.
      * @param random A pseudo-random number source.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csMercenaries(List<AbstractUnit> mercenaries,
+    public void csMercenaries(int price, List<AbstractUnit> mercenaries,
                               Monarch.MonarchAction action,
                               Random random, ChangeSet cs) {
-        if (mercenaries.isEmpty()) return;
+        if (price <= 0 || mercenaries.isEmpty()) return;
         final int n = NameCache.getMercenaryLeaderIndex(random);
-        final int price = priceMercenaries(mercenaries);
         cs.add(See.only(this),
                new MonarchActionMessage(action, StringTemplate
                    .template(action.getTextKey())

@@ -91,7 +91,7 @@ public final class RecruitPanel extends FreeColPanel {
             turns = immigrationRequired / production;
             if (immigrationRequired % production > 0) turns++;
         }
-        int recruitPrice = player.getRecruitPrice();
+        int recruitPrice = player.getEuropeanRecruitPrice();
         add(Utility.localizedTextArea(StringTemplate
                 .template("recruitPanel.clickOn")
                 .addAmount("%money%", recruitPrice)
