@@ -218,8 +218,8 @@ public class ColonyTile extends WorkLocation {
             }
 
             // Tile type change.
-            final Stream<AbstractGoods> newProd
-                = newType.getPossibleProduction(true);
+            final List<AbstractGoods> newProd
+                = toList(newType.getPossibleProduction(true));
             int food = sum(newProd, AbstractGoods::isFoodType,
                            AbstractGoods::getAmount);
             // Get the current food production.  Otherwise for goods
