@@ -258,7 +258,8 @@ public final class ReportTurnPanel extends ReportPanel {
             Market market = (Market) source;
             StringTemplate template = market.getOwner().getMarketName();
             text = Messages.message(template);
-            commandId = getMyPlayer().getEurope().getId();
+            Europe europe = getMyPlayer().getEurope();
+            commandId = (europe != null) ? europe.getId() : null;
         } else if (source instanceof Colony) {
             final Colony colony = (Colony) source;
             text = colony.getName();
