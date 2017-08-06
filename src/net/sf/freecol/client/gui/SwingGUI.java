@@ -1798,7 +1798,9 @@ public class SwingGUI extends GUI {
     @Override
     public void showTilePopUpAtSelectedTile() {
         Tile tile = mapViewer.getSelectedTile();
+        if (tile == null) return;
         Point point = mapViewer.calculateTilePosition(tile);
+        if (point == null) return;
         canvas.showTilePopup(tile, point.x+mapViewer.getTileWidth(), point.y);
     }
 
