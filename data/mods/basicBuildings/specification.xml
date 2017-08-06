@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2017 David Lewis (highwayoflife@gmail.com)
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+    *
+  -->
+<freecol-specification id="basicBuildings" version="0.1">
+  <building-types>
+    <building-type id="model.building.townHall">
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <production unattended="true">
+        <output goods-type="model.goods.bells" value="2"/>
+      </production>
+      <production>
+        <output goods-type="model.goods.bells" value="5"/>
+      </production>
+    </building-type>
+    <building-type id="model.building.carpenterHouse">
+      <production>
+        <input goods-type="model.goods.lumber" value="3"/>
+        <output goods-type="model.goods.hammers" value="3"/>
+      </production>
+      <ability id="model.ability.build"
+               value="true">
+        <scope type="model.unit.wagonTrain"/>
+      </ability>
+    </building-type>
+    <building-type id="model.building.lumberMill"
+                   extends="model.building.carpenterHouse"
+                   upgrades-from="model.building.carpenterHouse"
+                   competence-factor="2" rebel-factor="2"
+                   upkeep="10">
+      <production>
+        <input goods-type="model.goods.lumber" value="6"/>
+        <output goods-type="model.goods.hammers" value="6"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <modifier id="model.modifier.tileTypeChangeProduction"
+                type="multiplicative" value="3">
+        <scope type="model.goods.lumber"/>
+      </modifier>
+    </building-type>
+    <building-type id="model.building.blacksmithHouse">
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <production>
+        <input goods-type="model.goods.ore" value="3"/>
+        <output goods-type="model.goods.tools" value="3"/>
+      </production>
+    </building-type>
+    <building-type id="model.building.blacksmithShop"
+                   extends="model.building.blacksmithHouse"
+                   upgrades-from="model.building.blacksmithHouse"
+                   competence-factor="2"
+                   upkeep="5">
+      <production>
+        <input goods-type="model.goods.ore" value="6"/>
+        <output goods-type="model.goods.tools" value="6"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="64"/>
+      <required-goods id="model.goods.tools"
+                      value="20"/>
+    </building-type>
+    <building-type id="model.building.ironWorks"
+                   extends="model.building.blacksmithShop"
+                   upgrades-from="model.building.blacksmithShop"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
+                   required-population="8" upkeep="15">
+      <production>
+        <input goods-type="model.goods.ore" value="6"/>
+        <output goods-type="model.goods.tools" value="9"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="240"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <ability id="model.ability.expertsUseConnections"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.tobacconistHouse">
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <production>
+        <input goods-type="model.goods.tobacco" value="3"/>
+        <output goods-type="model.goods.cigars" value="3"/>
+      </production>
+    </building-type>
+    <building-type id="model.building.tobacconistShop"
+                   extends="model.building.tobacconistHouse"
+                   upgrades-from="model.building.tobacconistHouse"
+                   competence-factor="2"
+                   upkeep="5">
+      <production>
+        <input goods-type="model.goods.tobacco" value="6"/>
+        <output goods-type="model.goods.cigars" value="6"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="64"/>
+      <required-goods id="model.goods.tools"
+                      value="20"/>
+    </building-type>
+    <building-type id="model.building.cigarFactory"
+                   extends="model.building.tobacconistShop"
+                   upgrades-from="model.building.tobacconistShop"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
+                   required-population="8" upkeep="15">
+      <production>
+        <input goods-type="model.goods.tobacco" value="6"/>
+        <output goods-type="model.goods.cigars" value="9"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="160"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <ability id="model.ability.expertsUseConnections"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.weaverHouse">
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <production>
+        <input goods-type="model.goods.cotton" value="3"/>
+        <output goods-type="model.goods.cloth" value="3"/>
+      </production>
+    </building-type>
+    <building-type id="model.building.weaverShop"
+                   extends="model.building.weaverHouse"
+                   upgrades-from="model.building.weaverHouse"
+                   competence-factor="2"
+                   upkeep="5">
+      <production>
+        <input goods-type="model.goods.cotton" value="6"/>
+        <output goods-type="model.goods.cloth" value="6"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="64"/>
+      <required-goods id="model.goods.tools"
+                      value="20"/>
+    </building-type>
+    <building-type id="model.building.textileMill"
+                   extends="model.building.weaverShop"
+                   upgrades-from="model.building.weaverShop"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
+                   required-population="8" upkeep="15">
+      <production>
+        <input goods-type="model.goods.cotton" value="6"/>
+        <output goods-type="model.goods.cloth" value="9"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="160"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <ability id="model.ability.expertsUseConnections"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.distillerHouse">
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <production>
+        <input goods-type="model.goods.sugar" value="3"/>
+        <output goods-type="model.goods.rum" value="3"/>
+      </production>
+    </building-type>
+    <building-type id="model.building.rumDistillery"
+                   extends="model.building.distillerHouse"
+                   upgrades-from="model.building.distillerHouse"
+                   competence-factor="2"
+                   upkeep="5">
+      <production>
+        <input goods-type="model.goods.sugar" value="6"/>
+        <output goods-type="model.goods.rum" value="6"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="64"/>
+      <required-goods id="model.goods.tools"
+                      value="20"/>
+    </building-type>
+    <building-type id="model.building.rumFactory"
+                   extends="model.building.rumDistillery"
+                   upgrades-from="model.building.rumDistillery"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
+                   required-population="8" upkeep="15">
+      <production>
+        <input goods-type="model.goods.sugar" value="6"/>
+        <output goods-type="model.goods.rum" value="9"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="160"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <ability id="model.ability.expertsUseConnections"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.furTraderHouse">
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <production>
+        <input goods-type="model.goods.furs" value="3"/>
+        <output goods-type="model.goods.coats" value="3"/>
+      </production>
+    </building-type>
+    <building-type id="model.building.furTradingPost"
+                   extends="model.building.furTraderHouse"
+                   upgrades-from="model.building.furTraderHouse"
+                   competence-factor="2"
+                   upkeep="5">
+      <production>
+        <input goods-type="model.goods.furs" value="6"/>
+        <output goods-type="model.goods.coats" value="6"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="56"/>
+      <required-goods id="model.goods.tools"
+                      value="20"/>
+    </building-type>
+    <building-type id="model.building.furFactory"
+                   extends="model.building.furTradingPost"
+                   upgrades-from="model.building.furTradingPost"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
+                   required-population="6" upkeep="15">
+      <production>
+        <input goods-type="model.goods.furs" value="6"/>
+        <output goods-type="model.goods.coats" value="9"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="160"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <ability id="model.ability.expertsUseConnections"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.schoolhouse"
+                   workplaces="1" minimum-skill="1" maximum-skill="1"
+                   required-population="4" upkeep="5">
+      <required-goods id="model.goods.hammers"
+                      value="64"/>
+      <ability id="model.ability.teach"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.college"
+                   extends="model.building.schoolhouse"
+                   workplaces="2" maximum-skill="2"
+                   upgrades-from="model.building.schoolhouse"
+                   required-population="8" upkeep="10">
+      <required-goods id="model.goods.hammers"
+                      value="160"/>
+      <required-goods id="model.goods.tools"
+                      value="50"/>
+    </building-type>
+    <building-type id="model.building.university"
+                   extends="model.building.college"
+                   workplaces="3" maximum-skill="4"
+                   upgrades-from="model.building.college"
+                   required-population="10" upkeep="15">
+      <required-goods id="model.goods.hammers"
+                      value="200"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+    </building-type>
+    <building-type id="model.building.armory"
+                   priority="400" upkeep="5">
+      <production>
+        <input goods-type="model.goods.tools" value="3"/>
+        <output goods-type="model.goods.muskets" value="3"/>
+      </production>
+      <!-- priority should be less than the colony's build queue -->
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <ability id="model.ability.build"
+               value="true">
+        <scope type="model.unit.artillery"/>
+      </ability>
+    </building-type>
+    <building-type id="model.building.magazine"
+                   extends="model.building.armory"
+                   upgrades-from="model.building.armory"
+                   competence-factor="2"
+                   required-population="8" upkeep="10">
+      <production>
+        <input goods-type="model.goods.tools" value="6"/>
+        <output goods-type="model.goods.muskets" value="6"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="120"/>
+      <required-goods id="model.goods.tools"
+                      value="50"/>
+    </building-type>
+    <building-type id="model.building.arsenal"
+                   extends="model.building.magazine"
+                   upgrades-from="model.building.magazine"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
+                   upkeep="15">
+      <production>
+        <input goods-type="model.goods.tools" value="9"/>
+        <output goods-type="model.goods.muskets" value="9"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="240"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <ability id="model.ability.expertsUseConnections"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.chapel" workplaces="0">
+      <required-goods id="model.goods.hammers"
+                      value="42"/>
+      <production unattended="true">
+        <output goods-type="model.goods.crosses" value="3"/>
+      </production>
+    </building-type>
+    <building-type id="model.building.church"
+                   extends="model.building.chapel"
+                   upgrades-from="model.building.chapel"
+                   workplaces="3"
+                   required-population="3" upkeep="5">
+      <production unattended="true">
+        <output goods-type="model.goods.crosses" value="4"/>
+      </production>
+      <production>
+        <output goods-type="model.goods.crosses" value="6"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="64"/>
+      <ability id="model.ability.dressMissionary"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.cathedral"
+                   extends="model.building.church"
+                   upgrades-from="model.building.church"
+                   competence-factor="2" rebel-factor="2"
+                   required-population="8" upkeep="15">
+      <production unattended="true">
+        <output goods-type="model.goods.crosses" value="5"/>
+      </production>
+      <production>
+        <output goods-type="model.goods.crosses" value="10"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="176"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+    </building-type>
+    <building-type id="model.building.stockade"
+                   workplaces="0" required-population="3">
+      <required-goods id="model.goods.hammers"
+                      value="64"/>
+      <modifier id="model.modifier.defence" index="50"
+                type="percentage" value="100"/>
+      <modifier id="model.modifier.minimumColonySize"
+                type="additive" value="3"/>
+      <!-- FIXME: abilties to prevent the effects of Indian raids. -->
+    </building-type>
+    <building-type id="model.building.fort"
+                   extends="model.building.stockade"
+                   upgrades-from="model.building.stockade"
+                   upkeep="10">
+      <required-goods id="model.goods.hammers"
+                      value="120"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+      <modifier id="model.modifier.defence" delete="true" />
+      <modifier id="model.modifier.defence" index="50"
+                type="percentage" value="150"/>
+      <ability id="model.ability.bombardShips"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.fortress"
+                   extends="model.building.fort"
+                   upgrades-from="model.building.fort"
+                   required-population="8" upkeep="15">
+      <required-goods id="model.goods.hammers"
+                      value="320"/>
+      <required-goods id="model.goods.tools"
+                      value="200"/>
+      <modifier id="model.modifier.defence" delete="true" />
+      <modifier id="model.modifier.defence" index="50"
+                type="percentage" value="200"/>
+    </building-type>
+    <building-type id="model.building.depot"
+                   workplaces="0" priority="750">
+      <modifier id="model.modifier.warehouseStorage"
+                type="additive" value="100"/>
+    </building-type>
+    <building-type id="model.building.warehouse"
+                   extends="model.building.depot"
+                   upgrades-from="model.building.depot"
+                   upkeep="5">
+      <required-goods id="model.goods.hammers"
+                      value="80"/>
+      <modifier id="model.modifier.warehouseStorage"
+                type="additive" value="100"/>
+    </building-type>
+    <building-type id="model.building.warehouseExpansion"
+                   extends="model.building.warehouse"
+                   upgrades-from="model.building.warehouse"
+                   upkeep="5">
+      <required-goods id="model.goods.hammers"
+                      value="80"/>
+      <required-goods id="model.goods.tools"
+                      value="20"/>
+      <modifier id="model.modifier.warehouseStorage"
+                type="additive" value="100"/>
+    </building-type>
+    <building-type id="model.building.country"
+                   workplaces="0" priority="700">
+      <production unattended="true">
+        <input goods-type="model.goods.food" value="1"/>
+        <output goods-type="model.goods.horses" value="1"/>
+      </production>
+      <ability id="model.ability.autoProduction"/>
+      <ability id="model.ability.avoidExcessProduction"/>
+      <modifier id="model.modifier.breedingDivisor" index="60"
+                type="additive" value="50"/>
+      <modifier id="model.modifier.breedingFactor" index="60"
+                type="additive" value="2"/>
+      <modifier id="model.goods.horses" index="60"
+                type="multiplicative" value="1.0"/>
+      <modifier id="model.modifier.consumeOnlySurplusProduction" index="60"
+                type="multiplicative" value="0.5" />
+    </building-type>
+    <building-type id="model.building.stables"
+                   extends="model.building.country"
+                   upgrades-from="model.building.country"
+                   upkeep="5">
+      <production unattended="true">
+        <input goods-type="model.goods.food" value="1"/>
+        <output goods-type="model.goods.horses" value="1"/>
+      </production>
+      <required-goods id="model.goods.hammers"
+                      value="64"/>
+      <modifier id="model.modifier.breedingDivisor" index="60"
+                type="multiplicative" value="0.5" />
+    </building-type>
+    <building-type id="model.building.docks"
+                   workplaces="0"
+                   upkeep="5">
+      <required-ability id="model.ability.hasPort"
+                        value="true" />
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <ability id="model.ability.produceInWater"
+               value="true"/>
+    </building-type>
+    <building-type id="model.building.drydock"
+                   extends="model.building.docks"
+                   upgrades-from="model.building.docks"
+                   required-population="4" upkeep="10">
+      <required-goods id="model.goods.hammers"
+                      value="80"/>
+      <required-goods id="model.goods.tools"
+                      value="50"/>
+      <ability id="model.ability.repairUnits"
+               value="true">
+        <scope ability-id="model.ability.navalUnit"/>
+      </ability>
+    </building-type>
+    <building-type id="model.building.shipyard"
+                   extends="model.building.drydock"
+                   upgrades-from="model.building.drydock"
+                   required-population="8" upkeep="15">
+      <required-goods id="model.goods.hammers"
+                      value="240"/>
+      <required-goods id="model.goods.tools"
+                      value="100"/>
+      <ability id="model.ability.build"
+               value="true">
+        <scope ability-id="model.ability.navalUnit"/>
+      </ability>
+    </building-type>
+    <building-type id="model.building.printingPress"
+                   workplaces="0"
+                   upkeep="5">
+      <required-goods id="model.goods.hammers"
+                      value="52"/>
+      <required-goods id="model.goods.tools"
+                      value="20"/>
+      <modifier id="model.goods.bells" index="70"
+                type="percentage" value="50">
+        <scope ability-id="model.ability.person" match-negated="true"/>
+      </modifier>
+    </building-type>
+    <building-type id="model.building.newspaper"
+                   extends="model.building.printingPress"
+                   upgrades-from="model.building.printingPress"
+                   required-population="4" upkeep="10">
+      <required-goods id="model.goods.hammers"
+                      value="120"/>
+      <required-goods id="model.goods.tools"
+                      value="50"/>
+      <modifier id="model.goods.bells" delete="true" />
+      <modifier id="model.goods.bells" index="70"
+                type="percentage" value="100">
+        <scope ability-id="model.ability.person" match-negated="true"/>
+      </modifier>
+    </building-type>
+    <building-type id="model.building.customHouse"
+                   workplaces="0"
+                   upkeep="15">
+      <required-goods id="model.goods.hammers"
+                      value="160"/>
+      <required-goods id="model.goods.tools"
+                      value="50"/>
+      <required-ability id="model.ability.buildCustomHouse"/>
+      <ability id="model.ability.export"
+               value="true"/>
+      <ability id="model.ability.coastalOnly"
+               value="false"/>
+    </building-type>
+  </building-types>
+
+</freecol-specification>
