@@ -3839,8 +3839,7 @@ public class Unit extends GoodsLocation
 
         if (newLocation == this.location) return true;
         if (newLocation != null && !newLocation.canAdd(this)) {
-            logger.warning("Can not add " + this + " to "
-                + newLocation.getId());
+            logger.warning("Can not add " + this + " to " + newLocation);
             return false;
         }
 
