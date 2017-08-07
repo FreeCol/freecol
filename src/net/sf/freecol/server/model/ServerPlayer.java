@@ -1057,31 +1057,30 @@ public class ServerPlayer extends Player implements TurnTaker {
      */
     public List<Unit> createUnits(List<AbstractUnit> abstractUnits,
                                   Location location) {
-        if (location == null) return Collections.<Unit>emptyList();
-        List<Unit> units = new ArrayList<>();
-
         final Game game = getGame();
         final Specification spec = game.getSpecification();
+        List<Unit> units = new ArrayList<>();
+        LogBuilder lb = new LogBuilder(32);
+        lb.add("createUnits for ", getId(), " at ", location);
         for (AbstractUnit au : abstractUnits) {
             UnitType type = au.getType(spec);
             Role role = au.getRole(spec);
             if (!type.isAvailableTo(this)) {
-                logger.warning("Ignoring abstract unit " + au
-                    + " unavailable to: " + getId());
+                lb.add(" ignoring type-unavailable ", au);
                 continue;
             }
             if (!role.isAvailableTo(this, type)) {
-                logger.warning("Ignoring abstract unit " + au
-                    + " with role " + role
-                    + " unavailable to: " + getId());
+                lb.add(" ignoring role-unavailable ", au);
                 continue;
             }
             for (int i = 0; i < au.getNumber(); i++) {
                 ServerUnit su = new ServerUnit(game, location, this, type,
                                                role);//-vis(this)
                 units.add(su);
+                lb.add(' ', su);
             }
         }
+        lb.log(logger, Level.FINEST);
         return units;
     }
 
@@ -1127,21 +1126,6 @@ public class ServerPlayer extends Player implements TurnTaker {
             lb.log(logger, Level.FINEST);
         }        
         return leftOver;
-    }
-
-    /**
-     * Simpler frontend to loadShips.
-     *
-     * @param units The {@code Unit}s to load.
-     * @return The left over units.
-     */
-    public List<Unit> loadShips(List<Unit> units) {
-        List<Unit> landUnits = new ArrayList<Unit>();
-        List<Unit> navalUnits = new ArrayList<Unit>();
-        for (Unit u : units) {
-            if (u.isNaval()) navalUnits.add(u); else landUnits.add(u);
-        }
-        return loadShips(landUnits, navalUnits, null);
     }
 
     /**
@@ -4058,8 +4042,11 @@ outer:  for (Effect effect : effects) {
                                  ChangeSet cs) {
         if (checkGold(price)) {
             final Specification spec = getSpecification();
-            List<AbstractUnit> naval
-                = transform(mercs, au -> au.getType(spec).isNaval());
+            final Predicate<AbstractUnit> isNaval = au ->
+                au.getType(spec).isNaval();
+            final Predicate<AbstractUnit> isLand = au ->
+                !au.getType(spec).isNaval();
+            List<AbstractUnit> naval = transform(mercs, isNaval);
             Tile dst;
             if (naval.isEmpty()) { // Deliver to first settlement
                 dst = first(getColonies()).getTile();
@@ -4067,7 +4054,9 @@ outer:  for (Effect effect : effects) {
                 cs.add(See.only(this), dst);
             } else { // Let them sail in
                 dst = getEntryLocation().getTile();
-                loadShips(createUnits(mercs, dst));//-vis
+                loadShips(createUnits(transform(mercs, isLand), null),
+                          createUnits(naval, dst),//-vis
+                          null);
                 invalidateCanSeeTiles();//+vis(this)
                 cs.add(See.perhaps(), dst);
             }
@@ -4075,10 +4064,10 @@ outer:  for (Effect effect : effects) {
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "model.player.mercenariesArrived", this)
                     .addStringTemplate("%location%",
-                        dst.up().getLocationLabelFor(this)));
+                                       dst.up().getLocationLabelFor(this)));
             modifyGold(-price);
             cs.addPartial(See.only(this), this,
-                "gold", String.valueOf(this.getGold()));
+                          "gold", String.valueOf(this.getGold()));
         } else {
             getMonarch().setDispleasure(true);
             cs.add(See.only(this),
