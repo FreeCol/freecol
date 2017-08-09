@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2017  David Lewis (highwayoflife@gmail.com)
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+    *
+  -->
+<freecol-specification id="shippableWagons" version="0.1">
+  <unit-types>
+    <unit-type id="model.unit.wagonTrain" extends="wagon"
+               offence="0" defence="1" movement="6"
+               score-value="1" spaceTaken="6" space="2">
+      <limit id="model.limit.wagonTrains" operator="lt">
+        <left-hand-side operand-type="units" scope-level="player" />
+        <right-hand-side operand-type="settlements" scope-level="player" />
+      </limit>
+      <ability id="model.ability.carryGoods"
+               value="true"/>
+      <ability id="model.ability.canBeCaptured"
+               value="true"/>
+    </unit-type>
+  </unit-types>
+</freecol-specification>
