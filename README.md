@@ -1,4 +1,4 @@
-# freecol
+# FreeCol [![Build Status](https://travis-ci.org/FreeCol/freecol.svg?branch=master)](https://travis-ci.org/FreeCol/freecol)
 
 FreeCol is a turn-based strategy game based on the old game
 Colonization, and similar to Civilization. The objective of the game is
@@ -8,7 +8,7 @@ You start with only a few colonists defying the stormy seas in their
 search for new land. Will you guide them on the Colonization of a New
 World?
 
-## About FreeCol 
+## About FreeCol
 
 The FreeCol team aims to create an Open Source version of Colonization
 (released under the GPL). At first we'll try to make an exact clone of
