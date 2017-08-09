@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2017 David Lewis (highwayoflife@gmail.com)
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+    *
+  -->
+<freecol-specification id="expandExperience" version="0.1">
+  <unit-change-types>
+    <unit-change-type id="model.unitChange.experience" preserve="true">
+      <unit-type-change id="model.unitChange.experience.masterCarpenter"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterCarpenter" probability="4"/>
+      <unit-type-change id="model.unitChange.experience.firebrandPreacher"
+                        from="model.unit.freeColonist"
+                        to="model.unit.firebrandPreacher" probability="2"/>
+      <unit-type-change id="model.unitChange.experience.elderStatesman"
+                        from="model.unit.freeColonist"
+                        to="model.unit.elderStatesman" probability="2"/>
+      <unit-type-change id="model.unitChange.experience.masterDistiller"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterDistiller" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterWeaver"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterWeaver" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterTobacconist"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterTobacconist" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterFurTrader"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterFurTrader" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterBlacksmith"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterBlacksmith" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterGunsmith"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterGunsmith" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterBlacksmith"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterBlacksmith" probability="3"/>
+      <unit-type-change id="model.unitChange.experience.masterBlacksmith"
+                        from="model.unit.freeColonist"
+                        to="model.unit.masterBlacksmith" probability="3"/>
+    </unit-change-type>
+  </unit-change-types>
+</freecol-specification>
