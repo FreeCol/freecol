@@ -70,10 +70,10 @@ public class HighScoresMessage extends ObjectMessage {
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (HighScore.TAG.equals(tag)) {
-                HighScore hs = xr.readFreeColObject(game, HighScore.class);
+                HighScore hs = new HighScore(xr);
                 if (hs != null) scores.add(hs);
             } else {
-                expected(TAG, tag);
+                expected(HighScore.TAG, tag);
             }
             xr.expectTag(tag);
         }
