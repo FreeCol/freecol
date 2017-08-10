@@ -2099,7 +2099,7 @@ public final class Specification {
     private void fixRoles() {
         if (!roles.isEmpty()) return; // Trust what is there
 
-        if (compareVersion("0.86") >= 0) return;
+        if (compareVersion("0.85") > 0) return;
 
         File rolf = FreeColDirectories.getCompatibilityFile(ROLES_COMPAT_FILE_NAME);
         try (
@@ -2123,7 +2123,7 @@ public final class Specification {
         // Unlike roles, we can not trust what is already there, as the changes
         // are deeper.
 
-        if (compareVersion("0.117") >= 0) return;
+        if (compareVersion("0.116") > 0) return;
 
         unitChangeTypeList.clear();
         File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
