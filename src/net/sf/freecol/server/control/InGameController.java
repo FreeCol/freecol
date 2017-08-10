@@ -107,7 +107,7 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GameEndedMessage;
 import net.sf.freecol.common.networking.GameStateMessage;
-import net.sf.freecol.common.networking.HighScoreMessage;
+import net.sf.freecol.common.networking.HighScoresMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
@@ -2410,7 +2410,7 @@ public final class InGameController extends Controller {
      */
     public ChangeSet getHighScores(ServerPlayer serverPlayer, String key) {
         return ChangeSet.simpleChange(serverPlayer,
-            new HighScoreMessage(key, HighScore.loadHighScores()));
+            new HighScoresMessage(key, HighScore.loadHighScores()));
     }
 
 

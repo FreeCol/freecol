@@ -34,35 +34,35 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
- * The message sent when an highScore occurs.
+ * The message sent when an high score query/response occurs.
  */
-public class HighScoreMessage extends ObjectMessage {
+public class HighScoresMessage extends ObjectMessage {
 
-    public static final String TAG = "highScore";
+    public static final String TAG = "highScores";
     private static final String KEY_TAG = "key";
 
 
     /**
-     * Create a new {@code HighScoreMessage} in request form (no
+     * Create a new {@code HighScoresMessage} in request form (no
      * scores attached).
      *
      * @param key A message key for the final display.
      * @param scores The list of high scores, or null.
      */
-    public HighScoreMessage(String key, List<HighScore> scores) {
+    public HighScoresMessage(String key, List<HighScore> scores) {
         super(TAG, KEY_TAG, key);
 
         appendChildren(scores);
     }
 
     /**
-     * Create a new {@code HighScoreMessage} from a stream.
+     * Create a new {@code HighScoresMessage} from a stream.
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public HighScoreMessage(Game game, FreeColXMLReader xr)
+    public HighScoresMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
         super(TAG, xr, KEY_TAG);
 
@@ -73,7 +73,7 @@ public class HighScoreMessage extends ObjectMessage {
                 HighScore hs = xr.readFreeColObject(game, HighScore.class);
                 if (hs != null) scores.add(hs);
             } else {
-                expected(HighScore.TAG, tag);
+                expected(TAG, tag);
             }
             xr.expectTag(tag);
         }
@@ -117,7 +117,7 @@ public class HighScoreMessage extends ObjectMessage {
         final String key = getKey();
         final List<HighScore> scores = getScores();
 
-        igc(freeColClient).highScoreHandler(key, scores);
+        igc(freeColClient).highScoresHandler(key, scores);
         clientGeneric(freeColClient);
     }
         

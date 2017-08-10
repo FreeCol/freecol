@@ -3397,7 +3397,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param key An optional message key.
      * @param scores The list of {@code HighScore} records to display.
      */
-    public void highScoreHandler(String key, List<HighScore> scores) {
+    public void highScoresHandler(String key, List<HighScore> scores) {
         invokeLater(() ->
             getGUI().showHighScoresPanel(key, scores));
     }
