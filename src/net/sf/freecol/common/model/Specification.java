@@ -2335,6 +2335,18 @@ public final class Specification {
         if (mow != null && mow.getMercenaryPrice() < 0) {
             mow.setMercenaryPrice(10000);
         }
+
+        // Added canBeSurrendered ability to all the REF units.
+        // REF Units are the units that can be *added* to the REF.
+        // The REF can capture other units, but they can all automatically
+        // be surrendered, whereas of the actual REF units, only the artillery
+        // can be handed over to the victorious independent nation.
+        for (UnitType ut : getUnitTypesWithAbility(Ability.REF_UNIT)) {
+            if (!ut.containsAbilityKey(Ability.CAN_BE_SURRENDERED)) {
+                ut.addAbility(new Ability(Ability.CAN_BE_SURRENDERED, null,
+                        ut.getId().equals("model.unit.artillery")));
+            }
+        }
         // end @compat 0.11.6
     }
 

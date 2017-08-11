@@ -575,6 +575,8 @@ public final class InGameController extends Controller {
         // Who surrenders?
         final Predicate<Unit> surrenderPred = u -> //-vis(both)
             (u.hasTile() && !u.isNaval() && !u.isOnCarrier()
+                && (!u.hasAbility(Ability.REF_UNIT)
+                    || u.hasAbility(Ability.CAN_BE_SURRENDERED))
                 && serverPlayer.csChangeOwner(u, independent,
                     UnitChangeType.CAPTURE, null, cs));
         List<Unit> surrenderUnits
