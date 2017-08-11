@@ -149,7 +149,8 @@ public abstract class BuildableType extends FreeColSpecObjectType {
                 }
                 if (e.getValue() != any) {
                     System.err.println(this + ".isAvailableTo() fail on "
-                        + e.getKey() + " expecting " + e.getValue());
+                        + e.getKey() + " expecting " + e.getValue()
+                        + " but saw " + any);
                     return false;
                 }
             }

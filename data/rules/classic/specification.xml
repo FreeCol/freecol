@@ -2974,6 +2974,13 @@
       <ability id="model.ability.foundsColonies"
                value="true"/>
     </european-nation-type>
+    <!-- really special nation type for option use *only*, needed so
+         that the missionary role is available to units in unit list
+         options -->         
+    <european-nation-type id="model.nationType.optionOnly"
+                          extends="model.nationType.default">
+      <ability id="model.ability.dressMissionary" value="true"/>
+    </european-nation-type>
     <!-- default REF nation -->
     <european-nation-type id="model.nationType.ref" ref="true">
       <settlement id="model.settlement.colony" capital="false"
@@ -4265,7 +4272,7 @@
           <unitListOption id="model.option.immigrants" maximumNumber="999">
             <template>
               <unitOption id="model.option.immigrants.template"
-                          nationType="model.nationType.default">
+                          nationType="model.nationType.optionOnly">
                 <unitType value="model.unit.freeColonist" generate="immigrants" />
                 <role value="model.role.default">
                   <choice value="model.role.default"/>
