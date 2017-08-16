@@ -101,6 +101,9 @@ public final class ConnectController extends FreeColClientHolder {
                 err = StringTemplate.template("server.couldNotConnect");
             }
         } catch (Exception ex) {
+            logger.severe("Server could not connect to "
+                    + host + ":" + port
+                    + " as " + user);
             err = FreeCol.errorFromException(ex, "server.couldNotConnect");
         }
         return err;

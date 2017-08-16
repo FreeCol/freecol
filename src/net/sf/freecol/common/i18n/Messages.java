@@ -869,7 +869,8 @@ public class Messages {
                     } else {
                         logger.warning("Choice substitution for "
                             + selector + "/" + otherKey
-                            + " attempted, but template was " + replacement);
+                            + " attempted, but template was " + replacement
+                            + " for input " + input);
                         continue;
                     }
                 } else if (containsKey(otherKey)) {
