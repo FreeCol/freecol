@@ -39,7 +39,7 @@ public class AllTests {
         suite.addTest(net.sf.freecol.common.AllTests.suite());
         suite.addTest(net.sf.freecol.server.AllTests.suite());
         suite.addTest(net.sf.freecol.server.generator.AllTests.suite());
-        //suite.addTest(net.sf.freecol.client.control.AllTests.suite());
+        suite.addTest(net.sf.freecol.client.control.AllTests.suite());
         suite.addTest(net.sf.freecol.client.gui.AllTests.suite());
 
         // Make sure that we run the tests using the english locale

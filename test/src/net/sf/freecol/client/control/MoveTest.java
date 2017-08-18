@@ -57,25 +57,25 @@ public class MoveTest extends FreeColTestCase {
         FreeColClient client = null;
         try {
             client = ClientTestHelper
-                .startClient(ServerTestHelper.getServer());
+                    .startClient(ServerTestHelper.getServer(), spec());
 
             Player dutch = game.getPlayerByNationId("model.nation.dutch");
             Tile plain1 = map.getTile(5, 8);
             plain1.setExplored(dutch, true);
             Tile plain2 = map.getTile(5, 7);
             plain2.setExplored(dutch, true);
-    
+
             Unit hardyPioneer = new ServerUnit(game, plain1, dutch,
-                                               pioneerType);
-    
+                    pioneerType);
+
             client.getPreGameController().startGameHandler();
             assertEquals(plain1.getNeighbourOrNull(Direction.NE), plain2);
             client.getInGameController().moveDirection(hardyPioneer,
-                Direction.NE, false);
-            
+                    Direction.NE, false);
         } finally {
-            if (client != null) ClientTestHelper.stopClient(client);
+            if (client != null) {
+                ClientTestHelper.stopClient(client);
+            }
         }
     }
-
 }
