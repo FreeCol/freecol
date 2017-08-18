@@ -7,3 +7,6 @@ addons:
   apt:
     packages:
       - ant-optional
+
+script:
+  - ant testall
