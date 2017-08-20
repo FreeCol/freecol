@@ -10,3 +10,11 @@ addons:
 
 script:
   - ant testall
+
+deploy:
+  provider: pages
+  repo: git@github.com:FreeCol/FreeCol-Reports.git
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  on:
+    branch: master
