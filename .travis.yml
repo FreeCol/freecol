@@ -2,17 +2,35 @@ language: java
 jdk:
   - oraclejdk8
 addons:
-  apt:
+  - coverity_scan:
+    project:
+      name: "FreeCol/freecol"
+      description: "FreeCol Colonize the New World Game"
+    notification_email: highwayoflife@gmail.com
+    build_command_prepend: "ant clean"
+    build_command:   "ant"
+    branch_pattern: prerelease
+  - apt:
     packages:
       - ant-optional
 script:
   - ant test
+  - mkdir -p build/report
+  - touch index.html
 deploy:
   provider: pages
   repo: FreeCol/FreeCol-Reports
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   target_branch: master
-  local_dir: build/report/
+  local_dir: build/report
   on:
-    branch: travis_ci_test
+    branch: prerelease
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "nrArbB++rOhbhLXTvbKt5ymT2fPsmdxnaLMORYkQxhvNgRIxVsD+vHw6avwEJjr5LsoqKaaHLXhxbmvEhkEcQr81uZMeJHwUbqxKCdDDjqgPpFC7i3ALWmkJKkR3RqcTaEjVRVg2giQyNzf7YTMFPW+sLjMJzpiLi/3gvhe/mbE3VhMedY9Vyz6oxBRNYZVWlanwpW0LdLu0ql4Z8IsdvKL3vY+1tNOywTeeqfVHU1UNz61sVNrtpxQTRiQwEaQ3Kqp1slKXf8nosZAmh4c4Xy81Ji1pkk+GAHH9K+u69IdHjmfpxFMdELWIsQFa7m7dlA1G4rsy+s0BN+X31jyv2WGWfRvfBr/tJnMh4VRj9nk8jcCMTq+iLsVI/Hm6xmKE7qAGSKw8ZxZCO0EpJGs13F/9jlWCg35U2K+dpTsJ2H8u0YBWcmuejeQWeIU6oqRsnH8nRUkDKJnGaI1i7AuqpUMjqXSZCxfvuwEvSmd0Q3/DG06grzVWQ/9R8J5J3PBONaj/GR7pOW0rl2ClfM46jEyDL6u8F0wQvq+XMcQRO4+bwziANe4VZq1QCWX22sA+gKz6QPHIrwHa1PYKJVYfqEn5BR5btOe9eirsqmfw8blbCb4xDf9mGROB9B8kfKZ8tAs5KeprapzURwOzpFNGDkaX+zFtMFmhpXTfdSK0UOI="
+
+before_install:
+      - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
