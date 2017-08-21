@@ -14,3 +14,5 @@ deploy:
   github_token: "$GITHUB_TOKEN"
   target_branch: master
   local_dir: "build/report"
+  on:
+    branch: travis_ci_test
