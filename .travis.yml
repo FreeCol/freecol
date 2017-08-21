@@ -6,13 +6,13 @@ addons:
     packages:
       - ant-optional
 script:
-  - ant testall
+  - ant test
 deploy:
   provider: pages
-  repo: git@github.com:FreeCol/FreeCol-Reports.git
+  repo: FreeCol/FreeCol-Reports
   skip_cleanup: true
-  github_token: "$GITHUB_TOKEN"
+  github_token: $GITHUB_TOKEN
   target_branch: master
-  local_dir: "build/report"
+  local_dir: build/report
   on:
     branch: travis_ci_test
