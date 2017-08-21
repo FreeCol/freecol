@@ -226,7 +226,7 @@ public class DiplomaticTrade extends FreeColGameObject {
         return StringTemplate.template("model.diplomaticTrade.send."
             + getContext().getKey())
             .addStringTemplate("%nation%",
-                settlement.getOwner().getNationLabel())
+                settlement.getOwner().getCountryLabel())
             .addStringTemplate("%settlement%",
                 settlement.getLocationLabelFor(player));
     }
@@ -241,7 +241,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     public StringTemplate getReceiveMessage(Player player) {
         return StringTemplate.template("model.diplomaticTrade.receive."
             + getContext().getKey())
-            .addStringTemplate("%nation%", player.getNationLabel());
+            .addStringTemplate("%nation%", player.getCountryLabel());
     }
 
     /**

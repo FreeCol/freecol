@@ -81,7 +81,7 @@ public class CollectionUtils {
     public static final Comparator<List<?>> descendingListLengthComparator
         = ascendingListLengthComparator.reversed();
 
-    
+
     /**
      * Make an unmodifiable set with specified members.
      *
