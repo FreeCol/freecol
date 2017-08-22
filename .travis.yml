@@ -2,5 +2,5 @@ language: java
 jdk:
   - oraclejdk8
 script:
-  - ant -lib test/lib/junit.jar testci
+  - ant -lib ~/build/FreeCol/freecol/test/lib/junit.jar testci
   - cat build/report/*.txt
