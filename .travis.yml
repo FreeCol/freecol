@@ -1,18 +1,6 @@
 language: java
 jdk:
   - oraclejdk8
-addons:
-  apt:
-    packages:
-      - ant-optional
 script:
-  - ant test
-deploy:
-  provider: pages
-  repo: FreeCol/FreeCol-Reports
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN
-  target_branch: master
-  local_dir: build/report/
-  on:
-    branch: travis_ci_test
+  - ant -lib test/lib/junit.jar testci
+  - cat build/report/*.txt

@@ -682,6 +682,24 @@
         <fail if="error.junit" message="Automated Unit Tests failed."/>
     </target>
 
+    <target name="testci" depends="build-unit-tests"
+            description="Runs all tests into a text file">
+        <delete dir="${freecol.build.dir}/report" />
+        <mkdir dir="${freecol.build.dir}/report" />
+        <junit printsummary="yes" errorProperty="error.junit"
+               failureProperty="error.junit" fork="yes" maxmemory="96M">
+            <classpath refid="test.run.classpath"/>
+            <formatter type="plain" />
+            <test todir="${freecol.build.dir}/report"
+                  name="net.sf.freecol.AllTests" fork="yes"/>
+            <sysproperty key="java.awt.headless" value="true" />
+        </junit>
+
+        <echo message="For more detailed information about this test run see:"/>
+        <echo message="${freecol.build.dir}/report/TEST-net.sf.freecol.AllTests.txt"/>
+        <fail if="error.junit" message="Automated Unit Tests failed."/>
+    </target>
+
     <target name="build-unit-tests" depends="build">
         <depend srcDir="test/src" destDir="${freecol.build.dir}"
                 cache="${freecol.build.dir}" />
