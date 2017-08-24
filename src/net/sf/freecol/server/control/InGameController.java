@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Force;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -123,6 +124,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 import net.sf.freecol.server.FreeColServer;
@@ -366,18 +368,22 @@ public final class InGameController extends Controller {
 
         // Instantiate the REF in Europe
         Force exf = monarch.getExpeditionaryForce();
-        // Defend against underprovisioned navies
-        UnitType ut = monarch.getNavalREFUnitType();
-        while (exf.getSpaceRequired() > exf.getCapacity()) {
-            AbstractUnit au
-                = new AbstractUnit(ut, Specification.DEFAULT_ROLE_ID, 1);
-            exf.add(au);
+        if (!exf.prepareToBoard()) {
+            logger.warning("Unable to ensure space for the REF land units.");
+            // For now, do not fail completely
         }
         List<Unit> landUnits = refPlayer.createUnits(exf.getLandUnitsList(),
                                                      europe);//-vis: safe!map
         List<Unit> navalUnits = refPlayer.createUnits(exf.getNavalUnitsList(),
                                                       europe);//-vis: safe!map
-        refPlayer.loadShips(landUnits, navalUnits, random);//-vis: safe!map
+        List<Unit> leftOver = refPlayer.loadShips(landUnits, navalUnits,
+                                                  random);//-vis: safe!map
+        if (!leftOver.isEmpty()) {
+            // Should not happen, make this return null one day
+            logger.warning("Failed to board REF units: "
+                + join(" ", transform(leftOver, alwaysTrue(),
+                                      FreeColObject::getId)));
+        }
         return refPlayer;
     }
 
@@ -404,7 +410,7 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlement(owner);
         cs.add(See.only(owner), tile);
         cs.addPartial(See.only(owner), owner,
-            "gold", String.valueOf(owner.getGold()));
+                      "gold", String.valueOf(owner.getGold()));
         logger.finest(owner.getSuffix() + " " + unit + " buys " + goods
                       + " at " + sis.getName() + " for " + price);
     }
@@ -432,7 +438,7 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlement(owner);
         cs.add(See.only(owner), tile);
         cs.addPartial(See.only(owner), owner,
-            "gold", String.valueOf(owner.getGold()));
+                      "gold", String.valueOf(owner.getGold()));
         cs.addSale(owner, sis, goods.getType(),
                    Math.round((float)price/goods.getAmount()));
         logger.finest(owner.getSuffix() + " " + unit + " sells " + goods

@@ -2335,7 +2335,14 @@ public final class Specification {
         if (mow != null && mow.getMercenaryPrice() < 0) {
             mow.setMercenaryPrice(10000);
         }
-
+        // Old manOWars required independenceDeclared which was moved to
+        // independentNation a while back, but surfaced again in old games
+        final String maidId = "model.ability.independenceDeclared";
+        if (mow != null && mow.requiresAbility(maidId)) {
+            mow.removeRequiredAbility(maidId);
+            mow.addRequiredAbility(Ability.INDEPENDENT_NATION, true);
+        }
+        
         // Added canBeSurrendered ability to all the REF units.
         // REF Units are the units that can be *added* to the REF.
         // The REF can capture other units, but they can all automatically

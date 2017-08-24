@@ -1066,7 +1066,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         final Specification spec = game.getSpecification();
         List<Unit> units = new ArrayList<>();
         LogBuilder lb = new LogBuilder(32);
-        lb.add("createUnits for ", getId(), " at ", location);
+        lb.add("createUnits for ", this, " at ", location);
         for (AbstractUnit au : abstractUnits) {
             UnitType type = au.getType(spec);
             Role role = au.getRole(spec);
@@ -1116,7 +1116,8 @@ public class ServerPlayer extends Player implements TurnTaker {
             randomShuffle(logger, "Land load", landUnits, random);
         }
         LogBuilder lb = new LogBuilder(256);
-        lb.mark();
+        lb.add("Load ", navalUnits.size(), " ships with ", landUnits.size(),
+            " land units: ");
         for (Unit unit : landUnits) {
             Unit carrier = find(navalUnits, u -> u.canAdd(unit));
             if (carrier != null) {
@@ -1126,10 +1127,7 @@ public class ServerPlayer extends Player implements TurnTaker {
                 leftOver.add(unit);
             }
         }
-        if (lb.grew("Load ships: ")) {
-            lb.shrink(", ");
-            lb.log(logger, Level.FINEST);
-        }        
+        lb.log(logger, Level.FINEST);
         return leftOver;
     }
 

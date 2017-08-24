@@ -118,15 +118,29 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     /**
      * Add a new required ability.
      *
-     * @param tag The ablilty name.
+     * Public for specification fixes.
+     *
+     * @param tag The ability name.
      * @param value The ability value.
      */
-    private void addRequiredAbility(String tag, boolean value) {
+    public void addRequiredAbility(String tag, boolean value) {
         if (requiredAbilities == null) {
             requiredAbilities = new HashMap<>();
         }
         requiredAbilities.put(tag, value);
     }
+
+    /**
+     * Remove a required ability.
+     *
+     * Public for specification fixes.
+     *
+     * @param tag The ability name to remove.
+     */
+    public void removeRequiredAbility(String tag) {
+        if (requiredAbilities != null) requiredAbilities.remove(tag);
+    }
+
 
     /**
      * Is this buildable available to a given FreeColObject?
