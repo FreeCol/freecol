@@ -37,6 +37,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -221,9 +222,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * merging.
      *
      * @param option The {@code Option} to merge.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if the merge was accepted.
      */
-    public boolean merge(Option option) {
+    public boolean merge(Option option, LogBuilder lb) {
         final String id = option.getId();
         OptionGroup etc = null;
 
@@ -238,8 +240,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                 if (o.getId().startsWith("net.sf.freecol.client.gui.panel.")) {
                     if (etc == null) etc = getOptionGroup(ClientOptions.ETC);
                     etc.add(o);
-                    logger.log(Level.INFO, "Moved " + o.getId()
-                        + " to " + ClientOptions.ETC);
+                    lb.add(o.getId(), " moved to ", ClientOptions.ETC, ".\n");
                     continue;
                 }
                 // end @compat 0.11.6
@@ -247,18 +248,17 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                 // Merge from the top level, so that the new
                 // option will end up in the group inherited
                 // from the standard client-options.xml.
-                result = result && this.merge(o);
+                result = result && this.merge(o, lb);
             }
             if (result) {
                 optionGroup.setEditable(editable && optionGroup.isEditable());
             }
-            logger.finest("Merged option group " + id
-                + " contents into " + this.getId());
+            lb.add(id, " group merged contents into ", this.getId(), ".\n");
             return result;
         }
                 
         if (!optionMap.containsKey(id)) {
-            logger.warning("Ignoring unknown option " + id);
+            lb.add(id, " unknown/ignored.\n");
             return false;
         }
 
@@ -268,19 +268,19 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                 options.remove(index);
                 options.add(index, option);
                 optionMap.put(id, option);
-                logger.finest("Merged option " + id + " into " + this.getId()
-                    + ": " + option.toString() + "/");
+                lb.add(id, " merged into ", this.getId(),
+                    ": ", option.toString() + ".\n");
                 return true;
             }
             if (o instanceof OptionGroup) {
                 OptionGroup og = (OptionGroup)o;
-                if (og.optionMap.containsKey(id) && og.merge(option)) {
+                if (og.optionMap.containsKey(id) && og.merge(option, lb)) {
                     optionMap.put(id, option);
                     return true;
                 }
             }
         }
-        logger.warning("Option " + id + " registered but not found!");
+        lb.add(id, " registered but not found!\n");
         return false;
     }
         

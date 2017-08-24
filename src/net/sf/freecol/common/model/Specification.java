@@ -758,7 +758,10 @@ public final class Specification {
      */
     public boolean mergeGameOptions(OptionGroup newGameOptions, String who) {
         OptionGroup go = getGameOptions();
-        if (!go.merge(newGameOptions)) return false;
+        LogBuilder lb = new LogBuilder(64);
+        boolean ret = go.merge(newGameOptions, lb);
+        lb.shrink("\n"); lb.log(logger, Level.FINEST);
+        if (!ret) return false;
         addOptionGroup(go, true); // make sure allOptions is seeing any changes
         clean("merged game options (" + who + ")");
         return true;
@@ -775,7 +778,10 @@ public final class Specification {
     public boolean mergeMapGeneratorOptions(OptionGroup newMapGeneratorOptions,
                                             String who) {
         OptionGroup go = getMapGeneratorOptions();
-        if (!go.merge(newMapGeneratorOptions)) return false;
+        LogBuilder lb = new LogBuilder(64);
+        boolean ret = go.merge(newMapGeneratorOptions, lb);
+        lb.shrink("\n"); lb.log(logger, Level.FINEST);
+        if (!ret) return false;
         addOptionGroup(go, true); // make sure allOptions is seeing any changes
         clean("merged map options (" + who + ")");
         return true;
