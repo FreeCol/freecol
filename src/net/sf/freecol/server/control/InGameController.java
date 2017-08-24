@@ -2064,22 +2064,23 @@ public final class InGameController extends Controller {
 
             // Remove dead players and retry
             switch (current.checkForDeath()) {
-            case ServerPlayer.IS_DEAD:
+            case IS_DEAD:
                 current.csWithdraw(cs);
                 logger.info("For " + serverPlayer.getSuffix()
                     + ", " + current.getNation() + " is dead.");
                 break;
-            case ServerPlayer.IS_ALIVE:
-                if (current.isREF() && current.checkForREFDefeat()) {
-                    for (Player p : current.getRebels()) {
-                        csGiveIndependence(current, (ServerPlayer)p, cs);
-                    }
-                    current.csWithdraw(cs);
-                    logger.info(current.getNation() + " is defeated.");
+            case IS_DEFEATED:
+                for (Player p : current.getRebels()) {
+                    csGiveIndependence(current, (ServerPlayer)p, cs);
                 }
+                current.csWithdraw(cs);
+                logger.info(current.getNation() + " is defeated.");
                 break;
-            default: // Need to autorecruit a unit to keep alive.
+            case IS_AUTORECRUIT:
+                // Need to autorecruit a unit to keep alive.
                 current.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
+                break;
+            case IS_ALIVE: default:
                 break;
             }
             if (!cs.isEmpty()) { // Flush changes

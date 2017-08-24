@@ -122,10 +122,13 @@ public class ServerPlayer extends Player implements TurnTaker {
     public static final int ALARM_RADIUS = 2;
     public static final int ALARM_TILE_IN_USE = 2;
 
-    // checkForDeath results
-    public static final int IS_DEAD = -1;
-    public static final int IS_ALIVE = 0;
-    public static final int AUTORECRUIT = 1;
+    // checkForDeath result type
+    public static enum DeadCheck {
+        IS_DEAD,
+        IS_DEFEATED,
+        IS_AUTORECRUIT,
+        IS_ALIVE
+    };
 
     // Penalty for destroying a settlement (Col1)
     public static final int SCORE_SETTLEMENT_DESTROYED = -5;
@@ -446,12 +449,12 @@ public class ServerPlayer extends Player implements TurnTaker {
     /**
      * Checks if this player has died.
      *
-     * @return Negative if the player is dead, zero if they are ok,
-     *      positive non-zero if the server should auto-recruit
-     *      colonist units to keep this player alive.
+     * @return The appropriate {@code DeadCheck} value.
      */
-    public int checkForDeath() {
-        if (isUnknownEnemy()) return IS_ALIVE;
+    public DeadCheck checkForDeath() {
+        // Quickly ensure the unknown enemy is immortal.
+        if (isUnknownEnemy()) return DeadCheck.IS_ALIVE;
+
         final Specification spec = getGame().getSpecification();
         /*
          * Die if: (isNative && (no colonies or units))
@@ -462,7 +465,8 @@ public class ServerPlayer extends Player implements TurnTaker {
          */
         switch (getPlayerType()) {
         case NATIVE: // All natives units are viable
-            return (getUnitCount() == 0) ? IS_DEAD : IS_ALIVE;
+            return (getUnitCount() == 0) ? DeadCheck.IS_DEAD
+                : DeadCheck.IS_ALIVE;
 
         case COLONIAL: // Handle the hard case below
             break;
@@ -470,26 +474,27 @@ public class ServerPlayer extends Player implements TurnTaker {
         case REBEL: case INDEPENDENT:
             // Post-declaration European player needs a coastal colony
             // and can not hope for resupply from Europe.
-            return (getNumberOfPorts() > 0) ? IS_ALIVE : IS_DEAD;
+            return (getNumberOfPorts() > 0) ? DeadCheck.IS_ALIVE
+                : DeadCheck.IS_DEAD;
 
         case ROYAL:
-            return (getRebels().isEmpty()) ? IS_DEAD : IS_ALIVE;
+            return (checkForREFDefeat()) ? DeadCheck.IS_DEFEATED
+                : DeadCheck.IS_ALIVE;
 
         case UNDEAD:
-            return (getUnitCount() == 0) ? IS_DEAD : IS_ALIVE;
+            return (getUnitCount() == 0) ? DeadCheck.IS_DEAD
+                : DeadCheck.IS_ALIVE;
 
         default:
             throw new IllegalStateException("Bogus player type");
         }
 
         // Quick check for a colony.  Do not log, this is the common case.
-        if (any(getColonies())) return IS_ALIVE;
+        if (any(getColonies())) return DeadCheck.IS_ALIVE;
 
         // Do not kill the observing player during a debug run.
-        if (!isAI() && FreeColDebugger.getDebugRunTurns() >= 0) return IS_ALIVE;
-
-        // Do not kill the unknown enemy!
-        if (isUnknownEnemy()) return IS_ALIVE;
+        if (!isAI() && FreeColDebugger.getDebugRunTurns() >= 0)
+            return DeadCheck.IS_ALIVE;
 
         // Traverse player units, look for valid carriers, colonists,
         // carriers with units, carriers with goods.
@@ -512,14 +517,14 @@ public class ServerPlayer extends Player implements TurnTaker {
                 if (carrier.hasTile()) {
                     logger.info(getName() + " alive, unit " + unit.getId()
                         + " (embarked) on map.");
-                    return IS_ALIVE;
+                    return DeadCheck.IS_ALIVE;
                 }
                 hasEmbarked = true;
             }
             if (unit.hasTile() && !unit.isInMission()) {
                 logger.info(getName() + " alive, unit " + unit.getId()
                     + " on map.");
-                return IS_ALIVE;
+                return DeadCheck.IS_ALIVE;
             }
         }
         // The player does not have any valid units or settlements on the map.
@@ -529,17 +534,17 @@ public class ServerPlayer extends Player implements TurnTaker {
             // After the season cutover year there must be a presence
             // in the New World.
             logger.info(getName() + " dead, no presence >= " + mandatory);
-            return IS_DEAD;
+            return DeadCheck.IS_DEAD;
         }
 
         // No problems, unit available on carrier but off map, or goods
         // available to be sold.
         if (hasEmbarked) {
             logger.info(getName() + " alive, has embarked unit.");
-            return IS_ALIVE;
+            return DeadCheck.IS_ALIVE;
         } else if (hasGoods) {
             logger.info(getName() + " alive, has cargo.");
-            return IS_ALIVE;
+            return DeadCheck.IS_ALIVE;
         }
 
         // It is necessary to still have a carrier.
@@ -555,7 +560,7 @@ public class ServerPlayer extends Player implements TurnTaker {
                       unitPricer);
             if (price == Integer.MAX_VALUE || !checkGold(price)) {
                 logger.info(getName() + " dead, can not buy carrier.");
-                return IS_DEAD;
+                return DeadCheck.IS_DEAD;
             }
             goldNeeded += price;
         }
@@ -563,10 +568,10 @@ public class ServerPlayer extends Player implements TurnTaker {
         // A colonist is required.
         if (hasColonist) {
             logger.info(getName() + " alive, has waiting colonist.");
-            return IS_ALIVE;
+            return DeadCheck.IS_ALIVE;
         } else if (europe == null) {
             logger.info(getName() + " dead, can not recruit.");
-            return IS_DEAD;
+            return DeadCheck.IS_DEAD;
         }
         UnitType unitType = null;
         int price = Math.min(europe.getCurrentRecruitPrice(),
@@ -575,13 +580,13 @@ public class ServerPlayer extends Player implements TurnTaker {
         goldNeeded += price;
         if (checkGold(goldNeeded)) {
             logger.info(getName() + " alive, can buy colonist.");
-            return IS_ALIVE;
+            return DeadCheck.IS_ALIVE;
         }
 
         // Col1 auto-recruits a unit in Europe if you run out before
         // the cutover year.
         logger.info(getName() + " survives by autorecruit.");
-        return AUTORECRUIT;
+        return DeadCheck.IS_AUTORECRUIT;
     }
 
     /**
@@ -3226,7 +3231,7 @@ outer:  for (Effect effect : effects) {
                                  attacker)
                     .addStringTemplate("%nation%", nativeNation));
         }
-        if (nativePlayer.checkForDeath() == IS_DEAD) {
+        if (nativePlayer.checkForDeath() == DeadCheck.IS_DEAD) {
             h = new HistoryEvent(game.getTurn(),
                 HistoryEvent.HistoryEventType.DESTROY_NATION, this)
                     .addStringTemplate("%nation%", attackerNation)
@@ -3839,7 +3844,8 @@ outer:  for (Effect effect : effects) {
                 .addStringTemplate("%unit%", loser.getLabel())
                 .addStringTemplate("%enemyNation%", winnerNation)
                 .addStringTemplate("%enemyUnit%", winner.getLabel()));
-        if (loserPlayer.isIndian() && loserPlayer.checkForDeath() == IS_DEAD) {
+        if (loserPlayer.isIndian()
+            && loserPlayer.checkForDeath() == DeadCheck.IS_DEAD) {
             StringTemplate nativeNation = loserPlayer.getNationLabel();
             cs.addGlobalHistory(getGame(),
                 new HistoryEvent(getGame().getTurn(),
