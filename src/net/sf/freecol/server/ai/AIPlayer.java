@@ -70,6 +70,9 @@ public abstract class AIPlayer extends AIObject {
 
     public static final String TAG = "aiPlayer";
 
+    /** Do nothing! */
+    private static final Runnable nullRunnable = () -> {};
+    
     /** A comparator to sort AI units by location. */
     private static final Comparator<AIUnit> aiUnitLocationComparator
         = Comparator.comparing(AIUnit::getUnit, Unit.locComparator);
@@ -486,6 +489,18 @@ public abstract class AIPlayer extends AIObject {
                 AIMessage.askNewRegionName(this, region, tile, unit, name);
             });
     }    
+
+    /**
+     * Handle a multiple message.
+     */
+    public void multipleHandler() {
+        // We want to let the handlers for the parts of this message
+        // get a chance to run.  Perhaps we should even insist they
+        // all run to completion but let us try not being that severe.
+        // So invoke a null thread and yield.
+        invoke(nullRunnable);
+        Thread.yield();
+    }
 
     /**
      * Handle reconnect.
