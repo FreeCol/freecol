@@ -350,24 +350,8 @@ public class ServerColony extends Colony implements TurnTaker {
                         Function.identity(), Collectors.toSet());
 
         for (Tile t : owned) t.cacheUnseen(newOwner);//+til
-        
-        if (reassign) {
-            // Allow other neighbouring settlements a chance to claim
-            // this colony's tiles except for the center.
-            owned.remove(tile);
-            oldOwner.reassignTiles(owned, this);//-til
-
-            // Make sure units are ejected when a tile is claimed.
-            for (Tile t : transform(owned,
-                    t2 -> t2 != tile && t2.getOwningSettlement() != this)) {
-                ColonyTile ct = getColonyTile(t);
-                ejectUnits(ct, ct.getUnitList());
-            }
-            owned.add(tile);
-        }
-        
         changeOwner(newOwner);//-vis(both),-til
-
+        
         String change = (newOwner.isUndead()) ? UnitChangeType.UNDEAD
             : UnitChangeType.CAPTURE;
         List<Unit> units = getAllUnitsList();
@@ -393,8 +377,25 @@ public class ServerColony extends Colony implements TurnTaker {
         updateSoL();
         updateProductionBonus();
 
+        // Allow other neighbouring settlements a chance to claim this
+        // colony's tiles except for the center.  Do this after the
+        // general change of ownership so that neighbouring attacker units
+        // are not seen as tile occupiers that will impeded tile transfers.
+        if (reassign) {
+            owned.remove(tile);
+            oldOwner.reassignTiles(owned, this);//-til
+            owned.add(tile);
+
+            // Make sure units are ejected when a tile is no longer
+            // attached to the settlement.
+            for (Tile t : transform(owned, t2 -> t2.getOwningSettlement() != this)) {
+                ColonyTile ct = getColonyTile(t);
+                ejectUnits(ct, ct.getUnitList());
+            }
+        }
+
         // Always update the new owner
-        unseen.addAll(getOwnedTiles());
+        unseen.addAll(owned);
         cs.add(See.only(newOwner), unseen);
 
         // Always update the old owner, and perhaps others.

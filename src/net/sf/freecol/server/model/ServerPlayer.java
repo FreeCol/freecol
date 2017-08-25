@@ -990,8 +990,10 @@ public class ServerPlayer extends Player implements TurnTaker {
         HashMap<Settlement, Integer> votes = new HashMap<>();
         HashMap<Tile, Settlement> claims = new HashMap<>();
         Settlement claimant;
-        for (Tile t : tiles) t.changeOwnership(null, null);//-til
-        for (Tile tile : transform(tiles, t -> !t.isOccupied())) {
+        for (Tile tile : tiles) {
+            final Player occupier = (tile.getFirstUnit() == null) ? null
+                : tile.getFirstUnit().getOwner();
+            claims.put(tile, null);
             votes.clear();
             for (Tile t : tile.getSurroundingTiles(1)) {
                 claimant = t.getOwningSettlement();
@@ -1002,8 +1004,10 @@ public class ServerPlayer extends Player implements TurnTaker {
                     && !claimant.isDisposed()
                     && claimant.getOwner() != null
                     && claimant.getOwner().canOwnTile(tile)
-                    && (claimant.getOwner().isIndian()
-                        || claimant.getTile().getDistanceTo(tile)
+                    // If there is an occupying unit, only its owner may vote
+                    && (occupier == null || claimant.getOwner() == occupier)
+                    // Claim must be within radius
+                    && (claimant.getTile().getDistanceTo(tile)
                         <= claimant.getRadius())) {
                     // Weight claimant settlements:
                     //   settlements owned by the same player
@@ -1038,12 +1042,10 @@ public class ServerPlayer extends Player implements TurnTaker {
         }
         for (Entry<Tile, Settlement> e : claims.entrySet()) {
             Tile t = e.getKey();
-            if ((claimant = e.getValue()) == null) {
-                t.changeOwnership(null, null);//-til
-            } else {
-                ServerPlayer newOwner = (ServerPlayer)claimant.getOwner();
-                t.changeOwnership(newOwner, claimant);//-til
-            }
+            claimant = e.getValue();
+            ServerPlayer newOwner = (claimant == null) ? null
+                : (ServerPlayer)claimant.getOwner();
+            t.changeOwnership(newOwner, claimant);//-til
         }
     }
 
