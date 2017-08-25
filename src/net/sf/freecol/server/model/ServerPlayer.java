@@ -629,7 +629,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csKill(ChangeSet cs) {
+    private void csKill(ChangeSet cs) {
         setDead(true);
         cs.addPartial(See.all(), this, "dead", Boolean.TRUE.toString());
         cs.add(See.all(), new SetDeadMessage(this));
@@ -668,7 +668,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             Unit u = units.remove(0);
             if (u.hasTile()) cs.add(See.perhaps(), u.getTile());
             ((ServerUnit)u).csRemove(See.perhaps().always(this),
-                u.getLocation(), cs);//-vis(this)
+                                     u.getLocation(), cs);//-vis(this)
         }
 
         // Remove European stuff
@@ -700,20 +700,31 @@ public class ServerPlayer extends Player implements TurnTaker {
     /**
      * Withdraw a player from the new world.
      *
+     * Called from the standard endTurn processing when a player is found
+     * to have died, and from the Spanish Succession routine.
+     *
+     * @param mm A {@code ModelMessage} explaining why the player is leaving,
+     *     or null if the standard death message should be used.
+     * @param he A corresponding {@code HistoryEvent}, or null if the standard
+     *     death message should be used.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csWithdraw(ChangeSet cs) {
-        String key = (isEuropean() && getPlayerType() == PlayerType.COLONIAL)
-            ? "model.player.dead.european"
-            : "model.player.dead.native";
-        cs.addGlobalMessage(getGame(), null,
-            new ModelMessage(MessageType.FOREIGN_DIPLOMACY, key, this)
-                .addStringTemplate("%nation%", getNationLabel()));
-        Game game = getGame();
-        cs.addGlobalHistory(game,
-            new HistoryEvent(game.getTurn(),
-                             HistoryEvent.HistoryEventType.NATION_DESTROYED, null)
-                .addStringTemplate("%nation%", getNationLabel()));
+    public void csWithdraw(ChangeSet cs, ModelMessage mm, HistoryEvent he) {
+        final Game game = getGame();
+        if (mm == null) {
+            final String key = (isEuropean()
+                && getPlayerType() == PlayerType.COLONIAL)
+                ? "model.player.dead.european"
+                : "model.player.dead.native";
+            mm = new ModelMessage(MessageType.FOREIGN_DIPLOMACY, key, this)
+                .addStringTemplate("%nation%", getNationLabel());
+        }
+        if (he == null) {
+            he = new HistoryEvent(game.getTurn(), HistoryEvent.HistoryEventType.NATION_DESTROYED, null)
+                .addStringTemplate("%nation%", getNationLabel());
+        }
+        cs.addGlobalMessage(game, null, mm);
+        cs.addGlobalHistory(game, he);
         csKill(cs);
     }
 

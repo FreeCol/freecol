@@ -2070,17 +2070,15 @@ public final class InGameController extends Controller {
 
             // Remove dead players and retry
             switch (current.checkForDeath()) {
-            case IS_DEAD:
-                current.csWithdraw(cs);
-                logger.info("For " + serverPlayer.getSuffix()
-                    + ", " + current.getNation() + " is dead.");
-                break;
             case IS_DEFEATED:
                 for (Player p : current.getRebels()) {
                     csGiveIndependence(current, (ServerPlayer)p, cs);
                 }
-                current.csWithdraw(cs);
-                logger.info(current.getNation() + " is defeated.");
+                // Fall through
+            case IS_DEAD:
+                current.csWithdraw(cs, null, null);
+                logger.info("For " + serverPlayer.getSuffix()
+                    + ", " + current.getNation() + " has withdrawn.");
                 break;
             case IS_AUTORECRUIT:
                 // Need to autorecruit a unit to keep alive.
@@ -3402,7 +3400,7 @@ public final class InGameController extends Controller {
     public ChangeSet retire(ServerPlayer serverPlayer) {
         boolean highScore = HighScore.newHighScore(serverPlayer);
         ChangeSet cs = new ChangeSet();
-        serverPlayer.csWithdraw(cs); // Clean up the player.
+        serverPlayer.csWithdraw(cs, null, null); // Clean up the player.
         getGame().sendToOthers(serverPlayer, cs);
         cs.addAttribute(See.only(serverPlayer),
                         "highScore", Boolean.toString(highScore));
