@@ -20,6 +20,7 @@
 package net.sf.freecol.server.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -412,15 +413,23 @@ public class ServerColony extends Colony implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csFreeBuilding(BuildingType type, ChangeSet cs) {
-        if (canBuild(type)) {
-            final ServerPlayer owner = (ServerPlayer)getOwner();
-            buildBuilding(new ServerBuilding(getGame(), this, type));//-til
-            checkBuildQueueIntegrity(true, null);
-            cs.add(See.only(owner), this);
-            if (owner.isAI()) {
-                firePropertyChange(Colony.REARRANGE_COLONY, true, false);
-            }
+        if (!canBuild(type)) return;
+        
+        // Does this free building displace an existing one?
+        Building found = getBuilding(type);
+        List<Unit> present = (found == null) ? Collections.<Unit>emptyList()
+            : found.getUnitList();
+        
+        final ServerPlayer owner = (ServerPlayer)getOwner();
+        Building build = new ServerBuilding(getGame(), this, type);
+        buildBuilding(build);//-til
+        checkBuildQueueIntegrity(true, null);
+        cs.add(See.only(owner), this);
+        if (owner.isAI()) {
+            firePropertyChange(Colony.REARRANGE_COLONY, true, false);
         }
+
+        for (Unit u : present) u.setLocation(build);
     }
 
     /**
