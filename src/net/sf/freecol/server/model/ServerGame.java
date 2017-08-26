@@ -132,11 +132,15 @@ public class ServerGame extends Game implements TurnTaker {
      * Get a list of connected server players, optionally excluding
      * supplied ones.
      *
+     * Do *not* restrict this only to live players, dead players still
+     * need to be communicated with (e.g. to tell them they are dead,
+     * or to revive them).
+     *
      * @param serverPlayers The {@code ServerPlayer}s to exclude.
      * @return A list of all connected server players, with exclusions.
      */
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
-        return transform(getLivePlayers(),
+        return transform(getPlayerList(),
                          p -> ((ServerPlayer)p).isConnected()
                              && none(serverPlayers, matchKey((ServerPlayer)p)),
                          p -> (ServerPlayer)p);
