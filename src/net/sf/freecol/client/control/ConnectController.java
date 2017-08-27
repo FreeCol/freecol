@@ -98,12 +98,13 @@ public final class ConnectController extends FreeColClientHolder {
                 logger.info("Connected to " + host + ":" + port
                     + " as " + user);
             } else {
+                logger.warning("Failed to connect to "
+                    + host + ":" + port + " as " + user);
                 err = StringTemplate.template("server.couldNotConnect");
             }
         } catch (Exception ex) {
-            logger.severe("Server could not connect to "
-                    + host + ":" + port
-                    + " as " + user);
+            logger.log(Level.SEVERE, "Exception when connecting to "
+                + host + ":" + port + " as " + user, ex);
             err = FreeCol.errorFromException(ex, "server.couldNotConnect");
         }
         return err;
