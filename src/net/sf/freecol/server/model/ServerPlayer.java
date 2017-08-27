@@ -630,12 +630,14 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csKill(ChangeSet cs) {
+        final Game game = getGame();
+
         setDead(true);
         cs.addPartial(See.all(), this, "dead", Boolean.TRUE.toString());
         cs.add(See.all(), new SetDeadMessage(this));
 
         // Clean up missions and remove tension/alarm/stance.
-        for (Player other : getGame().getLivePlayerList(this)) {
+        for (Player other : game.getLivePlayerList(this)) {
             if (isEuropean() && other.isIndian()) {
                 for (IndianSettlement is : other.getIndianSettlementList()) {
                     ServerIndianSettlement sis = (ServerIndianSettlement)is;
@@ -648,28 +650,44 @@ public class ServerPlayer extends Player implements TurnTaker {
             other.setStance(this, null);
         }
 
+        // All other units must disappear
+        Set<Tile> tiles = new HashSet<>();
+        for (FreeColGameObject fcgo : game.getFreeColGameObjectList()) {
+            if (fcgo instanceof Unit) {
+                Unit u = (Unit)fcgo;
+                if (u.hasTile() && !this.owns(u)) {
+                    Tile t = u.getTile();
+                    cs.addRemove(See.only(this), t, u);
+                    tiles.add(t);
+                }
+            }
+        }
+        cs.add(See.only(this), tiles);
+
         // Remove settlements.  Update formerly owned tiles.
+        tiles.clear();
         List<Settlement> settlements = getSettlementList();
         while (!settlements.isEmpty()) {
             csDisposeSettlement(settlements.remove(0), cs);
         }
 
         // Clean up remaining tile ownerships
-        for (Tile t : transform(getGame().getMap().getAllTiles(),
+        for (Tile t : transform(game.getMap().getAllTiles(),
                                 matchKeyEquals(this, Tile::getOwner))) {
             t.cacheUnseen();//+til
             t.changeOwnership(null, null);//-til
-            cs.add(See.perhaps().always(this), t);
+            tiles.add(t);
         }
 
         // Remove units
         List<Unit> units = getUnitList();
         while (!units.isEmpty()) {
             Unit u = units.remove(0);
-            if (u.hasTile()) cs.add(See.perhaps(), u.getTile());
+            if (u.hasTile()) tiles.add(u.getTile());
             ((ServerUnit)u).csRemove(See.perhaps().always(this),
                                      u.getLocation(), cs);//-vis(this)
         }
+        cs.add(See.perhaps().always(this), tiles);
 
         // Remove European stuff
         if (market != null) {
@@ -725,7 +743,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         }
         cs.addGlobalMessage(game, null, mm);
         cs.addGlobalHistory(game, he);
-        csKill(cs);
+        csKill(cs);//+vis,+til
     }
 
 
