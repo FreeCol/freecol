@@ -525,7 +525,7 @@ public class ServerColony extends Colony implements TurnTaker {
      * @param lb A {@code LogBuilder} to log to.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csWarnings(Random random, LogBuilder lb, ChangeSet cs) {
+    public void csNewTurnWarnings(Random random, LogBuilder lb, ChangeSet cs) {
         final Specification spec = getSpecification();
         final BuildQueue<?>[] queues = new BuildQueue<?>[] {
             this.buildQueue, this.populationQueue };

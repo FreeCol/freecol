@@ -4549,10 +4549,9 @@ outer:  for (Effect effect : effects) {
                     + "(for " + port.getName() + ")");
             }
 
-            for (Settlement settlement : settlements) {
-                if (settlement instanceof ServerColony) {
-                    ((ServerColony)settlement).csWarnings(random, lb, cs);
-                }
+            // Generate warnings once everything is stabilized
+            for (Colony c : getColonyList()) {
+                ((ServerColony)c).csNewTurnWarnings(random, lb, cs);
             }
         }
 

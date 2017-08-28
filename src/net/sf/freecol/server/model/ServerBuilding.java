@@ -220,18 +220,30 @@ public class ServerBuilding extends Building implements TurnTaker {
     public void csCheckMissingInput(ProductionInfo pi, ChangeSet cs) {
         if (canAutoProduce()) return;
         List<AbstractGoods> production = pi.getProduction();
-        if (!production.isEmpty()
-            && all(production, ag -> ag.getAmount() == 0)) {
-            for (GoodsType gt : transform(getInputs(),
-                                          ag -> ag.getAmount() > 0,
-                                          AbstractGoods::getType)) {
-                cs.addMessage(getOwner(),
-                    new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                     "model.building.notEnoughInput",
-                                     this, gt)
-                        .addNamed("%inputGoods%", gt)
-                        .addNamed("%building%", this)
-                        .addName("%colony%", getColony().getName()));
+        if (!production.isEmpty()) {
+            if (all(production, ag -> ag.getAmount() == 0)) {
+                for (GoodsType gt : transform(getInputs(),
+                                              ag -> ag.getAmount() > 0,
+                                              AbstractGoods::getType)) {
+                    cs.addMessage(getOwner(),
+                        new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                         "model.building.noProduction",
+                                         this, gt)
+                            .addNamed("%inputGoods%", gt)
+                            .addNamed("%building%", this)
+                            .addName("%colony%", getColony().getName()));
+                }
+            } else {
+                for (AbstractGoods ag : pi.getConsumptionDeficit()) {
+                    cs.addMessage(getOwner(),
+                        new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                         "model.building.notEnoughInput",
+                                         this, ag.getType())
+                            .addNamed("%building%", this)
+                            .addName("%colony%", getColony().getName())
+                            .addAmount("%number%", ag.getAmount())
+                            .addNamed("%goodsType%", ag.getType()));
+                }
             }
         }
     }
