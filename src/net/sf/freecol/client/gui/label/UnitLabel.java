@@ -29,7 +29,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.Icon;
@@ -58,9 +57,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
-
 import static net.sf.freecol.common.model.Unit.*;
-import static net.sf.freecol.common.util.StringUtils.lastPart;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -397,8 +395,7 @@ public final class UnitLabel extends FreeColLabel
         final InGameController igc = freeColClient.getInGameController();
         String[] args = ae.getActionCommand().split("/");
         GoodsType gt;
-        switch (Enum.valueOf(UnitAction.class,
-                             args[0].toUpperCase(Locale.US))) {
+        switch (Enum.valueOf(UnitAction.class, upCase(args[0]))) {
             case ASSIGN:
                 igc.assignTeacher(unit,
                                   game.getFreeColGameObject(args[1], Unit.class));

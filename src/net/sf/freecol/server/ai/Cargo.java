@@ -21,7 +21,6 @@ package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -42,6 +41,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -359,8 +359,7 @@ public class Cargo {
 
     public String getModeString() {
         CargoMode mode = getMode();
-        return (mode == null) ? "null"
-            : mode.toString().toLowerCase(Locale.US);
+        return (mode == null) ? "null" : downCase(mode.toString());
     }
 
     public int getTurns() {

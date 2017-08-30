@@ -101,7 +101,7 @@ public class StringUtils {
      * @return A suitable key.
      */
     public static String getEnumKey(Enum<?> value) {
-        final String base = value.toString().toLowerCase(Locale.US);
+        final String base = downCase(value.toString());
         final int len = base.length();
         StringBuilder sb = new StringBuilder(len);
         int idx, from = 0;
@@ -222,4 +222,48 @@ public class StringUtils {
         return (s == null || s.length() == 0) ? s
             : s.substring(0, 1).toUpperCase(locale) + s.substring(1);
     }
+
+    /**
+     * Downcase a string in the default locale.
+     *
+     * @param s The {@code String} to convert to lower case.
+     * @return The converted string.
+     */
+    public static String downCase(String s) {
+        return downCase(s, Locale.US);
+    }
+
+    /**
+     * Downcase a string in a specific locale.
+     *
+     * @param s The {@code String} to convert to lower case.
+     * @param locale The {@code Locale} to apply.
+     * @return The converted string.
+     */
+    public static String downCase(String s, Locale locale) {
+        return (s == null || s.length() == 0) ? s : s.toLowerCase(locale);
+    }
+
+    /**
+     * Upcase a string in the default locale.
+     *
+     * @param s The {@code String} to convert to upper case.
+     * @return The converted string.
+     */
+    public static String upCase(String s) {
+        return upCase(s, Locale.US);
+    }
+
+    /**
+     * Upcase a string in a specific locale.
+     *
+     * @param s The {@code String} to convert to upper case.
+     * @param locale The {@code Locale} to apply.
+     * @return The converted string.
+     */
+    public static String upCase(String s, Locale locale) {
+        return (s == null || s.length() == 0) ? s : s.toUpperCase(locale);
+    }
+
+   
 }
