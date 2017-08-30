@@ -267,14 +267,8 @@ public final class FreeCol {
         // Now we have the data directory, establish the base locale.
         // Beware, the locale may change!
         String localeArg = findArg("--default-locale", args);
-        if (localeArg == null) {
-            locale = Locale.getDefault();
-        } else {
-            int index = localeArg.indexOf('.'); // Strip encoding if present
-            if (index > 0) localeArg = localeArg.substring(0, index);
-            locale = Messages.getLocale(localeArg);
-        }
-        Messages.loadMessageBundle(locale);
+        setLocale(localeArg);
+        Messages.loadMessageBundle(getLocale());
         // Now that we can emit error messages, parse the other
         // command line arguments.
         handleArgs(args);
@@ -322,29 +316,27 @@ public final class FreeCol {
             });
 
         // Now we can find the client options, allow the options
-        // setting to override the locale, if no command line option
-        // had been specified.
-        // We have users whose machines default to Finnish but play
-        // FreeCol in English.
+        // setting to override the locale, but only if no command line
+        // option had been specified.  This works for our users who,
+        // say, have machines that default to Finnish but play FreeCol in
+        // English.
+        //
         // If the user has selected automatic language selection, do
         // nothing, since we have already set up the default locale.
-        if (localeArg == null) {
-            String clientLanguage = ClientOptions.getLanguageOption();
-            Locale clientLocale;
-            if (clientLanguage != null
-                && !Messages.AUTOMATIC.equalsIgnoreCase(clientLanguage)
-                && (clientLocale = Messages.getLocale(clientLanguage)) != locale) {
-                locale = clientLocale;
-                Messages.loadMessageBundle(locale);
-                logger.info("Loaded messages for " + locale);
-            }
+        String clientLanguage;
+        if (localeArg == null
+            && (clientLanguage = ClientOptions.getLanguageOption()) != null
+            && !Messages.AUTOMATIC.equalsIgnoreCase(clientLanguage)
+            && setLocale(clientLanguage)) {
+            Messages.loadMessageBundle(getLocale());
+            logger.info("Loaded messages for " + locale);
         }
 
         // Now we have the user mods directory and the locale is now
         // stable, load the TCs, the mods and their messages.
         FreeColTcFile.loadTCs();
         FreeColModFile.loadMods();
-        Messages.loadModMessageBundle(locale);
+        Messages.loadModMessageBundle(getLocale());
 
         // Report on where we are.
         if (userMsg != null) logger.info(Messages.message(userMsg));
@@ -1124,9 +1116,32 @@ public final class FreeCol {
      * @return The {@code Locale} currently in use.
      */
     public static Locale getLocale() {
-        return FreeCol.locale;
+        return (FreeCol.locale == null) ? Locale.getDefault() : FreeCol.locale;
     }
-    
+
+    /**
+     * Set the locale.
+     *
+     * @param localeArg The locale specification, null implies the
+     *     default locale.
+     * @return True if the {@code Locale} changed.
+     */
+    public static boolean setLocale(String localeArg) {
+        Locale newLocale = null;
+        if (localeArg == null) {
+            newLocale = Locale.getDefault();
+        } else {
+            int index = localeArg.indexOf('.'); // Strip encoding if present
+            if (index > 0) localeArg = localeArg.substring(0, index);
+            newLocale = Messages.getLocale(localeArg);
+        }
+        if (newLocale != FreeCol.locale) {
+            FreeCol.locale = newLocale;
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Gets the current revision of game.
      *

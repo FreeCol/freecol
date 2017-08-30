@@ -19,10 +19,11 @@
 
 package net.sf.freecol.client;
 
+import java.util.logging.Logger;
+
 import static org.junit.Assert.*;
 
-import java.util.Locale;
-import java.util.logging.Logger;
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.i18n.Messages;
@@ -47,8 +48,8 @@ public class ClientTestHelper {
         FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
         FreeColDebugger.setDebugRunTurns(1);
 
-        Locale locale = Locale.getDefault();
-        Messages.loadMessageBundle(locale);
+        FreeCol.setLocale(null);
+        Messages.loadMessageBundle(FreeCol.getLocale());
 
         logger.info("Debug value: " + FreeColDebugger.isInDebugMode());
 
