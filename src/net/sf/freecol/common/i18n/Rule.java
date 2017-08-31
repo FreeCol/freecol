@@ -21,10 +21,10 @@ package net.sf.freecol.common.i18n;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.StringTokenizer;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -71,7 +71,7 @@ public class Rule {
      * @param input a {@code String} value
      */
     public final void parse(String input) {
-        StringTokenizer st = new StringTokenizer(input.toLowerCase(Locale.US), " .");
+        StringTokenizer st = new StringTokenizer(downCase(input), " .");
         List<String> tokens = new ArrayList<>();
         while (st.hasMoreTokens()) {
             String token = st.nextToken();

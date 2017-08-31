@@ -29,7 +29,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
 import java.util.Collection;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +44,7 @@ import javax.xml.transform.stream.StreamSource;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -375,7 +375,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     public void writeAttribute(String attributeName, Enum<?> value)
         throws XMLStreamException {
         xmlStreamWriter.writeAttribute(attributeName,
-            value.toString().toLowerCase(Locale.US));
+                                       downCase(value.toString()));
     }
 
     /**

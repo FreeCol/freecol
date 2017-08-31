@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,6 +52,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIMain;
 
@@ -557,8 +557,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         T result = defaultValue;
         if (attrib != null) {
             try {
-                result = Enum.valueOf(returnClass,
-                                      attrib.toUpperCase(Locale.US));
+                result = Enum.valueOf(returnClass, upCase(attrib));
             } catch (Exception e) {
                 logger.warning(attributeName + " is not a "
                     + returnClass.getName() + ": " + attrib);

@@ -26,7 +26,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -35,6 +34,7 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Player;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -150,8 +150,7 @@ public class FreeColDebugger {
 
         for (String s : optionValue.split(",")) {
             try {
-                DebugMode mode = Enum.valueOf(DebugMode.class,
-                                              s.toUpperCase(Locale.US));
+                DebugMode mode = Enum.valueOf(DebugMode.class, upCase(s));
                 enableDebugMode(mode);
             } catch (RuntimeException e) {
                 logger.warning("Unrecognized debug mode: " + optionValue);
