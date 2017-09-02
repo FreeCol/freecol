@@ -817,9 +817,11 @@ public class Messages {
                 if (template == null) {
                     selector = "default";
                 } else {
-                    StringTemplate replacement = template.getReplacement(selector);
+                    StringTemplate replacement
+                        = template.getReplacement(selector);
                     if (replacement == null) {
-                        logger.warning("Failed to find replacement for " + selector);
+                        logger.warning("Failed to find replacement for "
+                            + selector);
                         continue;
                     } else {
                         selector = message(replacement);
@@ -841,9 +843,11 @@ public class Messages {
                 String otherKey = input.substring(pipeIndex + 1, closeChoice);
                 if (otherKey.startsWith("%") && otherKey.endsWith("%")
                     && template != null) {
-                    StringTemplate replacement = template.getReplacement(otherKey);
+                    StringTemplate replacement
+                        = template.getReplacement(otherKey);
                     if (replacement == null) {
-                        logger.warning("Failed to find replacement for " + otherKey);
+                        logger.warning("Failed to find replacement for "
+                            + selector + "/" + otherKey);
                         continue;
                     } else if (replacement.getTemplateType() == TemplateType.KEY) {
                         otherKey = messageBundle.get(replacement.getId());
@@ -854,25 +858,29 @@ public class Messages {
                         } else {
                             keyIndex = otherKey.indexOf(selector, keyIndex);
                             if (keyIndex < 0) {
-                                logger.warning("Failed to find key " + selector + " in replacement "
-                                               + replacement.getId());
+                                logger.warning("Failed to find key "
+                                    + selector + "/" + otherKey
+                                    + " in replacement " + replacement);
                                 continue;
                             } else {
                                 result.append(getChoice(otherKey, selector));
                             }
                         }
                     } else {
-                        logger.warning("Choice substitution attempted, but template type was "
-                                       + replacement.getTemplateType());
+                        logger.warning("Choice substitution for "
+                            + selector + "/" + otherKey
+                            + " attempted, but template was " + replacement
+                            + " for input " + input);
                         continue;
                     }
                 } else if (containsKey(otherKey)) {
                     otherKey = getChoice(messageBundle.get(otherKey), selector);
                     result.append(otherKey);
                 } else {
-                    logger.warning("Unknown key or untagged choice: '" + otherKey
-                                   + "', selector was '" + selector
-                                   + "', trying 'default' instead");
+                    logger.warning("Unknown key or untagged choice: '"
+                        + otherKey
+                        + "', selector was '" + selector
+                        + "', trying 'default' instead");
                     int defaultStart = otherKey.indexOf("default=");
                     if (defaultStart >= 0) {
                         defaultStart += 8;

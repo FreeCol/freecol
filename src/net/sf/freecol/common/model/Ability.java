@@ -139,6 +139,10 @@ public final class Ability extends Feature {
     public static final String CAN_BE_EQUIPPED
         = "model.ability.canBeEquipped";
 
+    /** The ability of certain REF units to surrender on defeat. */
+    public static final String CAN_BE_SURRENDERED
+        = "model.ability.canBeSurrendered";
+
     /** The ability of a player to recruit units. */
     public static final String CAN_RECRUIT_UNIT
         = "model.ability.canRecruitUnit";

@@ -758,7 +758,10 @@ public final class Specification {
      */
     public boolean mergeGameOptions(OptionGroup newGameOptions, String who) {
         OptionGroup go = getGameOptions();
-        if (!go.merge(newGameOptions)) return false;
+        LogBuilder lb = new LogBuilder(64);
+        boolean ret = go.merge(newGameOptions, lb);
+        lb.shrink("\n"); lb.log(logger, Level.FINEST);
+        if (!ret) return false;
         addOptionGroup(go, true); // make sure allOptions is seeing any changes
         clean("merged game options (" + who + ")");
         return true;
@@ -775,7 +778,10 @@ public final class Specification {
     public boolean mergeMapGeneratorOptions(OptionGroup newMapGeneratorOptions,
                                             String who) {
         OptionGroup go = getMapGeneratorOptions();
-        if (!go.merge(newMapGeneratorOptions)) return false;
+        LogBuilder lb = new LogBuilder(64);
+        boolean ret = go.merge(newMapGeneratorOptions, lb);
+        lb.shrink("\n"); lb.log(logger, Level.FINEST);
+        if (!ret) return false;
         addOptionGroup(go, true); // make sure allOptions is seeing any changes
         clean("merged map options (" + who + ")");
         return true;
@@ -2099,7 +2105,7 @@ public final class Specification {
     private void fixRoles() {
         if (!roles.isEmpty()) return; // Trust what is there
 
-        if (compareVersion("0.86") >= 0) return;
+        if (compareVersion("0.85") > 0) return;
 
         File rolf = FreeColDirectories.getCompatibilityFile(ROLES_COMPAT_FILE_NAME);
         try (
@@ -2123,7 +2129,7 @@ public final class Specification {
         // Unlike roles, we can not trust what is already there, as the changes
         // are deeper.
 
-        if (compareVersion("0.117") >= 0) return;
+        if (compareVersion("0.116") > 0) return;
 
         unitChangeTypeList.clear();
         File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
@@ -2328,6 +2334,31 @@ public final class Specification {
             Ability uc = new Ability(Ability.UPGRADE_CONVERT, casas, true);
             addAbility(uc);
             casas.addAbility(uc);
+        }
+
+        // Added mercenary-price to manOWar
+        UnitType mow = getUnitType("model.unit.manOWar");
+        if (mow != null && mow.getMercenaryPrice() < 0) {
+            mow.setMercenaryPrice(10000);
+        }
+        // Old manOWars required independenceDeclared which was moved to
+        // independentNation a while back, but surfaced again in old games
+        final String maidId = "model.ability.independenceDeclared";
+        if (mow != null && mow.requiresAbility(maidId)) {
+            mow.removeRequiredAbility(maidId);
+            mow.addRequiredAbility(Ability.INDEPENDENT_NATION, true);
+        }
+        
+        // Added canBeSurrendered ability to all the REF units.
+        // REF Units are the units that can be *added* to the REF.
+        // The REF can capture other units, but they can all automatically
+        // be surrendered, whereas of the actual REF units, only the artillery
+        // can be handed over to the victorious independent nation.
+        for (UnitType ut : getUnitTypesWithAbility(Ability.REF_UNIT)) {
+            if (!ut.containsAbilityKey(Ability.CAN_BE_SURRENDERED)) {
+                ut.addAbility(new Ability(Ability.CAN_BE_SURRENDERED, null,
+                        ut.getId().equals("model.unit.artillery")));
+            }
         }
         // end @compat 0.11.6
     }

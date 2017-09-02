@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.118">
+<freecol-specification id="classic" version="0.119">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -2072,6 +2072,8 @@
                value="true"/>
       <ability id="model.ability.disposeOnAllEquipLost"
                value="true"/>
+      <ability id="model.ability.canBeSurrendered"
+               value="false"/>
       <ability id="model.ability.expertSoldier"
                value="true"/>
       <modifier id="model.modifier.offence" index="20"
@@ -2124,7 +2126,7 @@
       <required-goods id="model.goods.tools"
                       value="100"/>
     </unit-type>
-    <unit-type id="model.unit.manOWar" extends="ship"
+    <unit-type id="model.unit.manOWar" extends="ship" mercenary-price="10000"
                offence="24" defence="24" movement="18"
                line-of-sight="2" space="6" spaceTaken="64" hit-points="6"
                score-value="8">
@@ -2135,6 +2137,8 @@
       <required-ability id="model.ability.independentNation"/>
       <ability id="model.ability.refUnit"
                value="true"/>
+      <ability id="model.ability.canBeSurrendered"
+               value="false"/>
       <ability id="model.ability.captureGoods"
                value="true"/>
     </unit-type>
@@ -2172,6 +2176,8 @@
       <required-goods id="model.goods.tools"
                       value="40"/>
       <ability id="model.ability.refUnit"
+               value="true"/>
+      <ability id="model.ability.canBeSurrendered"
                value="true"/>
       <ability id="model.ability.captureUnits"
                value="true"/>
@@ -2973,6 +2979,13 @@
                value="true"/>
       <ability id="model.ability.foundsColonies"
                value="true"/>
+    </european-nation-type>
+    <!-- really special nation type for option use *only*, needed so
+         that the missionary role is available to units in unit list
+         options -->         
+    <european-nation-type id="model.nationType.optionOnly"
+                          extends="model.nationType.default">
+      <ability id="model.ability.dressMissionary" value="true"/>
     </european-nation-type>
     <!-- default REF nation -->
     <european-nation-type id="model.nationType.ref" ref="true">
@@ -4265,7 +4278,7 @@
           <unitListOption id="model.option.immigrants" maximumNumber="999">
             <template>
               <unitOption id="model.option.immigrants.template"
-                          nationType="model.nationType.default">
+                          nationType="model.nationType.optionOnly">
                 <unitType value="model.unit.freeColonist" generate="immigrants" />
                 <role value="model.role.default">
                   <choice value="model.role.default"/>

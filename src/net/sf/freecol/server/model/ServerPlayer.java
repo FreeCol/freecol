@@ -122,10 +122,13 @@ public class ServerPlayer extends Player implements TurnTaker {
     public static final int ALARM_RADIUS = 2;
     public static final int ALARM_TILE_IN_USE = 2;
 
-    // checkForDeath results
-    public static final int IS_DEAD = -1;
-    public static final int IS_ALIVE = 0;
-    public static final int AUTORECRUIT = 1;
+    // checkForDeath result type
+    public static enum DeadCheck {
+        IS_DEAD,
+        IS_DEFEATED,
+        IS_AUTORECRUIT,
+        IS_ALIVE
+    };
 
     // Penalty for destroying a settlement (Col1)
     public static final int SCORE_SETTLEMENT_DESTROYED = -5;
@@ -446,12 +449,12 @@ public class ServerPlayer extends Player implements TurnTaker {
     /**
      * Checks if this player has died.
      *
-     * @return Negative if the player is dead, zero if they are ok,
-     *      positive non-zero if the server should auto-recruit
-     *      colonist units to keep this player alive.
+     * @return The appropriate {@code DeadCheck} value.
      */
-    public int checkForDeath() {
-        if (isUnknownEnemy()) return IS_ALIVE;
+    public DeadCheck checkForDeath() {
+        // Quickly ensure the unknown enemy is immortal.
+        if (isUnknownEnemy()) return DeadCheck.IS_ALIVE;
+
         final Specification spec = getGame().getSpecification();
         /*
          * Die if: (isNative && (no colonies or units))
@@ -462,7 +465,8 @@ public class ServerPlayer extends Player implements TurnTaker {
          */
         switch (getPlayerType()) {
         case NATIVE: // All natives units are viable
-            return (getUnitCount() == 0) ? IS_DEAD : IS_ALIVE;
+            return (getUnitCount() == 0) ? DeadCheck.IS_DEAD
+                : DeadCheck.IS_ALIVE;
 
         case COLONIAL: // Handle the hard case below
             break;
@@ -470,26 +474,27 @@ public class ServerPlayer extends Player implements TurnTaker {
         case REBEL: case INDEPENDENT:
             // Post-declaration European player needs a coastal colony
             // and can not hope for resupply from Europe.
-            return (getNumberOfPorts() > 0) ? IS_ALIVE : IS_DEAD;
+            return (getNumberOfPorts() > 0) ? DeadCheck.IS_ALIVE
+                : DeadCheck.IS_DEAD;
 
         case ROYAL:
-            return (getRebels().isEmpty()) ? IS_DEAD : IS_ALIVE;
+            return (checkForREFDefeat()) ? DeadCheck.IS_DEFEATED
+                : DeadCheck.IS_ALIVE;
 
         case UNDEAD:
-            return (getUnitCount() == 0) ? IS_DEAD : IS_ALIVE;
+            return (getUnitCount() == 0) ? DeadCheck.IS_DEAD
+                : DeadCheck.IS_ALIVE;
 
         default:
             throw new IllegalStateException("Bogus player type");
         }
 
         // Quick check for a colony.  Do not log, this is the common case.
-        if (any(getColonies())) return IS_ALIVE;
+        if (any(getColonies())) return DeadCheck.IS_ALIVE;
 
         // Do not kill the observing player during a debug run.
-        if (!isAI() && FreeColDebugger.getDebugRunTurns() >= 0) return IS_ALIVE;
-
-        // Do not kill the unknown enemy!
-        if (isUnknownEnemy()) return IS_ALIVE;
+        if (!isAI() && FreeColDebugger.getDebugRunTurns() >= 0)
+            return DeadCheck.IS_ALIVE;
 
         // Traverse player units, look for valid carriers, colonists,
         // carriers with units, carriers with goods.
@@ -512,14 +517,14 @@ public class ServerPlayer extends Player implements TurnTaker {
                 if (carrier.hasTile()) {
                     logger.info(getName() + " alive, unit " + unit.getId()
                         + " (embarked) on map.");
-                    return IS_ALIVE;
+                    return DeadCheck.IS_ALIVE;
                 }
                 hasEmbarked = true;
             }
             if (unit.hasTile() && !unit.isInMission()) {
                 logger.info(getName() + " alive, unit " + unit.getId()
                     + " on map.");
-                return IS_ALIVE;
+                return DeadCheck.IS_ALIVE;
             }
         }
         // The player does not have any valid units or settlements on the map.
@@ -529,17 +534,17 @@ public class ServerPlayer extends Player implements TurnTaker {
             // After the season cutover year there must be a presence
             // in the New World.
             logger.info(getName() + " dead, no presence >= " + mandatory);
-            return IS_DEAD;
+            return DeadCheck.IS_DEAD;
         }
 
         // No problems, unit available on carrier but off map, or goods
         // available to be sold.
         if (hasEmbarked) {
             logger.info(getName() + " alive, has embarked unit.");
-            return IS_ALIVE;
+            return DeadCheck.IS_ALIVE;
         } else if (hasGoods) {
             logger.info(getName() + " alive, has cargo.");
-            return IS_ALIVE;
+            return DeadCheck.IS_ALIVE;
         }
 
         // It is necessary to still have a carrier.
@@ -555,7 +560,7 @@ public class ServerPlayer extends Player implements TurnTaker {
                       unitPricer);
             if (price == Integer.MAX_VALUE || !checkGold(price)) {
                 logger.info(getName() + " dead, can not buy carrier.");
-                return IS_DEAD;
+                return DeadCheck.IS_DEAD;
             }
             goldNeeded += price;
         }
@@ -563,10 +568,10 @@ public class ServerPlayer extends Player implements TurnTaker {
         // A colonist is required.
         if (hasColonist) {
             logger.info(getName() + " alive, has waiting colonist.");
-            return IS_ALIVE;
+            return DeadCheck.IS_ALIVE;
         } else if (europe == null) {
             logger.info(getName() + " dead, can not recruit.");
-            return IS_DEAD;
+            return DeadCheck.IS_DEAD;
         }
         UnitType unitType = null;
         int price = Math.min(europe.getCurrentRecruitPrice(),
@@ -575,13 +580,13 @@ public class ServerPlayer extends Player implements TurnTaker {
         goldNeeded += price;
         if (checkGold(goldNeeded)) {
             logger.info(getName() + " alive, can buy colonist.");
-            return IS_ALIVE;
+            return DeadCheck.IS_ALIVE;
         }
 
         // Col1 auto-recruits a unit in Europe if you run out before
         // the cutover year.
         logger.info(getName() + " survives by autorecruit.");
-        return AUTORECRUIT;
+        return DeadCheck.IS_AUTORECRUIT;
     }
 
     /**
@@ -624,13 +629,15 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csKill(ChangeSet cs) {
+    private void csKill(ChangeSet cs) {
+        final Game game = getGame();
+
         setDead(true);
         cs.addPartial(See.all(), this, "dead", Boolean.TRUE.toString());
         cs.add(See.all(), new SetDeadMessage(this));
 
         // Clean up missions and remove tension/alarm/stance.
-        for (Player other : getGame().getLivePlayerList(this)) {
+        for (Player other : game.getLivePlayerList(this)) {
             if (isEuropean() && other.isIndian()) {
                 for (IndianSettlement is : other.getIndianSettlementList()) {
                     ServerIndianSettlement sis = (ServerIndianSettlement)is;
@@ -643,28 +650,44 @@ public class ServerPlayer extends Player implements TurnTaker {
             other.setStance(this, null);
         }
 
+        // All other units must disappear
+        Set<Tile> tiles = new HashSet<>();
+        for (FreeColGameObject fcgo : game.getFreeColGameObjectList()) {
+            if (fcgo instanceof Unit) {
+                Unit u = (Unit)fcgo;
+                if (u.hasTile() && !this.owns(u)) {
+                    Tile t = u.getTile();
+                    cs.addRemove(See.only(this), t, u);
+                    tiles.add(t);
+                }
+            }
+        }
+        cs.add(See.only(this), tiles);
+
         // Remove settlements.  Update formerly owned tiles.
+        tiles.clear();
         List<Settlement> settlements = getSettlementList();
         while (!settlements.isEmpty()) {
             csDisposeSettlement(settlements.remove(0), cs);
         }
 
         // Clean up remaining tile ownerships
-        for (Tile t : transform(getGame().getMap().getAllTiles(),
+        for (Tile t : transform(game.getMap().getAllTiles(),
                                 matchKeyEquals(this, Tile::getOwner))) {
             t.cacheUnseen();//+til
             t.changeOwnership(null, null);//-til
-            cs.add(See.perhaps().always(this), t);
+            tiles.add(t);
         }
 
         // Remove units
         List<Unit> units = getUnitList();
         while (!units.isEmpty()) {
             Unit u = units.remove(0);
-            if (u.hasTile()) cs.add(See.perhaps(), u.getTile());
+            if (u.hasTile()) tiles.add(u.getTile());
             ((ServerUnit)u).csRemove(See.perhaps().always(this),
-                u.getLocation(), cs);//-vis(this)
+                                     u.getLocation(), cs);//-vis(this)
         }
+        cs.add(See.perhaps().always(this), tiles);
 
         // Remove European stuff
         if (market != null) {
@@ -695,21 +718,32 @@ public class ServerPlayer extends Player implements TurnTaker {
     /**
      * Withdraw a player from the new world.
      *
+     * Called from the standard endTurn processing when a player is found
+     * to have died, and from the Spanish Succession routine.
+     *
+     * @param mm A {@code ModelMessage} explaining why the player is leaving,
+     *     or null if the standard death message should be used.
+     * @param he A corresponding {@code HistoryEvent}, or null if the standard
+     *     death message should be used.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csWithdraw(ChangeSet cs) {
-        String key = (isEuropean() && getPlayerType() == PlayerType.COLONIAL)
-            ? "model.player.dead.european"
-            : "model.player.dead.native";
-        cs.addGlobalMessage(getGame(), null,
-            new ModelMessage(MessageType.FOREIGN_DIPLOMACY, key, this)
-                .addStringTemplate("%nation%", getNationLabel()));
-        Game game = getGame();
-        cs.addGlobalHistory(game,
-            new HistoryEvent(game.getTurn(),
-                             HistoryEvent.HistoryEventType.NATION_DESTROYED, null)
-                .addStringTemplate("%nation%", getNationLabel()));
-        csKill(cs);
+    public void csWithdraw(ChangeSet cs, ModelMessage mm, HistoryEvent he) {
+        final Game game = getGame();
+        if (mm == null) {
+            final String key = (isEuropean()
+                && getPlayerType() == PlayerType.COLONIAL)
+                ? "model.player.dead.european"
+                : "model.player.dead.native";
+            mm = new ModelMessage(MessageType.FOREIGN_DIPLOMACY, key, this)
+                .addStringTemplate("%nation%", getNationLabel());
+        }
+        if (he == null) {
+            he = new HistoryEvent(game.getTurn(), HistoryEvent.HistoryEventType.NATION_DESTROYED, null)
+                .addStringTemplate("%nation%", getNationLabel());
+        }
+        cs.addGlobalMessage(game, null, mm);
+        cs.addGlobalHistory(game, he);
+        csKill(cs);//+vis,+til
     }
 
 
@@ -985,8 +1019,10 @@ public class ServerPlayer extends Player implements TurnTaker {
         HashMap<Settlement, Integer> votes = new HashMap<>();
         HashMap<Tile, Settlement> claims = new HashMap<>();
         Settlement claimant;
-        for (Tile t : tiles) t.changeOwnership(null, null);//-til
-        for (Tile tile : transform(tiles, t -> !t.isOccupied())) {
+        for (Tile tile : tiles) {
+            final Player occupier = (tile.getFirstUnit() == null) ? null
+                : tile.getFirstUnit().getOwner();
+            claims.put(tile, null);
             votes.clear();
             for (Tile t : tile.getSurroundingTiles(1)) {
                 claimant = t.getOwningSettlement();
@@ -997,8 +1033,10 @@ public class ServerPlayer extends Player implements TurnTaker {
                     && !claimant.isDisposed()
                     && claimant.getOwner() != null
                     && claimant.getOwner().canOwnTile(tile)
-                    && (claimant.getOwner().isIndian()
-                        || claimant.getTile().getDistanceTo(tile)
+                    // If there is an occupying unit, only its owner may vote
+                    && (occupier == null || claimant.getOwner() == occupier)
+                    // Claim must be within radius
+                    && (claimant.getTile().getDistanceTo(tile)
                         <= claimant.getRadius())) {
                     // Weight claimant settlements:
                     //   settlements owned by the same player
@@ -1033,12 +1071,10 @@ public class ServerPlayer extends Player implements TurnTaker {
         }
         for (Entry<Tile, Settlement> e : claims.entrySet()) {
             Tile t = e.getKey();
-            if ((claimant = e.getValue()) == null) {
-                t.changeOwnership(null, null);//-til
-            } else {
-                ServerPlayer newOwner = (ServerPlayer)claimant.getOwner();
-                t.changeOwnership(newOwner, claimant);//-til
-            }
+            claimant = e.getValue();
+            ServerPlayer newOwner = (claimant == null) ? null
+                : (ServerPlayer)claimant.getOwner();
+            t.changeOwnership(newOwner, claimant);//-til
         }
     }
 
@@ -1057,31 +1093,30 @@ public class ServerPlayer extends Player implements TurnTaker {
      */
     public List<Unit> createUnits(List<AbstractUnit> abstractUnits,
                                   Location location) {
-        if (location == null) return Collections.<Unit>emptyList();
-        List<Unit> units = new ArrayList<>();
-
         final Game game = getGame();
         final Specification spec = game.getSpecification();
+        List<Unit> units = new ArrayList<>();
+        LogBuilder lb = new LogBuilder(32);
+        lb.add("createUnits for ", this, " at ", location);
         for (AbstractUnit au : abstractUnits) {
             UnitType type = au.getType(spec);
             Role role = au.getRole(spec);
             if (!type.isAvailableTo(this)) {
-                logger.warning("Ignoring abstract unit " + au
-                    + " unavailable to: " + getId());
+                lb.add(" ignoring type-unavailable ", au);
                 continue;
             }
             if (!role.isAvailableTo(this, type)) {
-                logger.warning("Ignoring abstract unit " + au
-                    + " with role " + role
-                    + " unavailable to: " + getId());
+                lb.add(" ignoring role-unavailable ", au);
                 continue;
             }
             for (int i = 0; i < au.getNumber(); i++) {
                 ServerUnit su = new ServerUnit(game, location, this, type,
                                                role);//-vis(this)
                 units.add(su);
+                lb.add(' ', su);
             }
         }
+        lb.log(logger, Level.FINEST);
         return units;
     }
 
@@ -1100,17 +1135,20 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @param landUnits A list of land units to put on ships.
      * @param navalUnits A list of ships to put land units on.
-     * @param random A pseudo-random number source.
+     * @param random An optional pseudo-random number source.
      * @return a list of units left over
      */
     public List<Unit> loadShips(List<Unit> landUnits,
                                 List<Unit> navalUnits,
                                 Random random) {
         List<Unit> leftOver = new ArrayList<>();
-        randomShuffle(logger, "Naval load", navalUnits, random);
-        randomShuffle(logger, "Land load", landUnits, random);
+        if (random != null) {
+            randomShuffle(logger, "Naval load", navalUnits, random);
+            randomShuffle(logger, "Land load", landUnits, random);
+        }
         LogBuilder lb = new LogBuilder(256);
-        lb.mark();
+        lb.add("Load ", navalUnits.size(), " ships with ", landUnits.size(),
+            " land units: ");
         for (Unit unit : landUnits) {
             Unit carrier = find(navalUnits, u -> u.canAdd(unit));
             if (carrier != null) {
@@ -1120,38 +1158,8 @@ public class ServerPlayer extends Player implements TurnTaker {
                 leftOver.add(unit);
             }
         }
-        if (lb.grew("Load ships: ")) {
-            lb.shrink(", ");
-            lb.log(logger, Level.FINEST);
-        }        
+        lb.log(logger, Level.FINEST);
         return leftOver;
-    }
-
-    /**
-     * Simpler frontend to loadShips.
-     *
-     * @param units The {@code Unit}s to load.
-     * @return The left over units.
-     */
-    public List<Unit> loadShips(List<Unit> units) {
-        List<Unit> landUnits = new ArrayList<Unit>();
-        List<Unit> navalUnits = new ArrayList<Unit>();
-        for (Unit u : units) {
-            if (u.isNaval()) navalUnits.add(u); else landUnits.add(u);
-        }
-        return loadShips(landUnits, navalUnits, null);
-    }
-
-    /**
-     * Calculates the price of a group of mercenaries for this player.
-     *
-     * @param mercenaries A list of mercenaries to price.
-     * @return The price.
-     */
-    public int priceMercenaries(List<AbstractUnit> mercenaries) {
-        int mercPrice = sum(mercenaries, au -> getPrice(au));
-        if (!checkGold(mercPrice)) mercPrice = getGold();
-        return mercPrice;
     }
 
     /**
@@ -3252,7 +3260,7 @@ outer:  for (Effect effect : effects) {
                                  attacker)
                     .addStringTemplate("%nation%", nativeNation));
         }
-        if (nativePlayer.checkForDeath() == IS_DEAD) {
+        if (nativePlayer.checkForDeath() == DeadCheck.IS_DEAD) {
             h = new HistoryEvent(game.getTurn(),
                 HistoryEvent.HistoryEventType.DESTROY_NATION, this)
                     .addStringTemplate("%nation%", attackerNation)
@@ -3865,7 +3873,8 @@ outer:  for (Effect effect : effects) {
                 .addStringTemplate("%unit%", loser.getLabel())
                 .addStringTemplate("%enemyNation%", winnerNation)
                 .addStringTemplate("%enemyUnit%", winner.getLabel()));
-        if (loserPlayer.isIndian() && loserPlayer.checkForDeath() == IS_DEAD) {
+        if (loserPlayer.isIndian()
+            && loserPlayer.checkForDeath() == DeadCheck.IS_DEAD) {
             StringTemplate nativeNation = loserPlayer.getNationLabel();
             cs.addGlobalHistory(getGame(),
                 new HistoryEvent(getGame().getTurn(),
@@ -4016,17 +4025,17 @@ outer:  for (Effect effect : effects) {
     /**
      * Add an independent (non-monarch) mercenary offer to the player.
      *
+     * @param price The price to charge for the mercenaries.
      * @param mercenaries A list of mercenary units.
      * @param action The monarch action that caused the offer.
      * @param random A pseudo-random number source.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csMercenaries(List<AbstractUnit> mercenaries,
+    public void csMercenaries(int price, List<AbstractUnit> mercenaries,
                               Monarch.MonarchAction action,
                               Random random, ChangeSet cs) {
-        if (mercenaries.isEmpty()) return;
+        if (price <= 0 || mercenaries.isEmpty()) return;
         final int n = NameCache.getMercenaryLeaderIndex(random);
-        final int price = priceMercenaries(mercenaries);
         cs.add(See.only(this),
                new MonarchActionMessage(action, StringTemplate
                    .template(action.getTextKey())
@@ -4068,8 +4077,11 @@ outer:  for (Effect effect : effects) {
                                  ChangeSet cs) {
         if (checkGold(price)) {
             final Specification spec = getSpecification();
-            List<AbstractUnit> naval
-                = transform(mercs, au -> au.getType(spec).isNaval());
+            final Predicate<AbstractUnit> isNaval = au ->
+                au.getType(spec).isNaval();
+            final Predicate<AbstractUnit> isLand = au ->
+                !au.getType(spec).isNaval();
+            List<AbstractUnit> naval = transform(mercs, isNaval);
             Tile dst;
             if (naval.isEmpty()) { // Deliver to first settlement
                 dst = first(getColonies()).getTile();
@@ -4077,7 +4089,9 @@ outer:  for (Effect effect : effects) {
                 cs.add(See.only(this), dst);
             } else { // Let them sail in
                 dst = getEntryLocation().getTile();
-                loadShips(createUnits(mercs, dst));//-vis
+                loadShips(createUnits(transform(mercs, isLand), null),
+                          createUnits(naval, dst),//-vis
+                          null);
                 invalidateCanSeeTiles();//+vis(this)
                 cs.add(See.perhaps(), dst);
             }
@@ -4085,10 +4099,10 @@ outer:  for (Effect effect : effects) {
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "model.player.mercenariesArrived", this)
                     .addStringTemplate("%location%",
-                        dst.up().getLocationLabelFor(this)));
+                                       dst.up().getLocationLabelFor(this)));
             modifyGold(-price);
             cs.addPartial(See.only(this), this,
-                "gold", String.valueOf(this.getGold()));
+                          "gold", String.valueOf(this.getGold()));
         } else {
             getMonarch().setDispleasure(true);
             cs.add(See.only(this),

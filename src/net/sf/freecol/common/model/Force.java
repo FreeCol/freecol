@@ -240,7 +240,26 @@ public class Force extends FreeColSpecObject {
             (naval) ? this.navalUnits : this.landUnits);
     }
 
-                    
+    /**
+     * Defend against underprovisioned navies.
+     */
+    public boolean prepareToBoard() {
+        if (this.navalUnits.isEmpty()) return false;
+        updateSpaceAndCapacity();
+        AbstractUnit ship0 = this.navalUnits.get(0);
+        int n = ship0.getNumber(),
+            sp = ship0.getType(getSpecification()).getSpace(),
+            space = getSpaceRequired(),
+            capacity = getCapacity();
+        while (space > capacity) {
+            n++;
+            ship0.setNumber(n);
+            capacity += sp;
+        }
+        return true;
+    }
+        
+
     // Override FreeColObject
 
     /**

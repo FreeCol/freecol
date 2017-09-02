@@ -218,8 +218,8 @@ public class ColonyTile extends WorkLocation {
             }
 
             // Tile type change.
-            final Stream<AbstractGoods> newProd
-                = newType.getPossibleProduction(true);
+            final List<AbstractGoods> newProd
+                = toList(newType.getPossibleProduction(true));
             int food = sum(newProd, AbstractGoods::isFoodType,
                            AbstractGoods::getAmount);
             // Get the current food production.  Otherwise for goods
@@ -244,9 +244,13 @@ public class ColonyTile extends WorkLocation {
             return food;
         }
 
-        // Units are present, see what the change would do to their work.
+        // Units present?
+        final Unit unit = getFirstUnit();
+        if (unit == null) return 0;
+
+        // See what the change would do to their work.
         final GoodsType work = getCurrentWorkType();
-        final UnitType unitType = getFirstUnit().getType();
+        final UnitType unitType = unit.getType();
         return (work == null) // No work, improvement does nothing
             ? 0
             : (newType == null) // No tile change, but return the new bonus

@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Force;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -107,7 +108,7 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GameEndedMessage;
 import net.sf.freecol.common.networking.GameStateMessage;
-import net.sf.freecol.common.networking.HighScoreMessage;
+import net.sf.freecol.common.networking.HighScoresMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
@@ -123,6 +124,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 import net.sf.freecol.server.FreeColServer;
@@ -366,18 +368,22 @@ public final class InGameController extends Controller {
 
         // Instantiate the REF in Europe
         Force exf = monarch.getExpeditionaryForce();
-        // Defend against underprovisioned navies
-        UnitType ut = monarch.getNavalREFUnitType();
-        while (exf.getSpaceRequired() > exf.getCapacity()) {
-            AbstractUnit au
-                = new AbstractUnit(ut, Specification.DEFAULT_ROLE_ID, 1);
-            exf.add(au);
+        if (!exf.prepareToBoard()) {
+            logger.warning("Unable to ensure space for the REF land units.");
+            // For now, do not fail completely
         }
         List<Unit> landUnits = refPlayer.createUnits(exf.getLandUnitsList(),
                                                      europe);//-vis: safe!map
         List<Unit> navalUnits = refPlayer.createUnits(exf.getNavalUnitsList(),
                                                       europe);//-vis: safe!map
-        refPlayer.loadShips(landUnits, navalUnits, random);//-vis: safe!map
+        List<Unit> leftOver = refPlayer.loadShips(landUnits, navalUnits,
+                                                  random);//-vis: safe!map
+        if (!leftOver.isEmpty()) {
+            // Should not happen, make this return null one day
+            logger.warning("Failed to board REF units: "
+                + join(" ", transform(leftOver, alwaysTrue(),
+                                      FreeColObject::getId)));
+        }
         return refPlayer;
     }
 
@@ -404,7 +410,7 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlement(owner);
         cs.add(See.only(owner), tile);
         cs.addPartial(See.only(owner), owner,
-            "gold", String.valueOf(owner.getGold()));
+                      "gold", String.valueOf(owner.getGold()));
         logger.finest(owner.getSuffix() + " " + unit + " buys " + goods
                       + " at " + sis.getName() + " for " + price);
     }
@@ -432,7 +438,7 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlement(owner);
         cs.add(See.only(owner), tile);
         cs.addPartial(See.only(owner), owner,
-            "gold", String.valueOf(owner.getGold()));
+                      "gold", String.valueOf(owner.getGold()));
         cs.addSale(owner, sis, goods.getType(),
                    Math.round((float)price/goods.getAmount()));
         logger.finest(owner.getSuffix() + " " + unit + " sells " + goods
@@ -575,6 +581,8 @@ public final class InGameController extends Controller {
         // Who surrenders?
         final Predicate<Unit> surrenderPred = u -> //-vis(both)
             (u.hasTile() && !u.isNaval() && !u.isOnCarrier()
+                && (!u.hasAbility(Ability.REF_UNIT)
+                    || u.hasAbility(Ability.CAN_BE_SURRENDERED))
                 && serverPlayer.csChangeOwner(u, independent,
                     UnitChangeType.CAPTURE, null, cs));
         List<Unit> surrenderUnits
@@ -776,10 +784,9 @@ public final class InGameController extends Controller {
                        monarchKey));
             break;
         case MONARCH_MERCENARIES:
-            final List<AbstractUnit> mercenaries
-                = monarch.getMercenaries(random);
-            if (mercenaries.isEmpty()) break;
-            final int mercPrice = serverPlayer.priceMercenaries(mercenaries);
+            final List<AbstractUnit> mercenaries = new ArrayList<>();
+            final int mercPrice = monarch.loadMercenaries(random, mercenaries);
+            if (mercPrice < 0) break;
             cs.add(See.only(serverPlayer),
                    new MonarchActionMessage(action, StringTemplate
                        .template(messageId)
@@ -790,7 +797,10 @@ public final class InGameController extends Controller {
             new MonarchSession(serverPlayer, action, mercenaries, mercPrice);
             break;
         case HESSIAN_MERCENARIES:
-            serverPlayer.csMercenaries(monarch.getMercenaries(random), action,
+            final List<AbstractUnit> hessians = new ArrayList<>();
+            final int hessianPrice = monarch.loadMercenaries(random, hessians);
+            if (hessianPrice <= 0) break;
+            serverPlayer.csMercenaries(hessianPrice, hessians, action,
                                        random, cs);
             break;
         case DISPLEASURE: default:
@@ -1427,7 +1437,8 @@ public final class InGameController extends Controller {
                     .addStringTemplate("%units%", seized));
         }
         serverPlayer.csLoseLocation(europe, cs);
-
+        serverPlayer.reinitialiseMarket();
+        
         // Create the REF.
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
         cs.addPlayers(Collections.singletonList(refPlayer));
@@ -1548,7 +1559,9 @@ public final class InGameController extends Controller {
         }
 
         // Make the mercenary force offer
-        serverPlayer.csMercenaries(monarch.getMercenaryForce().getUnitList(),
+        List<AbstractUnit> mercs = new ArrayList<>();
+        int mercPrice = monarch.loadMercenaryForce(random, mercs);
+        serverPlayer.csMercenaries(mercPrice, mercs,
             Monarch.MonarchAction.HESSIAN_MERCENARIES, random, cs);
         
         // Pity to have to update such a heavy object as the player,
@@ -2057,22 +2070,21 @@ public final class InGameController extends Controller {
 
             // Remove dead players and retry
             switch (current.checkForDeath()) {
-            case ServerPlayer.IS_DEAD:
-                current.csWithdraw(cs);
-                logger.info("For " + serverPlayer.getSuffix()
-                    + ", " + current.getNation() + " is dead.");
-                break;
-            case ServerPlayer.IS_ALIVE:
-                if (current.isREF() && current.checkForREFDefeat()) {
-                    for (Player p : current.getRebels()) {
-                        csGiveIndependence(current, (ServerPlayer)p, cs);
-                    }
-                    current.csWithdraw(cs);
-                    logger.info(current.getNation() + " is defeated.");
+            case IS_DEFEATED:
+                for (Player p : current.getRebels()) {
+                    csGiveIndependence(current, (ServerPlayer)p, cs);
                 }
+                // Fall through
+            case IS_DEAD:
+                current.csWithdraw(cs, null, null);
+                logger.info("For " + serverPlayer.getSuffix()
+                    + ", " + current.getNation() + " has withdrawn.");
                 break;
-            default: // Need to autorecruit a unit to keep alive.
+            case IS_AUTORECRUIT:
+                // Need to autorecruit a unit to keep alive.
                 current.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
+                break;
+            case IS_ALIVE: default:
                 break;
             }
             if (!cs.isEmpty()) { // Flush changes
@@ -2405,7 +2417,7 @@ public final class InGameController extends Controller {
      */
     public ChangeSet getHighScores(ServerPlayer serverPlayer, String key) {
         return ChangeSet.simpleChange(serverPlayer,
-            new HighScoreMessage(key, HighScore.loadHighScores()));
+            new HighScoresMessage(key, HighScore.loadHighScores()));
     }
 
 
@@ -3388,7 +3400,7 @@ public final class InGameController extends Controller {
     public ChangeSet retire(ServerPlayer serverPlayer) {
         boolean highScore = HighScore.newHighScore(serverPlayer);
         ChangeSet cs = new ChangeSet();
-        serverPlayer.csWithdraw(cs); // Clean up the player.
+        serverPlayer.csWithdraw(cs, null, null); // Clean up the player.
         getGame().sendToOthers(serverPlayer, cs);
         cs.addAttribute(See.only(serverPlayer),
                         "highScore", Boolean.toString(highScore));

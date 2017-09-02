@@ -1832,7 +1832,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The price of a single recruit in {@link Europe}.
      */
-    public int getRecruitPrice() {
+    public int getEuropeanRecruitPrice() {
         // return Math.max(0, (getCrossesRequired() - crosses) * 10);
         return getEurope().getCurrentRecruitPrice();
     }
@@ -1843,7 +1843,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param au The proposed {@code AbstractUnit}.
      * @return The price for the unit.
      */
-    public int getPrice(AbstractUnit au) {
+    public int getEuropeanPurchasePrice(AbstractUnit au) {
         final Specification spec = getSpecification();
         final UnitType unitType = au.getType(spec);
         if (!unitType.hasPrice()) return INFINITY;
@@ -1852,6 +1852,23 @@ public class Player extends FreeColGameObject implements Nameable {
             + au.getRole(spec).getRequiredGoodsPrice(getMarket()));
     }
 
+    /**
+     * Gets the price to this player to hire a mercenary unit.
+     *
+     * This does not need to follow the rules for unit or goods availability
+     * as it is being offered by another power.
+     *
+     * @param au The proposed {@code AbstractUnit}.
+     * @return The price for the unit or negative if not available.
+     */
+    public int getMercenaryHirePrice(AbstractUnit au) {
+        final Specification spec = getSpecification();
+        final UnitType unitType = au.getType(spec);
+        int price = unitType.getMercenaryPrice();
+        if (price < 0) price = unitType.getPrice();
+        return price * au.getNumber();
+    }
+    
     /**
      * Gets the monarch object this player has.
      *

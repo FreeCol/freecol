@@ -132,11 +132,15 @@ public class ServerGame extends Game implements TurnTaker {
      * Get a list of connected server players, optionally excluding
      * supplied ones.
      *
+     * Do *not* restrict this only to live players, dead players still
+     * need to be communicated with (e.g. to tell them they are dead,
+     * or to revive them).
+     *
      * @param serverPlayers The {@code ServerPlayer}s to exclude.
      * @return A list of all connected server players, with exclusions.
      */
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
-        return transform(getLivePlayers(),
+        return transform(getPlayerList(),
                          p -> ((ServerPlayer)p).isConnected()
                              && none(serverPlayers, matchKey((ServerPlayer)p)),
                          p -> (ServerPlayer)p);
@@ -302,7 +306,7 @@ public class ServerGame extends Game implements TurnTaker {
 
         Session.completeAll(cs);
         setTurn(getTurn().next());
-        logger.finest("Turn is now " + getTurn() + duration);
+        logger.finest("Turn is now " + getTurn() + "/" + duration);
         cs.add(See.all(), new NewTurnMessage(getTurn()));
     }
 
@@ -421,23 +425,20 @@ public class ServerGame extends Game implements TurnTaker {
         
         StringTemplate loser = weakAI.getNationLabel();
         StringTemplate winner = strongAI.getNationLabel();
-        cs.addGlobalMessage(this, null,
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             "model.game.spanishSuccession", strongAI)
-                .addStringTemplate("%loserNation%", loser)
-                .addStringTemplate("%nation%", winner));
-        cs.addGlobalHistory(this,
-            new HistoryEvent(getTurn(),
-                HistoryEvent.HistoryEventType.SPANISH_SUCCESSION, null)
-                   .addStringTemplate("%loserNation%", loser)
-                   .addStringTemplate("%nation%", winner));
         setSpanishSuccession(true);
         cs.addPartial(See.all(), this,
             "spanishSuccession", Boolean.TRUE.toString());
         tiles.removeAll(updated);
         cs.add(See.perhaps(), tiles);
         
-        weakest.csKill(cs);//+vis(weakest)
+        weakest.csWithdraw(cs, //+vis(weakest)
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             "model.game.spanishSuccession", strongAI)
+                .addStringTemplate("%loserNation%", loser)
+                .addStringTemplate("%nation%", winner),
+            new HistoryEvent(getTurn(), HistoryEvent.HistoryEventType.SPANISH_SUCCESSION, null)
+                .addStringTemplate("%loserNation%", loser)
+                .addStringTemplate("%nation%", winner));
         strongest.invalidateCanSeeTiles();//+vis(strongest)
 
         // Trace fail where not all units are transferred

@@ -1,0 +1,5 @@
+# Expanded Experience
+This mod expands experience for free colonists to gain expert status from working in buildings. By default, FreeCol only allows experience to be gained by doing outside work to become an expert. This mod allows the free colonist to become an expert/master after a time of working in a particular building including: City Hall (Elder Statesmen - 2% chance), Lumber Mill (Master Carpenter - 4% chance), Master Tobacconist, Master Weaver, Master Distiller, Master Fur Trader, Master Blacksmith, and Master Gunsmith each have a 3% chance after producing 200 units, and a 2% chance of free colonists becoming a Firebrand Preacher through producing crosses in the Church or Cathedral. The chance to become a master within any building increases from 0% and increasing until the free colonist has produced 200 units. By default in FreeCol, Free colonists working outside have up to a 4% chance of becoming an expert in any area of work.
+
+## Contributors
+* [David Lewis](https://github.com/HighwayofLife)

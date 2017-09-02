@@ -42,25 +42,25 @@ public class ModelMessage extends StringTemplate {
     /** Constants describing the type of message. */
     public static enum MessageType implements Named {
         DEFAULT(""),
-        WARNING("model.option.guiShowWarning"),
-        SONS_OF_LIBERTY("model.option.guiShowSonsOfLiberty"),
+        BUILDING_COMPLETED("model.option.guiShowBuildingCompleted"),
+        COMBAT_RESULT(null), // No option, always display
+        DEMANDS("model.option.guiShowDemands"),
+        FOREIGN_DIPLOMACY("model.option.guiShowForeignDiplomacy"),
+        GIFT_GOODS("model.option.guiShowGifts"),
+        GOODS_MOVEMENT("model.option.guiShowGoodsMovement"),
         GOVERNMENT_EFFICIENCY("model.option.guiShowGovernmentEfficiency"),
-        WAREHOUSE_CAPACITY("model.option.guiShowWarehouseCapacity"),
+        LOST_CITY_RUMOUR(null), // Displayed during the turn
+        MARKET_PRICES("model.option.guiShowMarketPrices"),
+        MISSING_GOODS("model.option.guiShowMissingGoods"),
+        SONS_OF_LIBERTY("model.option.guiShowSonsOfLiberty"),
+        TUTORIAL("model.option.guiShowTutorial"),
         UNIT_ADDED("model.option.guiShowUnitAdded"),
-        UNIT_IMPROVED("model.option.guiShowUnitImproved"),
         UNIT_DEMOTED("model.option.guiShowUnitDemoted"),
+        UNIT_IMPROVED("model.option.guiShowUnitImproved"),
         UNIT_LOST("model.option.guiShowUnitLost"),
         UNIT_REPAIRED("model.option.guiShowUnitRepaired"),
-        BUILDING_COMPLETED("model.option.guiShowBuildingCompleted"),
-        FOREIGN_DIPLOMACY("model.option.guiShowForeignDiplomacy"),
-        MARKET_PRICES("model.option.guiShowMarketPrices"),
-        LOST_CITY_RUMOUR(null), // Displayed during the turn
-        MISSING_GOODS("model.option.guiShowMissingGoods"),
-        TUTORIAL("model.option.guiShowTutorial"),
-        COMBAT_RESULT(null), // No option, always display
-        GIFT_GOODS("model.option.guiShowGifts"),
-        DEMANDS("model.option.guiShowDemands"),
-        GOODS_MOVEMENT("model.option.guiShowGoodsMovement");
+        WAREHOUSE_CAPACITY("model.option.guiShowWarehouseCapacity"),
+        WARNING("model.option.guiShowWarning");
 
         private final String optionName;
 

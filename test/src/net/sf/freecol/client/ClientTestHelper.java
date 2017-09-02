@@ -19,33 +19,53 @@
 
 package net.sf.freecol.client;
 
-import junit.framework.*;
+import java.util.logging.Logger;
+
 import static org.junit.Assert.*;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.common.model.Game.LogoutReason;
-import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.common.debug.FreeColDebugger;
 
 
 public class ClientTestHelper {
 
     public static final int port = 3541;
 
-    public static FreeColClient startClient(FreeColServer freeColServer) {
+    private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
+
+    private static FreeColClient client = null;
+
+    public static FreeColClient startClient(FreeColServer freeColServer, Specification specification) {
         // This is not ideal, but headless mode allows cutting off
         // some excessive resource loading, especially in the sound
         // tests where the resource manager is exercised.
-        System.setProperty("java.awt.headless", "true"); 
+        System.setProperty("java.awt.headless", "true");
+        FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
+        FreeColDebugger.setDebugRunTurns(1);
 
-        FreeColClient client = new FreeColClient(null, null);
-        client.startClient(null, null, false, false, null, null);
+        FreeCol.setLocale(null);
+        Messages.loadMessageBundle(FreeCol.getLocale());
+
+        logger.info("Debug value: " + FreeColDebugger.isInDebugMode());
+
+        client = new FreeColClient(null, null);
+        client.startClient(null, null, false, false, null, specification);
+        assertNotNull(client);
+
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);
+
         assertTrue(connectController.requestLogin("test",
-                freeColServer.getHost(), freeColServer.getPort()));
-        client.getPreGameController().setReady(true);
+                freeColServer.getHost(),
+                freeColServer.getPort()));
+
+        connectController.startSinglePlayerGame(specification);
         return client;
     }
     

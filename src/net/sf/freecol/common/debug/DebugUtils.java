@@ -21,6 +21,7 @@ package net.sf.freecol.common.debug;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -147,12 +148,16 @@ public class DebugUtils {
                 = sColony.getNoBuildReason(sBuildingType, null);
             results.add(sColony.getName() + ": " + reason);
             if (reason == Colony.NoBuildReason.NONE) {
+                Building sBuilding = sColony.getBuilding(sBuildingType);
+                List<Unit> present = (sBuilding == null)
+                    ? Collections.<Unit>emptyList()
+                    : sBuilding.getUnitList();
                 if (sBuildingType.isDefenceType()) {
                     sColony.getTile().cacheUnseen();//+til
                 }
-                Building sBuilding = new ServerBuilding(sGame, sColony,
-                                                        sBuildingType);
+                sBuilding = new ServerBuilding(sGame, sColony, sBuildingType);
                 sColony.addBuilding(sBuilding);//-til
+                for (Unit u : present) u.setLocation(sBuilding);
             } else {
                 fails++;
             }

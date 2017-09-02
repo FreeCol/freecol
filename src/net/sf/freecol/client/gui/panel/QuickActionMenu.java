@@ -70,7 +70,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.lastPart;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -135,8 +135,7 @@ public final class QuickActionMenu extends JPopupMenu {
      * @return The unit action as a string.
      */
     private static String getWorkLabel(WorkLocation wl) {
-        return "WORK_" + lastPart(wl.getClass().toString(), ".")
-                .toUpperCase(Locale.US);
+        return "WORK_" + upCase(lastPart(wl.getClass().toString(), "."));
     }
 
 

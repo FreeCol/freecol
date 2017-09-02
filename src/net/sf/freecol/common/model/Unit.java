@@ -104,6 +104,10 @@ public class Unit extends GoodsLocation
             (s == null || !s.getTile().isHighSeasConnected()) ? INFINITY
                 : s.getTile().getHighSeasCount());
 
+    /** Useful predicate for finding sentried land units. */
+    public static final Predicate<Unit> sentryPred = u ->
+        !u.isNaval() && u.getState() == UnitState.SENTRY;
+    
     /** A state a Unit can have. */
     public static enum UnitState {
         ACTIVE,
@@ -3839,8 +3843,7 @@ public class Unit extends GoodsLocation
 
         if (newLocation == this.location) return true;
         if (newLocation != null && !newLocation.canAdd(this)) {
-            logger.warning("Can not add " + this + " to "
-                + newLocation.getId());
+            logger.warning("Can not add " + this + " to " + newLocation);
             return false;
         }
 

@@ -84,6 +84,9 @@ public final class UnitType extends BuildableType implements Consumer {
     /** The price of this UnitType. */
     private int price = UNDEFINED;
 
+    /** The optional price of this UnitType for use by mercenary forces. */
+    private int mercenaryPrice = UNDEFINED;
+
     /** The initial moves of this UnitType. */
     private int movement = 3;
 
@@ -341,6 +344,28 @@ public final class UnitType extends BuildableType implements Consumer {
         return price;
     }
 
+    /**
+     * Get the special price used by mercenary forces when there is no
+     * standard base price (e.g. ManOWar).
+     *
+     * @return The mercenary price.
+     */
+    public int getMercenaryPrice() {
+        return mercenaryPrice;
+    }
+
+    // @compat 0.11.6
+    // Only used in spec fixups
+    /**
+     * Set the mercenary price.
+     *
+     * @param price The mercenary price.
+     */
+    public void setMercenaryPrice(int price) {
+        this.mercenaryPrice = price;
+    }
+    // end @compat 0.11.6
+    
     /**
      * Get the base movement of this unit type.
      *
@@ -675,6 +700,7 @@ public final class UnitType extends BuildableType implements Consumer {
     private static final String EXPERT_PRODUCTION_TAG = "expert-production";
     private static final String HIT_POINTS_TAG = "hit-points";
     private static final String LINE_OF_SIGHT_TAG = "line-of-sight";
+    private static final String MERCENARY_PRICE_TAG = "mercenary-price";
     private static final String MOVEMENT_TAG = "movement";
     private static final String MAXIMUM_EXPERIENCE_TAG = "maximum-experience";
     private static final String MAXIMUM_ATTRITION_TAG = "maximum-attrition";
@@ -746,6 +772,10 @@ public final class UnitType extends BuildableType implements Consumer {
 
         if (hasPrice()) {
             xw.writeAttribute(PRICE_TAG, price);
+        }
+
+        if (mercenaryPrice != UNDEFINED) {
+            xw.writeAttribute(MERCENARY_PRICE_TAG, mercenaryPrice);
         }
 
         xw.writeAttribute(SKILL_TAUGHT_TAG, skillTaught);
@@ -882,6 +912,9 @@ public final class UnitType extends BuildableType implements Consumer {
 
         price = xr.getAttribute(PRICE_TAG, parent.price);
 
+        mercenaryPrice = xr.getAttribute(MERCENARY_PRICE_TAG,
+                                         parent.mercenaryPrice);
+        
         expertProduction = xr.getType(spec, EXPERT_PRODUCTION_TAG,
                 GoodsType.class, parent.expertProduction);
 

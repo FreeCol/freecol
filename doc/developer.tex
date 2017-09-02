@@ -110,11 +110,13 @@ a bug tracker item should be updated while you are working:
   another developer. The milestone of open bugs should be ``Current''.
 
 \item If you successfully commit a fix for a bug, set the milestone to
-  ``Fixed-trunk'', the status to ``Closed'' if you are certain of the
-  fix, or ``Pending-Fixed'' if there is some uncertainty and/or
-  further comment is welcome. Please also write a comment telling
-  that the work is done, and it is helpful to refer to any commit/s
-  where relevant changes occurred.
+  ``Fixed-trunk'' and the status to some form of ``Closed'' if you are
+  certain of the fix and the bug was introduced during the current
+  development cycle, or ``Pending-Fixed'' if the bug was present in a
+  release.  The intent is that at release time all ``Fixed-Trunk''
+  bugs can be re-labelled as ``Fixed-\emph{release}''.  Please also
+  write a comment telling that the work is done, and it is helpful to
+  refer to any commit/s where relevant changes occurred.
 \end{enumerate}
 
 

@@ -265,7 +265,8 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         dutch.setGold(0);
         assertEquals("Should not have units", 0, dutch.getUnitCount());
-        assertEquals("Should be game over due to no carrier", -1,
+        assertEquals("Should not be alive, no carrier",
+                     ServerPlayer.DeadCheck.IS_DEAD,
                      dutch.checkForDeath());
     }
 
@@ -274,7 +275,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
 
         dutch.setGold(10000);
-        assertEquals("Should not be game, enough money", 0,
+        assertEquals("Should be alive, has enough money",
+                     ServerPlayer.DeadCheck.IS_ALIVE,
                      dutch.checkForDeath());
     }
 
@@ -285,7 +287,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         dutch.setGold(0);
 
         new ServerUnit(game, map.getTile(4, 7), dutch, colonistType);
-        assertEquals("Should not be game over, has units", 0,
+        assertEquals("Should be alive, has units",
+                     ServerPlayer.DeadCheck.IS_ALIVE,
                      dutch.checkForDeath());
     }
 
@@ -297,18 +300,18 @@ public class ServerPlayerTest extends FreeColTestCase {
         new ServerUnit(game, dutch.getEurope(), dutch, galleonType);
         assertEquals("Should have 1 unit", 1, dutch.getUnitCount());
         assertEquals("Should not be game over, not 1600 yet, autorecruit",
-                     ServerPlayer.AUTORECRUIT,
+                     ServerPlayer.DeadCheck.IS_AUTORECRUIT,
                      dutch.checkForDeath());
 
         new ServerUnit(game, dutch.getEurope(), dutch, colonistType);
         assertEquals("Should have 2 units", 2, dutch.getUnitCount());
         assertEquals("Should not be game over, not 1600 yet",
-                     ServerPlayer.IS_ALIVE,
+                     ServerPlayer.DeadCheck.IS_ALIVE,
                      dutch.checkForDeath());
 
         game.setTurn(new Turn(1600));
         assertEquals("Should be game over, no new world presence >= 1600",
-                     ServerPlayer.IS_DEAD,
+                     ServerPlayer.DeadCheck.IS_DEAD,
                      dutch.checkForDeath());
     }
 
@@ -328,11 +331,13 @@ public class ServerPlayerTest extends FreeColTestCase {
                      1, galleon.getUnitCount());
         igc.moveTo(dutch, galleon, dutch.getEurope());
 
-        assertEquals("Should not be game over, units between new world and europe", 0,
+        assertEquals("Should be alive, units between new world and europe",
+                     ServerPlayer.DeadCheck.IS_ALIVE,
                      dutch.checkForDeath());
 
         game.setTurn(new Turn(1600));
-        assertEquals("Should be game over, no new world presence >= 1600", -1,
+        assertEquals("Should not be alive, no new world presence >= 1600",
+                     ServerPlayer.DeadCheck.IS_DEAD,
                      dutch.checkForDeath());
     }
 
@@ -352,11 +357,13 @@ public class ServerPlayerTest extends FreeColTestCase {
                      galleon.getUnitCount());
         igc.moveTo(dutch, galleon, map);
 
-        assertEquals("Should not be game over, units between new world and europe", 0,
+        assertEquals("Should be alive, units between new world and europe",
+                     ServerPlayer.DeadCheck.IS_ALIVE,
                      dutch.checkForDeath());
 
         game.setTurn(new Turn(1600));
-        assertEquals("Should be game over, no new world presence >= 1600", -1,
+        assertEquals("Should not be alive, no new world presence >= 1600",
+                     ServerPlayer.DeadCheck.IS_DEAD,
                      dutch.checkForDeath());
     }
 

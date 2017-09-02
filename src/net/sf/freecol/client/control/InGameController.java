@@ -352,15 +352,11 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if the unit now has no destination or trade route.
      */
     private boolean askClearGotoOrders(Unit unit) {
-        if (!askAssignTradeRoute(unit, null)) return false;
+        if (!askAssignTradeRoute(unit, null)
+            || !askSetDestination(unit, null)) return false;
 
-        if (unit.getDestination() == null) return true;
-
-        if (askSetDestination(unit, null)) {
-            getGUI().clearGotoPath();
-            return true;
-        }
-        return false;
+        getGUI().clearGotoPath();
+        return true;
     }
 
     /**
@@ -496,6 +492,8 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if the destination was set.
      */
     private boolean askSetDestination(Unit unit, Location destination) {
+        if (unit.getDestination() == destination) return true;
+
         return askServer().setDestination(unit, destination)
             && unit.getDestination() == destination;
     }
@@ -743,12 +741,12 @@ public final class InGameController extends FreeColClientHolder {
 
         final Player player = getMyPlayer();
         final Unit active = getGUI().getActiveUnit();
-        Unit stillActive = null;
 
         // Ensure the goto mode sticks.
         moveMode = moveMode.maximize(MoveMode.EXECUTE_GOTO_ORDERS);
 
         // Deal with the trade route units first.
+        boolean fail = false;
         List<ModelMessage> messages = new ArrayList<>();
         final Predicate<Unit> tradePred = u ->
             u.isReadyToTrade() && player.owns(u);
@@ -756,7 +754,10 @@ public final class InGameController extends FreeColClientHolder {
                                    Function.identity(),
                                    tradeRouteUnitComparator)) {
             getGUI().setActiveUnit(unit);
-            if (moveToDestination(unit, messages)) stillActive = unit;
+            if (!moveToDestination(unit, messages)) {
+                fail = true;
+                break;
+            }
         }
         if (!messages.isEmpty()) {
             for (ModelMessage m : messages) {
@@ -764,36 +765,30 @@ public final class InGameController extends FreeColClientHolder {
                 turnReportMessages.add(m);
             }
             displayModelMessages(false, false);
-            getGUI().setActiveUnit((stillActive != null) ? stillActive : active);
-            return false;
+            fail = true;
         }
-
+        if (fail) return false;
         // The active unit might also be a going-to unit.  Make sure it
         // gets processed first.  setNextGoingToUnit will fail harmlessly
         // if it is not a going-to unit so this is safe.
         if (active != null) player.setNextGoingToUnit(active);
 
         // Process all units.
-        boolean fail = false;
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
             getGUI().setActiveUnit(unit);
             // Move the unit as much as possible
-            if (moveToDestination(unit, null)) stillActive = unit;
-
-            // Might have LCR messages to display
-            displayModelMessages(false, false);
-
-            // Give the player a chance to deal with any problems
-            // shown in a popup before pressing on with more moves.
-            if (getGUI().isShowingSubPanel()) {
-                getGUI().requestFocusForSubPanel();
+            if (!moveToDestination(unit, null)) {
                 fail = true;
                 break;
             }
         }
-        getGUI().setActiveUnit((stillActive != null) ? stillActive : active);
-        return stillActive == null && !fail;
+        // Might have LCR messages to display
+        displayModelMessages(false, false);
+
+        // Restore original active unit if not at a problematic one.
+        if (!fail) getGUI().setActiveUnit(active);
+        return !fail;
     }
 
     /**
@@ -907,25 +902,23 @@ public final class InGameController extends FreeColClientHolder {
      * @param unit The {@code Unit} to move.
      * @param messages An optional list in which to retain any
      *     trade route {@code ModelMessage}s generated.
-     * @return True if the unit reached its destination, is still alive,
-     *     and has more moves to make.
+     * @return True if automatic movement can proceed.
      */
     private boolean moveToDestination(Unit unit, List<ModelMessage> messages) {
         final Player player = getMyPlayer();
         Location destination;
         PathNode path;
-
         if (!requireOurTurn()
             || unit.isAtSea()
             || unit.getMovesLeft() <= 0
             || unit.getState() == UnitState.SKIPPED) {
-            return false;
+            return true;
         } else if (unit.getTradeRoute() != null) {
             return followTradeRoute(unit, messages);
         } else if ((destination = unit.getDestination()) == null) {
-            return unit.getMovesLeft() > 0;
+            return true;
         } else if (!changeState(unit, UnitState.ACTIVE)) {
-            return false;
+            return true;
         } else if ((path = unit.findPath(destination)) == null) {
             StringTemplate src = unit.getLocation()
                 .getLocationLabelFor(player);
@@ -939,20 +932,67 @@ public final class InGameController extends FreeColClientHolder {
             getGUI().showInformationMessage(unit, template);
             changeState(unit, UnitState.SKIPPED);
             return false;
-        }
+        } else {
+            // Clear ordinary destinations if arrived.
+            getGUI().setActiveUnit(unit);
+            if (!movePath(unit, path)) return false;
+        
+            if (unit.isAtLocation(destination)) {
+                if (!askClearGotoOrders(unit)) return false;
 
-        // Clear ordinary destinations if arrived.
-        getGUI().setActiveUnit(unit);
-        if (movePath(unit, path) && unit.isAtLocation(destination)) {
-            askClearGotoOrders(unit);
-            Colony colony = (unit.hasTile()) ? unit.getTile().getColony()
-                : null;
-            if (colony != null && !checkCashInTreasureTrain(unit)) {
-                colonyPanel(colony, unit);
+                Colony colony = (unit.hasTile()) ? unit.getTile().getColony()
+                    : null;
+                if (colony != null) {
+                    if (!checkCashInTreasureTrain(unit)) colonyPanel(colony, unit);
+                    return false;
+                }
             }
-            return unit.couldMove();
+            return true;
         }
-        return false;
+    }
+
+    /**
+     * Follow a path.
+     *
+     * @param unit The {@code Unit} to move.
+     * @param path The path to follow.
+     * @return True if automatic movement of the unit can proceed.
+     */
+    private boolean movePath(Unit unit, PathNode path) {
+        for (; path != null; path = path.next) {
+            if (unit.isAtLocation(path.getLocation())) continue;
+
+            if (path.getLocation() instanceof Europe) {
+                if (unit.hasTile()
+                    && unit.getTile().isDirectlyHighSeasConnected()) {
+                    return moveTowardEurope(unit, (Europe)path.getLocation());
+                }
+                logger.warning("Can not move to Europe from "
+                    + unit.getLocation()
+                    + " on path: " + path.fullPathToString());
+                return false;
+
+            } else if (path.getLocation() instanceof Tile) {
+                if (path.getDirection() == null) {
+                    if (unit.isInEurope()) {
+                        return moveAwayFromEurope(unit, unit.getGame().getMap());
+                    }
+                    logger.warning("Null direction on path: "
+                        + path.fullPathToString());
+                    return false;
+                }
+                if (!moveDirection(unit, path.getDirection(), false))
+                    return false;
+
+            } else if (path.getLocation() instanceof Unit) {
+                return moveEmbark(unit, path.getDirection());
+
+            } else {
+                logger.warning("Bad path: " + path.fullPathToString());
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -963,37 +1003,36 @@ public final class InGameController extends FreeColClientHolder {
      * @param unit The {@code Unit} to move.
      * @param direction The {@code Direction} to move in.
      * @param interactive Interactive mode: play sounds and emit errors.
-     * @return True if the unit can possibly move further.
+     * @return True if automatic movement of the unit can proceed.
      */
     public boolean moveDirection(Unit unit, Direction direction,
                                  boolean interactive) {
-        // If this move would reach the unit destination but we
-        // discover that it would be permanently impossible to complete,
-        // clear the destination.
-        Unit.MoveType mt = unit.getMoveType(direction);
-        Location destination = unit.getDestination();
-        Tile oldTile = unit.getTile();
-        boolean clearDestination = destination != null
+        // Is the unit on the brink of reaching the destination with
+        // this move?
+        final Location destination = unit.getDestination();
+        final Tile oldTile = unit.getTile();
+        boolean destinationImminent = destination != null
             && oldTile != null
             && Map.isSameLocation(oldTile.getNeighbourOrNull(direction),
                                   destination);
 
         // Consider all the move types.
+        final Unit.MoveType mt = unit.getMoveType(direction);
         boolean result = mt.isLegal();
         switch (mt) {
         case MOVE_HIGH_SEAS:
-            if (getMyPlayer().getEurope() == null) {
-                ; // do nothing
-            } else if (destination == null) {
-                result = moveHighSeas(unit, direction);
-                break;
-            } else if (destination instanceof Europe) {
-                result = moveTo(unit, destination);
-                break;
-            }
-            // Fall through
+            // Move on the map if there is no Europe or there is a
+            // destination that is not Europe, move to Europe if it is
+            // the destination, otherwise ask the player.
+            result = (getMyPlayer().getEurope() == null
+                || (destination != null && !(destination instanceof Europe)))
+                ? moveTile(unit, direction)
+                : (destination instanceof Europe)
+                ? moveTowardEurope(unit, (Europe)destination)
+                : moveHighSeas(unit, direction);
+            break;
         case MOVE:
-            result = moveMove(unit, direction);
+            result = moveTile(unit, direction);
             break;
         case EXPLORE_LOST_CITY_RUMOUR:
             result = moveExplore(unit, direction);
@@ -1025,7 +1064,7 @@ public final class InGameController extends FreeColClientHolder {
 
         // Illegal moves
         case MOVE_NO_ACCESS_BEACHED:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 getGUI().showInformationMessage(unit, StringTemplate
@@ -1034,7 +1073,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         case MOVE_NO_ACCESS_CONTACT:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 getGUI().showInformationMessage(unit, StringTemplate
@@ -1043,7 +1082,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         case MOVE_NO_ACCESS_GOODS:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 getGUI().showInformationMessage(unit, StringTemplate
@@ -1061,7 +1100,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         case MOVE_NO_ACCESS_MISSION_BAN:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 getGUI().showInformationMessage(unit, StringTemplate
@@ -1072,7 +1111,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         case MOVE_NO_ACCESS_SETTLEMENT:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 getGUI().showInformationMessage(unit, StringTemplate
@@ -1083,7 +1122,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         case MOVE_NO_ACCESS_SKILL:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 getGUI().showInformationMessage(unit, StringTemplate
                     .template("move.noAccessSkill")
@@ -1092,7 +1131,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         case MOVE_NO_ACCESS_TRADE:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 getGUI().showInformationMessage(unit, StringTemplate
@@ -1101,7 +1140,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         case MOVE_NO_ACCESS_WAR:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 getGUI().showInformationMessage(unit, StringTemplate
@@ -1110,7 +1149,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         case MOVE_NO_ACCESS_WATER:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 getGUI().showInformationMessage(unit, StringTemplate
                     .template("move.noAccessWater")
@@ -1119,7 +1158,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         case MOVE_NO_ATTACK_MARINE:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 getGUI().showInformationMessage(unit, StringTemplate
                     .template("move.noAttackWater")
@@ -1132,11 +1171,11 @@ public final class InGameController extends FreeColClientHolder {
             // to move to the next node.  The move is illegal
             // this turn, but might not be next turn, so do not cancel the
             // destination but set the state to skipped instead.
-            clearDestination = false;
+            destinationImminent = false;
             changeState(unit, UnitState.SKIPPED);
             break;
         case MOVE_NO_TILE:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
                 getGUI().showInformationMessage(unit, StringTemplate
                     .template("move.noTile")
@@ -1145,67 +1184,64 @@ public final class InGameController extends FreeColClientHolder {
             }
             break;
         default:
-            if (interactive || clearDestination) {
+            if (interactive || destinationImminent) {
                 sound("sound.event.illegalMove");
             }
             result = false;
             break;
         }
-        if (clearDestination && !unit.isDisposed()) {
-            askClearGotoOrders(unit);
+        if (destinationImminent && !unit.isDisposed()) {
+            // The unit either reached the destination or failed at
+            // the last step for some reason.  In either case, clear
+            // the goto orders because they have failed.
+            if (!askClearGotoOrders(unit)) result = false;
         }
         return result;
     }
 
     /**
-     * Follow a path.
+     * Move a unit from off map to an on map location.
      *
-     * @param unit The {@code Unit} to move.
-     * @param path The path to follow.
-     * @return True if the unit has completed the path and can move further.
+     * @param unit The {@code Unit} to be moved.
+     * @param destination The {@code Location} to be moved to.
+     * @return True if automatic movement of the unit can proceed (never).
      */
-    private boolean movePath(Unit unit, PathNode path) {
-        for (; path != null; path = path.next) {
-            if (unit.isAtLocation(path.getLocation())) continue;
-
-            if (path.getLocation() instanceof Europe) {
-                if (unit.hasTile()
-                    && unit.getTile().isDirectlyHighSeasConnected()) {
-                    moveTo(unit, path.getLocation());
-                } else {
-                    logger.warning("Can not move to Europe from "
-                        + unit.getLocation()
-                        + " on path: " + path.fullPathToString());
-                }
-                return false;
-            } else if (path.getLocation() instanceof Tile) {
-                if (path.getDirection() == null) {
-                    if (unit.isInEurope()) {
-                        moveTo(unit, unit.getGame().getMap());
-                    } else {
-                        logger.warning("Null direction on path: "
-                            + path.fullPathToString());
-                    }
-                    return false;
-                } else {
-                    if (!moveDirection(unit, path.getDirection(), false)) {
-                        return false;
-                    }
-                    if (unit.hasTile()
-                        && unit.getTile().getDiscoverableRegion() != null) {
-                        // Break up the goto to allow region naming to occur,
-                        // BR#2707
-                        return false;
-                    }
-                }
-            } else if (path.getLocation() instanceof Unit) {
-                return moveEmbark(unit, path.getDirection());
-
-            } else {
-                logger.warning("Bad path: " + path.fullPathToString());
-            }
+    private boolean moveAwayFromEurope(Unit unit, Location destination) {
+        // Autoload emigrants.
+        List<Unit> ul;
+        if (getClientOptions().getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
+            && unit.isInEurope()
+            && !(ul = unit.getOwner().getEurope().getUnitList()).isEmpty()) {
+            if (!moveAutoload(unit,
+                              transform(ul, Unit.sentryPred))) return false;
         }
-        return true;
+
+        EuropeWas europeWas = (!unit.isInEurope()) ? null
+            : new EuropeWas(unit.getOwner().getEurope());
+        UnitWas unitWas = new UnitWas(unit);
+        boolean ret = askServer().moveTo(unit, destination);
+        if (ret) {
+            unitWas.fireChanges();
+            if (europeWas != null) europeWas.fireChanges();
+            updateGUI(null);
+        }
+        return ret;
+    }
+
+    /**
+     * Move a unit from on map towards Europe.
+     *
+     * @param unit The {@code Unit} to be moved.
+     * @param europe The {@code Europe} to be moved to.
+     * @return True if automatic movement of the unit can proceed (never).
+     */
+    private boolean moveTowardEurope(Unit unit, Europe europe) {
+        UnitWas unitWas = new UnitWas(unit);
+        if (askServer().moveTo(unit, europe)) {
+            unitWas.fireChanges();
+            updateGUI(null);
+        }
+        return false;
     }
 
     /**
@@ -1214,16 +1250,16 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} to perform the attack.
      * @param direction The direction in which to attack.
-     * @return True if the unit could move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveAttack(Unit unit, Direction direction) {
-        Tile tile = unit.getTile();
-        Tile target = tile.getNeighbourOrNull(direction);
-        Unit u = target.getFirstUnit();
+        final Tile tile = unit.getTile();
+        final Tile target = tile.getNeighbourOrNull(direction);
+        final Unit u = target.getFirstUnit();
         if (u == null || unit.getOwner().owns(u)) return false;
 
-        askClearGotoOrders(unit);
-        if (getGUI().confirmHostileAction(unit, target)
+        if (askClearGotoOrders(unit)
+            && getGUI().confirmHostileAction(unit, target)
             && getGUI().confirmPreCombat(unit, target)) {
             askServer().attack(unit, direction);
         }
@@ -1239,18 +1275,18 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} to perform the attack.
      * @param direction The direction in which to attack.
-     * @return True if the unit could move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveAttackSettlement(Unit unit, Direction direction) {
-        Tile tile = unit.getTile();
-        Tile target = tile.getNeighbourOrNull(direction);
-        Settlement settlement = target.getSettlement();
+        final Tile tile = unit.getTile();
+        final Tile target = tile.getNeighbourOrNull(direction);
+        final Settlement settlement = target.getSettlement();
         if (settlement == null
             || unit.getOwner().owns(settlement)) return false;
 
         ArmedUnitSettlementAction act
             = getGUI().getArmedUnitSettlementChoice(settlement);
-        if (act == null) return true; // Cancelled
+        if (act == null) return false; // Cancelled
         switch (act) {
         case SETTLEMENT_ATTACK:
             if (getGUI().confirmHostileAction(unit, target)
@@ -1260,9 +1296,9 @@ public final class InGameController extends FreeColClientHolder {
                 if (col != null && unit.getOwner().owns(col)) {
                     colonyPanel(col, unit);
                 }
-                return false;
             }
             break;
+
         case SETTLEMENT_TRIBUTE:
             int amount = (settlement instanceof Colony)
                 ? getGUI().confirmEuropeanTribute(unit, (Colony)settlement,
@@ -1270,14 +1306,39 @@ public final class InGameController extends FreeColClientHolder {
                 : (settlement instanceof IndianSettlement)
                 ? getGUI().confirmNativeTribute(unit, (IndianSettlement)settlement)
                 : -1;
-            if (amount <= 0) return true; // Cancelled
-            return moveTribute(unit, amount, direction);
-
+            if (amount > 0) return moveTribute(unit, amount, direction);
+            break;
+            
         default:
             logger.warning("showArmedUnitSettlementDialog fail: " + act);
             break;
         }
-        return true;
+        return false;
+    }
+
+    /**
+     * Primitive to handle autoloading of a list of units onto a carrier.
+     *
+     * @param carrier The carrier {@code Unit} to load onto.
+     * @param embark A list of {@code Unit}s to load.
+     * @return True if automatic movement of the carrier can proceed.
+     */
+    private boolean moveAutoload(Unit carrier, List<Unit> embark) {
+        boolean update = false;
+        for (Unit u : embark) {
+            if (!carrier.couldCarry(u)) continue;
+            try {
+                update |= askEmbark(u, carrier);
+            } finally {
+                if (u.getLocation() != carrier) {
+                    changeState(u, UnitState.SKIPPED);
+                }
+                continue;
+            }
+        }
+        if (update) updateGUI(null);
+        // Boarding might have consumed the carrier moves.
+        return carrier.couldMove();
     }
 
     /**
@@ -1287,7 +1348,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param direction The direction of a settlement to negotiate with.
      * @param dt The base {@code DiplomaticTrade} agreement to
      *     begin the negotiation with.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveDiplomacy(Unit unit, Direction direction,
                                   DiplomaticTrade dt) {
@@ -1297,7 +1358,7 @@ public final class InGameController extends FreeColClientHolder {
             // Can not negotiate with the REF!
             if (colony.getOwner()
                 == unit.getOwner().getREFPlayer()) return false;
-            return !askServer().diplomacy(unit, colony, dt);
+            askServer().diplomacy(unit, colony, dt);
         }
         return false;
     }
@@ -1313,7 +1374,7 @@ public final class InGameController extends FreeColClientHolder {
      *     declined disembarks).
      */
     private boolean moveDisembark(Unit unit, final Direction direction) {
-        Tile tile = unit.getTile().getNeighbourOrNull(direction);
+        final Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile.getFirstUnit() != null
             && tile.getFirstUnit().getOwner() != unit.getOwner()) {
             return false; // Can not disembark onto other nation units.
@@ -1371,14 +1432,14 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} that wishes to embark.
      * @param direction The direction in which to embark.
-     * @return True if the unit could move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveEmbark(Unit unit, Direction direction) {
         if (unit.getColony() != null
             && !getGUI().confirmLeaveColony(unit)) return false;
 
-        Tile sourceTile = unit.getTile();
-        Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
+        final Tile sourceTile = unit.getTile();
+        final Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
         Unit carrier = null;
         List<ChoiceItem<Unit>> choices
             = transform(destinationTile.getUnits(),
@@ -1391,20 +1452,18 @@ public final class InGameController extends FreeColClientHolder {
             carrier = choices.get(0).getObject();
         } else {
             carrier = getGUI().getChoice(unit.getTile(),
-                                    Messages.message("embark.text"),
-                                    unit,
-                                    "none", choices);
-            if (carrier == null) return true; // User cancelled
+                Messages.message("embark.text"), unit, "none", choices);
+            if (carrier == null) return false; // User cancelled
         }
 
-        // Proceed to embark
-        askClearGotoOrders(unit);
-        if (!askServer().embark(unit, carrier, direction)
-            || unit.getLocation() != carrier) {
+        // Proceed to embark, skip if it did not work.
+        if (askClearGotoOrders(unit)
+            && askServer().embark(unit, carrier, direction)
+            && unit.getLocation() == carrier) {
+            unit.getOwner().invalidateCanSeeTiles();
+        } else {
             changeState(unit, UnitState.SKIPPED);
-            return false;
         }
-        unit.getOwner().invalidateCanSeeTiles();
         return false;
     }
 
@@ -1414,28 +1473,30 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} that is exploring.
      * @param direction The direction of a rumour.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveExplore(Unit unit, Direction direction) {
-        Tile tile = unit.getTile().getNeighbourOrNull(direction);
+        // Confirm the move.
+        final Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (!getGUI().confirm(unit.getTile(),
                 StringTemplate.key("exploreLostCityRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
-            if (unit.getDestination() != null) {
-                askClearGotoOrders(unit);
-                return false; // Need to break out of movePath
-            }
-            return true;
+            if (unit.getDestination() != null) askClearGotoOrders(unit);
+            return false;
         }
-        if (tile.getLostCityRumour().getType()== LostCityRumour.RumourType.MOUNDS
+
+        // Handle the mounds decision.
+        if (tile.getLostCityRumour().getType() == LostCityRumour.RumourType.MOUNDS
             && !getGUI().confirm(unit.getTile(),
                 StringTemplate.key("exploreMoundsRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             askServer().declineMounds(unit, direction); // LCR goes away
+            return false;
         }
-        // Prevent turn ending at once to allow FoY prompts to complete
-        moveMode = moveMode.minimize(MoveMode.EXECUTE_GOTO_ORDERS);
-        return moveMove(unit, direction);
+
+        // Always stop automatic movement as exploration always does something.
+        moveTile(unit, direction);
+        return false;
     }
 
     /**
@@ -1445,38 +1506,33 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} to be moved.
      * @param direction The direction in which to move.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed.
      */
     private boolean moveHighSeas(Unit unit, Direction direction) {
         // Confirm moving to Europe if told to move to a null tile
         // (FIXME: can this still happen?), or if crossing the boundary
         // between coastal and high sea.  Otherwise just move.
-        Tile oldTile = unit.getTile();
-        Tile newTile = oldTile.getNeighbourOrNull(direction);
+        final Tile oldTile = unit.getTile();
+        final Tile newTile = oldTile.getNeighbourOrNull(direction);
         if (newTile == null
             || (!oldTile.isDirectlyHighSeasConnected()
                 && newTile.isDirectlyHighSeasConnected())) {
-            if (unit.getTradeRoute() != null) {
-                TradeRouteStop stop = unit.getStop();
-                if (stop != null && TradeRoute.isStopValid(unit, stop)
-                    && stop.getLocation() instanceof Europe) {
-                    moveTo(unit, stop.getLocation());
-                    return false;
-                }
+            TradeRouteStop stop;
+            if (unit.getTradeRoute() != null
+                && (stop = unit.getStop()) != null
+                && TradeRoute.isStopValid(unit, stop)
+                && stop.getLocation() instanceof Europe) {
+                return moveTowardEurope(unit, (Europe)stop.getLocation());
             } else if (unit.getDestination() instanceof Europe) {
-                moveTo(unit, unit.getDestination());
-                return false;
-            } else {
-                if (getGUI().confirm(oldTile, StringTemplate
-                        .template("highseas.text")
-                        .addAmount("%number%", unit.getSailTurns()),
-                        unit, "highseas.yes", "highseas.no")) {
-                    moveTo(unit, unit.getOwner().getEurope());
-                    return false;
-                }
+                return moveTowardEurope(unit, (Europe)unit.getDestination());
+            } else if (getGUI().confirm(oldTile, StringTemplate
+                    .template("highseas.text")
+                    .addAmount("%number%", unit.getSailTurns()),
+                    unit, "highseas.yes", "highseas.no")) {
+                return moveTowardEurope(unit, unit.getOwner().getEurope());
             }
         }
-        return moveMove(unit, direction);
+        return moveTile(unit, direction);
     }
 
     /**
@@ -1487,36 +1543,34 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} to learn the skill.
      * @param direction The direction in which the Indian settlement lies.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveLearnSkill(Unit unit, Direction direction) {
-        askClearGotoOrders(unit);
         // Refresh knowledge of settlement skill.  It may have been
         // learned by another player.
-        if (!askServer().askSkill(unit, direction)) return false;
-
-        IndianSettlement is
-            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
-        UnitType skill = is.getLearnableSkill();
-        if (skill == null) {
-            getGUI().showInformationMessage(is, "info.noMoreSkill");
-        } else if (unit.getUnitChange(UnitChangeType.NATIVES) == null) {
-            getGUI().showInformationMessage(is, StringTemplate
-                .template("info.cantLearnSkill")
-                .addStringTemplate("%unit%",
-                    unit.getLabel(Unit.UnitLabelType.NATIONAL))
-                .addNamed("%skill%", skill));
-        } else if (getGUI().confirm(unit.getTile(), StringTemplate
-                .template("learnSkill.text")
-                .addNamed("%skill%", skill),
-                unit, "learnSkill.yes", "learnSkill.no")) {
-            if (askServer().learnSkill(unit, direction)) {
-                if (unit.isDisposed()) {
-                    getGUI().showInformationMessage(is, "learnSkill.die");
-                    return false;
-                }
-                if (unit.getType() != skill) {
-                    getGUI().showInformationMessage(is, "learnSkill.leave");
+        if (askClearGotoOrders(unit)
+            && askServer().askSkill(unit, direction)) {
+            IndianSettlement is
+                = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
+            UnitType skill = is.getLearnableSkill();
+            if (skill == null) {
+                getGUI().showInformationMessage(is, "info.noMoreSkill");
+            } else if (unit.getUnitChange(UnitChangeType.NATIVES) == null) {
+                getGUI().showInformationMessage(is, StringTemplate
+                    .template("info.cantLearnSkill")
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL))
+                    .addNamed("%skill%", skill));
+            } else if (getGUI().confirm(unit.getTile(), StringTemplate
+                    .template("learnSkill.text")
+                    .addNamed("%skill%", skill),
+                    unit, "learnSkill.yes", "learnSkill.no")) {
+                if (askServer().learnSkill(unit, direction)) {
+                    if (unit.isDisposed()) {
+                        getGUI().showInformationMessage(is, "learnSkill.die");
+                    } else if (unit.getType() != skill) {
+                        getGUI().showInformationMessage(is, "learnSkill.leave");
+                    }
                 }
             }
         }
@@ -1524,36 +1578,29 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * Actually move a unit in a specified direction, following a move
-     * of MoveType.MOVE.
+     * Move a unit in a specified direction on the map, following a
+     * move of MoveType.MOVE.
      *
      * @param unit The {@code Unit} to be moved.
      * @param direction The direction in which to move the Unit.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed.
      */
-    private boolean moveMove(Unit unit, Direction direction) {
+    private boolean moveTile(Unit unit, Direction direction) {
         final ClientOptions options = getClientOptions();
+        List<Unit> ul;
         if (unit.canCarryUnits() && unit.hasSpaceLeft()
-            && options.getBoolean(ClientOptions.AUTOLOAD_SENTRIES)) {
+            && options.getBoolean(ClientOptions.AUTOLOAD_SENTRIES)
+            && unit.isInColony()
+            && !(ul = unit.getTile().getUnitList()).isEmpty()) {
             // Autoload sentries if selected
-            List<Unit> waiting = (unit.getColony() != null)
-                ? unit.getTile().getUnitList()
-                : Collections.<Unit>emptyList();
-            for (Unit u : waiting) {
-                if (u.getState() != UnitState.SENTRY
-                    || !unit.couldCarry(u)) continue;
-                try {
-                    askEmbark(u, unit);
-                } finally {
-                    if (u.getLocation() != unit) {
-                        changeState(u, UnitState.SKIPPED);
-                    }
-                    continue;
-                }
-            }
-            // Boarding consumed this unit's moves.
-            if (unit.getMovesLeft() <= 0) return false;
+            if (!moveAutoload(unit,
+                              transform(ul, Unit.sentryPred))) return false;
         }
+
+        // Break up the goto to allow region naming to occur, BR#2707
+        final Tile newTile = unit.getTile().getNeighbourOrNull(direction);
+        boolean discover = newTile != null
+            && newTile.getDiscoverableRegion() != null;
 
         // Ask the server
         if (!askServer().move(unit, direction)) {
@@ -1564,30 +1611,32 @@ public final class InGameController extends FreeColClientHolder {
         }
 
         unit.getOwner().invalidateCanSeeTiles();
-        
-        final Tile tile = unit.getTile();
-
-        // Perform a short pause on an active unit's last move if
-        // the option is enabled.
+        // Perform a short pause on an active unit's last move if the
+        // option is enabled.
         if (unit.getMovesLeft() <= 0
             && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
             getGUI().paintImmediatelyCanvasInItsBounds();
-            Utils.delay(UNIT_LAST_MOVE_DELAY, "Last unit move delay interrupted.");
+            Utils.delay(UNIT_LAST_MOVE_DELAY, "Last move delay interrupted.");
         }
 
         // Update the active unit and GUI.
         boolean ret = !unit.isDisposed() && !checkCashInTreasureTrain(unit);
         if (ret) {
-            if (tile.getColony() != null && unit.isCarrier()) {
-                final Colony colony = tile.getColony();
-                if (unit.getTradeRoute() == null
-                    && Map.isSameLocation(tile, unit.getDestination())) {
-                    colonyPanel(colony, unit);
-                }
+            final Tile tile = unit.getTile();
+            if (unit.isInColony()
+                && unit.isCarrier()
+                && unit.getTradeRoute() == null
+                && Map.isSameLocation(tile, unit.getDestination())) {
+                // Bring up colony panel if non-trade-route carrier
+                // unit just arrived at a destination colony.
+                // Automatic movement should stop.
+                colonyPanel(tile.getColony(), unit);
+                ret = false;
+            } else {
+                ; // Automatic movement can continue after successful move.
             }
-            ret = unit.getMovesLeft() > 0;
         }
-        return ret;
+        return ret && !discover;
     }
 
     /**
@@ -1599,13 +1648,14 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The unit that will spy, negotiate or attack.
      * @param direction The direction in which the foreign colony lies.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveScoutColony(Unit unit, Direction direction) {
         final Game game = getGame();
         Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
         boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
-        askClearGotoOrders(unit);
+
+        if (!askClearGotoOrders(unit)) return false;
 
         ScoutColonyAction act
             = getGUI().getScoutForeignColonyChoice(colony, unit, canNeg);
@@ -1641,41 +1691,43 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} that is scouting.
      * @param direction The direction in which the Indian settlement lies.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveScoutIndianSettlement(Unit unit, Direction direction) {
         Tile unitTile = unit.getTile();
         Tile tile = unitTile.getNeighbourOrNull(direction);
         IndianSettlement is = tile.getIndianSettlement();
         Player player = unit.getOwner();
-        askClearGotoOrders(unit);
+
+        if (!askClearGotoOrders(unit)
+            || !askServer().scoutSettlement(unit, direction)) return false;
 
         // Offer the choices.
-        if (!askServer().scoutSettlement(unit, direction)) return false;
         int count = player.getNationSummary(is.getOwner())
             .getNumberOfSettlements();
         String number = (count <= 0) ? Messages.message("many")
             : Integer.toString(count);
         ScoutIndianSettlementAction act
             = getGUI().getScoutIndianSettlementChoice(is, number);
-        if (act == null) return true; // Cancelled
+        if (act == null) return false; // Cancelled
         switch (act) {
         case SCOUT_SETTLEMENT_ATTACK:
-            if (!getGUI().confirmPreCombat(unit, tile)) return true;
-            askServer().attack(unit, direction);
-            return false;
+            if (getGUI().confirmPreCombat(unit, tile)) {
+                askServer().attack(unit, direction);
+            }
+            break;
         case SCOUT_SETTLEMENT_SPEAK:
             // Prevent turn ending to allow speaking results to complete
             moveMode = moveMode.minimize(MoveMode.EXECUTE_GOTO_ORDERS);
             askServer().scoutSpeakToChief(unit, is);
-            return false;
+            break;
         case SCOUT_SETTLEMENT_TRIBUTE:
             return moveTribute(unit, 1, direction);
         default:
             logger.warning("showScoutIndianSettlementDialog fail: " + act);
             break;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -1683,13 +1735,16 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} that is spying.
      * @param direction The {@code Direction} of a colony to spy on.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveSpy(Unit unit, Direction direction) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
-        return (settlement instanceof Colony)
-            ? askServer().spy(unit, settlement)
-            : false;
+        if (settlement instanceof Colony && !unit.getOwner().owns(settlement)) {
+            askServer().spy(unit, settlement);
+        } else {
+            logger.warning("Unit " + unit + " can not spy on " + settlement);
+        }                
+        return false;
     }
 
     /**
@@ -1698,10 +1753,10 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The carrier.
      * @param direction The direction to the settlement.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveTrade(Unit unit, Direction direction) {
-        askClearGotoOrders(unit);
+        if (!askClearGotoOrders(unit)) return false;
 
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         if (settlement instanceof Colony) {
@@ -1712,18 +1767,19 @@ public final class InGameController extends FreeColClientHolder {
                     player, settlement.getOwner(), null, 0);
             agreement = getGUI().showNegotiationDialog(unit, settlement,
                 agreement, agreement.getSendMessage(player, settlement));
-            return (agreement == null
-                || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
-                : moveDiplomacy(unit, direction, agreement);
+            if (agreement != null
+                && agreement.getStatus() != TradeStatus.REJECT_TRADE)
+                return moveDiplomacy(unit, direction, agreement);
+
         } else if (settlement instanceof IndianSettlement) {
-            boolean ret = !askServer().newNativeTradeSession(unit,
-                (IndianSettlement)settlement);
+            askServer().newNativeTradeSession(unit, (IndianSettlement)settlement);
             getGUI().setActiveUnit(unit); // Will be deselected on losing moves
-            return ret;
+
         } else {
             throw new RuntimeException("Bogus settlement: "
                 + settlement.getId());
         }
+        return false;
     }
 
     /**
@@ -1732,7 +1788,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param unit The {@code Unit} to perform the attack.
      * @param amount An amount of tribute to demand.
      * @param direction The direction in which to attack.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveTribute(Unit unit, int amount, Direction direction) {
         final Game game = getGame();
@@ -1762,21 +1818,21 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} that will enter the settlement.
      * @param direction The direction in which the Indian settlement lies.
-     * @return True if the unit can move further.
+     * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveUseMissionary(Unit unit, Direction direction) {
-        IndianSettlement is
+        final IndianSettlement is
             = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
         Player player = unit.getOwner();
         boolean canEstablish = !is.hasMissionary();
         boolean canDenounce = !canEstablish
             && !is.hasMissionary(player);
-        askClearGotoOrders(unit);
+        if (!askClearGotoOrders(unit)) return false;
 
         // Offer the choices.
         MissionaryAction act = getGUI().getMissionaryChoice(unit, is,
             canEstablish, canDenounce);
-        if (act == null) return true;
+        if (act == null) return false;
         switch (act) {
         case MISSIONARY_ESTABLISH_MISSION: case MISSIONARY_DENOUNCE_HERESY:
             if (askServer().missionary(unit, direction,
@@ -1792,8 +1848,7 @@ public final class InGameController extends FreeColClientHolder {
                 unit, "missionarySettlement.cancel",
                 transform(getGame().getLiveEuropeanPlayers(player), alwaysTrue(),
                     p -> new ChoiceItem<>(Messages.message(p.getCountryLabel()), p)));
-            if (enemy == null) return true;
-            askServer().incite(unit, is, enemy, -1);
+            if (enemy != null) askServer().incite(unit, is, enemy, -1);
             break;
         default:
             logger.warning("showUseMissionaryDialog fail");
@@ -1812,9 +1867,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param unit The {@code Unit} on the route.
      * @param messages An optional list in which to retain any
      *     {@code ModelMessage}s generated.
-     * @return True if the unit should keep moving, which can only
-     *     happen if the trade route is found to be broken and the
-     *     unit is thrown off it.
+     * @return True if automatic movement can proceed.
      */
     private boolean followTradeRoute(Unit unit, List<ModelMessage> messages) {
         final Player player = unit.getOwner();
@@ -1824,7 +1877,7 @@ public final class InGameController extends FreeColClientHolder {
         final boolean checkProduction = getClientOptions()
             .getBoolean(ClientOptions.STOCK_ACCOUNTS_FOR_PRODUCTION);
         final List<TradeRouteStop> stops = unit.getCurrentStops();
-        boolean result = false;
+        boolean result = true;
 
         // If required, accumulate a summary of all the activity of
         // this unit on its trade route.
@@ -1843,7 +1896,7 @@ public final class InGameController extends FreeColClientHolder {
         if (!valid) {
             clearOrders(unit);
             stops.clear();
-            result = unit.getMovesLeft() > 0;
+            result = false;
         }
 
         // Try to find work to do on the current list of stops.
@@ -3397,7 +3450,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param key An optional message key.
      * @param scores The list of {@code HighScore} records to display.
      */
-    public void highScoreHandler(String key, List<HighScore> scores) {
+    public void highScoresHandler(String key, List<HighScore> scores) {
         invokeLater(() ->
             getGUI().showHighScoresPanel(key, scores));
     }
@@ -3722,52 +3775,36 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param unit The {@code Unit} to be moved.
      * @param destination The {@code Location} to be moved to.
-     * @return True if the unit can possibly move further.
+     * @return True if automatic movement of the unit can proceed.
      */
     public boolean moveTo(Unit unit, Location destination) {
         if (!requireOurTurn() || unit == null
             || destination == null) return false;
 
-        // Sanity check current state.
+        // Consider the distinct types of destinations.
         if (destination instanceof Europe) {
             if (unit.isInEurope()) {
                 sound("sound.event.illegalMove");
                 return false;
             }
+            return moveTowardEurope(unit, (Europe)destination);
         } else if (destination instanceof Map) {
-            if (unit.hasTile() && unit.getTile().getMap() == destination) {
+            if (unit.hasTile()
+                // Will we have multiple maps one day?
+                && unit.getTile().getMap() == destination) {
                 sound("sound.event.illegalMove");
                 return false;
             }
+            return moveAwayFromEurope(unit, destination);
         } else if (destination instanceof Settlement) {
             if (unit.hasTile()) {
                 sound("sound.event.illegalMove");
                 return false;
             }
+            return moveAwayFromEurope(unit, destination);
         } else {
             return false;
         }
-
-        // Autoload?
-        boolean update = false;
-        if (getClientOptions().getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
-            && unit.isInEurope()) {
-            for (Unit u : transform(unit.getOwner().getEurope().getUnits(),
-                    u -> (!u.isNaval()
-                        && u.getState() == UnitState.SENTRY
-                        && unit.canAdd(u)))) {
-                update |= askEmbark(u, unit);
-            }
-        }
-
-        UnitWas unitWas = new UnitWas(unit);
-        boolean ret = askServer().moveTo(unit, destination);
-        if (ret) {
-            unitWas.fireChanges();
-            update = true;
-        }
-        if (update) updateGUI(null);
-        return ret;
     }
 
     /**
@@ -4442,7 +4479,7 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = getMyPlayer();
         if (!player.isColonial()) return false;
 
-        if (!player.checkGold(player.getRecruitPrice())) {
+        if (!player.checkGold(player.getEuropeanRecruitPrice())) {
             getGUI().showInformationMessage("info.notEnoughGold");
             return false;
         }
@@ -4657,13 +4694,13 @@ public final class InGameController extends FreeColClientHolder {
             if (destination instanceof Europe) {
                 if (unit.hasTile()
                     && unit.getTile().isDirectlyHighSeasConnected()) {
-                    moveTo(unit, destination);
+                    moveTowardEurope(unit, (Europe)destination);
                 } else {
                     moveToDestination(unit, null);
                 }
             } else {
                 if (unit.isInEurope()) {
-                    moveTo(unit, destination);
+                    moveAwayFromEurope(unit, destination);
                 } else {
                     moveToDestination(unit, null);
                 }

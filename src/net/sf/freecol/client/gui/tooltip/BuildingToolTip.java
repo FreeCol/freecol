@@ -131,11 +131,16 @@ public class BuildingToolTip extends JToolTip {
                         new AbstractGoods(outputType, amount));
                     add(pLabel, "split 2");
                     add(new JLabel());
-                } else if (building.canTeach() && unit.getStudent() != null) {
+                }
+            }
+        } else if (building.canTeach()) {
+            for (Unit unit : building.getUnitList()) {
+                UnitLabel unitLabel = new UnitLabel(freeColClient, unit, false);
+                if (unit.getStudent() != null) {
                     JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/"
                         + unit.getNeededTurnsOfTraining());
                     UnitLabel sLabel = new UnitLabel(freeColClient,
-                        unit.getStudent(), true);
+                            unit.getStudent(), true);
                     sLabel.setIgnoreLocation(true);
                     add(unitLabel);
                     add(progress, "split 2, flowy");

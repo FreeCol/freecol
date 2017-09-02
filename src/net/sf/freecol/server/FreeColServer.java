@@ -255,6 +255,7 @@ public final class FreeColServer {
             try {
                 ret = new Server(this, host, port);
                 ret.start();
+                logger.finest("serverStart(" + host + ", " + port + ")");
                 break;
             } catch (IOException ie) {
                 if (i <= 1) throw ie; // Give up at last try

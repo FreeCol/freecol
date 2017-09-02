@@ -865,8 +865,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         this.agreement = agreement;
         this.comment = comment;
 
-        StringTemplate nation = player.getNationLabel(),
-                otherNation = otherPlayer.getNationLabel();
+        StringTemplate nation = player.getCountryLabel(),
+                otherNation = otherPlayer.getCountryLabel();
         this.demand = StringTemplate.template("negotiationDialog.demand")
                 .addStringTemplate("%nation%", nation)
                 .addStringTemplate("%otherNation%", otherNation);

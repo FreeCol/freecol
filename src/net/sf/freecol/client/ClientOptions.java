@@ -51,6 +51,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.TextOption;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -554,7 +555,11 @@ public class ClientOptions extends OptionGroup {
      */
     public boolean merge(File file) {
         ClientOptions clop = new ClientOptions();
-        return (!clop.load(file)) ? false : this.merge(clop);
+        if (!clop.load(file)) return false;
+        LogBuilder lb = new LogBuilder(64);
+        boolean ret = this.merge(clop, lb);
+        lb.shrink("\n"); lb.log(logger, Level.FINEST);
+        return ret;
     }
 
     /**
@@ -565,7 +570,11 @@ public class ClientOptions extends OptionGroup {
      */
     public boolean merge(FreeColSavegameFile save) {
         ClientOptions clop = new ClientOptions();
-        return (!clop.load(save)) ? false : this.merge(clop);
+        if (!clop.load(save)) return false;
+        LogBuilder lb = new LogBuilder(64);
+        boolean ret = this.merge(clop, lb);
+        lb.shrink("\n"); lb.log(logger, Level.FINEST);
+        return ret;
     }
 
     /**
