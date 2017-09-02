@@ -404,7 +404,7 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps(), unit);
         sis.getOwner().modifyGold(price);
         owner.modifyGold(-price);
-        sis.csModifyAlarm(owner, -price/50, true, cs);
+        sis.csModifyAlarm(owner, sis.csTradeAlarmModifier(price), true, cs);
         sis.updateWantedGoods();
         final Tile tile = sis.getTile();
         tile.updateIndianSettlement(owner);
@@ -432,7 +432,7 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps(), unit);
         sis.getOwner().modifyGold(-price);
         owner.modifyGold(price);
-        sis.csModifyAlarm(owner, -price/50, true, cs);
+        sis.csModifyAlarm(owner, sis.csTradeAlarmModifier(price), true, cs);
         sis.updateWantedGoods();
         final Tile tile = sis.getTile();
         tile.updateIndianSettlement(owner);
@@ -460,7 +460,7 @@ public final class InGameController extends Controller {
         csVisit(owner, sis, 0, cs);
         GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), sis);
         cs.add(See.perhaps(), unit);
-        sis.csModifyAlarm(owner, -price/50, true, cs);
+        sis.csModifyAlarm(owner, sis.csTradeAlarmModifier(price, true), true, cs);
         sis.updateWantedGoods();
         final Tile tile = sis.getTile();
         tile.updateIndianSettlement(owner);
@@ -1664,7 +1664,7 @@ public final class InGameController extends Controller {
         if (settlement instanceof ServerIndianSettlement) {
             ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
             csVisit(serverPlayer, sis, 0, cs);
-            sis.csModifyAlarm(serverPlayer, -sis.getPriceToBuy(goods) / 50,
+            sis.csModifyAlarm(serverPlayer, sis.csTradeAlarmModifier(sis.getPriceToBuy(goods), true),
                               true, cs);
             sis.updateWantedGoods();
             tile.updateIndianSettlement(serverPlayer);

@@ -66,6 +66,10 @@ public class ServerIndianSettlement extends IndianSettlement
 
     public static final int MAX_HORSES_PER_TURN = 2;
 
+    /**
+     * Alarm modifier
+     */
+    public static final int ALARM_MODIFIER = 5;
 
     /**
      * Trivial constructor for Game.newInstance.
@@ -360,6 +364,33 @@ public class ServerIndianSettlement extends IndianSettlement
             cs.add(See.perhaps(), this);
         }
         return change;
+    }
+
+    /**
+     * Alarm modifier factor applied to trades (buy/sell/gift).
+     * Gifts have a higher modifier factor than buy/sell.
+     *
+     * @param price The price of the goods being exchanged.
+     * @return alarm amount to modify
+     */
+    public int csTradeAlarmModifier(int price, boolean isGift) {
+        // Higher modifiers mean a lower divisor.
+        // e.g.: (10 - 8) * 10 = 20
+        int divisor = (10 - this.ALARM_MODIFIER) * 10;
+        // Gifts double the modifier factor
+        divisor = (isGift) ? divisor / 2 : divisor;
+
+        return -price / divisor;
+    }
+
+    /**
+     * Alarm modifier factor applied to trades (buy/sell)
+     *
+     * @param price The price of the goods being exchanged.
+     * @return alarm amount to modify
+     */
+    public int csTradeAlarmModifier(int price) {
+        return this.csTradeAlarmModifier(price, false);
     }
 
     /**
