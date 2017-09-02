@@ -67,9 +67,9 @@ public class ServerIndianSettlement extends IndianSettlement
     public static final int MAX_HORSES_PER_TURN = 2;
 
     /**
-     * Alarm modifier
+     * Trade Alarm modifier
      */
-    public static final int ALARM_MODIFIER = 5;
+    public static final int TRADE_ALARM_MODIFIER = 5;
 
     /**
      * Trivial constructor for Game.newInstance.
@@ -376,7 +376,7 @@ public class ServerIndianSettlement extends IndianSettlement
     public int csTradeAlarmModifier(int price, boolean isGift) {
         // Higher modifiers mean a lower divisor.
         // e.g.: (10 - 8) * 10 = 20
-        int divisor = (10 - this.ALARM_MODIFIER) * 10;
+        int divisor = (10 - this.TRADE_ALARM_MODIFIER) * 10;
         // Gifts double the modifier factor
         divisor = (isGift) ? divisor / 2 : divisor;
 
