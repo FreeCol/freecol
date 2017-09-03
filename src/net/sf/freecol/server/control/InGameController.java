@@ -398,13 +398,15 @@ public final class InGameController extends Controller {
      */
     private void csBuy(Unit unit, Goods goods, int price,
                        ServerIndianSettlement sis, ChangeSet cs) {
+        final int alarmBonus = -Math.round(price * 0.01f * getGame().getSpecification()
+                                            .getInteger(GameOptions.ALARM_BONUS_BUY));
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
         csVisit(owner, sis, 0, cs);
         GoodsLocation.moveGoods(sis, goods.getType(), goods.getAmount(), unit);
         cs.add(See.perhaps(), unit);
         sis.getOwner().modifyGold(price);
         owner.modifyGold(-price);
-        sis.csModifyAlarm(owner, -price/50, true, cs);
+        sis.csModifyAlarm(owner, alarmBonus, true, cs);
         sis.updateWantedGoods();
         final Tile tile = sis.getTile();
         tile.updateIndianSettlement(owner);
@@ -427,12 +429,14 @@ public final class InGameController extends Controller {
     private void csSell(Unit unit, Goods goods, int price,
                         ServerIndianSettlement sis, ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
+        final int alarmBonus = -Math.round(price * 0.001f * getGame().getSpecification()
+                                           .getInteger(GameOptions.ALARM_BONUS_SELL));
         csVisit(owner, sis, 0, cs);
         GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), sis);
         cs.add(See.perhaps(), unit);
         sis.getOwner().modifyGold(-price);
         owner.modifyGold(price);
-        sis.csModifyAlarm(owner, -price/50, true, cs);
+        sis.csModifyAlarm(owner, alarmBonus, true, cs);
         sis.updateWantedGoods();
         final Tile tile = sis.getTile();
         tile.updateIndianSettlement(owner);
@@ -457,10 +461,12 @@ public final class InGameController extends Controller {
     private void csGift(Unit unit, Goods goods, int price,
                         ServerIndianSettlement sis, ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
+        final int alarmBonus = -Math.round(price * 0.001f * getGame().getSpecification()
+                                           .getInteger(GameOptions.ALARM_BONUS_GIFT));
         csVisit(owner, sis, 0, cs);
         GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), sis);
         cs.add(See.perhaps(), unit);
-        sis.csModifyAlarm(owner, -price/50, true, cs);
+        sis.csModifyAlarm(owner, alarmBonus, true, cs);
         sis.updateWantedGoods();
         final Tile tile = sis.getTile();
         tile.updateIndianSettlement(owner);
@@ -1663,9 +1669,12 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps(), unit);
         if (settlement instanceof ServerIndianSettlement) {
             ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
+            final int alarmBonus = -Math.round(sis.getPriceToBuy(goods)
+                                               * 0.001f * getGame().getSpecification()
+                                               .getInteger(GameOptions.ALARM_BONUS_GIFT));
+
             csVisit(serverPlayer, sis, 0, cs);
-            sis.csModifyAlarm(serverPlayer, -sis.getPriceToBuy(goods) / 50,
-                              true, cs);
+            sis.csModifyAlarm(serverPlayer, alarmBonus, true, cs);
             sis.updateWantedGoods();
             tile.updateIndianSettlement(serverPlayer);
             cs.add(See.only(serverPlayer), tile);

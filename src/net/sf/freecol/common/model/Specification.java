@@ -2807,6 +2807,12 @@ public final class Specification {
         // @compat 0.11.6
         ret |= checkIntegerOption(GameOptions.SETTLEMENT_NUMBER_OF_GOODS_TO_SELL,
                                   GameOptions.GAMEOPTIONS_MAP, 3);
+        ret |= checkIntegerOption(GameOptions.ALARM_BONUS_BUY,
+                                  GameOptions.GAMEOPTIONS_MAP, 80);
+        ret |= checkIntegerOption(GameOptions.ALARM_BONUS_SELL,
+                                  GameOptions.GAMEOPTIONS_MAP, 40);
+        ret |= checkIntegerOption(GameOptions.ALARM_BONUS_GIFT,
+                                  GameOptions.GAMEOPTIONS_MAP, 80);
         // end @compat 0.11.6
 
         // SAVEGAME_VERSION == 14

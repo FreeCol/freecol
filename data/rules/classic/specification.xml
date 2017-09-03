@@ -4576,6 +4576,13 @@
              settlement. -->
         <percentageOption id="model.option.demandProbability"
                           defaultValue="10" />
+        <!-- Percentage impact on Native Alarm trades will have -->
+        <percentageOption id="model.option.alarmBonusBuy"
+                          defaultValue="80"/>
+        <percentageOption id="model.option.alarmBonusSell"
+                          defaultValue="40"/>
+        <percentageOption id="model.option.alarmBonusGift"
+                          defaultValue="80"/>
         <!-- Maximum number of goods a native settlement will offer
              for sale. -->
         <integerOption id="model.option.settlementNumberOfGoodsToSell"
