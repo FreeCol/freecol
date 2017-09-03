@@ -2413,6 +2413,7 @@ public final class Specification {
             GameOptions.NATIVE_DEMANDS,
             GameOptions.RUMOUR_DIFFICULTY,
             GameOptions.SHIP_TRADE_PENALTY,
+            GameOptions.TRADE_ALARM_BONUS,
             GameOptions.BUILD_ON_NATIVE_LAND,
             GameOptions.SETTLEMENT_NUMBER);
         ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_MONARCH, lb,
@@ -2807,6 +2808,8 @@ public final class Specification {
         // @compat 0.11.6
         ret |= checkIntegerOption(GameOptions.SETTLEMENT_NUMBER_OF_GOODS_TO_SELL,
                                   GameOptions.GAMEOPTIONS_MAP, 3);
+        ret |= checkIntegerOption(GameOptions.TRADE_ALARM_BONUS,
+                                  GameOptions.DIFFICULTY_NATIVES, 50);
         // end @compat 0.11.6
 
         // SAVEGAME_VERSION == 14
