@@ -411,7 +411,7 @@ recommended for a release. Uploads to sourceforge use \texttt{sftp}.
 
 \item Start a clean compile, run all tests and verify the
   specification(s). You can do that by calling \verb+ant prepare-commit+.
- 
+
 \item Call \verb+ant dist+ in order to build all packages. You will be
   prompted for the version of this release. Alternatively, you can
   specify the version on the command line, by with something like:
@@ -437,7 +437,7 @@ recommended for a release. Uploads to sourceforge use \texttt{sftp}.
 
 \item Upload the packages to \verb+sftp://frs.sourceforge.net/+. A
   script \verb|bin/release.sh| is provided that does this job,
-  including rebuilding and uploading the manual and JavaDoc. 
+  including rebuilding and uploading the manual and JavaDoc.
 
 \item Write a release announcement (see previous versions for
   comparison). Include information on savegame compatibility with
@@ -660,7 +660,7 @@ The unit can be born in a colony, provided that enough food is available.
 \ability{model.ability.bornInIndianSettlement}
 \affectsUnit
 
-The unit can be born in an Indian settlement, provided that enough food is available.
+The unit can be born in an Native settlement, provided that enough food is available.
 
 \ability{model.ability.build}
 \affectsBuilding
@@ -924,7 +924,7 @@ Goods of this type contribute to the player's immigration points.
 \modifier{model.modifier.landPaymentModifier}
 \affectsPlayer
 
-The player can buy Indian land at a reduced price.
+The player can buy Native land at a reduced price.
 
 \modifier{model.modifier.liberty}
 \textit{Affects: Player\\Provided by: Goods Type}
@@ -1007,7 +1007,7 @@ other files that implement the required changes. \texttt{mod.xml}
 simply contains: \texttt{<mod id="}\emph{identifier}\texttt{" />}
 where the identifier is some unique name (distinct from other existing
 mods). The \texttt{FreeColMessages.properties} file should contain at
-minimum entries for \texttt{mod.}\emph{identifier}\texttt{.name} 
+minimum entries for \texttt{mod.}\emph{identifier}\texttt{.name}
 and \texttt{mod.}\emph{identifier}\texttt{.shortDescription}, so that
 the mod selection dialog can display the mod correctly. Other
 messages needed by the mod belong in \texttt{ModMessages.properties}.
