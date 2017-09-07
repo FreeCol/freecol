@@ -33,7 +33,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
  */
 public class RandomChoice<T> {
 
-    private final int probability;
+    private int probability;
     private final T object;
 
 
@@ -67,7 +67,6 @@ public class RandomChoice<T> {
         return sum(input, RandomChoice::getProbability);
     }
 
-
     public static <T> T getWeightedRandom(Logger logger, String logMe,
                                           Collection<RandomChoice<T>> input,
                                           Random random) {
@@ -83,5 +82,16 @@ public class RandomChoice<T> {
                                           Random random) {
         return (input == null) ? null
             : getWeightedRandom(logger, logMe, toList(input), random);
+    }
+
+    public static <T> void normalize(Collection<RandomChoice<T>> input,
+                                     int expectedTotal) {
+        int n;
+        if (input == null || input.isEmpty()
+            || (n = getTotalProbability(input)) <= 0) return;
+        final double mult = (double)expectedTotal / n;
+        for (RandomChoice<T> choice : input) {
+            choice.probability = (int)Math.round(mult * choice.probability);
+        }
     }
 }
