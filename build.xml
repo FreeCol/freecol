@@ -282,7 +282,7 @@
     </target>
 
     <target name="prepareBaseFiles" depends="initDist,desktop-entry">
-        <antcall target="clean"/>
+        <antcall target="cleanMain"/>
         <antcall target="package"/>
         <mkdir dir="${freecol.release.dir}/base/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/base/${freecol.name}">
@@ -302,7 +302,7 @@
     </target>
 
     <target name="prepareSourceFiles" depends="initDist">
-        <antcall target="clean"/>
+        <antcall target="cleanMain"/>
         <mkdir dir="${freecol.release.dir}/source/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/source/${freecol.name}">
             <fileset dir="${basedir}"
@@ -546,8 +546,7 @@
         </tar>
     </target>
 
-    <!-- Cleans the directories by removing auto-generated files. -->
-    <target name="clean" depends="init"
+    <target name="cleanBuild" depends="init"
             description="Cleans the directories by removing auto-generated files.">
         <delete quiet="true" includeEmptyDirs="true">
             <fileset dir="${freecol.build.dir}" includes="net/**" />
@@ -558,12 +557,20 @@
             <fileset dir="${freecol.doc.dir}"
                      excludes="*.tex *.sty images/* specification.*" />
         </delete>
+    </target>
+
+    <target name="cleanMain" depends="init"
+            description="Clean the main (non-build) tree by removing auto-generated files.">
         <delete quiet="true" file="${freecol.jar.file}"/>
         <delete quiet="true" file="${freecol.metaserver.jar.file}"/>
         <delete quiet="true" file="TESTS-TestSuites.xml"/>
         <delete quiet="true" dir="${freecol.javadoc.dir}"/>
         <delete quiet="true" file="Freecol.log"/>
         <delete quiet="true" file="${basedir}/test/data/specification.xml"/>
+    </target>
+
+    <target name="clean" depends="cleanBuild,cleanMain"
+            description="General cleanup.">
     </target>
 
     <target name="distclean" depends="init,clean"
