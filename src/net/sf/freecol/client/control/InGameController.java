@@ -4201,12 +4201,17 @@ public final class InGameController extends FreeColClientHolder {
                     }
                     newRegionName(region, tile, unit, name);
                 } else {
-                    getGUI().showNamingDialog(StringTemplate
-                        .template("nameRegion.text")
-                        .addStringTemplate("%type%", region.getLabel()),
-                        name, unit,
-                        (String n) -> newRegionName(region, tile, unit,
-                            (n == null || n.isEmpty()) ? name : n));
+                    if (getClientOptions().getBoolean(ClientOptions.SHOW_REGION_NAMING)) {
+                        getGUI().showNamingDialog(StringTemplate
+                                        .template("nameRegion.text")
+                                        .addStringTemplate("%type%", region.getLabel()),
+                                name, unit,
+                                (String n) -> newRegionName(region, tile, unit,
+                                        (n == null || n.isEmpty()) ? name : n));
+                    } else {
+                        newRegionName(region, tile, unit, name);
+                    }
+
                 }
             });
     }
