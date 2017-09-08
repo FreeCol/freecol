@@ -357,6 +357,10 @@ public class GameOptions {
     public static final String SHIP_TRADE_PENALTY
         = "model.option.shipTradePenalty";
 
+    /** Bonus applied to Native alarm when conducting trades */
+    public static final String TRADE_ALARM_BONUS
+        = "model.option.tradeAlarmBonus";
+
     /** The score penalty for destroying a settlement. */
     public static final String DESTROY_SETTLEMENT_SCORE
         = "model.option.destroySettlementScore";

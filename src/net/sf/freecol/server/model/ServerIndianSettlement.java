@@ -45,6 +45,8 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+
+import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
@@ -66,6 +68,24 @@ public class ServerIndianSettlement extends IndianSettlement
 
     public static final int MAX_HORSES_PER_TURN = 2;
 
+    /**
+     * Constants for Trade Alarm Modifiers
+     */
+    public enum tradeType {
+        SELL(1),
+        BUY(5),
+        GIFT(3);
+
+        private final int type;
+
+        tradeType(int type) {
+            this.type = type;
+        }
+
+        public int getType() {
+            return type;
+        }
+    }
 
     /**
      * Trivial constructor for Game.newInstance.
@@ -360,6 +380,22 @@ public class ServerIndianSettlement extends IndianSettlement
             cs.add(See.perhaps(), this);
         }
         return change;
+    }
+
+    /**
+     * Alarm modifier factor applied to trades (buy/sell/gift).
+     * Gifts have a higher modifier factor than buy/sell.
+     *
+     * @param price The price of the goods being exchanged.
+     * @return alarm amount to modify
+     */
+    public int csTradeAlarmModifier(int price, tradeType tradeType) {
+        final Specification spec = getSpecification();
+
+        int divisor = 100 - spec.getInteger(GameOptions.TRADE_ALARM_BONUS);
+        divisor = divisor / tradeType.getType();
+
+        return -price / divisor;
     }
 
     /**

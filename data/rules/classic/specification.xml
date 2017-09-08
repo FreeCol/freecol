@@ -3378,6 +3378,8 @@
                          value="0"/>
           <integerOption id="model.option.shipTradePenalty"
                          value="-20"/>
+          <integerOption id="model.option.tradeAlarmBonus"
+                         value="80"/>
           <integerOption id="model.option.destroySettlementScore"
                          value="-2"/>
           <stringOption id="model.option.buildOnNativeLand"
@@ -3568,6 +3570,8 @@
                          value="1"/>
           <integerOption id="model.option.shipTradePenalty"
                          value="-25"/>
+          <integerOption id="model.option.tradeAlarmBonus"
+                         value="65"/>
           <integerOption id="model.option.destroySettlementScore"
                          value="-3"/>
           <stringOption  id="model.option.buildOnNativeLand"
@@ -3753,6 +3757,8 @@
                          value="2"/>
           <integerOption id="model.option.shipTradePenalty"
                          value="-30"/>
+          <integerOption id="model.option.tradeAlarmBonus"
+                         value="50"/>
           <integerOption id="model.option.destroySettlementScore"
                          value="-4"/>
           <stringOption  id="model.option.buildOnNativeLand"
@@ -3932,6 +3938,8 @@
                          value="3"/>
           <integerOption id="model.option.shipTradePenalty"
                          value="-35"/>
+          <integerOption id="model.option.tradeAlarmBonus"
+                         value="35"/>
           <integerOption id="model.option.destroySettlementScore"
                          value="-5"/>
           <stringOption  id="model.option.buildOnNativeLand"
@@ -4111,6 +4119,8 @@
                          value="4"/>
           <integerOption id="model.option.shipTradePenalty"
                          value="-40"/>
+          <integerOption id="model.option.tradeAlarmBonus"
+                         value="20"/>
           <integerOption id="model.option.destroySettlementScore"
                          value="-6"/>
           <stringOption  id="model.option.buildOnNativeLand"
@@ -4306,6 +4316,8 @@
                          value="4" minimumValue="0" maximumValue="4"/>
           <integerOption id="model.option.shipTradePenalty"
                          value="-40" minimumValue="-100" maximumValue="0"/>
+          <integerOption id="model.option.tradeAlarmBonus"
+                         value="20" minimumValue="10" maximumValue="90"/>
           <integerOption id="model.option.destroySettlementScore"
                          value="-6" minimumValue="-10" maximumValue="0"/>
           <!-- Whether a player can build a colony on native land without
