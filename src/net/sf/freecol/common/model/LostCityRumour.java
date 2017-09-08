@@ -189,6 +189,9 @@ public class LostCityRumour extends TileItem {
         // Base bad and good chances are difficulty options.
         int percentBad = spec.getInteger(GameOptions.BAD_RUMOUR);
         int percentGood = spec.getInteger(GameOptions.GOOD_RUMOUR);
+        int percentNeutral = 0;
+        int probabilityBad = 100;
+        boolean isExpertScout = unit != null && unit.hasAbility(Ability.EXPERT_SCOUT);
 
         // Expert scouts have a beneficial modifier that works on both
         // percentages
@@ -204,10 +207,10 @@ public class LostCityRumour extends TileItem {
             && unit.getOwner().hasAbility(Ability.RUMOURS_ALWAYS_POSITIVE)) {
             percentBad = 0;
             percentGood = 100;
+        } else {
+            // Neutral is what is left.
+            percentNeutral = Math.max(0, 100 - percentBad - percentGood);
         }
-
-        // Neutral is what is left.
-        int percentNeutral = Math.max(0, 100 - percentBad - percentGood);
 
         // Add all possible events to a RandomChoice List
         List<RandomChoice<RumourType>> c = new ArrayList<>();
@@ -243,11 +246,12 @@ public class LostCityRumour extends TileItem {
             // If the tile is native-owned, allow burial grounds rumour.
             c.add(new RandomChoice<>(RumourType.BURIAL_GROUND,
                     25 * percentBad));
+            probabilityBad = probabilityBad - 25;
+        }
+
+        if (!isExpertScout) {
             c.add(new RandomChoice<>(RumourType.EXPEDITION_VANISHES,
-                    75 * percentBad));
-        } else {
-            c.add(new RandomChoice<>(RumourType.EXPEDITION_VANISHES,
-                    100 * percentBad));
+                    probabilityBad * percentBad));
         }
 
         // The NEUTRAL
