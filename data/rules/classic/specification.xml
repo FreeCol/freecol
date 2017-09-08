@@ -1789,11 +1789,11 @@
                         to="model.unit.undead" probability="100"/>
     </unit-change-type>
   </unit-change-types>
-   
+
   <unit-types>
     <!-- ATTENTION: skill-taught can NOT be inherited because it
          defaults to the unit type itself! -->
-    <unit-type id="colonist" abstract="true" 
+    <unit-type id="colonist" abstract="true"
                offence="0" defence="1" movement="3" line-of-sight="1"
                priority="1000">
       <ability id="model.ability.person"
@@ -1995,7 +1995,7 @@
       <modifier id="model.goods.hammers" index="30" type="additive" value="-2"/>
       <modifier id="model.goods.tools"   index="30" type="additive" value="-2"/>
     </unit-type>
-    <unit-type id="model.unit.indianConvert" 
+    <unit-type id="model.unit.indianConvert"
                skill="0" offence="0" defence="1" movement="3" line-of-sight="1"
                maximum-attrition="8" score-value="3">
       <consumes id="model.goods.food" value="2"/>
@@ -2982,7 +2982,7 @@
     </european-nation-type>
     <!-- really special nation type for option use *only*, needed so
          that the missionary role is available to units in unit list
-         options -->         
+         options -->
     <european-nation-type id="model.nationType.optionOnly"
                           extends="model.nationType.default">
       <ability id="model.ability.dressMissionary" value="true"/>
@@ -4576,6 +4576,13 @@
              settlement. -->
         <percentageOption id="model.option.demandProbability"
                           defaultValue="10" />
+        <!-- Percentage impact on Native Alarm trades will have -->
+        <percentageOption id="model.option.alarmBonusBuy"
+                          defaultValue="20"/>
+        <percentageOption id="model.option.alarmBonusSell"
+                          defaultValue="20"/>
+        <percentageOption id="model.option.alarmBonusGift"
+                          defaultValue="40"/>
         <!-- Maximum number of goods a native settlement will offer
              for sale. -->
         <integerOption id="model.option.settlementNumberOfGoodsToSell"
