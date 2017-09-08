@@ -86,7 +86,7 @@ public final class Specification {
     /** Unit change types backward compatibility fragment. */
     public static final String UNIT_CHANGE_TYPES_COMPAT_FILE_NAME
         = "unit-change-types-compat.xml";
-    
+
     /** The default role. */
     public static final String DEFAULT_ROLE_ID = "model.role.default";
 
@@ -491,7 +491,7 @@ public final class Specification {
         }
         return realGroup;
     }
-                
+
     /**
      * Clean up the specification.
      *
@@ -766,7 +766,7 @@ public final class Specification {
         clean("merged game options (" + who + ")");
         return true;
     }
-        
+
     /**
      * Merge in a new set of map options.
      *
@@ -1407,7 +1407,7 @@ public final class Specification {
         return getUnitChange(UnitChangeType.EDUCATION, typeStudent, learn).turns;
     }
 
-      
+
     // -- Units --
 
     public List<UnitType> getUnitTypeList() {
@@ -1426,7 +1426,7 @@ public final class Specification {
         return (player == null) ? getDefaultUnitType()
             : getDefaultUnitType(player.getNationType());
     }
-    
+
     /**
      * Get the most vanilla unit type for a type of nation.
      *
@@ -1452,7 +1452,7 @@ public final class Specification {
                 && !ut.hasAbility(Ability.REF_UNIT);
         return find(defaultUnitTypes, p, getDefaultUnitType());
     }
-    
+
     /**
      * Get the most vanilla unit type.
      *
@@ -1461,7 +1461,7 @@ public final class Specification {
     public UnitType getDefaultUnitType() {
         return getUnitType("model.unit.freeColonist"); // Drop this soon
     }
-    
+
     /**
      * Get the list of buildable unit types.
      *
@@ -1643,7 +1643,7 @@ public final class Specification {
     public Nation getUnknownEnemyNation() {
         return getNation(Nation.UNKNOWN_NATION_ID);
     }
-                          
+
     /**
      * Clear all European advantages.  Implements the Advantages==NONE setting.
      */
@@ -1834,7 +1834,7 @@ public final class Specification {
         if (group != null) group.add(difficulty);
         allOptionGroups.put(difficulty.getId(), difficulty);
     }
-            
+
     /**
      * Applies the difficulty level identified by the given String to
      * the current specification.
@@ -1926,7 +1926,7 @@ public final class Specification {
             : (n < ages[1]) ? 0
             : (n < ages[2]) ? 1
             : 2;
-    }        
+    }
 
 
     // General type retrieval
@@ -2074,7 +2074,7 @@ public final class Specification {
         for (AbstractOption ao : allG) {
             allOptionGroups.remove(ao.getId());
             logger.warning("Dropping orphan option group: " + ao);
-        }            
+        }
     }
 
     /**
@@ -2094,7 +2094,7 @@ public final class Specification {
             }
         }
     }
-    
+
     // @compat 0.11.0
     /**
      * Handle the reworking of roles that landed in 0.11.0.
@@ -2132,7 +2132,7 @@ public final class Specification {
         if (compareVersion("0.116") > 0) return;
 
         unitChangeTypeList.clear();
-        File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
+        File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME);
         try (
              FileInputStream fis = new FileInputStream(uctf);
              ) {
@@ -2159,9 +2159,9 @@ public final class Specification {
         //
         // We need to keep these fixes for now as they are still
         // needed for games validly upgraded by 0.11.x series FreeCol.
-              
+
         // 0.10.x had no unknown enemy nation, just an unknown enemy
-        // player, and the type was poorly established.        
+        // player, and the type was poorly established.
         Nation ue = getUnknownEnemyNation();
         ue.setType(getNationType("model.nationType.default"));
         if (!nations.contains(ue)) nations.add(ue);
@@ -2243,7 +2243,7 @@ public final class Specification {
         goodsType.setMilitary();
         goodsType = getGoodsType("model.goods.muskets");
         goodsType.setMilitary();
-        // end @compat 0.10.x/0.11.x        
+        // end @compat 0.10.x/0.11.x
 
         // @compat 0.11.0
         // Bolivar changed from being an event, then to a liberty modifier,
@@ -2348,7 +2348,7 @@ public final class Specification {
             mow.removeRequiredAbility(maidId);
             mow.addRequiredAbility(Ability.INDEPENDENT_NATION, true);
         }
-        
+
         // Added canBeSurrendered ability to all the REF units.
         // REF Units are the units that can be *added* to the REF.
         // The REF can capture other units, but they can all automatically
@@ -2595,7 +2595,7 @@ public final class Specification {
                                             1500);
         // end @compat 0.11.3
 
-        
+
         // Ensure 2 levels of groups, and one level of leaves
         for (OptionGroup level : getDifficultyLevels()) {
             for (Option o : level.getOptions()) {
@@ -2712,7 +2712,7 @@ public final class Specification {
         }
         return ret;
     }
-        
+
     private UnitListOption checkDifficultyUnitListOption(String id, String gr,
                                                          LogBuilder lb) {
         UnitListOption ulo = null;
@@ -2807,6 +2807,12 @@ public final class Specification {
         // @compat 0.11.6
         ret |= checkIntegerOption(GameOptions.SETTLEMENT_NUMBER_OF_GOODS_TO_SELL,
                                   GameOptions.GAMEOPTIONS_MAP, 3);
+        ret |= checkIntegerOption(GameOptions.ALARM_BONUS_BUY,
+                                  GameOptions.GAMEOPTIONS_MAP, 20);
+        ret |= checkIntegerOption(GameOptions.ALARM_BONUS_SELL,
+                                  GameOptions.GAMEOPTIONS_MAP, 20);
+        ret |= checkIntegerOption(GameOptions.ALARM_BONUS_GIFT,
+                                  GameOptions.GAMEOPTIONS_MAP, 40);
         // end @compat 0.11.6
 
         // SAVEGAME_VERSION == 14
@@ -2875,7 +2881,7 @@ public final class Specification {
         addAbstractOption(option);
         return true;
     }
-        
+
 
 
     // Serialization
@@ -3020,7 +3026,7 @@ public final class Specification {
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
                 logger.warning("No reader found for: " + childName);
-            } else {  
+            } else {
                 reader.readChildren(xr);
             }
         }
