@@ -195,7 +195,7 @@ public class LostCityRumour extends TileItem {
         if (unit != null) {
             float mod = unit.applyModifiers(1.0f, getGame().getTurn(),
                                             Modifier.EXPLORE_LOST_CITY_RUMOUR);
-            percentBad = Math.round(percentBad * mod);
+            percentBad = Math.round(percentBad / mod);
             percentGood = Math.round(percentGood * mod);
         }
 
