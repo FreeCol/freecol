@@ -78,6 +78,15 @@ public class GameOptions {
     public static final String DEMAND_PROBABILITY
         = "model.option.demandProbability";
 
+    public static final String ALARM_BONUS_BUY
+        = "model.option.alarmBonusBuy";
+
+    public static final String ALARM_BONUS_SELL
+        = "model.option.alarmBonusSell";
+
+    public static final String ALARM_BONUS_GIFT
+        = "model.option.alarmBonusGift";
+
     /** Maximum number of goods a native settlement will offer for sale. */
     public static final String SETTLEMENT_NUMBER_OF_GOODS_TO_SELL
         = "model.option.settlementNumberOfGoodsToSell";
