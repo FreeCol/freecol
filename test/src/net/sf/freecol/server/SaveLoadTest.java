@@ -70,9 +70,9 @@ public class SaveLoadTest extends FreeColTestCase {
         ServerTestHelper.stopServer();
 
         FreeColServer server = ServerTestHelper.startServer(false, true);
-        FileOption importOption = (FileOption)server.getSpecification()
+        FileOption importOption = server.getSpecification()
             .getMapGeneratorOptions()
-            .getOption(MapGeneratorOptions.IMPORT_FILE);
+            .getOption(MapGeneratorOptions.IMPORT_FILE, FileOption.class);
         importOption.setValue(file);
         try {
             server.startGame();

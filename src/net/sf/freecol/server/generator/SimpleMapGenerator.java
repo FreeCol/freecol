@@ -169,8 +169,8 @@ public class SimpleMapGenerator implements MapGenerator {
     private void recache(boolean checkImport) {
         this.mapOptions = game.getMapGeneratorOptions();
         this.spec = game.getSpecification();
-        File importFile = (checkImport) ? ((FileOption)this.mapOptions
-            .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue()
+        File importFile = (checkImport)
+            ? this.mapOptions.getFile(MapGeneratorOptions.IMPORT_FILE)
             : null;
         this.importGame = (importFile == null) ? null
             : FreeColServer.readGame(importFile, this.spec, null);
@@ -201,7 +201,7 @@ public class SimpleMapGenerator implements MapGenerator {
         if (importGame != null && importRumours) return; // Should be done
 
         final int rumourNumber
-            = mapOptions.getInteger(MapGeneratorOptions.RUMOUR_NUMBER);
+            = mapOptions.getRange(MapGeneratorOptions.RUMOUR_NUMBER);
         int number = getApproximateLandCount() / rumourNumber;
         int counter = 0;
 

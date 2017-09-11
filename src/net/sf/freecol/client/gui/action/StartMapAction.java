@@ -64,9 +64,7 @@ public class StartMapAction extends FreeColAction {
             .saveMapEditorGame(startFile);
         Game game = freeColClient.getGame();
         OptionGroup options = game.getMapGeneratorOptions();
-        FileOption fileOption = (FileOption)options
-            .getOption(MapGeneratorOptions.IMPORT_FILE);
-        fileOption.setValue(startFile);
+        options.setFile(MapGeneratorOptions.IMPORT_FILE, startFile);
         File mapOptionsFile = FreeColDirectories
             .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
         options.save(mapOptionsFile, null, true);

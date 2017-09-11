@@ -1418,6 +1418,13 @@ public class ServerPlayer extends Player implements TurnTaker {
         }
     }
 
+    /**
+     * Check for natural disasters.
+     *
+     * @param random A {@code Random} number source.
+     * @param cs A {@code ChangeSet} to update.
+     * @param probability The percentage probability of a disaster occuring.
+     */
     public void csNaturalDisasters(Random random, ChangeSet cs,
                                    int probability) {
         if (randomInt(logger, "Natural disaster", random, 100) < probability) {
@@ -4441,9 +4448,9 @@ outer:  for (Effect effect : effects) {
                 csPayUpkeep(random, cs);
             }
 
-            int probability = spec.getInteger(GameOptions.NATURAL_DISASTERS);
-            if (probability > 0) {
-                csNaturalDisasters(random, cs, probability);
+            int disaster = spec.getPercentage(GameOptions.NATURAL_DISASTERS);
+            if (disaster > 0) {
+                csNaturalDisasters(random, cs, disaster);
             }
 
             if (isRebel()

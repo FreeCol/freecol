@@ -613,12 +613,12 @@ public final class Specification implements OptionContainer {
         Turn.initialize(getInteger(GameOptions.STARTING_YEAR),
                         getInteger(GameOptions.SEASON_YEAR),
                         getInteger(GameOptions.SEASONS));
-        {
-            boolean badAges = !hasOption(GameOptions.AGES, TextOption.class);
-            String agesValue = (badAges) ? ""
-                : getOption(GameOptions.AGES, TextOption.class).getValue();
+        boolean badAges = !hasOption(GameOptions.AGES, TextOption.class);
+        String agesValue = "";
+        if (!badAges) {
+            agesValue = getText(GameOptions.AGES);
             String a[] = agesValue.split(",");
-            badAges |= a.length != NUMBER_OF_AGES-1;
+            badAges = a.length != NUMBER_OF_AGES-1;
             if (!badAges) {
                 try {
                     ages[0] = 1;
@@ -635,12 +635,12 @@ public final class Specification implements OptionContainer {
                     badAges = true;
                 }
             }
-            if (badAges) {
-                logger.warning("Bad ages: " + agesValue);
-                ages[0] = 1;   // First turn
-                ages[1] = Turn.yearToTurn(1600);
-                ages[2] = Turn.yearToTurn(1700);
-            }
+        }
+        if (badAges) {
+            logger.warning("Bad ages: " + agesValue);
+            ages[0] = 1;   // First turn
+            ages[1] = Turn.yearToTurn(1600);
+            ages[2] = Turn.yearToTurn(1700);
         }
 
         // Apply the customs on coast restriction

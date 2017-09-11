@@ -495,7 +495,7 @@ public class ServerUnit extends Unit implements TurnTaker {
                     // protect against a burial ground at the same
                     // time as a ruins find!
                     if (randomInt(logger, "Ruins+Burial", random, 100)
-                        >= spec.getInteger(GameOptions.BAD_RUMOUR)) break;
+                        >= spec.getPercentage(GameOptions.BAD_RUMOUR)) break;
                     // Fall through
                 case BURIAL_GROUND:
                     done = tile.getOwner() != null

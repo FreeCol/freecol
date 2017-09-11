@@ -1243,19 +1243,20 @@ public final class FreeColServer {
      * @param reveal If true, reveal, if false, hide.
      */
     public void exploreMapForAllPlayers(boolean reveal) {
+        final Specification spec = getSpecification();
+
         for (Player player : getGame().getLiveEuropeanPlayerList()) {
             ((ServerPlayer)player).exploreMap(reveal);
         }
      
         // Removes fog of war when revealing the whole map
         // Restores previous setting when hiding it back again
-        BooleanOption fogOfWarSetting = getSpecification()
-            .getOption(GameOptions.FOG_OF_WAR, BooleanOption.class);
         if (reveal) {
-            FreeColDebugger.setNormalGameFogOfWar(fogOfWarSetting.getValue());
-            fogOfWarSetting.setValue(Boolean.FALSE); 
+            FreeColDebugger.setNormalGameFogOfWar(spec.getBoolean(GameOptions.FOG_OF_WAR));
+            spec.setBoolean(GameOptions.FOG_OF_WAR, Boolean.FALSE);
         } else {
-            fogOfWarSetting.setValue(FreeColDebugger.getNormalGameFogOfWar());
+            spec.setBoolean(GameOptions.FOG_OF_WAR,
+                            FreeColDebugger.getNormalGameFogOfWar());
         }
 
         for (Player player : getGame().getLiveEuropeanPlayerList()) {

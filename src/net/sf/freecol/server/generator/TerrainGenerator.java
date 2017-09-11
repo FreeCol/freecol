@@ -188,9 +188,9 @@ public class TerrainGenerator {
                                        int latitude) {
         // decode options
         final int forestChance
-            = mapOptions.getInteger(MapGeneratorOptions.FOREST_NUMBER);
+            = mapOptions.getRange(MapGeneratorOptions.FOREST_NUMBER);
         final int temperaturePreference
-            = mapOptions.getInteger(MapGeneratorOptions.TEMPERATURE);
+            = mapOptions.getRange(MapGeneratorOptions.TEMPERATURE);
 
         // temperature calculation
         int poleTemperature = -20;
@@ -506,7 +506,7 @@ public class TerrainGenerator {
                 mapOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT)) / 10;
         int number = Math.round((1.0f - randomHillsRatio)
             * ((float)getApproximateLandCount()
-                / mapOptions.getInteger(MapGeneratorOptions.MOUNTAIN_NUMBER)));
+                / mapOptions.getRange(MapGeneratorOptions.MOUNTAIN_NUMBER)));
         lb.add("Number of mountain tiles is ", number, "\n",
             "Maximum length of mountain ranges is ", maximumLength, "\n");
 
@@ -564,7 +564,7 @@ public class TerrainGenerator {
 
         // and sprinkle a few random hills/mountains here and there
         number = (int) (getApproximateLandCount() * randomHillsRatio)
-            / mapOptions.getInteger(MapGeneratorOptions.MOUNTAIN_NUMBER);
+            / mapOptions.getRange(MapGeneratorOptions.MOUNTAIN_NUMBER);
         counter = 0;
         for (int tries = 0; tries < 1000; tries++) {
             Tile t = getGoodMountainTile(map);
@@ -592,7 +592,7 @@ public class TerrainGenerator {
         final TileImprovementType riverType
             = spec.getTileImprovementType("model.improvement.river");
         final int number = getApproximateLandCount()
-            / mapOptions.getInteger(MapGeneratorOptions.RIVER_NUMBER);
+            / mapOptions.getRange(MapGeneratorOptions.RIVER_NUMBER);
         int counter = 0;
         HashMap<Tile, River> riverMap = new HashMap<>();
         List<River> rivers = new ArrayList<>();
@@ -724,7 +724,7 @@ public class TerrainGenerator {
         TileImprovementType fishBonusRiverType
             = spec.getTileImprovementType("model.improvement.fishBonusRiver");
         final int bonusNumber
-            = mapOptions.getInteger(MapGeneratorOptions.BONUS_NUMBER);
+            = mapOptions.getRange(MapGeneratorOptions.BONUS_NUMBER);
         if (t.isLand()) {
             if (generateBonus
                 && randomInt(logger, "Land Resource", random, 100) < bonusNumber) {

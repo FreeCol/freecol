@@ -597,15 +597,12 @@ public class ClientOptions extends OptionGroup {
      * @return A list of active mods.
      */
     public List<FreeColModFile> getActiveMods() {
-        ModListOption mlo = (ModListOption)getOption(ClientOptions.USER_MODS);
-        if (mlo == null) return Collections.<FreeColModFile>emptyList();
-
         final Predicate<FreeColModFile> validModPred = m ->
             m != null && m.getId() != null;
         final Function<FreeColModFile, FreeColModFile> modFileMapper = m ->
             FreeColModFile.getFreeColModFile(m.getId());
-        return transform(mlo.getOptionValues(), validModPred, modFileMapper,
-                         toListNoNulls());
+        return transform(getModList(ClientOptions.USER_MODS), validModPred,
+                         modFileMapper, toListNoNulls());
     }
 
     /**
@@ -733,7 +730,8 @@ public class ClientOptions extends OptionGroup {
         addBooleanOption(AUTOLOAD_SENTRIES,
             ClientOptions.OTHER, false);
         try { // Zoom range was increased
-            RangeOption ro = (RangeOption)getOption(DEFAULT_MINIMAP_ZOOM);
+            RangeOption ro = getOption(DEFAULT_MINIMAP_ZOOM,
+                                       RangeOption.class);
             if (ro.getItemValues().size() != 6) {
                 Integer value = ro.getValue();
                 ro.clearItemValues();
@@ -757,7 +755,7 @@ public class ClientOptions extends OptionGroup {
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {
-        if (getOption(id) == null) {
+        if (!hasOption(id, BooleanOption.class)) {
             BooleanOption op = new BooleanOption(id, null);
             op.setGroup(gr);
             op.setValue(val);
@@ -766,7 +764,7 @@ public class ClientOptions extends OptionGroup {
     }
 
     private void addIntegerOption(String id, String gr, int val) {
-        if (getOption(id) == null) {
+        if (!hasOption(id, IntegerOption.class)) {
             IntegerOption op = new IntegerOption(id, null);
             op.setGroup(gr);
             op.setValue(val);
@@ -775,7 +773,7 @@ public class ClientOptions extends OptionGroup {
     }
 
     private void addOptionGroup(String id, String gr) {
-        if (getOption(id) == null) {
+        if (!hasOption(id, OptionGroup.class)) {
             OptionGroup og = new OptionGroup(id);
             og.setGroup(gr);
             add(og);
@@ -783,7 +781,7 @@ public class ClientOptions extends OptionGroup {
     }
 
     private void addTextOption(String id, String gr, String val) {
-        if (getOption(id) == null) {
+        if (!hasOption(id, TextOption.class)) {
             TextOption op = new TextOption(id, null);
             op.setGroup(gr);
             op.setValue(val);

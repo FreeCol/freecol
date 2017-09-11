@@ -55,27 +55,31 @@ public class SoundController {
         final ClientOptions opts = freeColClient.getClientOptions();
         if (sound) {
             this.soundPlayer = null;
-            Option amo = opts.getOption(ClientOptions.AUDIO_MIXER);
-            Option vo = opts.getOption(ClientOptions.AUDIO_VOLUME);
-            if (!(amo instanceof AudioMixerOption)) {
-                logger.warning(ClientOptions.AUDIO_MIXER + " is not an AudioMixerOption");
-            } else if (!(vo instanceof PercentageOption)) {
-                logger.warning(ClientOptions.AUDIO_VOLUME + " is not a PercentageOption");
-            } else {
-                try {
-                    logger.log(Level.INFO, "Create sound controller with "
-                        + amo + "/" + vo);
-                        //+ " mixer /" + amo.getValue().toString()
-                        //+ "/, volume " + volume.getValue().toString());
-                    this.soundPlayer = new SoundPlayer((AudioMixerOption)amo,
-                                                       (PercentageOption)vo);
-                } catch (Exception e) {
-                    // #3168279 reports an undocumented NPE thrown by
-                    // AudioSystem.getMixer(null).  Workaround this and other
-                    // such failures by just disabling sound.
-                    this.soundPlayer = null;
-                    logger.log(Level.WARNING, "Sound disabled", e);
-                }
+            AudioMixerOption amo = null;
+            try {
+                amo = opts.getOption(ClientOptions.AUDIO_MIXER,
+                                     AudioMixerOption.class);
+            } catch (Exception ex) {
+                logger.warning(ex.getMessage());
+            }
+            PercentageOption vo = null;
+            try {
+                vo = opts.getOption(ClientOptions.AUDIO_VOLUME,
+                                    PercentageOption.class);
+            } catch (Exception ex) {
+                logger.warning(ex.getMessage());
+            }
+            if (amo == null || vo == null) return;
+            try {
+                logger.log(Level.INFO, "Create sound controller with "
+                    + amo + "/" + vo);
+                this.soundPlayer = new SoundPlayer(amo, vo);
+            } catch (Exception e) {
+                // #3168279 reports an undocumented NPE thrown by
+                // AudioSystem.getMixer(null).  Workaround this and other
+                // such failures by just disabling sound.
+                this.soundPlayer = null;
+                logger.log(Level.WARNING, "Sound disabled", e);
             }
         }
     }

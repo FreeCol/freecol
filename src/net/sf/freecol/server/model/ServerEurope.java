@@ -122,9 +122,7 @@ public class ServerEurope extends Europe implements TurnTaker {
      */
     public void initializeMigration(Random random) {
         final Specification spec = getGame().getSpecification();
-        UnitListOption option
-            = spec.getOption(GameOptions.IMMIGRANTS, UnitListOption.class);
-        for (AbstractUnit au : option.getOptionValues()) {
+        for (AbstractUnit au : spec.getUnitList(GameOptions.IMMIGRANTS)) {
             addRecruitable(au, true);
         }
         fillRecruitables(random);
