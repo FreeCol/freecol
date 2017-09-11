@@ -27,10 +27,10 @@
               value="${freecol.src.dir}/overview.html"/>
     <property name="test" value="AllTests"/>
     <property name="miglayout-swing.jar"
-              value="jars/miglayout-swing-4.2.jar"/>
+              value="jars/miglayout-swing-5.0.jar"/>
     <property name="miglayout-core.jar"
-              value="jars/miglayout-core-4.2.jar"/>
-    <property name="cli.jar" value="jars/commons-cli-1.3.1.jar"/>
+              value="jars/miglayout-core-5.0.jar"/>
+    <property name="cli.jar" value="jars/commons-cli-1.4.jar"/>
     <property name="cortado.jar" value="jars/cortado-0.6.0.jar"/>
 
 
@@ -495,7 +495,6 @@
              Java 1.8+.
              https://github.com/tofi86/universalJavaApplicationStub
              -->
-
         <taskdef name="jarbundler"
                  classname="com.ultramixer.jarbundler.JarBundler"
                  classpath="${freecol.build.dir}/jars/jarbundler-core-3.3.0.jar"/>
@@ -503,7 +502,7 @@
                     name="FreeCol"
                     mainclass="net.sf.freecol.freecol"
                     version="${freecol.version}"
-                    vmoptions="-Xmx256M -Dapple.awt.fakefullscreen=true"
+                    vmoptions="-Xmx512M -Dapple.awt.fakefullscreen=true"
                     jvmversion="1.8+"
                     arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
                     stubfile="${freecol.build.dir}/skeletons/universalJavaApplicationStub"
