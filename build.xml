@@ -268,9 +268,18 @@
         <echo message="Game version updated in FreeCol.java" />
     </target>
 
-    <target name="askReleaseVersion" unless="freecol.version">
+    <target name="askReleaseVersion" depends="setNightlyVersion" unless="freecol.version">
         <input message="Please specify the release version (default: git-${DSTAMP}): "
                addproperty="freecol.version" defaultvalue="git-${DSTAMP}" />
+    </target>
+
+    <!-- Whenever calling an ant command that prompts for version
+         passing in -Dnightly.version=true will set the
+         version to the datestamp automatically -->
+    <target name="setNightlyVersion" unless="freecol.version">
+        <condition value="git-${DSTAMP}" property="freecol.version">
+            <isset property="nightly.version"/>
+        </condition>
     </target>
 
     <target name="prepareManual" depends="initDist,print-manuals">
@@ -689,6 +698,27 @@
 
         <echo message="For detailed results of the test run see: ${freecol.build.dir}/report/index.html"/>
 
+        <fail if="error.junit" message="Automated Unit Tests failed."/>
+    </target>
+
+    <!-- Run full unit test suite and fail on errors, use brief format for CI -->
+    <target name="testci" depends="build-unit-tests" unless="skip.dist.test"
+            description="Runs all unit tests for CI">
+        <delete dir="${freecol.build.dir}/report" />
+        <mkdir dir="${freecol.build.dir}/report"/>
+
+        <junit printsummary="on" errorProperty="error.junit"
+               failureProperty="error.junit" fork="yes" maxmemory="128M">
+            <classpath refid="test.run.classpath"/>
+            <formatter type="brief" usefile="false" />
+            <formatter type="plain" />
+            <sysproperty key="java.awt.headless" value="true" />
+            <test todir="${freecol.build.dir}/report"
+                  name="net.sf.freecol.AllTests" fork="yes"/>
+        </junit>
+
+        <echo message="For more detailed information about this test run see:"/>
+        <echo message="${freecol.build.dir}/report/TEST-net.sf.freecol.AllTests.txt"/>
         <fail if="error.junit" message="Automated Unit Tests failed."/>
     </target>
 
