@@ -27,10 +27,10 @@
               value="${freecol.src.dir}/overview.html"/>
     <property name="test" value="AllTests"/>
     <property name="miglayout-swing.jar"
-              value="jars/miglayout-swing-4.2.jar"/>
+              value="jars/miglayout-swing-5.0.jar"/>
     <property name="miglayout-core.jar"
-              value="jars/miglayout-core-4.2.jar"/>
-    <property name="cli.jar" value="jars/commons-cli-1.3.1.jar"/>
+              value="jars/miglayout-core-5.0.jar"/>
+    <property name="cli.jar" value="jars/commons-cli-1.4.jar"/>
     <property name="cortado.jar" value="jars/cortado-0.6.0.jar"/>
 
 
@@ -490,17 +490,23 @@
         <!-- JarBundler is a feature-rich Ant task which will create a Mac OS X
              application bundle from a list of Jar files and a main class name.
              (GPL-Software) -> http://informagen.com/JarBundler/  -->
+        <!-- Applications created with JarBundler attempt to prompt the user to
+             download Java SE 6, a universalJavaApplicationStub is used for
+             Java 1.8+.
+             https://github.com/tofi86/universalJavaApplicationStub
+             -->
         <taskdef name="jarbundler"
-                 classname="net.sourceforge.jarbundler.JarBundler"
-                 classpath="${freecol.build.dir}/jars/jarbundler.jar"/>
+                 classname="com.ultramixer.jarbundler.JarBundler"
+                 classpath="${freecol.build.dir}/jars/jarbundler-core-3.3.0.jar"/>
         <jarbundler dir="${freecol.release.dir}"
                     name="FreeCol"
-                    mainclass="net.sf.freecol.FreeCol"
+                    mainclass="net.sf.freecol.freecol"
                     version="${freecol.version}"
-                    vmoptions="-Xmx256M -Dapple.awt.fakefullscreen=true"
+                    vmoptions="-Xmx512M -Dapple.awt.fakefullscreen=true"
                     jvmversion="1.8+"
                     arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
-                    stubfile="${freecol.build.dir}/skeletons/FreeCol"
+                    stubfile="${freecol.build.dir}/skeletons/universalJavaApplicationStub"
+                    useJavaXKey="true"
                     icon="${freecol.packaging.dir}/icons/FreeCol.icns">
             <jarfileset dir="${freecol.release.dir}/base/freecol/">
                 <include name="**/*" />
@@ -511,15 +517,8 @@
     </target>
 
     <target name="tarMacJavaBundle" unless="skip.dist.mac"
-            depends="tarMacJavaBundleOnUnixLike,tarMacJavaBundleOnWindows"
+            depends="tarMacJavaBundleOnWindows"
             description="Creates a Mac OS X application bundle inside a tar file.">
-    </target>
-
-    <target name="tarMacJavaBundleOnUnixLike" unless="skip.dist.mac"
-            if="isOsUnixLike" depends="macJavaBundle">
-        <delete file="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol"/>
-        <symlink link="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol"
-                 resource="/System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub"/>
         <exec executable="tar">
             <arg value="cfvj"/>
             <arg value="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2"/>
@@ -531,7 +530,11 @@
 
     <target name="tarMacJavaBundleOnWindows" depends="macJavaBundle"
             unless="skip.dist.mac" if="isOsWindows">
-        <echo message="Warning: You are building a Mac Os X Java Application Bundle containing a Copy Java Application Stub. Creating a bundle with the current copy of Java Launching Stub could lead to a future situation where the JavaApplicationStub file could become incompatible with a future OS X update. To avoid this, use a unix like system ... "/>
+        <echo message="Warning: You are building a Mac Os X Java Application Bundle
+              containing a Copy Java Application Stub. Creating a bundle with the current
+              copy of Java Launching Stub could lead to a future situation where the
+              JavaApplicationStub file could become incompatible with a future
+              OS X update. To avoid this, use a unix like system ... "/>
         <tar destfile="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2"
              compression="bzip2">
             <tarfileset dir="${freecol.release.dir}" mode="755"

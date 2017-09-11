@@ -398,7 +398,7 @@ public final class InGameController extends Controller {
      */
     private void csBuy(Unit unit, Goods goods, int price,
                        ServerIndianSettlement sis, ChangeSet cs) {
-        final int alarmBonus = -Math.round(price * 0.01f * getGame().getSpecification()
+        final int alarmBonus = -Math.round(price * 0.001f * getGame().getSpecification()
                                             .getInteger(GameOptions.ALARM_BONUS_BUY));
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
         csVisit(owner, sis, 0, cs);
