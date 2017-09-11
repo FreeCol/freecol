@@ -631,8 +631,7 @@ public final class InGameController extends FreeColClientHolder {
      * @return true if the message should be delivered
      */
     private boolean shouldAllowMessage(ModelMessage message) {
-        BooleanOption option = getClientOptions().getBooleanOption(message);
-        return (option == null) ? true : option.getValue();
+        return getClientOptions().getBoolean(message.getOptionName());
     }
 
     /**

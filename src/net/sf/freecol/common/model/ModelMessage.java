@@ -226,6 +226,16 @@ public class ModelMessage extends StringTemplate {
     }
 
     /**
+     * Get the option name for this message.
+     *
+     * @return The option name.
+     */
+    public String getOptionName() {
+        return (this.messageType == null) ? null
+            : this.messageType.getOptionName();
+    }
+
+    /**
      * Has this message been displayed?
      *
      * @return True if this message has been displayed.

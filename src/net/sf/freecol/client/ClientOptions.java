@@ -692,17 +692,6 @@ public class ClientOptions extends OptionGroup {
     }
 
     /**
-     * Returns the boolean option associated with a ModelMessage.
-     *
-     * @param message a {@code ModelMessage} value
-     * @return a {@code BooleanOption} value
-     */
-    public BooleanOption getBooleanOption(ModelMessage message) {
-        return (BooleanOption)getOption(message.getMessageType()
-            .getOptionName());
-    }
-
-    /**
      * Perform backward compatibility fixups on new client options as
      * they are introduced.  Annotate with introduction version so we
      * can clean these up as they become standard.
