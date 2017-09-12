@@ -58,11 +58,13 @@ import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionContainer;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -2681,44 +2683,60 @@ public final class Specification implements OptionContainer {
         // SAVEGAME_VERSION == 13
 
         // @compat 0.11.0
-        ret |= checkBooleanOption(GameOptions.BELL_ACCUMULATION_CAPPED,
-                                  GameOptions.GAMEOPTIONS_COLONY, false);
-        ret |= checkBooleanOption(GameOptions.CAPTURE_UNITS_UNDER_REPAIR,
-                                  GameOptions.GAMEOPTIONS_COLONY, false);
-        ret |= checkBooleanOption(GameOptions.PAY_FOR_BUILDING,
-                                  GameOptions.GAMEOPTIONS_COLONY, true);
-        ret |= checkBooleanOption(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH,
-                                  GameOptions.GAMEOPTIONS_COLONY, false);
-        ret |= checkBooleanOption(GameOptions.CUSTOMS_ON_COAST,
-                                  GameOptions.GAMEOPTIONS_COLONY, false);
-        ret |= checkBooleanOption(GameOptions.EQUIP_EUROPEAN_RECRUITS,
-                                  GameOptions.GAMEOPTIONS_COLONY, true);
+        ret |= checkOp(GameOptions.BELL_ACCUMULATION_CAPPED,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       false, BooleanOption.class);
+        ret |= checkOp(GameOptions.CAPTURE_UNITS_UNDER_REPAIR,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       false, BooleanOption.class);
+        ret |= checkOp(GameOptions.PAY_FOR_BUILDING,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       true, BooleanOption.class);
+        ret |= checkOp(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       false, BooleanOption.class);
+        ret |= checkOp(GameOptions.CUSTOMS_ON_COAST,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       false, BooleanOption.class);
+        ret |= checkOp(GameOptions.EQUIP_EUROPEAN_RECRUITS,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       true, BooleanOption.class);
         // end @compat 0.11.0
 
         // @compat 0.11.3
-        ret |= checkIntegerOption(GameOptions.MISSION_INFLUENCE,
-                                  GameOptions.GAMEOPTIONS_MAP, -10);
-        ret |= checkIntegerOption(GameOptions.INDEPENDENCE_TURN,
-                                  GameOptions.GAMEOPTIONS_YEARS, 468);
-        ret |= checkTextOption(GameOptions.AGES,
-                               GameOptions.GAMEOPTIONS_YEARS, "1600,1700");
-        ret |= checkIntegerOption(GameOptions.SEASONS,
-                                  GameOptions.GAMEOPTIONS_YEARS, 2);
-        ret |= checkBooleanOption(GameOptions.DISEMBARK_IN_COLONY,
-                                  GameOptions.GAMEOPTIONS_COLONY, false);
-        ret |= checkBooleanOption(GameOptions.ENHANCED_TRADE_ROUTES,
-                                  GameOptions.GAMEOPTIONS_MAP, false);
+        ret |= checkOp(GameOptions.MISSION_INFLUENCE,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       -10, IntegerOption.class);
+        ret |= checkOp(GameOptions.INDEPENDENCE_TURN,
+                       GameOptions.GAMEOPTIONS_YEARS,
+                       468, IntegerOption.class);
+        ret |= checkOp(GameOptions.AGES,
+                       GameOptions.GAMEOPTIONS_YEARS,
+                       "1600,1700", TextOption.class);
+        ret |= checkOp(GameOptions.SEASONS,
+                       GameOptions.GAMEOPTIONS_YEARS,
+                       2, IntegerOption.class);
+        ret |= checkOp(GameOptions.DISEMBARK_IN_COLONY,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       false, BooleanOption.class);
+        ret |= checkOp(GameOptions.ENHANCED_TRADE_ROUTES,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       false, BooleanOption.class);
         // end @compat 0.11.3
 
         // @compat 0.11.6
-        ret |= checkIntegerOption(GameOptions.SETTLEMENT_NUMBER_OF_GOODS_TO_SELL,
-                                  GameOptions.GAMEOPTIONS_MAP, 3);
-        ret |= checkIntegerOption(GameOptions.ALARM_BONUS_BUY,
-                                  GameOptions.GAMEOPTIONS_MAP, 20);
-        ret |= checkIntegerOption(GameOptions.ALARM_BONUS_SELL,
-                                  GameOptions.GAMEOPTIONS_MAP, 20);
-        ret |= checkIntegerOption(GameOptions.ALARM_BONUS_GIFT,
-                                  GameOptions.GAMEOPTIONS_MAP, 40);
+        ret |= checkOp(GameOptions.SETTLEMENT_NUMBER_OF_GOODS_TO_SELL,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       3, IntegerOption.class);
+        ret |= checkOp(GameOptions.ALARM_BONUS_BUY,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       20, PercentageOption.class);
+        ret |= checkOp(GameOptions.ALARM_BONUS_SELL,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       20, PercentageOption.class);
+        ret |= checkOp(GameOptions.ALARM_BONUS_GIFT,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       40, PercentageOption.class);
         // end @compat 0.11.6
 
         // SAVEGAME_VERSION == 14
@@ -2743,52 +2761,40 @@ public final class Specification implements OptionContainer {
         return ret;
     }
 
-    private boolean checkOptionGroup(String id) {
-        if (allOptionGroups.containsKey(id)) return false;
-        OptionGroup og = new OptionGroup(id, this);
-        allOptionGroups.put(id, og);
+    /**
+     * Check if an option exists, and if not, create and install it.
+     *
+     * FIXME: Handles failure to create a needed option badly.
+     *
+     * @param R The underlying type encapsulated by the option.
+     * @param T The option type.
+     * @param id The option identifier.
+     * @param gr The option group identifier.
+     * @param defaultValue The default value of the option.
+     * @param returnClass The expected class of option.
+     * @return True if the option did not exist and was successfully created.
+     */
+    private <R,T extends Option<R>> boolean checkOp(String id, String gr,
+                                                    R defaultValue,
+                                                    Class<T> returnClass) {
+        if (hasOption(id, returnClass)) return false;
+        T op;
+        try {
+            op = Introspector.instantiate(returnClass,
+                new Class[] { String.class, Specification.class },
+                new Object[] { id, this });
+        } catch (Introspector.IntrospectorException ie) {
+            logger.warning("Failed to make " + returnClass.getName()
+                + ": " + id);
+            return false;
+        }
+        op.setGroup(gr);
+        op.setValue(defaultValue);
+        getOptionGroup(gr).add(op);
+        addAbstractOption((AbstractOption)op);
         return true;
     }
-
-    private boolean checkBooleanOption(String id, String gr, boolean defaultValue) {
-        if (hasOption(id, BooleanOption.class)) return false;
-        BooleanOption op = new BooleanOption(id, this);
-        op.setGroup(gr);
-        op.setValue(defaultValue);
-        return checkOption(op);
-    }
-
-    private boolean checkIntegerOption(String id, String gr, int defaultValue) {
-        if (hasOption(id, IntegerOption.class)) return false;
-        IntegerOption op = new IntegerOption(id, this);
-        op.setGroup(gr);
-        op.setValue(defaultValue);
-        return checkOption(op);
-    }
-
-    private boolean checkStringOption(String id, String gr, String defaultValue) {
-        if (hasOption(id, StringOption.class)) return false;
-        StringOption op = new StringOption(id, this);
-        op.setGroup(gr);
-        op.setValue(defaultValue);
-        return checkOption(op);
-    }
-
-    private boolean checkTextOption(String id, String gr, String defaultValue) {
-        if (hasOption(id, TextOption.class)) return false;
-        TextOption op = new TextOption(id, this);
-        op.setGroup(gr);
-        op.setValue(defaultValue);
-        return checkOption(op);
-    }
-
-    private boolean checkOption(AbstractOption option) {
-        getOptionGroup(option.getGroup()).add(option);
-        addAbstractOption(option);
-        return true;
-    }
-
-
+        
 
     // Serialization
 

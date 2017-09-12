@@ -47,6 +47,19 @@ public class PercentageOption extends IntegerOption {
         setMaximumValue(100);
     }
 
+    /**
+     * Creates a new {@code PercentageOption}.
+     *
+     * @param id The object identifier.
+     * @param specification The {@code Specification} to refer to.
+     */
+    public PercentageOption(String id, Specification specification) {
+        super(id, specification);
+
+        setMinimumValue(0);
+        setMaximumValue(100);
+    }
+
 
     // Serialization
 
