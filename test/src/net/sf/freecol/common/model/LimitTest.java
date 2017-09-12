@@ -87,7 +87,8 @@ public class LimitTest extends FreeColTestCase {
         Event event = spec().getEvent("model.event.declareIndependence");
         assertNotNull(event);
         assertNotNull(event.getLimits());
-        assertNotNull(spec().getOption(GameOptions.LAST_COLONIAL_YEAR));
+        assertTrue(spec().hasOption(GameOptions.LAST_COLONIAL_YEAR,
+                                    IntegerOption.class));
 
         Limit rebelLimit = event.getLimit("model.limit.independence.rebels");
         Limit colonyLimit = event.getLimit("model.limit.independence.coastalColonies");
@@ -95,29 +96,43 @@ public class LimitTest extends FreeColTestCase {
 
         assertNotNull(rebelLimit);
         assertEquals(Limit.Operator.GE, rebelLimit.getOperator());
-        assertEquals(Operand.OperandType.NONE, rebelLimit.getLeftHandSide().getOperandType());
-        assertEquals(Operand.ScopeLevel.PLAYER, rebelLimit.getLeftHandSide().getScopeLevel());
-        assertEquals(Integer.valueOf(0), rebelLimit.getLeftHandSide().getValue(dutch));
-        assertEquals(Integer.valueOf(50), rebelLimit.getRightHandSide().getValue(dutch));
+        assertEquals(Operand.OperandType.NONE,
+                     rebelLimit.getLeftHandSide().getOperandType());
+        assertEquals(Operand.ScopeLevel.PLAYER,
+                     rebelLimit.getLeftHandSide().getScopeLevel());
+        assertEquals(Integer.valueOf(0),
+                     rebelLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(50),
+                     rebelLimit.getRightHandSide().getValue(dutch));
         assertFalse(rebelLimit.evaluate(dutch));
 
         assertNotNull(colonyLimit);
         assertEquals(Limit.Operator.GE, colonyLimit.getOperator());
-        assertEquals(Operand.OperandType.SETTLEMENTS, colonyLimit.getLeftHandSide().getOperandType());
-        assertEquals(Operand.ScopeLevel.PLAYER, colonyLimit.getLeftHandSide().getScopeLevel());
-        assertEquals("isConnectedPort", colonyLimit.getLeftHandSide().getMethodName());
+        assertEquals(Operand.OperandType.SETTLEMENTS,
+                     colonyLimit.getLeftHandSide().getOperandType());
+        assertEquals(Operand.ScopeLevel.PLAYER,
+                     colonyLimit.getLeftHandSide().getScopeLevel());
+        assertEquals("isConnectedPort",
+                     colonyLimit.getLeftHandSide().getMethodName());
         assertFalse(colony.isConnectedPort());
-        assertEquals(Integer.valueOf(0), colonyLimit.getLeftHandSide().getValue(dutch));
-        assertEquals(Integer.valueOf(1), colonyLimit.getRightHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(0),
+                     colonyLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(1),
+                     colonyLimit.getRightHandSide().getValue(dutch));
         assertFalse(colonyLimit.evaluate(dutch));
 
         assertNotNull(yearLimit);
         assertEquals(Limit.Operator.LE, yearLimit.getOperator());
-        assertEquals(Operand.OperandType.YEAR, yearLimit.getLeftHandSide().getOperandType());
-        assertEquals(Operand.OperandType.OPTION, yearLimit.getRightHandSide().getOperandType());
-        assertEquals(GameOptions.LAST_COLONIAL_YEAR, yearLimit.getRightHandSide().getType());
-        assertEquals(Integer.valueOf(1492), yearLimit.getLeftHandSide().getValue(dutch));
-        assertEquals(Integer.valueOf(1800), yearLimit.getRightHandSide().getValue(dutch));
+        assertEquals(Operand.OperandType.YEAR,
+                     yearLimit.getLeftHandSide().getOperandType());
+        assertEquals(Operand.OperandType.OPTION,
+                     yearLimit.getRightHandSide().getOperandType());
+        assertEquals(GameOptions.LAST_COLONIAL_YEAR,
+                     yearLimit.getRightHandSide().getType());
+        assertEquals(Integer.valueOf(1492),
+                     yearLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(1800),
+                     yearLimit.getRightHandSide().getValue(dutch));
         assertTrue(yearLimit.evaluate(dutch));
 
         colony.modifyLiberty(10000);
@@ -135,10 +150,9 @@ public class LimitTest extends FreeColTestCase {
         assertTrue(colonyLimit.getLeftHandSide().appliesTo(colony));
         assertTrue(colonyLimit.evaluate(dutch));
 
-        IntegerOption option = spec()
-            .getIntegerOption(GameOptions.LAST_COLONIAL_YEAR);
-        option.setMinimumValue(1300);
-        option.setValue(1300);
+        // Set the minimum first or the value will not stick!
+        spec().setIntegerMinimum(GameOptions.LAST_COLONIAL_YEAR, 1300);
+        spec().setInteger(GameOptions.LAST_COLONIAL_YEAR, 1300);
         assertFalse(yearLimit.evaluate(dutch));
     }
 

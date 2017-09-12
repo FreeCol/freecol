@@ -95,10 +95,13 @@ public class ClientOptions extends OptionGroup {
 
     // clientOptions.gui
 
+    public static final String GUI
+        = "clientOptions.gui";
+
     /** Option for setting the language. */
     public static final String LANGUAGE
         = "model.option.languageOption";
-    // Value for automatic language selection.
+    /** Value for automatic language selection. */
     public static final String AUTOMATIC
         = "clientOptions.gui.languageOption.autoDetectLanguage";
 
@@ -261,7 +264,10 @@ public class ClientOptions extends OptionGroup {
 
     // clientOptions.messages
 
-   /**
+    public static final String MESSAGES
+        = "clientOptions.messages";
+    
+    /**
      * Used by GUI, this defines the grouping of ModelMessages.
      * Possible values include nothing, type and source.
      *
@@ -308,6 +314,8 @@ public class ClientOptions extends OptionGroup {
 
     // clientOptions.savegames
 
+    public static final String SAVEGAMES
+        = "clientOptions.savegames";
     /** Use default values for savegames instead of displaying a dialog. */
     public static final String SHOW_SAVEGAME_SETTINGS
         = "model.option.showSavegameSettings";
@@ -358,6 +366,9 @@ public class ClientOptions extends OptionGroup {
 
     // clientOptions.warehouse
 
+    public static final String WAREHOUSE
+        = "clientOptions.warehouse";
+
     /** The amount of stock the custom house should keep when selling goods. */
     public static final String CUSTOM_STOCK
         = "model.option.customStock";
@@ -394,6 +405,9 @@ public class ClientOptions extends OptionGroup {
 
 
     // clientOptions.other
+
+    public static final String OTHER
+        = "clientOptions.other";
 
     /** Option to autoload emigrants on sailing to america. */
     public static final String AUTOLOAD_EMIGRANTS
@@ -583,15 +597,12 @@ public class ClientOptions extends OptionGroup {
      * @return A list of active mods.
      */
     public List<FreeColModFile> getActiveMods() {
-        ModListOption mlo = (ModListOption)getOption(ClientOptions.USER_MODS);
-        if (mlo == null) return Collections.<FreeColModFile>emptyList();
-
         final Predicate<FreeColModFile> validModPred = m ->
             m != null && m.getId() != null;
         final Function<FreeColModFile, FreeColModFile> modFileMapper = m ->
             FreeColModFile.getFreeColModFile(m.getId());
-        return transform(mlo.getOptionValues(), validModPred, modFileMapper,
-                         toListNoNulls());
+        return transform(getModList(ClientOptions.USER_MODS), validModPred,
+                         modFileMapper, toListNoNulls());
     }
 
     /**
@@ -699,27 +710,28 @@ public class ClientOptions extends OptionGroup {
     public void fixClientOptions() {
         // @compact 0.11.0
         addBooleanOption(MINIMAP_TOGGLE_BORDERS,
-            "clientOptions.gui", true);
+            ClientOptions.GUI, true);
         addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR,
-            "clientOptions.gui", true);
+            ClientOptions.GUI, true);
         addTextOption(AUTO_SAVE_PREFIX,
-            "clientOptions.savegames", "Autosave");
+            ClientOptions.SAVEGAMES, "Autosave");
         addTextOption(LAST_TURN_NAME,
-            "clientOptions.savegames", "last-turn");
+            ClientOptions.SAVEGAMES, "last-turn");
         addTextOption(BEFORE_LAST_TURN_NAME,
-            "clientOptions.savegames", "before-last-turn");
+            ClientOptions.SAVEGAMES, "before-last-turn");
         // end @compact 0.11.0
 
         // @compat 0.11.1
         addBooleanOption(STOCK_ACCOUNTS_FOR_PRODUCTION,
-            "clientOptions.warehouse", false);
+            ClientOptions.WAREHOUSE, false);
         // end @compat 0.11.1
 
         // @compat 0.11.3
         addBooleanOption(AUTOLOAD_SENTRIES,
-            "clientOptions.other", false);
+            ClientOptions.OTHER, false);
         try { // Zoom range was increased
-            RangeOption ro = (RangeOption)getOption(DEFAULT_MINIMAP_ZOOM);
+            RangeOption ro = getOption(DEFAULT_MINIMAP_ZOOM,
+                                       RangeOption.class);
             if (ro.getItemValues().size() != 6) {
                 Integer value = ro.getValue();
                 ro.clearItemValues();
@@ -738,13 +750,12 @@ public class ClientOptions extends OptionGroup {
         // end @compat 0.11.3
 
         // @compat 0.11.6
-        addBooleanOption(SHOW_REGION_NAMING,
-          "clientOptions.messages", true);
+        addBooleanOption(SHOW_REGION_NAMING, ClientOptions.MESSAGES, true);
         // end @compat 0.11.6
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {
-        if (getOption(id) == null) {
+        if (!hasOption(id, BooleanOption.class)) {
             BooleanOption op = new BooleanOption(id, null);
             op.setGroup(gr);
             op.setValue(val);
@@ -753,7 +764,7 @@ public class ClientOptions extends OptionGroup {
     }
 
     private void addIntegerOption(String id, String gr, int val) {
-        if (getOption(id) == null) {
+        if (!hasOption(id, IntegerOption.class)) {
             IntegerOption op = new IntegerOption(id, null);
             op.setGroup(gr);
             op.setValue(val);
@@ -762,7 +773,7 @@ public class ClientOptions extends OptionGroup {
     }
 
     private void addOptionGroup(String id, String gr) {
-        if (getOption(id) == null) {
+        if (!hasOption(id, OptionGroup.class)) {
             OptionGroup og = new OptionGroup(id);
             og.setGroup(gr);
             add(og);
@@ -770,7 +781,7 @@ public class ClientOptions extends OptionGroup {
     }
 
     private void addTextOption(String id, String gr, String val) {
-        if (getOption(id) == null) {
+        if (!hasOption(id, TextOption.class)) {
             TextOption op = new TextOption(id, null);
             op.setGroup(gr);
             op.setValue(val);

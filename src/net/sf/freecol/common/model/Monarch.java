@@ -204,8 +204,8 @@ public final class Monarch extends FreeColGameObject implements Named {
     public Force getExpeditionaryForce() {
         if (this.expeditionaryForce == null) {
             final Specification spec = getSpecification();
-            UnitListOption option = (UnitListOption)spec.getOption(GameOptions.REF_FORCE);
-            this.expeditionaryForce = new Force(spec, option.getOptionValues(), null);
+            this.expeditionaryForce = new Force(spec,
+                spec.getUnitList(GameOptions.REF_FORCE), null);
         }
         return this.expeditionaryForce;
     }
@@ -218,8 +218,8 @@ public final class Monarch extends FreeColGameObject implements Named {
     public Force getInterventionForce() {
         if (this.interventionForce == null) {
             final Specification spec = getSpecification();
-            UnitListOption option = (UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE);
-            this.interventionForce = new Force(spec, option.getOptionValues(), null);
+            this.interventionForce = new Force(spec,
+                spec.getUnitList(GameOptions.INTERVENTION_FORCE), null);
         }
         return this.interventionForce;
     }
@@ -233,8 +233,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public Force getMercenaryForce() {
         final Specification spec = getSpecification();
-        UnitListOption option = (UnitListOption)spec.getOption(GameOptions.MERCENARY_FORCE);
-        return new Force(spec, option.getOptionValues(), null);
+        return new Force(spec,
+            spec.getUnitList(GameOptions.MERCENARY_FORCE), null);
     }
 
     /**
@@ -246,8 +246,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public Force getWarSupportForce() {
         final Specification spec = getSpecification();
-        UnitListOption option = (UnitListOption)spec.getOption(GameOptions.WAR_SUPPORT_FORCE);
-        return new Force(spec, option.getOptionValues(), null);
+        return new Force(spec,
+            spec.getUnitList(GameOptions.WAR_SUPPORT_FORCE), null);
     }
 
     /**

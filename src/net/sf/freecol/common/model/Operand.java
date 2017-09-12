@@ -159,18 +159,6 @@ public class Operand extends Scope {
     }
 
     /**
-     * Gets the operand value if it is applicable to the given Game.
-     *
-     * @param game The {@code Game} to check.
-     * @return The operand value or null if inapplicable.
-     */
-    public Integer getValue(Game game) {
-        return (this.value != null) ? this.value
-            : (this.scopeLevel == ScopeLevel.GAME) ? calculateGameValue(game)
-            : null;
-    }
-
-    /**
      * Count the number of objects in a list that this operand is
      * applicable to.
      *
@@ -182,12 +170,15 @@ public class Operand extends Scope {
     }
 
     /**
-     * Calculate the operand value within a given game.
+     * Gets the operand value if it is applicable to the given Game.
      *
      * @param game The {@code Game} to check.
-     * @return The operand value.
+     * @return The operand value or null if inapplicable.
      */
-    private Integer calculateGameValue(Game game) {
+    public Integer getValue(Game game) {
+        if (this.value != null) return this.value;
+        if (this.scopeLevel != ScopeLevel.GAME) return null;
+
         final String methodName = getMethodName();
         int result = 0;
         switch (this.operandType) {
@@ -273,7 +264,6 @@ public class Operand extends Scope {
      */
     public Integer getValue(Settlement settlement) {
         if (this.value != null) return this.value;
-        
         // In future, we might expand this to handle native settlements
         if (this.scopeLevel != ScopeLevel.SETTLEMENT
             || !(settlement instanceof Colony)) return null;

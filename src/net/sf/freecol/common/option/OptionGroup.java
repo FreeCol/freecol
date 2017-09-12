@@ -43,7 +43,8 @@ import net.sf.freecol.common.util.LogBuilder;
 /**
  * Used for grouping {@link Option}s.
  */
-public class OptionGroup extends AbstractOption<OptionGroup> {
+public class OptionGroup extends AbstractOption<OptionGroup>
+    implements OptionContainer {
 
     private static final Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
@@ -407,180 +408,41 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
 
-    // Convenience accessors.
+    // Interface OptionContainer
 
     /**
-     * Gets the value of an option as an option group.
-     *
-     * @param id The object identifier.
-     * @return The {@code OptionGroup} value.
-     * @exception IllegalArgumentException If there is no option group
-     *     value associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
-     */
-    public OptionGroup getOptionGroup(String id) {
+     * {@inheritDoc}
+     */    
+    public <R,T extends Option<R>> boolean hasOption(String id,
+                                                     Class<T> returnClass) {
         try {
-            return ((OptionGroup)getOption(id)).getValue();
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No option group"
-                + " value associated with the specified option: " + id, e);
+            return id != null && this.optionMap.containsKey(id)
+                && returnClass.cast(this.optionMap.get(id)) != null;
+        } catch (ClassCastException cce) {
+            return false;
         }
     }
 
     /**
-     * Gets the integer value of an option.
-     *
-     * @param id The object identifier.
-     * @return The integer value.
-     * @exception IllegalArgumentException If there is no integer
-     *     value associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
+     * {@inheritDoc}
      */
-    public int getInteger(String id) {
-        try {
-            return ((IntegerOption)getOption(id)).getValue();
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No integer"
-                + " value associated with the specified option: " + id, e);
+    public <R,T extends Option<R>> T getOption(String id,
+                                               Class<T> returnClass) {
+        if (id == null) {
+            throw new RuntimeException("Null id");
+        } else if (!this.optionMap.containsKey(id)) {
+            throw new RuntimeException("Missing option: " + id);
+        } else {
+            try {
+                return returnClass.cast(optionMap.get(id));
+            } catch (ClassCastException cce) {
+                throw new RuntimeException("Not a " + returnClass.getName()
+                    + ": " + id);
+            }
         }
     }
 
-    /**
-     * Sets the integer value of an option.
-     *
-     * @param id The object identifier.
-     * @param value The new integer value of the option.
-     * @exception IllegalArgumentException If there is no integer
-     *     value associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
-     */
-    public void setInteger(String id, int value) {
-        try {
-            ((IntegerOption)getOption(id)).setValue(value);
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No integer"
-                + " value associated with the specified option: " + id, e);
-        }
-    }
-
-    /**
-     * Gets the boolean value of an option.
-     *
-     * @param id The object identifier.
-     * @return The boolean value.
-     * @exception IllegalArgumentException If there is no boolean
-     *     value associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
-     */
-    public boolean getBoolean(String id) {
-        try {
-            return ((BooleanOption)getOption(id)).getValue();
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No boolean"
-                + " value associated with the specified option: " + id, e);
-        }
-    }
-
-    /**
-     * Sets the boolean value of an option.
-     *
-     * @param id The object identifier.
-     * @param value The new boolean value of the option.
-     * @exception IllegalArgumentException If there is no boolean
-     *     value associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
-     */
-    public void setBoolean(String id, boolean value) {
-        try {
-            ((BooleanOption)getOption(id)).setValue(value);
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No boolean"
-                + " value associated with the specified option: " + id, e);
-        }
-    }
-
-    /**
-     * Gets the string value of an option.
-     *
-     * @param id The object identifier.
-     * @return The string value.
-     * @exception IllegalArgumentException If there is no string value
-     *     associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
-     */
-    public String getString(String id) {
-        try {
-            return ((StringOption)getOption(id)).getValue();
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No String"
-                + " value associated with the specified option: " + id, e);
-        }
-    }
-
-    /**
-     * Sets the string value of an option.
-     *
-     * @param id The object identifier.
-     * @param value The new string value.
-     * @exception IllegalArgumentException If there is no string value
-     *     associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
-     */
-    public void setString(String id, String value) {
-        try {
-            ((StringOption)getOption(id)).setValue(value);
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No String"
-                + " value associated with the specified option: " + id, e);
-        }
-    }
-
-    /**
-     * Gets the string value of an option.
-     *
-     * @param id The object identifier.
-     * @return The string value.
-     * @exception IllegalArgumentException If there is no string value
-     *     associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
-     */
-    public String getText(String id) {
-        try {
-            return ((TextOption)getOption(id)).getValue();
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No String"
-                + " value associated with the specified option: " + id, e);
-        }
-    }
-
-    /**
-     * Sets the string value of an option.
-     *
-     * @param id The object identifier.
-     * @param value The new string value.
-     * @exception IllegalArgumentException If there is no string value
-     *     associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
-     */
-    public void setText(String id, String value) {
-        try {
-            ((TextOption)getOption(id)).setValue(value);
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No String"
-                + " value associated with the specified option: " + id, e);
-        }
-    }
-
-
+    
     // Interface Option
 
     /**
@@ -656,9 +518,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
 
+    // Override FreeColObject
+
     /**
-     * Override FreeColObject
-     *
      * {@inheritDoc}
      */
     @Override

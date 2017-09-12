@@ -565,9 +565,7 @@ public class CombatTest extends FreeColTestCase {
             .settlementTile(tile1).skillToTeach(null).capital(true)
             .initialBravesInCamp(8).missionary(missionary).build();
 
-        IntegerOption io = spec().getIntegerOption(GameOptions.NATIVE_CONVERT_PROBABILITY);
-        assertNotNull(io);
-        io.setValue(100);
+        spec().setInteger(GameOptions.NATIVE_CONVERT_PROBABILITY, 100);
 
         Unit soldier = new ServerUnit(game, tile2, dutch, veteranType,
                                       soldierRole);

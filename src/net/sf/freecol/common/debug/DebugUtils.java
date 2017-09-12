@@ -939,18 +939,18 @@ public class DebugUtils {
                                  boolean reveal) {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game game = freeColClient.getGame();
+        final Specification spec = game.getSpecification();
 
         server.exploreMapForAllPlayers(reveal);
 
         // Removes fog of war when revealing the whole map
         // Restores previous setting when hiding it back again
-        BooleanOption fogOfWarSetting = game.getSpecification()
-            .getBooleanOption(GameOptions.FOG_OF_WAR);
         if (reveal) {
-            FreeColDebugger.setNormalGameFogOfWar(fogOfWarSetting.getValue());
-            fogOfWarSetting.setValue(false);
+            FreeColDebugger.setNormalGameFogOfWar(spec.getBoolean(GameOptions.FOG_OF_WAR));
+            spec.setBoolean(GameOptions.FOG_OF_WAR, Boolean.FALSE);
         } else {
-            fogOfWarSetting.setValue(FreeColDebugger.getNormalGameFogOfWar());
+            spec.setBoolean(GameOptions.FOG_OF_WAR,
+                            FreeColDebugger.getNormalGameFogOfWar());
         }
     }
 

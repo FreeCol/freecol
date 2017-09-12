@@ -48,7 +48,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class MapGeneratorTest extends FreeColTestCase {
 
     public void testWithNoIndians() {
-        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+        spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
 
         Game g = new ServerGame(spec());
         g.setNationOptions(new NationOptions(spec()));
@@ -72,7 +72,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     }
 
     public void testSinglePlayerOnSmallMap() {
-        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+        spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
 
         Game g = new ServerGame(spec());
         g.setNationOptions(new NationOptions(spec()));
@@ -98,7 +98,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     }
 
     public void testMapGenerator() {
-        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+        spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
 
         Game g = new ServerGame(spec());
 
@@ -151,7 +151,7 @@ public class MapGeneratorTest extends FreeColTestCase {
      *
      */
     public void testIndianCapital() {
-        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+        spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
 
         Game g = new ServerGame(spec());
         g.setNationOptions(new NationOptions(spec()));
@@ -196,14 +196,11 @@ public class MapGeneratorTest extends FreeColTestCase {
         Game game = new ServerGame(spec());
         MapGenerator gen = new SimpleMapGenerator(game, new Random(1));
         for (File importFile : FreeColDirectories.getMapFileList()) {
-System.err.println("Import " + importFile.getPath());
-            ((FileOption)spec().getOption(MapGeneratorOptions.IMPORT_FILE))
-                .setValue(importFile);
+            spec().setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
             assertNotNull(gen.createMap(new LogBuilder(-1)));
         }
         // Clear import file option
-        ((FileOption)spec().getOption(MapGeneratorOptions.IMPORT_FILE))
-            .setValue(null);
+        spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
     }
 
     public void testRegions() {

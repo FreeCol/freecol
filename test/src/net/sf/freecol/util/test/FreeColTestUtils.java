@@ -197,10 +197,10 @@ public class FreeColTestUtils {
 
 
     public static boolean setStudentSelection(boolean value) {
-        BooleanOption allowStudentSelection = FreeColTestCase.spec()
-            .getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION);
-        boolean ret = allowStudentSelection.getValue();
-        allowStudentSelection.setValue(value);
+        boolean ret = FreeColTestCase.spec()
+            .getBoolean(GameOptions.ALLOW_STUDENT_SELECTION);
+        FreeColTestCase.spec()
+            .setBoolean(GameOptions.ALLOW_STUDENT_SELECTION, value);
         return ret;
     }
 }

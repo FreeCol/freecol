@@ -462,14 +462,14 @@ public class NativeAIPlayer extends MissionAIPlayer {
     private void bringGifts(int[] randoms, LogBuilder lb) {
         final Player player = getPlayer();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
-        final int giftProbability = getSpecification()
-            .getInteger(GameOptions.GIFT_PROBABILITY);
+        final int giftPercent = getSpecification()
+            .getPercentage(GameOptions.GIFT_PROBABILITY);
         int randomIdx = 0;
         lb.mark();
 
         for (IndianSettlement is : player.getIndianSettlementList()) {
             // Do not bring gifts all the time.
-            if (randoms[randomIdx++] >= giftProbability) continue;
+            if (randoms[randomIdx++] >= giftPercent) continue;
 
             // Check if the settlement has anything to give.
             Goods gift = is.getRandomGift(getAIRandom());
@@ -562,14 +562,14 @@ public class NativeAIPlayer extends MissionAIPlayer {
     private void demandTribute(int[] randoms, LogBuilder lb) {
         final Player player = getPlayer();
         final CostDecider cd = CostDeciders.numberOfLegalTiles();
-        final int demandProbability = getSpecification()
-            .getInteger(GameOptions.DEMAND_PROBABILITY);
+        final int demandPercent = getSpecification()
+            .getPercentage(GameOptions.DEMAND_PROBABILITY);
         int randomIdx = 0;
         lb.mark();
 
         for (IndianSettlement is : player.getIndianSettlementList()) {
             // Do not demand tribute all of the time.
-            if (randoms[randomIdx++] >= demandProbability) continue;
+            if (randoms[randomIdx++] >= demandPercent) continue;
 
             // Check if there are available units, and if there are already
             // enough missions in operation.

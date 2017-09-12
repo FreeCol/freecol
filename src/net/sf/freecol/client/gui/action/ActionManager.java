@@ -186,7 +186,7 @@ public class ActionManager extends OptionGroup {
      * @return The {@code FreeColAction}.
      */
     public FreeColAction getFreeColAction(String id) {
-        return (FreeColAction)super.getOption(id);
+        return getOption(id, FreeColAction.class);
     }
 
     /**

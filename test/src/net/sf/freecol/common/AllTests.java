@@ -32,7 +32,7 @@ public class AllTests {
         suite.addTest(net.sf.freecol.common.option.AllTests.suite());
         suite.addTest(net.sf.freecol.common.model.AllTests.suite());
         suite.addTest(net.sf.freecol.common.utils.AllTests.suite());
-        suite.addTest(net.sf.freecol.common.sound.AllTests.suite());
+        // suite.addTest(net.sf.freecol.common.sound.AllTests.suite());
         //$JUnit-END$
         return suite;
     }

@@ -169,8 +169,8 @@ public class SimpleMapGenerator implements MapGenerator {
     private void recache(boolean checkImport) {
         this.mapOptions = game.getMapGeneratorOptions();
         this.spec = game.getSpecification();
-        File importFile = (checkImport) ? ((FileOption)this.mapOptions
-            .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue()
+        File importFile = (checkImport)
+            ? this.mapOptions.getFile(MapGeneratorOptions.IMPORT_FILE)
             : null;
         this.importGame = (importFile == null) ? null
             : FreeColServer.readGame(importFile, this.spec, null);
@@ -201,7 +201,7 @@ public class SimpleMapGenerator implements MapGenerator {
         if (importGame != null && importRumours) return; // Should be done
 
         final int rumourNumber
-            = mapOptions.getInteger(MapGeneratorOptions.RUMOUR_NUMBER);
+            = mapOptions.getRange(MapGeneratorOptions.RUMOUR_NUMBER);
         int number = getApproximateLandCount() / rumourNumber;
         int counter = 0;
 
@@ -420,8 +420,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // layer of surrounding tiles to own.
         List<Tile> allTiles = toList(map.getAllTiles());
         randomShuffle(logger, "All tile shuffle", allTiles, random);
-        final int minDistance
-            = spec.getRangeOption(GameOptions.SETTLEMENT_NUMBER).getValue();
+        final int minDistance = spec.getRange(GameOptions.SETTLEMENT_NUMBER);
         List<Tile> settlementTiles = new ArrayList<>();
         for (Tile tile : allTiles) {
             if (!tile.isPolar()
@@ -883,8 +882,7 @@ public class SimpleMapGenerator implements MapGenerator {
 
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
                 createDebugUnits(map, player, startTile, lb);
-                IntegerOption op = spec.getIntegerOption(GameOptions.STARTING_MONEY);
-                if (op != null) op.setValue(10000);
+                spec.setInteger(GameOptions.STARTING_MONEY, 10000);
             }
         }
     }

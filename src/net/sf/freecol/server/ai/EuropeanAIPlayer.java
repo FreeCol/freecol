@@ -1569,7 +1569,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         final Player player = getPlayer();
         final Turn turn = getGame().getTurn();
         final double peaceProb = getSpecification()
-            .getInteger(GameOptions.PEACE_PROBABILITY) / 100.0;
+            .getPercentageMultiplier(GameOptions.PEACE_PROBABILITY);
 
         int peaceTurn = -1;
         for (HistoryEvent h : player.getHistory()) {

@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.option;
 
+import java.util.List;
+
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.GameOptions;
@@ -30,15 +32,14 @@ public class OptionTest extends FreeColTestCase {
     public void testGameOptions() {
         OptionGroup gameOptions = spec().getGameOptions();
         assertNotNull(gameOptions);
-        assertNotNull(spec().getOptionGroup("gameOptions.map"));
-        assertNotNull(spec().getOptionGroup("gameOptions.colony"));
-        assertNotNull(spec().getOption(GameOptions.FOG_OF_WAR));
-        assertNotNull(spec().getOption(GameOptions.ALLOW_STUDENT_SELECTION));
-        assertNotNull(gameOptions);
         assertFalse(gameOptions.getOptions().isEmpty());
-        assertNotNull(gameOptions.getOption(GameOptions.FOG_OF_WAR));
-        assertFalse(((BooleanOption) gameOptions.getOption(GameOptions.CUSTOM_IGNORE_BOYCOTT))
-                    .getValue());
+        assertNotNull(spec().getOptionGroup(GameOptions.GAMEOPTIONS_MAP));
+        assertNotNull(spec().getOptionGroup(GameOptions.GAMEOPTIONS_COLONY));
+        assertTrue(spec().hasOption(GameOptions.FOG_OF_WAR,
+                                    BooleanOption.class));
+        assertTrue(spec().hasOption(GameOptions.ALLOW_STUDENT_SELECTION,
+                                    BooleanOption.class));
+        assertFalse(gameOptions.getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT));
         assertFalse(spec().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT));
         assertFalse(spec().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS));
         assertFalse(spec().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW));
@@ -46,7 +47,8 @@ public class OptionTest extends FreeColTestCase {
     }
 
     public void testCloneIntegerOption() {
-        IntegerOption money = spec().getIntegerOption(GameOptions.STARTING_MONEY);
+        IntegerOption money = spec().getOption(GameOptions.STARTING_MONEY,
+                                               IntegerOption.class);
         IntegerOption money2 = money.clone();
 
         assertFalse(money == money2);
@@ -61,10 +63,9 @@ public class OptionTest extends FreeColTestCase {
     }
 
     public void testUnitListOption() {
-
-        UnitListOption refOption = (UnitListOption) spec().getOption(GameOptions.REF_FORCE);
-
-        for (AbstractUnit unit : refOption.getOptionValues()) {
+        List<AbstractUnit> ref = spec().getUnitList(GameOptions.REF_FORCE);
+        assertNotNull(ref);
+        for (AbstractUnit unit : ref) {
             assertTrue(unit.getNumber() > 0);
             assertTrue(unit.getNumber() < Integer.MAX_VALUE);
         }
@@ -85,21 +86,21 @@ public class OptionTest extends FreeColTestCase {
         String[] levels = new String[] { "veryEasy", "easy", "medium", "hard", "veryHard" };
         String[] names = new String[] { "immigration", "natives", "monarch", "government", "other" };
         for (String level : levels) {
-            OptionGroup group = (OptionGroup) difficulties.getOption("model.difficulty." + level);
+            OptionGroup group = difficulties.getOptionGroup("model.difficulty." + level);
             assertNotNull("Failed to find difficulty level '" + level + "'", group);
             assertFalse("Difficulty level '" + level + "' should not be editable", group.isEditable());
             for (String name : names) {
-                OptionGroup subGroup = (OptionGroup) group.getOption("model.difficulty." + name);
+                OptionGroup subGroup = group.getOptionGroup("model.difficulty." + name);
                 assertNotNull("Failed to find option group '" + name + "' (" + level + ")", subGroup);
                 assertFalse("Option group '" + name + "' in '" + level + "' should not be editable", subGroup.isEditable());
             }
         }
 
-        OptionGroup group = (OptionGroup) difficulties.getOption("model.difficulty.custom");
+        OptionGroup group = difficulties.getOptionGroup("model.difficulty.custom");
         assertNotNull("Failed to find difficulty level 'custom'", group);
         assertTrue("Difficulty level 'custom' should be editable", group.isEditable());
         for (String name : names) {
-            OptionGroup subGroup = (OptionGroup) group.getOption("model.difficulty." + name);
+            OptionGroup subGroup = group.getOptionGroup("model.difficulty." + name);
             assertNotNull("Failed to find option group '" + name + "' (custom)", subGroup);
             assertTrue("Option group '" + name + "' should be editable", subGroup.isEditable());
         }

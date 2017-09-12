@@ -399,19 +399,19 @@ public class SwingGUI extends GUI {
         // Remove this if Java 2D is ever fixed.  DHYB.
         //
         final String pmoffscreen = "sun.java2d.pmoffscreen";
-        BooleanOption usePixmaps
-            = (BooleanOption) opts.getOption(ClientOptions.USE_PIXMAPS);
+        boolean usePixmaps = opts.getBoolean(ClientOptions.USE_PIXMAPS);
         String pmoffscreenValue = System.getProperty(pmoffscreen);
         if (pmoffscreenValue == null) {
-            System.setProperty(pmoffscreen, usePixmaps.getValue().toString());
-            logger.info(pmoffscreen + " using client option: "
-                + usePixmaps.getValue());
+            System.setProperty(pmoffscreen, Boolean.toString(usePixmaps));
+            logger.info(pmoffscreen + " using client option: " + usePixmaps);
         } else {
-            usePixmaps.setValue(Boolean.valueOf(pmoffscreenValue));
+            opts.setBoolean(ClientOptions.USE_PIXMAPS,
+                            Boolean.valueOf(pmoffscreenValue));
             logger.info(pmoffscreen + " overrides client option: "
                 + pmoffscreenValue);
         }
-        usePixmaps.addPropertyChangeListener((PropertyChangeEvent e) -> {
+        opts.getOption(ClientOptions.USE_PIXMAPS, BooleanOption.class)
+            .addPropertyChangeListener((PropertyChangeEvent e) -> {
                 String newValue = e.getNewValue().toString();
                 System.setProperty(pmoffscreen, newValue);
                 logger.info("Set " + pmoffscreen + " to: " + newValue);
@@ -423,9 +423,8 @@ public class SwingGUI extends GUI {
         this.tileViewer = new TileViewer(getFreeColClient());
 
         // Now that there is a canvas, prepare for language changes.
-        LanguageOption o = (LanguageOption)getClientOptions()
-            .getOption(ClientOptions.LANGUAGE);
-        o.addPropertyChangeListener((PropertyChangeEvent e) -> {
+        opts.getOption(ClientOptions.LANGUAGE, LanguageOption.class)
+            .addPropertyChangeListener((PropertyChangeEvent e) -> {
                 Language language = (Language)e.getNewValue();
                 logger.info("Set language to: " + language);
                 if (Messages.AUTOMATIC.equalsIgnoreCase(language.getKey())) {

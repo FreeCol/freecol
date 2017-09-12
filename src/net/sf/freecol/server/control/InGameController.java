@@ -398,8 +398,9 @@ public final class InGameController extends Controller {
      */
     private void csBuy(Unit unit, Goods goods, int price,
                        ServerIndianSettlement sis, ChangeSet cs) {
-        final int alarmBonus = -Math.round(price * 0.001f * getGame().getSpecification()
-                                            .getInteger(GameOptions.ALARM_BONUS_BUY));
+        final Specification spec = getGame().getSpecification();
+        final int alarmBonus = -Math.round(price * 0.001f
+            * spec.getPercentage(GameOptions.ALARM_BONUS_BUY));
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
         csVisit(owner, sis, 0, cs);
         GoodsLocation.moveGoods(sis, goods.getType(), goods.getAmount(), unit);
@@ -428,9 +429,10 @@ public final class InGameController extends Controller {
      */
     private void csSell(Unit unit, Goods goods, int price,
                         ServerIndianSettlement sis, ChangeSet cs) {
+        final Specification spec = getGame().getSpecification();
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
-        final int alarmBonus = -Math.round(price * 0.001f * getGame().getSpecification()
-                                           .getInteger(GameOptions.ALARM_BONUS_SELL));
+        final int alarmBonus = -Math.round(price * 0.001f
+            * spec.getPercentage(GameOptions.ALARM_BONUS_SELL));
         csVisit(owner, sis, 0, cs);
         GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), sis);
         cs.add(See.perhaps(), unit);
@@ -460,9 +462,10 @@ public final class InGameController extends Controller {
      */
     private void csGift(Unit unit, Goods goods, int price,
                         ServerIndianSettlement sis, ChangeSet cs) {
+        final Specification spec = getGame().getSpecification();
         final ServerPlayer owner = (ServerPlayer)unit.getOwner();
-        final int alarmBonus = -Math.round(price * 0.001f * getGame().getSpecification()
-                                           .getInteger(GameOptions.ALARM_BONUS_GIFT));
+        final int alarmBonus = -Math.round(price * 0.001f
+            * spec.getPercentage(GameOptions.ALARM_BONUS_GIFT));
         csVisit(owner, sis, 0, cs);
         GoodsLocation.moveGoods(unit, goods.getType(), goods.getAmount(), sis);
         cs.add(See.perhaps(), unit);
@@ -1373,12 +1376,12 @@ public final class InGameController extends Controller {
                            + " has not won the game!");
         } else {
             final Specification spec = game.getSpecification();
-            spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_REF)
-                .setValue(Boolean.FALSE);
-            spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_EUROPEANS)
-                .setValue(Boolean.FALSE);
-            spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_HUMANS)
-                .setValue(Boolean.FALSE);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_REF,
+                            Boolean.FALSE);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS,
+                            Boolean.FALSE);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_HUMANS,
+                            Boolean.FALSE);
             logger.info("Disabled victory conditions, as "
                         + serverPlayer.getName()
                         + " has won, but is continuing to play.");
@@ -1671,7 +1674,7 @@ public final class InGameController extends Controller {
             ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
             final int alarmBonus = -Math.round(sis.getPriceToBuy(goods)
                                                * 0.001f * getGame().getSpecification()
-                                               .getInteger(GameOptions.ALARM_BONUS_GIFT));
+                                               .getPercentage(GameOptions.ALARM_BONUS_GIFT));
 
             csVisit(serverPlayer, sis, 0, cs);
             sis.csModifyAlarm(serverPlayer, alarmBonus, true, cs);

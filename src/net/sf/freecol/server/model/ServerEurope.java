@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -121,9 +122,7 @@ public class ServerEurope extends Europe implements TurnTaker {
      */
     public void initializeMigration(Random random) {
         final Specification spec = getGame().getSpecification();
-        UnitListOption option
-            = (UnitListOption)spec.getOption(GameOptions.IMMIGRANTS);
-        for (AbstractUnit au : option.getOptionValues()) {
+        for (AbstractUnit au : spec.getUnitList(GameOptions.IMMIGRANTS)) {
             addRecruitable(au, true);
         }
         fillRecruitables(random);
@@ -247,7 +246,8 @@ public class ServerEurope extends Europe implements TurnTaker {
         String option = (spec.getBoolean(baseOption))
             ? "model.option.priceIncrease." + unitType.getSuffix()
             : "model.option.priceIncrease";
-        int increase = (spec.hasOption(option)) ? spec.getInteger(option) : 0;
+        int increase = (spec.hasOption(option, IntegerOption.class))
+            ? spec.getInteger(option) : 0;
         if (increase != 0) {
             unitPrices.put(unitType, price + increase);
         }

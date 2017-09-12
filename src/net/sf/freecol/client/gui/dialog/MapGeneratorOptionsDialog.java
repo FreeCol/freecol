@@ -49,6 +49,8 @@ import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -128,38 +130,48 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
 
         FileOptionUI foui = (FileOptionUI)mgoUI
             .getOptionUI(MapGeneratorOptions.IMPORT_FILE);
-        if (foui == null)
-            foui = (FileOptionUI)OptionUI.getOptionUI(gui,
-                mgo.getOption(MapGeneratorOptions.IMPORT_FILE), true);
+        if (foui == null) {
+            FileOption op = mgo.getOption(MapGeneratorOptions.IMPORT_FILE,
+                                          FileOption.class);
+            foui = (FileOptionUI)OptionUI.getOptionUI(gui, op, true);
+        }
         foui.setValue(file);
         
         BooleanOptionUI terrainUI = (BooleanOptionUI)mgoUI
             .getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN);
-        if (terrainUI == null)
-            terrainUI = (BooleanOptionUI)OptionUI.getOptionUI(gui,
-                mgo.getOption(MapGeneratorOptions.IMPORT_TERRAIN), true);
+        if (terrainUI == null) {
+            BooleanOption op = mgo.getOption(MapGeneratorOptions.IMPORT_TERRAIN,
+                                             BooleanOption.class);
+            terrainUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
+        }
         terrainUI.setValue(true);
 
         BooleanOptionUI bonusesUI = (BooleanOptionUI)mgoUI
             .getOptionUI(MapGeneratorOptions.IMPORT_BONUSES);
-        if (bonusesUI == null)
-            bonusesUI = (BooleanOptionUI)OptionUI.getOptionUI(gui,
-                mgo.getOption(MapGeneratorOptions.IMPORT_BONUSES), true);
+        if (bonusesUI == null) {
+            BooleanOption op = mgo.getOption(MapGeneratorOptions.IMPORT_BONUSES,
+                                             BooleanOption.class);
+            bonusesUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
+        }
         bonusesUI.setValue(false);
 
         BooleanOptionUI rumourUI = (BooleanOptionUI)mgoUI
             .getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS);
-        if (rumourUI == null)
-            rumourUI = (BooleanOptionUI)OptionUI.getOptionUI(gui,
-                mgo.getOption(MapGeneratorOptions.IMPORT_RUMOURS), true);
+        if (rumourUI == null) {
+            BooleanOption op = mgo.getOption(MapGeneratorOptions.IMPORT_RUMOURS,
+                                             BooleanOption.class);
+            rumourUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
+        }
         rumourUI.setValue(false);
 
-        BooleanOptionUI settlementsUI = (BooleanOptionUI)mgoUI
+        BooleanOptionUI settUI = (BooleanOptionUI)mgoUI
             .getOptionUI(MapGeneratorOptions.IMPORT_SETTLEMENTS);
-        if (settlementsUI == null)
-            settlementsUI = (BooleanOptionUI)OptionUI.getOptionUI(gui,
-                mgo.getOption(MapGeneratorOptions.IMPORT_SETTLEMENTS), true);
-        settlementsUI.setValue(false);
+        if (settUI == null) {
+            BooleanOption op = mgo.getOption(MapGeneratorOptions.IMPORT_SETTLEMENTS,
+                                             BooleanOption.class);
+            settUI = (BooleanOptionUI)OptionUI.getOptionUI(gui, op, true);
+        }
+        settUI.setValue(false);
     }
 
     /**
@@ -218,13 +230,11 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      */
     @Override
     protected boolean save(File file) {
+        final String EDGE = MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE;
         boolean ok = false;
         try {
-            IntegerOption opWidth = (IntegerOption)getGroup()
-                .getOption(MapGeneratorOptions.MAP_WIDTH);
-            IntegerOption opEdge = (IntegerOption)getGroup()
-                .getOption(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE);
-            int width = opWidth.getValue(), edge = opEdge.getValue();
+            int edge = getGroup().getInteger(EDGE),
+                width = getGroup().getInteger(MapGeneratorOptions.MAP_WIDTH);
             if (width >= 4 * edge) {
                 ok = true;
             } else {
@@ -232,7 +242,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                     .template("mapGeneratorOptionsDialog.badWidth")
                     .addAmount("%width%", width)
                     .addAmount("%edge%", edge));
-                opEdge.setValue(opEdge.getMinimumValue());
+                getGroup().setInteger(EDGE, getGroup().getIntegerMinimum(EDGE));
                 return false;
             }
         } catch (Exception ex) {

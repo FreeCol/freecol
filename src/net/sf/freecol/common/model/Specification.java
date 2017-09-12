@@ -56,6 +56,7 @@ import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionContainer;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
@@ -71,7 +72,7 @@ import net.sf.freecol.common.util.LogBuilder;
  * through the class loader from the resource named
  * "specification.xml" in the same package as this class.
  */
-public final class Specification {
+public final class Specification implements OptionContainer {
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
@@ -612,13 +613,12 @@ public final class Specification {
         Turn.initialize(getInteger(GameOptions.STARTING_YEAR),
                         getInteger(GameOptions.SEASON_YEAR),
                         getInteger(GameOptions.SEASONS));
-        {
-            Option agesOption = getOption(GameOptions.AGES);
-            boolean badAges = !(agesOption instanceof TextOption);
-            String agesValue = (badAges) ? ""
-                : ((TextOption)agesOption).getValue();
+        boolean badAges = !hasOption(GameOptions.AGES, TextOption.class);
+        String agesValue = "";
+        if (!badAges) {
+            agesValue = getText(GameOptions.AGES);
             String a[] = agesValue.split(",");
-            badAges |= a.length != NUMBER_OF_AGES-1;
+            badAges = a.length != NUMBER_OF_AGES-1;
             if (!badAges) {
                 try {
                     ages[0] = 1;
@@ -635,12 +635,12 @@ public final class Specification {
                     badAges = true;
                 }
             }
-            if (badAges) {
-                logger.warning("Bad ages: " + agesValue);
-                ages[0] = 1;   // First turn
-                ages[1] = Turn.yearToTurn(1600);
-                ages[2] = Turn.yearToTurn(1700);
-            }
+        }
+        if (badAges) {
+            logger.warning("Bad ages: " + agesValue);
+            ages[0] = 1;   // First turn
+            ages[1] = Turn.yearToTurn(1600);
+            ages[2] = Turn.yearToTurn(1700);
         }
 
         // Apply the customs on coast restriction
@@ -1005,59 +1005,12 @@ public final class Specification {
     // Option routines
 
     /**
-     * Is option with this identifier present?  This is helpful when
-     * options are optionally(!) present, for example
-     * model.option.priceIncrease.artillery exists but
-     * model.option.priceIncrease.frigate does not.
-     *
-     * @param id The object identifier to test.
-     * @return True/false on presence of option id.
-     */
-    public boolean hasOption(String id) {
-        return id != null && allOptions.containsKey(id);
-    }
-
-    /**
-     * Get the {@code AbstractOption} with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code AbstractOption} found.
-     */
-    public AbstractOption getOption(String id) {
-        if (id == null) {
-            throw new IllegalArgumentException("AbstractOption with null id.");
-        } else if (!allOptions.containsKey(id)) {
-            throw new IllegalArgumentException("Missing AbstractOption: " + id);
-        } else {
-            return allOptions.get(id);
-        }
-    }
-
-    /**
-     * Get the {@code OptionGroup} with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code OptionGroup} found.
-     * @exception IllegalArgumentException if the identifier is null
-     *     or not present.
-     */
-    public OptionGroup getOptionGroup(String id) {
-        if (id == null) {
-            throw new IllegalArgumentException("OptionGroup with null id.");
-        } else if (!allOptionGroups.containsKey(id)) {
-            throw new IllegalArgumentException("Missing OptionGroup: " + id);
-        } else {
-            return allOptionGroups.get(id);
-        }
-    }
-
-    /**
      * Adds an {@code OptionGroup} to this specification.
      *
      * @param optionGroup The {@code OptionGroup} to add.
      * @param recursive If true, add recursively to subgroups.
      */
-    public void addOptionGroup(OptionGroup optionGroup, boolean recursive) {
+    private void addOptionGroup(OptionGroup optionGroup, boolean recursive) {
         // Add the options of the group
         for (Option option : optionGroup.getOptions()) {
             if (option instanceof OptionGroup) {
@@ -1081,97 +1034,53 @@ public final class Specification {
         allOptions.put(abstractOption.getId(), abstractOption);
     }
 
-    /**
-     * Get the {@code IntegerOption} with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code IntegerOption} found.
-     */
-    public IntegerOption getIntegerOption(String id) {
-        return (IntegerOption)getOption(id);
-    }
+
+    // Interface OptionContainer
 
     /**
-     * Get the {@code RangeOption} with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code RangeOption} found.
+     * {@inheritDoc}
      */
-    public RangeOption getRangeOption(String id) {
-        return (RangeOption)getOption(id);
-    }
-
-    /**
-     * Get the {@code BooleanOption} with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code BooleanOption} found.
-     */
-    public BooleanOption getBooleanOption(String id) {
-        return (BooleanOption)getOption(id);
-    }
-
-    /**
-     * Get the {@code StringOption} with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code StringOption} found.
-     */
-    public StringOption getStringOption(String id) {
-        return (StringOption) getOption(id);
-    }
-
-    /**
-     * Gets the boolean value of an option.
-     *
-     * @param id The object identifier.
-     * @return The value.
-     * @exception IllegalArgumentException If there is no boolean
-     *     value associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
-     */
-    public boolean getBoolean(String id) {
+    public <R,T extends Option<R>> boolean hasOption(String id,
+                                                     Class<T> returnClass) {
         try {
-            return getBooleanOption(id).getValue();
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Not a boolean option: " + id, e);
+            return id != null && allOptions.containsKey(id)
+                && returnClass.cast(allOptions.get(id)) != null;
+        } catch (ClassCastException cce) {
+            return false;
         }
     }
 
     /**
-     * Gets the integer value of an option.
-     *
-     * @param id The object identifier.
-     * @return The value.
-     * @exception IllegalArgumentException If there is no integer
-     *     value associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
+     * {@inheritDoc}
      */
-    public int getInteger(String id) {
-        try {
-            return getIntegerOption(id).getValue();
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Not an integer option: " + id, e);
+    public <R,T extends Option<R>> T getOption(String id,
+                                               Class<T> returnClass) {
+        if (id == null) {
+            throw new RuntimeException("Null identifier for "
+                + returnClass.getName());
+        } else if (!this.allOptions.containsKey(id)) {
+            throw new RuntimeException("Missing option: " + id);
+        } else {
+            AbstractOption op = this.allOptions.get(id);
+            try {
+                return returnClass.cast(op);
+            } catch (ClassCastException cce) {
+                throw new RuntimeException("Not a " + returnClass.getName()
+                    + ": " + id);
+            }
         }
     }
 
     /**
-     * Gets the string value of an option.
-     *
-     * @param id The object identifier.
-     * @return The value.
-     * @exception IllegalArgumentException If there is no string
-     *     value associated with the specified option.
-     * @exception NullPointerException if the given
-     *     {@code Option} does not exist.
+     * {@inheritDoc}
      */
-    public String getString(String id) {
-        try {
-            return getStringOption(id).getValue();
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Not a string option: " + id, e);
+    public OptionGroup getOptionGroup(String id) {
+        if (id == null) {
+            throw new RuntimeException("OptionGroup with null id.");
+        } else if (!this.allOptionGroups.containsKey(id)) {
+            throw new RuntimeException("Missing OptionGroup: " + id);
+        } else {
+            return this.allOptionGroups.get(id);
         }
     }
 
@@ -1252,7 +1161,8 @@ public final class Specification {
         String suffix = goodsType.getSuffix("model.goods.");
         String minPrice = "model.option." + suffix + ".minimumPrice";
         String maxPrice = "model.option." + suffix + ".maximumPrice";
-        return (hasOption(minPrice) && hasOption(maxPrice))
+        return (hasOption(minPrice, IntegerOption.class)
+            && hasOption(maxPrice, IntegerOption.class))
             ? Math.min(getInteger(minPrice), getInteger(maxPrice))
             : goodsType.getInitialSellPrice();
     }
@@ -2845,7 +2755,7 @@ public final class Specification {
     }
 
     private boolean checkBooleanOption(String id, String gr, boolean defaultValue) {
-        if (hasOption(id)) return false;
+        if (hasOption(id, BooleanOption.class)) return false;
         BooleanOption op = new BooleanOption(id, this);
         op.setGroup(gr);
         op.setValue(defaultValue);
@@ -2853,7 +2763,7 @@ public final class Specification {
     }
 
     private boolean checkIntegerOption(String id, String gr, int defaultValue) {
-        if (hasOption(id)) return false;
+        if (hasOption(id, IntegerOption.class)) return false;
         IntegerOption op = new IntegerOption(id, this);
         op.setGroup(gr);
         op.setValue(defaultValue);
@@ -2861,7 +2771,7 @@ public final class Specification {
     }
 
     private boolean checkStringOption(String id, String gr, String defaultValue) {
-        if (hasOption(id)) return false;
+        if (hasOption(id, StringOption.class)) return false;
         StringOption op = new StringOption(id, this);
         op.setGroup(gr);
         op.setValue(defaultValue);
@@ -2869,7 +2779,7 @@ public final class Specification {
     }
 
     private boolean checkTextOption(String id, String gr, String defaultValue) {
-        if (hasOption(id)) return false;
+        if (hasOption(id, TextOption.class)) return false;
         TextOption op = new TextOption(id, this);
         op.setGroup(gr);
         op.setValue(defaultValue);
