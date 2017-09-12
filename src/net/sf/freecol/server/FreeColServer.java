@@ -1250,7 +1250,7 @@ public final class FreeColServer {
         // Removes fog of war when revealing the whole map
         // Restores previous setting when hiding it back again
         BooleanOption fogOfWarSetting = getSpecification()
-            .getBooleanOption(GameOptions.FOG_OF_WAR);
+            .getOption(GameOptions.FOG_OF_WAR, BooleanOption.class);
         if (reveal) {
             FreeColDebugger.setNormalGameFogOfWar(fogOfWarSetting.getValue());
             fogOfWarSetting.setValue(Boolean.FALSE); 

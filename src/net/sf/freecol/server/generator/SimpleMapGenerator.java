@@ -420,8 +420,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // layer of surrounding tiles to own.
         List<Tile> allTiles = toList(map.getAllTiles());
         randomShuffle(logger, "All tile shuffle", allTiles, random);
-        final int minDistance
-            = spec.getRangeOption(GameOptions.SETTLEMENT_NUMBER).getValue();
+        final int minDistance = spec.getRange(GameOptions.SETTLEMENT_NUMBER);
         List<Tile> settlementTiles = new ArrayList<>();
         for (Tile tile : allTiles) {
             if (!tile.isPolar()
@@ -883,8 +882,7 @@ public class SimpleMapGenerator implements MapGenerator {
 
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
                 createDebugUnits(map, player, startTile, lb);
-                IntegerOption op = spec.getIntegerOption(GameOptions.STARTING_MONEY);
-                if (op != null) op.setValue(10000);
+                spec.setInteger(GameOptions.STARTING_MONEY, 10000);
             }
         }
     }

@@ -1373,12 +1373,12 @@ public final class InGameController extends Controller {
                            + " has not won the game!");
         } else {
             final Specification spec = game.getSpecification();
-            spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_REF)
-                .setValue(Boolean.FALSE);
-            spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_EUROPEANS)
-                .setValue(Boolean.FALSE);
-            spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_HUMANS)
-                .setValue(Boolean.FALSE);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_REF,
+                            Boolean.FALSE);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS,
+                            Boolean.FALSE);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_HUMANS,
+                            Boolean.FALSE);
             logger.info("Disabled victory conditions, as "
                         + serverPlayer.getName()
                         + " has won, but is continuing to play.");

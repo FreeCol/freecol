@@ -104,6 +104,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.SetDeadMessage;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -420,8 +421,9 @@ public class ServerPlayer extends Player implements TurnTaker {
             String prefix = "model.option."
                 + type.getSuffix("model.goods.");
             // these options are not available for all goods types
-            if (spec.hasOption(prefix + ".minimumPrice")
-                && spec.hasOption(prefix + ".maximumPrice")) {
+            if (spec.hasOption(prefix + ".minimumPrice", IntegerOption.class)
+                && spec.hasOption(prefix + ".maximumPrice",
+                                  IntegerOption.class)) {
                 int min = spec.getInteger(prefix + ".minimumPrice");
                 int max = spec.getInteger(prefix + ".maximumPrice");
                 if (max < min) { // User error

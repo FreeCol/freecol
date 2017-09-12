@@ -204,7 +204,8 @@ public final class Monarch extends FreeColGameObject implements Named {
     public Force getExpeditionaryForce() {
         if (this.expeditionaryForce == null) {
             final Specification spec = getSpecification();
-            UnitListOption option = (UnitListOption)spec.getOption(GameOptions.REF_FORCE);
+            UnitListOption option = spec.getOption(GameOptions.REF_FORCE,
+                                                   UnitListOption.class);
             this.expeditionaryForce = new Force(spec, option.getOptionValues(), null);
         }
         return this.expeditionaryForce;
@@ -218,7 +219,8 @@ public final class Monarch extends FreeColGameObject implements Named {
     public Force getInterventionForce() {
         if (this.interventionForce == null) {
             final Specification spec = getSpecification();
-            UnitListOption option = (UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE);
+            UnitListOption option = spec.getOption(GameOptions.INTERVENTION_FORCE,
+                                                   UnitListOption.class);
             this.interventionForce = new Force(spec, option.getOptionValues(), null);
         }
         return this.interventionForce;
@@ -233,7 +235,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public Force getMercenaryForce() {
         final Specification spec = getSpecification();
-        UnitListOption option = (UnitListOption)spec.getOption(GameOptions.MERCENARY_FORCE);
+        UnitListOption option = spec.getOption(GameOptions.MERCENARY_FORCE,
+                                               UnitListOption.class);
         return new Force(spec, option.getOptionValues(), null);
     }
 
@@ -246,7 +249,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public Force getWarSupportForce() {
         final Specification spec = getSpecification();
-        UnitListOption option = (UnitListOption)spec.getOption(GameOptions.WAR_SUPPORT_FORCE);
+        UnitListOption option = spec.getOption(GameOptions.WAR_SUPPORT_FORCE,
+                                               UnitListOption.class);
         return new Force(spec, option.getOptionValues(), null);
     }
 

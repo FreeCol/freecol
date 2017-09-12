@@ -30,12 +30,13 @@ public class OptionTest extends FreeColTestCase {
     public void testGameOptions() {
         OptionGroup gameOptions = spec().getGameOptions();
         assertNotNull(gameOptions);
-        assertNotNull(spec().getOptionGroup("gameOptions.map"));
-        assertNotNull(spec().getOptionGroup("gameOptions.colony"));
-        assertNotNull(spec().getOption(GameOptions.FOG_OF_WAR));
-        assertNotNull(spec().getOption(GameOptions.ALLOW_STUDENT_SELECTION));
-        assertNotNull(gameOptions);
         assertFalse(gameOptions.getOptions().isEmpty());
+        assertNotNull(spec().getOptionGroup(GameOptions.GAMEOPTIONS_MAP));
+        assertNotNull(spec().getOptionGroup(GameOptions.GAMEOPTIONS_COLONY));
+        assertTrue(spec().hasOption(GameOptions.FOG_OF_WAR,
+                                    BooleanOption.class));
+        assertTrue(spec().hasOption(GameOptions.ALLOW_STUDENT_SELECTION,
+                                    BooleanOption.class));
         assertNotNull(gameOptions.getOption(GameOptions.FOG_OF_WAR));
         assertFalse(((BooleanOption) gameOptions.getOption(GameOptions.CUSTOM_IGNORE_BOYCOTT))
                     .getValue());
@@ -46,7 +47,8 @@ public class OptionTest extends FreeColTestCase {
     }
 
     public void testCloneIntegerOption() {
-        IntegerOption money = spec().getIntegerOption(GameOptions.STARTING_MONEY);
+        IntegerOption money = spec().getOption(GameOptions.STARTING_MONEY,
+                                               IntegerOption.class);
         IntegerOption money2 = money.clone();
 
         assertFalse(money == money2);
@@ -62,8 +64,8 @@ public class OptionTest extends FreeColTestCase {
 
     public void testUnitListOption() {
 
-        UnitListOption refOption = (UnitListOption) spec().getOption(GameOptions.REF_FORCE);
-
+        UnitListOption refOption = spec().getOption(GameOptions.REF_FORCE,
+                                                    UnitListOption.class);
         for (AbstractUnit unit : refOption.getOptionValues()) {
             assertTrue(unit.getNumber() > 0);
             assertTrue(unit.getNumber() < Integer.MAX_VALUE);

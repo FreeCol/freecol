@@ -87,7 +87,8 @@ public class LimitTest extends FreeColTestCase {
         Event event = spec().getEvent("model.event.declareIndependence");
         assertNotNull(event);
         assertNotNull(event.getLimits());
-        assertNotNull(spec().getOption(GameOptions.LAST_COLONIAL_YEAR));
+        assertTrue(spec().hasOption(GameOptions.LAST_COLONIAL_YEAR,
+                                    IntegerOption.class));
 
         Limit rebelLimit = event.getLimit("model.limit.independence.rebels");
         Limit colonyLimit = event.getLimit("model.limit.independence.coastalColonies");
@@ -135,10 +136,8 @@ public class LimitTest extends FreeColTestCase {
         assertTrue(colonyLimit.getLeftHandSide().appliesTo(colony));
         assertTrue(colonyLimit.evaluate(dutch));
 
-        IntegerOption option = spec()
-            .getIntegerOption(GameOptions.LAST_COLONIAL_YEAR);
-        option.setMinimumValue(1300);
-        option.setValue(1300);
+        spec().setIntegerMinimum(GameOptions.LAST_COLONIAL_YEAR, 1300);
+        spec().setInteger(GameOptions.LAST_COLONIAL_YEAR, 1300);
         assertFalse(yearLimit.evaluate(dutch));
     }
 

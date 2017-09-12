@@ -231,8 +231,7 @@ public class TerrainGenerator {
         localeTemperature = limitToRange(localeTemperature, -20, 40);
 
         // humidity calculation
-        int localeHumidity = spec.getRangeOption(MapGeneratorOptions.HUMIDITY)
-            .getValue();
+        int localeHumidity = spec.getRange(MapGeneratorOptions.HUMIDITY);
         int humidityDeviation = 20; // +/- 20% randomization
         localeHumidity += randomInt(logger, "Humidity", random,
                                     humidityDeviation * 2)
