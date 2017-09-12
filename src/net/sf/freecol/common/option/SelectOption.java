@@ -69,6 +69,15 @@ public class SelectOption extends IntegerOption {
 
 
     /**
+     * Get the name associated with the current value.
+     *
+     * @return The name.
+     */
+    public String getName() {
+        return this.itemValues.get(getValue());
+    }
+
+    /**
      * Gets the range values of this {@code RangeOption}.
      *
      * @return The value.
@@ -116,6 +125,7 @@ public class SelectOption extends IntegerOption {
     public String getXMLItemElementTagName() {
         return "selectValue";
     }
+
 
     // Interface Option
     

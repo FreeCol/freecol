@@ -56,6 +56,7 @@ import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionContainer;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
@@ -71,7 +72,7 @@ import net.sf.freecol.common.util.LogBuilder;
  * through the class loader from the resource named
  * "specification.xml" in the same package as this class.
  */
-public final class Specification {
+public final class Specification implements OptionContainer {
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
@@ -1004,166 +1005,6 @@ public final class Specification {
     // Option routines
 
     /**
-     * Is option with this identifier present?  This is helpful when
-     * options are optionally(!) present, for example
-     * model.option.priceIncrease.artillery exists but
-     * model.option.priceIncrease.frigate does not.
-     *
-     * @param id The object identifier to test.
-     * @return True/false on presence of option id.
-     */
-    public boolean hasOption(String id) {
-        return id != null && allOptions.containsKey(id);
-    }
-
-    /**
-     * Is option with this identifier present?  This is helpful when
-     * options are optionally(!) present, for example
-     * model.option.priceIncrease.artillery exists but
-     * model.option.priceIncrease.frigate does not.
-     *
-     * @param T The underlying option class.
-     * @param id The object identifier to test.
-     * @param returnClass The expected return class.
-     * @return True/false on presence of option id.
-     */
-    public <R,T extends Option<R>> boolean hasOption(String id,
-                                                     Class<T> returnClass) {
-        try {
-            return id != null && allOptions.containsKey(id)
-                && returnClass.cast(allOptions.get(id)) != null;
-        } catch (ClassCastException cce) {
-            return false;
-        }
-    }
-
-    /**
-     * Get the {@code AbstractOption} with the given identifier and class.
-     *
-     * @param R The underlying type the option contains.
-     * @param T The expected option class.
-     * @param id The object identifier.
-     * @param returnClass The expected return class.
-     * @return The {@code AbstractOption} found. A run time error occurs
-     *     if the option does not exist or os of the wrong type.
-     */
-    public <R,T extends Option<R>> T getOption(String id,
-                                               Class<T> returnClass) {
-        if (id == null) {
-            throw new RuntimeException("Null identifier for "
-                + returnClass.getName());
-        } else if (!this.allOptions.containsKey(id)) {
-            throw new RuntimeException("Missing option: " + id);
-        } else {
-            AbstractOption op = this.allOptions.get(id);
-            try {
-                return returnClass.cast(op);
-            } catch (ClassCastException cce) {
-                throw new RuntimeException("Not a " + returnClass.getName()
-                    + ": " + id);
-            }
-        }
-    }
-
-    /**
-     * Gets the value of a {@code BooleanOption}.
-     *
-     * @param id The object identifier.
-     * @return The boolean value.
-     */
-    public boolean getBoolean(String id) {
-        return getOption(id, BooleanOption.class).getValue();
-    }
-
-    /**
-     * Sets the value of a {@code BooleanOption}.
-     *
-     * @param id The object identifier.
-     * @param value The new boolean value of the option.
-     */
-    public void setBoolean(String id, boolean value) {
-        getOption(id, BooleanOption.class).setValue(value);
-    }
-
-    /**
-     * Gets the value of an {@code IntegerOption}.
-     *
-     * @param id The object identifier.
-     * @return The integer value.
-     */
-    public int getInteger(String id) {
-        return getOption(id, IntegerOption.class).getValue();
-    }
-
-    /**
-     * Sets the value of an {@code IntegerOption}.
-     *
-     * @param id The object identifier.
-     * @param value The new integer value of the option.
-     */
-    public void setInteger(String id, int value) {
-        getOption(id, IntegerOption.class).setValue(value);
-    }
-
-    /**
-     * Gets the minimum value of an {@code IntegerOption}.
-     *
-     * @param id The object identifier.
-     * @return The minimum value.
-     */
-    public int getIntegerMinimum(String id) {
-        return getOption(id, IntegerOption.class).getMinimumValue();
-    }
-
-    /**
-     * Sets the minimum value of an {@code IntegerOption}.
-     *
-     * @param id The object identifier.
-     * @param value The new minimum value.
-     */
-    public void setIntegerMinimum(String id, Integer value) {
-        getOption(id, IntegerOption.class).setMinimumValue(value);
-    }
-
-    /**
-     * Get the {@code OptionGroup} with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The {@code OptionGroup} found.
-     * @exception IllegalArgumentException if the identifier is null
-     *     or not present.
-     */
-    public OptionGroup getOptionGroup(String id) {
-        if (id == null) {
-            throw new RuntimeException("OptionGroup with null id.");
-        } else if (!this.allOptionGroups.containsKey(id)) {
-            throw new RuntimeException("Missing OptionGroup: " + id);
-        } else {
-            return this.allOptionGroups.get(id);
-        }
-    }
-
-    /**
-     * Gets the value of an {@code RangeOption}.
-     *
-     * @param id The object identifier.
-     * @return The range value.
-     */
-    public int getRange(String id) {
-        return getOption(id, RangeOption.class).getValue();
-    }
-
-    /**
-     * Gets the value of a {@code StringOption}.
-     *
-     * @param id The object identifier.
-     * @return The value.
-     */
-    public String getString(String id) {
-        return getOption(id, StringOption.class).getValue();
-    }
-
-    /**
      * Adds an {@code OptionGroup} to this specification.
      *
      * @param optionGroup The {@code OptionGroup} to add.
@@ -1191,6 +1032,56 @@ public final class Specification {
     private void addAbstractOption(AbstractOption abstractOption) {
         // Add the option
         allOptions.put(abstractOption.getId(), abstractOption);
+    }
+
+
+    // Interface OptionContainer
+
+    /**
+     * {@inheritDoc}
+     */
+    public <R,T extends Option<R>> boolean hasOption(String id,
+                                                     Class<T> returnClass) {
+        try {
+            return id != null && allOptions.containsKey(id)
+                && returnClass.cast(allOptions.get(id)) != null;
+        } catch (ClassCastException cce) {
+            return false;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public <R,T extends Option<R>> T getOption(String id,
+                                               Class<T> returnClass) {
+        if (id == null) {
+            throw new RuntimeException("Null identifier for "
+                + returnClass.getName());
+        } else if (!this.allOptions.containsKey(id)) {
+            throw new RuntimeException("Missing option: " + id);
+        } else {
+            AbstractOption op = this.allOptions.get(id);
+            try {
+                return returnClass.cast(op);
+            } catch (ClassCastException cce) {
+                throw new RuntimeException("Not a " + returnClass.getName()
+                    + ": " + id);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public OptionGroup getOptionGroup(String id) {
+        if (id == null) {
+            throw new RuntimeException("OptionGroup with null id.");
+        } else if (!this.allOptionGroups.containsKey(id)) {
+            throw new RuntimeException("Missing OptionGroup: " + id);
+        } else {
+            return this.allOptionGroups.get(id);
+        }
     }
 
 
