@@ -183,10 +183,12 @@ public class ActionManager extends OptionGroup {
      * identifier.
      *
      * @param id The object identifier.
-     * @return The {@code FreeColAction}.
+     * @return The {@code FreeColAction} or null if not present.
      */
     public FreeColAction getFreeColAction(String id) {
-        return getOption(id, FreeColAction.class);
+        return (hasOption(id, FreeColAction.class))
+            ? getOption(id, FreeColAction.class)
+            : null;
     }
 
     /**
