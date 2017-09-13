@@ -1042,12 +1042,8 @@ public final class Specification implements OptionContainer {
      */
     public <R,T extends Option<R>> boolean hasOption(String id,
                                                      Class<T> returnClass) {
-        try {
-            return id != null && allOptions.containsKey(id)
-                && returnClass.cast(allOptions.get(id)) != null;
-        } catch (ClassCastException cce) {
-            return false;
-        }
+        return id != null && allOptions.containsKey(id)
+            && returnClass.isAssignableFrom(allOptions.get(id).getClass());
     }
 
     /**
