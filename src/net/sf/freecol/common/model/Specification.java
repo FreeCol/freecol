@@ -2679,8 +2679,49 @@ public final class Specification implements OptionContainer {
     public boolean fixGameOptions() {
         boolean ret = false;
         // SAVEGAME_VERSION == 11
+
         // SAVEGAME_VERSION == 12
+
+        // @compat 0.10.5
+        ret |= checkOp(GameOptions.ENABLE_UPKEEP,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       false, BooleanOption.class);
+        ret |= checkOp(GameOptions.NATURAL_DISASTERS,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       0, PercentageOption.class);
+        ret |= checkOp(GameOptions.GIFT_PROBABILITY,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       5, PercentageOption.class);
+        ret |= checkOp(GameOptions.DEMAND_PROBABILITY,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       10, PercentageOption.class);
+        ret |= checkOp(GameOptions.EMPTY_TRADERS,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       false, BooleanOption.class);
+        // end @compat 0.10.5
+
         // SAVEGAME_VERSION == 13
+
+        // @compat 0.10.7
+        ret |= checkOp(GameOptions.ONLY_NATURAL_IMPROVEMENTS,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       true, BooleanOption.class);
+        ret |= checkOp(GameOptions.PEACE_PROBABILITY,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       90, PercentageOption.class);
+        ret |= checkOp(GameOptions.INITIAL_IMMIGRATION,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       15, IntegerOption.class);
+        ret |= checkOp(GameOptions.EUROPEAN_UNIT_IMMIGRATION_PENALTY,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       -4, IntegerOption.class);
+        ret |= checkOp(GameOptions.PLAYER_IMMIGRATION_BONUS,
+                       GameOptions.GAMEOPTIONS_MAP,
+                       2, IntegerOption.class);
+        ret |= checkOp(GameOptions.FOUND_COLONY_DURING_REBELLION,
+                       GameOptions.GAMEOPTIONS_COLONY,
+                       true, BooleanOption.class);
+        // end @compat 0.10.7
 
         // @compat 0.11.0
         ret |= checkOp(GameOptions.BELL_ACCUMULATION_CAPPED,
