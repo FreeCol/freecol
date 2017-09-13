@@ -41,6 +41,20 @@ public interface Option<T> extends Cloneable, ObjectWithId {
     public Option<T> clone() throws CloneNotSupportedException;
 
     /**
+     * Gets the option group identifier for this option.
+     *
+     * @return The option group identifier.
+     */
+    public String getGroup();
+
+    /**
+     * Set the option group for this option.
+     *
+     * @param group The identifier for the option group.
+     */
+    public void setGroup(String group);
+
+    /**
      * Gets the value of this option.
      *
      * @return The value of this {@code Option}.

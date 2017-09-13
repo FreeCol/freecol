@@ -42,7 +42,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
     private static final Logger logger = Logger.getLogger(AbstractOption.class.getName());
 
     /** The option group prefix. */
-    private String optionGroup = "";
+    private String optionGroupId = "";
 
     /**
      * Determine if the option has been defined.  When defined an
@@ -79,26 +79,6 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      */
     public AbstractOption(Specification specification) {
         this(null, specification);
-    }
-
-
-    /**
-     * Gets the string prefix that identifies the group of this
-     * {@code Option}.
-     *
-     * @return The string prefix provided by the OptionGroup.
-     */
-    public String getGroup() {
-        return optionGroup;
-    }
-
-    /**
-     * Set the option group prefix.
-     *
-     * @param group The prefix to set.
-     */
-    public void setGroup(String group) {
-        optionGroup = (group == null) ? "" : group;
     }
 
     /**
@@ -161,17 +141,27 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
     public abstract AbstractOption<T> clone() throws CloneNotSupportedException;
 
     /**
-     * Gets the value of this option.
-     *
-     * @return The value of this {@code Option}.
+     * {@inheritDoc}
+     */
+    public String getGroup() {
+        return this.optionGroupId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setGroup(String group) {
+        this.optionGroupId = (group == null) ? "" : group;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public abstract T getValue();
 
     /**
-     * Sets the value of this option.
-     *
-     * @param value The new value of this {@code Option}.
+     * {@inheritDoc}
      */
     @Override
     public abstract void setValue(T value);

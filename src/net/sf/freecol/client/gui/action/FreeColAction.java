@@ -314,31 +314,6 @@ public abstract class FreeColAction extends AbstractAction
         return (keyStroke == null) ? "" : keyStroke.toString();
     }
 
-    /**
-     * Returns the action itself.
-     *
-     * FIXME: at the moment, this is only necessary in order to
-     * implement Option.
-     *
-     * @return This {@code FreeColAction}.
-     */
-    @Override
-    public FreeColAction getValue() {
-        return this;
-    }
-
-    /**
-     * Does nothing except log a warning.
-     *
-     * FIXME: at the moment, this is only necessary in order to
-     * implement Option.
-     *
-     * @param value a {@code FreeColAction} value
-     */
-    @Override
-    public void setValue(FreeColAction value) {
-        logger.warning("Calling unsupported method setValue.");
-    }
 
     public MenuKeyListener getMenuKeyListener() {
         return new InnerMenuKeyListener();
@@ -361,6 +336,41 @@ public abstract class FreeColAction extends AbstractAction
     public void update() {
         boolean b = shouldBeEnabled();
         if (isEnabled() != b) setEnabled(b);
+    }
+
+
+    // Interface Option
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getGroup() {
+        return getActionManager().getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setGroup(String group) {
+        logger.warning("Unsupported method FreeColAction.setGroup.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColAction getValue() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setValue(FreeColAction value) {
+        logger.warning("Unsupported method FreeColAction.setValue.");
     }
 
 
