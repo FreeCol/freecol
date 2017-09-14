@@ -415,12 +415,8 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      */    
     public <R,T extends Option<R>> boolean hasOption(String id,
                                                      Class<T> returnClass) {
-        try {
-            return id != null && this.optionMap.containsKey(id)
-                && returnClass.cast(this.optionMap.get(id)) != null;
-        } catch (ClassCastException cce) {
-            return false;
-        }
+        return id != null && this.optionMap.containsKey(id)
+            && returnClass.isAssignableFrom(this.optionMap.get(id).getClass());
     }
 
     /**

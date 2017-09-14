@@ -48,7 +48,8 @@ public interface OptionContainer {
      * @param R The underlying type of option.
      * @param T The actual return type.
      * @param id The object identifier.
-     * @return The option, or null if not found.
+     * @return The option, or a run time exception if the option does not
+     *     exist or is of the wrong class.
      */
     <R,T extends Option<R>> T getOption(String id, Class<T> returnClass);
 

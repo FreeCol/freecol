@@ -108,12 +108,12 @@ public final class ReportTurnPanel extends ReportPanel {
         
     private void displayMessages() {
         final Game game = getFreeColClient().getGame();
-        final ClientOptions options = getClientOptions();
-        final int groupBy = options.getInteger(ClientOptions.MESSAGES_GROUP_BY);
+        final ClientOptions co = getClientOptions();
+        final int groupBy = co.getInteger(ClientOptions.MESSAGES_GROUP_BY);
 
         // Sort if requested
         final Comparator<ModelMessage> comparator
-            = options.getModelMessageComparator(game);
+            = co.getModelMessageComparator(game);
         if (comparator != null) this.messages.sort(comparator);
 
         Object source = this;
@@ -209,16 +209,16 @@ public final class ReportTurnPanel extends ReportPanel {
             components.add(label);
             
             // Add filter button if option present.
-            final BooleanOption filterOption = options.getBooleanOption(message);
-            if (filterOption != null) {
+            final String msgKey = message.getOptionName();
+            if (co.hasOption(msgKey, BooleanOption.class)) {
                 JButton filterButton = new JButton("X");
                 Utility.localizeToolTip(filterButton, StringTemplate
                     .template("report.turn.filter")
                     .addNamed("%type%", message.getMessageType()));
                 final ModelMessage mess = message;
                 filterButton.addActionListener((ActionEvent ae) -> {
-                        boolean flag = filterOption.getValue();
-                        filterOption.setValue(!flag);
+                        boolean flag = co.getBoolean(msgKey);
+                        co.setBoolean(msgKey, !flag);
                         for (ModelMessage m : messages) {
                             if (m.getMessageType() != mess.getMessageType()) continue;
                             for (JComponent jc : textPanesByMessage.get(m.getId())) {
