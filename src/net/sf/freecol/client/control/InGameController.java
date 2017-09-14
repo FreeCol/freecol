@@ -625,17 +625,6 @@ public final class InGameController extends FreeColClientHolder {
     // Utilities for message handling.
 
     /**
-     * Provides an opportunity to filter the messages delivered to the canvas.
-     *
-     * @param message the message that is candidate for delivery to the canvas
-     * @return true if the message should be delivered
-     */
-    private boolean shouldAllowMessage(ModelMessage message) {
-        final String key = message.getOptionName();
-        return (key == null) ? true : getClientOptions().getBoolean(key);
-    }
-
-    /**
      * Start ignoring a kind of message.
      *
      * @param key The key for a message to ignore.
@@ -698,13 +687,15 @@ public final class InGameController extends FreeColClientHolder {
      */
     public boolean displayModelMessages(final boolean allMessages,
                                         final boolean endOfTurn) {
+        final ClientOptions co = getClientOptions();
         final Player player = getMyPlayer();
         final Turn thisTurn = getGame().getTurn();
         final ArrayList<ModelMessage> messages = new ArrayList<>();
 
         for (ModelMessage m : ((allMessages) ? player.getModelMessages()
                 : player.getNewModelMessages())) {
-            if (shouldAllowMessage(m)
+            final String key = m.getOptionName();
+            if ((key == null || co.getBoolean(key))
                 && !continueIgnoreMessage(m.getIgnoredMessageKey(), thisTurn)) {
                 messages.add(m);
             }
