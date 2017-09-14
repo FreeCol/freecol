@@ -73,6 +73,7 @@ public final class UnitImageAnimation {
         // Painting the whole screen once to get rid of disposed dialog-boxes.
         gui.paintImmediatelyCanvasInItsBounds();
         gui.executeWithUnitOutForAnimation(unit, tile, (JLabel unitLabel) -> {
+                gui.requireFocus(tile);
                 for (AnimationEvent event : animation) {
                     long time = System.nanoTime();
                     if (event instanceof ImageAnimationEvent) {
@@ -91,6 +92,7 @@ public final class UnitImageAnimation {
                         if (time > 0) Utils.delay(time, "Animation delayed.");
                     }
                 }
+                gui.refresh();
             });
     }
 

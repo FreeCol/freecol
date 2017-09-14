@@ -2436,20 +2436,9 @@ public final class InGameController extends FreeColClientHolder {
     public void animateAttackHandler(Unit attacker, Unit defender,
                                      Tile attackerTile, Tile defenderTile,
                                      boolean success) {
-        // Note: we used to focus the map on the unit even when
-        // animation is off as long as the center-active-unit option
-        // was set.  However IR#115 requested that if animation is off
-        // that we display nothing so as to speed up the other player
-        // moves as much as possible.
-        final FreeColClient fcc = getFreeColClient();
-        invokeAndWait(() -> {
-                if (fcc.getAnimationSpeed(attacker.getOwner()) > 0) {
-                    getGUI().animateUnitAttack(attacker, defender,
-                                               attackerTile, defenderTile,
-                                               success);
-                }
-                getGUI().refresh();
-            });
+        // Proceed directly to animation, it has its own deferral.
+        getGUI().animateUnitAttack(attacker, defender,
+                                   attackerTile, defenderTile, success);
     }
 
     /**
@@ -2460,20 +2449,8 @@ public final class InGameController extends FreeColClientHolder {
      * @param newTile The {@code Tile} the move ends at.
      */
     public void animateMoveHandler(Unit unit, Tile oldTile, Tile newTile) {
-        // Note: we used to focus the map on the unit even when
-        // animation is off as long as the center-active-unit option
-        // was set.  However IR#115 requested that if animation is off
-        // that we display nothing so as to speed up the other player
-        // moves as much as possible.
-        final FreeColClient fcc = getFreeColClient();
-        invokeAndWait(() -> {
-                if (fcc.getAnimationSpeed(unit.getOwner()) > 0) {
-                    getGUI().animateUnitMove(unit, oldTile, newTile);
-                } else if (getMyPlayer().owns(unit)) {
-                    getGUI().requireFocus(newTile);
-                }
-                getGUI().refresh();
-            });
+        // Proceed directly to animation, it has its own deferral.
+        getGUI().animateUnitMove(unit, oldTile, newTile);
     }
 
     /**

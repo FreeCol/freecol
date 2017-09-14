@@ -652,8 +652,16 @@ public class SwingGUI extends GUI {
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
-        requireFocus(attackerTile);
-        if (!Animations.unitAttack(getFreeColClient(), attacker, defender,
+        // Note: we used to focus the map on the unit even when
+        // animation is off as long as the center-active-unit option
+        // was set.  However IR#115 requested that if animation is off
+        // that we display nothing so as to speed up the other player
+        // moves as much as possible.
+        final FreeColClient fcc = getFreeColClient();
+        if (fcc.getAnimationSpeed(attacker.getOwner()) <= 0
+            && fcc.getAnimationSpeed(defender.getOwner()) <= 0) return;
+
+        if (!Animations.unitAttack(fcc, attacker, defender,
                                    attackerTile, defenderTile, success)) {
             logger.warning("Attack animation failure: " + attacker
                 + " v " + defender);
@@ -665,10 +673,17 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
-        requireFocus(srcTile);
-        if (!Animations.unitMove(getFreeColClient(), unit, srcTile, dstTile)) {
-            logger.warning("Move animation failure: " + unit + " " + srcTile
-                + " " + dstTile);
+        // Note: we used to focus the map on the unit even when
+        // animation is off as long as the center-active-unit option
+        // was set.  However IR#115 requested that if animation is off
+        // that we display nothing so as to speed up the other player
+        // moves as much as possible.
+        final FreeColClient fcc = getFreeColClient();
+        if (fcc.getAnimationSpeed(unit.getOwner()) <= 0) return;
+
+        if (!Animations.unitMove(fcc, unit, srcTile, dstTile)) {
+            logger.warning("Move animation failure: " + unit
+                + " " + srcTile + " " + dstTile);
         }
     }
 
@@ -1868,7 +1883,8 @@ public class SwingGUI extends GUI {
     public void executeWithUnitOutForAnimation(final Unit unit,
                                                final Tile sourceTile,
                                                final OutForAnimationCallback r) {
-        mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
+        invokeNowOrWait(() ->
+            mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r));
     }
 
     /**
