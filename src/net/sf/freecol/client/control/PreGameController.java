@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
@@ -330,7 +331,11 @@ public final class PreGameController extends FreeColClientHolder {
      * @param objects The {@code FreeColObject}s to update.
      */
     public void updateHandler(List<FreeColObject> objects) {
+        final Game game = getGame();
         for (FreeColObject fco : objects) {
+            if (fco instanceof FreeColGameObject) {
+                game.setFreeColGameObject(fco.getId(), (FreeColGameObject)fco);
+            }
             if (fco instanceof Game) {
                 final FreeColClient fcc = getFreeColClient();
                 fcc.addSpecificationActions(((Game)fco).getSpecification());

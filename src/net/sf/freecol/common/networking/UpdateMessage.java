@@ -63,27 +63,26 @@ public class UpdateMessage extends ObjectMessage {
      * Create a new {@code UpdateMessage}.
      *
      * @param destination The destination {@code ServerPlayer}.
-     * @param fco A {@code FreeColObject}s to add (FIXME: currently
-     *     only {@code FreeColGameObject}s are actually allowed).
+     * @param fco A {@code FreeColGameObject}s to add.
      */
     public UpdateMessage(ServerPlayer destination,
-                         FreeColObject fco) {
+                         FreeColGameObject fcgo) {
         this(destination);
 
-        appendChild(fco);
+        appendChild(fcgo);
     }
 
     /**
      * Create a new {@code UpdateMessage}.
      *
      * @param destination The destination {@code ServerPlayer}.
-     * @param fcos A list of {@code FreeColObject}s to add.
+     * @param fcgos A list of {@code FreeColObject}s to add.
      */
     public UpdateMessage(ServerPlayer destination,
-                         List<FreeColObject> fcos) {
+                         List<FreeColGameObject> fcgos) {
         this(destination);
 
-        appendChildren(fcos);
+        appendChildren(fcgos);
     }
 
     /**
@@ -98,7 +97,7 @@ public class UpdateMessage extends ObjectMessage {
         this((ServerPlayer)null);
 
         FreeColXMLReader.ReadScope rs
-            = xr.replaceScope(FreeColXMLReader.ReadScope.NORMAL);
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
         List<FreeColObject> fcos = new ArrayList<>();
         try {
             while (xr.moreTags()) {
