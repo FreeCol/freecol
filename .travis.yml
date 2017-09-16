@@ -1,6 +1,8 @@
 language: java
 jdk:
   - oraclejdk8
+env:
+  - DSTAMP=$(date +%F)
 addons:
   apt:
     packages:
@@ -13,6 +15,7 @@ before_deploy:
 deploy:
   provider: releases
   skip_cleanup: true
+  tag_name: "nightly-$DSTAMP"
   api_key:
     secure: 27nIysTc9XqIKbwyevG1XvDXwl9N7TL5PihRpyrteMAePfWOQgjNUQe2vmc2KCt/SJc6sxt48KpnlfFIv7IIPn1fccl3SvC4mxlaiOAhdMTWMaf6mACOuIsqMFhmBqW4ukD3rxVh78oATnYaS1OLq3bJoucQhXg57QmacW+gRvKbI/jO7ltqDVMGY+5EQzcHYYj7fUrbpGhSUN/rtSUDlPkrreVl2trTzavwQlN8vBNOdTX4PXhOztNlCBepveRVAC6mJTVpyvvz9jfLtVM224CJF2TMn/j1cwEIln/DF94uqdKvpkCc6kgduVWPJHEPdfi0QjgdrO+kPzAfPnXZrgVSaiVAnUBQ1XYOthwUpxyOwLU/u5g6aZ7ix7Hg9MiBgJWJ4+4zqkdi78+MEimFN3Ky9BGb3t8MbO98LsX34W48j1j1wxJWx4OC8dSQiBb3bVJaDWZo+kORjsd0qVgWuGD4R9PL1snuRxGHezrq0KZe2Wa0JKqtrXYDrXxKYSlo3CXwzjM4O6+t0ERjrsrXt+Ns3CaZB9w1GHvB2/qVr+SNfOU0MxeSgUgIMzEBVjJeL093C/4JR8JbBcLaxei9vOHt5iubDvSveMO4hTuY62jPCixmmvLBGw7DqRxa8wA6HR5ejJoI2eazK1NNh8Fxsn3Q4iwyau3758cGpGhB3Ng=
   file_glob: true
