@@ -228,6 +228,16 @@
         <antcall target="javaInstallerBundle"/>
     </target>
 
+    <target name="nightly-release" description="Creates nightly build distribution.">
+      <property name="print.manual.is.up.to.date" value="true"/>
+      <property name="print.devmanual.is.up.to.date" value="true"/>
+      <property name="nightly.version" value="true" />
+      <property name="skip.dist.source" value="true" />
+
+      <antcall target="distclean" />
+      <antcall target="dist" />
+    </target>
+
     <!--
         Creates archives and installers for distribution and places these in the
         "dist" directory.
@@ -282,8 +292,7 @@
         </condition>
     </target>
 
-    <target name="prepareManual" depends="initDist,print-manuals"
-            unless="skip.manual">
+    <target name="prepareManual" depends="initDist,print-manuals">
         <mkdir dir="${freecol.release.dir}/manual/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/manual/${freecol.name}">
             <fileset dir="${freecol.doc.dir}" includes="FreeCol.pdf"/>
