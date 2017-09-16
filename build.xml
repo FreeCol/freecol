@@ -228,6 +228,21 @@
         <antcall target="javaInstallerBundle"/>
     </target>
 
+    <target name="nightly-release" description="Creates nightly build distribution.">
+      <property name="print.manual.is.up.to.date" value="true"/>
+      <property name="print.devmanual.is.up.to.date" value="true"/>
+      <property name="nightly.version" value="true" />
+      <property name="skip.dist.source" value="true" />
+
+      <antcall target="distclean" />
+      <antcall target="dist" />
+
+      <mkdir dir="${freecol.release.dir}/releases"/>
+      <copy todir="${freecol.release.dir}/releases">
+          <fileset dir="${freecol.release.dir}" includes="freecol-git-*"/>
+      </copy>
+    </target>
+
     <!--
         Creates archives and installers for distribution and places these in the
         "dist" directory.
