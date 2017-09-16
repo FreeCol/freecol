@@ -236,6 +236,11 @@
 
       <antcall target="distclean" />
       <antcall target="dist" />
+
+      <mkdir dir="${freecol.release.dir}/releases"/>
+      <copy todir="${freecol.release.dir}/releases">
+          <fileset dir="${freecol.release.dir}" includes="freecol-git-*"/>
+      </copy>
     </target>
 
     <!--
