@@ -282,7 +282,8 @@
         </condition>
     </target>
 
-    <target name="prepareManual" depends="initDist,print-manuals">
+    <target name="prepareManual" depends="initDist,print-manuals"
+            unless="skip.manual">
         <mkdir dir="${freecol.release.dir}/manual/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/manual/${freecol.name}">
             <fileset dir="${freecol.doc.dir}" includes="FreeCol.pdf"/>
