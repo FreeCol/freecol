@@ -8,7 +8,7 @@ addons:
 script:
   - ant testci
 before_deploy:
-  - ant dist -Dnightly.version=true
+  - ant dist -Dnightly.version=true -Dskip.dist.source=true -Dskip.manual=true
 deploy:
   provider: releases
   skip_cleanup: true
