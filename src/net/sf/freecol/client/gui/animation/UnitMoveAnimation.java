@@ -101,6 +101,7 @@ final class UnitMoveAnimation extends FreeColClientHolder {
                 final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0
                     : (srcPoint.getY() > dstPoint.getY()) ? -1 : 1;
 
+                gui.requireFocus(sourceTile);
                 // Painting the whole screen once to get rid of
                 // disposed dialog-boxes.
                 gui.paintImmediatelyCanvasInItsBounds();
@@ -133,9 +134,10 @@ final class UnitMoveAnimation extends FreeColClientHolder {
                             dropFrames = timeTaken / ANIMATION_DELAY - 1;
                         }
                     } else {
-                            dropFrames--;
+                        dropFrames--;
                     }
                 }
+                gui.refresh();
             });
         return true;
     }

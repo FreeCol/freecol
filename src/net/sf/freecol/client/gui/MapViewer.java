@@ -989,7 +989,8 @@ public final class MapViewer extends FreeColClientHolder {
         if (unitTile == null || unitTile.isEmpty()) {
             result = null;
 
-        } else if (activeUnit != null && activeUnit.getTile() == unitTile) {
+        } else if (activeUnit != null && activeUnit.getTile() == unitTile
+            && !isOutForAnimation(activeUnit)) {
             result = activeUnit;
 
         } else if (unitTile.hasSettlement()) {
@@ -999,50 +1000,23 @@ public final class MapViewer extends FreeColClientHolder {
             result = unitTile.getDefendingUnit(activeUnit);
 
         } else {
-            // Find the unit with the most moves left, preferring
-            // active units.
+            // Find the unit with the most moves left, preferring active units.
+            result = null;
             List<Unit> units = unitTile.getUnitList();
-            result = units.remove(0);
-            int best = result.getMovesLeft();
-            boolean carrier,
-                active = result.getState() == Unit.UnitState.ACTIVE;
-            for (Unit u : units) {
-                carrier = false;
-                if (active) {
-                    if (u.getState() == Unit.UnitState.ACTIVE) {
-                        if (best < u.getMovesLeft()) {
-                            best = u.getMovesLeft();
-                            result = u;
-                        }
-                    } else {
-                        carrier = !u.isEmpty();
-                    }
-                } else if (u.getState() == Unit.UnitState.ACTIVE) {
-                    active = true;
-                    best = u.getMovesLeft();
+            int bestScore = -1;
+            while (!units.isEmpty()) {
+                Unit u = units.remove(0);
+                if (isOutForAnimation(u)) continue;
+                boolean active = u.getState() == Unit.UnitState.ACTIVE;
+                int score = u.getMovesLeft() + ((active) ? 10000 : 0);
+                if (bestScore < score) {
+                    bestScore = score;
                     result = u;
-                } else {
-                    if (best < u.getMovesLeft()) {
-                        best = u.getMovesLeft();
-                        result = u;
-                    }
-                    carrier = !u.isEmpty();
                 }
-                if (carrier) {
-                    // Check for active units on carriers.  Usually the
-                    // carrier takes precedence.
-                    for (Unit c : u.getUnitList()) {
-                        if (active) {
-                            if (best < c.getMovesLeft()) {
-                                best = c.getMovesLeft();
-                                result = c;
-                            }
-                        } else if (c.getState() == Unit.UnitState.ACTIVE) {
-                            active = true;
-                            best = c.getMovesLeft();
-                            result = c;
-                        }
-                    }
+                if (!active) {
+                    // Also consider units on carriers if the carrier itself
+                    // is not active.
+                    units.addAll(u.getUnitList());
                 }
             }
         }
