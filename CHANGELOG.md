@@ -63,14 +63,7 @@ Running FreeCol in Full-screen mode on OSX is known to be problematic and may no
 * Delivering gifts to Natives has a stronger effect on reducing native alarm. [BR#3092](https://sourceforge.net/p/freecol/bugs/3092/)
 
 
-## FreeCol 0.11.6 (2015##
-
-The FreeCol team are glad to announce the release of FreeCol 0.11.6.  This is a bug fix and incremental improvement release from 0.11.5.  All 0.10.x and 0.11.x (x != 4) games should continue to work with 0.11.6.
-
-We hope you enjoy FreeCol 0.11.6.  Onward to 1.0.
-
-The FreeCol Team
-
+## FreeCol 0.11.6 (October 16, 2015) ##
 
 ### Common problems ###
 
@@ -85,10 +78,9 @@ There has been significant effort trying to track down cases where the lower rig
 
 At least 7 older bug reports were also closed, 2 were fixed and 5 went out of date.
 
-There are now 50 open bug reports, many received partial fixes. 
+There are now 50 open bug reports, many received partial fixes.
 The majority of cases are still UI issues, but the proportion of reports that are blocked needing further information is rising.  Please remember, if you report a bug, check back to see if developers that are working on it have clarifying questions.  On the other hand, there has been useful progress on several "What Would Col1 Do?" issues, and more is anticipated in the next release thanks to a highly detailed play through of Col1 contributed by Mark Jackson.
 Additionally, there are some open bug reports which require more media (images or sounds). Any help on these would be highly appreciated.
-
 
 ### User-visible changes since 0.11.5-release ###
 
@@ -122,30 +114,10 @@ Additionally, there are some open bug reports which require more media (images o
 - Fixed map display to consistently draw everything on partial updates, see [BR#2580](https://sourceforge.net/p/freecol/bugs/2580).
 - --server option now only controls starting a stand alone server, --server-port controls the port independently.
 
-
-<!--
-Bug:  2883? 2886 2887 2891 2893 2899 2904 2905
-Dup: 2907 2914 2923
-Media: 2888
-Fixed:  2879 2880 2881 2882 2884 2889 2890 2894 2896 2898 2903 2906 2908 2909 2910 2915 2917 2920 2922
-Invalid: 2897 2913 2916
-NeedInfo  2895 2897 2901 2921
-Rejected: 2900 2918 2919
-->IR:   2892 2902
-UI:      2911 2912
-
-[2879 .. 2923, (2885 in 0.11.5)]
-
-Fixed:    2580 2873
-OutOfDate: 2047 2828 2830 2850 2854
--->
-
 #### Other improvements ####
 
 - When characters are not supported by the "ShadowedBlack" font we provide (mostly used for panel headers) the game automatically falls back to using the normal game font, to prevent rectangle glyphs from being shown for non-latin characters.
 - Map display is improved; the optional region borders and black map-grid are consistently shown everywhere now.
-
-<!-- ecbc3b7(0.11.4) .. -->
 
 ### Developer issues ###
 
@@ -154,3 +126,94 @@ OutOfDate: 2047 2828 2830 2850 2854
 - Integer, Select and Range options now validate their input.  Watch out for logged warnings of bad input.
 - splash.jpg moved into ./build, and is built into FreeCol.jar, added --no-splash option.
 - The game now tolerates modding in higher resolution tile images, see git.a85590de for more detailed explanation.
+
+## FreeCol 0.11.5 (August 3, 2015) ##
+
+### Common problems ###
+
+There was a major reorganization of the translation subsystem.  This may have caused an increase in the number of untranslated texts appearing.  This should go away in time as the translators resynchronize.  Feel free to help at [translatewiki](https://translatewiki.net/wiki/Translating:FreeCol).
+
+Autosaving may have been disabled in old savegames, as a bug([BR#2825](https://sourceforge.net/p/freecol/bugs/2825/)) with the autosave interval could not be fixed in a completely backwards compatible way.  Manually set the autosave interval if you have problems.
+
+### Bugs ###
+
+For the 0.11.5 release we only fixed the map generation bug which incompletely generated regions, which could hang the game for various reasons but most quickly when the display tile regions option was activated.
+
+There are now less than fifty open bug reports.  The majority of cases are now UI issues, followed by reports that are blocked in the `What would Col1 do?' state.
+
+<!---
+Bug:
+Dup:
+Fixed:    2885
+Invalid:
+NeedInfo:
+->IR:
+OutOfDate:
+
+[>2876]
+
+Fixed:
+->IR:
+WontFix:
+-->
+
+
+### Changes since 0.11.4-release ###
+
+#### Bugs fixed ####
+
+- Map region generation has been fixed, see  [BR#2885](https://sourceforge.net/p/freecol/bugs/2885/).
+
+### Changes since 0.11.3-release ###
+
+#### New features ####
+
+- Major improvements to map scaling, suitable for higher resolution displays [BR#2726](https://sourceforge.net/p/freecol/bugs/2726/).
+- Overall scaling of most text, icons and many panels in the GUI is a new feature to help users with high resolution displays. This can now be set at the command line with the "--gui-scale *percentage*" option. See also  [BR#2726](https://sourceforge.net/p/freecol/bugs/2726/).
+- The monarch now sometimes provides troops and gold when declaring war [PF#4](https://sourceforge.net/p/freecol/pending-features-for-freecol/4/).
+- Native nations may support the REF or the player following a declaration of independence [PF#5](https://sourceforge.net/p/freecol/pending-features-for-freecol/5/).
+- Added attack animations for artillery, damaged artillery, privateer and frigate [BR#2722](https://sourceforge.net/p/freecol/bugs/2722/).
+- Added Col1-compatibility game option to auto-disembark units in colonies, [PF#54](https://sourceforge.net/p/freecol/pending-features-for-freecol/54/).
+- Multi-season year mods from Fenyo.
+
+
+#### Bugs fixed ####
+
+- Bryce mod no longer duplicates requirements [BR#2816](https://sourceforge.net/p/freecol/bugs/2816/)
+- Unblocked trade routes [BR#2819](https://sourceforge.net/p/freecol/bugs/2819/)
+- Windowed mode can not be changed while panels are visible, mitigating but not really fixing [BR#2820](https://sourceforge.net/p/freecol/bugs/2820/).
+- Temporary goods warning message disable works again [BR#2822](https://sourceforge.net/p/freecol/bugs/2822/).
+- Military report REF units should aggregate correctly [BR#2823](https://sourceforge.net/p/freecol/bugs/2823/).
+- Autosaves can be disabled again [BR#2825](https://sourceforge.net/p/freecol/bugs/2825/).
+- Colonies are named before claiming the tile they are on (reverting an old behaviour),
+but rejected suggested colony names are now recycled.
+- Several cases of missing i18n fixed.
+- Some panels, for example, Europe Panel have been made internally and externally resizable to prevent problems from wrongly cut off parts of the panel and its buttons [BR#2786](https://sourceforge.net/p/freecol/bugs/2786/).
+- The WorkProductionPanel does not anymore cut off the top part of a forest or similar in the tile image it is showing, similar glitches have been fixed in other places.
+- Fixed missing window frame icon after switching between windowed and fullscreen mode.
+- Fixed colors for minimap in markovoss mod.
+- Fixed partially wrong dialog background texture in Classic FreeCol UI mod.
+- Fixed rare crash when loading a savegame with the map centered over a colony [BR#2875](https://sourceforge.net/p/freecol/bugs/2875/).
+- Fixed font loading for languages needing localized glyph sets [BR#2877](https://sourceforge.net/p/freecol/bugs/2877/).
+
+
+#### Other improvements ####
+
+- Better preloading of resources and other code improvements to game startup.
+- Code for resource management reorganized. This results in major savings of RAM [BR#2843](https://sourceforge.net/p/freecol/bugs/2823/) and is also including less, but more correct, thread synchronization.
+- The size of the game in windowed mode now correctly adapts to the space used for task bar and window decorations.
+- Several minor improvements in image quality (for example, dynamically drawing labels, building images, fixed icons, better scaling code).
+- Some AI efficiency improvements.
+- Improved where line breaks are added to text in InformationPanel.
+
+
+#### Developer issues ###
+
+- Updated project file and developer documentation for using NetBeans.
+- Code for the major gui classes reorganized with less circular dependencies and not as large classes.
+- Some code cleanup, like adding @override, reformatting and improving comments, contributed by calebrw.
+- Most types of resource keys renamed to bring them into a consistent scheme.
+- Large message renaming for consistency and ease of checking.
+- Nation options now have a distinct tag that does not rely on capitalization.
+- Other serialization naming consistency fixes.
+- Added --headless command line option.
