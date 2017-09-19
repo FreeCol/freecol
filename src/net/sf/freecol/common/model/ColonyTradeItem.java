@@ -144,8 +144,7 @@ public class ColonyTradeItem extends TradeItem {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         ColonyTradeItem o = copyInCast(other, ColonyTradeItem.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.colonyId = o.getColonyId();
         this.colonyName = o.getColonyName();
         return true;

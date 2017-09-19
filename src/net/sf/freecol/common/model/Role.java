@@ -431,8 +431,7 @@ public class Role extends BuildableType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Role o = copyInCast(other, Role.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.downgrade = o.getDowngrade();
         this.maximumCount = o.getMaximumCount();
         this.expertUnit = o.getExpertUnit();

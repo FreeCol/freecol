@@ -309,8 +309,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         BuildableType o = copyInCast(other, BuildableType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.setRequiredPopulation(o.getRequiredPopulation());
         this.setRequiredAbilities(o.getRequiredAbilities());
         this.setRequiredGoods(o.getRequiredGoodsList());

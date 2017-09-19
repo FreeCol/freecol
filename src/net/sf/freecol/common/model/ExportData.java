@@ -202,8 +202,7 @@ public class ExportData extends FreeColObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         ExportData o = copyInCast(other, ExportData.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.highLevel = o.getHighLevel();
         this.lowLevel = o.getLowLevel();
         this.importLevel = o.getImportLevel();

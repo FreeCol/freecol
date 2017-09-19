@@ -131,8 +131,7 @@ public class Disaster extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Disaster o = copyInCast(other, Disaster.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.natural = o.isNatural();
         this.numberOfEffects = o.getNumberOfEffects();
         this.setEffects(o.getEffects());

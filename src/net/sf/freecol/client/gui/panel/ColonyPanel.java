@@ -1969,6 +1969,7 @@ public final class ColonyPanel extends PortPanel
                     if (colonyTile == null) {
                         logger.warning("Null colony tile for " + getColony()
                             + " on " + tiles[x][y] + " at " + x + "," + y);
+                        dump("TILES", colony.getColonyTiles());
                         continue;
                     }
                     ASingleTilePanel aSTP

@@ -574,10 +574,13 @@ public class TileItemContainer extends FreeColGameObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         TileItemContainer o = copyInCast(other, TileItemContainer.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.tile = o.getTile();
-        setTileItems(o.getTileItems());
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        this.tile = game.updateRef(o.getTile(), Tile.class);
+        clearTileItems();
+        for (TileItem ti : o.getTileItems()) {
+            addTileItem(game.update(ti, TileItem.class));
+        }
         return true;
     }
 

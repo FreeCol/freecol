@@ -1542,13 +1542,19 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         IndianSettlement o = copyInCast(other, IndianSettlement.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
         this.learnableSkill = o.getLearnableSkill();
         this.setWantedGoods(o.getWantedGoods());
-        this.setContactLevels(o.getContactLevels());
-        this.setOwnedUnitList(o.getOwnedUnitList());
-        this.missionary = o.getMissionary();
+        clearContactLevels();
+        synchronized (this.contactLevels) {
+            for (Entry<Player, ContactLevel> e : this.contactLevels.entrySet()) {
+                setContactLevel(game.updateRef(e.getKey(), Player.class),
+                                e.getValue());
+            }
+        }
+        this.setOwnedUnitList(game.updateRef(o.getOwnedUnitList(), Unit.class));
+        this.missionary = game.update(o.getMissionary(), Unit.class);
         this.convertProgress = o.getConvertProgress();
         this.lastTribute = o.getLastTribute();
         this.mostHated = o.getMostHated();

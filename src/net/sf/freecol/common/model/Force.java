@@ -268,8 +268,7 @@ public class Force extends FreeColSpecObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Force o = copyInCast(other, Force.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.setLandUnitList(o.getLandUnitsList());
         this.setNavalUnitList(o.getNavalUnitsList());
         this.spaceRequired = o.getSpaceRequired();

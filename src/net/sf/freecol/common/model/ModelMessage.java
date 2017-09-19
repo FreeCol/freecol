@@ -395,8 +395,7 @@ public class ModelMessage extends StringTemplate {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         ModelMessage o = copyInCast(other, ModelMessage.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.sourceId = o.getSourceId();
         this.displayId = o.getDisplayId();
         this.messageType = o.getMessageType();

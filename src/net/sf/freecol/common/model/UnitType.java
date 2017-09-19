@@ -666,8 +666,7 @@ public final class UnitType extends BuildableType implements Consumer {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         UnitType o = copyInCast(other, UnitType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.baseOffence = o.getBaseOffence();
         this.baseDefence = o.getBaseDefence();
         this.space = o.getSpace();

@@ -369,8 +369,7 @@ public class ProductionType extends FreeColSpecObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         ProductionType o = copyInCast(other, ProductionType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.unattended = o.getUnattended();
         this.productionLevel = o.getProductionLevel();
         this.setOutputs(o.getOutputList());

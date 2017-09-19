@@ -225,8 +225,7 @@ public class Scope extends FreeColObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Scope o = copyInCast(other, Scope.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.type = o.getType();
         this.abilityId = o.getAbilityId();
         this.abilityValue = o.getAbilityValue();

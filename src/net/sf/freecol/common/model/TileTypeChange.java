@@ -105,8 +105,7 @@ public class TileTypeChange extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         TileTypeChange o = copyInCast(other, TileTypeChange.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.from = o.getFrom();
         this.to = o.getTo();
         this.production = o.getProduction();

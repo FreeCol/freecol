@@ -212,8 +212,7 @@ public class NationOptions extends FreeColSpecObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         NationOptions o = copyInCast(other, NationOptions.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.nationalAdvantages = o.getNationalAdvantages();
         this.setNations(o.getNations());
         return true;

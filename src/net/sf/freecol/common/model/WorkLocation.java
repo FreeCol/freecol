@@ -957,9 +957,8 @@ public abstract class WorkLocation extends UnitLocation
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         WorkLocation o = copyInCast(other, WorkLocation.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.colony = o.getColony();
+        if (o == null || !super.copyIn(o)) return false;
+        this.colony = getGame().updateRef(o.getColony(), Colony.class);
         this.productionType = o.getProductionType();
         return true;
     }

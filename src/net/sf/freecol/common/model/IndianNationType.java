@@ -205,8 +205,7 @@ public class IndianNationType extends NationType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         IndianNationType o = copyInCast(other, IndianNationType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.setSkills(o.getSkills());
         this.setRegions(o.getRegions());
         return true;

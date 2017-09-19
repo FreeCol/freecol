@@ -473,8 +473,7 @@ public final class BuildingType extends BuildableType
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         BuildingType o = copyInCast(other, BuildingType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.level = o.getLevel();
         this.workPlaces = o.getWorkPlaces();
         this.minSkill = o.getMinimumSkill();

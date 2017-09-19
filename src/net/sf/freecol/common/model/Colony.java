@@ -137,14 +137,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /** A list of items to be built. */
     protected final BuildQueue<BuildableType> buildQueue
             = new BuildQueue<>(this,
-            BuildQueue.CompletionAction.REMOVE_EXCEPT_LAST,
-            Consumer.COLONY_PRIORITY);
+                               BuildQueue.CompletionAction.REMOVE_EXCEPT_LAST,
+                               Consumer.COLONY_PRIORITY);
 
     /** The colonists that may be born. */
     protected final BuildQueue<UnitType> populationQueue
             = new BuildQueue<>(this,
-            BuildQueue.CompletionAction.SHUFFLE,
-            Consumer.POPULATION_PRIORITY);
+                               BuildQueue.CompletionAction.SHUFFLE,
+                               Consumer.POPULATION_PRIORITY);
 
     // Will only be used on enemy colonies:
     protected int displayUnitCount = -1;
@@ -2983,10 +2983,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Colony o = copyInCast(other, Colony.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.setBuildingMap(o.getBuildings());
-        this.setColonyTiles(o.getColonyTiles());
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        this.setBuildingMap(game.update(o.getBuildings(), Building.class));
+        this.setColonyTiles(game.update(o.getColonyTiles(), ColonyTile.class));
         this.setExportData(o.getExportData());
         this.liberty = o.getLiberty();
         this.sonsOfLiberty = o.getSonsOfLiberty();

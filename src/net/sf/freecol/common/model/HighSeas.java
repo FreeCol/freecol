@@ -194,9 +194,12 @@ public class HighSeas extends UnitLocation {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         HighSeas o = copyInCast(other, HighSeas.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.setDestinations(o.getDestinations());
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        this.destinations.clear();
+        for (Location loc : o.getDestinations()) {
+            this.destinations.add(game.updateLocationRef(loc));
+        }
         return true;
     }
 

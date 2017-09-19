@@ -142,8 +142,7 @@ public class StanceTradeItem extends TradeItem {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         StanceTradeItem o = copyInCast(other, StanceTradeItem.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.stance = o.getStance();
         return true;
     }

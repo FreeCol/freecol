@@ -396,6 +396,15 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Set a tile from its internal coordinates.
+     *
+     * @param tile The {@code Tile} to set.
+     */
+    public void setTile(Tile tile) {
+        setTile(tile, tile.getX(), tile.getY());
+    }
+
+    /**
      * Gets the width of this map.
      *
      * @return The width of this map.
@@ -2558,15 +2567,18 @@ public class Map extends FreeColGameObject implements Location {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Map o = copyInCast(other, Map.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.tiles = o.getTiles();
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        o.forEachTile((Tile t) ->
+            this.setTile(game.update(t, Tile.class), t.getX(), t.getY()));
         this.layer = o.getLayer();
         this.minimumLatitude = o.getMinimumLatitude();
         this.maximumLatitude = o.getMaximumLatitude();
         this.latitudePerRow = o.getLatitudePerRow();
         this.regions.clear();
-        this.regions.addAll(o.getRegions());
+        for (Region r : o.getRegions()) {
+            this.regions.add(game.update(r, Region.class));
+        }
         return true;
     }
 
@@ -2681,7 +2693,7 @@ public class Map extends FreeColGameObject implements Location {
 
         } else if (Tile.TAG.equals(tag)) {
             Tile t = xr.readFreeColObject(game, Tile.class);
-            setTile(t, t.getX(), t.getY());
+            setTile(t);
 
         } else {
             super.readChild(xr);

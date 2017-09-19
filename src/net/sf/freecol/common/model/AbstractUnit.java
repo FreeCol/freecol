@@ -256,8 +256,7 @@ public class AbstractUnit extends FreeColObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         AbstractUnit o = copyInCast(other, AbstractUnit.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.roleId = o.getRoleId();
         this.number = o.getNumber();
         return true;

@@ -664,8 +664,7 @@ public class Building extends WorkLocation
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Building o = copyInCast(other, Building.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.buildingType = o.getType();
         return true;
     }

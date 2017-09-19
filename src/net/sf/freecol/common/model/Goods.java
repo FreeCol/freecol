@@ -246,10 +246,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Goods o = copyInCast(other, Goods.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         //Game can not change.  No: this.game = o.getGame();
-        this.location = o.getLocation();
+        this.location = getGame().updateLocationRef(o.getLocation());
         return true;
     }
 

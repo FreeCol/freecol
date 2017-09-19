@@ -290,8 +290,7 @@ public class Resource extends TileItem {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Resource o = copyInCast(other, Resource.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.type = o.getType();
         this.quantity = o.getQuantity();
         return true;

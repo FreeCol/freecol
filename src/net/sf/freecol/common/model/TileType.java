@@ -459,8 +459,7 @@ public final class TileType extends FreeColSpecObjectType
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         TileType o = copyInCast(other, TileType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.forest = o.isForested();
         this.water = o.isWater();
         this.canSettle = o.canSettle();

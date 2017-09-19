@@ -180,9 +180,15 @@ public class GoodsTradeItem extends TradeItem {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         ColonyTradeItem o = copyInCast(other, ColonyTradeItem.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.goods = o.getGoods();
+        if (o == null || !super.copyIn(o)) return false;
+        Goods g = o.getGoods();
+        if (g == null) {
+            this.goods = null;
+        } else if (this.goods == null) {
+            this.goods = g;
+        } else {
+            return this.goods.copyIn(g);
+        }
         return true;
     }
 

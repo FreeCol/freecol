@@ -559,11 +559,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         UnitLocation o = copyInCast(other, UnitLocation.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
         synchronized (this.units) {
             this.units.clear();
-            this.units.addAll(o.getUnitList());
+            this.units.addAll(game.update(o.getUnitList(), Unit.class));
         }
         return true;
     }

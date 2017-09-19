@@ -399,8 +399,7 @@ public class MarketData extends FreeColGameObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         MarketData o = copyInCast(other, MarketData.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.goodsType = o.getGoodsType();
         this.costToBuy = o.getCostToBuy();
         this.paidForSale = o.getPaidForSale();

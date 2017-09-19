@@ -456,8 +456,7 @@ public class HighScore extends FreeColObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         HighScore o = copyInCast(other, HighScore.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.independenceTurn = o.getIndependenceTurn();
         this.playerName = o.getPlayerName();
         this.nationId = o.getNationId();

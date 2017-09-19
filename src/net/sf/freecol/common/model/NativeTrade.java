@@ -497,17 +497,20 @@ public class NativeTrade extends FreeColGameObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         NativeTrade o = copyInCast(other, NativeTrade.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.unit = o.getUnit();
-        this.is = o.getIndianSettlement();
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        this.unit = game.updateRef(o.getUnit(), Unit.class);
+        this.is = game.updateRef(o.getIndianSettlement(),
+                                 IndianSettlement.class);
         this.count = o.getCount();
         this.buy = o.getBuy();
         this.sell = o.getSell();
         this.gift = o.getGift();
-        this.item = o.getItem();
-        this.unitToSettlement = o.getUnitToSettlement();
-        this.settlementToUnit = o.getSettlementToUnit();
+        this.item = game.update(o.getItem(), NativeTradeItem.class);
+        this.unitToSettlement = game.update(o.getUnitToSettlement(),
+                                            NativeTradeItem.class);
+        this.settlementToUnit = game.update(o.getSettlementToUnit(),
+                                            NativeTradeItem.class);
         return true;
     }
 

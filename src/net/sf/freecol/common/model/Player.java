@@ -23,6 +23,7 @@ import java.awt.Color;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2945,7 +2946,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param bannedMissions The new set of banned players.
      */
-    protected void setBannedMissions(Set<Player> bannedMissions) {
+    protected void setBannedMissions(Collection<Player> bannedMissions) {
         if (this.bannedMissions == null) {
             this.bannedMissions = new HashSet<>();
         } else {
@@ -3953,8 +3954,8 @@ public class Player extends FreeColGameObject implements Nameable {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Player o = copyInCast(other, Player.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
         this.name = o.getName();
         this.independentNationName = o.getIndependentNationName();
         this.playerType = o.getPlayerType();
@@ -3975,18 +3976,21 @@ public class Player extends FreeColGameObject implements Nameable {
         this.oldSoL = o.getOldSoL();
         this.interventionBells = o.getInterventionBells();
         this.tax = o.getTax();
-        this.entryLocation = o.getEntryLocation();
-        this.market = o.getMarket();
-        this.europe = o.getEurope();
-        this.monarch = o.getMonarch();
+        this.entryLocation = game.updateLocationRef(o.getEntryLocation());
+        this.market = game.update(o.getMarket(), Market.class);
+        this.europe = game.update(o.getEurope(), Europe.class);
+        this.monarch = game.update(o.getMonarch(), Monarch.class);
+        this.highSeas = game.update(o.getHighSeas(), HighSeas.class);
         this.setFoundingFathers(o.getFoundingFathers());
         this.currentFather = o.getCurrentFather();
         this.setTension(o.getTension());
-        this.setBannedMissions(o.getBannedMissions());
+        this.setBannedMissions(game.updateRef(o.getBannedMissions(), Player.class));
         this.setStances(o.getStances());
         // TradeRoutes are special
-        //this.tradeRoutes.clear();
-        //this.tradeRoutes.addAll(o.getTradeRoutes());
+        this.tradeRoutes.clear();
+        for (TradeRoute tr : o.getTradeRoutes()) {
+            this.tradeRoutes.add(game.update(tr, TradeRoute.class));
+        }
         this.setModelMessages(o.getModelMessages());
         this.setHistory(o.getHistory());
         this.setLastSales(o.getLastSales());
