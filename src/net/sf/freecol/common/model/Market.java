@@ -107,8 +107,52 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
 
+    /**
+     * Get the market data.
+     *
+     * @return The map of goods type to market data.
+     */
+    private Map<GoodsType, MarketData> getMarketData() {
+        synchronized (this.marketData) {
+            return this.marketData;
+        }
+    }
+
+    /**
+     * Get the market data values.
+     *
+     * @return The market data in this market.
+     */
+    public Collection<MarketData> getMarketDataValues() {
+        synchronized (this.marketData) {
+            return this.marketData.values();
+        }
+    }
+
+    /**
+     * Gets the market data for a type of goods.
+     *
+     * Public so the server can send individual MarketData updates.
+     *
+     * @param goodsType The {@code GoodsType} to look for.
+     * @return The corresponding {@code MarketData}, or null if none.
+     */
+    public MarketData getMarketData(GoodsType goodsType) {
+        synchronized (this.marketData) {
+            return this.marketData.get(goodsType);
+        }
+    }
+
+    /**
+     * Set the market data for a given goods type.
+     *
+     * @param goodsType The {@code GoodsType} to set the market data for.
+     * @param data The new {@code MarketData}.
+     */
     private void putMarketData(GoodsType goodsType, MarketData data) {
-        marketData.put(goodsType, data);
+        synchronized (this.marketData) {
+            this.marketData.put(goodsType, data);
+        }
     }
 
     /**
@@ -128,33 +172,24 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Get the market data.
+     * Set the market data.
      *
-     * @return The map of goods type to market data.
+     * @param data The new market data.
      */
-    protected Map<GoodsType, MarketData> getMarketData() {
-        return this.marketData;
+    private void setMarketData(Map<GoodsType, MarketData> data) {
+        synchronized (this.marketData) {
+            this.marketData.clear();
+            this.marketData.putAll(data);
+        }
     }
 
     /**
-     * Get the market data values.
-     *
-     * @return The market data in this market.
+     * Clear the market data.
      */
-    public Collection<MarketData> getMarketDataValues() {
-        return this.marketData.values();
-    }
-
-    /**
-     * Gets the market data for a type of goods.
-     *
-     * Public so the server can send individual MarketData updates.
-     *
-     * @param goodsType The {@code GoodsType} to look for.
-     * @return The corresponding {@code MarketData}, or null if none.
-     */
-    public MarketData getMarketData(GoodsType goodsType) {
-        return marketData.get(goodsType);
+    private void clearMarketData() {
+        synchronized (this.marketData) {
+            this.marketData.clear();
+        }
     }
 
     /**
@@ -542,7 +577,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         if (xw.validFor(owner)) {
 
-            for (MarketData data : sort(marketData.values())) {
+            for (MarketData data : sort(getMarketDataValues())) {
                 data.toXML(xw);
             }
         }
@@ -565,7 +600,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        marketData.clear();
+        clearMarketData();
 
         super.readChildren(xr);
     }
@@ -602,7 +637,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[').append(getId())
             .append(" owner=").append(owner.getId());
-        for (MarketData md : sort(marketData.values())) {
+        for (MarketData md : sort(getMarketDataValues())) {
             sb.append(' ').append(md);
         }
         sb.append(']');
