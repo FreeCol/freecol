@@ -39,7 +39,12 @@ public class ModelMessage extends StringTemplate {
 
     public static final String TAG = "modelMessage";
 
-    /** Constants describing the type of message. */
+    /**
+     * Constants categorizing the type of message.
+     *
+     * When this changes, be sure to update client-options.xml and the
+     * messages file appropriately.
+     */
     public static enum MessageType implements Named {
         DEFAULT(""),
         BUILDING_COMPLETED("model.option.guiShowBuildingCompleted"),
