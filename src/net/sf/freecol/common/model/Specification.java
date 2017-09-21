@@ -2592,9 +2592,12 @@ public final class Specification implements OptionContainer {
             }
             if (op != null) {
                 level.remove(op.getId());
-                if (op instanceof AbstractOption) {
-                    ((AbstractOption)op).setGroup(og.getId());
+                if (!(op instanceof IntegerOption)) {
+                    IntegerOption iop = new IntegerOption(id, this);
+                    iop.setValue(defaultValue);
+                    op = iop;
                 }
+                op.setGroup(gr);
                 og.add(op);
                 lb.add("\n  ~", level.getId(), "/", id, " -> ",
                     level.getId(), "/" + og.getId());
@@ -2642,9 +2645,12 @@ public final class Specification implements OptionContainer {
             }
             if (op != null) {
                 level.remove(op.getId());
-                if (op instanceof AbstractOption) {
-                    ((AbstractOption)op).setGroup(og.getId());
+                if (!(op instanceof PercentageOption)) {
+                    PercentageOption pop = new PercentageOption(id, this);
+                    pop.setValue(defaultValue);
+                    op = pop;
                 }
+                op.setGroup(gr);
                 og.add(op);
                 lb.add("\n  ~", level.getId(), "/", id, " -> ",
                     level.getId(), "/" + og.getId());
@@ -2659,8 +2665,8 @@ public final class Specification implements OptionContainer {
                 if (op instanceof PercentageOption) continue;
                 if (op != null) og.remove(id);
                 PercentageOption pop = new PercentageOption(id, this);
-                pop.setGroup(gr);
                 pop.setValue(defaultValue);
+                pop.setGroup(gr);
                 og.add(pop);
                 lb.add("\n  +", level.getId(), "/", og.getId(),
                     "/", id, "=", defaultValue);
