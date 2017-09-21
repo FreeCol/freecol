@@ -238,7 +238,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<ColonyTile> getColonyTiles() {
         synchronized (this.colonyTiles) {
-            return this.colonyTiles;
+            return new ArrayList<>(this.colonyTiles);
         }
     }
 
@@ -252,6 +252,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             this.colonyTiles.clear();
             this.colonyTiles.addAll(colonyTiles);
         }
+    }
+        
+    /**
+     * Clear the colony tiles.
+     */
+    private void clearColonyTiles() {
+        synchronized (this.colonyTiles) { this.colonyTiles.clear(); }
     }
         
     /**
@@ -3132,8 +3139,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        synchronized (colonyTiles) { colonyTiles.clear(); }
         clearBuildingMap();
+        clearColonyTiles();
         exportData.clear();
         buildQueue.clear();
         populationQueue.clear();

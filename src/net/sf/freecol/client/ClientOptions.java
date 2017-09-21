@@ -740,6 +740,12 @@ public class ClientOptions extends OptionGroup {
 
         // @compat 0.11.6
         addBooleanOption(SHOW_REGION_NAMING, ClientOptions.MESSAGES, true);
+
+        // These have computed keys in ModelMessage.MessageType
+        addBooleanOption("model.option.guiShowCombatResult",
+                         ClientOptions.MESSAGES, true);
+        addBooleanOption("model.option.guiShowUnitRepaired",
+                         ClientOptions.MESSAGES, true);
         // end @compat 0.11.6
     }
 

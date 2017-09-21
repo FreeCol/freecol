@@ -2474,12 +2474,12 @@ public final class Specification implements OptionContainer {
         ret |= checkDifficultyIntegerOption(GameOptions.DESTROY_SETTLEMENT_SCORE,
                                             GameOptions.DIFFICULTY_NATIVES, lb,
                                             -5);
-        ret |= checkDifficultyIntegerOption(GameOptions.BAD_RUMOUR,
-                                            GameOptions.DIFFICULTY_OTHER, lb,
-                                            23);
-        ret |= checkDifficultyIntegerOption(GameOptions.GOOD_RUMOUR,
-                                            GameOptions.DIFFICULTY_OTHER, lb,
-                                            48);
+        ret |= checkDifficultyPercentageOption(GameOptions.BAD_RUMOUR,
+                                               GameOptions.DIFFICULTY_OTHER, lb,
+                                               23);
+        ret |= checkDifficultyPercentageOption(GameOptions.GOOD_RUMOUR,
+                                               GameOptions.DIFFICULTY_OTHER, lb,
+                                               48);
         ret |= checkDifficultyIntegerOption(GameOptions.OFFENSIVE_LAND_UNIT_CHEAT,
                                             GameOptions.DIFFICULTY_CHEAT, lb,
                                             4);
@@ -2502,7 +2502,6 @@ public final class Specification implements OptionContainer {
                                             GameOptions.DIFFICULTY_MONARCH, lb,
                                             1500);
         // end @compat 0.11.3
-
 
         // Ensure 2 levels of groups, and one level of leaves
         for (OptionGroup level : getDifficultyLevels()) {
@@ -2593,9 +2592,12 @@ public final class Specification implements OptionContainer {
             }
             if (op != null) {
                 level.remove(op.getId());
-                if (op instanceof AbstractOption) {
-                    ((AbstractOption)op).setGroup(og.getId());
+                if (!(op instanceof IntegerOption)) {
+                    IntegerOption iop = new IntegerOption(id, this);
+                    iop.setValue(defaultValue);
+                    op = iop;
                 }
+                op.setGroup(gr);
                 og.add(op);
                 lb.add("\n  ~", level.getId(), "/", id, " -> ",
                     level.getId(), "/" + og.getId());
@@ -2613,6 +2615,59 @@ public final class Specification implements OptionContainer {
                 iop.setGroup(gr);
                 iop.setValue(defaultValue);
                 og.add(iop);
+                lb.add("\n  +", level.getId(), "/", og.getId(),
+                    "/", id, "=", defaultValue);
+            }
+            ret = true;
+        }
+        return ret;
+    }
+
+    private boolean checkDifficultyPercentageOption(String id, String gr,
+                                                    LogBuilder lb,
+                                                    int defaultValue) {
+        boolean ret = false;
+        for (OptionGroup level : getDifficultyLevels()) {
+            OptionGroup og = null;
+            for (Option o : level.getOptions()) {
+                if (o.getId().equals(gr) && o instanceof OptionGroup) {
+                    og = (OptionGroup)o;
+                    break;
+                }
+            }
+            if (og == null) continue;
+            Option op = null;
+            for (Option o : level.getOptions()) {
+                if (o.getId().equals(id) && !(o instanceof OptionGroup)) {
+                    op = o;
+                    break;
+                }
+            }
+            if (op != null) {
+                level.remove(op.getId());
+                if (!(op instanceof PercentageOption)) {
+                    PercentageOption pop = new PercentageOption(id, this);
+                    pop.setValue(defaultValue);
+                    op = pop;
+                }
+                op.setGroup(gr);
+                og.add(op);
+                lb.add("\n  ~", level.getId(), "/", id, " -> ",
+                    level.getId(), "/" + og.getId());
+            } else {
+                op = null;
+                for (Option o : og.getOptions()) {
+                    if (o.getId().equals(id)) {
+                        op = o;
+                        break;
+                    }
+                }
+                if (op instanceof PercentageOption) continue;
+                if (op != null) og.remove(id);
+                PercentageOption pop = new PercentageOption(id, this);
+                pop.setValue(defaultValue);
+                pop.setGroup(gr);
+                og.add(pop);
                 lb.add("\n  +", level.getId(), "/", og.getId(),
                     "/", id, "=", defaultValue);
             }
