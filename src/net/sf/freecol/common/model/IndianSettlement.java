@@ -118,7 +118,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * At the client side, only the information regarding the player
      * on that client should be included.
      */
-    protected final java.util.Map<Player, ContactLevel> contactLevels = new HashMap<>();
+    protected final java.util.Map<Player, ContactLevel> contactLevels
+        = new HashMap<>();
 
     /** Units that belong to this settlement. */
     protected final List<Unit> ownedUnits = new ArrayList<>();
@@ -498,8 +499,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *
      * @return The contact level map.
      */
-    protected java.util.Map<Player, ContactLevel> getContactLevels() {
-        return this.contactLevels;
+    private java.util.Map<Player, ContactLevel> getContactLevels() {
+        synchronized (this.contactLevels) {
+            return this.contactLevels;
+        }
     }
 
     /**
@@ -508,10 +511,21 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @param contactLevels The new contact level map.
      */
     protected void setContactLevels(java.util.Map<Player, ContactLevel> contactLevels) {
-        this.contactLevels.clear();
-        this.contactLevels.putAll(contactLevels);
+        clearContactLevels();
+        synchronized (this.contactLevels) {
+            this.contactLevels.putAll(contactLevels);
+        }
     }
-    
+
+    /**
+     * Clear the contact levels.
+     */
+    private void clearContactLevels() {
+        synchronized (this.contactLevels) {
+            this.contactLevels.clear();
+        }
+    }
+
     /**
      * Gets the contact level between this settlement and a player.
      *
@@ -519,8 +533,22 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return The contact level.
      */
     public ContactLevel getContactLevel(Player player) {
-        ContactLevel cl = contactLevels.get(player);
-        return (cl == null) ? ContactLevel.UNCONTACTED : cl;
+        synchronized (this.contactLevels) {
+            ContactLevel cl = this.contactLevels.get(player);
+            return (cl == null) ? ContactLevel.UNCONTACTED : cl;
+        }
+    }
+
+    /**
+     * Sets a contact level between this settlement and a player.
+     *
+     * @param player The contacted {@code Player}.
+     * @param level The new {@code ContactLevel}.
+     */
+    private void setContactLevel(Player player, ContactLevel level) {
+        synchronized (this.contactLevels) {
+            this.contactLevels.put(player, level);
+        }
     }
 
     /**
@@ -535,7 +563,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public boolean setContacted(Player player) {
         if (!hasContacted(player)) {
-            contactLevels.put(player, ContactLevel.CONTACTED);
+            setContactLevel(player, ContactLevel.CONTACTED);
             initializeAlarm(player);
             return true;
         }
@@ -564,7 +592,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     public boolean setVisited(Player player) {
         if (!hasVisited(player)) {
             if (!hasContacted(player)) initializeAlarm(player);
-            contactLevels.put(player, ContactLevel.VISITED);
+            setContactLevel(player, ContactLevel.VISITED);
             return true;
         }
         return false;
@@ -592,7 +620,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     public boolean setScouted(Player player) {
         if (!hasScouted(player)) {
             if (!hasContacted(player)) initializeAlarm(player);
-            contactLevels.put(player, ContactLevel.SCOUTED);
+            setContactLevel(player, ContactLevel.SCOUTED);
             return true;
         }
         return false;
@@ -604,7 +632,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return True if any European player has spoken with the chief.
      */
     public boolean hasAnyScouted() {
-        return any(contactLevels.keySet(), p -> hasScouted(p));
+        synchronized (this.contactLevels) {
+            return any(this.contactLevels.keySet(), p -> hasScouted(p));
+        }
     }
 
     /**
@@ -1595,7 +1625,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
         if (xw.validFor(getOwner())) {
 
-            for (Player p : sort(contactLevels.keySet())) {
+            for (Player p : sort(this.contactLevels.keySet())) {
                 xw.writeStartElement(CONTACT_LEVEL_TAG);
 
                 xw.writeAttribute(LEVEL_TAG, contactLevels.get(p));
@@ -1605,7 +1635,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 xw.writeEndElement();
             }
 
-            for (Player p : sort(alarm.keySet())) {
+            for (Player p : sort(this.alarm.keySet())) {
                 xw.writeStartElement(ALARM_TAG);
 
                 xw.writeAttribute(PLAYER_TAG, p);
@@ -1626,7 +1656,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         } else {
             Player client = xw.getClientPlayer();
 
-            ContactLevel cl = contactLevels.get(client);
+            ContactLevel cl = getContactLevel(client);
             if (cl != null) {
                 xw.writeStartElement(CONTACT_LEVEL_TAG);
 
@@ -1681,7 +1711,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        contactLevels.clear();
+        clearContactLevels();
         clearAlarm();
         missionary = null;
         clearOwnedUnits();
@@ -1708,7 +1738,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 ContactLevel.class, ContactLevel.UNCONTACTED);
             Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
                 Player.class, (Player)null, true);
-            contactLevels.put(player, cl);
+            setContactLevel(player, cl);
             xr.closeTag(CONTACT_LEVEL_TAG);
 
         } else if (MISSIONARY_TAG.equals(tag)) {
