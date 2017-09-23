@@ -759,6 +759,10 @@ public final class InGameController extends FreeColClientHolder {
             fail = true;
         }
         if (fail) return false;
+
+        // Wait for user to close outstanding panels.
+        if (getGUI().isShowingSubPanel()) return false;
+
         // The active unit might also be a going-to unit.  Make sure it
         // gets processed first.  setNextGoingToUnit will fail harmlessly
         // if it is not a going-to unit so this is safe.

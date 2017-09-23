@@ -1023,6 +1023,14 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
+    public boolean isShowingSubPanel() {
+        return canvas != null && canvas.getShowingSubPanel() != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void paintImmediatelyCanvasIn(Rectangle rectangle) {
         canvas.paintImmediately(rectangle);
     }
