@@ -179,9 +179,9 @@ public abstract class FreeColGameObject extends FreeColObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         FreeColGameObject fcgo = copyInCast(other, FreeColGameObject.class);
-        if (fcgo == null) return false;
-        super.copyIn(fcgo);
-        this.game = fcgo.getGame();
+        if (fcgo == null || !super.copyIn(fcgo)) return false;
+        final Game game = getGame();
+        this.game = game.updateRef(fcgo.getGame(), Game.class);
         this.disposed = fcgo.isDisposed();
         this.initialized = fcgo.isInitialized();
         return true;

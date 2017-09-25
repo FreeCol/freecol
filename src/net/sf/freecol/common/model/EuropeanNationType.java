@@ -170,8 +170,7 @@ public class EuropeanNationType extends NationType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         EuropeanNationType o = copyInCast(other, EuropeanNationType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.setStartingUnitMap(o.getStartingUnitMap());
         return true;
     }

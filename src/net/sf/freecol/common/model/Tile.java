@@ -2380,20 +2380,23 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Tile o = copyInCast(other, Tile.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
         this.type = o.getType();
         this.x = o.getX();
         this.y = o.getY();
-        this.owner = o.getOwner();
-        this.settlement = o.getSettlement();
-        this.owningSettlement = o.getOwningSettlement();
-        this.tileItemContainer = o.getTileItemContainer();
-        this.region = o.getRegion();
+        this.owner = game.updateRef(o.getOwner(), Player.class);
+        this.settlement = game.update(o.getSettlement(), Settlement.class);
+        this.owningSettlement = game.updateRef(o.getOwningSettlement(),
+                                               Settlement.class);
+        this.tileItemContainer = game.update(o.getTileItemContainer(),
+                                             TileItemContainer.class);
+        this.region = game.updateRef(o.getRegion(), Region.class);
         this.highSeasCount = o.getHighSeasCount();
         this.moveToEurope = o.getMoveToEurope();
         this.style = o.getStyle();
         this.contiguity = o.getContiguity();
+        // Do not need to update the cached tiles, they live server-side
         this.setCachedTiles(o.getCachedTiles());
         return true;
     }

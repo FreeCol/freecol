@@ -167,8 +167,7 @@ public class Event extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Event o = copyInCast(other, Event.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.value = o.getValue();
         this.scoreValue = o.getScoreValue();
         this.setLimits(o.getLimits());

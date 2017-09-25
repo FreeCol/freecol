@@ -536,8 +536,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         GoodsType o = copyInCast(other, GoodsType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.isFarmed = o.isFarmed();
         this.isFood = o.isFoodType();
         this.ignoreLimit = o.limitIgnored();

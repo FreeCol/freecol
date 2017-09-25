@@ -196,8 +196,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         UnitChangeType o = copyInCast(other, UnitChangeType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.setChanges(o.getChanges());
         this.ownerChange = o.getOwnerChange();
         return true;

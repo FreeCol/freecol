@@ -289,8 +289,7 @@ public class Operand extends Scope {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Operand o = copyInCast(other, Operand.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.operandType = o.getOperandType();
         this.scopeLevel = o.getScopeLevel();
         this.value = o.getValue();

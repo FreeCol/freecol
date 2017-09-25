@@ -121,8 +121,7 @@ public final class LastSale extends FreeColObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         LastSale o = copyInCast(other, LastSale.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.when = o.getWhen();
         this.price = o.getPrice();
         return true;

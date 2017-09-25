@@ -79,8 +79,7 @@ public class PlunderType extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         PlunderType o = copyInCast(other, PlunderType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.plunder = o.getPlunder();
         return true;
     }

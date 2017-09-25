@@ -542,9 +542,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         GoodsContainer o = copyInCast(other, GoodsContainer.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.parent = o.getParent();
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        this.parent = game.updateLocationRef(o.getParent());
         this.setStoredGoods(o.getStoredGoods());
         this.setOldStoredGoods(o.getOldStoredGoods());
         return true;

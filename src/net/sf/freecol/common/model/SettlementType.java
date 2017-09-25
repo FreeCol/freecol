@@ -283,8 +283,7 @@ public class SettlementType extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         SettlementType o = copyInCast(other, SettlementType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.capital = o.isCapital();
         this.visibleRadius = o.getVisibleRadius();
         this.claimableRadius = o.getClaimableRadius();

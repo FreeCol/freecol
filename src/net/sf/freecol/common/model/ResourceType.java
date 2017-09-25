@@ -92,8 +92,7 @@ public final class ResourceType extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         ResourceType o = copyInCast(other, ResourceType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.maxValue = o.getMaxValue();
         this.minValue = o.getMinValue();
         return true;

@@ -242,9 +242,10 @@ public abstract class TradeItem extends FreeColGameObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         TradeItem o = copyInCast(other, TradeItem.class);
-        if (o == null) return false;
-        this.source = o.getSource();
-        this.destination = o.getDestination();
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        this.source = game.updateRef(o.getSource(), Player.class);
+        this.destination = game.updateRef(o.getDestination(), Player.class);
         return true;
     }
 

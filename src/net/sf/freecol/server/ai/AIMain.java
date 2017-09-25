@@ -490,8 +490,7 @@ public class AIMain extends FreeColObject
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         AIMain o = copyInCast(other, AIMain.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.nextId = Integer.valueOf(o.getNextId());
         return true;
     }

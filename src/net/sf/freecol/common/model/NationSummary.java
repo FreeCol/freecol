@@ -148,8 +148,7 @@ public class NationSummary extends FreeColObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         NationSummary o = copyInCast(other, NationSummary.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.stance = o.getStance();
         this.numberOfSettlements = o.getNumberOfSettlements();
         this.numberOfUnits = o.getNumberOfUnits();

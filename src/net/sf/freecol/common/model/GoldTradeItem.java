@@ -125,8 +125,7 @@ public class GoldTradeItem extends TradeItem {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         ColonyTradeItem o = copyInCast(other, ColonyTradeItem.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.gold = o.getGold();
         return true;
     }

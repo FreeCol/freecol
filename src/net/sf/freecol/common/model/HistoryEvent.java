@@ -214,8 +214,7 @@ public class HistoryEvent extends StringTemplate {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         HistoryEvent o = copyInCast(other, HistoryEvent.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.turn = o.getTurn();
         this.eventType = o.getEventType();
         this.playerId = o.getPlayerId();

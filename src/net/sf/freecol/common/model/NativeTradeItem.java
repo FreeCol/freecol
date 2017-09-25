@@ -172,8 +172,7 @@ public class NativeTradeItem extends GoodsTradeItem {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         NativeTradeItem o = copyInCast(other, NativeTradeItem.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.price = o.getPrice();
         this.haggleCount = o.getHaggleCount();
         return true;

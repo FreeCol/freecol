@@ -4277,31 +4277,33 @@ public class Unit extends GoodsLocation
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Unit o = copyInCast(other, Unit.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
         this.name = o.getName();
-        this.owner = o.getOwner();
+        this.owner = game.updateRef(o.getOwner(), Player.class);
         this.type = o.getType();
         this.state = o.getState();
         this.role = o.getRole();
         this.roleCount = o.getRoleCount();
-        this.location = o.getLocation();
-        this.entryLocation = o.getEntryLocation();
+        this.location = game.updateLocationRef(o.getLocation());
+        this.entryLocation = game.updateLocationRef(o.getEntryLocation());
         this.movesLeft = o.getMovesLeft();
         this.workType = o.getWorkType();
         this.experienceType = o.getExperienceType();
         this.experience = o.getExperience();
         this.workLeft = o.getWorkLeft();
-        this.workImprovement = o.getWorkImprovement();
-        this.student = o.getStudent();
-        this.teacher = o.getTeacher();
+        this.workImprovement = game.update(o.getWorkImprovement(),
+                                           TileImprovement.class);
+        this.student = game.updateRef(o.getStudent(), Unit.class);
+        this.teacher = game.updateRef(o.getTeacher(), Unit.class);
         this.turnsOfTraining = o.getTurnsOfTraining();
         this.nationality = o.getNationality();
         this.ethnicity = o.getEthnicity();
-        this.indianSettlement = o.getIndianSettlement();
+        this.indianSettlement = game.updateRef(o.getIndianSettlement(),
+                                               IndianSettlement.class);
         this.hitPoints = o.getHitPoints();
-        this.destination = o.getDestination();
-        this.tradeRoute = o.getTradeRoute();
+        this.destination = game.updateLocationRef(o.getDestination());
+        this.tradeRoute = game.updateRef(o.getTradeRoute(), TradeRoute.class);
         this.currentStop = o.getCurrentStop();
         this.treasureAmount = o.getTreasureAmount();
         this.attrition = o.getAttrition();

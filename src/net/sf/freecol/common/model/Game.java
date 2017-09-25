@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.lang.ref.WeakReference;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -407,7 +408,7 @@ public class Game extends FreeColGameObject {
      * Gets the {@code FreeColGameObject} with the specified
      * identifier and class.
      *
-     * @param <T> The actual return type.
+     * @param T The actual return type.
      * @param id The object identifier.
      * @param returnClass The expected class of the object.
      * @return The game object, or null if not found.
@@ -498,6 +499,101 @@ public class Game extends FreeColGameObject {
             System.gc(); // Probably a good opportunity.
         }
     }
+
+    /**
+     * Update a {@code FreeColGameObject} from another.
+     *
+     * @param T The type of object to update.
+     * @param other The other object.
+     * @param returnClass The expected class of the object.
+     * @return The resulting object after update.
+     */
+    public <T extends FreeColGameObject> T update(T other,
+                                                  Class<T> returnClass) {
+        if (other == null) return null;
+        final String id = other.getId();
+        FreeColGameObject fcgo = getFreeColGameObject(id);
+        if (fcgo == null) { // Should not happen, but try to recover
+            logger.warning("Update of missing object: " + id);
+            setFreeColGameObject(id, other);
+            return other;
+        }
+        T t;
+        try {
+            t = returnClass.cast(fcgo);
+        } catch (ClassCastException e) { // "Can not happen"
+            throw new RuntimeException("Update class clash: " + fcgo.getClass()
+                + " / " + returnClass);
+        }
+        if (!t.copyIn(other)) { // "Can not happen"
+            throw new RuntimeException("Update copy failed: " + id);
+        }
+        return t;
+    }
+
+    /**
+     * Convenience wrapper to update several {@code FreeColGameObject}s.
+     *
+     * @param T The type of object to update.
+     * @param other The collection of objects to update.
+     * @param returnClass The expected class of the objects.
+     * @return The resulting list of updated objects.
+     */
+    public <T extends FreeColGameObject> List<T> update(Collection<T> other,
+                                                        Class<T> returnClass) {
+        if (other == null) return null;
+        List<T> ret = new ArrayList<>();
+        for (T t : other) {
+            T nt = update(t, returnClass);
+            if (nt != null) ret.add(nt);
+        }
+        return ret;
+    }
+
+    /**
+     * Update a {@code FreeColGameObject} from a reference to it in an update.
+     *
+     * @param T The type of object to update.
+     * @param other The other object.
+     * @param returnClass The expected class of the object.
+     * @return The resulting object after update.
+     */
+    public <T extends FreeColGameObject> T updateRef(T other,
+                                                     Class<T> returnClass) {
+        if (other == null) return null;
+        final String id = other.getId();
+        return getFreeColGameObject(id, returnClass);
+    }        
+
+    /**
+     * Update several {@code FreeColGameObject}s from a list of
+     * references to it in an update.
+     *
+     * @param T The type of object to update.
+     * @param other The other object.
+     * @param returnClass The expected class of the object.
+     * @return The resulting object after update.
+     */
+    public <T extends FreeColGameObject> List<T> updateRef(Collection<T> other,
+                                                           Class<T> returnClass) {
+        if (other == null) return null;
+        List<T> ret = new ArrayList<>();
+        for (T t : other) {
+            T nt = updateRef(t, returnClass);
+            if (nt != null) ret.add(nt);
+        }
+        return ret;
+    }        
+
+    /**
+     * Update a {@code Location} from a reference to it in an update.
+     *
+     * @param loc The {@code Location}.
+     * @return The resulting location after update.
+     */
+    public Location updateLocationRef(Location loc) {
+        return (loc == null) ? null : findFreeColLocation(loc.getId());
+    }        
 
     /**
      * Convenience wrapper to find a location (which is an interface,
@@ -1385,17 +1481,19 @@ public class Game extends FreeColGameObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Game o = copyInCast(other, Game.class);
-        if (o == null) return false;
+        if (o == null || !super.copyIn(o)) return false;
         this.specification = o.getSpecification();
         // Do not update nextId, it is not meaningful in the client.
         this.uuid = o.getUUID();
         this.clientUserName = o.getClientUserName();
         this.players.clear();
-        this.players.addAll(o.getPlayerList());
-        this.unknownEnemy = o.getUnknownEnemy();
-        this.map = o.getMap();
+        for (Player p : o.getPlayerList()) {
+            this.players.add(update(p, Player.class));
+        }
+        this.unknownEnemy = update(o.getUnknownEnemy(), Player.class);
+        this.map = update(o.getMap(), Map.class);
         this.nationOptions = o.getNationOptions();
-        this.currentPlayer = o.getCurrentPlayer();
+        this.currentPlayer = updateRef(o.getCurrentPlayer(), Player.class);
         this.turn = o.getTurn();
         this.spanishSuccession = o.getSpanishSuccession();
         this.initialActiveUnitId = o.getInitialActiveUnitId();

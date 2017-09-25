@@ -232,9 +232,8 @@ public abstract class TileItem extends FreeColGameObject
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         TileItem o = copyInCast(other, TileItem.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.tile = o.getTile();
+        if (o == null || !super.copyIn(o)) return false;
+        this.tile = getGame().updateRef(o.getTile(), Tile.class);
         return true;
     }
 }

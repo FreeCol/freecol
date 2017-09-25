@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -188,7 +189,7 @@ public abstract class Settlement extends GoodsLocation
      *
      * @param ownedTiles The new set of owned {@code Tile}s.
      */
-    protected void setOwnedTiles(Set<Tile> ownedTiles) {
+    protected void setOwnedTiles(Collection<Tile> ownedTiles) {
         this.ownedTiles.clear();
         this.ownedTiles.addAll(ownedTiles);
     }
@@ -835,13 +836,13 @@ public abstract class Settlement extends GoodsLocation
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Settlement o = copyInCast(other, Settlement.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
         this.type = o.getType();
-        this.owner = o.getOwner();
+        this.owner = game.updateRef(o.getOwner(), Player.class);
         this.name = o.getName();
-        this.tile = o.getTile();
-        this.setOwnedTiles(o.getOwnedTiles());
+        this.tile = game.updateRef(o.getTile(), Tile.class);
+        this.setOwnedTiles(game.updateRef(o.getOwnedTiles(), Tile.class));
         this.featureContainer.copy(o.getFeatureContainer());
         return true;
     }

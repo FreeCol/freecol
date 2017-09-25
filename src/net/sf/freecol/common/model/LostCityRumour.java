@@ -407,8 +407,7 @@ public class LostCityRumour extends TileItem {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         LostCityRumour o = copyInCast(other, LostCityRumour.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.type = o.getType();
         this.name = o.getName();
         return true;

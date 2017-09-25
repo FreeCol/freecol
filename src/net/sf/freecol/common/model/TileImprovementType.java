@@ -462,8 +462,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         TileImprovementType o = copyInCast(other, TileImprovementType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.natural = o.isNatural();
         this.magnitude = o.getMagnitude();
         this.addWorkTurns = o.getAddWorkTurns();

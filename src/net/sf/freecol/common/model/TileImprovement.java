@@ -704,8 +704,7 @@ public class TileImprovement extends TileItem implements Named {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         TileImprovement o = copyInCast(other, TileImprovement.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.type = o.getType();
         this.turnsToComplete = o.getTurnsToComplete();
         this.magnitude = o.getMagnitude();

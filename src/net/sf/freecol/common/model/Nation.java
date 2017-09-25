@@ -231,8 +231,7 @@ public class Nation extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Nation o = copyInCast(other, Nation.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.type = o.getType();
         this.selectable = o.isSelectable();
         this.refNation = o.getREFNation();

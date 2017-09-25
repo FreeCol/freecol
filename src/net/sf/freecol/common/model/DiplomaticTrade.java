@@ -423,14 +423,14 @@ public class DiplomaticTrade extends FreeColGameObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         DiplomaticTrade o = copyInCast(other, DiplomaticTrade.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
         this.context = o.getContext();
         this.status = o.getStatus();
-        this.sender = o.getSender();
-        this.recipient = o.getRecipient();
+        this.sender = game.updateRef(o.getSender(), Player.class);
+        this.recipient = game.updateRef(o.getRecipient(), Player.class);
         this.items.clear();
-        this.items.addAll(o.getItems());
+        this.items.addAll(game.updateRef(o.getItems(), TradeItem.class));
         this.version = o.getVersion();
         return true;
     }

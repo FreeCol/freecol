@@ -1074,13 +1074,13 @@ public abstract class FreeColObject
      */
     protected <T extends FreeColObject, R extends FreeColObject> R
         copyInCast(T other, Class<R> returnClass) {
+        if (!idEquals(other)) return (R)null;
         try {
-            R ret = returnClass.cast(other);
-            if (idEquals(other)) return ret;
+            return returnClass.cast(other);
         } catch (ClassCastException cce) {}
         return (R)null;
     }
-        
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

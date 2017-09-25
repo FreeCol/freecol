@@ -220,8 +220,7 @@ public class FoundingFather extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         FoundingFather o = copyInCast(other, FoundingFather.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.type = o.getType();
         for (int i = 0; i < weight.length; i++) {
             this.weight[i] = o.getWeight(i);

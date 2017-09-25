@@ -611,13 +611,13 @@ public class Europe extends UnitLocation
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Europe o = copyInCast(other, Europe.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
         this.setRecruitables(o.getRecruitables());
         this.setUnitPrices(o.getUnitPrices());
         this.baseRecruitPrice = o.getBaseRecruitPrice();
         this.recruitLowerCap = o.getRecruitLowerCap();
-        this.owner = o.getOwner();
+        this.owner = game.updateRef(o.getOwner(), Player.class);
         this.featureContainer.copy(o.getFeatureContainer());
         return true;
     }

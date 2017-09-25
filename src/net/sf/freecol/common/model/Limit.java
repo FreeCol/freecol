@@ -298,8 +298,7 @@ public final class Limit extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Limit o = copyInCast(other, Limit.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.operator = o.getOperator();
         this.leftHandSide = o.getLeftHandSide();
         this.rightHandSide = o.getRightHandSide();

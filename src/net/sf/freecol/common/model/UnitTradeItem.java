@@ -131,9 +131,8 @@ public class UnitTradeItem extends TradeItem {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         UnitTradeItem o = copyInCast(other, UnitTradeItem.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.unit = o.getUnit();
+        if (o == null || !super.copyIn(o)) return false;
+        this.unit = getGame().updateRef(o.getUnit(), Unit.class);
         return true;
     }
 

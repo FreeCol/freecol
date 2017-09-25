@@ -317,12 +317,12 @@ public class TradeRoute extends FreeColGameObject
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         TradeRoute o = copyInCast(other, TradeRoute.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
         this.name = o.getName();
         this.owner = o.getOwner();
         this.stops.clear();
-        this.stops.addAll(o.getStops());
+        this.stops.addAll(game.updateRef(o.getStops(), TradeRouteStop.class));
         this.silent = o.isSilent();
         return true;
     }

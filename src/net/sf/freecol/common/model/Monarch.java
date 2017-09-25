@@ -831,9 +831,9 @@ public final class Monarch extends FreeColGameObject implements Named {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Monarch o = copyInCast(other, Monarch.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.player = o.getPlayer();
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        this.player = game.updateRef(o.getPlayer(), Player.class);
         this.supportSea = o.getSupportSea();
         this.displeasure = o.getDispleasure();
         this.expeditionaryForce = o.getExpeditionaryForce();

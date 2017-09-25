@@ -211,8 +211,7 @@ public abstract class AIObject extends FreeColObject {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         AIObject o = copyInCast(other, AIObject.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         //this.aiMain is fixed
         this.uninitialized = o.isUninitialized();
         return true;

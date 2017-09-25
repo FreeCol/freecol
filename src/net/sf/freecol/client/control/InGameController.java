@@ -759,6 +759,10 @@ public final class InGameController extends FreeColClientHolder {
             fail = true;
         }
         if (fail) return false;
+
+        // Wait for user to close outstanding panels.
+        if (getGUI().isShowingSubPanel()) return false;
+
         // The active unit might also be a going-to unit.  Make sure it
         // gets processed first.  setNextGoingToUnit will fail harmlessly
         // if it is not a going-to unit so this is safe.
@@ -5049,9 +5053,16 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = getMyPlayer();
         boolean visibilityChange = false;
 
-        // Currently, interning was handled as the objects were read,
-        // so all we have to do is the visibility check
         for (FreeColObject fco : objects) {
+            FreeColGameObject fcgo = game.getFreeColGameObject(fco.getId());
+            if (fcgo == null) {
+                logger.warning("Update of missing FCGO: " + fco.getId());
+                continue;
+            }
+            if (!fcgo.copyIn(fco)) {
+                logger.warning("Update copy-in failed: " + fco.getId());
+                continue;
+            }
             if ((fco instanceof Player && (fco == player))
                 || ((fco instanceof Ownable) && player.owns((Ownable)fco))) {
                 visibilityChange = true;//-vis(player)

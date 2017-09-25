@@ -208,8 +208,7 @@ public abstract class NationType extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         NationType o = copyInCast(other, NationType.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.numberOfSettlements = o.getNumberOfSettlements();
         this.aggression = o.getAggression();
         this.setSettlementTypes(o.getSettlementTypes());

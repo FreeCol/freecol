@@ -307,8 +307,7 @@ public abstract class Feature extends FreeColSpecObject
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Feature o = copyInCast(other, Feature.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.source = o.getSource();
         this.firstTurn = o.getFirstTurn();
         this.lastTurn = o.getLastTurn();

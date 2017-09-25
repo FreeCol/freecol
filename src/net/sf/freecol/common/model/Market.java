@@ -544,11 +544,10 @@ public final class Market extends FreeColGameObject implements Ownable {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         Market o = copyInCast(other, Market.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.marketData.clear();
-        this.marketData.putAll(o.getMarketData());
-        this.owner = o.getOwner();
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        setMarketData(o.getMarketData());
+        this.owner = game.updateRef(o.getOwner(), Player.class);
         return true;
     }
 

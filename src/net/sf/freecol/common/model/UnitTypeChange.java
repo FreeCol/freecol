@@ -95,8 +95,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         UnitTypeChange o = copyInCast(other, UnitTypeChange.class);
-        if (o == null) return false;
-        super.copyIn(o);
+        if (o == null || !super.copyIn(o)) return false;
         this.from = o.from;
         this.to = o.to;
         this.probability = o.probability;

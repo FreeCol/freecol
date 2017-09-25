@@ -529,9 +529,9 @@ public class ColonyTile extends WorkLocation {
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
         ColonyTile o = copyInCast(other, ColonyTile.class);
-        if (o == null) return false;
-        super.copyIn(o);
-        this.workTile = o.getWorkTile();
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        this.workTile = game.updateRef(o.getWorkTile(), Tile.class);
         return true;
     }
 
