@@ -2588,7 +2588,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * Add the tutorial message for the start of the game.
      */
     public void addStartGameMessage() {
-        Tile tile = getEntryLocation().getTile();
+        Location loc = getEntryLocation();
+        Tile tile = (loc == null) ? null : loc.getTile();
         String sailTag = (tile == null) ? "unknown"
             : (tile.getX() < tile.getMap().getWidth() / 2) ? "east"
             : "west";
