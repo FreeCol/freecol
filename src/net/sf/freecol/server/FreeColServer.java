@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
@@ -220,7 +223,8 @@ public final class FreeColServer {
      */
     private FreeColServer(String name, int port) throws IOException {
         this.name = name;
-        this.server = serverStart(port); // Throws IOException
+        this.server = createServer(port); // Throws IOException
+        this.server.start();
         this.userConnectionHandler = new UserConnectionHandler(this);
         this.preGameController = new PreGameController(this);
         this.inGameController = new InGameController(this);
@@ -228,41 +232,45 @@ public final class FreeColServer {
     }
     
     /**
-     * Start a Server at port.
+     * Create a Server at port.
      *
      * If the port is specified, just try once.
-     *
      * If the port is unspecified (negative), try multiple times.
      *
      * @param firstPort The port to start trying to connect at.
      * @return A started {@code Server}.
      * @exception IOException on failure to open the port.
      */
-    private Server serverStart(int firstPort) throws IOException {
-        final String host = "0.0.0.0";
-        int port, tries;
+    private Server createServer(int firstPort) throws IOException {
+        List<InetAddress> addresses = new ArrayList<>();
+        try {
+            addresses.add(InetAddress.getLocalHost());
+        } catch (UnknownHostException uhe) {
+            logger.warning("Could not resolve local host name");
+        }
+        addresses.add(InetAddress.getLoopbackAddress());
+        int tryMax = 1;
         if (firstPort < 0) {
-            port = FreeCol.getServerPort();
-            tries = 10;
-        } else {
-            port = firstPort;
-            tries = 1;
+            firstPort = FreeCol.getServerPort();
+            tryMax = 10;
         }
-        logger.finest("serverStart(" + firstPort + ") => " + port
-            + " x " + tries);
-        Server ret = null;
-        for (int i = tries; i > 0; i--) {
-            try {
-                ret = new Server(this, host, port);
-                ret.start();
-                logger.finest("serverStart(" + host + ", " + port + ")");
-                break;
-            } catch (IOException ie) {
-                if (i <= 1) throw ie; // Give up at last try
+        IOException ex = null;
+        for (InetAddress ia : addresses) {
+            String host = ia.getHostAddress();
+            int port = firstPort;
+            for (int i = tryMax; i > 0; i--) {
+                try {
+                    Server ret = new Server(this, host, port);
+                    logger.finest("Server started: " + ret.getHost()
+                        + ", " + ret.getPort());
+                    return ret;
+                } catch (IOException ioe) {
+                    ex = ioe;
+                }
+                port++;
             }
-            port++;
         }
-        return ret;
+        throw ex;
     }
 
     /**
