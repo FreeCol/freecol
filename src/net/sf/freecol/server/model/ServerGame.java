@@ -96,9 +96,6 @@ public class ServerGame extends Game implements TurnTaker {
      */
     public ServerGame(Specification specification) {
         super(specification);
-
-        this.combatModel = new SimpleCombatModel();
-        currentPlayer = null;
     }
 
     /**

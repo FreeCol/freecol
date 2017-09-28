@@ -513,10 +513,10 @@ public class Game extends FreeColGameObject {
         if (other == null) return null;
         final String id = other.getId();
         FreeColGameObject fcgo = getFreeColGameObject(id);
-        if (fcgo == null) { // Should not happen, but try to recover
-            logger.warning("Update of missing object: " + id);
-            setFreeColGameObject(id, other);
-            return other;
+        if (fcgo == null) { // It is an error for this to happen
+            logger.warning("Update of missing object: " + id
+                + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());                
+            return null;
         }
         T t;
         try {
@@ -1106,6 +1106,8 @@ public class Game extends FreeColGameObject {
 
     /**
      * Set the current nation options.
+     *
+     * Public for the test suite.
      *
      * @param newNationOptions The new {@code NationOptions} value.
      */
