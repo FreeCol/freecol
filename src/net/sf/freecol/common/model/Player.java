@@ -4159,8 +4159,6 @@ public class Player extends FreeColGameObject implements Nameable {
                 route.toXML(xw);
             }
 
-            if (highSeas != null) highSeas.toXML(xw);
-            
             xw.writeToListElement(FOUNDING_FATHERS_TAG, foundingFathers);
 
             xw.writeToListElement(OFFERED_FATHERS_TAG, offeredFathers);
@@ -4169,6 +4167,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
             if (monarch != null) monarch.toXML(xw);
 
+            if (highSeas != null) highSeas.toXML(xw);
+            
             for (ModelMessage m : getModelMessages()) m.toXML(xw);
 
             if (lastSales != null) {
