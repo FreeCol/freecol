@@ -72,7 +72,8 @@ public final class PreGameController extends FreeColClientHolder {
     /**
      * Handle an addPlayer message.
      */
-    public void addPlayerHandler() {
+    public void addPlayerHandler(List<Player> players) {
+        getGame().addPlayers(players);
         getFreeColClient().getGUI().refreshPlayersTable();
     }
 

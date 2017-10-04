@@ -140,10 +140,9 @@ public class AddPlayerMessage extends ObjectMessage {
         List<Player> players = getPlayers();
         
         if (freeColClient.isInGame()) {
-            // Interning is sufficient
+            igc(freeColClient).addPlayerHandler(getPlayers());
         } else {
-            // Interning is sufficient
-            pgc(freeColClient).addPlayerHandler();
+            pgc(freeColClient).addPlayerHandler(getPlayers());
         }
     }
 }

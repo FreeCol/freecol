@@ -2429,6 +2429,13 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Handle an addPlayer message.
+     */
+    public void addPlayerHandler(List<Player> players) {
+        getGame().addPlayers(players);
+    }
+
+    /**
      * Animate an attack.
      *
      * @param attacker The attacking {@code Unit}.

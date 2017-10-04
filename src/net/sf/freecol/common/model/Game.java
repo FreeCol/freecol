@@ -928,12 +928,38 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Add a list of players to this game.
+     *
+     * Called from the pre and in-game controllers when players change.
+     * ATM we never remove players, even dead ones.  Must tolerate player
+     * being both present and not present.
+     *
+     * @param players The list of {@code players} to add.
+     */
+    public void addPlayers(List<Player> players) {
+        for (Player p : players) {
+            FreeColGameObject fcgo = getFreeColGameObject(p.getId());
+            if (fcgo == null) {
+                fcgo = new Player(this, p.getId());
+            } else if (fcgo instanceof Player) {
+                ; // OK
+            } else {
+                logger.warning("addPlayers onto non-player: " + fcgo);
+                continue;
+            }
+            if (!fcgo.copyIn(p)) {
+                logger.warning("addPlayers copy in fail: " + p);
+            }
+        }
+    }
+
+    /**
      * Gets the unknown enemy player, which is used for privateers.
      *
      * @return The unknown enemy {@code Player}.
      */
     public Player getUnknownEnemy() {
-        return unknownEnemy;
+        return this.unknownEnemy;
     }
 
     /**
