@@ -1171,20 +1171,21 @@ public final class FreeColServer {
             setAIMain(aiMain);
         }
 
-        // Fill in missing available players
-        final Predicate<Entry<Nation, NationState>> availablePred = e ->
-            !e.getKey().isUnknownEnemy()
-                && e.getValue() != NationState.NOT_AVAILABLE
-                && serverGame.getPlayerByNationId(e.getKey().getId()) == null;
-        serverGame.updatePlayers(transform(serverGame.getNationOptions()
-                .getNations().entrySet(),
-                availablePred, e -> makeAIPlayer(e.getKey()),
-                Player.playerComparator));
-
         // We need a fake unknown enemy player
         if (serverGame.getUnknownEnemy() == null) {
             establishUnknownEnemy(serverGame);
         }
+
+        // Fill in missing available players, and the unknown enemy
+        final Predicate<Entry<Nation, NationState>> availablePred = e ->
+            e.getValue() != NationState.NOT_AVAILABLE
+            && serverGame.getPlayerByNationId(e.getKey().getId()) == null;
+        List<ServerPlayer> toUpdate
+            = transform(serverGame.getNationOptions().getNations().entrySet(),
+                        availablePred, e -> makeAIPlayer(e.getKey()),
+            Player.playerComparator);
+        toUpdate.add((ServerPlayer)serverGame.getUnknownEnemy());
+        serverGame.updatePlayers(toUpdate);
 
         // Create the map.
         if (serverGame.getMap() == null) {
