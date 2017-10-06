@@ -53,7 +53,7 @@ public class FreeColMapLoader implements MapLoader {
 
     private static final Logger logger = Logger.getLogger(FreeColMapLoader.class.getName());
 
-    private ServerGame importGame = null;
+    private Map importMap = null;
 
     /**
      * Constructor for the FreeColMapLoader class.
@@ -65,16 +65,10 @@ public class FreeColMapLoader implements MapLoader {
      */
     public FreeColMapLoader(File file) throws IOException, FreeColException, XMLStreamException {
 
-        try {
-            importGame = FreeColServer.readGame(new FreeColSavegameFile(file), null, null);
-        } catch (FreeColException fce) {
-            logger.log(Level.SEVERE, "File (" + file + ") could not be read properly.", fce);
-        } catch (IOException ioe) {
-            logger.log(Level.SEVERE, "The game-loading Stream could not be created.", ioe);
-        } catch (XMLStreamException xse) {
-            logger.log(Level.SEVERE, "There was a problem loading the XML Stream.", xse);
+        this.importMap = FreeColServer.readMap(file, null);
+        if (this.importMap == null) {
+            throw new RuntimeException("No map found in file (" + file + ").");
         }
-
     }
 
     /**
@@ -82,7 +76,6 @@ public class FreeColMapLoader implements MapLoader {
      */
     @Override
     public Layer loadMap(Game game, Layer layer) {
-        Map importMap = importGame.getMap();
         Layer highestLayer = layer.compareTo(importMap.getLayer()) < 0
             ? layer : importMap.getLayer();
         int width = importMap.getWidth();

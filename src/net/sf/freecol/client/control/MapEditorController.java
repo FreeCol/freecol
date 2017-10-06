@@ -48,6 +48,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGenerator;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -124,9 +125,9 @@ public final class MapEditorController extends FreeColClientHolder {
             final FreeColServer freeColServer
                 = new FreeColServer(false, false, specification, 0, null);
             fcc.setFreeColServer(freeColServer);
-            Game game = freeColServer.getGame();
-            requireNativeNations(game);
-            fcc.setGame(game);
+            ServerGame serverGame = freeColServer.getGame();
+            requireNativeNations(serverGame);
+            fcc.setGame(serverGame);
             fcc.setMyPlayer(null);
             getSoundController().playSound(null);
 
@@ -194,15 +195,16 @@ public final class MapEditorController extends FreeColClientHolder {
      * @see MapGeneratorOptions
      */
     public void newMap() {
-        final Game game = getGame();
+        final FreeColServer freeColServer = getFreeColServer();
+        final ServerGame serverGame = freeColServer.getGame();
 
         getGUI().removeInGameComponents();
         OptionGroup mgo = getGUI().showMapGeneratorOptionsDialog(true);
         if (mgo == null) return;
-        game.setMapGeneratorOptions(mgo);
-        getFreeColServer().getMapGenerator().createMap(new LogBuilder(-1));
-        requireNativeNations(game);
-        getGUI().setFocus(game.getMap().getTile(1,1));
+        serverGame.setMapGeneratorOptions(mgo);
+        freeColServer.createMap();
+        requireNativeNations(serverGame);
+        getGUI().setFocus(serverGame.getMap().getTile(1,1));
         getGUI().updateMenuBar();
         getGUI().refresh();
     }

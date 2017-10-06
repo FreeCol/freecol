@@ -33,12 +33,14 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -56,7 +58,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(g, new Random(1));
+        MapGenerator gen = new SimpleMapGenerator(new Random(1));
 
         for (Nation n : spec().getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()
@@ -65,7 +67,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             }
         }
 
-        gen.createMap(new LogBuilder(-1));
+        gen.createMap(g, null, new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -80,12 +82,12 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(g, new Random(1));
+        MapGenerator gen = new SimpleMapGenerator(new Random(1));
         Nation nation = spec().getNation("model.nation.dutch");
 
         g.addPlayer(new ServerPlayer(g, false, nation));
 
-        gen.createMap(new LogBuilder(-1));
+        gen.createMap(g, null, new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -106,7 +108,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(g, new Random(1));
+        MapGenerator gen = new SimpleMapGenerator(new Random(1));
 
         // Apply the difficulty level
         //spec().applyDifficultyLevel("model.difficulty.medium");
@@ -121,7 +123,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        gen.createMap(new LogBuilder(-1));
+        gen.createMap(g, null, new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -156,7 +158,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         Game g = new ServerGame(spec());
         g.setNationOptions(new NationOptions(spec()));
 
-        MapGenerator gen = new SimpleMapGenerator(g, new Random(1));
+        MapGenerator gen = new SimpleMapGenerator(new Random(1));
 
         Vector<Player> players = new Vector<Player>();
 
@@ -168,7 +170,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        gen.createMap(new LogBuilder(-1));
+        gen.createMap(g, null, new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -193,20 +195,23 @@ public class MapGeneratorTest extends FreeColTestCase {
      * Make sure we can import all distributed maps.
      */
     public void testImportMap() {
-        Game game = new ServerGame(spec());
-        MapGenerator gen = new SimpleMapGenerator(game, new Random(1));
+        final Specification spec = spec();
+        Game game = new ServerGame(spec);
+        MapGenerator gen = new SimpleMapGenerator(new Random(1));
         for (File importFile : FreeColDirectories.getMapFileList()) {
-            spec().setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
-            assertNotNull(gen.createMap(new LogBuilder(-1)));
+            spec.setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
+            Map importMap = FreeColServer.readMap(importFile, spec);
+            assertNotNull(gen.createMap(game, importMap, new LogBuilder(-1)));
         }
         // Clear import file option
-        spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
+        spec.setFile(MapGeneratorOptions.IMPORT_FILE, null);
     }
 
     public void testRegions() {
+        spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
         Game game = new ServerGame(spec());
-        MapGenerator gen = new SimpleMapGenerator(game, new Random(1));
-        gen.createMap(new LogBuilder(-1));
+        MapGenerator gen = new SimpleMapGenerator(new Random(1));
+        gen.createMap(game, null, new LogBuilder(-1));
         
         Map map = game.getMap();
         Region pacific = map.getRegionByKey("model.region.pacific");

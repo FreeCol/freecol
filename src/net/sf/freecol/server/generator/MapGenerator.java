@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.generator;
 
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.util.LogBuilder;
 
@@ -31,18 +32,22 @@ public interface MapGenerator {
     /**
      * Create an empty map.
      *
+     * @param game The {@code Game} to generate for.
      * @param width The map width.
      * @param height The map height.
      * @param lb A {@code LogBuilder} to log to.
      * @return A new empty {@code Map}.
      */
-    public abstract Map createEmptyMap(int width, int height, LogBuilder lb);
+    public abstract Map createEmptyMap(Game game, int width, int height,
+                                       LogBuilder lb);
 
     /**
      * Creates the map with the current set options
      *
+     * @param game The {@code Game} to generate for.
+     * @param importMap An optional {@code Map} to import.
      * @param lb A {@code LogBuilder} to log to.
      * @return The new {@code Map}.
      */
-    public abstract Map createMap(LogBuilder lb);
+    public abstract Map createMap(Game game, Map importMap, LogBuilder lb);
 }

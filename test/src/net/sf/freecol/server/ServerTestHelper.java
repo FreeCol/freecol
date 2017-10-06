@@ -183,7 +183,7 @@ public final class ServerTestHelper {
     public static ServerGame startServerGame(Map map, Specification spec) {
         stopServerGame();
         FreeColServer serv = startServer(false, true, spec);
-        serv.setMapGenerator(new MockMapGenerator(serv.getGame(), map));
+        serv.setMapGenerator(new MockMapGenerator(map));
         try {
             serv.startGame();
         } catch (FreeColException e) {

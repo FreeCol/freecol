@@ -153,7 +153,7 @@ public class Game extends FreeColGameObject {
     private Player unknownEnemy;
 
     /** The map of the New World. */
-    private Map map = null;
+    protected Map map = null;
 
     /**
      * The current nation options.  Mainly used to see if a player
@@ -1076,7 +1076,7 @@ public class Game extends FreeColGameObject {
      * @return The game {@code Map}.
      */
     public Map getMap() {
-        return map;
+        return this.map;
     }
 
     /**
@@ -1087,7 +1087,7 @@ public class Game extends FreeColGameObject {
     public void setMap(Map newMap) {
         if (this.map != newMap) {
             for (HighSeas hs : transform(getLivePlayers(), alwaysTrue(),
-                    Player::getHighSeas, toListNoNulls())) {
+                                         Player::getHighSeas, toListNoNulls())) {
                 hs.removeDestination(this.map);
                 hs.addDestination(newMap);
             }
