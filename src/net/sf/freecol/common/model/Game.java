@@ -703,40 +703,15 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get all the players in the game.
-     *
-     * @return The list of {@code Player}s.
-     */
-    public List<Player> getPlayerList() {
-        return this.players;
-    }
-
-    /**
-     * Get all the players in the game as a stream.
-     *
-     * @return The list of {@code Player}s.
-     */
-    public Stream<Player> getPlayers() {
-        return this.players.stream();
-    }
-
-    /**
-     * Sort the players list.
-     *
-     * @param comparator The {@code Comparator} to sort with.
-     */
-    public void sortPlayers(Comparator<Player> comparator) {
-        this.players.sort(comparator);
-    }
-
-    /**
      * Get players in the game.
      *
      * @param predicate A {@code Predicate} to select suitable players with.
      * @return A list of {@code Player}s.
      */
-    public List<Player> getPlayerList(Predicate<Player> predicate) {
-        return transform(this.players, predicate);
+    protected List<Player> getPlayerList(Predicate<? super Player> predicate) {
+        synchronized (this.players) {
+            return transform(this.players, predicate);
+        }
     }
 
     /**
@@ -745,8 +720,132 @@ public class Game extends FreeColGameObject {
      * @param predicate A {@code Predicate} to select suitable players with.
      * @return The stream of {@code Player}s.
      */
-    public Stream<Player> getPlayers(Predicate<Player> predicate) {
-        return getPlayerList(predicate).stream();
+    public Stream<Player> getPlayers(Predicate<? super Player> predicate) {
+        synchronized (this.players) {
+            return getPlayerList(predicate).stream();
+        }
+    }
+
+    /**
+     * Get a particular player in the game by a predicate.
+     *
+     * @param predicate A {@code Predicate} to select suitable players with.
+     * @return The {@code Player} found or null if not present.
+     */
+    public Player getPlayer(Predicate<? super Player> predicate) {
+        synchronized (this.players) {
+            return find(this.players, predicate);
+        }
+    }
+
+    /**
+     * Set the players in the game.
+     *
+     * @param players The new {@code Player}s to add.
+     */
+    private void setPlayers(List<Player> players) {
+        synchronized (this.players) {
+            this.players.clear();
+            if (players != null) this.players.addAll(players);
+        }
+    }
+
+    /**
+     * Gets the live player after the given player.
+     *
+     * @param beforePlayer The {@code Player} before the
+     *     {@code Player} to be returned.
+     * @return The {@code Player} after the {@code beforePlayer}
+     *     in the list which determines the order each player becomes the
+     *     current player.
+     * @see #getNextPlayer
+     */
+    private Player getPlayerAfter(Player beforePlayer) {
+        synchronized (this.players) {
+            if (this.players.isEmpty()) return null;
+
+            final int start = this.players.indexOf(beforePlayer);
+            int index = start;
+            do {
+                if (++index >= this.players.size()) index = 0;
+                Player player = this.players.get(index);
+                if (!player.isUnknownEnemy()
+                    && !player.isDead()) return player;
+            } while (index != start);
+        }
+        return null;
+    }
+
+    /**
+     * Adds the specified player to the game.
+     *
+     * @param player The {@code Player} to add.
+     */
+    public void addPlayer(Player player) {
+        synchronized (this.players) {
+            this.players.add(player);
+        }
+        Nation nation = getSpecification().getNation(player.getNationId());
+        nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
+        if (getCurrentPlayer() == null) setCurrentPlayer(player);
+    }
+
+    /**
+     * Removes the specified player from the game.
+     *
+     * We do not really remove the full FCGO from the game, just from the
+     * active players list.
+     *
+     * @param player The {@code Player} to remove.
+     * @return True if the player was removed.
+     */
+    public boolean removePlayer(Player player) {
+        Player newCurrent = (currentPlayer != player) ? null
+            : getPlayerAfter(currentPlayer);
+
+        synchronized (this.players) {
+            if (!this.players.remove(player)) return false;
+        }
+
+        Nation nation = getSpecification().getNation(player.getNationId());
+        nationOptions.getNations().put(nation, NationState.AVAILABLE);
+        player.dispose();
+
+        if (newCurrent != null) currentPlayer = newCurrent;
+        return true;
+    }
+
+    /**
+     * Get the first player in this game.
+     *
+     * @return The first player, or null if none present.
+     */
+    public Player getFirstPlayer() {
+        synchronized (this.players) {
+            return first(this.players);
+        }
+    }
+
+    /**
+     * Sort the players list.
+     *
+     * @param comparator The {@code Comparator} to sort with.
+     */
+    public void sortPlayers(Comparator<Player> comparator) {
+        synchronized (this.players) {
+            this.players.sort(comparator);
+        }
+    }
+
+
+    /**
+     * Gets a player specified by a name.
+     *
+     * @param name The name identifying the {@code Player}.
+     * @return The {@code Player} or null if none found.
+     */
+    public Player getPlayerByName(String name) {
+        return getPlayer(matchKeyEquals(name, Player::getName));
     }
 
     /**
@@ -768,7 +867,7 @@ public class Game extends FreeColGameObject {
      *     not found.
      */
     public Player getPlayerByNationId(String nationId) {
-        return find(this.players, matchKeyEquals(nationId, Player::getNationId));
+        return getPlayer(matchKeyEquals(nationId, Player::getNationId));
     }
 
     /**
@@ -854,80 +953,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the live player after the given player.
-     *
-     * @param beforePlayer The {@code Player} before the
-     *     {@code Player} to be returned.
-     * @return The {@code Player} after the {@code beforePlayer}
-     *     in the list which determines the order each player becomes the
-     *     current player.
-     * @see #getNextPlayer
-     */
-    public Player getPlayerAfter(Player beforePlayer) {
-        if (players.isEmpty()) return null;
-
-        final int start = players.indexOf(beforePlayer);
-        int index = start;
-        do {
-            if (++index >= players.size()) index = 0;
-            Player player = players.get(index);
-            if (!player.isUnknownEnemy() && !player.isDead()) return player;
-        } while (index != start);
-        return null;
-    }
-
-    /**
-     * Get the first player in this game.
-     *
-     * @return The first player, or null if none present.
-     */
-    public Player getFirstPlayer() {
-        return first(players);
-    }
-
-    /**
-     * Gets a player specified by a name.
-     *
-     * @param name The name identifying the {@code Player}.
-     * @return The {@code Player} or null if none found.
-     */
-    public Player getPlayerByName(String name) {
-        return find(players, matchKeyEquals(name, Player::getName));
-    }
-
-    /**
-     * Adds the specified player to the game.
-     *
-     * @param player The {@code Player} to add.
-     */
-    public void addPlayer(Player player) {
-        players.add(player);
-        Nation nation = getSpecification().getNation(player.getNationId());
-        nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
-        if (getCurrentPlayer() == null) setCurrentPlayer(player);
-    }
-
-    /**
-     * Removes the specified player from the game.
-     *
-     * @param player The {@code Player} to remove.
-     * @return True if the player was removed.
-     */
-    public boolean removePlayer(Player player) {
-        Player newCurrent = (currentPlayer != player) ? null
-            : getPlayerAfter(currentPlayer);
-
-        if (!players.remove(player)) return false;
-
-        Nation nation = getSpecification().getNation(player.getNationId());
-        nationOptions.getNations().put(nation, NationState.AVAILABLE);
-        player.dispose();
-
-        if (newCurrent != null) currentPlayer = newCurrent;
-        return true;
-    }
-
-    /**
      * Add a list of players to this game.
      *
      * Called from the pre and in-game controllers when players change.
@@ -935,22 +960,31 @@ public class Game extends FreeColGameObject {
      * being both present and not present.
      *
      * @param players The list of {@code players} to add.
+     * @return The players that were successfully copied in.
      */
-    public void addPlayers(List<Player> players) {
+    public List<Player> addPlayers(List<Player> players) {
+        List<Player> valid = new ArrayList<>();
         for (Player p : players) {
             FreeColGameObject fcgo = getFreeColGameObject(p.getId());
             if (fcgo == null) {
                 fcgo = new Player(this, p.getId());
+                if (!fcgo.copyIn(p)) {
+                    logger.warning("addPlayers copyIn new fail: " + p);
+                } else {
+                    addPlayer(p);
+                    valid.add(p);
+                }
             } else if (fcgo instanceof Player) {
-                ; // OK
+                if (!fcgo.copyIn(p)) {
+                    logger.warning("addPlayers copyIn existing fail: " + p);
+                } else {
+                    valid.add(p);
+                }
             } else {
                 logger.warning("addPlayers onto non-player: " + fcgo);
-                continue;
-            }
-            if (!fcgo.copyIn(p)) {
-                logger.warning("addPlayers copy in fail: " + p);
             }
         }
+        return valid;
     }
 
     /**
@@ -1015,7 +1049,7 @@ public class Game extends FreeColGameObject {
      * @return True if an undead player is present.
      */
     public boolean isInRevengeMode() {
-        return any(getPlayers(), Player::isUndead);
+        return getPlayer(Player::isUndead) != null;
     }
 
     /**
@@ -1456,8 +1490,10 @@ public class Game extends FreeColGameObject {
         if (map != null) {
             result = Math.min(result, getMap().checkIntegrity(fix, lb));
         }
-        for (Player player : getPlayerList()) {
-            result = Math.min(result, player.checkIntegrity(fix, lb));
+        synchronized (this.players) {
+            for (Player p : this.players) {
+                result = Math.min(result, p.checkIntegrity(fix, lb));
+            }
         }
         return result;
     }
@@ -1512,10 +1548,7 @@ public class Game extends FreeColGameObject {
         // Do not update nextId, it is not meaningful in the client.
         this.uuid = o.getUUID();
         this.clientUserName = o.getClientUserName();
-        this.players.clear();
-        for (Player p : o.getPlayerList()) {
-            this.players.add(update(p, Player.class));
-        }
+        setPlayers(addPlayers(o.players));
         this.unknownEnemy = update(o.getUnknownEnemy(), Player.class);
         this.map = update(o.getMap(), Map.class);
         this.nationOptions = o.getNationOptions();
@@ -1597,10 +1630,11 @@ public class Game extends FreeColGameObject {
 
         nationOptions.toXML(xw);
 
-        List<Player> players = sort(getPlayers());
+        synchronized (this.players) { // Should be sorted
+            for (Player p : this.players) p.toXML(xw);
+        }
         Player unknown = getUnknownEnemy();
-        if (unknown != null) players.add(unknown);
-        for (Player p : players) p.toXML(xw);
+        if (unknown != null) unknown.toXML(xw);
 
         if (map != null) map.toXML(xw);
     }

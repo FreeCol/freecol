@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -140,10 +141,12 @@ public class ServerGame extends Game implements TurnTaker {
      * @return A list of all connected server players, with exclusions.
      */
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
-        return transform(getPlayerList(),
-                         p -> ((ServerPlayer)p).isConnected()
-                             && none(serverPlayers, matchKey((ServerPlayer)p)),
-                         p -> (ServerPlayer)p);
+        final Predicate<Player> connPred = p ->
+            ((ServerPlayer)p).isConnected()
+                && none(serverPlayers, matchKey((ServerPlayer)p));
+        synchronized (this.players) {
+            return transform(this.players, connPred, p -> (ServerPlayer)p);
+        }
     }
 
     /**

@@ -65,8 +65,8 @@ public class GameTest extends FreeColTestCase {
         players.sort(Player.playerComparator);
         game.sortPlayers(Player.playerComparator);
         assertEquals(spec().getNations().size() - counter,
-                     count(game.getPlayers()));
-        assertEquals(players, game.getPlayerList());
+                     count(game.getPlayerList(alwaysTrue())));
+        assertEquals(players, game.getPlayerList(alwaysTrue()));
     }
 
     public void testTurn() {

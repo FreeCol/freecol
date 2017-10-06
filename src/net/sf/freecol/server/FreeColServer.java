@@ -1274,15 +1274,16 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets a {@code Player} specified by a connection.
+     * Get a {@code ServerPlayer} by connection.
      *
-     * @param connection The connection to use while searching for a
-     *            {@code ServerPlayer}.
-     * @return The player.
+     * @param conn The {@code Connection} to use while searching for a
+     *     {@code ServerPlayer}.
+     * @return The {@code ServerPlayer} found, or null if none.
      */
-    public ServerPlayer getPlayer(Connection connection) {
-        return (ServerPlayer)find(getGame().getPlayers(),
-            p -> ((ServerPlayer)p).getConnection() == connection);
+    public ServerPlayer getPlayer(final Connection conn) {
+        final Predicate<Player> connPred
+            = matchKeyEquals(conn, p -> ((ServerPlayer)p).getConnection());
+        return (ServerPlayer)getGame().getPlayer(connPred);
     }
 
     /**
