@@ -151,6 +151,9 @@ public final class InGameController extends Controller {
 
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
+    private static final Predicate<Player> coronadoPred = p ->
+        p.hasAbility(Ability.SEE_ALL_COLONIES);
+
     /** The server random number source. */
     private Random random;
 
@@ -990,7 +993,7 @@ public final class InGameController extends Controller {
 
             // Coronado
             for (ServerPlayer sp : transform(game.getConnectedPlayers(serverPlayer),
-                    p -> p.hasAbility(Ability.SEE_ALL_COLONIES))) {
+                                             coronadoPred)) {
                 cs.add(See.only(sp), sp.exploreForSettlement(settlement));//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(sp,
@@ -1280,14 +1283,14 @@ public final class InGameController extends Controller {
      */
     public ChangeSet claimLand(ServerPlayer serverPlayer, Tile tile,
                                Settlement settlement, int price) {
+        final ServerGame sg = getGame();
         ChangeSet cs = new ChangeSet();
         serverPlayer.csClaimLand(tile, settlement, price, cs);
 
         if (settlement != null && serverPlayer.isEuropean()) {
             // Define Coronado to make all colony-owned tiles visible
-            for (ServerPlayer sp
-                     : transform(getGame().getConnectedPlayers(serverPlayer),
-                         p -> p.hasAbility(Ability.SEE_ALL_COLONIES))) {
+            for (ServerPlayer sp : transform(sg.getConnectedPlayers(serverPlayer),
+                                             coronadoPred)) {
                 sp.exploreTile(tile);
                 cs.add(See.only(sp), tile);
                 sp.invalidateCanSeeTiles();//+vis(sp)
@@ -1295,7 +1298,7 @@ public final class InGameController extends Controller {
         }
 
         // Others can see the tile.
-        getGame().sendToOthers(serverPlayer, cs);
+        sg.sendToOthers(serverPlayer, cs);
         return cs;
     }
 
@@ -2109,10 +2112,12 @@ public final class InGameController extends Controller {
             // Are there humans left?
             // FIXME: see if this can be relaxed so we can run large
             // AI-only simulations.
-            boolean onlyAI = all(serverGame.getConnectedPlayers(), Player::isAI);
+            List<ServerPlayer> connected = serverGame.getConnectedPlayers();
+            boolean onlyAI = all(connected, Player::isAI);
             if (onlyAI) {
-                winner = first(sort(serverGame.getConnectedPlayers(),
-                        Comparator.comparingInt(Player::getScore).reversed()));
+                final Comparator<Player> scoreComp
+                    = Comparator.comparingInt(Player::getScore).reversed();
+                winner = first(sort(connected, scoreComp));
                 logger.info("No human player left, winner is: " + winner);
                 if (debugOnlyAITurns > 0) { // Complete debug runs
                     FreeColDebugger.signalEndDebugRun();

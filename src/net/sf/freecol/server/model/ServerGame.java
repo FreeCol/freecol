@@ -150,13 +150,11 @@ public class ServerGame extends Game implements TurnTaker {
     }
 
     /**
-     * Send a change set to all live players, and optional extras.
+     * Send a change set to all live players.
      *
      * @param cs The {@code ChangeSet} to send.
-     * @param serverPlayers Optional extra {@code ServerPlayer}s
-     *     to include (useful when a player dies).
      */
-    public void sendToAll(ChangeSet cs, ServerPlayer... serverPlayers) {
+    public void sendToAll(ChangeSet cs) {
         sendToList(getConnectedPlayers(), cs);
     }
     
