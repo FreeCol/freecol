@@ -42,15 +42,20 @@ public class AddPlayerMessage extends ObjectMessage {
 
     public static final String TAG = "addPlayer";
 
+    /** The player to specialize the players for. */
+    private final ServerPlayer destination;
+
 
     /**
      * Create a new {@code AddPlayerMessage}.
      *
      * @param players A list of {@code Player}s to add.
      */
-    public AddPlayerMessage(List<? extends Player> players) {
+    public AddPlayerMessage(ServerPlayer destination,
+                            List<? extends Player> players) {
         super(TAG);
 
+        this.destination = destination;
         appendChildren(players);
     }
 
@@ -65,18 +70,25 @@ public class AddPlayerMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG);
 
+        this.destination = null;
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
         List<Player> players = new ArrayList<>();
-        while (xr.moreTags()) {
-            String tag = xr.getLocalName();
-            if (Player.TAG.equals(tag)) {
-                Player p = xr.readFreeColObject(game, Player.class);
-                if (p != null) players.add(p);
-            } else {
-                expected(Player.TAG, tag);
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (Player.TAG.equals(tag)) {
+                    Player p = xr.readFreeColObject(game, Player.class);
+                    if (p != null) players.add(p);
+                } else {
+                    expected(Player.TAG, tag);
+                }
+                xr.expectTag(tag);
             }
-            xr.expectTag(tag);
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
         }
-        xr.expectTag(TAG);
         appendChildren(players);
     }
 
@@ -102,6 +114,20 @@ public class AddPlayerMessage extends ObjectMessage {
      * {@inheritDoc}
      */
     @Override
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        FreeColXMLWriter.WriteScope ws = null;
+        if (this.destination != null) {
+            ws = xw.replaceScope(FreeColXMLWriter.WriteScope
+                .toClient(this.destination));
+        }
+        super.toXML(xw);
+        if (this.destination != null) xw.replaceScope(ws);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer) {
         // Ignored
     }
@@ -114,10 +140,9 @@ public class AddPlayerMessage extends ObjectMessage {
         List<Player> players = getPlayers();
         
         if (freeColClient.isInGame()) {
-            // Interning is sufficient
+            igc(freeColClient).addPlayerHandler(getPlayers());
         } else {
-            // Interning is sufficient
-            pgc(freeColClient).addPlayerHandler();
+            pgc(freeColClient).addPlayerHandler(getPlayers());
         }
     }
 }

@@ -834,7 +834,7 @@ public class ChangeSet {
         public AddPlayerMessage toMessage(ServerPlayer serverPlayer) {
             if (!isNotifiable(serverPlayer)) return null;
 
-            return new AddPlayerMessage(this.serverPlayers);
+            return new AddPlayerMessage(serverPlayer, this.serverPlayers);
         }
 
 

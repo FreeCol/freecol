@@ -4103,9 +4103,10 @@ public class Player extends FreeColGameObject implements Nameable {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (market != null) market.toXML(xw);
 
         if (xw.validFor(this)) {
+
+            if (market != null) market.toXML(xw);
 
             for (Ability ability : transform(getSortedAbilities(),
                                              Ability::isIndependent)) {

@@ -72,7 +72,8 @@ public final class PreGameController extends FreeColClientHolder {
     /**
      * Handle an addPlayer message.
      */
-    public void addPlayerHandler() {
+    public void addPlayerHandler(List<Player> players) {
+        getGame().addPlayers(players);
         getFreeColClient().getGUI().refreshPlayersTable();
     }
 
@@ -333,12 +334,14 @@ public final class PreGameController extends FreeColClientHolder {
     public void updateHandler(List<FreeColObject> objects) {
         final Game game = getGame();
         for (FreeColObject fco : objects) {
-            if (fco instanceof FreeColGameObject) {
-                game.setFreeColGameObject(fco.getId(), (FreeColGameObject)fco);
-            }
+            FreeColGameObject fcgo = game.getFreeColGameObject(fco.getId());
             if (fco instanceof Game) {
-                final FreeColClient fcc = getFreeColClient();
-                fcc.addSpecificationActions(((Game)fco).getSpecification());
+                if (game.copyIn((Game)fco)) {
+                    final FreeColClient fcc = getFreeColClient();
+                    fcc.addSpecificationActions(((Game)fco).getSpecification());
+                } else {
+                    logger.warning("Pre-game copy-in failed: " + fco.getId());
+                }
             } else {
                 logger.warning("Game node expected: " + fco.getId());
             }
