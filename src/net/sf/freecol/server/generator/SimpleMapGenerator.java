@@ -1066,8 +1066,8 @@ public class SimpleMapGenerator implements MapGenerator {
     public Map createEmptyMap(int width, int height, LogBuilder lb) {
         recache(false); // Reload the options and specification
 
-        return new TerrainGenerator(game, null, random)
-            .createMap(new LandMap(width, height), lb);
+        return new TerrainGenerator(random)
+            .createMap(game, null, new LandMap(width, height), lb);
     }
 
     /**
@@ -1083,8 +1083,9 @@ public class SimpleMapGenerator implements MapGenerator {
             : new LandMap(mapOptions, random);
 
         // Create terrain.
-        Map map = new TerrainGenerator(game, importGame, random)
-            .createMap(landMap, lb);
+        Map importMap = (importGame != null) ? importGame.getMap() : null;
+        Map map = new TerrainGenerator(random)
+            .createMap(game, importMap, landMap, lb);
 
         // Decorate the map.
         makeNativeSettlements(map, lb);
