@@ -294,6 +294,7 @@ public final class FreeColServer {
         this.serverGame = new ServerGame(specification);
         this.serverGame.setNationOptions(new NationOptions(specification));
         this.serverGame.randomize(this.random);
+        this.serverGame.establishUnknownEnemy();
         this.inGameController.setRandom(this.random);
         this.mapGenerator = new SimpleMapGenerator(this.serverGame, this.random);
         this.publicServer = registerWithMetaServer();
@@ -1070,8 +1071,7 @@ public final class FreeColServer {
 
         int savegameVersion = fis.getSavegameVersion();
         serverGame.getMap().resetContiguity();
-        Player unknown = serverGame.getUnknownEnemy();
-        if (unknown == null) establishUnknownEnemy(serverGame);
+        serverGame.establishUnknownEnemy();
 
         // Ensure that critical option groups can not be edited.
         specification = getSpecification();
@@ -1123,22 +1123,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Add option to capture units under repair in a colony.
-     * Establish a new unknown enemy player.
-     *
-     * @param game The {@code Game} to establish the enemy within.
-     * @return The new unknown enemy {@code Player}.
-     */
-    private ServerPlayer establishUnknownEnemy(Game game) {
-        final Specification spec = game.getSpecification();
-
-        ServerPlayer enemy = new ServerPlayer(game, false,
-            spec.getUnknownEnemyNation());
-        game.setUnknownEnemy(enemy);
-        return enemy;
-    }
-
-    /**
      * Create an empty map.
      *
      * Public for the map generator.
@@ -1172,9 +1156,7 @@ public final class FreeColServer {
         }
 
         // We need a fake unknown enemy player
-        if (serverGame.getUnknownEnemy() == null) {
-            establishUnknownEnemy(serverGame);
-        }
+        serverGame.establishUnknownEnemy();
 
         // Fill in missing available players, and the unknown enemy
         final Predicate<Entry<Nation, NationState>> availablePred = e ->

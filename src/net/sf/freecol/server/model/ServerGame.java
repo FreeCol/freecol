@@ -224,6 +224,20 @@ public class ServerGame extends Game implements TurnTaker {
     }
 
     /**
+     * Establish the unknown enemy player.
+     *
+     * @return The new unknown enemy {@code Player}.
+     */
+    public Player establishUnknownEnemy() {
+        Player ret = getUnknownEnemy();
+        if (ret != null) return ret;
+        ServerPlayer enemy = new ServerPlayer(this, false,
+            getSpecification().getUnknownEnemyNation());
+        setUnknownEnemy(enemy);
+        return enemy;
+    }
+
+    /**
      * Update the players.
      *
      * @param players A list of new {@code ServerPlayer}s.
