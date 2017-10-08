@@ -1078,7 +1078,8 @@ public class SimpleMapGenerator implements MapGenerator {
         recache(true); // Reload the options and specification
 
         // Create land map.
-        LandMap landMap = (importGame != null) ? new LandMap(importGame)
+        LandMap landMap = (importGame != null)
+            ? new LandMap(importGame.getMap())
             : new LandMap(mapOptions, random);
 
         // Create terrain.

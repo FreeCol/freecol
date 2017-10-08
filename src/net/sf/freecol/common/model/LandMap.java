@@ -68,18 +68,17 @@ public class LandMap {
     }
 
     /**
-     * Create a land map by importing it from a given game.
+     * Create a land map by importing it from a given map.
      *
-     * @param game The {@code Game} to get the land map from.
+     * @param map The {@code Map} to get the land map from.
      */
-    public LandMap(Game game) {
-        this(game.getMap().getWidth(), game.getMap().getHeight());
+    public LandMap(Map map) {
+        this(map.getWidth(), map.getHeight());
 
-        final Map gmap = game.getMap();
         for (int y = 0; y < this.height; y++) {
             for (int x = 0; x < this.width; x++) {
-                this.map[x][y] = (gmap.isValid(x, y))
-                    ? gmap.getTile(x, y).isLand()
+                this.map[x][y] = (map.isValid(x, y))
+                    ? map.getTile(x, y).isLand()
                     : false;
                 if (this.map[x][y]) this.numberOfLandTiles++;
             }
