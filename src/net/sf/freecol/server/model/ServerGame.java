@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -140,20 +141,20 @@ public class ServerGame extends Game implements TurnTaker {
      * @return A list of all connected server players, with exclusions.
      */
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
-        return transform(getPlayerList(),
-                         p -> ((ServerPlayer)p).isConnected()
-                             && none(serverPlayers, matchKey((ServerPlayer)p)),
-                         p -> (ServerPlayer)p);
+        final Predicate<Player> connPred = p ->
+            ((ServerPlayer)p).isConnected()
+                && none(serverPlayers, matchKey((ServerPlayer)p));
+        synchronized (this.players) {
+            return transform(this.players, connPred, p -> (ServerPlayer)p);
+        }
     }
 
     /**
-     * Send a change set to all live players, and optional extras.
+     * Send a change set to all live players.
      *
      * @param cs The {@code ChangeSet} to send.
-     * @param serverPlayers Optional extra {@code ServerPlayer}s
-     *     to include (useful when a player dies).
      */
-    public void sendToAll(ChangeSet cs, ServerPlayer... serverPlayers) {
+    public void sendToAll(ChangeSet cs) {
         sendToList(getConnectedPlayers(), cs);
     }
     
@@ -220,6 +221,20 @@ public class ServerGame extends Game implements TurnTaker {
         Class<?> c = Class.forName(type);
         return c.getConstructor(Game.class, String.class)
             .newInstance(this, id);
+    }
+
+    /**
+     * Establish the unknown enemy player.
+     *
+     * @return The new unknown enemy {@code Player}.
+     */
+    public Player establishUnknownEnemy() {
+        Player ret = getUnknownEnemy();
+        if (ret != null) return ret;
+        ServerPlayer enemy = new ServerPlayer(this, false,
+            getSpecification().getUnknownEnemyNation());
+        setUnknownEnemy(enemy);
+        return enemy;
     }
 
     /**

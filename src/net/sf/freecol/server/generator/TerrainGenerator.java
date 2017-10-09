@@ -63,12 +63,6 @@ public class TerrainGenerator {
     public static final int LAND_REGION_MIN_SCORE = 5;
     public static final int LAND_REGION_MAX_SIZE = 75;
 
-    /** The Game to generate for. */
-    private final Game game;
-
-    /** The game to selectively import from. */
-    private final Game importGame;
-
     /**
      * The pseudo-random number source to use.
      *
@@ -78,12 +72,6 @@ public class TerrainGenerator {
      */
     private final Random random;
 
-    /** The cached map generator options. */
-    private final OptionGroup mapOptions;
-
-    /** The cache of the Specification. */
-    private final Specification spec;
-
     /** The cached land and ocean tile types. */
     private List<TileType> landTileTypes = null;
     private List<TileType> oceanTileTypes = null;
@@ -92,17 +80,11 @@ public class TerrainGenerator {
     /**
      * Creates a new {@code TerrainGenerator}.
      *
-     * @param game The {@code Game} to generate for.
-     * @param importGame A {@code Game} to selectively import from.
      * @param random A {@code Random} number source.
      * @see #createMap
      */
-    public TerrainGenerator(Game game, Game importGame, Random random) {
-        this.game = game;
-        this.importGame = importGame;
+    public TerrainGenerator(Random random) {
         this.random = random;
-        this.mapOptions = game.getMapGeneratorOptions();
-        this.spec = game.getSpecification();
     }
 
 
@@ -116,9 +98,11 @@ public class TerrainGenerator {
     /**
      * Gets the approximate number of land tiles.
      *
+     * @param game The {@code Game} to generate for.
      * @return The approximate number of land tiles
      */
-    private int getApproximateLandCount() {
+    private int getApproximateLandCount(Game game) {
+        final OptionGroup mapOptions = game.getMapGeneratorOptions();
         return mapOptions.getInteger(MapGeneratorOptions.MAP_WIDTH)
             * mapOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT)
             * mapOptions.getInteger(MapGeneratorOptions.LAND_MASS)
@@ -126,52 +110,41 @@ public class TerrainGenerator {
     }
 
     /**
-     * Creates a random tile for the specified position.
-     *
-     * @param x The tile x coordinate.
-     * @param y The tile y coordinate.
-     * @param landMap A boolean array defining where the land is.
-     * @param latitude The tile latitude.
-     * @return The created tile.
-     */
-    private Tile createTile(int x, int y, LandMap landMap, int latitude) {
-        return (landMap.isLand(x, y))
-            ? new Tile(game, getRandomLandTileType(latitude), x, y)
-            : new Tile(game, getRandomOceanTileType(latitude), x, y);
-    }
-
-    /**
      * Gets a random land tile type based on the latitude.
      *
+     * @param game The {@code Game} to generate for.
      * @param latitude The location of the tile relative to the north/south
      *     poles and equator:
      *     0 is the mid-section of the map (equator)
      *     +/-90 is on the bottom/top of the map (poles).
      * @return A suitable random land tile type.
      */
-    private TileType getRandomLandTileType(int latitude) {
+    private TileType getRandomLandTileType(Game game, int latitude) {
+        final Specification spec = game.getSpecification();
         if (landTileTypes == null) {
             // Do not generate elevated and water tiles at this time
             // they are created elsewhere.
             landTileTypes = transform(spec.getTileTypeList(),
                                       t -> !t.isElevation() && !t.isWater());
         }
-        return getRandomTileType(landTileTypes, latitude);
+        return getRandomTileType(game, landTileTypes, latitude);
     }
 
     /**
      * Gets a random ocean tile type.
      *
+     * @param game The {@code Game} to generate for.
      * @param latitude The latitude of the proposed tile.
      * @return A suitable random ocean tile type.
      */
-    private TileType getRandomOceanTileType(int latitude) {
+    private TileType getRandomOceanTileType(Game game, int latitude) {
+        final Specification spec = game.getSpecification();
         if (oceanTileTypes == null) {
             oceanTileTypes = transform(spec.getTileTypeList(),
                                        t -> t.isWater() && t.isHighSeasConnected()
                                            && !t.isDirectlyHighSeasConnected());
         }
-        return getRandomTileType(oceanTileTypes, latitude);
+        return getRandomTileType(game, oceanTileTypes, latitude);
     }
 
     /**
@@ -179,13 +152,16 @@ public class TerrainGenerator {
      *
      * FIXME: Can be used for mountains and rivers too.
      *
+     * @param game The {@code Game} to generate for.
      * @param candidates A list of {@code TileType}s to use for
      *     calculations.
      * @param latitude The tile latitude.
      * @return A suitable {@code TileType}.
      */
-    private TileType getRandomTileType(List<TileType> candidates,
+    private TileType getRandomTileType(Game game, List<TileType> candidates,
                                        int latitude) {
+        final OptionGroup mapOptions = game.getMapGeneratorOptions();
+        final Specification spec = game.getSpecification();
         // decode options
         final int forestChance
             = mapOptions.getRange(MapGeneratorOptions.FOREST_NUMBER);
@@ -220,7 +196,6 @@ public class TerrainGenerator {
             break;
         }
 
-        final Specification spec = game.getSpecification();
         int temperatureRange = equatorTemperature-poleTemperature;
         int localeTemperature = poleTemperature + (90 - Math.abs(latitude))
             * temperatureRange/90;
@@ -329,6 +304,7 @@ public class TerrainGenerator {
      */
     private List<ServerRegion> createLandRegions(Map map, LogBuilder lb) {
         // Create "explorable" land regions
+        final Game game = map.getGame();
         int continents = 0;
         boolean[][] landmap = new boolean[map.getWidth()][map.getHeight()];
         int[][] continentmap = new int[map.getWidth()][map.getHeight()];
@@ -466,6 +442,7 @@ public class TerrainGenerator {
      * @return A suitable {@code Tile}, or null if none found.
      */
     private Tile getGoodMountainTile(Map map) {
+        final Specification spec = map.getGame().getSpecification();
         final TileType hills = spec.getTileType("model.tile.hills");
         final TileType mountains = spec.getTileType("model.tile.mountains");
         Tile tile = null;
@@ -496,6 +473,9 @@ public class TerrainGenerator {
      * @return A list of created {@code ServerRegion}s.
      */
     private List<ServerRegion> createMountains(Map map, LogBuilder lb) {
+        final Game game = map.getGame();
+        final Specification spec = game.getSpecification();
+        final OptionGroup mapOptions = game.getMapGeneratorOptions();
         List<ServerRegion> result = new ArrayList<>();
         float randomHillsRatio = 0.5f;
         // 50% of user settings will be allocated for random hills
@@ -505,7 +485,7 @@ public class TerrainGenerator {
             = Math.max(mapOptions.getInteger(MapGeneratorOptions.MAP_WIDTH),
                 mapOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT)) / 10;
         int number = Math.round((1.0f - randomHillsRatio)
-            * ((float)getApproximateLandCount()
+            * ((float)getApproximateLandCount(game)
                 / mapOptions.getRange(MapGeneratorOptions.MOUNTAIN_NUMBER)));
         lb.add("Number of mountain tiles is ", number, "\n",
             "Maximum length of mountain ranges is ", maximumLength, "\n");
@@ -563,7 +543,7 @@ public class TerrainGenerator {
         lb.add("Added ", counter, " mountain range tiles.\n");
 
         // and sprinkle a few random hills/mountains here and there
-        number = (int) (getApproximateLandCount() * randomHillsRatio)
+        number = (int) (getApproximateLandCount(game) * randomHillsRatio)
             / mapOptions.getRange(MapGeneratorOptions.MOUNTAIN_NUMBER);
         counter = 0;
         for (int tries = 0; tries < 1000; tries++) {
@@ -588,10 +568,13 @@ public class TerrainGenerator {
      * @return A list of created {@code ServerRegion}s.
      */
     private List<ServerRegion> createRivers(Map map, LogBuilder lb) {
+        final Game game = map.getGame();
+        final Specification spec = game.getSpecification();
+        final OptionGroup mapOptions = game.getMapGeneratorOptions();
         List<ServerRegion> result = new ArrayList<>();
         final TileImprovementType riverType
             = spec.getTileImprovementType("model.improvement.river");
-        final int number = getApproximateLandCount()
+        final int number = getApproximateLandCount(game)
             / mapOptions.getRange(MapGeneratorOptions.RIVER_NUMBER);
         int counter = 0;
         HashMap<Tile, River> riverMap = new HashMap<>();
@@ -718,7 +701,9 @@ public class TerrainGenerator {
      * @param generateBonus Generate the bonus or not.
      */
     private void perhapsAddBonus(Tile t, boolean generateBonus) {
-        final Specification spec = t.getSpecification();
+        final Game game = t.getGame();
+        final OptionGroup mapOptions = game.getMapGeneratorOptions();
+        final Specification spec = game.getSpecification();
         TileImprovementType fishBonusLandType
             = spec.getTileImprovementType("model.improvement.fishBonusLand");
         TileImprovementType fishBonusRiverType
@@ -789,7 +774,7 @@ public class TerrainGenerator {
         int quantity = (minValue == maxValue) ? maxValue
             : (minValue + randomInt(logger, "Rsiz", random, 
                                     maxValue - minValue + 1));
-        return new Resource(game, tile, resourceType, quantity);
+        return new Resource(tile.getGame(), tile, resourceType, quantity);
     }
 
     /**
@@ -838,18 +823,23 @@ public class TerrainGenerator {
     /**
      * Creates a {@code Map}.
      *
+     * @param game The {@code Game} to generate the map for.
+     * @param importMap An optional {@code Map} to import.
      * @param landMap The {@code LandMap} to use as a template.
      * @param lb A {@code LogBuilder} to log to.
      * @return The new {@code Map}.
      */
-    public Map createMap(LandMap landMap, LogBuilder lb) {
+    public Map createMap(Game game, Map importMap, LandMap landMap,
+                         LogBuilder lb) {
+        final Specification spec = game.getSpecification();
+        final OptionGroup mapOptions = game.getMapGeneratorOptions();
         final int width = landMap.getWidth();
         final int height = landMap.getHeight();
-        final boolean importBonuses = (importGame != null)
+        final boolean importBonuses = (importMap != null)
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
-        final boolean importRumours = (importGame != null)
+        final boolean importRumours = (importMap != null)
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
-        final boolean importTerrain = (importGame != null)
+        final boolean importTerrain = (importMap != null)
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
 
         boolean mapHasLand = false;
@@ -867,13 +857,13 @@ public class TerrainGenerator {
         java.util.Map<String, ServerRegion> regionMap = new HashMap<>();
         if (importTerrain) { // Import the regions
             lb.add("Imported regions: ");
-            for (Region r : importGame.getMap().getRegions()) {
+            for (Region r : importMap.getRegions()) {
                 ServerRegion region = new ServerRegion(game, r);
                 map.addRegion(region);
                 regionMap.put(r.getId(), region);
                 lb.add(" ", region.toString());
             }
-            for (Region r : importGame.getMap().getRegions()) {
+            for (Region r : importMap.getRegions()) {
                 ServerRegion region = regionMap.get(r.getId());
                 Region x = r.getParent();
                 if (x != null) x = regionMap.get(x.getId());
@@ -893,8 +883,8 @@ public class TerrainGenerator {
                 if (landMap.isLand(x, y)) mapHasLand = true;
                 Tile t, importTile = null;
                 if (importTerrain
-                    && importGame.getMap().isValid(x, y)
-                    && (importTile = importGame.getMap().getTile(x, y)) != null
+                    && importMap.isValid(x, y)
+                    && (importTile = importMap.getTile(x, y)) != null
                     && importTile.isLand() == landMap.isLand(x, y)) {
                     String id = importTile.getType().getId();
                     t = new Tile(game, spec.getTileType(id), x, y);
@@ -926,7 +916,10 @@ public class TerrainGenerator {
                         }
                     }
                 } else {
-                    t = createTile(x, y, landMap, latitude);
+                    TileType tt = (landMap.isLand(x, y))
+                        ? getRandomLandTileType(game, latitude)
+                        : getRandomOceanTileType(game, latitude);
+                    t = new Tile(game, tt, x, y);
                 }
                 map.setTile(t, x, y);
             }

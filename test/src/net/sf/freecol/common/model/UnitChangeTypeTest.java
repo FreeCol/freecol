@@ -41,7 +41,7 @@ public class UnitChangeTypeTest extends FreeColTestCase {
         assertEquals("Education has no scopes", 0, count(uct.getScopes()));
 
         // empty scope applies to all players
-        for (Player player : getStandardGame().getPlayerList()) {
+        for (Player player : getStandardGame().getPlayerList(alwaysTrue())) {
             assertTrue("Empty scopes apply to all players",
                        uct.appliesTo(player));
         }
