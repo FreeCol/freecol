@@ -949,7 +949,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      */
     public Set<Tile> exploreForSettlement(Settlement settlement) {
         Set<Tile> tiles = new HashSet<>(settlement.getOwnedTiles());
-        tiles.addAll(settlement.getVisibleTiles());
+        tiles.addAll(settlement.getVisibleTileSet());
         tiles.remove(settlement.getTile());
         return exploreTiles(tiles);
     }
@@ -966,7 +966,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         return (getGame() == null || getGame().getMap() == null || unit == null
             || !(unit.getLocation() instanceof Tile)) 
             ? Collections.<Tile>emptySet()
-            : exploreTiles(unit.getVisibleTiles());
+            : exploreTiles(unit.getVisibleTileSet());
     }
 
     /**
@@ -1937,9 +1937,9 @@ outer:  for (Effect effect : effects) {
                     : getColonies();
                 Set<Tile> tiles
                     = transform(concat(flatten(colonies,
-                                               c -> c.getVisibleTiles().stream()),
+                                               c -> c.getVisibleTileSet().stream()),
                                        flatten(getUnits(),
-                                               u -> u.getVisibleTiles().stream())),
+                                               u -> u.getVisibleTileSet().stream())),
                                 t -> !canSee(t), Function.identity(),
                                 Collectors.toSet());
                 exploreTiles(tiles); // Explore the new tiles

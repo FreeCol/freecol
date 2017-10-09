@@ -768,7 +768,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
         final Location oldLocation = getLocation();
-        Set<Tile> oldTiles = getVisibleTiles();
+        Set<Tile> oldTiles = getVisibleTileSet();
         List<Tile> newTiles = collectNewTiles(newTile);
 
         // Update unit state.
