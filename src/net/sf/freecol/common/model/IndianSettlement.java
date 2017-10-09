@@ -30,6 +30,7 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -349,6 +350,16 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         return (enhanced) ? getLineOfSight() : 1;
     }
 
+    /**
+     * Get a stream of tiles that should be visible to a missionary at
+     * this settlement.
+     *
+     * @return A list of {@code Tile}s.
+     */
+    public List<Tile> getMissionaryVisibleTiles() {
+        return getTile().getSurroundingTiles(0, getMissionaryLineOfSight());
+    }
+        
     /**
      * Gets the convert progress status for this settlement.
      *
