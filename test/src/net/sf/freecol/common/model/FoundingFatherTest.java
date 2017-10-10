@@ -94,13 +94,13 @@ public class FoundingFatherTest extends FreeColTestCase {
     }
 
     public void testAddAllFathers() {
-        // check that all fathers can be added
         Game game = getGame();
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
 
+        // check that all fathers can be added
         for (FoundingFather father : spec().getFoundingFathers()) {
             player.addFather(father);
         }

@@ -307,6 +307,7 @@ public class IndividualFatherTest extends FreeColTestCase {
     public void testPaine() {
         Game game = getGame();
         game.setMap(getTestMap(true));
+
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
         List<AbstractGoods> empty = new ArrayList<>();

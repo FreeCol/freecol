@@ -254,10 +254,9 @@ public class BuildingTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        Colony colony = getStandardColony();
-
         // First check with a building that can be fully built with a
         // normal colony
+        Colony colony = getStandardColony();
         Building warehouse = new ServerBuilding(getGame(), colony, depotType);
         colony.addBuilding(warehouse);
         assertTrue(warehouse.canBuildNext());
@@ -283,6 +282,7 @@ public class BuildingTest extends FreeColTestCase {
     public void testStockadeRequiresMinimumPopulation() {
         Game game = getGame();
         game.setMap(getTestMap(true));
+
         Colony colony = getStandardColony(2);
         assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL,
                      colony.getNoBuildReason(stockadeType, null));
@@ -297,6 +297,7 @@ public class BuildingTest extends FreeColTestCase {
     public void testFortRequiresMinimumPopulation() {
         Game game = getGame();
         game.setMap(getTestMap(true));
+
         Colony colony = getStandardColony(2);
         assertEquals(Colony.NoBuildReason.POPULATION_TOO_SMALL,
                      colony.getNoBuildReason(fortType, null));
@@ -332,7 +333,6 @@ public class BuildingTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony();
-
         Building warehouse = colony.getBuilding(warehouseType);
 
         // Is build as depot...
@@ -542,7 +542,6 @@ public class BuildingTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(10);
-
         Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit farmer = units.next();
@@ -682,10 +681,10 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testStockade() {
         final Game game = getGame();
-        final Turn turn = game.getTurn();
         game.setMap(getTestMap(true));
-        List<Modifier> modifiers;
 
+        final Turn turn = game.getTurn();
+        List<Modifier> modifiers;
         Colony colony = getStandardColony(2);
         modifiers = toList(colony.getModifiers(Modifier.DEFENCE));
         assertEquals(1, modifiers.size());
@@ -828,8 +827,8 @@ public class BuildingTest extends FreeColTestCase {
     public void testTownhallProduction() {
         final Game game = getGame();
         game.setMap(getTestMap(true));
-        final Turn turn = game.getTurn();
 
+        final Turn turn = game.getTurn();
         Colony colony = getStandardColony(6);
         Player owner = colony.getOwner();
         Unit colonist = colony.getUnitList().get(0);

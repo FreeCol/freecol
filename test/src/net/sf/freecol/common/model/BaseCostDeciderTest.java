@@ -66,7 +66,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
     public void testGetCostLandLand() {
         Map map = getTestMap(plainsType);
         game.setMap(map);
-    	
+
         final CostDecider decider = CostDeciders.avoidSettlements();
         Tile start = game.getMap().getTile(5, 5);
         ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
@@ -88,7 +88,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
     public void testGetRemainingMovesAndNewTurn() {
         Map map = getTestMap(plainsType);
         game.setMap(map);
-        
+
         final CostDecider decider = CostDeciders.avoidSettlements();
         ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         Unit unit = new ServerUnit(game, game.getMap().getTile(1, 1),
@@ -108,7 +108,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         // For this test we need a different map
         Map map = getCoastTestMap(plainsType);
         game.setMap(map);
-        
+
         Tile unitTile = map.getTile(9, 9);
         assertTrue("Unit tile should be land",unitTile.isLand());
         ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
@@ -131,7 +131,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         // For this test we need a different map
         Map map = getCoastTestMap(plainsType);
         game.setMap(map);
-        
+
         Tile unitTile = map.getTile(10, 9);
         assertFalse("Unit tile should be ocean", unitTile.isLand());
 

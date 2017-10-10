@@ -118,7 +118,6 @@ public class MapTest extends FreeColTestCase {
 
     public void testGetSurroundingTiles() {
         Game game = getStandardGame();
-
         MapBuilder builder = new MapBuilder(game);
         Map map = builder.setDimensions(10, 15).build();
         game.setMap(map);
@@ -592,8 +591,9 @@ public class MapTest extends FreeColTestCase {
 
     public void testCopy() {
         Game game = getStandardGame();
-        game.setMap(getTestMap());
-        Map map = game.getMap();
+        Map map = getTestMap();
+        game.setMap(map);
+
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();
 

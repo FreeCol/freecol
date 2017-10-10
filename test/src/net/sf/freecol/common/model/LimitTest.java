@@ -31,7 +31,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class LimitTest extends FreeColTestCase {
 
     public void testOperand() {
-
         UnitType carpenter = spec().getUnitType("model.unit.masterCarpenter");
         UnitType frigate = spec().getUnitType("model.unit.frigate");
 
@@ -46,12 +45,11 @@ public class LimitTest extends FreeColTestCase {
     }
 
     public void testWagonTrainLimit() {
-
         Game game = getStandardGame();
-        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Colony colony = getStandardColony(3);
         Building armory = new ServerBuilding(getGame(), colony, spec().getBuildingType("model.building.armory"));
         colony.addBuilding(armory);
@@ -78,10 +76,10 @@ public class LimitTest extends FreeColTestCase {
 
     public void testIndependenceLimits() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Colony colony = getStandardColony(3);
 
         Event event = spec().getEvent("model.event.declareIndependence");
@@ -159,10 +157,10 @@ public class LimitTest extends FreeColTestCase {
     public void testSuccessionLimits() {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Colony colony = getStandardColony(3);
 
         Event event = spec().getEvent("model.event.spanishSuccession");

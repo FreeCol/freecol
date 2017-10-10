@@ -138,10 +138,10 @@ public class ColonyTest extends FreeColTestCase {
     }
 
     public void testOccupationWithFood() {
-        int population = 1;
-
         Game game = getGame();
         game.setMap(getTestMap(true));
+
+        int population = 1;
         Colony colony = getStandardColony(population);
 
         assertTrue("colony should produce enough food",
@@ -191,6 +191,7 @@ public class ColonyTest extends FreeColTestCase {
     public void testTeaParty() {
         Game game = getGame();
         game.setMap(getTestMap(true));
+
         Colony colony = getStandardColony(5);
         ServerPlayer serverPlayer = (ServerPlayer)colony.getOwner();
 
@@ -426,6 +427,7 @@ public class ColonyTest extends FreeColTestCase {
     public void testUnderSiege() {
         Game game = getGame();
         game.setMap(getTestMap(true));
+
         Colony colony = getStandardColony(5);
         Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
         Player iroquois = game.getPlayerByNationId("model.nation.iroquois");
@@ -465,6 +467,7 @@ public class ColonyTest extends FreeColTestCase {
     public void testUpkeep() {
         Game game = getGame();
         game.setMap(getTestMap(true));
+
         Colony colony = getStandardColony(5);
 
         assertEquals("New colonies should not require upkeep.",
@@ -482,6 +485,7 @@ public class ColonyTest extends FreeColTestCase {
     public void testCopyColony() {
         Game game = getGame();
         game.setMap(getTestMap(true));
+
         Colony colony = getStandardColony(2);
         Player player = colony.getOwner();
 

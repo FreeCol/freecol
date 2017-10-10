@@ -47,6 +47,7 @@ public class PathfindingTest extends FreeColTestCase {
         final Game game = getStandardGame();
         final Map map = getCoastTestMap(plainsType, true);
         game.setMap(map);
+
         final Player dutch = game.getPlayerByNationId("model.nation.dutch");
         PathNode path;
         GoalDecider gd;

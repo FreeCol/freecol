@@ -158,8 +158,9 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testStringTemplates() {
         final Game game = getGame();
-        Messages.loadMessageBundle(Locale.US);
+        game.setMap(getTestMap());
 
+        Messages.loadMessageBundle(Locale.US);
         // template with key not in message bundle
         StringTemplate s1 = StringTemplate.key("!no.such.string.template");
         assertTrue(s1.getId()
@@ -188,7 +189,6 @@ public class MessagesTest extends FreeColTestCase {
         assertTrue("Food / xyz"
             .equals(Messages.message(t2)));
 
-        game.setMap(getTestMap());
         Colony colony = getStandardColony();
         assertTrue("New Amsterdam"
             .equals(colony.getName()));
