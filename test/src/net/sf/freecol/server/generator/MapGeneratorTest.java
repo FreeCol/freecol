@@ -52,7 +52,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testWithNoIndians() {
         spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
 
-        Game g = new ServerGame(spec());
+        Game g = getStandardGame();
         g.setNationOptions(new NationOptions(spec()));
 
         // A new game does not have a map yet
@@ -76,7 +76,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testSinglePlayerOnSmallMap() {
         spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
 
-        Game g = new ServerGame(spec());
+        Game g = getStandardGame();
         g.setNationOptions(new NationOptions(spec()));
 
         // A new game does not have a map yet
@@ -102,8 +102,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testMapGenerator() {
         spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
 
-        Game g = new ServerGame(spec());
-
+        Game g = getStandardGame();
         g.setNationOptions(new NationOptions(spec()));
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
@@ -155,7 +154,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testIndianCapital() {
         spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
 
-        Game g = new ServerGame(spec());
+        Game g = getStandardGame();
         g.setNationOptions(new NationOptions(spec()));
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
@@ -195,8 +194,9 @@ public class MapGeneratorTest extends FreeColTestCase {
      * Make sure we can import all distributed maps.
      */
     public void testImportMap() {
-        final Specification spec = spec();
-        Game game = new ServerGame(spec);
+        Game game = getStandardGame();
+        final Specification spec = game.getSpecification();
+
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
         for (File importFile : FreeColDirectories.getMapFileList()) {
             spec.setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
@@ -209,7 +209,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
     public void testRegions() {
         spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
-        Game game = new ServerGame(spec());
+        Game game = getStandardGame();
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
         gen.createMap(game, null, new LogBuilder(-1));
         

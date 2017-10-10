@@ -32,10 +32,9 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class GameTest extends FreeColTestCase {
 
     public void testGame() throws FreeColException {
-
-        Game game = new ServerGame(spec());
-        game.setNationOptions(new NationOptions(spec()));
+        Game game = getStandardGame();
         game.setMap(getTestMap());
+
         Nation dutchNation = spec().getNation("model.nation.dutch");
         game.addPlayer(new ServerPlayer(game, false, dutchNation));
         // map tiles are null
@@ -43,12 +42,12 @@ public class GameTest extends FreeColTestCase {
     }
 
     public void testAddPlayer() {
+        // Do *not* call getStandardGame so the players are not created
         Game game = new ServerGame(spec());
         NationOptions defaultOptions = new NationOptions(spec());
         game.setNationOptions(defaultOptions);
 
         List<Player> players = new ArrayList<>();
-
         int counter = 0;
         for (Nation n : spec().getNations()) {
             if (defaultOptions.getNationState(n)
