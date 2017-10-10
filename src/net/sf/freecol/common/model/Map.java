@@ -2368,7 +2368,50 @@ public class Map extends FreeColGameObject implements Location {
         }
     }
 
-
+    /**
+     * Scale the map into the specified size.
+     *
+     * @param width The width of the resulting map.
+     * @param height The height of the resulting map.
+     */
+    public void scale(final int width, final int height) {
+        /*
+         * This implementation uses a simple linear scaling, and
+         * the isometric shape is not taken into account.
+         *
+         * FIXME: Find a better method for choosing a group of
+         * adjacent tiles.  This group can then be merged into a
+         * common tile by using the average value (for example: are
+         * there a majority of ocean tiles?).
+         */
+        final Game game = getGame();
+        final int oldWidth = getWidth();
+        final int oldHeight = getHeight();
+        Tile newTiles[][] = new Tile[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                final int oldX = (x * oldWidth) / width;
+                final int oldY = (y * oldHeight) / height;
+                // FIXME: This tile should be based on the average as
+                // mentioned at the top of this method.
+                Tile importTile = getTile(oldX, oldY);
+                Tile t = new Tile(game, importTile.getType(), x, y);
+                if (importTile.getMoveToEurope() != null) {
+                    t.setMoveToEurope(importTile.getMoveToEurope());
+                }
+                if (t.getTileItemContainer() != null) {
+                    t.getTileItemContainer().copyFrom(importTile
+                        .getTileItemContainer(), Map.Layer.ALL);
+                }
+                newTiles[x][y] = t;
+            }
+        }
+        // FIXME: the scaling above can omit or double tiles, which will
+        // break the river and road connections.  We should fix them.
+        this.tiles = newTiles;
+    }
+        
+    
     // Interface Location
     // getId() inherited.
 

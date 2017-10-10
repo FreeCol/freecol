@@ -54,49 +54,8 @@ public class ScaleMapAction extends FreeColAction {
      * @param height The height of the resulting map.
      */
     private void scaleMapTo(final int width, final int height) {
-        /*
-         * This implementation uses a simple linear scaling, and
-         * the isometric shape is not taken into account.
-         *
-         * FIXME: Find a better method for choosing a group of
-         * adjacent tiles.  This group can then be merged into a
-         * common tile by using the average value (for example: are
-         * there a majority of ocean tiles?).
-         */
-
-        final Game game = getGame();
-        final Map oldMap = game.getMap();
-
-        final int oldWidth = oldMap.getWidth();
-        final int oldHeight = oldMap.getHeight();
-
-        Map map = new Map(game, width, height);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                final int oldX = (x * oldWidth) / width;
-                final int oldY = (y * oldHeight) / height;
-                // FIXME: This tile should be based on the average as
-                // mentioned at the top of this method.
-                Tile importTile = oldMap.getTile(oldX, oldY);
-                Tile t = new Tile(game, importTile.getType(), x, y);
-                if (importTile.getMoveToEurope() != null) {
-                    t.setMoveToEurope(importTile.getMoveToEurope());
-                }
-                if (t.getTileItemContainer() != null) {
-                    t.getTileItemContainer().copyFrom(importTile
-                        .getTileItemContainer(), Map.Layer.ALL);
-                }
-                map.setTile(t, x, y);
-            }
-        }
-        game.setMap(map);
-
-        /* Commented because it doesn't appear to do anything valuable
-        // Update river directions
-        for (Tile t : map.getAllTiles()) {
-            t.getTileItemContainer().updateRiver();
-        }*/
-
+        final Map map = getGame().getMap();
+        map.scale(width, height);
         getGUI().setSelectedTile(map.getTile(0, 0));
         getGUI().refresh();
     }
