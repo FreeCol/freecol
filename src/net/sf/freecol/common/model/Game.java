@@ -209,7 +209,7 @@ public class Game extends FreeColGameObject {
     /**
      * Trivial constructor for use in Game.newInstance.
      */
-    public Game() {
+    private Game() {
         super((Game)null);
 
         this.clientUserName = null;
@@ -224,7 +224,11 @@ public class Game extends FreeColGameObject {
         this.freeColGameObjects = new HashMap<>(10000);
         this.combatModel = new SimpleCombatModel();
         this.removeCount = 0;
-        internId("0");
+        this.setGame(this);
+
+        // Games always have a zero identifier.
+        // Explicitly set initialized as FCGO.initialize() has not happened
+        setId("0");
         this.initialized = true;
     }
 
@@ -1744,7 +1748,7 @@ public class Game extends FreeColGameObject {
             }
 
         } else if (Specification.TAG.equals(tag)) {
-            logger.info(((specification == null) ? "Loading" : "Reloading")
+            logger.info(((this.specification == null) ? "Loading" : "Reloading")
                 + " specification.");
             this.specification = new Specification(xr);
 
