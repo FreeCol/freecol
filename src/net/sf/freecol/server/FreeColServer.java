@@ -292,10 +292,7 @@ public final class FreeColServer {
         this.publicServer = publicServer;
         this.singlePlayer = singlePlayer;
         this.random = new Random(FreeColSeed.getFreeColSeed(true));
-        this.serverGame = new ServerGame(specification);
-        this.serverGame.setNationOptions(new NationOptions(specification));
-        this.serverGame.randomize(this.random);
-        this.serverGame.establishUnknownEnemy();
+        this.serverGame = new ServerGame(specification, random);
         this.inGameController.setRandom(this.random);
         this.mapGenerator = new SimpleMapGenerator(this.random);
         this.publicServer = registerWithMetaServer();
@@ -1030,7 +1027,7 @@ public final class FreeColServer {
 
                 } else if (Game.TAG.equals(tag)) {
                     // Read the game
-                    serverGame = new ServerGame(xr, specification);
+                    serverGame = new ServerGame(xr);
                     serverGame.setCurrentPlayer(null);
                     if (freeColServer != null) {
                         freeColServer.setGame(serverGame);

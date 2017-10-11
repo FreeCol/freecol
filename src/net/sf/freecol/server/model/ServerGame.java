@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
+import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -91,28 +92,42 @@ public class ServerGame extends Game implements TurnTaker {
     /**
      * Creates a new game model.
      *
+     * Public for the test suite.
+     *
      * @param specification The {@code Specification} to use in this game.
-     * @see net.sf.freecol.server.FreeColServer
      */
     public ServerGame(Specification specification) {
         super(specification);
     }
 
     /**
+     * Creates a new game model.
+     *
+     * Called from the FreeColServer constructor to create a
+     * completely new game.
+     *
+     * @param specification The {@code Specification} to use in this game.
+     * @param random A pseudo-random number source.
+     */
+    public ServerGame(Specification specification, Random random) {
+        super(specification);
+
+        this.setNationOptions(new NationOptions(specification));
+        this.randomize(random);
+        this.establishUnknownEnemy();
+    }
+
+    /**
      * Initiate a new {@code ServerGame} with information from a
      * saved game.
      *
+     * Called from FreeColServer.readGame when restoring a saved game.
+     *
      * @param xr The input stream containing the XML.
-     * @param specification The {@code Specification} to use in this game.
      * @exception XMLStreamException if an error occurred during parsing.
-     * @see net.sf.freecol.server.FreeColServer#loadGame
      */
-    public ServerGame(FreeColXMLReader xr, Specification specification)
-        throws XMLStreamException {
-        this(specification);
-
-        this.setGame(this);
-        readFromXML(xr);
+    public ServerGame(FreeColXMLReader xr) throws XMLStreamException {
+        super(null, xr);
     }
 
 
