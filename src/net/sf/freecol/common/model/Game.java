@@ -150,7 +150,7 @@ public class Game extends FreeColGameObject {
     protected final List<Player> players = new ArrayList<>();
 
     /** A virtual player to use for enemy privateers. */
-    private Player unknownEnemy;
+    private Player unknownEnemy = null;
 
     /** The map of the New World. */
     protected Map map = null;
@@ -180,7 +180,8 @@ public class Game extends FreeColGameObject {
      * Serialization is not needed directly as these must be completely
      * within { players, unknownEnemy, map } which are directly serialized.
      */
-    protected final HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects;
+    protected final HashMap<String, WeakReference<FreeColGameObject>>
+        freeColGameObjects = new HashMap<>(10000);
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -207,10 +208,15 @@ public class Game extends FreeColGameObject {
 
 
     /**
-     * Trivial constructor for use in Game.newInstance.
+     * Root constructor for games.
+     *
+     * Game.newInstance uses this so it must be public.
      */
-    private Game() {
+    public Game() {
         super((Game)null);
+
+        // Games always have a zero identifier.
+        setId("0");
 
         this.clientUserName = null;
         this.players.clear();
@@ -221,14 +227,11 @@ public class Game extends FreeColGameObject {
         this.spanishSuccession = false;
         this.initialActiveUnitId = null;
         this.specification = null;
-        this.freeColGameObjects = new HashMap<>(10000);
         this.combatModel = new SimpleCombatModel();
         this.removeCount = 0;
         this.setGame(this);
 
-        // Games always have a zero identifier.
         // Explicitly set initialized as FCGO.initialize() has not happened
-        setId("0");
         this.initialized = true;
     }
 
