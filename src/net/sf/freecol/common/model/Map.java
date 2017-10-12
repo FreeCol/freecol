@@ -285,7 +285,7 @@ public class Map extends FreeColGameObject implements Location {
     public Map(Game game, int width, int height) {
         super(game);
 
-        this.tiles = new Tile[width][height];
+        setTiles(width, height);
         setLayer(Layer.RESOURCES);
         calculateLatitudePerRow();
     }
@@ -315,6 +315,24 @@ public class Map extends FreeColGameObject implements Location {
         super(game, id);
     }
 
+
+    /**
+     * Gets the width of this map.
+     *
+     * @return The width of this map.
+     */
+    public int getWidth() {
+        return this.tiles.length;
+    }
+
+    /**
+     * Gets the height of this map.
+     *
+     * @return The height of this map.
+     */
+    public int getHeight() {
+        return this.tiles[0].length;
+    }
 
     /**
      * Checks if an (x,y) coordinate tuple is within a map of
@@ -358,6 +376,16 @@ public class Map extends FreeColGameObject implements Location {
      */
     protected Tile[][] getTiles() {
         return this.tiles;
+    }
+
+    /**
+     * Set the tiles to a new shape.
+     *
+     * @param width The new map width.
+     * @param height The new map height.
+     */
+    public void setTiles(int width, int height) {
+        this.tiles = new Tile[width][height];
     }
 
     /**
@@ -405,30 +433,12 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets the width of this map.
-     *
-     * @return The width of this map.
-     */
-    public int getWidth() {
-        return this.tiles.length;
-    }
-
-    /**
-     * Gets the height of this map.
-     *
-     * @return The height of this map.
-     */
-    public int getHeight() {
-        return this.tiles[0].length;
-    }
-
-    /**
      * Get the layer.
      *
      * @return The maximum implemented layer on this map.
      */
     public final Layer getLayer() {
-        return layer;
+        return this.layer;
     }
 
     /**
@@ -446,7 +456,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The minimum latitude of this map.
      */
     public final int getMinimumLatitude() {
-        return minimumLatitude;
+        return this.minimumLatitude;
     }
 
     /**
@@ -465,7 +475,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The maximum latitude of this map.
      */
     public final int getMaximumLatitude() {
-        return maximumLatitude;
+        return this.maximumLatitude;
     }
 
     /**
@@ -484,14 +494,14 @@ public class Map extends FreeColGameObject implements Location {
      * @return The latitude change between rows.
      */
     public final float getLatitudePerRow() {
-        return latitudePerRow;
+        return this.latitudePerRow;
     }
 
     /**
      * Recalculate the latitude/row from the current maximum and minimum.
      */
     private final void calculateLatitudePerRow() {
-        this.latitudePerRow = 1f * (maximumLatitude - minimumLatitude) /
+        this.latitudePerRow = 1f * (this.maximumLatitude - this.minimumLatitude) /
             (getHeight() - 1);
     }
 
@@ -502,7 +512,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The row latitude.
      */
     public int getLatitude(int row) {
-        return minimumLatitude + (int) (row * latitudePerRow);
+        return this.minimumLatitude + (int) (row * this.latitudePerRow);
     }
 
     /**
@@ -512,7 +522,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The row closest to the supplied latitude.
      */
     public int getRow(int latitude) {
-        return (int) ((latitude - minimumLatitude) / latitudePerRow);
+        return (int) ((latitude - this.minimumLatitude) / this.latitudePerRow);
     }
 
     /**
@@ -521,7 +531,29 @@ public class Map extends FreeColGameObject implements Location {
      * @return All the regions in this map.
      */
     public Collection<Region> getRegions() {
-        return regions;
+        synchronized (this.regions) {
+            return new ArrayList<>(this.regions);
+        }
+    }
+
+    /**
+     * Adds a region to this map.
+     *
+     * @param region The {@code Region} to add.
+     */
+    public void addRegion(final Region region) {
+        synchronized (this.regions) {
+            this.regions.add(region);
+        }
+    }
+
+    /**
+     * Clear the regions list.
+     */
+    public void clearRegions() {
+        synchronized (this.regions) {
+            this.regions.clear();
+        }
     }
 
     /**
@@ -561,16 +593,6 @@ public class Map extends FreeColGameObject implements Location {
         return (name == null) ? null
             : find(getRegions(), matchKeyEquals(name, Region::getName));
     }
-
-    /**
-     * Adds a region to this map.
-     *
-     * @param region The {@code Region} to add.
-     */
-    public void addRegion(final Region region) {
-        regions.add(region);
-    }
-
 
     /**
      * Are two locations non-null and either the same or at the same tile.
@@ -2333,7 +2355,7 @@ public class Map extends FreeColGameObject implements Location {
         final int hgt = getHeight(), wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
-                Tile t = this.tiles[x][y];
+                Tile t = getTile(x, y);
                 regions |= t.getRegion() != null;
                 rivers |= t.hasRiver();
                 lostCityRumours |= t.hasLostCityRumour();
@@ -2355,7 +2377,7 @@ public class Map extends FreeColGameObject implements Location {
      * Fix the region parent/child relationships.
      */
     public void fixupRegions() {
-        for (Region r : transform(regions, r -> !r.isPacific())) {
+        for (Region r : transform(getRegions(), r -> !r.isPacific())) {
             Region p = r.getParent();
             // Mountains and Rivers were setting their parent to the
             // discoverable land region they are created within.  Move them
@@ -2368,7 +2390,49 @@ public class Map extends FreeColGameObject implements Location {
         }
     }
 
-
+    /**
+     * Scale the map into the specified size.
+     *
+     * This implementation uses a simple linear scaling, and
+     * the isometric shape is not taken into account.
+     *
+     * FIXME: Find a better method for choosing a group of
+     * adjacent tiles.  This group can then be merged into a
+     * common tile by using the average value (for example: are
+     * there a majority of ocean tiles?).
+     *
+     * @param width The width of the resulting map.
+     * @param height The height of the resulting map.
+     */
+    public void scale(final int width, final int height) {
+        // FIXME: the scaling above can omit or double tiles, which will
+        // break the river and road connections.  We should fix them.
+        final Game game = getGame();
+        final int oldWidth = getWidth();
+        final int oldHeight = getHeight();
+        Tile oldTiles[][] = this.tiles;
+        setTiles(width, height);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                final int oldX = (x * oldWidth) / width;
+                final int oldY = (y * oldHeight) / height;
+                // FIXME: This tile should be based on the average as
+                // mentioned at the top of this method.
+                Tile importTile = oldTiles[oldX][oldY];
+                Tile t = new Tile(game, importTile.getType(), x, y);
+                if (importTile.getMoveToEurope() != null) {
+                    t.setMoveToEurope(importTile.getMoveToEurope());
+                }
+                if (t.getTileItemContainer() != null) {
+                    t.getTileItemContainer().copyFrom(importTile
+                        .getTileItemContainer(), Map.Layer.ALL);
+                }
+                setTile(t, x, y);
+            }
+        }
+    }
+        
+    
     // Interface Location
     // getId() inherited.
 
@@ -2551,7 +2615,7 @@ public class Map extends FreeColGameObject implements Location {
         final int hgt = getHeight(), wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
-                Tile t = this.tiles[x][y];
+                Tile t = getTile(x, y);
                 result = Math.min(result, t.checkIntegrity(fix, lb));
             }
         }
@@ -2575,10 +2639,8 @@ public class Map extends FreeColGameObject implements Location {
         this.minimumLatitude = o.getMinimumLatitude();
         this.maximumLatitude = o.getMaximumLatitude();
         this.latitudePerRow = o.getLatitudePerRow();
-        this.regions.clear();
-        for (Region r : o.getRegions()) {
-            this.regions.add(game.update(r, Region.class));
-        }
+        clearRegions();
+        for (Region r : o.getRegions()) addRegion(game.update(r, Region.class));
         return true;
     }
 
@@ -2617,12 +2679,12 @@ public class Map extends FreeColGameObject implements Location {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Region region : sort(regions)) region.toXML(xw);
+        for (Region region : sort(getRegions())) region.toXML(xw);
 
         final int hgt = getHeight(), wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
-                this.tiles[x][y].toXML(xw);
+                getTile(x, y).toXML(xw);
             }
         }
     }
@@ -2647,7 +2709,7 @@ public class Map extends FreeColGameObject implements Location {
                 throw new XMLStreamException("Bogus height: " + height);
             }
 
-            this.tiles = new Tile[width][height];
+            setTiles(width, height);
         }
 
         minimumLatitude = xr.getAttribute(MINIMUM_LATITUDE_TAG, -90);

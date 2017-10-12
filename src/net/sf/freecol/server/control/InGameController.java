@@ -1968,8 +1968,9 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         Location newLocation = carrier.getLocation();
-        List<Tile> newTiles = (newLocation.getTile() == null) ? null
-            : serverUnit.collectNewTiles(newLocation.getTile());
+        Set<Tile> newTiles = (newLocation.getTile() == null) ? null
+            : serverPlayer.collectNewTiles(newLocation.getTile(),
+                                           serverUnit.getLineOfSight());
         serverUnit.setLocation(newLocation);//-vis(serverPlayer)
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         serverUnit.setMovesLeft(0); // In Col1 disembark consumes whole move.

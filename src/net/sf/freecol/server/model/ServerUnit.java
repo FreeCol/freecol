@@ -743,19 +743,6 @@ public class ServerUnit extends Unit implements TurnTaker {
     }
 
     /**
-     * Collects the tiles surrounding this unit that the player
-     * can not currently see, but now should as a result of a move.
-     *
-     * @param tile The center tile to look from.
-     * @return A list of new tiles to see.
-     */
-    public List<Tile> collectNewTiles(Tile tile) {
-        final int los = getLineOfSight();
-        return transform(tile.getSurroundingTiles(0, los),
-                         t -> !getOwner().canSee(t));
-    }
-
-    /**
      * Move a unit.
      *
      * @param newTile The {@code Tile} to move to.
@@ -768,8 +755,9 @@ public class ServerUnit extends Unit implements TurnTaker {
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
         final Location oldLocation = getLocation();
-        Set<Tile> oldTiles = getVisibleTiles();
-        List<Tile> newTiles = collectNewTiles(newTile);
+        Set<Tile> oldTiles = getVisibleTileSet();
+        Set<Tile> newTiles
+            = serverPlayer.collectNewTiles(newTile, getLineOfSight());
 
         // Update unit state.
         setState(UnitState.ACTIVE);

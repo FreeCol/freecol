@@ -3209,7 +3209,7 @@ public class Unit extends GoodsLocation
      *
      * @return A set of visible {@code Tile}s.
      */
-    public Set<Tile> getVisibleTiles() {
+    public Set<Tile> getVisibleTileSet() {
         final Tile tile = getTile();
         return (tile == null) ? Collections.<Tile>emptySet()
             : new HashSet<Tile>(tile.getSurroundingTiles(0, getLineOfSight()));

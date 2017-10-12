@@ -153,7 +153,7 @@ public class Game extends FreeColGameObject {
     private Player unknownEnemy;
 
     /** The map of the New World. */
-    private Map map = null;
+    protected Map map = null;
 
     /**
      * The current nation options.  Mainly used to see if a player
@@ -209,7 +209,7 @@ public class Game extends FreeColGameObject {
     /**
      * Trivial constructor for use in Game.newInstance.
      */
-    public Game() {
+    private Game() {
         super((Game)null);
 
         this.clientUserName = null;
@@ -224,7 +224,11 @@ public class Game extends FreeColGameObject {
         this.freeColGameObjects = new HashMap<>(10000);
         this.combatModel = new SimpleCombatModel();
         this.removeCount = 0;
-        internId("0");
+        this.setGame(this);
+
+        // Games always have a zero identifier.
+        // Explicitly set initialized as FCGO.initialize() has not happened
+        setId("0");
         this.initialized = true;
     }
 
@@ -513,10 +517,10 @@ public class Game extends FreeColGameObject {
         if (other == null) return null;
         final String id = other.getId();
         FreeColGameObject fcgo = getFreeColGameObject(id);
-        if (fcgo == null) { // Should not happen, but try to recover
-            logger.warning("Update of missing object: " + id);
-            setFreeColGameObject(id, other);
-            return other;
+        if (fcgo == null) { // It is an error for this to happen
+            logger.warning("Update of missing object: " + id
+                + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());                
+            return null;
         }
         T t;
         try {
@@ -1076,7 +1080,7 @@ public class Game extends FreeColGameObject {
      * @return The game {@code Map}.
      */
     public Map getMap() {
-        return map;
+        return this.map;
     }
 
     /**
@@ -1087,7 +1091,7 @@ public class Game extends FreeColGameObject {
     public void setMap(Map newMap) {
         if (this.map != newMap) {
             for (HighSeas hs : transform(getLivePlayers(), alwaysTrue(),
-                    Player::getHighSeas, toListNoNulls())) {
+                                         Player::getHighSeas, toListNoNulls())) {
                 hs.removeDestination(this.map);
                 hs.addDestination(newMap);
             }
@@ -1106,6 +1110,8 @@ public class Game extends FreeColGameObject {
 
     /**
      * Set the current nation options.
+     *
+     * Public for the test suite.
      *
      * @param newNationOptions The new {@code NationOptions} value.
      */
@@ -1742,7 +1748,7 @@ public class Game extends FreeColGameObject {
             }
 
         } else if (Specification.TAG.equals(tag)) {
-            logger.info(((specification == null) ? "Loading" : "Reloading")
+            logger.info(((this.specification == null) ? "Loading" : "Reloading")
                 + " specification.");
             this.specification = new Specification(xr);
 

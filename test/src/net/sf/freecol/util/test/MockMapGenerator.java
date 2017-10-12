@@ -36,16 +36,25 @@ import net.sf.freecol.server.generator.MapGenerator;
 
 public class MockMapGenerator implements MapGenerator {
 
-    private Game game;
     private Map map;
 
 	
-    public MockMapGenerator(Game game, Map map) {
-        this.game = game;
+    public MockMapGenerator(Map map) {
         this.map = map;
     }
-	
-    public Map createMap(LogBuilder lb) {
+
+
+    public void setMap(Map map) {
+        this.map = map;
+    }
+    
+
+    // Implement MapGenerator
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map createMap(Game game, Map importMap, LogBuilder lb) {
         // For all map descendents in the old game, move them to the
         // new game.
         Game oldGame = map.getGame();
@@ -70,12 +79,11 @@ public class MockMapGenerator implements MapGenerator {
         return map;
     }
 
-    public Map createEmptyMap(int width, int height, LogBuilder lb) {
-        // do nothing yet
-        return map;
-    }
-	
-    public void setMap(Map map) {
-        this.map = map;
+    /**
+     * {@inheritDoc}
+     */
+    public Map createEmptyMap(Game game, int width, int height,
+                              LogBuilder lb) {
+        return this.map; // Do nothing yet
     }
 }

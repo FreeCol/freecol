@@ -75,6 +75,7 @@ import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -291,12 +292,9 @@ public final class FreeColServer {
         this.publicServer = publicServer;
         this.singlePlayer = singlePlayer;
         this.random = new Random(FreeColSeed.getFreeColSeed(true));
-        this.serverGame = new ServerGame(specification);
-        this.serverGame.setNationOptions(new NationOptions(specification));
-        this.serverGame.randomize(this.random);
-        this.serverGame.establishUnknownEnemy();
+        this.serverGame = new ServerGame(specification, random);
         this.inGameController.setRandom(this.random);
-        this.mapGenerator = new SimpleMapGenerator(this.serverGame, this.random);
+        this.mapGenerator = new SimpleMapGenerator(this.random);
         this.publicServer = registerWithMetaServer();
     }
 
@@ -911,6 +909,21 @@ public final class FreeColServer {
     }
 
     /**
+     * Read just the map part from a file.
+     *
+     * When the specification is not supplied, the one found in the saved
+     * game will be used.
+     *
+     * @param file The {@code File} to read from.
+     * @param spec An optional {@code Specification} to use.
+     * @return The {@code Map} found in the stream.
+     */
+    public static Map readMap(File file, Specification spec) {
+        ServerGame serverGame = readGame(file, spec, null);
+        return (serverGame == null) ? null : serverGame.getMap();
+    }
+    
+    /**
      * Read just the game part from a file.
      *
      * When the specification is not supplied, the one found in the saved
@@ -1014,7 +1027,7 @@ public final class FreeColServer {
 
                 } else if (Game.TAG.equals(tag)) {
                     // Read the game
-                    serverGame = new ServerGame(xr, specification);
+                    serverGame = new ServerGame(xr);
                     serverGame.setCurrentPlayer(null);
                     if (freeColServer != null) {
                         freeColServer.setGame(serverGame);
@@ -1133,7 +1146,7 @@ public final class FreeColServer {
      * @return The new empty {@code Map}.
      */
     public Map createEmptyMap(Game game, int width, int height) {
-        return getMapGenerator().createEmptyMap(width, height,
+        return getMapGenerator().createEmptyMap(game, width, height,
                                                 new LogBuilder(-1));
     }
 
@@ -1171,9 +1184,7 @@ public final class FreeColServer {
 
         // Create the map.
         if (serverGame.getMap() == null) {
-            LogBuilder lb = new LogBuilder(256);
-            serverGame.setMap(getMapGenerator().createMap(lb));
-            lb.log(logger, Level.FINER);
+            serverGame.setMap(createMap());
         
             // Initial stances and randomizations for all players.
             spec.generateDynamicOptions();
@@ -1204,6 +1215,23 @@ public final class FreeColServer {
         getAIMain().findNewObjects(true);
 
         return serverGame;
+    }
+
+    /**
+     * Create a new map in this server.
+     *
+     * @return The {@code Map} that was created.
+     */
+    public Map createMap() {
+        ServerGame serverGame = getGame();
+        LogBuilder lb = new LogBuilder(256);
+        File importFile = serverGame.getMapGeneratorOptions()
+            .getFile(MapGeneratorOptions.IMPORT_FILE);
+        Map importMap = (importFile == null) ? null
+            : FreeColServer.readMap(importFile, serverGame.getSpecification());
+        Map ret = getMapGenerator().createMap(serverGame, importMap, lb);
+        lb.log(logger, Level.FINER);
+        return ret;
     }
 
     /**

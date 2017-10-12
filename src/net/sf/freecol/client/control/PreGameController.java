@@ -240,6 +240,18 @@ public final class PreGameController extends FreeColClientHolder {
     }
 
     /**
+     * Is the game and map present?
+     *
+     * Deliberately split out to make the check unambiguous.
+     *
+     * @return True if both are non-null.
+     */
+    private boolean isGameAndMapPresent() {
+        final Game game = getGame();
+        return game != null && game.getMap() != null;
+    }
+
+    /**
      * Handle starting the game.
      *
      * Wait until map is received from server (sometimes a startGame
@@ -252,20 +264,17 @@ public final class PreGameController extends FreeColClientHolder {
                 @Override
                 public void run() {
                     logger.info("Client starting game");
-                    Game game = null;
                     for (int tries = 50; tries >= 0; tries--) {
-                        game = getGame();
-                        if (game != null && game.getMap() != null) break;
+                        if (isGameAndMapPresent()) {
+                            SwingUtilities.invokeLater(() -> {
+                                    startGameInternal();
+                                });
+                            return;
+                        }
                         Utils.delay(200, "StartGame has been interupted.");
                     }
-                    if (game != null && game.getMap() != null) {
-                        SwingUtilities.invokeLater(() -> {
-                                startGameInternal();
-                            });
-                        return;
-                    }
                     final GUI gui = getGUI();
-                    String err = (game == null) ? "client.noGame"
+                    String err = (getGame() == null) ? "client.noGame"
                         : "client.noMap";
                     gui.closeMainPanel();
                     gui.closeMenus();

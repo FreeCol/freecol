@@ -403,14 +403,8 @@ public class ServerIndianSettlement extends IndianSettlement
             csChangeAlarm(newOwner, ALARM_NEW_MISSIONARY, true, cs);//-til
             tile.updateIndianSettlement(newOwner);
 
-            for (Tile t : transform(getMissionaryVisibleTiles(),
-                    t2 -> newOwner.exploreTile(t2) || !newOwner.canSee(t2))) {
-                cs.add(See.only(newOwner), t);
-            }
-            /* To become:
             cs.add(See.only(newOwner),
                    newOwner.collectNewTiles(getMissionaryVisibleTiles()));
-            */
             cs.add(See.perhaps().always(newOwner), tile);
             newOwner.invalidateCanSeeTiles();//+vis(newOwner)
         }

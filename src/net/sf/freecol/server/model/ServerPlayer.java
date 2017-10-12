@@ -949,7 +949,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      */
     public Set<Tile> exploreForSettlement(Settlement settlement) {
         Set<Tile> tiles = new HashSet<>(settlement.getOwnedTiles());
-        tiles.addAll(settlement.getVisibleTiles());
+        tiles.addAll(settlement.getVisibleTileSet());
         tiles.remove(settlement.getTile());
         return exploreTiles(tiles);
     }
@@ -966,7 +966,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         return (getGame() == null || getGame().getMap() == null || unit == null
             || !(unit.getLocation() instanceof Tile)) 
             ? Collections.<Tile>emptySet()
-            : exploreTiles(unit.getVisibleTiles());
+            : exploreTiles(unit.getVisibleTileSet());
     }
 
     /**
@@ -1004,6 +1004,43 @@ public class ServerPlayer extends Player implements TurnTaker {
             : (tile.hasSettlement()) ? false
             : (unit.isOnCarrier()) ? false
             : true;
+    }
+
+    /**
+     * Given a tile and new radius of visibility, explore unexplored tiles
+     * and return those plus the previously invisible tiles.
+     *
+     * @param center The center {@code Tile} to explore from.
+     * @param radius A radius to explore to.
+     * @return A set of newly explored or currently invisible {@code Tile}s.
+     */
+    public Set<Tile> collectNewTiles(Tile center, int radius) {
+        return collectNewTiles(center.getSurroundingTiles(0, radius));
+    }
+
+    /**
+     * Given a tile and new radius of visibility, explore unexplored tiles
+     * and return those plus the previously invisible tiles.
+     *
+     * @param center The center {@code Tile} to explore from.
+     * @param radius A radius to explore to.
+     * @return A set of newly explored or currently invisible {@code Tile}s.
+     */
+    public Set<Tile> collectNewTiles(Collection<Tile> collection) {
+        return (collection == null) ? Collections.<Tile>emptySet()
+            : collectNewTiles(collection.stream());
+    }
+
+    /**
+     * Given a stream of tiles, explore unexplored tiles and return those
+     * plus the previously invisible tiles.
+     *
+     * @param tiles A stream of {@code Tile}s to check.
+     * @return A set of newly explored or currently invisible {@code Tile}s.
+     */
+    public Set<Tile> collectNewTiles(Stream<Tile> tiles) {
+        return transform(tiles, t -> exploreTile(t) || !canSee(t),
+                         Function.identity(), Collectors.toSet());
     }
         
     /**
@@ -1937,9 +1974,9 @@ outer:  for (Effect effect : effects) {
                     : getColonies();
                 Set<Tile> tiles
                     = transform(concat(flatten(colonies,
-                                               c -> c.getVisibleTiles().stream()),
+                                               c -> c.getVisibleTileSet().stream()),
                                        flatten(getUnits(),
-                                               u -> u.getVisibleTiles().stream())),
+                                               u -> u.getVisibleTileSet().stream())),
                                 t -> !canSee(t), Function.identity(),
                                 Collectors.toSet());
                 exploreTiles(tiles); // Explore the new tiles
