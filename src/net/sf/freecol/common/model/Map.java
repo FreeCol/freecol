@@ -531,7 +531,29 @@ public class Map extends FreeColGameObject implements Location {
      * @return All the regions in this map.
      */
     public Collection<Region> getRegions() {
-        return regions;
+        synchronized (this.regions) {
+            return new ArrayList<>(this.regions);
+        }
+    }
+
+    /**
+     * Adds a region to this map.
+     *
+     * @param region The {@code Region} to add.
+     */
+    public void addRegion(final Region region) {
+        synchronized (this.regions) {
+            this.regions.add(region);
+        }
+    }
+
+    /**
+     * Clear the regions list.
+     */
+    public void clearRegions() {
+        synchronized (this.regions) {
+            this.regions.clear();
+        }
     }
 
     /**
@@ -571,16 +593,6 @@ public class Map extends FreeColGameObject implements Location {
         return (name == null) ? null
             : find(getRegions(), matchKeyEquals(name, Region::getName));
     }
-
-    /**
-     * Adds a region to this map.
-     *
-     * @param region The {@code Region} to add.
-     */
-    public void addRegion(final Region region) {
-        regions.add(region);
-    }
-
 
     /**
      * Are two locations non-null and either the same or at the same tile.
@@ -2365,7 +2377,7 @@ public class Map extends FreeColGameObject implements Location {
      * Fix the region parent/child relationships.
      */
     public void fixupRegions() {
-        for (Region r : transform(regions, r -> !r.isPacific())) {
+        for (Region r : transform(getRegions(), r -> !r.isPacific())) {
             Region p = r.getParent();
             // Mountains and Rivers were setting their parent to the
             // discoverable land region they are created within.  Move them
@@ -2627,10 +2639,8 @@ public class Map extends FreeColGameObject implements Location {
         this.minimumLatitude = o.getMinimumLatitude();
         this.maximumLatitude = o.getMaximumLatitude();
         this.latitudePerRow = o.getLatitudePerRow();
-        this.regions.clear();
-        for (Region r : o.getRegions()) {
-            this.regions.add(game.update(r, Region.class));
-        }
+        clearRegions();
+        for (Region r : o.getRegions()) addRegion(game.update(r, Region.class));
         return true;
     }
 
