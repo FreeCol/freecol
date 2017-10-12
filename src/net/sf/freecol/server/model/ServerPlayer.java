@@ -1005,6 +1005,43 @@ public class ServerPlayer extends Player implements TurnTaker {
             : (unit.isOnCarrier()) ? false
             : true;
     }
+
+    /**
+     * Given a tile and new radius of visibility, explore unexplored tiles
+     * and return those plus the previously invisible tiles.
+     *
+     * @param center The center {@code Tile} to explore from.
+     * @param radius A radius to explore to.
+     * @return A set of newly explored or currently invisible {@code Tile}s.
+     */
+    public Set<Tile> collectNewTiles(Tile center, int radius) {
+        return collectNewTiles(center.getSurroundingTiles(0, radius));
+    }
+
+    /**
+     * Given a tile and new radius of visibility, explore unexplored tiles
+     * and return those plus the previously invisible tiles.
+     *
+     * @param center The center {@code Tile} to explore from.
+     * @param radius A radius to explore to.
+     * @return A set of newly explored or currently invisible {@code Tile}s.
+     */
+    public Set<Tile> collectNewTiles(Collection<Tile> collection) {
+        return (collection == null) ? Collections.<Tile>emptySet()
+            : collectNewTiles(collection.stream());
+    }
+
+    /**
+     * Given a stream of tiles, explore unexplored tiles and return those
+     * plus the previously invisible tiles.
+     *
+     * @param tiles A stream of {@code Tile}s to check.
+     * @return A set of newly explored or currently invisible {@code Tile}s.
+     */
+    public Set<Tile> collectNewTiles(Stream<Tile> tiles) {
+        return transform(tiles, t -> exploreTile(t) || !canSee(t),
+                         Function.identity(), Collectors.toSet());
+    }
         
     /**
      * Try to reassign the ownership of a collection of tiles,
