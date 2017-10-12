@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.NationOptions;
@@ -110,7 +111,7 @@ public class ServerGame extends Game implements TurnTaker {
      * @param random A pseudo-random number source.
      */
     public ServerGame(Specification specification, Random random) {
-        super(specification);
+        this(specification);
 
         this.setNationOptions(new NationOptions(specification));
         this.randomize(random);

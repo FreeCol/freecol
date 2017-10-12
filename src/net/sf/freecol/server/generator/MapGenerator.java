@@ -38,8 +38,8 @@ public interface MapGenerator {
      * @param lb A {@code LogBuilder} to log to.
      * @return A new empty {@code Map}.
      */
-    public abstract Map createEmptyMap(Game game, int width, int height,
-                                       LogBuilder lb);
+    public abstract Map generateEmptyMap(Game game, int width, int height,
+                                         LogBuilder lb);
 
     /**
      * Creates the map with the current set options
@@ -49,5 +49,5 @@ public interface MapGenerator {
      * @param lb A {@code LogBuilder} to log to.
      * @return The new {@code Map}.
      */
-    public abstract Map createMap(Game game, Map importMap, LogBuilder lb);
+    public abstract Map generateMap(Game game, Map importMap, LogBuilder lb);
 }

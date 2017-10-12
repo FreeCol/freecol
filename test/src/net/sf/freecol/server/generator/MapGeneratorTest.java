@@ -55,8 +55,8 @@ public class MapGeneratorTest extends FreeColTestCase {
         Game g = getStandardGame();
         g.setNationOptions(new NationOptions(spec()));
 
-        // A new game does not have a map yet
-        assertEquals(null, g.getMap());
+        // A new game has no map
+        assertNull("No new map", g.getMap());
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
 
@@ -67,10 +67,8 @@ public class MapGeneratorTest extends FreeColTestCase {
             }
         }
 
-        gen.createMap(g, null, new LogBuilder(-1));
-
-        // Check that the map is created at all
-        assertNotNull(g.getMap());
+        gen.generateMap(g, null, new LogBuilder(-1));
+        assertNotNull("New map", g.getMap());
     }
 
     public void testSinglePlayerOnSmallMap() {
@@ -79,15 +77,16 @@ public class MapGeneratorTest extends FreeColTestCase {
         Game g = getStandardGame();
         g.setNationOptions(new NationOptions(spec()));
 
-        // A new game does not have a map yet
-        assertEquals(null, g.getMap());
+        // A new game has no map
+        assertNull("No new map", g.getMap());
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
         Nation nation = spec().getNation("model.nation.dutch");
 
         g.addPlayer(new ServerPlayer(g, false, nation));
 
-        gen.createMap(g, null, new LogBuilder(-1));
+        gen.generateMap(g, null, new LogBuilder(-1));
+        assertNotNull("New map", g.getMap());
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -104,10 +103,9 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         Game g = getStandardGame();
         g.setNationOptions(new NationOptions(spec()));
-        // A new game does not have a map yet
-        assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(new Random(1));
+        // A new game has no map
+        assertNull("No new map", g.getMap());
 
         // Apply the difficulty level
         //spec().applyDifficultyLevel("model.difficulty.medium");
@@ -122,10 +120,9 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        gen.createMap(g, null, new LogBuilder(-1));
-
-        // Check that the map is created at all
-        assertNotNull(g.getMap());
+        MapGenerator gen = new SimpleMapGenerator(new Random(1));
+        gen.generateMap(g, null, new LogBuilder(-1));
+        assertNotNull("New map", g.getMap());
 
         // Map of correct size?
         Map m = g.getMap();
@@ -169,7 +166,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        gen.createMap(g, null, new LogBuilder(-1));
+        gen.generateMap(g, null, new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -201,7 +198,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         for (File importFile : FreeColDirectories.getMapFileList()) {
             spec.setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
             Map importMap = FreeColServer.readMap(importFile, spec);
-            assertNotNull(gen.createMap(game, importMap, new LogBuilder(-1)));
+            assertNotNull(gen.generateMap(game, importMap, new LogBuilder(-1)));
         }
         // Clear import file option
         spec.setFile(MapGeneratorOptions.IMPORT_FILE, null);
@@ -211,7 +208,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         spec().setFile(MapGeneratorOptions.IMPORT_FILE, null);
         Game game = getStandardGame();
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
-        gen.createMap(game, null, new LogBuilder(-1));
+        gen.generateMap(game, null, new LogBuilder(-1));
         
         Map map = game.getMap();
         Region pacific = map.getRegionByKey("model.region.pacific");

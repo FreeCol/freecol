@@ -776,20 +776,6 @@ public final class FreeColServer {
     // Game save/load
 
     /**
-     * Saves a normal (non-map-editor) game.
-     *
-     * @param file The file where the data will be written.
-     * @param options The client options to save.
-     * @param active An optional active {@code Unit}.
-     * @exception IOException If a problem was encountered while trying
-     *     to open, write or close the file.
-     */
-    public void saveGame(File file, OptionGroup options, Unit active)
-        throws IOException {
-        saveGame(file, null, options, active, null);
-    }
-
-    /**
      * Save a game from the map editor.
      *
      * @param file The file where the data will be written.
@@ -805,6 +791,20 @@ public final class FreeColServer {
         getGame().setSpecification(null);
         saveGame(file, MAP_EDITOR_NAME, null, null, image);
         getGame().setSpecification(spec);
+    }
+
+    /**
+     * Saves a normal (non-map-editor) game.
+     *
+     * @param file The file where the data will be written.
+     * @param options The client options to save.
+     * @param active An optional active {@code Unit}.
+     * @exception IOException If a problem was encountered while trying
+     *     to open, write or close the file.
+     */
+    public void saveGame(File file, OptionGroup options, Unit active)
+        throws IOException {
+        saveGame(file, null, options, active, null);
     }
 
     /**
@@ -1136,21 +1136,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Create an empty map.
-     *
-     * Public for the map generator.
-     *
-     * @param game The {@code Game} to create the map for.
-     * @param width The map width.
-     * @param height The map height.
-     * @return The new empty {@code Map}.
-     */
-    public Map createEmptyMap(Game game, int width, int height) {
-        return getMapGenerator().createEmptyMap(game, width, height,
-                                                new LogBuilder(-1));
-    }
-
-    /**
      * Builds a new game using the parameters that exist in the game
      * as it stands.
      *
@@ -1184,7 +1169,7 @@ public final class FreeColServer {
 
         // Create the map.
         if (serverGame.getMap() == null) {
-            serverGame.setMap(createMap());
+            generateMap();
         
             // Initial stances and randomizations for all players.
             spec.generateDynamicOptions();
@@ -1218,18 +1203,33 @@ public final class FreeColServer {
     }
 
     /**
-     * Create a new map in this server.
+     * Generate an empty map in this server/game.
+     *
+     * Public for the map generator.
+     *
+     * @param game The {@code Game} to create the map for.
+     * @param width The map width.
+     * @param height The map height.
+     * @return The new empty {@code Map}.
+     */
+    public Map generateEmptyMap(int width, int height) {
+        return getMapGenerator().generateEmptyMap(getGame(), width, height,
+                                                  new LogBuilder(-1));
+    }
+
+    /**
+     * Generate a new map in this server/game.
      *
      * @return The {@code Map} that was created.
      */
-    public Map createMap() {
+    public Map generateMap() {
         ServerGame serverGame = getGame();
         LogBuilder lb = new LogBuilder(256);
         File importFile = serverGame.getMapGeneratorOptions()
             .getFile(MapGeneratorOptions.IMPORT_FILE);
         Map importMap = (importFile == null) ? null
             : FreeColServer.readMap(importFile, serverGame.getSpecification());
-        Map ret = getMapGenerator().createMap(serverGame, importMap, lb);
+        Map ret = getMapGenerator().generateMap(serverGame, importMap, lb);
         lb.log(logger, Level.FINER);
         return ret;
     }
