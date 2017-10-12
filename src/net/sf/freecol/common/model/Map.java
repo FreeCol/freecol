@@ -246,6 +246,9 @@ public class Map extends FreeColGameObject implements Location {
     /** The tiles that this map contains. */
     private Tile[][] tiles;
 
+    /** The width and height of the map. */
+    private int width, height;
+
     /** The highest map layer included. */
     private Layer layer;
 
@@ -322,7 +325,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The width of this map.
      */
     public int getWidth() {
-        return this.tiles.length;
+        return this.width;
     }
 
     /**
@@ -331,7 +334,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The height of this map.
      */
     public int getHeight() {
-        return this.tiles[0].length;
+        return this.height;
     }
 
     /**
@@ -385,6 +388,8 @@ public class Map extends FreeColGameObject implements Location {
      * @param height The new map height.
      */
     public void setTiles(int width, int height) {
+        this.width = width;
+        this.height = height;
         this.tiles = new Tile[width][height];
     }
 
