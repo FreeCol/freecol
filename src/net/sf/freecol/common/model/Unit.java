@@ -4292,8 +4292,9 @@ public class Unit extends GoodsLocation
         this.experienceType = o.getExperienceType();
         this.experience = o.getExperience();
         this.workLeft = o.getWorkLeft();
+        // Allow creation, might be first sight
         this.workImprovement = game.update(o.getWorkImprovement(),
-                                           TileImprovement.class);
+                                           TileImprovement.class, true);
         this.student = game.updateRef(o.getStudent(), Unit.class);
         this.teacher = game.updateRef(o.getTeacher(), Unit.class);
         this.turnsOfTraining = o.getTurnsOfTraining();

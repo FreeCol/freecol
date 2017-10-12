@@ -517,24 +517,50 @@ public class Game extends FreeColGameObject {
      */
     public <T extends FreeColGameObject> T update(T other,
                                                   Class<T> returnClass) {
+        return update(other, returnClass, false);
+    }
+
+    /**
+     * Update a {@code FreeColGameObject} from another, optionally allowing
+     * missing objects to be created.
+     *
+     * @param T The type of object to update.
+     * @param other The other object.
+     * @param returnClass The expected class of the object.
+     * @param create If true, create missing objects.
+     * @return The resulting object after update.
+     */
+    public <T extends FreeColGameObject> T update(T other,
+                                                  Class<T> returnClass,
+                                                  boolean create) {
         if (other == null) return null;
         final String id = other.getId();
         FreeColGameObject fcgo = getFreeColGameObject(id);
-        if (fcgo == null) { // It is an error for this to happen
-            logger.warning("Update of missing object: " + id
-                + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());                
-            return null;
+        if (fcgo == null) {
+            if (create) {
+                fcgo = newInstance(this, returnClass, false);
+                fcgo.setId(id);
+            } else {
+                // Otherwise this is an error
+                logger.warning("Update of missing object: " + id
+                    + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+                return null;
+            }
         }
         T t;
         try {
             t = returnClass.cast(fcgo);
-        } catch (ClassCastException e) { // "Can not happen"
+        } catch (ClassCastException e) {
+            // "Can not happen"
             throw new RuntimeException("Update class clash: " + fcgo.getClass()
                 + " / " + returnClass);
         }
-        if (!t.copyIn(other)) { // "Can not happen"
-            throw new RuntimeException("Update copy failed: " + id);
+        if (!t.copyIn(other)) {
+            // "Can not happen"
+            throw new RuntimeException("Update copy failed: " + id
+                + " onto " + t);
         }
+        if (create) t.internId(id);
         return t;
     }
 
@@ -1559,7 +1585,8 @@ public class Game extends FreeColGameObject {
         this.clientUserName = o.getClientUserName();
         setPlayers(addPlayers(o.players));
         this.unknownEnemy = update(o.getUnknownEnemy(), Player.class);
-        this.map = update(o.getMap(), Map.class);
+        // Allow creation, might be first sight of the map
+        setMap(update(o.getMap(), Map.class, true));
         this.nationOptions = o.getNationOptions();
         this.currentPlayer = updateRef(o.getCurrentPlayer(), Player.class);
         this.turn = o.getTurn();
