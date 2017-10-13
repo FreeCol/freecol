@@ -1945,7 +1945,7 @@ outer:  for (Effect effect : effects) {
 
         List<AbstractUnit> units = father.getUnitList();
         if (units != null && !units.isEmpty() && europe != null) {
-            createUnits(father.getUnitList(), europe);//-vis: safe, Europe
+            createUnits(units, europe);//-vis: safe, Europe
             europeDirty = true;
         }
 
@@ -1969,19 +1969,9 @@ outer:  for (Effect effect : effects) {
                 // Check for tiles that are now visible.  They need to be
                 // explored, and always updated so that units are visible.
                 // *Requires that canSee[] has **not** been updated yet!*
-                Stream<Colony> colonies = (hasAbility(Ability.SEE_ALL_COLONIES))
-                    ? getGame().getAllColonies(null)
-                    : getColonies();
-                Set<Tile> tiles
-                    = transform(concat(flatten(colonies,
-                                               c -> c.getVisibleTileSet().stream()),
-                                       flatten(getUnits(),
-                                               u -> u.getVisibleTileSet().stream())),
-                                t -> !canSee(t), Function.identity(),
-                                Collectors.toSet());
-                exploreTiles(tiles); // Explore the new tiles
+                Set<Tile> tiles = collectNewTiles(getVisibleTileSet());
                 cs.add(See.only(this), tiles);
-                visibilityChange = true;
+                visibilityChange = !tiles.isEmpty();
             } else if (Modifier.SOL.equals(m.getId())) {
                 for (Colony c : getColonyList()) {
                     c.addLiberty(0); // Kick the SoL and production bonus

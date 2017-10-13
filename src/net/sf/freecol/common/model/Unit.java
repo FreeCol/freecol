@@ -3214,7 +3214,7 @@ public class Unit extends GoodsLocation
         return (tile == null) ? Collections.<Tile>emptySet()
             : new HashSet<Tile>(tile.getSurroundingTiles(0, getLineOfSight()));
     }
-           
+
     
     // Goods handling
 
