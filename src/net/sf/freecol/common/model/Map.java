@@ -377,7 +377,7 @@ public class Map extends FreeColGameObject implements Location {
      *
      * @param An doubly indexed array of tiles.
      */
-    protected Tile[][] getTiles() {
+    protected synchronized Tile[][] getTiles() {
         return this.tiles;
     }
 
@@ -387,7 +387,7 @@ public class Map extends FreeColGameObject implements Location {
      * @param width The new map width.
      * @param height The new map height.
      */
-    public void setTiles(int width, int height) {
+    public synchronized void setTiles(int width, int height) {
         this.width = width;
         this.height = height;
         this.tiles = new Tile[width][height];
@@ -403,7 +403,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The {@code Tile} at (x, y), or null if the
      *     position is invalid.
      */
-    public Tile getTile(int x, int y) {
+    public synchronized Tile getTile(int x, int y) {
         return (isValid(x, y)) ? this.tiles[x][y] : null;
     }
 
@@ -424,8 +424,8 @@ public class Map extends FreeColGameObject implements Location {
      * @param y The y-coordinate of the {@code Tile}.
      * @param tile The {@code Tile} to set.
      */
-    public void setTile(Tile tile, int x, int y) {
-        this.tiles[x][y] = tile;
+    public synchronized void setTile(Tile tile, int x, int y) {
+        if (isValid(x, y)) this.tiles[x][y] = tile;
     }
 
     /**
@@ -2029,9 +2029,8 @@ public class Map extends FreeColGameObject implements Location {
         final int hgt = getHeight(), wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
-                if (predicate.test(this.tiles[x][y])) {
-                    consumer.accept(this.tiles[x][y]);
-                }
+                Tile t = getTile(x, y);
+                if (predicate.test(t)) consumer.accept(t);
             }
         }
     }
@@ -2065,7 +2064,7 @@ public class Map extends FreeColGameObject implements Location {
         if (y+h > height) h = height - y;
         for (int yi = y; yi < y+h; ++yi) {
             for (int xi = x; xi < x+w; ++xi) {
-                consumer.accept(this.tiles[xi][yi]);
+                consumer.accept(getTile(xi, yi));
             }
         }
     }
@@ -2415,7 +2414,7 @@ public class Map extends FreeColGameObject implements Location {
         final Game game = getGame();
         final int oldWidth = getWidth();
         final int oldHeight = getHeight();
-        Tile oldTiles[][] = this.tiles;
+        Tile oldTiles[][] = getTiles();
         setTiles(width, height);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
