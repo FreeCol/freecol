@@ -17,6 +17,8 @@ World?
 
 ## About FreeCol
 
+**Website: [FreeCol.org](http://www.freecol.org/)**
+
 The FreeCol team aims to create an Open Source version of Colonization
 (released under the GPL). At first we'll try to make an exact clone of
 Colonization. The visuals will be brought up to date with more recent
@@ -35,3 +37,37 @@ Once FreeCol 1.0.0 is finished we'll start working towards FreeCol
 2.0.0. FreeCol 2 will go beyond the original Colonization and will have
 many new features, it will be an implementation of our (and our users')
 image of what Colonization 2 would have been.
+
+## Downloads
+
+#### Supports Mac OS X, Windows, and Linux
+
+Current stable release is _0.11.6_, since this release, there has been a complete code overhaul over the last 2 years, and we are nearing a stable release (0.12.0)
+
+The latest binary releases are created weekly and contain Mac OS X, Windows, and Linux installers.
+
+* See: [Weekly Releases](https://github.com/FreeCol/freecol/releases)
+
+## Contributing
+
+Ways you can contribute:
+
+* Download the [latest nightly release](https://github.com/FreeCol/freecol/releases) and play the game.
+* Report any bugs you find to our [Bug Tracker.](https://sourceforge.net/p/freecol/bugs/)
+* Suggest features or improvements in our [Improvement Requests Tracker.](https://sourceforge.net/p/freecol/improvement-requests/)
+* Discuss FreeCol on our [Forums.](https://sourceforge.net/p/freecol/discussion/)
+* Contribute to our [code base](https://github.com/FreeCol/freecol) by Forking and submitting a Pull Request. See [Creating a pull request from a fork.](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
+
+See [doc/developer.tex](doc/developer.tex) for more details on contributing to the FreeCol project.
+
+
+## Building
+
+Build the latest version of the code by running:
+
+```sh
+ant
+```
+
+Requires Java 8, Ant, and Java SDK to build.
+
