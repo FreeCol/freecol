@@ -261,6 +261,22 @@ public class Game extends FreeColGameObject {
         readFromXML(xr);
     }
 
+
+    /**
+     * Special update handler for the pre-game update.
+     *
+     * When starting a new game the server sends an update that
+     * contains the game map.  This must be synchronized so that the
+     * client does not race ahead and launch into the game before the
+     * update completes.
+     *
+     * @param game The update for this {@code Game}.
+     * @return True if the update succeeds.
+     */
+    public synchronized boolean preGameUpdate(Game game) {
+        return copyIn(game);
+    }
+
     /**
      * Instantiate an uninitialized FreeColGameObject within a game.
      *
