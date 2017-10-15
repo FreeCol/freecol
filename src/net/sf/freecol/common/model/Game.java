@@ -1124,7 +1124,7 @@ public class Game extends FreeColGameObject {
      *
      * @return The game {@code Map}.
      */
-    public Map getMap() {
+    public synchronized Map getMap() {
         return this.map;
     }
 
@@ -1134,14 +1134,18 @@ public class Game extends FreeColGameObject {
      * @param newMap The new {@code Map} to use.
      */
     public void setMap(Map newMap) {
-        if (this.map != newMap) {
+        Map oldMap;
+        synchronized (this) {
+            oldMap = this.map;
+            this.map = newMap;
+        }
+        if (this.map != oldMap) {
             for (HighSeas hs : transform(getLivePlayers(), alwaysTrue(),
                                          Player::getHighSeas, toListNoNulls())) {
-                hs.removeDestination(this.map);
-                hs.addDestination(newMap);
+                hs.removeDestination(oldMap);
+                hs.addDestination(this.map);
             }
         }
-        this.map = newMap;
     }
 
     /**
