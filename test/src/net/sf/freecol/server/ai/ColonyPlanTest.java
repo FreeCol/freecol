@@ -370,11 +370,11 @@ public class ColonyPlanTest extends FreeColTestCase {
     }
 
     public void testBestImprovements() throws Exception {
-        Map map = getTestMap(plains);
         Game game = getStandardGame();
+        Map map = getTestMap(plains);
         game.setMap(map);
-        Tile tile1 = map.getTile(5, 8);
 
+        Tile tile1 = map.getTile(5, 8);
         tile1.setType(savannah);
         assertEquals(plow, TileImprovementPlan.getBestTileImprovementType(tile1, grainType));
         assertEquals(plow, TileImprovementPlan.getBestTileImprovementType(tile1, sugarType));

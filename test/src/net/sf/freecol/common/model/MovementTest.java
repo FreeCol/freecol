@@ -63,11 +63,11 @@ public class MovementTest extends FreeColTestCase {
 
 
     public void testMoveFromPlainsToPlains() throws Exception {
-
         Game game = getStandardGame();
-        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap(plains);
         game.setMap(map);
+
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         tile1.setExplored(dutch, true);
@@ -93,11 +93,11 @@ public class MovementTest extends FreeColTestCase {
     }
 
     public void testMoveFromPlainsToHills() throws Exception {
-
         Game game = getStandardGame();
-        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap(plains);
         game.setMap(map);
+
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         tile2.setType(hills);
@@ -114,11 +114,11 @@ public class MovementTest extends FreeColTestCase {
     }
 
     public void testMoveAlongRoad() throws Exception {
-
         Game game = getStandardGame();
-        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap(plains);
         game.setMap(map);
+
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         tile1.setExplored(dutch, true);
@@ -149,11 +149,11 @@ public class MovementTest extends FreeColTestCase {
     }
 
     public void testMoveAlongRiver() throws Exception {
-
         Game game = getStandardGame();
-        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap(ocean);
         game.setMap(map);
+
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = tile1.getNeighbourOrNull(Direction.NE);
         tile1.setType(plains);

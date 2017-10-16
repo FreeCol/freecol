@@ -1057,8 +1057,9 @@ public abstract class FreeColObject
      * @return True if the copy in is succesful.
      */
     public <T extends FreeColObject> boolean copyIn(T other) {
-        if (!idEquals(other)) return false;
-        this.pcs = other.getPropertyChangeSupport();
+        FreeColObject fco = copyInCast(other, FreeColObject.class);
+        if (fco == null) return false;
+        this.pcs = fco.getPropertyChangeSupport();
         return true;
     } 
 
@@ -1074,7 +1075,11 @@ public abstract class FreeColObject
      */
     protected <T extends FreeColObject, R extends FreeColObject> R
         copyInCast(T other, Class<R> returnClass) {
-        if (!idEquals(other)) return (R)null;
+        if (other == null) return (R)null;
+        if (!idEquals(other)) {
+            logger.warning("copyInCast " + other.getId() + " onto " + getId());
+            return (R)null;
+        }
         try {
             return returnClass.cast(other);
         } catch (ClassCastException cce) {}

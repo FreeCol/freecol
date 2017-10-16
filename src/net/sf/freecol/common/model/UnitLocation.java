@@ -563,7 +563,9 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         final Game game = getGame();
         synchronized (this.units) {
             this.units.clear();
-            this.units.addAll(game.update(o.getUnitList(), Unit.class));
+            for (Unit u : o.getUnitList()) { // Allow creation, unit may be new
+                this.units.add(game.update(u, Unit.class, true));
+            }
         }
         return true;
     }

@@ -246,6 +246,9 @@ public class Map extends FreeColGameObject implements Location {
     /** The tiles that this map contains. */
     private Tile[][] tiles;
 
+    /** The width and height of the map. */
+    private int width, height;
+
     /** The highest map layer included. */
     private Layer layer;
 
@@ -322,7 +325,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The width of this map.
      */
     public int getWidth() {
-        return this.tiles.length;
+        return this.width;
     }
 
     /**
@@ -331,7 +334,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The height of this map.
      */
     public int getHeight() {
-        return this.tiles[0].length;
+        return this.height;
     }
 
     /**
@@ -374,7 +377,7 @@ public class Map extends FreeColGameObject implements Location {
      *
      * @param An doubly indexed array of tiles.
      */
-    protected Tile[][] getTiles() {
+    protected synchronized Tile[][] getTiles() {
         return this.tiles;
     }
 
@@ -384,7 +387,9 @@ public class Map extends FreeColGameObject implements Location {
      * @param width The new map width.
      * @param height The new map height.
      */
-    public void setTiles(int width, int height) {
+    public synchronized void setTiles(int width, int height) {
+        this.width = width;
+        this.height = height;
         this.tiles = new Tile[width][height];
     }
 
@@ -398,7 +403,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The {@code Tile} at (x, y), or null if the
      *     position is invalid.
      */
-    public Tile getTile(int x, int y) {
+    public synchronized Tile getTile(int x, int y) {
         return (isValid(x, y)) ? this.tiles[x][y] : null;
     }
 
@@ -419,8 +424,8 @@ public class Map extends FreeColGameObject implements Location {
      * @param y The y-coordinate of the {@code Tile}.
      * @param tile The {@code Tile} to set.
      */
-    public void setTile(Tile tile, int x, int y) {
-        this.tiles[x][y] = tile;
+    public synchronized void setTile(Tile tile, int x, int y) {
+        if (isValid(x, y)) this.tiles[x][y] = tile;
     }
 
     /**
@@ -2024,9 +2029,8 @@ public class Map extends FreeColGameObject implements Location {
         final int hgt = getHeight(), wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
-                if (predicate.test(this.tiles[x][y])) {
-                    consumer.accept(this.tiles[x][y]);
-                }
+                Tile t = getTile(x, y);
+                if (predicate.test(t)) consumer.accept(t);
             }
         }
     }
@@ -2060,7 +2064,7 @@ public class Map extends FreeColGameObject implements Location {
         if (y+h > height) h = height - y;
         for (int yi = y; yi < y+h; ++yi) {
             for (int xi = x; xi < x+w; ++xi) {
-                consumer.accept(this.tiles[xi][yi]);
+                consumer.accept(getTile(xi, yi));
             }
         }
     }
@@ -2410,7 +2414,7 @@ public class Map extends FreeColGameObject implements Location {
         final Game game = getGame();
         final int oldWidth = getWidth();
         final int oldHeight = getHeight();
-        Tile oldTiles[][] = this.tiles;
+        Tile oldTiles[][] = getTiles();
         setTiles(width, height);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -2633,14 +2637,19 @@ public class Map extends FreeColGameObject implements Location {
         Map o = copyInCast(other, Map.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
+        this.setTiles(o.getWidth(), o.getHeight());
         o.forEachTile((Tile t) ->
-            this.setTile(game.update(t, Tile.class), t.getX(), t.getY()));
+            // Allow creating new tiles in first map update
+            this.setTile(game.update(t, Tile.class, true),
+                         t.getX(), t.getY()));
         this.layer = o.getLayer();
         this.minimumLatitude = o.getMinimumLatitude();
         this.maximumLatitude = o.getMaximumLatitude();
         this.latitudePerRow = o.getLatitudePerRow();
         clearRegions();
-        for (Region r : o.getRegions()) addRegion(game.update(r, Region.class));
+        for (Region r : o.getRegions()) {
+            addRegion(game.update(r, Region.class, true));
+        }
         return true;
     }
 
@@ -2696,21 +2705,17 @@ public class Map extends FreeColGameObject implements Location {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        setLayer(xr.getAttribute(LAYER_TAG, Layer.class, Layer.ALL));
-
-        if (this.tiles == null) {
-            int width = xr.getAttribute(WIDTH_TAG, -1);
-            if (width < 0) {
-                throw new XMLStreamException("Bogus width: " + width);
-            }
-               
-            int height = xr.getAttribute(HEIGHT_TAG, -1);
-            if (height < 0) {
-                throw new XMLStreamException("Bogus height: " + height);
-            }
-
-            setTiles(width, height);
+        int width = xr.getAttribute(WIDTH_TAG, -1);
+        if (width < 0) {
+            throw new XMLStreamException("Bogus width: " + width);
         }
+        int height = xr.getAttribute(HEIGHT_TAG, -1);
+        if (height < 0) {
+            throw new XMLStreamException("Bogus height: " + height);
+        }
+        setTiles(width, height);
+
+        setLayer(xr.getAttribute(LAYER_TAG, Layer.class, Layer.ALL));
 
         minimumLatitude = xr.getAttribute(MINIMUM_LATITUDE_TAG, -90);
 

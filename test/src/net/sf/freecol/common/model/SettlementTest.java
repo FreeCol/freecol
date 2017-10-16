@@ -44,7 +44,6 @@ public class SettlementTest extends FreeColTestCase {
 
 
     public void testSettlementRadius() throws FreeColException {
-
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
@@ -81,7 +80,6 @@ public class SettlementTest extends FreeColTestCase {
     }
 
     public void testColonyRadius() {
-
         Game game = getGame();
         Map map = getTestMap();
         game.setMap(map);
@@ -95,10 +93,10 @@ public class SettlementTest extends FreeColTestCase {
     }
 
     public void testSettlementDoesNotClaimWater() {
-
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
+
         map.getTile(4, 8).setType(spec().getTileType("model.tile.ocean"));
         assertFalse(map.getTile(4, 8).isLand());
 
@@ -116,6 +114,7 @@ public class SettlementTest extends FreeColTestCase {
         Game game = getGame();
         Map map = getTestMap();
         game.setMap(map);
+
         map.getTile(4, 8).setType(spec().getTileType("model.tile.ocean"));
         assertFalse(map.getTile(4, 8).isLand());
 
@@ -134,6 +133,7 @@ public class SettlementTest extends FreeColTestCase {
         Game game = getGame();
         Map map = getTestMap();
         game.setMap(map);
+
         Colony colony = getStandardColony();
 
         assertEquals(2, colony.getLineOfSight());
@@ -152,6 +152,7 @@ public class SettlementTest extends FreeColTestCase {
         Game game = getGame();
         Map map = getTestMap();
         game.setMap(map);
+
         Colony colony = getStandardColony(4);
 
         // Colony has no equipment for the unit

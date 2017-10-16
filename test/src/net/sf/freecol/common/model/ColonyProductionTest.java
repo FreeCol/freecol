@@ -71,8 +71,8 @@ public class ColonyProductionTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
-        Player dutch = game.getPlayerByNationId("model.nation.dutch");
 
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile = map.getTile(5, 8);
         Resource grain = new Resource(game, tile, grainResource);
         tile.addResource(grain);
@@ -119,8 +119,8 @@ public class ColonyProductionTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
-        Player dutch = game.getPlayerByNationId("model.nation.dutch");
 
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile = map.getTile(5, 8);
         Resource grain = new Resource(game, tile, grainResource);
         tile.addResource(grain);
@@ -285,10 +285,8 @@ public class ColonyProductionTest extends FreeColTestCase {
 
 
     public void testConsumers() {
-
         Game game = getGame();
         game.setMap(getTestMap());
-
 
         Colony colony = getStandardColony(3);
         int units = colony.getUnitCount();

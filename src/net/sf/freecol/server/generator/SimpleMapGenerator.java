@@ -140,7 +140,7 @@ public class SimpleMapGenerator implements MapGenerator {
      *
      * @param game The {@code Game} to generate for.
      * @param random The {@code Random} number source to use.
-     * @see #createMap
+     * @see #generateMap
      */
     public SimpleMapGenerator(Random random) {
         this.random = random;
@@ -1039,24 +1039,24 @@ public class SimpleMapGenerator implements MapGenerator {
      * {@inheritDoc}
      */
     @Override
-    public Map createEmptyMap(Game game, int width, int height,
-                              LogBuilder lb) {
+    public Map generateEmptyMap(Game game, int width, int height,
+                                LogBuilder lb) {
         return new TerrainGenerator(random)
-            .createMap(game, null, new LandMap(width, height), lb);
+            .generateMap(game, null, new LandMap(width, height), lb);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map createMap(Game game, Map importMap, LogBuilder lb) {
+    public Map generateMap(Game game, Map importMap, LogBuilder lb) {
         // Create land map.
         LandMap landMap = (importMap != null) ? new LandMap(importMap)
             : new LandMap(game.getMapGeneratorOptions(), random);
 
         // Create terrain.
         Map map = new TerrainGenerator(random)
-            .createMap(game, importMap, landMap, lb);
+            .generateMap(game, importMap, landMap, lb);
 
         // Decorate the map.
         makeNativeSettlements(map, importMap, lb);

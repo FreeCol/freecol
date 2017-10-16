@@ -240,18 +240,6 @@ public final class PreGameController extends FreeColClientHolder {
     }
 
     /**
-     * Is the game and map present?
-     *
-     * Deliberately split out to make the check unambiguous.
-     *
-     * @return True if both are non-null.
-     */
-    private boolean isGameAndMapPresent() {
-        final Game game = getGame();
-        return game != null && game.getMap() != null;
-    }
-
-    /**
      * Handle starting the game.
      *
      * Wait until map is received from server (sometimes a startGame
@@ -260,12 +248,13 @@ public final class PreGameController extends FreeColClientHolder {
      * from receiving the map!
      */
     public void startGameHandler() {
+        final FreeColClient fcc = getFreeColClient();
         new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
                 @Override
                 public void run() {
                     logger.info("Client starting game");
                     for (int tries = 50; tries >= 0; tries--) {
-                        if (isGameAndMapPresent()) {
+                        if (fcc.isReadyToStart()) {
                             SwingUtilities.invokeLater(() -> {
                                     startGameInternal();
                                 });
@@ -342,10 +331,11 @@ public final class PreGameController extends FreeColClientHolder {
      */
     public void updateHandler(List<FreeColObject> objects) {
         final Game game = getGame();
+        
         for (FreeColObject fco : objects) {
             FreeColGameObject fcgo = game.getFreeColGameObject(fco.getId());
             if (fco instanceof Game) {
-                if (game.copyIn((Game)fco)) {
+                if (game.preGameUpdate((Game)fco)) {
                     final FreeColClient fcc = getFreeColClient();
                     fcc.addSpecificationActions(((Game)fco).getSpecification());
                 } else {

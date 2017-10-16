@@ -2395,7 +2395,7 @@ public class Player extends FreeColGameObject implements Nameable {
         return transform(getSettlements(), s -> s instanceof Colony,
                          s -> (Colony)s);
     }
-    
+
     /**
      * Get a sorted list of all colonies this player owns.
      *
@@ -2699,6 +2699,35 @@ public class Player extends FreeColGameObject implements Nameable {
         highSeas = new HighSeas(game);
         if (europe != null) highSeas.addDestination(europe);
         if (game.getMap() != null ) highSeas.addDestination(game.getMap());
+    }
+
+    /**
+     * Get the set of tiles visible to this player.
+     *
+     * @return A set of visible {@code Tile}s.
+     */
+    public Set<Tile> getVisibleTileSet() {
+        Set<Tile> tiles = new HashSet<>();
+        List<? extends Settlement> settlements
+            = (hasAbility(Ability.SEE_ALL_COLONIES))
+            ? getGame().getAllColoniesList(null)
+            : getSettlementList();
+        for (Settlement s : settlements) tiles.addAll(s.getVisibleTileSet());
+        for (Unit u : getUnitList()) {
+            if (u.getLocation() instanceof Tile) {
+                tiles.addAll(u.getVisibleTileSet());
+            }
+        }
+        final Specification spec = getSpecification();
+        if (isEuropean()
+            && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+            for (Player other : getGame().getLiveNativePlayerList(this)) {
+                for (IndianSettlement is : getIndianSettlementsWithMissionaryList(this)) {
+                    tiles.addAll(is.getVisibleTileSet());
+                }
+            }
+        }
+        return tiles;
     }
 
     /**

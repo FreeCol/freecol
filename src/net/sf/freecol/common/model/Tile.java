@@ -2386,11 +2386,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         this.x = o.getX();
         this.y = o.getY();
         this.owner = game.updateRef(o.getOwner(), Player.class);
-        this.settlement = game.update(o.getSettlement(), Settlement.class);
+        // Allow settlement creation, might be first sight
+        this.settlement = game.update(o.getSettlement(), Settlement.class, true);
         this.owningSettlement = game.updateRef(o.getOwningSettlement(),
                                                Settlement.class);
+        // Allow TIC creation, might be the first time we see the tile
         this.tileItemContainer = game.update(o.getTileItemContainer(),
-                                             TileItemContainer.class);
+                                             TileItemContainer.class, true);
         this.region = game.updateRef(o.getRegion(), Region.class);
         this.highSeasCount = o.getHighSeasCount();
         this.moveToEurope = o.getMoveToEurope();

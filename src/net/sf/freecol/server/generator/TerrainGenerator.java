@@ -81,7 +81,7 @@ public class TerrainGenerator {
      * Creates a new {@code TerrainGenerator}.
      *
      * @param random A {@code Random} number source.
-     * @see #createMap
+     * @see #generateMap
      */
     public TerrainGenerator(Random random) {
         this.random = random;
@@ -821,16 +821,16 @@ public class TerrainGenerator {
     // Main functionality, create the map.
 
     /**
-     * Creates a {@code Map}.
+     * Make a {@code Map}.
      *
-     * @param game The {@code Game} to generate the map for.
+     * @param game The {@code Game} to generate a map for.
      * @param importMap An optional {@code Map} to import.
      * @param landMap The {@code LandMap} to use as a template.
      * @param lb A {@code LogBuilder} to log to.
      * @return The new {@code Map}.
      */
-    public Map createMap(Game game, Map importMap, LandMap landMap,
-                         LogBuilder lb) {
+    public Map generateMap(Game game, Map importMap, LandMap landMap,
+                           LogBuilder lb) {
         final Specification spec = game.getSpecification();
         final OptionGroup mapOptions = game.getMapGeneratorOptions();
         final int width = landMap.getWidth();
@@ -842,8 +842,16 @@ public class TerrainGenerator {
         final boolean importTerrain = (importMap != null)
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
 
+        Map map = game.getMap();
+        if (map == null) {
+            map = new Map(game, width, height);
+            game.setMap(map);
+        } else {
+            map.setTiles(width, height);
+        }
+        map.clearRegions();
+        
         boolean mapHasLand = false;
-        Map map = new Map(game, width, height);
         int minimumLatitude = mapOptions
             .getInteger(MapGeneratorOptions.MINIMUM_LATITUDE);
         int maximumLatitude = mapOptions
@@ -924,7 +932,6 @@ public class TerrainGenerator {
                 map.setTile(t, x, y);
             }
         }
-        game.setMap(map);
 
         // Build the regions.
         List<ServerRegion> fixed = ServerRegion.requireFixedRegions(map, lb);

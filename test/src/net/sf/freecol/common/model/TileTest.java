@@ -244,6 +244,7 @@ public class TileTest extends FreeColTestCase {
     public void testPrimarySecondaryGoods() {
         Game game = getStandardGame();
         game.setMap(getTestMap(true));
+
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();
         ColonyTile center = colony.getColonyTile(tile);
@@ -383,6 +384,7 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
         game.setMap(map);
+
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
 
@@ -416,7 +418,6 @@ public class TileTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony();
-
         List<ColonyTile> colonyTiles = colony.getColonyTiles();
         ColonyTile colonyTile1 = null;
         ColonyTile colonyTile2 = null;
@@ -537,11 +538,9 @@ public class TileTest extends FreeColTestCase {
         game.setMap(map);
 
         Colony colony = FreeColTestUtils.getColonyBuilder().build();
-
         assertTrue(colony.getTile().hasRoad());
 
         colony.exciseSettlement();
-
         assertFalse(colony.getTile().hasRoad());
     }
 
@@ -756,6 +755,7 @@ public class TileTest extends FreeColTestCase {
     public void testCopy() {
         Game game = getStandardGame();
         game.setMap(getTestMap(plains));
+
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();
 

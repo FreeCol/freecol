@@ -328,7 +328,7 @@ public abstract class GoodsLocation extends UnitLocation {
         GoodsLocation o = copyInCast(other, GoodsLocation.class);
         if (o == null || !super.copyIn(o)) return false;
         this.goodsContainer = getGame().update(o.getGoodsContainer(),
-                                               GoodsContainer.class);
+                                               GoodsContainer.class, true);
         return true;
     }
 

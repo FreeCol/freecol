@@ -94,12 +94,9 @@ public class IndianSettlementTest extends FreeColTestCase {
         game.setMap(map);
 
         Tile camp2Tile = map.getTile(3, 3);
-
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-
         IndianSettlement camp1 = builder.build();
         IndianSettlement camp2 = builder.reset().settlementTile(camp2Tile).build();
-
         final int notEnoughToShare = 50;
         final int enoughToShare = 100;
         final int none = 0;

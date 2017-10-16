@@ -579,7 +579,19 @@ public class TileItemContainer extends FreeColGameObject {
         this.tile = game.updateRef(o.getTile(), Tile.class);
         clearTileItems();
         for (TileItem ti : o.getTileItems()) {
-            addTileItem(game.update(ti, TileItem.class));
+            // Allow creation, tile item might be new
+            // FIXME: lazy OO
+            TileItem nti = (ti instanceof LostCityRumour)
+                ? game.update((LostCityRumour)ti, LostCityRumour.class, true)
+                : (ti instanceof Resource)
+                ? game.update((Resource)ti, Resource.class, true)
+                : (ti instanceof TileImprovement)
+                ? game.update((TileImprovement)ti, TileImprovement.class, true)
+                : null;
+            if (nti == null) {
+                throw new RuntimeException("TileItem class fail " + ti);
+            }
+            addTileItem(nti);
         }
         return true;
     }

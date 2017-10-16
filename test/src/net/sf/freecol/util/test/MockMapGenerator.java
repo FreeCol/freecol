@@ -54,7 +54,7 @@ public class MockMapGenerator implements MapGenerator {
     /**
      * {@inheritDoc}
      */
-    public Map createMap(Game game, Map importMap, LogBuilder lb) {
+    public Map generateMap(Game game, Map importMap, LogBuilder lb) {
         // For all map descendents in the old game, move them to the
         // new game.
         Game oldGame = map.getGame();
@@ -82,8 +82,8 @@ public class MockMapGenerator implements MapGenerator {
     /**
      * {@inheritDoc}
      */
-    public Map createEmptyMap(Game game, int width, int height,
-                              LogBuilder lb) {
+    public Map generateEmptyMap(Game game, int width, int height,
+                                LogBuilder lb) {
         return this.map; // Do nothing yet
     }
 }

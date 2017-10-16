@@ -150,7 +150,7 @@ public class Game extends FreeColGameObject {
     protected final List<Player> players = new ArrayList<>();
 
     /** A virtual player to use for enemy privateers. */
-    private Player unknownEnemy;
+    private Player unknownEnemy = null;
 
     /** The map of the New World. */
     protected Map map = null;
@@ -180,7 +180,8 @@ public class Game extends FreeColGameObject {
      * Serialization is not needed directly as these must be completely
      * within { players, unknownEnemy, map } which are directly serialized.
      */
-    protected final HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects;
+    protected final HashMap<String, WeakReference<FreeColGameObject>>
+        freeColGameObjects = new HashMap<>(10000);
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -207,10 +208,15 @@ public class Game extends FreeColGameObject {
 
 
     /**
-     * Trivial constructor for use in Game.newInstance.
+     * Root constructor for games.
+     *
+     * Game.newInstance uses this so it must be public.
      */
-    private Game() {
+    public Game() {
         super((Game)null);
+
+        // Games always have a zero identifier.
+        setId("0");
 
         this.clientUserName = null;
         this.players.clear();
@@ -221,14 +227,11 @@ public class Game extends FreeColGameObject {
         this.spanishSuccession = false;
         this.initialActiveUnitId = null;
         this.specification = null;
-        this.freeColGameObjects = new HashMap<>(10000);
         this.combatModel = new SimpleCombatModel();
         this.removeCount = 0;
         this.setGame(this);
 
-        // Games always have a zero identifier.
         // Explicitly set initialized as FCGO.initialize() has not happened
-        setId("0");
         this.initialized = true;
     }
 
@@ -256,6 +259,22 @@ public class Game extends FreeColGameObject {
         this();
         
         readFromXML(xr);
+    }
+
+
+    /**
+     * Special update handler for the pre-game update.
+     *
+     * When starting a new game the server sends an update that
+     * contains the game map.  This must be synchronized so that the
+     * client does not race ahead and launch into the game before the
+     * update completes.
+     *
+     * @param game The update for this {@code Game}.
+     * @return True if the update succeeds.
+     */
+    public synchronized boolean preGameUpdate(Game game) {
+        return copyIn(game);
     }
 
     /**
@@ -514,24 +533,50 @@ public class Game extends FreeColGameObject {
      */
     public <T extends FreeColGameObject> T update(T other,
                                                   Class<T> returnClass) {
+        return update(other, returnClass, false);
+    }
+
+    /**
+     * Update a {@code FreeColGameObject} from another, optionally allowing
+     * missing objects to be created.
+     *
+     * @param T The type of object to update.
+     * @param other The other object.
+     * @param returnClass The expected class of the object.
+     * @param create If true, create missing objects.
+     * @return The resulting object after update.
+     */
+    public <T extends FreeColGameObject> T update(T other,
+                                                  Class<T> returnClass,
+                                                  boolean create) {
         if (other == null) return null;
         final String id = other.getId();
         FreeColGameObject fcgo = getFreeColGameObject(id);
-        if (fcgo == null) { // It is an error for this to happen
-            logger.warning("Update of missing object: " + id
-                + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());                
-            return null;
+        if (fcgo == null) {
+            if (create) {
+                fcgo = newInstance(this, returnClass, false);
+                fcgo.setId(id);
+            } else {
+                // Otherwise this is an error
+                logger.warning("Update of missing object: " + id
+                    + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+                return null;
+            }
         }
         T t;
         try {
             t = returnClass.cast(fcgo);
-        } catch (ClassCastException e) { // "Can not happen"
+        } catch (ClassCastException e) {
+            // "Can not happen"
             throw new RuntimeException("Update class clash: " + fcgo.getClass()
                 + " / " + returnClass);
         }
-        if (!t.copyIn(other)) { // "Can not happen"
-            throw new RuntimeException("Update copy failed: " + id);
+        if (!t.copyIn(other)) {
+            // "Can not happen"
+            throw new RuntimeException("Update copy failed: " + id
+                + " onto " + t);
         }
+        if (create) t.internId(id);
         return t;
     }
 
@@ -1079,7 +1124,7 @@ public class Game extends FreeColGameObject {
      *
      * @return The game {@code Map}.
      */
-    public Map getMap() {
+    public synchronized Map getMap() {
         return this.map;
     }
 
@@ -1089,14 +1134,18 @@ public class Game extends FreeColGameObject {
      * @param newMap The new {@code Map} to use.
      */
     public void setMap(Map newMap) {
-        if (this.map != newMap) {
+        Map oldMap;
+        synchronized (this) {
+            oldMap = this.map;
+            this.map = newMap;
+        }
+        if (this.map != oldMap) {
             for (HighSeas hs : transform(getLivePlayers(), alwaysTrue(),
                                          Player::getHighSeas, toListNoNulls())) {
-                hs.removeDestination(this.map);
-                hs.addDestination(newMap);
+                hs.removeDestination(oldMap);
+                hs.addDestination(this.map);
             }
         }
-        this.map = newMap;
     }
 
     /**
@@ -1556,7 +1605,8 @@ public class Game extends FreeColGameObject {
         this.clientUserName = o.getClientUserName();
         setPlayers(addPlayers(o.players));
         this.unknownEnemy = update(o.getUnknownEnemy(), Player.class);
-        this.map = update(o.getMap(), Map.class);
+        // Allow creation, might be first sight of the map
+        setMap(update(o.getMap(), Map.class, true));
         this.nationOptions = o.getNationOptions();
         this.currentPlayer = updateRef(o.getCurrentPlayer(), Player.class);
         this.turn = o.getTurn();

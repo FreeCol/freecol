@@ -25,11 +25,18 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class TileItemContainerTest extends FreeColTestCase {
 
+    private static final ResourceType oreRsc
+        = spec().getResourceType("model.resource.ore");
+
     private static final TileImprovementType riverImprov
         = spec().getTileImprovementType("model.improvement.river");
     private static final TileImprovementType roadImprov
         = spec().getTileImprovementType("model.improvement.road");
-    private static final ResourceType oreRsc = spec().getResourceType("model.resource.ore");
+
+    private static final TileType desert
+        = spec().getTileType("model.tile.desert");
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
 
 
     private TileItemContainer getSample(Game game, Tile t, 
@@ -58,9 +65,6 @@ public class TileItemContainerTest extends FreeColTestCase {
 
 
     public void testCopyFromWithEveryThing() {
-        final TileType desert = spec().getTileType("model.tile.desert");
-        final TileType plains = spec().getTileType("model.tile.plains");
-    	
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);

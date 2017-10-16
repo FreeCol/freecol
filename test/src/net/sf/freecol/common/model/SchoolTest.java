@@ -115,7 +115,6 @@ public class SchoolTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(5);
-
         Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit lumberJack = units.next();

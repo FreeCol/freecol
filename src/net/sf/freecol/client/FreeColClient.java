@@ -500,7 +500,7 @@ public final class FreeColClient {
      * @see #setGame
      */
     public Game getGame() {
-        return game;
+        return this.game;
     }
 
     /**
@@ -558,7 +558,7 @@ public final class FreeColClient {
      *
      * @return True if the game has started.
      */
-    public boolean isInGame() {
+    public synchronized boolean isInGame() {
         return this.inGame;
     }
 
@@ -567,10 +567,21 @@ public final class FreeColClient {
      *
      * @param inGame If true, change to in-game state.
      */
-    public void changeClientState(boolean inGame) {
+    public synchronized void changeClientState(boolean inGame) {
         this.inGame = inGame;
     }
-        
+
+    /**
+     * Is the client ready to switch to in-game mode?
+     *
+     * @return True if in pre-game mode, the game is present, and it has a map.
+     */
+    public boolean isReadyToStart() {
+        if (isInGame()) return false;
+        final Game game = getGame();
+        return (game == null) ? false : game.getMap() != null;
+    }
+
     /**
      * Are we using the map editor?
      *
@@ -724,7 +735,7 @@ public final class FreeColClient {
      * @return True if the current player is owned by this client.
      */
     public boolean currentPlayerIsMyPlayer() {
-        return this.inGame
+        return isInGame()
             && this.game != null
             && this.player != null
             && this.player.equals(this.game.getCurrentPlayer());
@@ -771,6 +782,7 @@ public final class FreeColClient {
         getGUI().reconnect((u != null && player.owns(u)) ? u : null,
                            player.getFallbackTile());
     }
+
 
     // Server handling
 

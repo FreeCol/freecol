@@ -705,46 +705,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
-     * Reads an XML-representation of a list of some general type.
-     *
-     * @param <T> The list member type.
-     * @param tag The tag for the list.
-     * @param type The type of the items to be added.  This type
-     *     needs to have a constructor accepting a single {@code String}.
-     * @return The list.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    public <T> List<T> readList(String tag, Class<T> type)
-        throws XMLStreamException {
-
-        expectTag(tag);
-
-        final int length = getAttribute(FreeColObject.ARRAY_SIZE_TAG, -1);
-        if (length < 0) return Collections.<T>emptyList();
-
-        List<T> list = new ArrayList<>(length);
-        for (int x = 0; x < length; x++) {
-            try {
-                final String value = getAttribute(FreeColObject.arrayKey(x),
-                                                  (String)null);
-                T object = null;
-                if (value != null) {
-                    Constructor<T> c = type.getConstructor(type);
-                    object = c.newInstance(new Object[] {value});
-                }
-                list.add(object);
-            } catch (IllegalAccessException|InstantiationException
-                |InvocationTargetException|NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        closeTag(tag);
-        return list;
-    }
-
-    /**
      * Reads an XML-representation of a list of
      * {@code FreeColSpecObjectType}s.
      *
