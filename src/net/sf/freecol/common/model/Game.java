@@ -795,8 +795,9 @@ public class Game extends FreeColGameObject {
     private void setPlayers(List<Player> players) {
         synchronized (this.players) {
             this.players.clear();
-            if (players != null) this.players.addAll(players);
+            if (players == null) return;
         }
+        for (Player p : players) addPlayer(p);
     }
 
     /**
@@ -832,7 +833,7 @@ public class Game extends FreeColGameObject {
      */
     public void addPlayer(Player player) {
         synchronized (this.players) {
-            this.players.add(player);
+            if (!this.players.contains(player)) this.players.add(player);
         }
         Nation nation = getSpecification().getNation(player.getNationId());
         nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
