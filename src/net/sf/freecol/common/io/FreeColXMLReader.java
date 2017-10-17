@@ -787,8 +787,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
      *     during parsing.
      */
     public <T extends FreeColObject> T makeFreeColObject(Game game,
-        String attributeName, Class<T> returnClass,
-        boolean required) throws XMLStreamException {
+        String attributeName, Class<T> returnClass, boolean required)
+        throws XMLStreamException {
         final String id =
             // @compat 0.11.x
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
@@ -808,25 +808,21 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 if (ret == null) {
                     String err = "Failed to create " + returnClass.getName()
                         + " with id: " + id;
-                    if (required) {
-                        throw new XMLStreamException(err);
-                    } else {
-                        logger.warning(err);
-                    }
-                } else {
-                    if (shouldIntern() && ret instanceof FreeColGameObject) {
+                    if (required) throw new XMLStreamException(err);
+                    logger.warning(err);
+                } else if (ret instanceof FreeColGameObject) {
+                    if (shouldIntern()) {
                         ((FreeColGameObject)ret).internId(id);
                     } else {
                         uninterned.put(id, ret);
                     }
                 }
                 return ret;
-            } else {
-                try {
-                    return returnClass.cast(fco);
-                } catch (ClassCastException cce) {
-                    throw new XMLStreamException(cce);
-                }
+            }
+            try {
+                return returnClass.cast(fco);
+            } catch (ClassCastException cce) {
+                throw new XMLStreamException(cce);
             }
         }
         return null;
