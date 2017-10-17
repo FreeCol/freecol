@@ -1604,10 +1604,13 @@ public class Game extends FreeColGameObject {
         // Do not update nextId, it is not meaningful in the client.
         this.uuid = o.getUUID();
         this.clientUserName = o.getClientUserName();
+
+        // Allow creation, might be first sight of the map.
+        // Do map early, so map references work
+        setMap(update(o.getMap(), Map.class, true));
+
         setPlayers(addPlayers(o.players));
         this.unknownEnemy = update(o.getUnknownEnemy(), Player.class);
-        // Allow creation, might be first sight of the map
-        setMap(update(o.getMap(), Map.class, true));
         this.nationOptions = o.getNationOptions();
         this.currentPlayer = updateRef(o.getCurrentPlayer(), Player.class);
         this.turn = o.getTurn();
