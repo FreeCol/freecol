@@ -496,7 +496,8 @@ public class MarketData extends FreeColGameObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append('[').append(getId())
-            .append(' ').append(goodsType.getId())
+            .append(' ').append((goodsType == null) ? "null"
+                : goodsType.getId())
             .append(" costToBuy=").append(costToBuy)
             .append(" paidForSale=").append(paidForSale)
             .append(" amountInMarket=").append(amountInMarket)
