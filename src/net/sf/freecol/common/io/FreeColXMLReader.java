@@ -631,8 +631,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
      *     during parsing.
      */
     public Location getLocationAttribute(Game game, String attributeName,
-        boolean make) throws XMLStreamException {
-
+                                         boolean make)
+        throws XMLStreamException {
         if (attributeName == null) return null;
 
         final String attrib =
@@ -640,20 +640,19 @@ public class FreeColXMLReader extends StreamReaderDelegate
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
         // end @compat 0.11.x
             getAttribute(attributeName, (String)null);
+        if (attrib == null) return null;
 
-        if (attrib != null) {
-            FreeColObject fco = lookup(game, attrib);
-            if (fco == null && make) {
-                Class<? extends FreeColGameObject> c
-                    = game.getLocationClass(attrib);
-                if (c != null) {
-                    fco = makeFreeColObject(game, attributeName, c,
-                        getReadScope() == ReadScope.SERVER);
-                }
+        FreeColObject fco = lookup(game, attrib);
+        if (fco == null && make) {
+            Class<? extends FreeColGameObject> c
+                = game.getLocationClass(attrib);
+            if (c != null) {
+                fco = makeFreeColObject(game, attributeName, c,
+                                        getReadScope()==ReadScope.SERVER);
             }
-            if (fco instanceof Location) return (Location)fco;
-                logger.warning("Not a location: " + attrib);
         }
+        if (fco instanceof Location) return (Location)fco;
+        logger.warning("Not a location: " + attrib);
         return null;
     }
 
