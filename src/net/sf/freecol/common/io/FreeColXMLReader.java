@@ -863,11 +863,21 @@ public class FreeColXMLReader extends StreamReaderDelegate
         if (id == null) {
             throw new XMLStreamException("Object identifier not found.");
         }
-        T ret = Game.newInstance(game, returnClass,
-                                 getReadScope() == ReadScope.SERVER);
-        if (ret == null) {
-            throw new XMLStreamException("Could not create instance of "
-                + returnClass.getName());
+        T ret;
+        FreeColObject fco = uninterned.get(id);
+        if (fco == null) {
+            ret = Game.newInstance(game, returnClass,
+                                   getReadScope() == ReadScope.SERVER);
+            if (!(ret instanceof FreeColGameObject)) {
+                throw new XMLStreamException("Failed to create "
+                    + returnClass.getName() + " with id: " + id);
+            }
+        } else {
+            try {
+                ret = returnClass.cast(fco);
+            } catch (ClassCastException cce) {
+                throw new XMLStreamException(cce);
+            }
         }
         uninterned.put(id, ret); // Register id before reading
         ret.readFromXML(this);
