@@ -816,9 +816,8 @@ public class Game extends FreeColGameObject {
     private void setPlayers(List<Player> players) {
         synchronized (this.players) {
             this.players.clear();
-            if (players == null) return;
+            if (players != null) this.players.addAll(players);
         }
-        for (Player p : players) addPlayer(p);
     }
 
     /**
@@ -1037,18 +1036,16 @@ public class Game extends FreeColGameObject {
         for (Player p : players) {
             FreeColGameObject fcgo = getFreeColGameObject(p.getId());
             if (fcgo == null) {
-                fcgo = new Player(this, p.getId());
-                if (!fcgo.copyIn(p)) {
-                    logger.warning("addPlayers copyIn new fail: " + p);
+                if ((fcgo = update(p, Player.class, true)) != null) {
+                    addPlayer((Player)fcgo);
                 } else {
-                    addPlayer(p);
-                    valid.add(p);
-                }
+                    logger.warning("addPlayers create new fail: " + p);
+                }                
             } else if (fcgo instanceof Player) {
-                if (!fcgo.copyIn(p)) {
-                    logger.warning("addPlayers copyIn existing fail: " + p);
-                } else {
+                if (fcgo.copyIn(p)) {
                     valid.add(p);
+                } else {
+                    logger.warning("addPlayers copyIn existing fail: " + p);
                 }
             } else {
                 logger.warning("addPlayers onto non-player: " + fcgo);
