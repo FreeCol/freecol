@@ -223,6 +223,29 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
+     * Look up an identifier in an enclosing game.
+     *
+     * This is public to allow the special fixup in Game.readChildren.
+     *
+     * @param <T> The expected object class type.
+     * @param game The {@code Game} to consult.
+     * @param id The object identifier.
+     * @param returnClass The class of the return value.
+     * @return The {@code FreeColObject} found, or null if none.
+     * @exception XMLStreamException if the return class does not match.
+     */
+    public <T extends FreeColObject> T lookup(Game game, String id,
+                                              Class<T> returnClass)
+        throws XMLStreamException {
+        FreeColObject fco = lookup(game, id);
+        try {
+            return returnClass.cast(fco);
+        } catch (ClassCastException cce) {
+            throw new XMLStreamException(cce);
+        }
+    }
+
+    /**
      * Closes both the {@code XMLStreamReader} and
      * the underlying stream if any.
      *
@@ -589,12 +612,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             getAttribute(attributeName, (String)null);
 
         if (attrib == null) return defaultValue;
-        FreeColObject fco = lookup(game, attrib);
-        try {
-            return returnClass.cast(fco);
-        } catch (ClassCastException cce) {
-            throw new XMLStreamException(cce);
-        }
+        return lookup(game, attrib, returnClass);
     }
 
     /**
@@ -794,37 +812,29 @@ public class FreeColXMLReader extends StreamReaderDelegate
             // end @compat 0.11.x
             getAttribute(attributeName, (String)null);
 
+        T ret = null;
         if (id == null) {
             if (required) {
                 throw new XMLStreamException("Missing " + attributeName
                     + " for " + returnClass.getName() + ": " + currentTag());
             }
-        } else {
-            FreeColObject fco = lookup(game, id);
-            if (fco == null) {
-                T ret = Game.newInstance(game, returnClass,
-                                         getReadScope() == ReadScope.SERVER);
-                if (ret == null) {
-                    String err = "Failed to create " + returnClass.getName()
-                        + " with id: " + id;
-                    if (required) throw new XMLStreamException(err);
-                    logger.warning(err);
-                } else if (ret instanceof FreeColGameObject) {
-                    if (shouldIntern()) {
-                        ((FreeColGameObject)ret).internId(id);
-                    } else {
-                        uninterned.put(id, ret);
-                    }
+        } else if ((ret = lookup(game, id, returnClass)) == null) {
+            ret = Game.newInstance(game, returnClass,
+                                   getReadScope() == ReadScope.SERVER);
+            if (ret == null) {
+                String err = "Failed to create " + returnClass.getName()
+                    + " with id: " + id;
+                if (required) throw new XMLStreamException(err);
+                logger.warning(err);
+            } else if (ret instanceof FreeColGameObject) {
+                if (shouldIntern()) {
+                    ((FreeColGameObject)ret).internId(id);
+                } else {
+                    uninterned.put(id, ret);
                 }
-                return ret;
-            }
-            try {
-                return returnClass.cast(fco);
-            } catch (ClassCastException cce) {
-                throw new XMLStreamException(cce);
             }
         }
-        return null;
+        return ret;
     }
 
     /**
