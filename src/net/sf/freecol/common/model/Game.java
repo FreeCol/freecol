@@ -837,7 +837,6 @@ public class Game extends FreeColGameObject {
         }
         Nation nation = getSpecification().getNation(player.getNationId());
         nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
-        if (getCurrentPlayer() == null) setCurrentPlayer(player);
     }
 
     /**
@@ -1729,6 +1728,8 @@ public class Game extends FreeColGameObject {
 
         initialActiveUnitId = xr.getAttribute(INITIAL_ACTIVE_UNIT_ID,
                                               (String)null);
+
+        // currentPlayer handled in readChildren()
     }
 
     /**
@@ -1741,15 +1742,14 @@ public class Game extends FreeColGameObject {
         players.clear();
         unknownEnemy = null;
 
-        // Special case for the current player.  Defer lookup of the
-        // current player tag until we read the children, because that
-        // is where the players are defined.
+        // The current player is special.  Defer lookup of the current
+        // player tag until we read the children, because that is
+        // where the players are defined.
         String current = xr.getAttribute(CURRENT_PLAYER_TAG, (String)null);
 
         super.readChildren(xr);
 
-        currentPlayer = (current == null) ? null
-            : getFreeColGameObject(current, Player.class);
+        currentPlayer = xr.lookup(this, current, Player.class);
 
         // Make sure all work locations have rational default production
         // now that all tiles are defined.
