@@ -878,7 +878,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         if (fco == null) {
             ret = Game.newInstance(game, returnClass,
                                    getReadScope() == ReadScope.SERVER);
-            if (!(ret instanceof FreeColGameObject)) {
+            if (ret == null) {
                 throw new XMLStreamException("Failed to create "
                     + returnClass.getName() + " with id: " + id);
             }
