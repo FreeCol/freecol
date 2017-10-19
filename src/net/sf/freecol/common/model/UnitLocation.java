@@ -567,7 +567,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
                 this.units.add(game.update(u, true));
             }
         }
-if (!o.getUnitList().isEmpty()) { dump("UL ", getUnitList()); }
         return true;
     }
 
