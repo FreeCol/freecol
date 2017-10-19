@@ -4307,6 +4307,8 @@ public class Unit extends GoodsLocation
         this.treasureAmount = o.getTreasureAmount();
         this.attrition = o.getAttrition();
         this.visibleGoodsCount = o.getVisibleGoodsCount();
+
+        this.owner.addUnit(this);
         return true;
     }
 

@@ -1340,7 +1340,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected void setFoundingFathers(Set<FoundingFather> foundingFathers) {
         this.foundingFathers.clear();
-        this.foundingFathers.addAll(foundingFathers);
+        for (FoundingFather ff : foundingFathers) addFather(ff);
     }
 
     /**
@@ -3989,7 +3989,7 @@ public class Player extends FreeColGameObject implements Nameable {
         this.name = o.getName();
         this.independentNationName = o.getIndependentNationName();
         this.playerType = o.getPlayerType();
-        this.nationType = o.getNationType();
+        this.changeNationType(o.getNationType());
         this.nationId = o.getNationId();
         this.newLandName = o.getNewLandName();
         this.admin = o.isAdmin();
@@ -4016,11 +4016,8 @@ public class Player extends FreeColGameObject implements Nameable {
         this.setTension(o.getTension());
         this.setBannedMissions(game.updateRef(o.getBannedMissions()));
         this.setStances(o.getStances());
-        // TradeRoutes are special
         this.tradeRoutes.clear();
-        for (TradeRoute tr : o.getTradeRoutes()) {
-            this.tradeRoutes.add(game.update(tr, false));
-        }
+        for (TradeRoute tr : tradeRoutes) this.tradeRoutes.add(game.update(tr, false));
         this.setModelMessages(o.getModelMessages());
         this.setHistory(o.getHistory());
         this.setLastSales(o.getLastSales());

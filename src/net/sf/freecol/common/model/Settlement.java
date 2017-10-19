@@ -844,6 +844,8 @@ public abstract class Settlement extends GoodsLocation
         this.tile = game.updateRef(o.getTile());
         this.setOwnedTiles(game.updateRef(o.getOwnedTiles()));
         this.featureContainer.copy(o.getFeatureContainer());
+
+        this.owner.addSettlement(this);
         return true;
     }
 
