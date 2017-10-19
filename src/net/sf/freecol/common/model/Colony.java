@@ -2985,8 +2985,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         Colony o = copyInCast(other, Colony.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        this.setBuildingMap(game.update(o.getBuildings(), Building.class));
-        this.setColonyTiles(game.update(o.getColonyTiles(), ColonyTile.class));
+        this.setBuildingMap(game.update(o.getBuildings()));
+        this.setColonyTiles(game.update(o.getColonyTiles()));
         this.setExportData(o.getExportData());
         this.liberty = o.getLiberty();
         this.sonsOfLiberty = o.getSonsOfLiberty();

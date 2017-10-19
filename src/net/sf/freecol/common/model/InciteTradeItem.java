@@ -130,7 +130,7 @@ public class InciteTradeItem extends TradeItem {
     public <T extends FreeColObject> boolean copyIn(T other) {
         InciteTradeItem o = copyInCast(other, InciteTradeItem.class);
         if (o == null || !super.copyIn(o)) return false;
-        this.victim = getGame().updateRef(o.getVictim(), Player.class);
+        this.victim = getGame().updateRef(o.getVictim());
         return true;
     }
 

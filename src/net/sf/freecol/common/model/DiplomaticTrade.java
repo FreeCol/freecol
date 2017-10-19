@@ -427,10 +427,10 @@ public class DiplomaticTrade extends FreeColGameObject {
         final Game game = getGame();
         this.context = o.getContext();
         this.status = o.getStatus();
-        this.sender = game.updateRef(o.getSender(), Player.class);
-        this.recipient = game.updateRef(o.getRecipient(), Player.class);
+        this.sender = game.updateRef(o.getSender());
+        this.recipient = game.updateRef(o.getRecipient());
         this.items.clear();
-        this.items.addAll(game.updateRef(o.getItems(), TradeItem.class));
+        this.items.addAll(game.updateRef(o.getItems()));
         this.version = o.getVersion();
         return true;
     }

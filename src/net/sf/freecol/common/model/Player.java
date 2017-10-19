@@ -4007,19 +4007,19 @@ public class Player extends FreeColGameObject implements Nameable {
         this.interventionBells = o.getInterventionBells();
         this.tax = o.getTax();
         this.entryLocation = game.updateLocationRef(o.getEntryLocation());
-        this.market = game.update(o.getMarket(), Market.class);
-        this.europe = game.update(o.getEurope(), Europe.class);
-        this.monarch = game.update(o.getMonarch(), Monarch.class);
-        this.highSeas = game.update(o.getHighSeas(), HighSeas.class);
+        this.market = game.update(o.getMarket(), false);
+        this.europe = game.update(o.getEurope(), false);
+        this.monarch = game.update(o.getMonarch(), false);
+        this.highSeas = game.update(o.getHighSeas(), false);
         this.setFoundingFathers(o.getFoundingFathers());
         this.currentFather = o.getCurrentFather();
         this.setTension(o.getTension());
-        this.setBannedMissions(game.updateRef(o.getBannedMissions(), Player.class));
+        this.setBannedMissions(game.updateRef(o.getBannedMissions()));
         this.setStances(o.getStances());
         // TradeRoutes are special
         this.tradeRoutes.clear();
         for (TradeRoute tr : o.getTradeRoutes()) {
-            this.tradeRoutes.add(game.update(tr, TradeRoute.class));
+            this.tradeRoutes.add(game.update(tr, false));
         }
         this.setModelMessages(o.getModelMessages());
         this.setHistory(o.getHistory());

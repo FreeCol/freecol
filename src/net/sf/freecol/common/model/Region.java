@@ -490,12 +490,12 @@ public class Region extends FreeColGameObject implements Nameable {
         this.name = o.getName();
         this.key = o.getKey();
         this.type = o.getType();
-        this.parent = game.updateRef(o.getParent(), Region.class);
-        this.children = game.updateRef(o.getChildren(), Region.class);
+        this.parent = game.updateRef(o.getParent());
+        this.children = game.updateRef(o.getChildren());
         this.claimable = o.getClaimable();
         this.discoverable = o.getDiscoverable();
         this.discoveredIn = o.getDiscoveredIn();
-        this.discoveredBy = game.updateRef(o.getDiscoveredBy(), Player.class);
+        this.discoveredBy = game.updateRef(o.getDiscoveredBy());
         this.discoverer = o.getDiscoverer();
         this.scoreValue = o.getScoreValue();
         return true;

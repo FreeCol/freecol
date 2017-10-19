@@ -322,7 +322,7 @@ public class TradeRoute extends FreeColGameObject
         this.name = o.getName();
         this.owner = o.getOwner();
         this.stops.clear();
-        this.stops.addAll(game.updateRef(o.getStops(), TradeRouteStop.class));
+        this.stops.addAll(game.updateRef(o.getStops()));
         this.silent = o.isSilent();
         return true;
     }

@@ -839,10 +839,10 @@ public abstract class Settlement extends GoodsLocation
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
         this.type = o.getType();
-        this.owner = game.updateRef(o.getOwner(), Player.class);
+        this.owner = game.updateRef(o.getOwner());
         this.name = o.getName();
-        this.tile = game.updateRef(o.getTile(), Tile.class);
-        this.setOwnedTiles(game.updateRef(o.getOwnedTiles(), Tile.class));
+        this.tile = game.updateRef(o.getTile());
+        this.setOwnedTiles(game.updateRef(o.getOwnedTiles()));
         this.featureContainer.copy(o.getFeatureContainer());
         return true;
     }

@@ -132,7 +132,7 @@ public class UnitTradeItem extends TradeItem {
     public <T extends FreeColObject> boolean copyIn(T other) {
         UnitTradeItem o = copyInCast(other, UnitTradeItem.class);
         if (o == null || !super.copyIn(o)) return false;
-        this.unit = getGame().updateRef(o.getUnit(), Unit.class);
+        this.unit = getGame().updateRef(o.getUnit());
         return true;
     }
 

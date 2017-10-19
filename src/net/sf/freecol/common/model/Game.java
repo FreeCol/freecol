@@ -528,12 +528,11 @@ public class Game extends FreeColGameObject {
      *
      * @param T The type of object to update.
      * @param other The other object.
-     * @param returnClass The expected class of the object.
      * @return The resulting object after update.
      */
-    public <T extends FreeColGameObject> T update(T other,
-                                                  Class<T> returnClass) {
-        return update(other, returnClass, false);
+    public <T extends FreeColGameObject> T update(T other, boolean create) {
+        return (other == null) ? null
+            : update(other, other.getFreeColObjectClass(), create);
     }
 
     /**
@@ -546,7 +545,7 @@ public class Game extends FreeColGameObject {
      * @param create If true, create missing objects.
      * @return The resulting object after update.
      */
-    public <T extends FreeColGameObject> T update(T other,
+    private <T extends FreeColGameObject> T update(T other,
                                                   Class<T> returnClass,
                                                   boolean create) {
         if (other == null) return null;
@@ -588,12 +587,11 @@ public class Game extends FreeColGameObject {
      * @param returnClass The expected class of the objects.
      * @return The resulting list of updated objects.
      */
-    public <T extends FreeColGameObject> List<T> update(Collection<T> other,
-                                                        Class<T> returnClass) {
+    public <T extends FreeColGameObject> List<T> update(Collection<T> other) {
         if (other == null) return null;
         List<T> ret = new ArrayList<>();
         for (T t : other) {
-            T nt = update(t, returnClass);
+            T nt = update(t, false);
             if (nt != null) ret.add(nt);
         }
         return ret;
@@ -604,11 +602,23 @@ public class Game extends FreeColGameObject {
      *
      * @param T The type of object to update.
      * @param other The other object.
+     * @return The resulting object after update.
+     */
+    public <T extends FreeColGameObject> T updateRef(T other) {
+        return (other == null) ? null
+            : updateRef(other, other.getFreeColObjectClass());
+    }
+
+    /**
+     * Update a {@code FreeColGameObject} from a reference to it in an update.
+     *
+     * @param T The type of object to update.
+     * @param other The other object.
      * @param returnClass The expected class of the object.
      * @return The resulting object after update.
      */
-    public <T extends FreeColGameObject> T updateRef(T other,
-                                                     Class<T> returnClass) {
+    private <T extends FreeColGameObject> T updateRef(T other,
+                                                      Class<T> returnClass) {
         if (other == null) return null;
         final String id = other.getId();
         return getFreeColGameObject(id, returnClass);
@@ -620,15 +630,13 @@ public class Game extends FreeColGameObject {
      *
      * @param T The type of object to update.
      * @param other The other object.
-     * @param returnClass The expected class of the object.
      * @return The resulting object after update.
      */
-    public <T extends FreeColGameObject> List<T> updateRef(Collection<T> other,
-                                                           Class<T> returnClass) {
+    public <T extends FreeColGameObject> List<T> updateRef(Collection<T> other) {
         if (other == null) return null;
         List<T> ret = new ArrayList<>();
         for (T t : other) {
-            T nt = updateRef(t, returnClass);
+            T nt = updateRef(t);
             if (nt != null) ret.add(nt);
         }
         return ret;
@@ -1609,7 +1617,7 @@ public class Game extends FreeColGameObject {
         setMap(update(o.getMap(), Map.class, true));
 
         setPlayers(addPlayers(o.players));
-        this.unknownEnemy = update(o.getUnknownEnemy(), Player.class);
+        this.unknownEnemy = update(o.getUnknownEnemy(), false);
         this.nationOptions = o.getNationOptions();
         this.currentPlayer = updateRef(o.getCurrentPlayer(), Player.class);
         this.turn = o.getTurn();

@@ -617,7 +617,7 @@ public class Europe extends UnitLocation
         this.setUnitPrices(o.getUnitPrices());
         this.baseRecruitPrice = o.getBaseRecruitPrice();
         this.recruitLowerCap = o.getRecruitLowerCap();
-        this.owner = game.updateRef(o.getOwner(), Player.class);
+        this.owner = game.updateRef(o.getOwner());
         this.featureContainer.copy(o.getFeatureContainer());
         return true;
     }

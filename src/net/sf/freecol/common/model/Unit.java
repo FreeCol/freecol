@@ -4280,7 +4280,7 @@ public class Unit extends GoodsLocation
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
         this.name = o.getName();
-        this.owner = game.updateRef(o.getOwner(), Player.class);
+        this.owner = game.updateRef(o.getOwner());
         this.type = o.getType();
         this.state = o.getState();
         this.role = o.getRole();
@@ -4293,18 +4293,16 @@ public class Unit extends GoodsLocation
         this.experience = o.getExperience();
         this.workLeft = o.getWorkLeft();
         // Allow creation, might be first sight
-        this.workImprovement = game.update(o.getWorkImprovement(),
-                                           TileImprovement.class, true);
-        this.student = game.updateRef(o.getStudent(), Unit.class);
-        this.teacher = game.updateRef(o.getTeacher(), Unit.class);
+        this.workImprovement = game.update(o.getWorkImprovement(), true);
+        this.student = game.updateRef(o.getStudent());
+        this.teacher = game.updateRef(o.getTeacher());
         this.turnsOfTraining = o.getTurnsOfTraining();
         this.nationality = o.getNationality();
         this.ethnicity = o.getEthnicity();
-        this.indianSettlement = game.updateRef(o.getIndianSettlement(),
-                                               IndianSettlement.class);
+        this.indianSettlement = game.updateRef(o.getIndianSettlement());
         this.hitPoints = o.getHitPoints();
         this.destination = game.updateLocationRef(o.getDestination());
-        this.tradeRoute = game.updateRef(o.getTradeRoute(), TradeRoute.class);
+        this.tradeRoute = game.updateRef(o.getTradeRoute());
         this.currentStop = o.getCurrentStop();
         this.treasureAmount = o.getTreasureAmount();
         this.attrition = o.getAttrition();

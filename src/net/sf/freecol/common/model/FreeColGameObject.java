@@ -181,7 +181,7 @@ public abstract class FreeColGameObject extends FreeColObject {
         FreeColGameObject fcgo = copyInCast(other, FreeColGameObject.class);
         if (fcgo == null || !super.copyIn(fcgo)) return false;
         final Game game = getGame();
-        this.game = game.updateRef(fcgo.getGame(), Game.class);
+        this.game = game.updateRef(fcgo.getGame());
         this.disposed = fcgo.isDisposed();
         this.initialized = fcgo.isInitialized();
         return true;
