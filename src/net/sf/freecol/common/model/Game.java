@@ -1612,11 +1612,13 @@ public class Game extends FreeColGameObject {
         this.uuid = o.getUUID();
         this.clientUserName = o.getClientUserName();
 
+        // Players before map, so the tile owners work efficiently
+        this.setPlayers(addPlayers(o.players));
+
         // Allow creation, might be first sight of the map.
         // Do map early, so map references work
-        setMap(update(o.getMap(), Map.class, true));
+        this.setMap(update(o.getMap(), Map.class, true));
 
-        setPlayers(addPlayers(o.players));
         this.unknownEnemy = update(o.getUnknownEnemy(), false);
         this.nationOptions = o.getNationOptions();
         this.currentPlayer = updateRef(o.getCurrentPlayer(), Player.class);
