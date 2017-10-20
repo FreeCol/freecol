@@ -274,7 +274,20 @@ public class Game extends FreeColGameObject {
      * @return True if the update succeeds.
      */
     public synchronized boolean preGameUpdate(Game game) {
-        return copyIn(game);
+        boolean ret = copyIn(game);
+        LogBuilder lb = new LogBuilder(64);
+        switch (game.checkIntegrity(true, lb)) {
+        case 1:
+            break;
+        case 0:
+            logger.info("New game integrity test failed, but fixed."
+                + lb.toString());
+            break;
+        default:
+            logger.warning("New game integrity test failed." + lb.toString());
+            break;
+        }
+        return ret;
     }
 
     /**
