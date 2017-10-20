@@ -139,6 +139,10 @@ public abstract class WorkLocation extends UnitLocation
     }
 
 
+    public void setColony(Colony colony) {
+        this.colony = colony;
+    }
+
     /**
      * Get the production type.
      *

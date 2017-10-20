@@ -2985,8 +2985,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         Colony o = copyInCast(other, Colony.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        this.setBuildingMap(game.update(o.getBuildings()));
-        this.setColonyTiles(game.update(o.getColonyTiles()));
+        this.setBuildingMap(game.update(o.getBuildings(), true));
+        this.setColonyTiles(game.update(o.getColonyTiles(), true));
         this.setExportData(o.getExportData());
         this.liberty = o.getLiberty();
         this.sonsOfLiberty = o.getSonsOfLiberty();
@@ -2999,6 +2999,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         this.setBuildQueue(o.getBuildQueue());
         this.setPopulationQueue(o.getPopulationQueue());
         this.displayUnitCount = o.getDisplayUnitCount();
+
+        for (WorkLocation wl : getAllWorkLocationsList()) wl.setColony(this);
         return true;
     }
 

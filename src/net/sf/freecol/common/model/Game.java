@@ -598,13 +598,15 @@ public class Game extends FreeColGameObject {
      * @param T The type of object to update.
      * @param other The collection of objects to update.
      * @param returnClass The expected class of the objects.
+     * @param create If true, create missing objects.
      * @return The resulting list of updated objects.
      */
-    public <T extends FreeColGameObject> List<T> update(Collection<T> other) {
+    public <T extends FreeColGameObject> List<T> update(Collection<T> other,
+                                                        boolean create) {
         if (other == null) return null;
         List<T> ret = new ArrayList<>();
         for (T t : other) {
-            T nt = update(t, false);
+            T nt = update(t, create);
             if (nt != null) ret.add(nt);
         }
         return ret;

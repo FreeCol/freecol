@@ -506,8 +506,8 @@ public class NativeTrade extends FreeColGameObject {
         this.sell = o.getSell();
         this.gift = o.getGift();
         this.item = game.update(o.getItem(), false);
-        this.unitToSettlement = game.update(o.getUnitToSettlement());
-        this.settlementToUnit = game.update(o.getSettlementToUnit());
+        this.unitToSettlement = game.update(o.getUnitToSettlement(), false);
+        this.settlementToUnit = game.update(o.getSettlementToUnit(), false);
         return true;
     }
 
