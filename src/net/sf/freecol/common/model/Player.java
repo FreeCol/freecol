@@ -4107,6 +4107,10 @@ public class Player extends FreeColGameObject implements Nameable {
             xw.writeAttribute(OLD_SOL_TAG, oldSoL);
 
             xw.writeAttribute(SCORE_TAG, score);
+
+            if (entryLocation != null) {
+                xw.writeLocationAttribute(ENTRY_LOCATION_TAG, entryLocation);
+            }
         }
 
         if (newLandName != null) {
@@ -4115,10 +4119,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
         if (independentNationName != null) {
             xw.writeAttribute(INDEPENDENT_NATION_NAME_TAG, independentNationName);
-        }
-
-        if (entryLocation != null) {
-            xw.writeLocationAttribute(ENTRY_LOCATION_TAG, entryLocation);
         }
     }
 
