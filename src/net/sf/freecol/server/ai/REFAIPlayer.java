@@ -437,7 +437,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         rebelNavy.sort(militaryStrengthComparator);
         Iterator<Unit> ui = rebelNavy.iterator();
         List<Tile> entries = new ArrayList<>();
-        entries.add(rebel.getEntryLocation().getTile());
+        entries.add(rebel.getEntryTile());
         while (!navy.isEmpty()) {
             final AIUnit aiu = navy.remove(0);
             final Unit u = aiu.getUnit();

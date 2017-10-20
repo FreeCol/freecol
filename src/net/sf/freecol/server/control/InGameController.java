@@ -365,7 +365,7 @@ public final class InGameController extends Controller {
         refPlayer.exploreTiles(explore);
 
         // Trigger initial placement routine
-        refPlayer.setEntryLocation(null);
+        refPlayer.setEntryTile(null);
         // Will change, setup only
         Player.makeContact(serverPlayer, refPlayer);
 
@@ -525,7 +525,7 @@ public final class InGameController extends Controller {
         // REF is initialized.
         Player rebel = first(serverPlayer.getRebels());
         if (rebel != null) {
-            serverPlayer.setEntryLocation(rebel.getEntryLocation().getTile());
+            serverPlayer.setEntryTile(rebel.getEntryTile());
         }
 
         if (teleport) { // Teleport in the units.
@@ -2145,7 +2145,7 @@ public final class InGameController extends Controller {
             // Do "new turn"-like actions that need to wait until right
             // before the player is about to move.
             serverGame.setCurrentPlayer(current);
-            if (current.isREF() && current.getEntryLocation() == null) {
+            if (current.isREF() && current.getEntryTile() == null) {
                 // Initialize this newly created REF
                 // If the teleportREF option is enabled, teleport it in.
                 REFAIPlayer refAIPlayer = (REFAIPlayer)freeColServer
@@ -2240,7 +2240,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         UnitType navalType = getRandomMember(logger, "Choose undead navy",
                                              navalUnits, random);
-        Tile start = ((Tile)serverPlayer.getEntryLocation())
+        Tile start = serverPlayer.getEntryTile()
             .getSafeTile(serverPlayer, random);
         Unit theFlyingDutchman
             = new ServerUnit(game, start, serverPlayer,

@@ -4124,7 +4124,7 @@ outer:  for (Effect effect : effects) {
                 createUnits(mercs, dst);//-vis: safe, in colony
                 cs.add(See.only(this), dst);
             } else { // Let them sail in
-                dst = getEntryLocation().getTile();
+                dst = getEntryTile();
                 loadShips(createUnits(transform(mercs, isLand), null),
                           createUnits(naval, dst),//-vis
                           null);

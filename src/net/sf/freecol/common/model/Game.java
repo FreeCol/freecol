@@ -559,8 +559,8 @@ public class Game extends FreeColGameObject {
      * @return The resulting object after update.
      */
     private <T extends FreeColGameObject> T update(T other,
-                                                  Class<T> returnClass,
-                                                  boolean create) {
+                                                   Class<T> returnClass,
+                                                   boolean create) {
         if (other == null) return null;
         final String id = other.getId();
         FreeColGameObject fcgo = getFreeColGameObject(id);

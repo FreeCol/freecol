@@ -1047,7 +1047,8 @@ public class Unit extends GoodsLocation
     public void setEntryLocation(Location entryLocation) {
         this.entryLocation = entryLocation;
         if (this.entryLocation != null) {
-            owner.setEntryLocation(this.entryLocation);
+            Tile tile = this.entryLocation.getTile();
+            if (tile != null) owner.setEntryTile(tile);
         }
     }
 
@@ -1059,8 +1060,8 @@ public class Unit extends GoodsLocation
      */
     public Tile getFullEntryLocation() {
         return (this.entryLocation != null) ? this.entryLocation.getTile()
-            : (owner.getEntryLocation() == null) ? null
-            : owner.getEntryLocation().getTile();
+            : (owner.getEntryTile() == null) ? null
+            : owner.getEntryTile();
     }
 
     /**
