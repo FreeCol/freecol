@@ -1230,6 +1230,7 @@ public final class FreeColServer {
         Map importMap = (importFile == null) ? null
             : FreeColServer.readMap(importFile, serverGame.getSpecification());
         Map ret = getMapGenerator().generateMap(serverGame, importMap, lb);
+        lb.shrink("\n");
         lb.log(logger, Level.FINER);
         return ret;
     }

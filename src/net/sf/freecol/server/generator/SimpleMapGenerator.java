@@ -757,7 +757,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 // random latitude, not too close to the pole
                 int y = randomInt(logger, "Pole", random,
                                   height - 2*poleDistance) + poleDistance;
-                player.setEntryLocation(map.getTile(x, y));
+                player.setEntryTile(map.getTile(x, y));
                 continue;
             }
             if (player.isEuropean()) europeanPlayers.add(player);
@@ -830,7 +830,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 throw new RuntimeException(lb2.toString());
             }
 
-            player.setEntryLocation(startTile);
+            player.setEntryTile(startTile);
 
             if (startAtSea) {
                 for (Unit carrier : carriers) {

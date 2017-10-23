@@ -499,18 +499,15 @@ public class NativeTrade extends FreeColGameObject {
         NativeTrade o = copyInCast(other, NativeTrade.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        this.unit = game.updateRef(o.getUnit(), Unit.class);
-        this.is = game.updateRef(o.getIndianSettlement(),
-                                 IndianSettlement.class);
+        this.unit = game.updateRef(o.getUnit());
+        this.is = game.updateRef(o.getIndianSettlement());
         this.count = o.getCount();
         this.buy = o.getBuy();
         this.sell = o.getSell();
         this.gift = o.getGift();
-        this.item = game.update(o.getItem(), NativeTradeItem.class);
-        this.unitToSettlement = game.update(o.getUnitToSettlement(),
-                                            NativeTradeItem.class);
-        this.settlementToUnit = game.update(o.getSettlementToUnit(),
-                                            NativeTradeItem.class);
+        this.item = game.update(o.getItem(), false);
+        this.unitToSettlement = game.update(o.getUnitToSettlement(), false);
+        this.settlementToUnit = game.update(o.getSettlementToUnit(), false);
         return true;
     }
 

@@ -158,7 +158,10 @@ public class LogBuilder {
      */
     public void shrink(String delim) {
         if (sb != null && delim != null) {
-            sb.setLength(sb.length() - delim.length());
+            int idx = sb.length() - delim.length();
+            if (idx >= 0 && sb.substring(idx).equals(delim)) {
+                sb.setLength(sb.length() - delim.length());
+            }
         }
     }
 

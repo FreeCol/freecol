@@ -107,7 +107,17 @@ public abstract class FreeColObject
         logger.warning("getFreeColObjectClass could not find: " + type);
         return null;
     }
-        
+
+    /**
+     * Get the FreeColObject class for this object.
+     *
+     * @return The class, or null on error.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends FreeColObject> Class<T> getFreeColObjectClass() {
+        return (Class<T>)this.getClass();
+    }
+
 
     // Identifier handling
 

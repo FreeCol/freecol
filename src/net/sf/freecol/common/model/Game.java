@@ -274,7 +274,20 @@ public class Game extends FreeColGameObject {
      * @return True if the update succeeds.
      */
     public synchronized boolean preGameUpdate(Game game) {
-        return copyIn(game);
+        boolean ret = copyIn(game);
+        LogBuilder lb = new LogBuilder(64);
+        switch (game.checkIntegrity(true, lb)) {
+        case 1:
+            break;
+        case 0:
+            logger.info("New game integrity test failed, but fixed."
+                + lb.toString());
+            break;
+        default:
+            logger.warning("New game integrity test failed." + lb.toString());
+            break;
+        }
+        return ret;
     }
 
     /**
@@ -528,12 +541,11 @@ public class Game extends FreeColGameObject {
      *
      * @param T The type of object to update.
      * @param other The other object.
-     * @param returnClass The expected class of the object.
      * @return The resulting object after update.
      */
-    public <T extends FreeColGameObject> T update(T other,
-                                                  Class<T> returnClass) {
-        return update(other, returnClass, false);
+    public <T extends FreeColGameObject> T update(T other, boolean create) {
+        return (other == null) ? null
+            : update(other, other.getFreeColObjectClass(), create);
     }
 
     /**
@@ -546,9 +558,9 @@ public class Game extends FreeColGameObject {
      * @param create If true, create missing objects.
      * @return The resulting object after update.
      */
-    public <T extends FreeColGameObject> T update(T other,
-                                                  Class<T> returnClass,
-                                                  boolean create) {
+    private <T extends FreeColGameObject> T update(T other,
+                                                   Class<T> returnClass,
+                                                   boolean create) {
         if (other == null) return null;
         final String id = other.getId();
         FreeColGameObject fcgo = getFreeColGameObject(id);
@@ -586,14 +598,15 @@ public class Game extends FreeColGameObject {
      * @param T The type of object to update.
      * @param other The collection of objects to update.
      * @param returnClass The expected class of the objects.
+     * @param create If true, create missing objects.
      * @return The resulting list of updated objects.
      */
     public <T extends FreeColGameObject> List<T> update(Collection<T> other,
-                                                        Class<T> returnClass) {
+                                                        boolean create) {
         if (other == null) return null;
         List<T> ret = new ArrayList<>();
         for (T t : other) {
-            T nt = update(t, returnClass);
+            T nt = update(t, create);
             if (nt != null) ret.add(nt);
         }
         return ret;
@@ -604,11 +617,23 @@ public class Game extends FreeColGameObject {
      *
      * @param T The type of object to update.
      * @param other The other object.
+     * @return The resulting object after update.
+     */
+    public <T extends FreeColGameObject> T updateRef(T other) {
+        return (other == null) ? null
+            : updateRef(other, other.getFreeColObjectClass());
+    }
+
+    /**
+     * Update a {@code FreeColGameObject} from a reference to it in an update.
+     *
+     * @param T The type of object to update.
+     * @param other The other object.
      * @param returnClass The expected class of the object.
      * @return The resulting object after update.
      */
-    public <T extends FreeColGameObject> T updateRef(T other,
-                                                     Class<T> returnClass) {
+    private <T extends FreeColGameObject> T updateRef(T other,
+                                                      Class<T> returnClass) {
         if (other == null) return null;
         final String id = other.getId();
         return getFreeColGameObject(id, returnClass);
@@ -620,15 +645,13 @@ public class Game extends FreeColGameObject {
      *
      * @param T The type of object to update.
      * @param other The other object.
-     * @param returnClass The expected class of the object.
      * @return The resulting object after update.
      */
-    public <T extends FreeColGameObject> List<T> updateRef(Collection<T> other,
-                                                           Class<T> returnClass) {
+    public <T extends FreeColGameObject> List<T> updateRef(Collection<T> other) {
         if (other == null) return null;
         List<T> ret = new ArrayList<>();
         for (T t : other) {
-            T nt = updateRef(t, returnClass);
+            T nt = updateRef(t);
             if (nt != null) ret.add(nt);
         }
         return ret;
@@ -832,11 +855,10 @@ public class Game extends FreeColGameObject {
      */
     public void addPlayer(Player player) {
         synchronized (this.players) {
-            this.players.add(player);
+            if (!this.players.contains(player)) this.players.add(player);
         }
         Nation nation = getSpecification().getNation(player.getNationId());
         nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
-        if (getCurrentPlayer() == null) setCurrentPlayer(player);
     }
 
     /**
@@ -1016,18 +1038,16 @@ public class Game extends FreeColGameObject {
         for (Player p : players) {
             FreeColGameObject fcgo = getFreeColGameObject(p.getId());
             if (fcgo == null) {
-                fcgo = new Player(this, p.getId());
-                if (!fcgo.copyIn(p)) {
-                    logger.warning("addPlayers copyIn new fail: " + p);
+                if ((fcgo = update(p, Player.class, true)) != null) {
+                    addPlayer((Player)fcgo);
                 } else {
-                    addPlayer(p);
-                    valid.add(p);
-                }
+                    logger.warning("addPlayers create new fail: " + p);
+                }                
             } else if (fcgo instanceof Player) {
-                if (!fcgo.copyIn(p)) {
-                    logger.warning("addPlayers copyIn existing fail: " + p);
-                } else {
+                if (fcgo.copyIn(p)) {
                     valid.add(p);
+                } else {
+                    logger.warning("addPlayers copyIn existing fail: " + p);
                 }
             } else {
                 logger.warning("addPlayers onto non-player: " + fcgo);
@@ -1603,10 +1623,15 @@ public class Game extends FreeColGameObject {
         // Do not update nextId, it is not meaningful in the client.
         this.uuid = o.getUUID();
         this.clientUserName = o.getClientUserName();
-        setPlayers(addPlayers(o.players));
-        this.unknownEnemy = update(o.getUnknownEnemy(), Player.class);
-        // Allow creation, might be first sight of the map
-        setMap(update(o.getMap(), Map.class, true));
+
+        // Players before map, so the tile owners work efficiently
+        this.setPlayers(addPlayers(o.players));
+
+        // Allow creation, might be first sight of the map.
+        // Do map early, so map references work
+        this.setMap(update(o.getMap(), Map.class, true));
+
+        this.unknownEnemy = update(o.getUnknownEnemy(), false);
         this.nationOptions = o.getNationOptions();
         this.currentPlayer = updateRef(o.getCurrentPlayer(), Player.class);
         this.turn = o.getTurn();
@@ -1725,6 +1750,8 @@ public class Game extends FreeColGameObject {
 
         initialActiveUnitId = xr.getAttribute(INITIAL_ACTIVE_UNIT_ID,
                                               (String)null);
+
+        // currentPlayer handled in readChildren()
     }
 
     /**
@@ -1737,15 +1764,14 @@ public class Game extends FreeColGameObject {
         players.clear();
         unknownEnemy = null;
 
-        // Special case for the current player.  Defer lookup of the
-        // current player tag until we read the children, because that
-        // is where the players are defined.
+        // The current player is special.  Defer lookup of the current
+        // player tag until we read the children, because that is
+        // where the players are defined.
         String current = xr.getAttribute(CURRENT_PLAYER_TAG, (String)null);
 
         super.readChildren(xr);
 
-        currentPlayer = (current == null) ? null
-            : getFreeColGameObject(current, Player.class);
+        currentPlayer = xr.lookup(this, current, Player.class);
 
         // Make sure all work locations have rational default production
         // now that all tiles are defined.

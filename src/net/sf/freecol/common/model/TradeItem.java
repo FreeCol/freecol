@@ -244,8 +244,8 @@ public abstract class TradeItem extends FreeColGameObject {
         TradeItem o = copyInCast(other, TradeItem.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        this.source = game.updateRef(o.getSource(), Player.class);
-        this.destination = game.updateRef(o.getDestination(), Player.class);
+        this.source = game.updateRef(o.getSource());
+        this.destination = game.updateRef(o.getDestination());
         return true;
     }
 

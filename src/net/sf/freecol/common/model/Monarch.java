@@ -833,7 +833,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         Monarch o = copyInCast(other, Monarch.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        this.player = game.updateRef(o.getPlayer(), Player.class);
+        this.player = game.updateRef(o.getPlayer());
         this.supportSea = o.getSupportSea();
         this.displeasure = o.getDispleasure();
         this.expeditionaryForce = o.getExpeditionaryForce();

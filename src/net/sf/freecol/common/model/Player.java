@@ -227,8 +227,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /** The current tax rate for this player. */
     protected int tax = 0;
 
-    /** The player starting location on the map. */
-    protected Location entryLocation;
+    /** The player starting tile on the map. */
+    protected Tile entryTile;
 
     /** The market for Europe. */
     protected Market market;
@@ -1340,7 +1340,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected void setFoundingFathers(Set<FoundingFather> foundingFathers) {
         this.foundingFathers.clear();
-        this.foundingFathers.addAll(foundingFathers);
+        for (FoundingFather ff : foundingFathers) addFather(ff);
     }
 
     /**
@@ -2588,8 +2588,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Add the tutorial message for the start of the game.
      */
     public void addStartGameMessage() {
-        Location loc = getEntryLocation();
-        Tile tile = (loc == null) ? null : loc.getTile();
+        Tile tile = getEntryTile();
         String sailTag = (tile == null) ? "unknown"
             : (tile.getX() < tile.getMap().getWidth() / 2) ? "east"
             : "west";
@@ -2648,22 +2647,21 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets the default initial location where the units arriving from
      * {@link Europe} appear on the map.
      *
-     * @return The entry {@code Location}.
-     * @see Unit#getEntryLocation
+     * @return The entry {@code Tile}.
      */
-    public Location getEntryLocation() {
-        return this.entryLocation;
+    public Tile getEntryTile() {
+        return this.entryTile;
     }
 
     /**
      * Sets the default initial location where the units arriving from
      * {@link Europe} appear on the map.
      *
-     * @param entryLocation The new entry {@code Location}.
-     * @see #getEntryLocation
+     * @param entryTile The new entry {@code Tile}.
+     * @see #getEntryTile
      */
-    public void setEntryLocation(Location entryLocation) {
-        this.entryLocation = entryLocation;
+    public void setEntryTile(Tile entryTile) {
+        this.entryTile = entryTile;
     }
 
     /**
@@ -2676,8 +2674,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Tile getFallbackTile() {
         Settlement settlement = first(getSettlements());
-        Location loc = (settlement != null) ? settlement : getEntryLocation();
-        return (loc == null) ? null : loc.getTile();
+        return (settlement != null) ? settlement.getTile() : getEntryTile();
     }
 
     /**
@@ -3989,7 +3986,7 @@ public class Player extends FreeColGameObject implements Nameable {
         this.name = o.getName();
         this.independentNationName = o.getIndependentNationName();
         this.playerType = o.getPlayerType();
-        this.nationType = o.getNationType();
+        this.changeNationType(o.getNationType());
         this.nationId = o.getNationId();
         this.newLandName = o.getNewLandName();
         this.admin = o.isAdmin();
@@ -4006,21 +4003,19 @@ public class Player extends FreeColGameObject implements Nameable {
         this.oldSoL = o.getOldSoL();
         this.interventionBells = o.getInterventionBells();
         this.tax = o.getTax();
-        this.entryLocation = game.updateLocationRef(o.getEntryLocation());
-        this.market = game.update(o.getMarket(), Market.class);
-        this.europe = game.update(o.getEurope(), Europe.class);
-        this.monarch = game.update(o.getMonarch(), Monarch.class);
-        this.highSeas = game.update(o.getHighSeas(), HighSeas.class);
+        // Usually no map yet for the user
+        this.entryTile = game.update(o.getEntryTile(), true);
+        this.market = game.update(o.getMarket(), false);
+        this.europe = game.update(o.getEurope(), false);
+        this.monarch = game.update(o.getMonarch(), false);
+        this.highSeas = game.update(o.getHighSeas(), false);
         this.setFoundingFathers(o.getFoundingFathers());
         this.currentFather = o.getCurrentFather();
         this.setTension(o.getTension());
-        this.setBannedMissions(game.updateRef(o.getBannedMissions(), Player.class));
+        this.setBannedMissions(game.updateRef(o.getBannedMissions()));
         this.setStances(o.getStances());
-        // TradeRoutes are special
         this.tradeRoutes.clear();
-        for (TradeRoute tr : o.getTradeRoutes()) {
-            this.tradeRoutes.add(game.update(tr, TradeRoute.class));
-        }
+        for (TradeRoute tr : tradeRoutes) this.tradeRoutes.add(game.update(tr, false));
         this.setModelMessages(o.getModelMessages());
         this.setHistory(o.getHistory());
         this.setLastSales(o.getLastSales());
@@ -4110,6 +4105,10 @@ public class Player extends FreeColGameObject implements Nameable {
             xw.writeAttribute(OLD_SOL_TAG, oldSoL);
 
             xw.writeAttribute(SCORE_TAG, score);
+
+            if (entryTile != null) {
+                xw.writeAttribute(ENTRY_LOCATION_TAG, entryTile);
+            }
         }
 
         if (newLandName != null) {
@@ -4118,10 +4117,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
         if (independentNationName != null) {
             xw.writeAttribute(INDEPENDENT_NATION_NAME_TAG, independentNationName);
-        }
-
-        if (entryLocation != null) {
-            xw.writeLocationAttribute(ENTRY_LOCATION_TAG, entryLocation);
         }
     }
 
@@ -4302,8 +4297,8 @@ public class Player extends FreeColGameObject implements Nameable {
         attackedByPrivateers = xr.getAttribute(ATTACKED_BY_PRIVATEERS_TAG,
                                                false);
 
-        entryLocation = xr.getLocationAttribute(game, ENTRY_LOCATION_TAG,
-                                                true);
+        entryTile = xr.getAttribute(game, ENTRY_LOCATION_TAG,
+                                    Tile.class, (Tile)null);
     }
 
     /**

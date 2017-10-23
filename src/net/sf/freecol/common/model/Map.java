@@ -2637,19 +2637,17 @@ public class Map extends FreeColGameObject implements Location {
         Map o = copyInCast(other, Map.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
+        // Allow creating new regions in first map update
+        clearRegions();
+        for (Region r : o.getRegions()) addRegion(game.update(r, true));
         this.setTiles(o.getWidth(), o.getHeight());
         o.forEachTile((Tile t) ->
             // Allow creating new tiles in first map update
-            this.setTile(game.update(t, Tile.class, true),
-                         t.getX(), t.getY()));
+            this.setTile(game.update(t, true), t.getX(), t.getY()));
         this.layer = o.getLayer();
         this.minimumLatitude = o.getMinimumLatitude();
         this.maximumLatitude = o.getMaximumLatitude();
         this.latitudePerRow = o.getLatitudePerRow();
-        clearRegions();
-        for (Region r : o.getRegions()) {
-            addRegion(game.update(r, Region.class, true));
-        }
         return true;
     }
 

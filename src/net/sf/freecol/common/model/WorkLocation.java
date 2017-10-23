@@ -139,6 +139,10 @@ public abstract class WorkLocation extends UnitLocation
     }
 
 
+    public void setColony(Colony colony) {
+        this.colony = colony;
+    }
+
     /**
      * Get the production type.
      *
@@ -958,7 +962,7 @@ public abstract class WorkLocation extends UnitLocation
     public <T extends FreeColObject> boolean copyIn(T other) {
         WorkLocation o = copyInCast(other, WorkLocation.class);
         if (o == null || !super.copyIn(o)) return false;
-        this.colony = getGame().updateRef(o.getColony(), Colony.class);
+        this.colony = getGame().updateRef(o.getColony());
         this.productionType = o.getProductionType();
         return true;
     }

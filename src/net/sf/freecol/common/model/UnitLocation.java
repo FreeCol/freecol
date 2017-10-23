@@ -561,10 +561,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         UnitLocation o = copyInCast(other, UnitLocation.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        synchronized (this.units) {
-            this.units.clear();
-            for (Unit u : o.getUnitList()) { // Allow creation, unit may be new
-                this.units.add(game.update(u, Unit.class, true));
+        clearUnitList();
+        for (Unit u : o.getUnitList()) { // Allow creation, unit may be new
+            synchronized (this.units) {
+                Unit nu = game.update(u, true);
+                this.units.add(nu);
+                nu.setLocationNoUpdate(this);
             }
         }
         return true;

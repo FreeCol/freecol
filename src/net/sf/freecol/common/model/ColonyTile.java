@@ -531,7 +531,7 @@ public class ColonyTile extends WorkLocation {
         ColonyTile o = copyInCast(other, ColonyTile.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        this.workTile = game.updateRef(o.getWorkTile(), Tile.class);
+        this.workTile = game.updateRef(o.getWorkTile());
         return true;
     }
 

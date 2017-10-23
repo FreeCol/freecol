@@ -327,8 +327,7 @@ public abstract class GoodsLocation extends UnitLocation {
     public <T extends FreeColObject> boolean copyIn(T other) {
         GoodsLocation o = copyInCast(other, GoodsLocation.class);
         if (o == null || !super.copyIn(o)) return false;
-        this.goodsContainer = getGame().update(o.getGoodsContainer(),
-                                               GoodsContainer.class, true);
+        this.goodsContainer = getGame().update(o.getGoodsContainer(), true);
         return true;
     }
 
