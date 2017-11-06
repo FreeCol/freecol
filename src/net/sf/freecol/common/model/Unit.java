@@ -107,7 +107,7 @@ public class Unit extends GoodsLocation
     /** Useful predicate for finding sentried land units. */
     public static final Predicate<Unit> sentryPred = u ->
         !u.isNaval() && u.getState() == UnitState.SENTRY;
-    
+
     /** A state a Unit can have. */
     public static enum UnitState {
         ACTIVE,
@@ -265,7 +265,7 @@ public class Unit extends GoodsLocation
             setEthnicity(owner.getNationId());
         }
     }
-        
+
     /**
      * Get the individual name of this unit.
      *
@@ -358,7 +358,6 @@ public class Unit extends GoodsLocation
                     extra = StringTemplate.template("goldAmount")
                         .addAmount("%amount%", getTreasureAmount());
                 } else {
-                    boolean noEquipment = false;
                     // unequipped expert has no-equipment label
                     List<Role> expertRoles = type.getExpertRoles();
                     for (Role someRole : expertRoles) {
@@ -432,7 +431,7 @@ public class Unit extends GoodsLocation
             .addName("%chance%", (unknown) ? "??"
                 : String.valueOf((int)(combatOdds.win * 100)));
     }
-    
+
     /**
      * Get a destination label for this unit.
      *
@@ -819,7 +818,7 @@ public class Unit extends GoodsLocation
      * Get the role count.
      *
      * @return The current role count.
-     */    
+     */
     public int getRoleCount() {
         return roleCount;
     }
@@ -828,7 +827,7 @@ public class Unit extends GoodsLocation
      * Set the role count.
      *
      * @param roleCount The new role count.
-     */    
+     */
     public void setRoleCount(int roleCount) {
         this.roleCount = roleCount;
     }
@@ -1060,7 +1059,7 @@ public class Unit extends GoodsLocation
      */
     public Tile getFullEntryLocation() {
         return (this.entryLocation != null) ? this.entryLocation.getTile()
-            : (owner.getEntryTile() == null) ? null
+            : (owner.getEntryTile() == null) ? this.owner.getFallbackTile()
             : owner.getEntryTile();
     }
 
@@ -1358,7 +1357,7 @@ public class Unit extends GoodsLocation
     public UnitTypeChange getUnitChange(String change) {
         return getUnitChange(change, null);
     }
-    
+
     /**
      * Get a unit change for this unit.
      *
@@ -1637,7 +1636,7 @@ public class Unit extends GoodsLocation
     public List<TradeRouteStop> getCurrentStops() {
         if (validateCurrentStop() < 0) return null;
         List<TradeRouteStop> stops
-            = new ArrayList<TradeRouteStop>(getTradeRoute().getStops());
+            = new ArrayList<>(getTradeRoute().getStops());
         rotate(stops, currentStop);
         return stops;
     }
@@ -2576,7 +2575,7 @@ public class Unit extends GoodsLocation
             && getState() == UnitState.ACTIVE
             && getMovesLeft() > 0;
     }
-    
+
     /**
      * Is this unit a suitable `next active unit', that is, the unit
      * needs to be currently movable by the player.
@@ -2618,7 +2617,7 @@ public class Unit extends GoodsLocation
             // Trade route code might set destination
     }
 
-    
+
     // Map support routines
 
     /**
@@ -2722,7 +2721,7 @@ public class Unit extends GoodsLocation
             Tile tile = getTile();
             if (tile != null && tile.isOnRiver()
                 && tile.isHighSeasConnected()) {
-                path = search(getLocation(), 
+                path = search(getLocation(),
                     GoalDeciders.getCornerGoalDecider(),
                     CostDeciders.avoidSettlementsAndBlockingUnits(),
                     INFINITY, null);
@@ -2866,7 +2865,7 @@ public class Unit extends GoodsLocation
     public Colony getClosestColony(List<Colony> colonies) {
         return getClosestColony(colonies.stream());
     }
-    
+
     /**
      * Get the colony that can be reached by this unit in the least number
      * of turns.
@@ -2879,7 +2878,7 @@ public class Unit extends GoodsLocation
             (col == null) ? MANY_TURNS-1 : this.getTurnsToReach(col));
         return minimize(concat(Stream.of((Colony)null), colonies), comp);
     }
-    
+
     /**
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier.
@@ -3146,7 +3145,7 @@ public class Unit extends GoodsLocation
                     }
                     final Predicate<Unit> attackerPred = u -> {
                         PathNode p;
-                        return (u.canAttack(unit) 
+                        return (u.canAttack(unit)
                             && cm.calculateCombatOdds(u, unit).win >= threat
                             && (p = u.findPath(start)) != null
                             && p.getTotalTurns() < range);
@@ -3213,10 +3212,10 @@ public class Unit extends GoodsLocation
     public Set<Tile> getVisibleTileSet() {
         final Tile tile = getTile();
         return (tile == null) ? Collections.<Tile>emptySet()
-            : new HashSet<Tile>(tile.getSurroundingTiles(0, getLineOfSight()));
+            : new HashSet<>(tile.getSurroundingTiles(0, getLineOfSight()));
     }
 
-    
+
     // Goods handling
 
     /**
@@ -3663,7 +3662,7 @@ public class Unit extends GoodsLocation
         result.addAll(transform(owner.getModifiers(id, fcgot, turn),
                 alwaysTrue(),
                 m -> m.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX)));
-        
+
         // Role modifiers apply
         result.addAll(transform(role.getModifiers(id, fcgot, turn),
                 alwaysTrue(),
@@ -4091,6 +4090,7 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public void invalidateCache() {}
 
     /**
@@ -4317,6 +4317,7 @@ public class Unit extends GoodsLocation
     // Serialization
 
     private static final String ATTRITION_TAG = "attrition";
+    @SuppressWarnings("unused")
     private static final String COUNT_TAG = "count";
     private static final String CURRENT_STOP_TAG = "currentStop";
     private static final String DESTINATION_TAG = "destination";
@@ -4468,7 +4469,6 @@ public class Unit extends GoodsLocation
                                          Player.class, (Player)null, true);
         if (xr.shouldIntern()) game.checkOwners(this, oldOwner);
 
-        UnitType oldUnitType = this.type;
         this.type = xr.getType(spec, UNIT_TYPE_TAG,
                                UnitType.class, (UnitType)null);
 
@@ -4545,7 +4545,6 @@ public class Unit extends GoodsLocation
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
@@ -4569,6 +4568,7 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return TAG; }
 
 
