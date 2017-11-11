@@ -1069,7 +1069,10 @@ public abstract class FreeColObject
     public <T extends FreeColObject> boolean copyIn(T other) {
         FreeColObject fco = copyInCast(other, FreeColObject.class);
         if (fco == null) return false;
-        this.pcs = fco.getPropertyChangeSupport();
+        for (PropertyChangeListener pcl : fco.getPropertyChangeListeners()) {
+            fco.removePropertyChangeListener(pcl);
+            this.addPropertyChangeListener(pcl);
+        }
         return true;
     } 
 
