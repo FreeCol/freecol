@@ -1034,7 +1034,7 @@ public class ServerUnit extends Unit implements TurnTaker {
                     if (getTradeRoute() == null) {
                         setDestination(null);
                         cs.addMessage(owner,
-                            new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                            new ModelMessage(ModelMessage.MessageType.UNIT_ARRIVED,
                                              "model.unit.arriveInEurope",
                                              europe, this)
                                 .addNamed("%europe%", europe));
