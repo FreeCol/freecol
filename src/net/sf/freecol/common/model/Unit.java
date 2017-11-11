@@ -3406,7 +3406,8 @@ public class Unit extends GoodsLocation
                 } else {
                     ret = StringTemplate.key("model.unit.occupation.inTradeRoute");
                 }
-            } else if (getState() == UnitState.ACTIVE && getMovesLeft() == 0) {
+            } else if (getState() == UnitState.ACTIVE && getMovesLeft() == 0
+                       && !isInEurope()) {
                 ret = StringTemplate.key("model.unit.occupation.activeNoMovesLeft");
             } else if (getState() == UnitState.IMPROVING
                 && getWorkImprovement() != null) {
