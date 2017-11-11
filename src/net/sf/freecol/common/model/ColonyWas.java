@@ -50,9 +50,6 @@ public class ColonyWas {
         this.population = colony.getUnitCount();
         this.productionBonus = colony.getProductionBonus();
         this.buildQueue = new ArrayList<>(colony.getBuildQueue());
-        if (colony.getGoodsContainer() != null) {
-            colony.getGoodsContainer().saveState();
-        }
     }
 
     /**
@@ -83,8 +80,7 @@ public class ColonyWas {
             ret = true;
         }
         if (colony.getGoodsContainer() != null) {
-            colony.getGoodsContainer().fireChanges();
-            ret = true;
+            ret |= colony.getGoodsContainer().fireChanges();
         }
         return true;
     }
