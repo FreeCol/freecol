@@ -544,7 +544,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         GoodsContainer o = copyInCast(other, GoodsContainer.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        this.parent = game.updateLocationRef(o.getParent());
+        // Parent is fixed, and not serialized
         this.setStoredGoods(o.getStoredGoods());
         this.setOldStoredGoods(o.getOldStoredGoods());
         return true;
