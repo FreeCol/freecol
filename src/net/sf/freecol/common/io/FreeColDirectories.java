@@ -573,7 +573,10 @@ public class FreeColDirectories {
             saveDirectory = new File(getUserDataDirectory(), SAVE_DIRECTORY);
             if (!insistDirectory(saveDirectory)) return badDir(saveDirectory);
         }
-        autosaveDirectory = deriveAutosaveDirectory();
+        // TODO: Drop trace when BR#3097b is settled
+        File dir = deriveAutosaveDirectory();
+        System.err.println("Autosave directory initialized to " + dir);
+        setAutosaveDirectory(dir);
         userModsDirectory = new File(getUserDataDirectory(), MODS_DIRECTORY);
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
 
@@ -609,9 +612,22 @@ public class FreeColDirectories {
     public static File getAutosaveDirectory() {
         // Re-establish the autosave directory if it has gone away
         if (!isGoodDirectory(autosaveDirectory)) {
-            autosaveDirectory = deriveAutosaveDirectory();
+            File dir = deriveAutosaveDirectory();
+            // TODO: Drop trace when BR#3097b is settled
+            System.err.println("Autosave directory " + autosaveDirectory
+                + " is broken, replacing with " + dir);
+            setAutosaveDirectory(dir);
         }
         return autosaveDirectory;
+    }
+
+    /**
+     * Set the autosave directory.
+     *
+     * @param dir The new autosave directory.
+     */
+    private static void setAutosaveDirectory(File dir) {
+        autosaveDirectory = dir;
     }
 
     /**
@@ -1102,7 +1118,11 @@ public class FreeColDirectories {
         File parent = file.getParentFile();
         if (parent == null) parent = new File(".");
         saveDirectory = parent;
-        autosaveDirectory = deriveAutosaveDirectory();
+        // TODO: Drop trace when BR#3097b is settled
+        File dir = deriveAutosaveDirectory();
+        System.err.println("Autosave directory " + autosaveDirectory
+                + " follows saveDirectory change to " + dir);
+        setAutosaveDirectory(dir);
         return true;
     }
 
