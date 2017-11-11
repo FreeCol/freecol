@@ -695,7 +695,6 @@ public final class InGameController extends FreeColClientHolder {
         for (ModelMessage m : ((allMessages) ? player.getModelMessages()
                 : player.getNewModelMessages())) {
             final String key = m.getOptionName();
-System.err.println("MESSAGE: " + m + " key=|" + key + "|");
             if ((key == null || co.getBoolean(key))
                 && !continueIgnoreMessage(m.getIgnoredMessageKey(), thisTurn)) {
                 messages.add(m);
