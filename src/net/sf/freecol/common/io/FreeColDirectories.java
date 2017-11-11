@@ -23,14 +23,16 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.filechooser.FileSystemView;
@@ -158,6 +160,12 @@ public class FreeColDirectories {
             || Utils.directoryAllPresent(f, MOD_DESCRIPTOR_FILE_NAME,
                                          SPECIFICATION_FILE_NAME);
 
+    /** Posix file mode 0700. */
+    private static final Set<PosixFilePermission> mode0700
+        = makeUnmodifiableSet(PosixFilePermission.OWNER_READ,
+                              PosixFilePermission.OWNER_WRITE,
+                              PosixFilePermission.OWNER_EXECUTE);
+        
     
     /**
      * The directory containing automatically created save games.  At
@@ -305,7 +313,12 @@ public class FreeColDirectories {
         if (dir.exists()) {
             if (dir.isDirectory() && dir.canWrite()) return dir;
         } else {
-            if (dir.mkdir()) return dir;
+            if (dir.mkdir()) {
+                try {
+                    Files.setPosixFilePermissions(dir.toPath(), mode0700);
+                } catch (IOException ioe) { /* ignore */ }
+                return dir;
+            }
         }
         return null;
     }
@@ -341,24 +354,14 @@ public class FreeColDirectories {
     /**
      * Get directories for XDG compliant systems.
      *
-     * Result is:
-     * - Negative if a non-XDG OS is detected or there is insufficient
-     *   XDG structure to merit migrating, or what structure there is is
-     *   broken in some way.
-     * - Zero if there is at least one relevant XDG environment
-     *   variable in use and it points to a valid writable directory,
-     *   or the default exists and is writable.
-     * - Positive if there are a full set of suitable XDG directories and
-     *   there are freecol directories therein.
-     * - Otherwise negative, including non-directories in the wrong place
-     *   and unwritable directories.
-     *
-     * The intent is to ignore XDG on negative, migrate on zero, and use
-     * on positive.
+     * XDG say: 
+     *   If, when attempting to write a file, the destination
+     *   directory is non-existant an attempt should be made to create
+     *   it with permission 0700.
      *
      * @param dirs An array of {@code File} to be filled in with the
      *     XDG directory if it is present or created.
-     * @return The XDG compliance state.
+     * @return Null on success, an error message on error.
      */
     private static StringTemplate getXDGDirs(File[] dirs) {
         File home = getUserDefaultDirectory();
@@ -367,7 +370,7 @@ public class FreeColDirectories {
         String env = System.getenv(XDG_CONFIG_HOME_ENV);
         File d = (env != null) ? new File(env)
             : new File(home, XDG_CONFIG_HOME_DEFAULT);
-        if (!isGoodDirectory(d)) return badDir(d);
+        if ((d = requireDirectory(d)) == null) return badDir(d);
         File f = new File(d, FREECOL_DIRECTORY);
         if ((d = requireDirectory(f)) == null) return badConfig(f);
         dirs[0] = d;
@@ -375,7 +378,7 @@ public class FreeColDirectories {
         env = System.getenv(XDG_DATA_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_DATA_HOME_DEFAULT);
-        if (!isGoodDirectory(d)) return badDir(d);
+        if ((d = requireDirectory(d)) == null) return badDir(d);
         f = new File(d, FREECOL_DIRECTORY);
         if ((d = requireDirectory(f)) == null) return badData(f);
         dirs[1] = d;
@@ -383,7 +386,7 @@ public class FreeColDirectories {
         env = System.getenv(XDG_CACHE_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_CACHE_HOME_DEFAULT);
-        if (!isGoodDirectory(d)) return badDir(d);
+        if ((d = requireDirectory(d)) == null) return badDir(d);
         f = new File(d, FREECOL_DIRECTORY);
         if ((d = requireDirectory(f)) == null) return badCache(f);
         dirs[2] = d;
