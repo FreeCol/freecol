@@ -43,6 +43,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.util.OSUtils;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.OSUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -241,33 +242,6 @@ public class FreeColDirectories {
      */
     private static File userModsDirectory = null;
 
-
-    /**
-     * Does the OS look like Mac OS X?
-     *
-     * @return True if Mac OS X appears to be present.
-     */
-    public static boolean onMacOSX() {
-        return "Mac OS X".equals(OSUtils.getOperatingSystem());
-    }
-
-    /**
-     * Does the OS look like some sort of unix?
-     *
-     * @return True we hope.
-     */
-    public static boolean onUnix() {
-        return "/".equals(SEPARATOR);
-    }
-
-    /**
-     * Does the OS look like some sort of Windows?
-     *
-     * @return True if Windows appears to be present.
-     */
-    public static boolean onWindows() {
-        return OSUtils.getOperatingSystem().startsWith("Windows");
-    }
 
     /**
      * Get the user home directory.
