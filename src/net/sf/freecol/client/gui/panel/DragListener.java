@@ -30,7 +30,7 @@ import javax.swing.JPopupMenu.Separator;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.label.AbstractGoodsLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.common.model.Unit;
@@ -49,33 +49,28 @@ public final class DragListener extends MouseAdapter {
 
     /**
      * The maximum numbers of pixels of the user's screen height
-     *      before triggering the small flag
+     * before triggering the small flag.
      */
     private static final int maxWindowHeight = 768;
 
-    /**
-     * The user's screen height.
-     */
-    private static final int windowHeight = (int) Math.floor(Toolkit.getDefaultToolkit().getScreenSize().getHeight());
+    /** The user's screen height. */
+    private static final int windowHeight
+        = (int)Math.floor(Toolkit.getDefaultToolkit().getScreenSize().getHeight());
 
     /**
-     * The user's operating system.
-     */
-    private static final String operatingSystem = OSUtils.getOperatingSystem();
-
-    /**
-     * Whether the user's operating system is Microsoft Windows
-     */
-    private final boolean windows = operatingSystem.startsWith("Windows");
-
-    /**
-     * Whether the user's screen height is smaller than the maximum height allowed
+     * Whether the user's screen height is smaller than the maximum
+     * height allowed
      */
     private static final boolean small = windowHeight < maxWindowHeight;
 
-    private final FreeColPanel parentPanel;
+    /** Enable windows workaround. */
+    private final boolean windows = OSUtils.onWindows();
 
+    /** The enclosing client. */
     private final FreeColClient freeColClient;
+
+    /** The panel within which the drag occurs. */
+    private final FreeColPanel parentPanel;
 
 
     /**
@@ -100,18 +95,14 @@ public final class DragListener extends MouseAdapter {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        JComponent comp = (JComponent) e.getSource();
-        // Does not work on some platforms:
-        // if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
+        final JComponent comp = (JComponent)e.getSource();
 
+        // Special case for the menu.
         if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
-            if (!parentPanel.isEditable()) { // No panel when not editable
-                logger.warning("Button3 disabled on non-editable panel: "
-                        + parentPanel);
-                return;
-            }
+            if (!this.parentPanel.isEditable()) return;
+
             final QuickActionMenu menu
-                    = new QuickActionMenu(freeColClient, parentPanel)
+                = new QuickActionMenu(this.freeColClient, this.parentPanel)
                     .addMenuItems(comp);
             final int lastIdx = menu.getComponentCount() - 1;
             if ((lastIdx >= 0)
@@ -119,7 +110,6 @@ public final class DragListener extends MouseAdapter {
                 menu.remove(lastIdx);
             if (menu.getComponentCount() <= 0) return;
 
-            final SwingGUI gui = (SwingGUI) freeColClient.getGUI();
             /*
             FIXME: Cleanup implementation
             Work-arounds:
@@ -129,52 +119,57 @@ public final class DragListener extends MouseAdapter {
             extend beyond the canvas. Targeted for users with
             smaller screens such as netbooks.
             */
-            if ((gui.isWindowed() && windows) || (!gui.isWindowed() && small)) {
+            final GUI gui = this.freeColClient.getGUI();
+            if ((gui.isWindowed() && windows)
+                || (!gui.isWindowed() && small)) {
                 menu.show(gui.getCanvas(), menu.getLocation().x, 0);
             } else {
                 menu.show(comp, e.getX(), e.getY());
             }
+            return;
+        }
 
-        } else {
-            if (comp instanceof AbstractGoodsLabel) {
-                AbstractGoodsLabel label = (AbstractGoodsLabel) comp;
-                if (e.isShiftDown() && e.isAltDown()) {
-                    Component[] cArr = comp.getParent().getComponents();
-                    int sum = 0;
-                    for (int i = 0; i < cArr.length; i++) {
-                        if (cArr[i] instanceof AbstractGoodsLabel) {
-                            AbstractGoodsLabel abGoods = (AbstractGoodsLabel) cArr[i];
-                            if (abGoods.getAbstractGoods().getType().equals(label.getAbstractGoods().getType())) {
-                                sum += abGoods.getAmount();
-                            }
+        if (comp instanceof AbstractGoodsLabel) {
+            AbstractGoodsLabel label = (AbstractGoodsLabel)comp;
+            if (e.isShiftDown() && e.isAltDown()) {
+                Component[] cArr = comp.getParent().getComponents();
+                int sum = 0;
+                for (int i = 0; i < cArr.length; i++) {
+                    if (cArr[i] instanceof AbstractGoodsLabel) {
+                        AbstractGoodsLabel abGoods = (AbstractGoodsLabel) cArr[i];
+                        if (abGoods.getAbstractGoods().getType().equals(label.getAbstractGoods().getType())) {
+                            sum += abGoods.getAmount();
                         }
                     }
-                    label.setSuperFullChosen(true);
-                    label.setAmount(sum);
-                } else if (e.isShiftDown()) {
-                    label.setSuperFullChosen(false);
-                    label.setPartialChosen(true);
-                } else if (e.isControlDown()) {
-                    label.setSuperFullChosen(false);
-                    label.setFullChosen(true);
-                } else {
-                    label.setSuperFullChosen(false);
-                    label.setPartialChosen(false);
-                    label.setDefaultAmount();
-                }            } else if (comp instanceof UnitLabel) {
-                final UnitLabel label = (UnitLabel) comp;
-                final Unit u = label.getUnit();
-                if (u.isCarrier()
-                        && !u.isAtSea()
-                        && parentPanel instanceof PortPanel) {
-                    ((PortPanel) parentPanel).setSelectedUnitLabel(label);
                 }
+                label.setSuperFullChosen(true);
+                label.setAmount(sum);
+            } else if (e.isShiftDown()) {
+                label.setSuperFullChosen(false);
+                label.setPartialChosen(true);
+            } else if (e.isControlDown()) {
+                label.setSuperFullChosen(false);
+                label.setFullChosen(true);
+            } else {
+                label.setSuperFullChosen(false);
+                label.setPartialChosen(false);
+                label.setDefaultAmount();
             }
+        } else if (comp instanceof UnitLabel) {
+            final UnitLabel label = (UnitLabel) comp;
+            final Unit u = label.getUnit();
+            if (u.isCarrier()
+                && !u.isAtSea()
+                && this.parentPanel instanceof PortPanel) {
+                ((PortPanel)this.parentPanel).setSelectedUnitLabel(label);
+            }
+        } else {
+            System.err.println("What is this?:" + comp);
+        }
 
-            final TransferHandler handler = comp.getTransferHandler();
-            if (handler != null) {
-                handler.exportAsDrag(comp, e, TransferHandler.COPY);
-            }
+        final TransferHandler handler = comp.getTransferHandler();
+        if (handler != null) {
+            handler.exportAsDrag(comp, e, TransferHandler.COPY);
         }
     }
 }
