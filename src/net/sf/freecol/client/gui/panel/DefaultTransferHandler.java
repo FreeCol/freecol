@@ -85,95 +85,100 @@ public final class DefaultTransferHandler extends TransferHandler {
         private boolean scrolls;
 
 
-        // --- DragGestureListener methods -----------------------------------
+        private void updatePartialChosen(JComponent comp, boolean partial) {
+            if (comp instanceof AbstractGoodsLabel) {
+                ((AbstractGoodsLabel)comp).setPartialChosen(partial);
+            }
+        }
 
         /**
-         * A Drag gesture has been recognized.
+         * Get a suitable cursor for the given component.
+         *
+         * @param c The component to consider.
+         * @return A suitable {@code Cursor}, or null on failure.
          */
-        @Override
+        private Cursor getCursor(JComponent c) {
+            if (c instanceof JLabel
+                && ((JLabel)c).getIcon() instanceof ImageIcon) {
+                Toolkit tk = Toolkit.getDefaultToolkit();
+                ImageIcon imageIcon = ((ImageIcon)((JLabel)c).getIcon());
+                Dimension bestSize = tk.getBestCursorSize(imageIcon.getIconWidth(),
+                    imageIcon.getIconHeight());
+                    
+                if (bestSize.width == 0 || bestSize.height == 0) return null;
+                   
+                if (bestSize.width > bestSize.height) {
+                    bestSize.height = (int)((((double)bestSize.width)
+                            / ((double)imageIcon.getIconWidth()))
+                        * imageIcon.getIconHeight());
+                } else {
+                    bestSize.width = (int)((((double)bestSize.height)
+                            / ((double)imageIcon.getIconHeight()))
+                        * imageIcon.getIconWidth());
+                }
+                BufferedImage scaled = ImageLibrary
+                    .createResizedImage(imageIcon.getImage(),
+                                        bestSize.width, bestSize.height);
+                Point point = new Point(bestSize.width / 2,
+                                        bestSize.height / 2);
+                try {
+                    return tk.createCustomCursor(scaled, point,
+                                                 "freeColDragIcon");
+                } catch (Exception ex) {
+                    ; // Fall through
+                }
+            }
+            return null;
+        }
+        
+
+        // Interface DragGestureListener
+
+        /**
+         * {@inheritDoc}
+         */
         public void dragGestureRecognized(DragGestureEvent dge) {
             JComponent c = (JComponent)dge.getComponent();
             DefaultTransferHandler th
                 = (DefaultTransferHandler)c.getTransferHandler();
             Transferable t = th.createTransferable(c);
-
-            if (t != null) {
-                scrolls = c.getAutoscrolls();
-                c.setAutoscrolls(false);
-                try {
-                    if (c instanceof JLabel
-                        && ((JLabel)c).getIcon() instanceof ImageIcon) {
-                        Toolkit tk = Toolkit.getDefaultToolkit();
-                        ImageIcon imageIcon = ((ImageIcon)((JLabel)c).getIcon());
-                        Dimension bestSize = tk.getBestCursorSize(imageIcon.getIconWidth(),
-                            imageIcon.getIconHeight());
-
-                        if (bestSize.width == 0 || bestSize.height == 0) {
-                            dge.startDrag(null, t, this);
-                            return;
-                        }
-
-                        if (bestSize.width > bestSize.height) {
-                            bestSize.height = (int)((((double)bestSize.width)
-                                    / ((double)imageIcon.getIconWidth()))
-                                * imageIcon.getIconHeight());
-                        } else {
-                            bestSize.width = (int)((((double)bestSize.height)
-                                    / ((double)imageIcon.getIconHeight()))
-                                * imageIcon.getIconWidth());
-                        }
-                        BufferedImage scaled = ImageLibrary.createResizedImage(
-                            imageIcon.getImage(),
-                            bestSize.width, bestSize.height);
-
-                        Point point = new Point(bestSize.width / 2,
-                                                bestSize.height / 2);
-                        Cursor cursor;
-                        try {
-                            cursor = tk.createCustomCursor(scaled, point,
-                                                           "freeColDragIcon");
-                        } catch (RuntimeException re) {
-                            cursor = null;
-                        }
-                        // Point point = new Point(0, 0);
-                        dge.startDrag(cursor, t, this);
-                    } else {
-                        dge.startDrag(null, t, this);
-                    }
-
-                    return;
-                } catch (RuntimeException re) {
-                    c.setAutoscrolls(scrolls);
-                }
+            if (t == null) {
+                logger.warning("Unable to create transferable for: " + dge);
+                th.exportDone(c, null, NONE);
+                return;
             }
 
-            th.exportDone(c, null, NONE);
+            this.scrolls = c.getAutoscrolls();
+            c.setAutoscrolls(false);
+            try {
+                Cursor cursor = getCursor(c);
+                dge.startDrag(cursor, t, this);
+            } catch (RuntimeException re) {
+                c.setAutoscrolls(this.scrolls);
+            }
         }
 
-        // --- DragSourceListener methods -----------------------------------
+
+        // Interface DragSourceListener
 
         /**
-         * As the hotspot enters a platform dependent drop site.
+         * {@inheritDoc}
          */
-        @Override
         public void dragEnter(DragSourceDragEvent dsde) {}
 
         /**
-         * As the hotspot moves over a platform dependent drop site.
+         * {@inheritDoc}
          */
-        @Override
         public void dragOver(DragSourceDragEvent dsde) {}
 
         /**
-         * As the hotspot exits a platform dependent drop site.
+         * {@inheritDoc}
          */
-        @Override
         public void dragExit(DragSourceEvent dsde) {}
 
         /**
-         * As the operation completes.
+         * {@inheritDoc}
          */
-        @Override
         public void dragDropEnd(DragSourceDropEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent c = (JComponent)dsc.getComponent();
@@ -188,17 +193,13 @@ public final class DefaultTransferHandler extends TransferHandler {
             c.setAutoscrolls(scrolls);
         }
 
-        @Override
+        /**
+         * {@inheritDoc}
+         */
         public void dropActionChanged(DragSourceDragEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent comp = (JComponent)dsc.getComponent();
             updatePartialChosen(comp, dsde.getUserAction() == MOVE);
-        }
-
-        private void updatePartialChosen(JComponent comp, boolean partial) {
-            if (comp instanceof AbstractGoodsLabel) {
-                ((AbstractGoodsLabel)comp).setPartialChosen(partial);
-            }
         }
     }
 
@@ -319,6 +320,155 @@ public final class DefaultTransferHandler extends TransferHandler {
                                     needToPay);
     }
 
+    /**
+     * Complain about import failure.
+     *
+     * @param comp The importing component.
+     * @param data A description of the data being imported.
+     * @return Always false.
+     */
+    private boolean importFail(JComponent comp, String data) {
+        logger.warning("Transfer of " + data + " invalid at: " + comp);
+        return false;
+    }
+
+    /**
+     * Import goods specified by label to a component.
+     *
+     * @param comp The component to import to.
+     * @param label The {@code GoodsLabel} specifying the goods.
+     * @param oldSelectedUnit A label for the old {@code Unit} to restore
+     *     selection to.
+     * @return True if the import succeeds.
+     */
+    private boolean importGoods(JComponent comp, GoodsLabel label,
+                                UnitLabel oldSelectedUnit) {
+        Goods goods = label.getGoods();
+
+        // Special handling for goods amount.
+        if (label.isSuperFullChosen()) {
+            if (goods.getLocation() instanceof GoodsLocation) {
+                GoodsLocation loc = (GoodsLocation)goods.getLocation();
+                int amountToTransfer = loc.getGoodsCount(goods.getType());
+                if (comp instanceof DropTarget) {
+                    DropTarget dt = (DropTarget) comp;
+                    if (dt instanceof CargoPanel) {
+                        CargoPanel cp = (CargoPanel) dt;
+                        Unit carrier = cp.getCarrier();
+                        int spaceTaken = carrier.getCargoSpaceTaken();
+                        int availableHolds = carrier.getCargoCapacity() - spaceTaken;
+                        if (amountToTransfer > GoodsContainer.CARGO_SIZE * availableHolds) {
+                            amountToTransfer = GoodsContainer.CARGO_SIZE * availableHolds;
+                            label.setAmount(amountToTransfer);
+                            goods = label.getGoods();
+                        }
+                    }
+                }
+            }
+        } else if (label.isPartialChosen()) {
+            int defaultAmount = goods.getAmount();
+            if (goods.getLocation() instanceof GoodsLocation) {
+                GoodsLocation loc = (GoodsLocation)goods.getLocation();
+                if (goods.getAmount() > loc.getGoodsCapacity()) {
+                    // If over capacity, favour the amount that would
+                    // correct the problem.
+                    defaultAmount = Math.min(GoodsContainer.CARGO_SIZE,
+                        goods.getAmount() - loc.getGoodsCapacity());
+                }
+            }
+            if (comp instanceof DropTarget) {
+                int alt = ((DropTarget)comp).suggested(goods.getType());
+                if (alt >= 0 && alt < defaultAmount) defaultAmount = alt;
+            }
+            int amount = getAmount(goods.getType(), goods.getAmount(),
+                                   defaultAmount, false);
+            if (amount <= 0) {
+                return importFail(comp, "weird goods amount (" + amount + ")");
+            }
+            goods.setAmount(amount);
+        } else if (label.isFullChosen()) {
+            ; // Amount correct
+        } else if (goods.getAmount() > GoodsContainer.CARGO_SIZE) {
+            goods.setAmount(GoodsContainer.CARGO_SIZE);
+        }
+
+        if (comp instanceof UnitLabel) {
+            return equipUnitIfPossible((UnitLabel)comp, goods);
+
+        } else if (comp instanceof DropTarget) {
+            DropTarget target = (DropTarget)comp;
+            if (!target.accepts(goods)) {
+                return importFail(comp, "unacceptable goods (" + goods + ")");
+            }
+            target.add(label, true);
+            restoreSelection(oldSelectedUnit);
+            comp.revalidate();
+            return true;
+        }
+        return importFail(comp, "goods");
+    }
+
+    /**
+     * Import from a market specified by label to a component.
+     *
+     * @param comp The component to import to.
+     * @param label The {@code MarketLabel} specifying the goods.
+     * @return True if the import succeeds.
+     */
+    private boolean importMarket(JComponent comp, MarketLabel label) {
+        if (label.isPartialChosen()) {
+            int amount = getAmount(label.getType(), label.getAmount(), -1, true);
+            if (amount <= 0) return false;
+            label.setAmount(amount);
+        }
+        if (comp instanceof UnitLabel) {
+            if (equipUnitIfPossible((UnitLabel)comp,
+                                    label.getAbstractGoods())) return true;
+            // Try again with parent
+            if (comp.getParent() instanceof JComponent) {
+                comp = (JComponent)comp.getParent();
+            } else {
+                return importFail(comp, "equipping market goods");
+            }
+        }
+        if (comp instanceof CargoPanel) {
+            ((CargoPanel)comp).add(label, true);
+            comp.revalidate();
+            return true;
+        }
+        return importFail(comp, "market goods");
+    }
+
+    /**
+     * Import a unit specified by its label to a component.
+     *
+     * @param comp The component to import to.
+     * @param label The {@code UnitLabel} specifying the unit.
+     * @param oldSelectedUnit A label for the old {@code Unit} to restore
+     *     selection to.
+     * @return True if the import succeeds.
+     */
+    private boolean importUnit(JComponent comp, UnitLabel label,
+                               UnitLabel oldSelectedUnit) {
+        if (!(comp instanceof DropTarget)) return importFail(comp, "unit");
+        final DropTarget target = (DropTarget)comp;
+
+        // Check if the unit can be dragged to comp.
+        final Unit unit = label.getUnit();
+        if (!target.accepts(unit)) {
+            return importFail(comp, "unacceptable unit (" + unit + ")");
+        }
+
+        // OK, add it.
+        target.add(label, true);
+
+        // Update unit selection.
+        // New unit selection has already been taken care of
+        // if this unit was moved to ToAmericaPanel
+        restoreSelection(oldSelectedUnit);
+        comp.revalidate();
+        return true;
+    }
 
     // Override TransferHandler
 
@@ -370,27 +520,27 @@ public final class DefaultTransferHandler extends TransferHandler {
      */
     @Override
     public boolean importData(JComponent comp, Transferable t) {
+System.err.println("DTH import: " + comp + " " + t);
+        // Check flavor.
+        if (!t.isDataFlavorSupported(DefaultTransferHandler.flavor)) {
+            return importFail(comp, "data flavor");
+        }
+
+        boolean ret;
+        // This variable is used to temporarily keep the old
+        // selected unit, while moving cargo from one carrier to another:
+        UnitLabel oldSelectedUnit = null;
         try {
-            JLabel data;
-
-            // This variable is used to temporarily keep the old
-            // selected unit, while moving cargo from one carrier to another:
-            UnitLabel oldSelectedUnit = null;
-
-            // Check flavor.
-            if (t.isDataFlavorSupported(DefaultTransferHandler.flavor)) {
-                data = (JLabel)t.getTransferData(DefaultTransferHandler.flavor);
-            } else {
-                logger.warning("Data flavor is not supported for " + t);
-                return false;
-            }
-
+            // Get the data to transfer.
+            JLabel data = (JLabel)t.getTransferData(DefaultTransferHandler.flavor);
             // Do not allow a transferable to be dropped upon itself:
             if (comp == data) return false;
 
             // Make sure we don't drop onto other Labels.
-            if (comp instanceof UnitLabel) {
-                UnitLabel unitLabel = (UnitLabel) comp;
+            if (comp instanceof AbstractGoodsLabel) {
+                comp = getDropTarget(comp);
+            } else if (comp instanceof UnitLabel) {
+                UnitLabel unitLabel = (UnitLabel)comp;
                 /**
                  * If the unit/cargo is dropped on a carrier in port
                  * then the ship is selected and the unit is added to
@@ -416,130 +566,20 @@ public final class DefaultTransferHandler extends TransferHandler {
                 } else {
                     comp = getDropTarget(comp);
                 }
-            } else if (comp instanceof AbstractGoodsLabel) {
-                comp = getDropTarget(comp);
             }
-            // Ignore if data is already in comp.
-            if (data.getParent() == comp) return false;
 
-            if (data instanceof GoodsLabel) {
-                // Check if the goods can be dragged to comp.
-                GoodsLabel label = (GoodsLabel)data;
-                Goods goods = label.getGoods();
-
-                // Import the data.
-                if (label.isSuperFullChosen()) {
-                    if (goods.getLocation() instanceof GoodsLocation) {
-                        GoodsLocation loc = (GoodsLocation) goods.getLocation();
-                        int amountToTransfer = loc.getGoodsCount(goods.getType());
-                        if (comp instanceof DropTarget) {
-                            DropTarget dt = (DropTarget) comp;
-                            if (dt instanceof CargoPanel) {
-                                CargoPanel cp = (CargoPanel) dt;
-                                Unit carrier = cp.getCarrier();
-                                int spaceTaken = carrier.getCargoSpaceTaken();
-                                int availableHolds = carrier.getCargoCapacity() - spaceTaken;
-                                if (amountToTransfer > GoodsContainer.CARGO_SIZE * availableHolds) {
-                                    amountToTransfer = GoodsContainer.CARGO_SIZE * availableHolds;
-                                    label.setAmount(amountToTransfer);
-                                    goods = label.getGoods();
-                                }
-                            }
-                        }
-                    }
-                } else if (label.isPartialChosen()) {
-                    int defaultAmount = goods.getAmount();
-                    if (goods.getLocation() instanceof GoodsLocation) {
-                        GoodsLocation loc = (GoodsLocation)goods.getLocation();
-                        if (goods.getAmount() > loc.getGoodsCapacity()) {
-                            // If over capacity, favour the amount that would
-                            // correct the problem.
-                            defaultAmount = Math.min(GoodsContainer.CARGO_SIZE,
-                                goods.getAmount() - loc.getGoodsCapacity());
-                        }
-                    }
-                    if (comp instanceof DropTarget) {
-                        int alt = ((DropTarget)comp).suggested(goods.getType());
-                        if (alt >= 0 && alt < defaultAmount) {
-                            defaultAmount = alt;
-                        }
-                    }
-                    int amount = getAmount(goods.getType(), goods.getAmount(),
-                                           defaultAmount, false);
-                    if (amount <= 0) return false;
-                    goods.setAmount(amount);
-                } else if (label.isFullChosen()) {
-                } else if (goods.getAmount() > GoodsContainer.CARGO_SIZE) {
-                    goods.setAmount(GoodsContainer.CARGO_SIZE);
-                }
-
-                if (comp instanceof UnitLabel) {
-                    return equipUnitIfPossible((UnitLabel)comp, goods);
-
-                } else if (comp instanceof DropTarget) {
-                    DropTarget target = (DropTarget)comp;
-                    if (!target.accepts(goods)) return false;
-                    target.add(data, true);
-                    restoreSelection(oldSelectedUnit);
-                    comp.revalidate();
-                    return true;
-
-                } else if (comp instanceof JLabel) {
-                    logger.warning("Failed to handle: " + comp);
-                }
-
-            } else if (data instanceof MarketLabel) {
-                MarketLabel label = (MarketLabel)data;
-                if (label.isPartialChosen()) {
-                    int amount = getAmount(label.getType(), label.getAmount(),
-                                           -1, true);
-                    if (amount <= 0) return false;
-                    label.setAmount(amount);
-                }
-                if (comp instanceof UnitLabel) {
-                    if (equipUnitIfPossible((UnitLabel)comp,
-                            label.getAbstractGoods())) return true;
-                    // Try again with parent
-                    if (comp.getParent() instanceof JComponent) {
-                        comp = (JComponent)comp.getParent();
-                    } else {
-                        return false;
-                    }
-                }
-                if (comp instanceof CargoPanel) {
-                    ((CargoPanel)comp).add(data, true);
-                    comp.revalidate();
-                    return true;
-                } else if (comp instanceof JLabel) {
-                    logger.warning("Failed to handle: " + comp);
-                    return true;
-                } else {
-                    logger.warning("Invalid type for receiving component: "
-                                   + comp);
-                }
-
-            } else if (data instanceof UnitLabel) {
-                // Check if the unit can be dragged to comp.
-                Unit unit = ((UnitLabel)data).getUnit();
-                if (!(comp instanceof DropTarget)) return false;
-
-                DropTarget target = (DropTarget)comp;
-                if (!target.accepts(unit)) return false;
-                target.add(data, true);
-
-                // Update unit selection.
-                // New unit selection has already been taken care of
-                // if this unit was moved to ToAmericaPanel
-                restoreSelection(oldSelectedUnit);
-                comp.revalidate();
-                return true;
-
-            } else {
-                logger.warning("Invalid type for dragged component: " + data);
-            }
+            ret = (data.getParent() == comp)
+                ? importFail(comp, "data-already-present")
+                : (data instanceof GoodsLabel)
+                ? importGoods(comp, (GoodsLabel)data, oldSelectedUnit)
+                : (data instanceof MarketLabel)
+                ? importMarket(comp, (MarketLabel)data)
+                : (data instanceof UnitLabel)
+                ? importUnit(comp, (UnitLabel)data, oldSelectedUnit)
+                : importFail(comp, data.toString());
         } catch (Exception e) { // FIXME: Suggest a reconnect?
-            logger.log(Level.WARNING, "Import data fail", e);
+            ret = importFail(comp, "crash: " + e.toString());
         }
-        return false;
+        return ret;
     }
 }
