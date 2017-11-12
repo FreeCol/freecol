@@ -46,7 +46,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
 
     private final Canvas canvas;
 
-    private final Timer doubleClickTimer = new Timer(doubleClickDelay,this);
+    private final Timer doubleClickTimer = new Timer(doubleClickDelay, this);
 
     private int centerX, centerY;
 
@@ -55,7 +55,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
      * Create a new canvas mouse listener.
      *
      * @param freeColClient The enclosing {@code FreeColClient}.
-     * @param canvas The component this object gets created for.
+     * @param canvas The {@code Canvas} to listen on.
      */
     public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas) {
         super(freeColClient);
@@ -113,90 +113,6 @@ public final class CanvasMouseListener extends FreeColClientHolder
         }
     }
 
-    /**
-     * Invoked when a mouse button was clicked.
-     *
-     * @param e The MouseEvent that holds all the information.
-     */
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        Tile tile;
-        if (e.getClickCount() > 1
-                && (tile = canvas.convertToMapTile(e.getX(), e.getY())) != null) {
-            immediateSettlement(tile);
-        } else {
-            canvas.requestFocus();
-        }
-    }
-
-    /**
-     * Invoked when the mouse enters the component.
-     *
-     * @param e The MouseEvent that holds all the information.
-     */
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        // Ignore for now.
-    }
-
-    /**
-     * Invoked when the mouse exits the component.
-     *
-     * @param e The MouseEvent that holds all the information.
-     */
-    @Override
-    public void mouseExited(MouseEvent e) {
-        // Ignore for now.
-    }
-
-    /**
-     * Invoked when a mouse button was pressed.
-     *
-     * @param e The MouseEvent that holds all the information.
-     */
-    @Override
-    public void mousePressed(MouseEvent e) {
-        if (!e.getComponent().isEnabled()) return;
-
-        int me = e.getButton();
-        if (e.isPopupTrigger()) me = MouseEvent.BUTTON3;
-        Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
-
-        switch (me) {
-            case MouseEvent.BUTTON1:
-                // Record initial click point for purposes of dragging,
-                // @see CanvasMouseMotionListener#mouseDragged.
-                canvas.setDragPoint(e.getX(), e.getY());
-
-                // New click sequence? Remember position to use when timer expires
-                if (!doubleClickTimer.isRunning()) {
-                    centerX = e.getX();
-                    centerY = e.getY();
-                }
-                doubleClickTimer.start();
-                canvas.requestFocus();
-                break;
-            case MouseEvent.BUTTON2:
-                immediateGoto(tile);
-                break;
-            case MouseEvent.BUTTON3:
-                immediatePopup(tile, e.getX(), e.getY());
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
-     * Invoked when a mouse button was released.
-     *
-     * @param e The MouseEvent that holds all the information.
-     */
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        flushGoto();
-    }
-
 
     // Interface ActionListener
 
@@ -225,5 +141,76 @@ public final class CanvasMouseListener extends FreeColClientHolder
             break;
         }
         getGUI().setSelectedTile(tile);
+    }
+
+
+    // Interface MouseListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseClicked(MouseEvent e) {
+        if (!e.getComponent().isEnabled()) return;
+
+        Tile tile;
+        if (e.getClickCount() > 1
+            && (tile = canvas.convertToMapTile(e.getX(), e.getY())) != null) {
+            immediateSettlement(tile);
+        } else {
+            canvas.requestFocus();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseEntered(MouseEvent e) { /* Ignore for now. */ }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseExited(MouseEvent e) { /* Ignore for now. */ }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mousePressed(MouseEvent e) {
+        if (!e.getComponent().isEnabled()) return;
+
+        final Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
+        final int me = (e.isPopupTrigger()) ? MouseEvent.BUTTON3
+            : e.getButton();
+        switch (me) {
+        case MouseEvent.BUTTON1:
+            // Record initial click point for purposes of dragging,
+            // @see CanvasMouseMotionListener#mouseDragged.
+            canvas.setDragPoint(e.getX(), e.getY());
+
+            // New click sequence? Remember position to use when timer expires
+            if (!doubleClickTimer.isRunning()) {
+                centerX = e.getX();
+                centerY = e.getY();
+            }
+            doubleClickTimer.start();
+            canvas.requestFocus();
+            break;
+        case MouseEvent.BUTTON2:
+            immediateGoto(tile);
+            break;
+        case MouseEvent.BUTTON3:
+            immediatePopup(tile, e.getX(), e.getY());
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseReleased(MouseEvent e) {
+        if (!e.getComponent().isEnabled()) return;
+
+        flushGoto();
     }
 }
