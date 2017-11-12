@@ -2700,6 +2700,14 @@ public final class InGameController extends Controller {
             cs.addPartial(See.only(serverPlayer), carrier,
                 "movesLeft", String.valueOf(carrier.getMovesLeft()));
         }
+        if (gl instanceof Unit) {
+            Unit dst = (Unit)gl;
+            if (dst.getInitialMovesLeft() != dst.getMovesLeft()) {
+                dst.setMovesLeft(0);
+                cs.addPartial(See.only(serverPlayer), dst,
+                    "movesLeft", String.valueOf(dst.getMovesLeft()));
+            }
+        }
 
         // Invisible in settlement
         return cs;

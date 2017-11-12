@@ -520,8 +520,6 @@ public final class DefaultTransferHandler extends TransferHandler {
      */
     @Override
     public boolean importData(JComponent comp, Transferable t) {
-System.err.println("DTH import: " + comp + " " + t);
-        // Check flavor.
         if (!t.isDataFlavorSupported(DefaultTransferHandler.flavor)) {
             return importFail(comp, "data flavor");
         }
