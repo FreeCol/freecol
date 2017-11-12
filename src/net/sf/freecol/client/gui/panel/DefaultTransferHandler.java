@@ -49,7 +49,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.label.AbstractGoodsLabel;
 import net.sf.freecol.client.gui.label.Draggable;
 import net.sf.freecol.client.gui.label.GoodsLabel;
@@ -202,13 +202,15 @@ public final class DefaultTransferHandler extends TransferHandler {
         }
     }
 
-    private static class FreeColDragGestureRecognizer extends DragGestureRecognizer {
+    private static class FreeColDragGestureRecognizer
+        extends DragGestureRecognizer {
 
         FreeColDragGestureRecognizer(DragGestureListener dgl) {
             super(DragSource.getDefaultDragSource(), null, NONE, dgl);
         }
 
-        void gestured(JComponent c, MouseEvent e, int srcActions, int action) {
+        public void gestured(JComponent c, MouseEvent e, int srcActions,
+                             int action) {
             setComponent(c);
             setSourceActions(srcActions);
             appendEvent(e);
@@ -216,20 +218,16 @@ public final class DefaultTransferHandler extends TransferHandler {
             fireDragGestureRecognized(action, e.getPoint());
         }
 
+        // Implement DragGestureRecognizer
+
         /**
-         * Register this DragGestureRecognizer's Listeners with the
-         * Component.
+         * {@inheritDoc}
          */
-        @Override
         protected void registerListeners() {}
 
         /**
-         * Unregister this DragGestureRecognizer's Listeners with the
-         * Component.
-         *
-         * subclasses must override this method
+         * {@inheritDoc}
          */
-        @Override
         protected void unregisterListeners() {}
     }
 
@@ -237,12 +235,13 @@ public final class DefaultTransferHandler extends TransferHandler {
     public static final DataFlavor flavor
         = new DataFlavor(ImageSelection.class, "ImageSelection");
 
-    private static FreeColDragGestureRecognizer recognizer = null;
+    private static final FreeColDragGestureRecognizer recognizer
+        = new FreeColDragGestureRecognizer(new FreeColDragHandler());
 
+    /** The enclosing client. */
     private final FreeColClient freeColClient;
 
-    private final SwingGUI gui;
-
+    /** The panel where the transfer begins. */
     private final FreeColPanel parentPanel;
 
 
@@ -255,31 +254,76 @@ public final class DefaultTransferHandler extends TransferHandler {
     public DefaultTransferHandler(FreeColClient freeColClient,
                                   FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
-        this.gui = (SwingGUI)freeColClient.getGUI();
         this.parentPanel = parentPanel;
     }
 
 
+    public JComponent getDropTarget(JComponent component) {
+        return (component instanceof DropTarget)
+            ? component
+            : (component.getParent() instanceof JComponent)
+            ? getDropTarget((JComponent)component.getParent())
+            : null;
+    }
+
+    private void restoreSelection(UnitLabel oldSelectedUnit) {
+        if (oldSelectedUnit != null
+            && oldSelectedUnit.getParent() instanceof InPortPanel) {
+            ((PortPanel) parentPanel).setSelectedUnitLabel(oldSelectedUnit);
+        }
+    }
+
+    private boolean equipUnitIfPossible(UnitLabel unitLabel,
+                                        AbstractGoods goods) {
+        final Unit unit = unitLabel.getUnit();
+        if (!unit.hasAbility(Ability.CAN_BE_EQUIPPED)
+            || unit.getRole().hasAbility(Ability.ESTABLISH_MISSION)) {
+            // Do not equip missionaries.  The test below will succeed
+            // when dragging incompatible goods (anything:-) because
+            // there is no actual missionary equipment.
+            return false;
+        }
+
+        for (Role role : transform(unit.getAvailableRoles(null),
+                                   r -> !r.isDefaultRole())) {
+            List<AbstractGoods> required = unit.getGoodsDifference(role, 1);
+            int count;
+            if (required.size() == 1
+                && required.get(0).getType() == goods.getType()
+                && (count = Math.min(role.getMaximumCount(),
+                        goods.getAmount() / required.get(0).getAmount())) > 0
+                && (role != unit.getRole() || count != unit.getRoleCount())) {
+                freeColClient.getInGameController()
+                    .equipUnitForRole(unit, role, count);
+                unitLabel.updateIcon();
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
-     * Get the action that can be done to an ImageSelection on the
-     * given component.
+     * Displays an input dialog box where the user should specify a
+     * goods transfer amount.
      *
-     * @return The action that can be done to an ImageSelection on the
-     *     given component.
+     * @param goodsType The {@code GoodsType} to transfer.
+     * @param available The amount of goods available.
+     * @param defaultAmount The default amount of goods to offer.
+     * @param needToPay If true limit by available funds.
+     * @return The selected amount of goods.
      */
-    @Override
-    public int getSourceActions(JComponent comp) {
-        return COPY_OR_MOVE;
+    private int getAmount(GoodsType goodsType, int available,
+                          int defaultAmount, boolean needToPay) {
+        return this.freeColClient.getGUI()
+            .showSelectAmountDialog(goodsType, available, defaultAmount,
+                                    needToPay);
     }
 
 
+    // Override TransferHandler
+
     /**
-     * Can the given component import a selection of a given flavor.
-     *
-     * @param comp The component that needs to be checked.
-     * @param flavor The flavor that needs to be checked for.
-     * @return True if the given component can import a selection of
-     *     the flavor that is indicated by the second parameter.
+     * {@inheritDoc}
      */
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
@@ -288,29 +332,41 @@ public final class DefaultTransferHandler extends TransferHandler {
     }
 
     /**
-     * Creates a Transferable (an ImageSelection to be precise) of the
-     * data that is represented by the given component and returns that
-     * object.
-     *
-     * @param comp The component to create a Transferable of.
-     * @return The resulting Transferable (an ImageSelection object).
+     * {@inheritDoc}
      */
     @Override
     public Transferable createTransferable(JComponent comp) {
-        if (comp instanceof JLabel && comp instanceof Draggable) {
-            return new ImageSelection((JLabel) comp);
+        return (comp instanceof JLabel && comp instanceof Draggable)
+            ? new ImageSelection((JLabel) comp)
+            : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void exportAsDrag(JComponent comp, InputEvent e, int action) {
+        final int srcActions = getSourceActions(comp);
+        final int dragAction = (e instanceof MouseEvent)
+            ? (srcActions & action)
+            : NONE;
+        if (dragAction != NONE) { // Use the recognizer
+            recognizer.gestured(comp, (MouseEvent)e, srcActions, dragAction);
         } else {
-            return null;
+            exportDone(comp, null, NONE);
         }
     }
 
     /**
-     * Imports the data represented by the given Transferable into
-     * the given component. Returns 'true' on success, 'false' otherwise.
-     *
-     * @param comp The component to import the data to.
-     * @param t The Transferable that holds the data.
-     * @return True if the import succeeded.
+     * {@inheritDoc}
+     */
+    @Override
+    public int getSourceActions(JComponent comp) {
+        return COPY_OR_MOVE;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean importData(JComponent comp, Transferable t) {
@@ -485,87 +541,5 @@ public final class DefaultTransferHandler extends TransferHandler {
             logger.log(Level.WARNING, "Import data fail", e);
         }
         return false;
-    }
-
-    public JComponent getDropTarget(JComponent component) {
-        return (component instanceof DropTarget)
-            ? component
-            : (component.getParent() instanceof JComponent)
-            ? getDropTarget((JComponent)component.getParent())
-            : null;
-    }
-
-    private void restoreSelection(UnitLabel oldSelectedUnit) {
-        if (oldSelectedUnit != null
-            && oldSelectedUnit.getParent() instanceof InPortPanel) {
-            ((PortPanel) parentPanel).setSelectedUnitLabel(oldSelectedUnit);
-        }
-    }
-
-    private boolean equipUnitIfPossible(UnitLabel unitLabel,
-                                        AbstractGoods goods) {
-        final Unit unit = unitLabel.getUnit();
-        if (!unit.hasAbility(Ability.CAN_BE_EQUIPPED)
-            || unit.getRole().hasAbility(Ability.ESTABLISH_MISSION)) {
-            // Do not equip missionaries.  The test below will succeed
-            // when dragging incompatible goods (anything:-) because
-            // there is no actual missionary equipment.
-            return false;
-        }
-
-        for (Role role : transform(unit.getAvailableRoles(null),
-                                   r -> !r.isDefaultRole())) {
-            List<AbstractGoods> required = unit.getGoodsDifference(role, 1);
-            int count;
-            if (required.size() == 1
-                && required.get(0).getType() == goods.getType()
-                && (count = Math.min(role.getMaximumCount(),
-                        goods.getAmount() / required.get(0).getAmount())) > 0
-                && (role != unit.getRole() || count != unit.getRoleCount())) {
-                freeColClient.getInGameController()
-                    .equipUnitForRole(unit, role, count);
-                unitLabel.updateIcon();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Displays an input dialog box where the user should specify a
-     * goods transfer amount.
-     *
-     * @param goodsType The {@code GoodsType} to transfer.
-     * @param available The amount of goods available.
-     * @param defaultAmount The default amount of goods to offer.
-     * @param needToPay If true limit by available funds.
-     * @return The selected amount of goods.
-     */
-    private int getAmount(GoodsType goodsType, int available,
-                          int defaultAmount, boolean needToPay) {
-        return gui.showSelectAmountDialog(goodsType, available, defaultAmount,
-                                          needToPay);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void exportAsDrag(JComponent comp, InputEvent e, int action) {
-        int srcActions = getSourceActions(comp);
-        int dragAction = srcActions & action;
-        if (!(e instanceof MouseEvent)) {
-            dragAction = NONE;
-        }
-
-        if (dragAction != NONE) {
-            if (recognizer == null) {
-                recognizer = new FreeColDragGestureRecognizer(new FreeColDragHandler());
-            }
-
-            recognizer.gestured(comp, (MouseEvent)e, srcActions, dragAction);
-        } else {
-            exportDone(comp, null, NONE);
-        }
     }
 }
