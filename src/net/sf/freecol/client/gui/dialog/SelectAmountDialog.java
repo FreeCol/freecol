@@ -21,9 +21,12 @@ package net.sf.freecol.client.gui.dialog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
+import javax.swing.InputVerifier;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
@@ -33,6 +36,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -51,7 +55,10 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
     /** The combo box to input the amount through. */
     private final JComboBox<Integer> comboBox;
 
+    /** The maximum amount of goods available. */
+    private int available;
 
+    
     /**
      * The constructor to use.
      *
@@ -63,7 +70,8 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
      * @param pay If true, check the player has sufficient funds.
      */
     public SelectAmountDialog(FreeColClient freeColClient, JFrame frame,
-            GoodsType goodsType, int available, int defaultAmount, boolean pay) {
+                              GoodsType goodsType, int available,
+                              int defaultAmount, boolean pay) {
         super(freeColClient, frame);
 
         if (pay) {
@@ -72,12 +80,13 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
             int price = player.getMarket().getCostToBuy(goodsType);
             available = Math.min(available, gold/price);
         }
+        this.available = available;
 
         JTextArea question
             = Utility.localizedTextArea("selectAmountDialog.text");
 
-        int defaultIndex = -1;
         List<Integer> values = new ArrayList<>();
+        int defaultIndex = -1;
         for (int index = 0; index < amounts.length; index++) {
             if (amounts[index] < available) {
                 if (amounts[index] == defaultAmount) defaultIndex = index;
@@ -100,13 +109,32 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
         this.comboBox = new JComboBox<>(values.toArray(new Integer[0]));
         this.comboBox.setEditable(true);
         if (defaultIndex >= 0) this.comboBox.setSelectedIndex(defaultIndex);
-
+        this.comboBox.setInputVerifier(new InputVerifier() {
+                @Override @SuppressWarnings("unchecked")
+                public boolean verify(JComponent input) {
+                    return verifyWholeBox((JComboBox<Integer>)input);
+                }
+            });
         MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
         panel.add(question);
         panel.add(this.comboBox, "wrap 20, growx");
         panel.setSize(panel.getPreferredSize());
 
         initializeInputDialog(frame, true, panel, null, "ok", "cancel");
+    }
+
+    /**
+     * Verify the contents of the JComboBox.
+     *
+     * @return True if all is well.
+     */
+    private boolean verifyWholeBox(JComboBox<Integer> box) {
+        final int n = box.getItemCount();
+        for (int i = 0; i < n; i++) {
+            Integer v = box.getItemAt(i);
+            if (v < 0 || v > available) return false;
+        }
+        return true;
     }
 
     /**
