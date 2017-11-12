@@ -5058,6 +5058,7 @@ public final class InGameController extends FreeColClientHolder {
     public void updateHandler(List<FreeColObject> objects) {
         final Game game = getGame();
         final Player player = getMyPlayer();
+        final Unit active = getGUI().getActiveUnit();
         boolean visibilityChange = false;
 
         for (FreeColObject fco : objects) {
@@ -5076,6 +5077,11 @@ public final class InGameController extends FreeColClientHolder {
             }
         }
         if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
+        if (active != null) { // Kick the GUI, unit may have changed its cargo
+            // FIXME: this is a hack, provide a proper method
+            getGUI().setActiveUnit(null);
+            getGUI().setActiveUnit(active);
+        }
     }
 
     /**

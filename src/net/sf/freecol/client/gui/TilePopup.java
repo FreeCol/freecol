@@ -417,6 +417,8 @@ public final class TilePopup extends JPopupMenu {
         if (hasGoods) {
             JMenuItem dumpItem = Utility.localizedMenuItem("dumpCargo");
             dumpItem.setAction(new UnloadAction(freeColClient, unit));
+            // setAction changes the label
+            dumpItem.setText(Messages.message("dumpCargo"));
             menu.add(dumpItem);
             lineCount++;
         }
