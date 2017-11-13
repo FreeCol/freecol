@@ -1689,21 +1689,19 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveScoutIndianSettlement(Unit unit, Direction direction) {
-        Tile unitTile = unit.getTile();
-        Tile tile = unitTile.getNeighbourOrNull(direction);
-        IndianSettlement is = tile.getIndianSettlement();
-        Player player = unit.getOwner();
-
         if (!askClearGotoOrders(unit)
             || !askServer().scoutSettlement(unit, direction)) return false;
 
         // Offer the choices.
-        int count = player.getNationSummary(is.getOwner())
+        final Tile unitTile = unit.getTile();
+        final Tile tile = unitTile.getNeighbourOrNull(direction);
+        final Player player = unit.getOwner();
+        final IndianSettlement is = tile.getIndianSettlement();
+        final int count = player.getNationSummary(is.getOwner())
             .getNumberOfSettlements();
-        String number = (count <= 0) ? Messages.message("many")
-            : Integer.toString(count);
         ScoutIndianSettlementAction act
-            = getGUI().getScoutIndianSettlementChoice(is, number);
+            = getGUI().getScoutIndianSettlementChoice(is, (count <= 0)
+                ? Messages.message("many") : Integer.toString(count));
         if (act == null) return false; // Cancelled
         switch (act) {
         case SCOUT_SETTLEMENT_ATTACK:
