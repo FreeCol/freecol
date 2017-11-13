@@ -179,8 +179,9 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     public static void moveGoods(GoodsLocation src, GoodsType goodsType,
                                  int amount, GoodsLocation dst) {
-        if (src != null) src.removeGoods(goodsType, amount);
-        if (dst != null) dst.addGoods(goodsType, amount);
+        GoodsContainer srcC = (src == null) ? null : src.getGoodsContainer();
+        GoodsContainer dstC = (dst == null) ? null : dst.getGoodsContainer();
+        GoodsContainer.moveGoods(srcC, goodsType, amount, dstC);
     }
 
     

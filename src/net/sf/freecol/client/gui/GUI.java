@@ -168,9 +168,24 @@ public class GUI extends FreeColClientHolder {
         return this.imageLibrary;
     }
 
+    /**
+     * Is this GUI in windowed mode?
+     *
+     * @return True by default, real implementations will override.
+     */
     public boolean isWindowed() {
         return true;
     }
+
+    /**
+     * Get the canvas.
+     *
+     * @return Null here, real implementations will override.
+     */
+    public Canvas getCanvas() {
+        return null;
+    }
+
 
     // Error handlers
 

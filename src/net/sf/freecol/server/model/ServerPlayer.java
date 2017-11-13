@@ -4132,7 +4132,7 @@ outer:  for (Effect effect : effects) {
                 cs.add(See.perhaps(), dst);
             }
             cs.addMessage(this,
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                new ModelMessage(ModelMessage.MessageType.UNIT_ARRIVED,
                                  "model.player.mercenariesArrived", this)
                     .addStringTemplate("%location%",
                                        dst.up().getLocationLabelFor(this)));

@@ -60,6 +60,7 @@ public class ModelMessage extends StringTemplate {
         SONS_OF_LIBERTY("model.option.guiShowSonsOfLiberty"),
         TUTORIAL("model.option.guiShowTutorial"),
         UNIT_ADDED("model.option.guiShowUnitAdded"),
+        UNIT_ARRIVED("model.option.guiShowUnitArrived"),
         UNIT_DEMOTED("model.option.guiShowUnitDemoted"),
         UNIT_IMPROVED("model.option.guiShowUnitImproved"),
         UNIT_LOST("model.option.guiShowUnitLost"),

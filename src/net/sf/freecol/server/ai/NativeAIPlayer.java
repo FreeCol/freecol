@@ -864,10 +864,12 @@ public class NativeAIPlayer extends MissionAIPlayer {
         final Turn turn = getGame().getTurn();
         NativeTradeItem ours;
         int anger, haggle;
-        
+        Tension tension = is.getAlarm(other);
+        if (tension == null) return NativeTradeAction.NAK_INVALID;
+
         switch (action) {
         case OPEN:
-            switch (is.getAlarm(other).getLevel()) {
+            switch (tension.getLevel()) {
             case HAPPY: case CONTENT:
                 anger = 1;
                 break;
@@ -883,7 +885,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
             return NativeTradeAction.ACK_OPEN;
 
         case BUY:
-            switch (is.getAlarm(other).getLevel()) {
+            switch (tension.getLevel()) {
             case HAPPY: case CONTENT:
                 anger = 1;
                 break;
@@ -913,7 +915,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
             return NativeTradeAction.ACK_BUY_HAGGLE;
 
         case SELL:
-            switch (is.getAlarm(other).getLevel()) {
+            switch (tension.getLevel()) {
             case HAPPY: case CONTENT:
                 anger = 1;
                 break;

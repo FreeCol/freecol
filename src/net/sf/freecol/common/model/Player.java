@@ -4297,8 +4297,8 @@ public class Player extends FreeColGameObject implements Nameable {
         attackedByPrivateers = xr.getAttribute(ATTACKED_BY_PRIVATEERS_TAG,
                                                false);
 
-        entryTile = xr.getAttribute(game, ENTRY_LOCATION_TAG,
-                                    Tile.class, (Tile)null);
+        entryTile = xr.makeFreeColObject(game, ENTRY_LOCATION_TAG,
+                                         Tile.class, false);
     }
 
     /**

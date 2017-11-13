@@ -2306,7 +2306,7 @@ public class Unit extends GoodsLocation
                 : MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
         } else if (settlement instanceof IndianSettlement) {
             // Do not block for war, bringing gifts is allowed
-            return (!allowContact(settlement))
+            return (!((IndianSettlement)settlement).allowContact(this))
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
                 : (hasGoodsCargo() || getSpecification()
                     .getBoolean(GameOptions.EMPTY_TRADERS))
@@ -3406,7 +3406,8 @@ public class Unit extends GoodsLocation
                 } else {
                     ret = StringTemplate.key("model.unit.occupation.inTradeRoute");
                 }
-            } else if (getState() == UnitState.ACTIVE && getMovesLeft() == 0) {
+            } else if (getState() == UnitState.ACTIVE && getMovesLeft() == 0
+                       && !isInEurope()) {
                 ret = StringTemplate.key("model.unit.occupation.activeNoMovesLeft");
             } else if (getState() == UnitState.IMPROVING
                 && getWorkImprovement() != null) {

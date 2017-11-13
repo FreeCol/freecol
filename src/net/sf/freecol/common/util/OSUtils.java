@@ -31,13 +31,52 @@ public class OSUtils {
 
     private static final Logger logger = Logger.getLogger(OSUtils.class.getName());
 
+    private static final String SEPARATOR
+        = System.getProperty("file.separator");
+
+
+    /**
+     * What OS are we using?
+     *
+     * @return The operating system name.
+     */
+    public static String getOperatingSystem() {
+        return System.getProperty("os.name");
+    }
+
+    /**
+     * Does the OS look like Mac OS X?
+     *
+     * @return True if Mac OS X appears to be present.
+     */
+    public static boolean onMacOSX() {
+        return "Mac OS X".equals(getOperatingSystem());
+    }
+
+    /**
+     * Does the OS look like some sort of unix?
+     *
+     * @return True we hope.
+     */
+    public static boolean onUnix() {
+        return "/".equals(SEPARATOR);
+    }
+
+    /**
+     * Does the OS look like some sort of Windows?
+     *
+     * @return True if Windows appears to be present.
+     */
+    public static boolean onWindows() {
+        return getOperatingSystem().startsWith("Windows");
+    }
+
     /**
      * Launches the web browser based on a given operating system
      *
      * @param url The URL to launch
      */
     final public static void launchBrowser(String url) {
-
         // Use Desktop Class first
         try {
             URI uri = java.net.URI.create(url);
@@ -59,43 +98,28 @@ public class OSUtils {
         }
     }
 
-
     /**
-     * Returns the browser for a given operating system
+     * What should we run to launch a browser?
      *
      * @param url The URL to launch
-     * @return The String array with the browswer launch configurations
+     * @return An OS-dependent array of commands to exec a browser.
      *
      * @see #launchBrowser(String)
      */
     final private static String[] getBrowserExecString(String url) {
-        final String os = getOperatingSystem();
-        if (os == null) {
-            // error, the operating system could not be determined
-            return null;
-        } else if (os.toLowerCase().contains("mac")) {
+        if (onMacOSX()) {
             // Apple Macintosh, Safari is the main browser
             return new String[] { "open" , "-a", "Safari", url };
-        } else if (os.toLowerCase().contains("windows")) {
-            // Microsoft Windows, use the default browser
-            return new String[] { "rundll32.exe",
-                    "url.dll,FileProtocolHandler", url };
-        } else if (os.toLowerCase().contains("linux")) {
+        } else if (onUnix()) {
             // GNU Linux, use xdg-utils to launch the default
             // browser (portland.freedesktop.org)
             return new String[] { "xdg-open", url };
+        } else if (onWindows()) {
+            // Microsoft Windows, use the default browser
+            return new String[] { "rundll32.exe",
+                    "url.dll,FileProtocolHandler", url };
         } else {
             return new String[] { "firefox", url };
         }
-    }
-
-
-    /**
-     * Function that returns the operating system
-     *
-     * @return os The string containing the Operating system
-     */
-    final public static String getOperatingSystem() {
-        return System.getProperty("os.name");
     }
 }
