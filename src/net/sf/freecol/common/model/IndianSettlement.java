@@ -1559,7 +1559,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         this.setWantedGoods(o.getWantedGoods());
         clearContactLevels();
         synchronized (this.contactLevels) {
-            for (Entry<Player, ContactLevel> e : this.contactLevels.entrySet()) {
+            for (Entry<Player, ContactLevel> e : o.contactLevels.entrySet()) {
                 setContactLevel(game.updateRef(e.getKey()), e.getValue());
             }
         }
