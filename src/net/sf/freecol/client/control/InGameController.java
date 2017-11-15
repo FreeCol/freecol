@@ -5059,7 +5059,6 @@ public final class InGameController extends FreeColClientHolder {
         final Game game = getGame();
         final Player player = getMyPlayer();
         final Unit active = getGUI().getActiveUnit();
-        boolean visibilityChange = false;
 
         for (FreeColObject fco : objects) {
             FreeColGameObject fcgo = game.getFreeColGameObject(fco.getId());
@@ -5067,16 +5066,12 @@ public final class InGameController extends FreeColClientHolder {
                 logger.warning("Update of missing FCGO: " + fco.getId());
                 continue;
             }
-            if (!fcgo.copyIn(fco)) {
+            if (!fcgo.copyIn(fco)) { // Possibly -vis(player)
                 logger.warning("Update copy-in failed: " + fco.getId());
                 continue;
             }
-            if ((fco instanceof Player && (fco == player))
-                || ((fco instanceof Ownable) && player.owns((Ownable)fco))) {
-                visibilityChange = true;//-vis(player)
-            }
         }
-        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
+        player.invalidateCanSeeTiles(); //+vis(player)
         if (active != null) { // Kick the GUI, unit may have changed its cargo
             // FIXME: this is a hack, provide a proper method
             getGUI().setActiveUnit(null);
