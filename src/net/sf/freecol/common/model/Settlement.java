@@ -845,7 +845,9 @@ public abstract class Settlement extends GoodsLocation
         this.setOwnedTiles(game.updateRef(o.getOwnedTiles()));
         this.featureContainer.copy(o.getFeatureContainer());
 
-        this.owner.addSettlement(this);
+        // Owner can be null when creating a Settlement known only by
+        // its tile ownership.
+        if (this.owner != null) this.owner.addSettlement(this);
         return true;
     }
 
