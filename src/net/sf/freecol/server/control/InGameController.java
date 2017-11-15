@@ -324,7 +324,7 @@ public final class InGameController extends Controller {
             = owner.csApplyDisaster(random, colony, disaster, cs);
         if (!messages.isEmpty()) {
             cs.addGlobalMessage(game, null,
-                new ModelMessage(MessageType.DEFAULT,
+                new ModelMessage(MessageType.DISASTERS,
                                  "model.disaster.strikes", owner)
                     .addName("%colony%", colony.getName())
                     .addName("%disaster%", disaster));

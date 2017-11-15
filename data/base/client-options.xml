@@ -175,6 +175,8 @@
                      defaultValue="true"/>
       <booleanOption id="model.option.guiShowDemands"
                      defaultValue="true"/>
+      <booleanOption id="model.option.guiShowDisasters"
+                     defaultValue="true"/>
       <booleanOption id="model.option.guiShowForeignDiplomacy"
                      defaultValue="true"/>
       <booleanOption id="model.option.guiShowGifts"

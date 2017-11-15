@@ -748,6 +748,8 @@ public class ClientOptions extends OptionGroup {
                          ClientOptions.MESSAGES, true);
         addBooleanOption("model.option.guiShowArrived",
                          ClientOptions.MESSAGES, true);
+        addBooleanOption("model.option.guiShowDisasters",
+                         ClientOptions.MESSAGES, true);
         // end @compat 0.11.6
     }
 
