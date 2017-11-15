@@ -4511,7 +4511,7 @@ outer:  for (Effect effect : effects) {
                 invalidateCanSeeTiles();//+vis(this)
                 cs.add(See.perhaps(), tiles);
                 cs.addMessage(this,
-                    new ModelMessage(MessageType.DEFAULT,
+                    new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "model.player.interventionForceArrives",
                                      this));
                 logger.info("Intervention force (" + naval.size() + " naval, "
