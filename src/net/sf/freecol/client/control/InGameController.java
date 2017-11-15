@@ -695,9 +695,14 @@ public final class InGameController extends FreeColClientHolder {
         for (ModelMessage m : ((allMessages) ? player.getModelMessages()
                 : player.getNewModelMessages())) {
             final String key = m.getOptionName();
-            if ((key == null || co.getBoolean(key))
-                && !continueIgnoreMessage(m.getIgnoredMessageKey(), thisTurn)) {
-                messages.add(m);
+            try {
+                if ((key == null || co.getBoolean(key))
+                    && !continueIgnoreMessage(m.getIgnoredMessageKey(), thisTurn)) {
+                    messages.add(m);
+                }
+            } catch (RuntimeException rte) {
+                logger.warning("Bogus ModelMessage with key<" + key
+                    + ">: " + m.toString());
             }
             m.setDisplayed(true);
         }
