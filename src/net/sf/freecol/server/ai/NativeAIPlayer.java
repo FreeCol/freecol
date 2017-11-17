@@ -882,7 +882,8 @@ public class NativeAIPlayer extends MissionAIPlayer {
             }
             if (anger < 0) return NativeTradeAction.NAK_HOSTILE;
             updateTrade(nt, anger);
-            return NativeTradeAction.ACK_OPEN;
+            return (nt.getDone()) ? NativeTradeAction.NAK_NOSALE
+                : NativeTradeAction.ACK_OPEN;
 
         case BUY:
             switch (tension.getLevel()) {

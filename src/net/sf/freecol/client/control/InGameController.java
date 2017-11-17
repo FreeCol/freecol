@@ -3975,6 +3975,11 @@ public final class InGameController extends FreeColClientHolder {
                 gui.showInformationMessage(StringTemplate
                     .template("trade.noTradeHostile")));
             return;
+        case NAK_NOSALE:
+            invokeLater(() ->
+                gui.showInformationMessage(StringTemplate
+                    .template("trade.nothingToSell")));
+            return;
         case NAK_INVALID: // Should not happen, log and fail quietly.
         default:
             logger.warning("Bogus native trade: " + nt.toString());
