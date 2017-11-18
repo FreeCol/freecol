@@ -73,6 +73,9 @@
       <!-- Use pixmaps or not? -->
       <booleanOption id="model.option.usePixmaps"
                      defaultValue="true"/>
+      <!-- Use openGL or not? -->
+      <booleanOption id="model.option.useOpenGL"
+                     defaultValue="true"/>
       <!-- Remember panel positions? -->
       <booleanOption id="model.option.rememberPanelPositions"
                      defaultValue="false"/>

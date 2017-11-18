@@ -183,6 +183,10 @@ public class ClientOptions extends OptionGroup {
     public static final String USE_PIXMAPS
         = "model.option.usePixmaps";
 
+    /** Pixmap setting to work around another Java 2D graphics bug. */
+    public static final String USE_OPENGL
+        = "model.option.useOpenGL";
+
     /** Whether to remember the positions of various dialogs and panels. */
     public static final String REMEMBER_PANEL_POSITIONS
         = "model.option.rememberPanelPositions";
@@ -750,6 +754,8 @@ public class ClientOptions extends OptionGroup {
                          ClientOptions.MESSAGES, true);
         addBooleanOption("model.option.guiShowDisasters",
                          ClientOptions.MESSAGES, true);
+        addBooleanOption("model.option.useOpenGL2D",
+                         ClientOptions.GUI, true);
         // end @compat 0.11.6
     }
 
