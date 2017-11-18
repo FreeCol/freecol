@@ -725,10 +725,10 @@ public final class FreeColServer {
      */
     public void startGame() throws FreeColException {
         logger.info("Server starting game: " + this.serverState);
-        final Game game = buildGame();
 
         switch (this.serverState) {
         case PRE_GAME: // Send the updated game to the clients.
+            final Game game = buildGame();
             for (Player player : transform(game.getLivePlayers(),
                                            p -> !p.isAI())) {
                 ServerPlayer serverPlayer = (ServerPlayer)player;
@@ -1027,7 +1027,7 @@ public final class FreeColServer {
 
                 } else if (Game.TAG.equals(tag)) {
                     // Read the game
-                    serverGame = new ServerGame(xr);
+                    serverGame = new ServerGame(specification, xr);
                     serverGame.setCurrentPlayer(null);
                     if (freeColServer != null) {
                         freeColServer.setGame(serverGame);
