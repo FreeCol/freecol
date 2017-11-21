@@ -1689,21 +1689,19 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if automatic movement of the unit can proceed (never).
      */
     private boolean moveScoutIndianSettlement(Unit unit, Direction direction) {
-        Tile unitTile = unit.getTile();
-        Tile tile = unitTile.getNeighbourOrNull(direction);
-        IndianSettlement is = tile.getIndianSettlement();
-        Player player = unit.getOwner();
-
         if (!askClearGotoOrders(unit)
             || !askServer().scoutSettlement(unit, direction)) return false;
 
         // Offer the choices.
-        int count = player.getNationSummary(is.getOwner())
+        final Tile unitTile = unit.getTile();
+        final Tile tile = unitTile.getNeighbourOrNull(direction);
+        final Player player = unit.getOwner();
+        final IndianSettlement is = tile.getIndianSettlement();
+        final int count = player.getNationSummary(is.getOwner())
             .getNumberOfSettlements();
-        String number = (count <= 0) ? Messages.message("many")
-            : Integer.toString(count);
         ScoutIndianSettlementAction act
-            = getGUI().getScoutIndianSettlementChoice(is, number);
+            = getGUI().getScoutIndianSettlementChoice(is, (count <= 0)
+                ? Messages.message("many") : Integer.toString(count));
         if (act == null) return false; // Cancelled
         switch (act) {
         case SCOUT_SETTLEMENT_ATTACK:
@@ -3977,6 +3975,11 @@ public final class InGameController extends FreeColClientHolder {
                 gui.showInformationMessage(StringTemplate
                     .template("trade.noTradeHostile")));
             return;
+        case NAK_NOSALE:
+            invokeLater(() ->
+                gui.showInformationMessage(StringTemplate
+                    .template("trade.nothingToSell")));
+            return;
         case NAK_INVALID: // Should not happen, log and fail quietly.
         default:
             logger.warning("Bogus native trade: " + nt.toString());
@@ -5059,7 +5062,6 @@ public final class InGameController extends FreeColClientHolder {
         final Game game = getGame();
         final Player player = getMyPlayer();
         final Unit active = getGUI().getActiveUnit();
-        boolean visibilityChange = false;
 
         for (FreeColObject fco : objects) {
             FreeColGameObject fcgo = game.getFreeColGameObject(fco.getId());
@@ -5067,16 +5069,12 @@ public final class InGameController extends FreeColClientHolder {
                 logger.warning("Update of missing FCGO: " + fco.getId());
                 continue;
             }
-            if (!fcgo.copyIn(fco)) {
+            if (!fcgo.copyIn(fco)) { // Possibly -vis(player)
                 logger.warning("Update copy-in failed: " + fco.getId());
                 continue;
             }
-            if ((fco instanceof Player && (fco == player))
-                || ((fco instanceof Ownable) && player.owns((Ownable)fco))) {
-                visibilityChange = true;//-vis(player)
-            }
         }
-        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
+        player.invalidateCanSeeTiles(); //+vis(player)
         if (active != null) { // Kick the GUI, unit may have changed its cargo
             // FIXME: this is a hack, provide a proper method
             getGUI().setActiveUnit(null);

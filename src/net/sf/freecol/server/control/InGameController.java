@@ -324,7 +324,7 @@ public final class InGameController extends Controller {
             = owner.csApplyDisaster(random, colony, disaster, cs);
         if (!messages.isEmpty()) {
             cs.addGlobalMessage(game, null,
-                new ModelMessage(MessageType.DEFAULT,
+                new ModelMessage(MessageType.DISASTERS,
                                  "model.disaster.strikes", owner)
                     .addName("%colony%", colony.getName())
                     .addName("%disaster%", disaster));
@@ -3052,18 +3052,11 @@ public final class InGameController extends Controller {
                     + " has no moves left.");
             }
             nt = new NativeTrade(nt.getUnit(), nt.getIndianSettlement());
-            if (nt.getDone()) {
-                // Trade can not happen, just outright NAK as invalid.
-                cs.add(See.only(serverPlayer),
-                       new NativeTradeMessage(NativeTradeAction.NAK_INVALID, nt));
-            } else {
-                // Trade can proceed.  Register a session and ask the natives
-                // to price the goods.
-                session = new NativeTradeSession(nt);
-                nt.initialize();
-                cs.add(See.only(otherPlayer),
-                       new NativeTradeMessage(action, nt));
-            }
+            // Register a session and ask the natives to price the goods.
+            session = new NativeTradeSession(nt);
+            nt.initialize();
+            cs.add(See.only(otherPlayer),
+                   new NativeTradeMessage(action, nt));
             break;
 
         case CLOSE: // Just close the session
@@ -3181,16 +3174,16 @@ public final class InGameController extends Controller {
                    new NativeTradeMessage(action, nt));
             break;
 
-        case NAK_INVALID: case NAK_HOSTILE: case NAK_HAGGLE: // Fail, close
+        case NAK_HAGGLE: case NAK_NOSALE: // Fail, close
+            unit.setMovesLeft(0);
+            cs.addPartial(See.only(otherPlayer), unit,
+                          "movesLeft", String.valueOf(unit.getMovesLeft()));
+            // Fall through
+        case NAK_INVALID: case NAK_HOSTILE:
             session.getNativeTrade().mergeFrom(nt);
             cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             session.complete(cs);
-            if (action == NativeTradeAction.NAK_HAGGLE) {
-                unit.setMovesLeft(0); // Clear moves again on hagglers
-                cs.addPartial(See.only(otherPlayer), unit,
-                    "movesLeft", String.valueOf(unit.getMovesLeft()));
-            }
             break;
 
         default:

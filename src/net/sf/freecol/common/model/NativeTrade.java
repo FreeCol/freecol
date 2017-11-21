@@ -67,6 +67,7 @@ public class NativeTrade extends FreeColGameObject {
         NAK_GOODS(false, false),   // Gift failed due to storage
         NAK_HAGGLE(true, false),   // Trade failed due to too much haggling
         NAK_HOSTILE(true, false),  // Natives are hostile
+        NAK_NOSALE(true, false),   // Nothing to trade
         NAK_INVALID(true, false);  // Trade is completely invalid
 
         /** Does this action close the trade? */

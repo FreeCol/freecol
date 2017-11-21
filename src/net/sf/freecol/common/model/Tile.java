@@ -155,16 +155,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /** The player that consider this tile to be their land. */
     private Player owner;
 
-    /**
-     * A pointer to the settlement located on this tile or null if
-     * there is no settlement on this tile.
-     */
+    /** The settlement located on this tile, if any. */
     private Settlement settlement;
 
     /**
      * Indicates which settlement owns this tile (null indicates no
      * owner).  A colony owns the tile it is located on, and every
      * tile it has claimed by successfully moving a worker on to it.
+     * Native settlements make more extensive and unpredictable claims.
      * Note that while units and settlements are owned by a player, a
      * tile is owned by a settlement.
      */
@@ -1926,7 +1924,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * A change may have occured on this tile.  Establish caches where
      * needed.  Use the copied tile if supplied (which should have
-     * been created previously with {@link #getTileToCache},
+     * been created previously with {@link #getTileToCache}.
      *
      * @param player A {@code Player} that currently may not be able
      *     to see the tile, but will as a result of the change, and so
@@ -2435,20 +2433,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         final Player player = xw.getClientPlayer();
         Tile tile;
 
-        if (player == null) {
-            // 1. If not writing to a player, just write this tile.
+        if (player == null) { // 1. Not writing to a player, just write tile.
             this.internalToXML(xw, tag);
 
-        } else if ((tile = getCachedTile(player)) != null) {
-            // 2. There is a cached tile, so write it instead.
+        } else if ((tile = getCachedTile(player)) != null) { // 2. Cached tile.
             tile.internalToXML(xw, tag);
 
-        } else if (isExploredBy(player)) {
-            // 3. Tile is explored, write it
+        } else if (isExploredBy(player)) { // 3. Tile is explored, write it
             this.internalToXML(xw, tag);
 
-        } else {
-            // 4. Tile is not explored.
+        } else { // 4. Tile is not explored.
             xw.writeStartElement(tag);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());

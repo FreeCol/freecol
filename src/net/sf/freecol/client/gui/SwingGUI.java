@@ -425,6 +425,25 @@ public class SwingGUI extends GUI {
                 logger.info("Set " + pmoffscreen + " to: " + newValue);
             });
 
+        // There is also this option, BR#3102.
+        final String openGL = "sun.java2d.opengl";
+        boolean useOpenGL = opts.getBoolean(ClientOptions.USE_OPENGL);
+        String openGLValue = System.getProperty(openGL);
+        if (openGLValue == null) {
+            System.setProperty(openGL, Boolean.toString(useOpenGL));
+            logger.info(openGL + " using client option: " + useOpenGL);
+        } else {
+            opts.setBoolean(ClientOptions.USE_OPENGL,
+                            Boolean.valueOf(openGLValue));
+            logger.info(openGL + " overrides client option: " + openGLValue);
+        }
+        opts.getOption(ClientOptions.USE_OPENGL, BooleanOption.class)
+            .addPropertyChangeListener((PropertyChangeEvent e) -> {
+                String newValue = e.getNewValue().toString();
+                System.setProperty(openGL, newValue);
+                logger.info("Set " + openGL + " to: " + newValue);
+            });
+        
         this.mapViewer = new MapViewer(getFreeColClient());
         this.canvas = new Canvas(getFreeColClient(), graphicsDevice, this,
                                  desiredWindowSize, mapViewer);

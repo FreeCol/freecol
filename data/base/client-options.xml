@@ -73,6 +73,9 @@
       <!-- Use pixmaps or not? -->
       <booleanOption id="model.option.usePixmaps"
                      defaultValue="true"/>
+      <!-- Use openGL or not? -->
+      <booleanOption id="model.option.useOpenGL"
+                     defaultValue="true"/>
       <!-- Remember panel positions? -->
       <booleanOption id="model.option.rememberPanelPositions"
                      defaultValue="false"/>
@@ -174,6 +177,8 @@
       <booleanOption id="model.option.guiShowCombatResult"
                      defaultValue="true"/>
       <booleanOption id="model.option.guiShowDemands"
+                     defaultValue="true"/>
+      <booleanOption id="model.option.guiShowDisasters"
                      defaultValue="true"/>
       <booleanOption id="model.option.guiShowForeignDiplomacy"
                      defaultValue="true"/>

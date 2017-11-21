@@ -452,16 +452,20 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     public List<StringTemplate> getWantedGoodsLabel(int index, Player player) {
         StringTemplate lab = null, tip = null;
         GoodsType gt;
-        if (hasVisited(player) && (gt = getWantedGoods(index)) != null) {
-            lab = StringTemplate.label("").add(Messages.nameKey(gt));
-            String sale = player.getLastSaleString(this, gt);
-            if (sale != null) {
-                lab.addName(" " + sale);
-                tip = player.getLastSaleTip(this, gt);
+        if (hasVisited(player)) {
+            if ((gt = getWantedGoods(index)) != null) {
+                lab = StringTemplate.label("").add(Messages.nameKey(gt));
+                String sale = player.getLastSaleString(this, gt);
+                if (sale != null) {
+                    lab.addName(" " + sale);
+                    tip = player.getLastSaleTip(this, gt);
+                }
             }
-        }
-        if (lab == null) {
-            lab = StringTemplate.key("model.indianSettlement.wantedGoodsNone");
+            if (lab == null) {
+                lab = StringTemplate.key("model.indianSettlement.wantedGoodsNone");
+            }
+        } else {
+            lab = StringTemplate.name("");
         }
         List<StringTemplate> ret = new ArrayList<>();
         ret.add(lab);
@@ -522,8 +526,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @param contactLevels The new contact level map.
      */
     protected void setContactLevels(java.util.Map<Player, ContactLevel> contactLevels) {
-        clearContactLevels();
         synchronized (this.contactLevels) {
+            this.contactLevels.clear();
             this.contactLevels.putAll(contactLevels);
         }
     }
@@ -1557,10 +1561,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         final Game game = getGame();
         this.learnableSkill = o.getLearnableSkill();
         this.setWantedGoods(o.getWantedGoods());
-        clearContactLevels();
         synchronized (this.contactLevels) {
-            for (Entry<Player, ContactLevel> e : this.contactLevels.entrySet()) {
-                setContactLevel(game.updateRef(e.getKey()), e.getValue());
+            this.contactLevels.clear();
+            for (Entry<Player, ContactLevel> e : o.contactLevels.entrySet()) {
+                this.contactLevels.put(game.updateRef(e.getKey()), e.getValue());
             }
         }
         this.setOwnedUnitList(game.updateRef(o.getOwnedUnitList()));
@@ -1598,30 +1602,37 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
-
-        final Player hated = getMostHated();
-
-        if (getName() != null) { // Delegated from Settlement
-            xw.writeAttribute(NAME_TAG, getName());
+        final ContactLevel cl = getContactLevel(xw.getClientPlayer());
+        final boolean full = xw.validFor(getOwner());
+        
+        if (full // Name needs contact
+            || cl != ContactLevel.UNCONTACTED) {
+            if (getName() != null) { // Delegated from Settlement
+                xw.writeAttribute(NAME_TAG, getName());
+            }
         }
 
-        if (xw.validFor(getOwner())) {
-
+        if (full) { // Server internal fields only
             xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);
 
             xw.writeAttribute(CONVERT_PROGRESS_TAG, convertProgress);
         }
 
-        if (learnableSkill != null) {
-            xw.writeAttribute(LEARNABLE_SKILL_TAG, learnableSkill);
-        }
+        if (full // Other fields visible from visiting
+            || cl == ContactLevel.SCOUTED || cl == ContactLevel.VISITED) {
 
-        for (int i = 0; i < WANTED_GOODS_COUNT; i++) {
-            GoodsType gt = getWantedGoods(i);
-            if (gt != null) xw.writeAttribute(WANTED_GOODS_TAG + i, gt);
-        }
+            if (learnableSkill != null) {
+                xw.writeAttribute(LEARNABLE_SKILL_TAG, learnableSkill);
+            }
 
-        if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
+            for (int i = 0; i < WANTED_GOODS_COUNT; i++) {
+                GoodsType gt = getWantedGoods(i);
+                if (gt != null) xw.writeAttribute(WANTED_GOODS_TAG + i, gt);
+            }
+
+            final Player hated = getMostHated();
+            if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
+        }
     }
 
     /**
@@ -1670,9 +1681,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             }
 
         } else {
-            Player client = xw.getClientPlayer();
+            final Player client = xw.getClientPlayer();
+            final ContactLevel cl = getContactLevel(client);
 
-            ContactLevel cl = getContactLevel(client);
             if (cl != null) {
                 xw.writeStartElement(CONTACT_LEVEL_TAG);
 
@@ -1683,7 +1694,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 xw.writeEndElement();
             }
 
-            Tension alarm = getAlarm(client);
+            final Tension alarm = getAlarm(client);
             if (alarm != null) {
                 xw.writeStartElement(ALARM_TAG);
 

@@ -1480,7 +1480,7 @@ public class ServerPlayer extends Player implements TurnTaker {
                     colony, disaster, cs);
                 if (!messages.isEmpty()) {
                     cs.addMessage(this,
-                        new ModelMessage(MessageType.DEFAULT,
+                        new ModelMessage(MessageType.DISASTERS,
                                          "model.player.disaster.strikes",
                                          colony)
                             .addName("%colony%", colony.getName())
@@ -1565,7 +1565,7 @@ outer:  for (Effect effect : effects) {
                         modifyGold(-plunder);
                         cs.addPartial(See.only(this), this,
                             "gold", String.valueOf(this.getGold()));
-                        mm = new ModelMessage(MessageType.DEFAULT,
+                        mm = new ModelMessage(MessageType.DISASTERS,
                                               effect.getId(), this)
                             .addAmount("%amount%", plunder);
                         break;
@@ -1573,7 +1573,7 @@ outer:  for (Effect effect : effects) {
                         Building building = getBuildingForEffect(colony, effect, random);
                         if (building != null) {
                             // Add message before damaging building
-                            mm = new ModelMessage(MessageType.DEFAULT,
+                            mm = new ModelMessage(MessageType.DISASTERS,
                                                   effect.getId(), colony)
                                 .addNamed("%building%", building.getType());
                             csDamageBuilding(building, cs);
@@ -1587,7 +1587,7 @@ outer:  for (Effect effect : effects) {
                         if (goods != null) {
                             goods.setAmount(Math.min(goods.getAmount() / 2, 50));
                             colony.removeGoods(goods);
-                            mm = new ModelMessage(MessageType.DEFAULT,
+                            mm = new ModelMessage(MessageType.DISASTERS,
                                                   effect.getId(), colony)
                                 .addStringTemplate("%goods%", goods.getLabel(true));
                             colonyDirty = true;
@@ -1599,7 +1599,7 @@ outer:  for (Effect effect : effects) {
                             if (unit != null) {
                                 if (colony.getUnitCount() == 1) {
                                     messages.clear();
-                                    mm = new ModelMessage(MessageType.DEFAULT,
+                                    mm = new ModelMessage(MessageType.DISASTERS,
                                         "model.player.disaster.effect.colonyDestroyed",
                                         this)
                                         .addName("%colony%", colony.getName());
@@ -1608,7 +1608,7 @@ outer:  for (Effect effect : effects) {
                                     colonyDirty = false;
                                     break outer; // No point proceeding
                                 }
-                                mm = new ModelMessage(MessageType.DEFAULT,
+                                mm = new ModelMessage(MessageType.DISASTERS,
                                                       effect.getId(), colony)
                                     .addStringTemplate("%unit%",
                                         unit.getLabel());
@@ -1624,14 +1624,14 @@ outer:  for (Effect effect : effects) {
                             if (unit != null && unit.isNaval()) {
                                 Location repairLocation = unit.getRepairLocation();
                                 if (repairLocation == null) {
-                                    mm = new ModelMessage(MessageType.DEFAULT,
+                                    mm = new ModelMessage(MessageType.DISASTERS,
                                                           effect.getId(),
                                                           colony)
                                         .addStringTemplate("%unit%",
                                             unit.getLabel());
                                     csSinkShip(unit, null, cs);
                                 } else {
-                                    mm = new ModelMessage(MessageType.DEFAULT,
+                                    mm = new ModelMessage(MessageType.DISASTERS,
                                                           effect.getId(),
                                                           colony)
                                         .addStringTemplate("%unit%",
@@ -1643,7 +1643,7 @@ outer:  for (Effect effect : effects) {
                             break;
                         }
                     default:
-                        mm = new ModelMessage(MessageType.DEFAULT,
+                        mm = new ModelMessage(MessageType.DISASTERS,
                                               effect.getId(), colony);
                         forEach(effect.getModifiers(), m -> {
                                 if (m.getDuration() > 0) {
@@ -4511,7 +4511,7 @@ outer:  for (Effect effect : effects) {
                 invalidateCanSeeTiles();//+vis(this)
                 cs.add(See.perhaps(), tiles);
                 cs.addMessage(this,
-                    new ModelMessage(MessageType.DEFAULT,
+                    new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "model.player.interventionForceArrives",
                                      this));
                 logger.info("Intervention force (" + naval.size() + " naval, "

@@ -124,11 +124,15 @@ public class ServerGame extends Game implements TurnTaker {
      *
      * Called from FreeColServer.readGame when restoring a saved game.
      *
+     * @param specification The {@code Specification} to use in this game.
      * @param xr The input stream containing the XML.
      * @exception XMLStreamException if an error occurred during parsing.
      */
-    public ServerGame(FreeColXMLReader xr) throws XMLStreamException {
-        super(null, xr);
+    public ServerGame(Specification specification, FreeColXMLReader xr)
+        throws XMLStreamException {
+        this(specification);
+
+        readFromXML(xr);
     }
 
 

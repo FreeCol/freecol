@@ -50,6 +50,7 @@ public class ModelMessage extends StringTemplate {
         BUILDING_COMPLETED("model.option.guiShowBuildingCompleted"),
         COMBAT_RESULT(null), // No option, always display
         DEMANDS("model.option.guiShowDemands"),
+        DISASTERS("model.option.guiShowDisasters"),
         FOREIGN_DIPLOMACY("model.option.guiShowForeignDiplomacy"),
         GIFT_GOODS("model.option.guiShowGifts"),
         GOODS_MOVEMENT("model.option.guiShowGoodsMovement"),
