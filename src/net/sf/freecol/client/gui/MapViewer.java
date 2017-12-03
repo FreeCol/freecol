@@ -36,6 +36,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -1391,6 +1392,9 @@ public final class MapViewer extends FreeColClientHolder {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
         boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
+        RescaleOp fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
+                                      new float[] { 0, 0, 0, 0 },
+                                      null);
         map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
             (Tile tile) -> {
                 if (!tile.isExplored())
@@ -1402,10 +1406,13 @@ public final class MapViewer extends FreeColClientHolder {
                 final int yt = (y-y0) * halfHeight;
                 g.translate(xt, yt);
 
+                RescaleOp rop = tv.hasFogOfWar(tile) ? fow : null;
+
                 BufferedImage overlayImage = lib.getOverlayImage(tile, overlayCache);
-                tv.displayTileItems(g, tile, overlayImage);
+                tv.displayTileItems(g, tile, rop, overlayImage);
                 tv.displaySettlementWithChipsOrPopulationNumber(
-                    g, tile, withNumbers);
+                    g, tile, withNumbers, rop);
+
                 tv.displayOptionalTileText(g, tile);
 
                 g.translate(-xt, -yt);
