@@ -29,6 +29,7 @@ import javax.swing.JTextField;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.FileOption;
 
 
@@ -66,9 +67,10 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         panel.add(fileField);
 
         JButton browse = Utility.localizedButton("browse");
+        final File root = FreeColDirectories.getSaveDirectory();
         if (editable) {
             browse.addActionListener((ActionEvent ae) -> {
-                    File f = gui.showLoadSaveFileDialog();
+                    File f = gui.showLoadSaveFileDialog(root);
                     if (f != null) setValue(f);
                 });
         }

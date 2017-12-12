@@ -3642,7 +3642,8 @@ public final class InGameController extends FreeColClientHolder {
      * Returns no status as this game is stopped.
      */
     public void loadGame() {
-        File file = getGUI().showLoadSaveFileDialog();
+        File file = getGUI()
+            .showLoadSaveFileDialog(FreeColDirectories.getSaveDirectory());
         if (file == null) return;
         if (getFreeColClient().isInGame()
             && !getGUI().confirmStopGame()) return;

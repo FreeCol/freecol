@@ -88,28 +88,24 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             // FIXME: The update should be solved by PropertyEvent.
 
             final List<File> mapFiles = FreeColDirectories.getMapFileList();
-            if (mapFiles == null) {
-                logger.warning("Could not find map files!");
-            } else {
-                JPanel mapPanel = new JPanel();
-                for (File f : mapFiles) {
-                    JButton mapButton = makeMapButton(f);
-                    if (mapButton == null) continue;
-                    mapButton.addActionListener((ActionEvent ae) -> {
-                            updateFile(f);
-                        });
-                    mapPanel.add(mapButton);
-                }
-
-                JScrollPane scrollPane = new JScrollPane(mapPanel,
-                    JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-                scrollPane.getViewport().setOpaque(false);
-                // FIXME: find out how to do this properly
-                scrollPane.setMinimumSize(new Dimension(400, 110));
-                panel.add(scrollPane);
+            JPanel mapPanel = new JPanel();
+            for (File f : mapFiles) {
+                JButton mapButton = makeMapButton(f);
+                if (mapButton == null) continue;
+                mapButton.addActionListener((ActionEvent ae) -> {
+                        updateFile(f);
+                    });
+                mapPanel.add(mapButton);
             }
+
+            JScrollPane scrollPane = new JScrollPane(mapPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+            scrollPane.getViewport().setOpaque(false);
+            // FIXME: find out how to do this properly
+            scrollPane.setMinimumSize(new Dimension(400, 110));
+            panel.add(scrollPane);
         }
         initialize(frame, choices());
     }
