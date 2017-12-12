@@ -1247,51 +1247,78 @@ public class ServerPlayer extends Player implements TurnTaker {
     /**
      * Buy goods in Europe.
      *
+     * @param random A pseudo-random number source.
      * @param container The {@code GoodsContainer} to carry the goods.
      * @param type The {@code GoodsType} to buy.
      * @param amount The amount of goods to buy.
      * @return The amount actually removed from the market, or
      *     negative on failure.
      */
-    public int buy(GoodsContainer container, GoodsType type, int amount) {
+    public int buyInEurope(Random random, GoodsContainer container,
+                           GoodsType type, int amount) {
         final Market market = getMarket();
-        final int price = market.getBidPrice(type, amount);
-        if (!checkGold(price)) return -1;
-
-        modifyGold(-price);
-        market.modifySales(type, -amount);
-        if (container != null) container.addGoods(type, amount);
-        market.modifyIncomeBeforeTaxes(type, -price);
-        market.modifyIncomeAfterTaxes(type, -price);
-        int marketAmount = (int)applyModifiers((float)amount,
-            getGame().getTurn(), Modifier.TRADE_BONUS, type);
-        market.addGoodsToMarket(type, -marketAmount);
+        int marketAmount = 0;
+        while (amount > 0) {
+            // Always break up into chunks, so the price can adjust
+            // dynamically during large transactions, avoiding
+            // exploitable market manipulation.
+            int a =  (amount <= GoodsContainer.CARGO_SIZE) ? amount
+                : GoodsContainer.CARGO_SIZE;
+            int price = market.getBidPrice(type, a);
+            if (!checkGold(price)) {
+                if (marketAmount == 0) return -1;
+                break;
+            }
+            modifyGold(-price);
+            market.modifySales(type, -a);
+            if (container != null) container.addGoods(type, a);
+            market.modifyIncomeBeforeTaxes(type, -price);
+            market.modifyIncomeAfterTaxes(type, -price);
+            int ma = (int)applyModifiers((float)a, getGame().getTurn(),
+                                         Modifier.TRADE_BONUS, type);
+            market.addGoodsToMarket(type, -ma);
+            marketAmount += ma;
+            propagateToEuropeanMarkets(type, -a, random);
+            amount -= a;
+        }
         return marketAmount;
     }
 
     /**
      * Sell goods in Europe.
      *
+     * @param random A pseudo-random number source.
      * @param container An optional {@code GoodsContainer}
      *     carrying the goods.
      * @param type The {@code GoodsType} to sell.
      * @param amount The amount of goods to sell.
      * @return The amount actually added to the market, or negative on failure.
      */
-    public int sell(GoodsContainer container, GoodsType type, int amount) {
+    public int sellInEurope(Random random, GoodsContainer container,
+                            GoodsType type, int amount) {
         final Market market = getMarket();
         final int tax = getTax();
-        final int incomeBeforeTaxes = market.getSalePrice(type, amount);
-        final int incomeAfterTaxes = ((100 - tax) * incomeBeforeTaxes) / 100;
-        
-        modifyGold(incomeAfterTaxes);
-        market.modifySales(type, amount);
-        if (container != null) container.addGoods(type, -amount);
-        market.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
-        market.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
-        int marketAmount = (int)applyModifiers((float)amount,
-            getGame().getTurn(), Modifier.TRADE_BONUS, type);
-        market.addGoodsToMarket(type, marketAmount);
+        int marketAmount = 0;
+        while (amount > 0) {
+            // Always break up into chunks, so the price can adjust
+            // dynamically during large transactions, avoiding
+            // exploitable market manipulation.
+            int a = (amount <= GoodsContainer.CARGO_SIZE) ? amount
+                : GoodsContainer.CARGO_SIZE;
+            int incomeBeforeTaxes = market.getSalePrice(type, a);
+            int incomeAfterTaxes = ((100 - tax) * incomeBeforeTaxes) / 100;
+            modifyGold(incomeAfterTaxes);
+            market.modifySales(type, a);
+            if (container != null) container.addGoods(type, -a);
+            market.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
+            market.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
+            int ma = (int)applyModifiers((float)a, getGame().getTurn(),
+                                         Modifier.TRADE_BONUS, type);
+            market.addGoodsToMarket(type, ma);
+            marketAmount += ma;
+            propagateToEuropeanMarkets(type, a, random);
+            amount -= a;
+        }
         return marketAmount;
     }
 
@@ -1685,17 +1712,20 @@ outer:  for (Effect effect : effects) {
      *
      * @param type The type of goods that was traded.
      * @param amount The amount of goods that was traded.
-     * @param random A pseudo-random number source.
+     * @param random A pseudo-random number source (note: may be null
+     *     in some cases).
      */
     public void propagateToEuropeanMarkets(GoodsType type, int amount,
                                            Random random) {
         if (!type.isStorable()) return;
 
         // Propagate 5-30% of the original change.
+        // Use average if no PRNG available.
         final int lowerBound = 5; // FIXME: to spec
         final int upperBound = 30;// FIXME: to spec
-        amount *= randomInt(logger, "Propagate goods", random,
-                            upperBound - lowerBound + 1) + lowerBound;
+        int r = (random == null) ? (lowerBound + upperBound)/2
+            : randomInt(logger, "Propagate goods", random,
+                        upperBound - lowerBound + 1) + lowerBound;
         amount /= 100;
         if (amount == 0) return;
 

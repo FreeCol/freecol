@@ -1064,7 +1064,7 @@ public final class InGameController extends Controller {
         GoodsContainer container = carrier.getGoodsContainer();
         container.saveState();
         int gold = serverPlayer.getGold();
-        int buyAmount = serverPlayer.buy(container, type, amount);
+        int buyAmount = serverPlayer.buyInEurope(random, container, type, amount);
         if (buyAmount < 0) {
             return serverPlayer.clientError("Player " + serverPlayer.getName()
                 + " tried to buy " + amount + " " + type.getSuffix());
@@ -3276,11 +3276,11 @@ public final class InGameController extends Controller {
             int amount = ag.getAmount();
             if (type.isStorable()) {
                 // FIXME: should also check canTrade(type, Access.?)
-                if ((amount = serverPlayer.buy(container, type, amount)) < 0) {
+                if ((amount = serverPlayer.buyInEurope(random, container,
+                                                       type, amount)) < 0) {
                     return serverPlayer.clientError("Can not buy " + amount
                         + " " + type + " for " + build);
                 }
-                serverPlayer.propagateToEuropeanMarkets(type, -amount, random);
                 serverPlayer.csFlushMarket(type, cs);
             } else {
                 container.addGoods(type, amount);
@@ -3569,12 +3569,12 @@ public final class InGameController extends Controller {
         container.saveState();
         if (serverPlayer.canTrade(type, Access.EUROPE)) {
             int gold = serverPlayer.getGold();
-            int sellAmount = serverPlayer.sell(container, type, amount);
+            int sellAmount = serverPlayer.sellInEurope(random, container,
+                                                       type, amount);
             if (sellAmount < 0) {
                 return serverPlayer.clientError("Player " + serverPlayer.getName()
                     + " tried to sell " + amount + " " + type.getSuffix());
             }
-            serverPlayer.propagateToEuropeanMarkets(type, sellAmount, random);
             serverPlayer.csFlushMarket(type, cs);
             cs.addPartial(See.only(serverPlayer), serverPlayer,
                 "gold", String.valueOf(serverPlayer.getGold()));
