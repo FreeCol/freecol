@@ -2451,24 +2451,16 @@ public class Unit extends GoodsLocation
      * @return True if this unit can move immediately to the high seas.
      */
     public boolean canMoveToHighSeas() {
-        if (isInEurope() || isAtSea()) return true;
-        if (!getOwner().canMoveToEurope()
-            || !getType().canMoveToHighSeas()) return false;
-        return getTile().isDirectlyHighSeasConnected();
-    }
-
-    /**
-     * Does this unit have a valid move to the high seas this turn.
-     *
-     * @return True if the unit can either move immediately to the high
-     *      seas or can make a move to a neighbouring high seas tile.
-     */
-    public boolean hasHighSeasMove() {
-        return (canMoveToHighSeas())
-            ? true
-            : (hasTile() && getMovesLeft() > 0)
-            ? any(getTile().getSurroundingTiles(1, 1),
-                Tile::isDirectlyHighSeasConnected)
+        final Predicate<Tile> highSeasMovePred = t ->
+            t.isDirectlyHighSeasConnected() // Quick filter before full check
+                && getMoveType(t) == MoveType.MOVE_HIGH_SEAS;
+        return (isAtSea()) ? true
+            : (isInEurope()) ? getType().canMoveToHighSeas()
+            : (hasTile()) ? (getType().canMoveToHighSeas()
+                && getOwner().canMoveToEurope()
+                && (getTile().isDirectlyHighSeasConnected()
+                    || any(getTile().getSurroundingTiles(1, 1),
+                           highSeasMovePred)))
             : false;
     }
 
