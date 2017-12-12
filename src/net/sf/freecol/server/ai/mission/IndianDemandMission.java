@@ -180,7 +180,7 @@ public class IndianDemandMission extends Mission {
             && tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
             final Predicate<Goods> angryPred = g ->
                 !g.isFoodType() && !g.getType().getMilitary();
-            goods = maximize(target.getCompactGoods(), angryPred, marketPrice);
+            goods = maximize(target.getCompactGoodsList(), angryPred, marketPrice);
             if (goods != null) goods = makeGoods.apply(goods);
         }
 
@@ -196,7 +196,7 @@ public class IndianDemandMission extends Mission {
 
         // Finally just go for expense
         if (goods == null) {
-            goods = maximize(target.getCompactGoods(), marketPrice);
+            goods = maximize(target.getCompactGoodsList(), marketPrice);
             if (goods != null) goods = makeGoods.apply(goods);
         }
 
@@ -437,7 +437,7 @@ public class IndianDemandMission extends Mission {
                 // Unload the goods
                 lbAt(lb);
                 GoodsContainer container = unit.getGoodsContainer();
-                for (Goods goods : container.getCompactGoods()) {
+                for (Goods goods : container.getCompactGoodsList()) {
                     Goods tribute = container.removeGoods(goods.getType());
                     is.addGoods(tribute);
                 }

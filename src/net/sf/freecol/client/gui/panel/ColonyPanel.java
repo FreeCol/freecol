@@ -193,7 +193,7 @@ public final class ColonyPanel extends PortPanel
     private final ActionListener unloadCmd = ae -> {
         final Unit unit = getSelectedUnit();
         if (unit == null || !unit.isCarrier()) return;
-        for (Goods goods : unit.getGoodsContainer().getGoods()) {
+        for (Goods goods : unit.getGoodsList()) {
             igc().unloadCargo(goods, false);
         }
         for (Unit u : unit.getUnitList()) {

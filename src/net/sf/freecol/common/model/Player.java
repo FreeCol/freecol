@@ -1751,7 +1751,7 @@ public class Player extends FreeColGameObject implements Nameable {
             market.getSalePrice(g.getType(),
                 Math.min(g.getAmount(), GoodsContainer.CARGO_SIZE)));
         return maximize(flatten(getColonies(),
-                                c -> c.getCompactGoods().stream()),
+                                c -> c.getCompactGoodsList().stream()),
                         boycottPred, tradedValueComp);
     }
 

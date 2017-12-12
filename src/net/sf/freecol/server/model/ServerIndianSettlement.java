@@ -134,7 +134,7 @@ public class ServerIndianSettlement extends IndianSettlement
         setLastTribute(template.getLastTribute());
         setGoodsContainer(new GoodsContainer(game, this));
         final Specification spec = getSpecification();
-        for (Goods goods : template.getCompactGoods()) {
+        for (Goods goods : template.getCompactGoodsList()) {
             GoodsType type = spec.getGoodsType(goods.getType().getId());
             addGoods(type, goods.getAmount());
         }

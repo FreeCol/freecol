@@ -703,7 +703,7 @@ public class TransportMission extends Mission {
         final AIUnit aiCarrier = getAIUnit();
 
         List<Unit> unitsPresent = carrier.getUnitList();
-        List<Goods> goodsPresent = carrier.getCompactGoods();
+        List<Goods> goodsPresent = carrier.getCompactGoodsList();
         List<TransportableAIObject> todo = new ArrayList<>();
         List<TransportableAIObject> drop = new ArrayList<>();
 

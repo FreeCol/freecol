@@ -484,7 +484,7 @@ public class ServerColony extends Colony implements TurnTaker {
         if (oldOwner.csChangeOwner(brave, newOwner, UnitChangeType.CONVERSION, 
                                    getTile(), cs)) { //-vis(other)
             brave.changeRole(getSpecification().getDefaultRole(), 0);
-            for (Goods g : brave.getGoods()) brave.removeGoods(g);
+            for (Goods g : brave.getCompactGoodsList()) brave.removeGoods(g);
             brave.setMovesLeft(0);
             brave.setState(Unit.UnitState.ACTIVE);
             cs.addDisappear(newOwner, tile, brave);
@@ -571,7 +571,7 @@ public class ServerColony extends Colony implements TurnTaker {
         // levels that will be exceeded next turn
         final int limit = getWarehouseCapacity();
         final int adjustment = limit / GoodsContainer.CARGO_SIZE;
-        for (Goods goods : transform(getCompactGoods(),
+        for (Goods goods : transform(getCompactGoodsList(),
                                      AbstractGoods::isStorable)) {
             final GoodsType type = goods.getType();
             final ExportData exportData = getExportData(type);
@@ -841,7 +841,7 @@ public class ServerColony extends Colony implements TurnTaker {
             LogBuilder lb2 = new LogBuilder(64);
             lb2.add(" ");
             lb2.mark();
-            for (Goods goods : getCompactGoods()) {
+            for (Goods goods : getCompactGoodsList()) {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
                 if (!data.getExported()

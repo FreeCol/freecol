@@ -3220,26 +3220,6 @@ public class Unit extends GoodsLocation
     // Goods handling
 
     /**
-     * Get the goods carried by this unit.
-     *
-     * @return A list of {@code Goods}.
-     */
-    public List<Goods> getGoodsList() {
-        return (getGoodsContainer() == null) ? Collections.<Goods>emptyList()
-            : getGoodsContainer().getGoods();
-    }
-
-    /**
-     * Get a compact version of the goods carried by this unit.
-     *
-     * @return A compact list of {@code Goods}.
-     */
-    public List<Goods> getCompactGoodsList() {
-        return (getGoodsContainer() == null) ? Collections.<Goods>emptyList()
-            : getGoodsContainer().getCompactGoods();
-    }
-
-    /**
      * Can this unit carry other units?
      *
      * @return True if the unit can carry units.

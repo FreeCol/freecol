@@ -116,7 +116,7 @@ public class CargoPanel extends FreeColPanel
                 add(label);
             }
 
-            for (Goods g : carrier.getGoods()) {
+            for (Goods g : carrier.getGoodsList()) {
                 GoodsLabel label = new GoodsLabel(getGUI(), g);
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);

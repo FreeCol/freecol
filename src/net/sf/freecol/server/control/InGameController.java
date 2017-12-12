@@ -2982,7 +2982,7 @@ public final class InGameController extends Controller {
      */
     public ChangeSet nativeGift(ServerPlayer serverPlayer,
                                 Unit unit, Colony colony) {
-        final Goods goods = first(unit.getGoods());
+        final Goods goods = first(unit.getGoodsList());
         if (goods == null) {
             return serverPlayer.clientError("No gift to deliver: "
                 + unit.getId());

@@ -276,7 +276,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
             
-            List<Goods> iGoods = is.getCompactGoods();
+            List<Goods> iGoods = is.getCompactGoodsList();
             if (iGoods.isEmpty()) {
                 sis.addRandomGoods(random);
             } else {

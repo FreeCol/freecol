@@ -2031,7 +2031,7 @@ public final class InGameController extends FreeColClientHolder {
         // be loaded at this stop then complain (unload must have
         // failed somewhere).  If it is expected to load, reduce the
         // loading amount by what is already on board.
-        for (Goods g : unit.getCompactGoods()) {
+        for (Goods g : unit.getCompactGoodsList()) {
             AbstractGoods ag = find(toLoad, AbstractGoods.matches(g.getType()));
             if (ag == null) { // Excess goods on board, failed unload?
                 unexpected.addStringTemplate(g.getLabel());
