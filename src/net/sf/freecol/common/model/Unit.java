@@ -3220,6 +3220,41 @@ public class Unit extends GoodsLocation
     // Goods handling
 
     /**
+     * Get the goods carried by this unit.
+     *
+     * @param compact If true create a compact list.
+     * @return A list of {@code Goods}.
+     */
+    private List<Goods> getGoodsInternal(boolean compact) {
+        GoodsContainer gc = getGoodsContainer();
+        if (gc == null) return Collections.<Goods>emptyList();
+        List<Goods> goods = (compact) ? gc.getCompactGoodsList()
+            : gc.getGoodsList();
+        for (Goods g : goods) g.setLocation(this);
+        return goods;
+    }
+        
+    /**
+     * Get the goods carried by this unit.
+     *
+     * @return A list of {@code Goods}.
+     */
+    @Override
+    public List<Goods> getGoodsList() {
+        return getGoodsInternal(false);
+    }
+
+    /**
+     * Get a compact version of the goods carried by this unit.
+     *
+     * @return A compact list of {@code Goods}.
+     */
+    @Override
+    public List<Goods> getCompactGoodsList() {
+        return getGoodsInternal(true);
+    }
+
+    /**
      * Can this unit carry other units?
      *
      * @return True if the unit can carry units.
