@@ -1742,8 +1742,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of lootable goods in this colony.
      */
     public List<Goods> getLootableGoodsList() {
-        return transform(getGoodsContainer().getGoods(),
-                AbstractGoods::isStorable);
+        return transform(getGoodsList(), AbstractGoods::isStorable);
     }
 
     /**
@@ -1796,7 +1795,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 if (v == Integer.MIN_VALUE) return Integer.MIN_VALUE;
                 result += v;
             }
-            for (Goods g : getCompactGoods()) {
+            for (Goods g : getCompactGoodsList()) {
                 v = g.evaluateFor(player);
                 if (v == Integer.MIN_VALUE) return Integer.MIN_VALUE;
                 result += v;

@@ -3222,11 +3222,26 @@ public class Unit extends GoodsLocation
     /**
      * Get the goods carried by this unit.
      *
+     * @param compact If true create a compact list.
      * @return A list of {@code Goods}.
      */
+    private List<Goods> getGoodsInternal(boolean compact) {
+        GoodsContainer gc = getGoodsContainer();
+        if (gc == null) return Collections.<Goods>emptyList();
+        List<Goods> goods = (compact) ? gc.getCompactGoodsList()
+            : gc.getGoodsList();
+        for (Goods g : goods) g.setLocation(this);
+        return goods;
+    }
+        
+    /**
+     * Get the goods carried by this unit.
+     *
+     * @return A list of {@code Goods}.
+     */
+    @Override
     public List<Goods> getGoodsList() {
-        return (getGoodsContainer() == null) ? Collections.<Goods>emptyList()
-            : getGoodsContainer().getGoods();
+        return getGoodsInternal(false);
     }
 
     /**
@@ -3234,9 +3249,9 @@ public class Unit extends GoodsLocation
      *
      * @return A compact list of {@code Goods}.
      */
+    @Override
     public List<Goods> getCompactGoodsList() {
-        return (getGoodsContainer() == null) ? Collections.<Goods>emptyList()
-            : getGoodsContainer().getCompactGoods();
+        return getGoodsInternal(true);
     }
 
     /**

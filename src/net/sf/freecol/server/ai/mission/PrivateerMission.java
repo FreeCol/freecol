@@ -238,7 +238,7 @@ public class PrivateerMission extends Mission {
         return (!unit.isCarrier()) ? "unit-not-a-carrier"
             : (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
             : (!unit.isEmpty()
-                || !unit.getCompactGoods().isEmpty()) ? "unit-has-cargo"
+                || !unit.getCompactGoodsList().isEmpty()) ? "unit-has-cargo"
             : null;
     }
 

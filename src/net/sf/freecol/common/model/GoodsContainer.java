@@ -393,7 +393,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *
      * @return A list of {@code Goods}.
      */
-    public List<Goods> getGoods() {
+    public List<Goods> getGoodsList() {
         final Game game = getGame();
         List<Goods> result = new ArrayList<>();
         synchronized (this.storedGoods) {
@@ -410,13 +410,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Gets a list of all goods in this goods container.
-     * There is only one {@code Goods} for each distinct
-     * {@code GoodsType}.
+     * Gets a list of all goods in this goods container.  There is
+     * only one {@code Goods} for each distinct {@code GoodsType}.
      *
      * @return A list of {@code Goods}.
      */
-    public List<Goods> getCompactGoods() {
+    public List<Goods> getCompactGoodsList() {
         final Game game = getGame();
         synchronized (this.storedGoods) {
             return transform(this.storedGoods.entrySet(),

@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.MarketData;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
@@ -807,10 +808,11 @@ public final class EuropePanel extends PortPanel {
      * Unload the contents of the currently selected carrier.
      */
     private void unloadAction() {
+        final Player player = getMyPlayer();
         Unit unit = getSelectedUnit();
         if (unit != null && unit.isCarrier()) {
             for (Goods g : unit.getCompactGoodsList()) {
-                if (getMyPlayer().canTrade(g.getType())) {
+                if (player.canTrade(g.getType())) {
                     igc().sellGoods(g);
                 } else {
                     igc().payArrears(g.getType());

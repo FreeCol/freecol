@@ -2856,7 +2856,7 @@ outer:  for (Effect effect : effects) {
                                        attacker.getTile(),
                                        cs)) { //-vis(attackerPlayer)
             convert.changeRole(spec.getDefaultRole(), 0);
-            for (Goods g : convert.getGoods()) convert.removeGoods(g);
+            for (Goods g : convert.getCompactGoodsList()) convert.removeGoods(g);
             convert.setMovesLeft(0);
             convert.setState(Unit.UnitState.ACTIVE);
             cs.add(See.only(nativePlayer), is.getTile());
@@ -3106,7 +3106,7 @@ outer:  for (Effect effect : effects) {
         ServerPlayer player = (ServerPlayer) ship.getOwner();
 
         // Lose the goods and units aboard
-        for (Goods g : ship.getGoodsContainer().getCompactGoods()) {
+        for (Goods g : ship.getCompactGoodsList()) {
             ship.remove(g);
         }
         for (Unit u : ship.getUnitList()) {

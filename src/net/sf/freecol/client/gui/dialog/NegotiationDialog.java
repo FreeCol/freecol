@@ -912,7 +912,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                 this.goodsDemandPanel = new GoodsTradeItemPanel(otherPlayer, goods);
                 GoodsLocation gl = (ourUnit != null) ? ourUnit : ourColony;
                 goods = (ourUnit != null) ? ourUnit.getGoodsList()
-                        : ourColony.getCompactGoods();
+                        : ourColony.getCompactGoodsList();
                 for (Goods g : goods) {
                     if (g.getAmount() > GoodsContainer.CARGO_SIZE) {
                         g.setAmount(GoodsContainer.CARGO_SIZE);
