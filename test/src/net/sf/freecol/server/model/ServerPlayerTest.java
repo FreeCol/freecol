@@ -95,15 +95,13 @@ public class ServerPlayerTest extends FreeColTestCase {
         // Sell lightly in the English market to check that the good
         // is now considered "traded".
         Random random = new Random();
-        int m = english.sell(null, silverType, 1);
-        if (m > 0) english.propagateToEuropeanMarkets(silverType, m, random);
+        int m = english.sellInEurope(random, null, silverType, 1);
         assertTrue(englishMarket.hasBeenTraded(silverType));
         int englishAmount = englishMarket.getAmountInMarket(silverType);
 
         // Sell heavily in the French market, price should drop.
-        m = french.sell(null, silverType, 200);
-        if (m > 0) french.propagateToEuropeanMarkets(silverType, m, random);
-        assertEquals(frenchGold + silverPrice * 200, french.getGold());
+        m = french.sellInEurope(random, null, silverType, 200);
+        assertTrue(frenchGold < french.getGold());
         assertTrue(frenchMarket.hasBeenTraded(silverType));
         assertTrue(frenchMarket.getSalePrice(silverType, 1) < silverPrice);
 
@@ -369,27 +367,29 @@ public class ServerPlayerTest extends FreeColTestCase {
 
     public void testSellingMakesPricesFall() {
         Game g = ServerTestHelper.startServerGame(getTestMap());
-        ServerPlayer p = (ServerPlayer)g.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)g.getPlayerByNationId("model.nation.dutch");
 
-        Market dm = p.getMarket();
-        int previousGold = p.getGold();
+        Market dm = dutch.getMarket();
+        int previousGold = dutch.getGold();
         int price = spec().getInitialPrice(silverType);
-        p.sell(null, silverType, 1000);
+        dutch.sellInEurope(null, null, silverType, 1000);
 
-        assertEquals(previousGold + price * 1000, p.getGold());
+        assertTrue(previousGold < dutch.getGold());
         assertTrue(dm.getSalePrice(silverType, 1) < price);
     }
 
     public void testBuyingMakesPricesRaise() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
-        ServerPlayer player = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
 
-        Market dm = player.getMarket();
-        player.modifyGold(1000000);
+        Market dm = dutch.getMarket();
+        dutch.modifyGold(1000000);
+        int previousGold = dutch.getGold();
         int price = dm.getCostToBuy(foodType);
-        int n = player.buy(new GoodsContainer(game, player.getEurope()),
-                                              foodType, 10000);
-        assertEquals(1000000 - 10000 * price, player.getGold());
+        dutch.buyInEurope(null,
+            new GoodsContainer(game, dutch.getEurope()),
+            foodType, 10000);
+        assertTrue(previousGold > dutch.getGold());
         assertTrue(dm.getBidPrice(foodType, 1) > price);
     }
 
@@ -407,7 +407,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         }
 
         while (price == market.getSalePrice(type, 1)) {
-            player.sell(null, type, 10);
+            player.sellInEurope(null, null, type, 10);
             result++;
         }
         return result;
@@ -432,7 +432,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         GoodsContainer container
             = new GoodsContainer(game, player.getEurope());
         while (price == market.getBidPrice(type, 1)) {
-            player.buy(container, type, 10);
+            player.buyInEurope(random, container, type, 10);
             result++;
         }
         return result;

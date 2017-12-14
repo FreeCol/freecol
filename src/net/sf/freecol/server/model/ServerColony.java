@@ -849,7 +849,8 @@ public class ServerColony extends Colony implements TurnTaker {
                 int amount = goods.getAmount() - data.getExportLevel();
                 if (amount <= 0) continue;
                 int oldGold = owner.getGold();
-                int marketAmount = owner.sell(container, type, amount);
+                int marketAmount = owner.sellInEurope(random, container,
+                                                      type, amount);
                 if (marketAmount > 0) {
                     owner.addExtraTrade(new AbstractGoods(type, marketAmount));
                 }

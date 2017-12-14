@@ -102,6 +102,9 @@ public final class MapEditorController extends FreeColClientHolder {
         }
     }
 
+    /**
+     * Reload the main panel when done with the map editor.
+     */
     private void reloadMainPanel () {
         SwingUtilities.invokeLater(() -> {
                 getGUI().closeMainPanel();
@@ -214,8 +217,10 @@ public final class MapEditorController extends FreeColClientHolder {
      * and saves the game.
      */
     public void saveMapEditorGame() {
-        File file = getGUI().showSaveDialog(FreeColDirectories.getSaveDirectory(),
-                                            FreeColDirectories.MAP_FILE_NAME);
+        File dir = FreeColDirectories.getUserMapsDirectory();
+        if (dir == null) dir = FreeColDirectories.getSaveDirectory();
+        File file = getGUI()
+            .showSaveDialog(dir, FreeColDirectories.MAP_FILE_NAME);
         if (file != null) saveMapEditorGame(file);
     }
 
@@ -259,7 +264,8 @@ public final class MapEditorController extends FreeColClientHolder {
      * game.
      */
     public void loadGame() {
-        File file = getGUI().showLoadSaveFileDialog();
+        File file = getGUI()
+            .showLoadSaveFileDialog(FreeColDirectories.getUserMapsDirectory());
         if (file != null) loadGame(file);
     }
 

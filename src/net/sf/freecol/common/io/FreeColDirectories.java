@@ -115,6 +115,8 @@ public class FreeColDirectories {
 
     private static final String TC_FILE_SUFFIX = ".ftc";
 
+    private static final String USER_MAPS_DIRECTORY = "maps";
+
     private static final String ZIP_FILE_SUFFIX = ".zip";
     
     private static final String XDG_CONFIG_HOME_ENV = "XDG_CONFIG_HOME";
@@ -451,15 +453,26 @@ public class FreeColDirectories {
     }
 
     /**
+     * Safely derive a subdirectory of a root.
+     *
+     * @param root The root directory.
+     * @param subdir The name of the subdirectory to find or create.
+     * @return The directory found, or null on error.
+     */
+    private static File deriveDirectory(File root, String subdir) {
+        File dir;
+        return (isGoodDirectory(root)
+            && (dir = new File(root, subdir)) != null
+            && insistDirectory(dir)) ? dir : null;
+    }
+
+    /**
      * Derive the directory for the autosave files from the save directory.
      *
      * @return The new autosave directory, or null if not possible.
      */
     private static File deriveAutosaveDirectory() {
-        File dir;
-        return (isGoodDirectory(saveDirectory)
-            && (dir = new File(saveDirectory, AUTOSAVE_DIRECTORY)) != null
-            && insistDirectory(dir)) ? dir : null;
+        return deriveDirectory(saveDirectory, AUTOSAVE_DIRECTORY);
     }
 
     /**
@@ -946,12 +959,16 @@ public class FreeColDirectories {
     /**
      * Get the map files.
      *
-     * @return A list of map files, or null on error.
+     * @return A list of map files which may be empty.
      */
     public static List<File> getMapFileList() {
-        final File mapsDirectory = getMapsDirectory();
-        return (mapsDirectory == null || !mapsDirectory.isDirectory()) ? null
-            : collectFiles(mapsDirectory, saveGameFilter);
+        List<File> ret = new ArrayList<>();
+        for (File f : new File[] { getMapsDirectory(), getUserMapsDirectory() }) {
+            if (f != null && f.isDirectory()) {
+                ret.addAll(collectFiles(f, saveGameFilter));
+            }
+        }
+        return ret;
     }
 
     /**
@@ -1214,6 +1231,15 @@ public class FreeColDirectories {
         String ret = checkDir(dir);
         if (ret == null) userDataDirectory = dir;
         return ret;
+    }
+
+    /**
+     * Get the user maps directory.
+     *
+     * @return The directory to save user maps to, or null if none.
+     */
+    public static File getUserMapsDirectory() {
+        return deriveDirectory(getUserDataDirectory(), USER_MAPS_DIRECTORY);
     }
 
     /**

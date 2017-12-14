@@ -67,7 +67,7 @@ public class ServerEurope extends Europe implements TurnTaker {
     /**
      * Creates a new ServerEurope.
      *
-     * @param game The {@code Game} in which this object belong.
+     * @param game The {@code Game} in which this object belongs.
      * @param owner The {@code Player} that will be using this object of
      *            {@code Europe}.
      */
@@ -97,14 +97,14 @@ public class ServerEurope extends Europe implements TurnTaker {
         // Sell any excess
         final ServerPlayer owner = (ServerPlayer)getOwner();
         for (AbstractGoods ag : transform(req, g -> g.getAmount() < 0)) {
-            int rm = owner.sell(null, ag.getType(), -ag.getAmount());
+            int rm = owner.sellInEurope(null, null, ag.getType(), -ag.getAmount());
             if (rm > 0) {
                 owner.addExtraTrade(new AbstractGoods(ag.getType(), rm));
             }
         }
         // Buy what is needed
         for (AbstractGoods ag : transform(req, AbstractGoods::isPositive)) {
-            int m = owner.buy(null, ag.getType(), ag.getAmount());
+            int m = owner.buyInEurope(null, null, ag.getType(), ag.getAmount());
             if (m > 0) {
                 owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));
             }
