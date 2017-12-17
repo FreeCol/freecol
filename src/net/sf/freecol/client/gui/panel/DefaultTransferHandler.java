@@ -576,6 +576,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 ? importUnit(comp, (UnitLabel)data, oldSelectedUnit)
                 : importFail(comp, data.toString());
         } catch (Exception e) { // FIXME: Suggest a reconnect?
+            logger.log(Level.WARNING, "Import fail", e);
             ret = importFail(comp, "crash: " + e.toString());
         }
         return ret;

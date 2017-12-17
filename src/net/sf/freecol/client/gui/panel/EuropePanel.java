@@ -195,8 +195,14 @@ public final class EuropePanel extends PortPanel {
                             unit, "ok", "cancel")) return null;
                 }
 
-                comp.getParent().remove(comp);
                 igc().moveTo(unit, dest);
+                if (dest instanceof Europe) {
+                    ; // Assume this works
+                } else {
+                    // Fail if still in Europe if told to leave
+                    if (unit.isInEurope()) return null;
+                }
+                if (comp.getParent() != null) comp.getParent().remove(comp);
                 inPortPanel.update();
                 docksPanel.update();
                 cargoPanel.update();
@@ -832,9 +838,8 @@ public final class EuropePanel extends PortPanel {
      */
     private void sailAction() {
         Unit unit = getSelectedUnit();
-        if (unit != null && unit.isNaval()) {
-            UnitLabel unitLabel = getSelectedUnitLabel();
-            toAmericaPanel.add(unitLabel, true);
+        if (unit != null && toAmericaPanel.accepts(unit)) {
+            toAmericaPanel.add(getSelectedUnitLabel(), true);
         }
         requestFocus();
     }
