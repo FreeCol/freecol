@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -443,6 +444,37 @@ public final class Specification implements OptionContainer {
         }
     }
 
+    /**
+     * Update the game and map options from the user configuration files.
+     */
+    public void updateGameAndMapOptions() {
+        String gtag = GameOptions.TAG;
+        File gof = FreeColDirectories
+            .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
+        OptionGroup gog = (gof.exists()) ? OptionGroup.load(gof, gtag, this)
+            : null;
+        if (gog != null) {
+            gog = mergeGroup(gog);
+            fixGameOptions();
+        } else {
+            gog = getOptionGroup(gtag);
+        }
+        gog.save(gof, null, true);
+        
+        String mtag = MapGeneratorOptions.TAG;
+        File mof = FreeColDirectories
+            .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
+        OptionGroup mog = (mof.exists()) ? OptionGroup.load(mof, mtag, this)
+            : null;
+        if (mog != null) {
+            mog = mergeGroup(mog);
+            fixMapGeneratorOptions();
+        } else {
+            mog = getOptionGroup(mtag);
+        }
+        mog.save(mof, null, true);
+    }
+        
     /**
      * Load mods into this specification.
      *

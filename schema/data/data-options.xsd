@@ -69,6 +69,8 @@
       <xs:attribute name="id" use="required" type="xs:string"/>
 
       <xs:attribute name="value" type="xs:string"/>
+      
+      <xs:attribute name="type" use="optional" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 

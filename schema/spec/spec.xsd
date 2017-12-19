@@ -117,6 +117,7 @@
       0.117: Update unit-type-change to include identifier.
       0.118: Add optional nationType to unitOption.
       0.119: Add optional mercenary-price to unit-type.
+      0.120: Add type attribute to fileOption.
     </xs:documentation>
   </xs:annotation>
 

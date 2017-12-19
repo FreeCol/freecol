@@ -134,25 +134,7 @@ public final class StartGamePanel extends FreeColPanel {
         this.singlePlayerGame = singlePlayer;
 
         if (singlePlayer || getMyPlayer().isAdmin()) {
-            Specification spec = getSpecification();
-
-            String gtag = GameOptions.TAG;
-            File gof = FreeColDirectories
-                .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
-            OptionGroup gog = (gof.exists()) ? OptionGroup.load(gof, gtag, spec)
-                : null;
-            gog = (gog != null) ? spec.mergeGroup(gog)
-                : spec.getOptionGroup(gtag);
-            gog.save(gof, null, true);
-
-            String mtag = MapGeneratorOptions.TAG;
-            File mof = FreeColDirectories
-                .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
-            OptionGroup mog = (mof.exists()) ? OptionGroup.load(mof, mtag, spec)
-                : null;
-            mog = (mog != null) ? spec.mergeGroup(mog)
-                : spec.getOptionGroup(mtag);
-            mog.save(mof, null, true);
+            getSpecification().updateGameAndMapOptions();
         }
 
         NationOptions nationOptions = getGame().getNationOptions();
