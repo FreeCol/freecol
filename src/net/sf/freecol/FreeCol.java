@@ -94,6 +94,9 @@ public final class FreeCol {
     /** The extension for FreeCol saved games. */
     public static final String  FREECOL_SAVE_EXTENSION = "fsg";
 
+    /** The extension for FreeCol maps. */
+    public static final String  FREECOL_MAP_EXTENSION = "fsg";
+
     /** The Java version. */
     private static final String JAVA_VERSION
         = System.getProperty("java.version");

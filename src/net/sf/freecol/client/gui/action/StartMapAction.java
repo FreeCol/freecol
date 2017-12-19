@@ -25,7 +25,6 @@ import java.io.File;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 

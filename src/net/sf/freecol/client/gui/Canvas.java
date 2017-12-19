@@ -54,7 +54,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.FreeCol;
@@ -147,6 +146,7 @@ import net.sf.freecol.client.gui.dialog.VictoryDialog;
 import net.sf.freecol.client.gui.dialog.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -177,6 +177,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -294,9 +295,6 @@ public final class Canvas extends JDesktopPane {
     private boolean clientOptionsDialogShowing = false;
 
     private LoadingSavegameDialog loadingSavegameDialog;
-
-    /** Filters for loadable game files. */
-    private FileFilter[] fileFilters = null;
 
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
@@ -933,21 +931,6 @@ public final class Canvas extends JDesktopPane {
             }
         } catch (Exception e) {}
         return co.getPanelSize(comp.getClass().getName());
-    }
-
-    /**
-     * Initialize the file filters to filter for saved games.
-     *
-     * @return File filters for the FreeCol save game extension.
-     */
-    private FileFilter[] getFileFilters() {
-        if (fileFilters == null) {
-            String s = Messages.message("filter.savedGames");
-            fileFilters = new FileFilter[] {
-                new FileNameExtensionFilter(s, FreeCol.FREECOL_SAVE_EXTENSION)
-            };
-        }
-        return fileFilters;
     }
 
     /**
@@ -2190,8 +2173,10 @@ public final class Canvas extends JDesktopPane {
      * @param filters The file filters which the user can select in the dialog.
      * @return The selected {@code File}.
      */
-    public File showLoadDialog(File directory, FileFilter[] filters) {
-        if (filters == null) filters = getFileFilters();
+    public File showLoadDialog(File directory, String extension) {
+        FileFilter[] filters = new FileFilter[] {
+            FreeColDataFile.getFileFilter(extension)
+        };
         File file = null;
         for (;;) {
             file = showFreeColDialog(new LoadDialog(freeColClient, frame,
@@ -2484,15 +2469,17 @@ public final class Canvas extends JDesktopPane {
      *
      * @param directory The directory containing the files in which
      *     the user may overwrite.
-     * @param filters The available file filters in the dialog.
      * @param defaultName Default filename for the savegame.
      * @return The selected {@code File}.
      */
-    public File showSaveDialog(File directory, FileFilter[] filters,
-                               String defaultName) {
-        if (filters == null) filters = getFileFilters();
-        return showFreeColDialog(new SaveDialog(freeColClient, frame, directory,
-                                                filters, defaultName),
+    public File showSaveDialog(File directory, String defaultName) {
+        String extension = lastPart(defaultName, ".");
+        FileFilter[] filters = new FileFilter[] {
+            FreeColDataFile.getFileFilter(extension)
+        };
+        return showFreeColDialog(new SaveDialog(freeColClient, frame,
+                                                directory, filters,
+                                                defaultName),
                                  null);
     }
 

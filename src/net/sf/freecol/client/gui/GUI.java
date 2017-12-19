@@ -1363,12 +1363,12 @@ public class GUI extends FreeColClientHolder {
         alertSound();
     }
 
-    public File showLoadDialog(File directory) {
+    public File showLoadDialog(File directory, String extension) {
         return null;
     }
 
-    final public File showLoadSaveFileDialog(File root) {
-        File file = showLoadDialog(root);
+    final public File showLoadSaveFileDialog(File root, String extension) {
+        File file = showLoadDialog(root, extension);
         if (file != null && !file.isFile()) {
             showErrorMessage(FreeCol.badFile("error.noSuchFile", file));
             file = null;

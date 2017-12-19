@@ -3644,7 +3644,8 @@ public final class InGameController extends FreeColClientHolder {
      */
     public void loadGame() {
         File file = getGUI()
-            .showLoadSaveFileDialog(FreeColDirectories.getSaveDirectory());
+            .showLoadSaveFileDialog(FreeColDirectories.getSaveDirectory(),
+                                    FreeCol.FREECOL_SAVE_EXTENSION);
         if (file == null) return;
         if (getFreeColClient().isInGame()
             && !getGUI().confirmStopGame()) return;
