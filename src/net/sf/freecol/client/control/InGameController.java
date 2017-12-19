@@ -1211,9 +1211,10 @@ public final class InGameController extends FreeColClientHolder {
         List<Unit> ul;
         if (getClientOptions().getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
             && unit.isInEurope()
-            && !(ul = unit.getOwner().getEurope().getUnitList()).isEmpty()) {
-            if (!moveAutoload(unit,
-                              transform(ul, Unit.sentryPred))) return false;
+            && !(ul = transform(unit.getOwner().getEurope().getUnits(),
+                                Unit.sentryPred)).isEmpty()) {
+            // Can still proceed even if moves consumed
+            moveAutoload(unit, ul);
         }
 
         EuropeWas europeWas = (!unit.isInEurope()) ? null
@@ -3643,7 +3644,8 @@ public final class InGameController extends FreeColClientHolder {
      */
     public void loadGame() {
         File file = getGUI()
-            .showLoadSaveFileDialog(FreeColDirectories.getSaveDirectory());
+            .showLoadSaveFileDialog(FreeColDirectories.getSaveDirectory(),
+                                    FreeCol.FREECOL_SAVE_EXTENSION);
         if (file == null) return;
         if (getFreeColClient().isInGame()
             && !getGUI().confirmStopGame()) return;

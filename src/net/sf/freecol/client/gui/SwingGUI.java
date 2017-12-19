@@ -50,7 +50,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.Timer;
-import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -1457,12 +1456,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public File showLoadDialog(File directory) {
-        return canvas.showLoadDialog(directory, null);
-    }
-
-    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
-        return canvas.showLoadDialog(directory, fileFilters);
+    public File showLoadDialog(File directory, String extension) {
+        return canvas.showLoadDialog(directory, extension);
     }
 
     /**
@@ -1760,12 +1755,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public File showSaveDialog(File directory, String defaultName) {
-        return canvas.showSaveDialog(directory, null, defaultName);
-    }
-
-    public File showSaveDialog(File directory, FileFilter[] fileFilters,
-                               String defaultName) {
-        return canvas.showSaveDialog(directory, fileFilters, defaultName);
+        return canvas.showSaveDialog(directory, defaultName);
     }
 
     /**

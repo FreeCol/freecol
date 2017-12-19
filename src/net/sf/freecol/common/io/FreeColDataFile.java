@@ -35,7 +35,10 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapper;
@@ -257,5 +260,17 @@ public class FreeColDataFile {
      */
     public String getPath() {
         return file.getPath();
+    }
+
+
+    /**
+     * Get a file filter for a given extension.
+     *
+     * @param extension The file extension to filter on.
+     * @return File filters for the extension.
+     */
+    public static FileFilter getFileFilter(String extension) {
+        String s = Messages.message("filter." + extension);
+        return new FileNameExtensionFilter(s, extension);
     }
 }

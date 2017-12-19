@@ -27,13 +27,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
@@ -50,9 +49,6 @@ public final class DifficultyDialog extends OptionsDialog
     implements TreeSelectionListener {
 
     private static final Logger logger = Logger.getLogger(DifficultyDialog.class.getName());
-
-    /** File filters array to filter for XML files. */
-    private static final FileFilter[] filters = { null };
 
     /** The currently selected subgroup. */
     private OptionGroup selected;
@@ -134,10 +130,9 @@ public final class DifficultyDialog extends OptionsDialog
      * @param button The {@code JButton} to add the action to.
      */
     private void addLoadAction(JButton button) {
-        initializeFilters();
         button.addActionListener((ActionEvent ae) -> {
                 File dir = FreeColDirectories.getOptionsDirectory();
-                File file = getGUI().showLoadDialog(dir, filters);
+                File file = getGUI().showLoadDialog(dir, "xml");
                 if (file != null) {
                     if (load(file)) {
                         ; // OptionsDialog.load should update the GUI
@@ -157,28 +152,14 @@ public final class DifficultyDialog extends OptionsDialog
      * @param button The {@code JButton} to add the action to.
      */
     private void addSaveAction(JButton button) {
-        initializeFilters();
         button.addActionListener((ActionEvent ae) -> {
                 File dir = FreeColDirectories.getOptionsDirectory();
-                File file = getGUI().showSaveDialog(dir, filters,
-                                                    getDefaultFileName());
+                File file = getGUI().showSaveDialog(dir, getDefaultFileName());
                 if (file != null) {
                     getOptionUI().updateOption();
                     save(file);
                 }
             });
-    }
-
-    /**
-     * Initialize the XML file filter.
-     */
-    private void initializeFilters() {
-        final String desc = Messages.message("filter.xml");
-        synchronized (filters) {
-            if (filters[0] == null) {
-                filters[0] = new FileNameExtensionFilter(desc, "xml");
-            }
-        }
     }
 
 
