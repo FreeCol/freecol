@@ -68,11 +68,16 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         panel.add(fileField);
 
         JButton browse = Utility.localizedButton("browse");
-        final File root = FreeColDirectories.getSaveDirectory();
         if (editable) {
             browse.addActionListener((ActionEvent ae) -> {
-                    File f = gui.showLoadSaveFileDialog(root,
-                        FreeCol.FREECOL_SAVE_EXTENSION);
+                    final boolean isMap = "map".equals(option.getType());
+                    final File root = (isMap)
+                        ? FreeColDirectories.getMapsDirectory()
+                        : FreeColDirectories.getSaveDirectory();
+                    final String extension = (isMap)
+                        ? FreeCol.FREECOL_MAP_EXTENSION
+                        : FreeCol.FREECOL_SAVE_EXTENSION;
+                    File f = gui.showLoadSaveFileDialog(root, extension);
                     if (f != null) setValue(f);
                 });
         }
