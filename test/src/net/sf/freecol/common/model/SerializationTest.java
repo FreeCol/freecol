@@ -115,19 +115,21 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     public void testMapAfrica() throws Exception {
-        validateMap("data/maps/Africa.fsg");
+        validateMap("data/maps/Africa.fsm");
     }
 
     public void testMapAustralia() throws Exception {
-        validateMap("data/maps/Australia.fsg");
+        validateMap("data/maps/Australia.fsm");
     }
 
     public void testMapAmerica() throws Exception {
-        validateMap("data/maps/America_large.fsg");
+        validateMap("data/maps/America_large.fsm");
+        validateMap("data/maps/South_America.fsm");
     }
 
     public void testMapCaribbean() throws Exception {
-        validateMap("data/maps/Caribbean_basin.fsg");
+        validateMap("data/maps/Caribbean_basin.fsm");
+        validateMap("data/maps/Caribbean_large.fsm");
     }
 
     public void testStringTemplate() throws Exception {
