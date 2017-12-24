@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.option.GameOptions;
 
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -1364,12 +1365,32 @@ public final class MapViewer extends FreeColClientHolder {
                 });
         }
 
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_OFF);
+
+        // Apply fog of war to flat parts of all tiles
+        if (getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
+            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+                (Tile tile) -> {
+                    if (!tile.isExplored())
+                        return;
+
+                    final int x = tile.getX();
+                    final int y = tile.getY();
+                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                    final int yt = (y-y0) * halfHeight;
+                    g.translate(xt, yt);
+
+                    tv.displayFogOfWar(g, tile);
+
+                    g.translate(-xt, -yt);
+                });
+        }
+
         // Display the Tile overlays
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
         boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                           RenderingHints.VALUE_ANTIALIAS_OFF);
         map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
             (Tile tile) -> {
                 if (!tile.isExplored())
@@ -1385,11 +1406,11 @@ public final class MapViewer extends FreeColClientHolder {
                 tv.displayTileItems(g, tile, overlayImage);
                 tv.displaySettlementWithChipsOrPopulationNumber(
                     g, tile, withNumbers);
-                tv.displayFogOfWar(g, tile);
                 tv.displayOptionalTileText(g, tile);
 
                 g.translate(-xt, -yt);
             });
+
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
 
