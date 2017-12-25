@@ -514,7 +514,7 @@ public final class InfoPanel extends FreeColPanel {
         Player player = getFreeColClient().getMyPlayer();
         boolean fail = newMode == InfoPanelMode.END && player != null
             && player.hasNextActiveUnit();
-        logger.info("InfoPanel " + mode + " -> " + newMode
+        logger.info("InfoPanel " + this.mode + " -> " + newMode
             + ((fail) ? "inconsistent" : ""));
         if (this.mode != newMode) {
             switch (this.mode = newMode) {

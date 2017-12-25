@@ -203,33 +203,23 @@ public class SwingGUI extends GUI {
     @Override
     public void reconnect(Unit active, Tile tile) {
         setupMouseListeners();
-        setActiveUnit(null);
         requestFocusInWindow();
-        initializeInGame();
+        canvas.initializeInGame();
+        enableMapControls(getClientOptions()
+            .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
         closeMenus();
         clearGotoPath();
         resetMenuBar();
         resetMapZoom(); // This should refresh the map
-        changeViewMode(GUI.VIEW_TERRAIN_MODE);
-        setSelectedTile(tile);
-        setFocus(tile);
-        if (active != null) {
-            changeViewMode(GUI.MOVE_UNITS_MODE);
-            setActiveUnit(active);
+        setActiveUnit(active);
+        if (getActiveUnit() != null) {
             centerActiveUnit();
+        } else {
+            changeViewMode(GUI.VIEW_TERRAIN_MODE);
+            setSelectedTile(tile);
         }
     }
         
-    /** 
-     * {@inheritDoc}
-     */
-    @Override
-    public void initializeInGame() {
-        canvas.initializeInGame();
-        enableMapControls(getClientOptions()
-            .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
-    }
-
     /**
      * {@inheritDoc}
      */

@@ -2034,22 +2034,28 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Recover the active unit when restoring a game.
+     *
+     * If found, clear the active unit identifier in the game.
+     *
+     * @return The next active {@code Unit}.
+     */
+    public Unit restoreActiveUnit() {        
+        final Game game = getGame();
+        Unit u = game.getInitialActiveUnit();
+        game.setInitialActiveUnitId(null);
+        if (u != null && owns(u)) return u;
+        resetIterators();
+        return getNextActiveUnit();
+    }
+
+    /**
      * Gets a new active unit.
      *
      * @return A {@code Unit} that can be made active.
      */
     public Unit getNextActiveUnit() {
         return nextActiveUnitIterator.next();
-    }
-
-    /**
-     * Sets a new active unit.
-     *
-     * @param unit A {@code Unit} to make the next one to be active.
-     * @return True if the operation succeeded.
-     */
-    public boolean setNextActiveUnit(Unit unit) {
-        return nextActiveUnitIterator.setNext(unit);
     }
 
     /**

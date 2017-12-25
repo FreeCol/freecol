@@ -948,17 +948,16 @@ public final class MapViewer extends FreeColClientHolder {
         boolean ret = false;
         selectedTile = newTile;
 
-        if (viewMode == GUI.MOVE_UNITS_MODE) {
-            if (activeUnit == null || activeUnit.getTile() != newTile) {
-                // select a unit on the selected tile
-                Unit unitInFront = findUnitInFront(newTile);
-                if (unitInFront != null) {
-                    ret = gui.setActiveUnit(unitInFront);
-                    updateCurrentPathForActiveUnit();
-                } else {
-                    gui.setFocus(newTile);
-                    ret = true;
-                }
+        if (viewMode == GUI.MOVE_UNITS_MODE
+            && (activeUnit == null || activeUnit.getTile() != newTile)) {
+            // select a unit on the selected tile
+            Unit unitInFront = findUnitInFront(newTile);
+            if (unitInFront != null) {
+                ret = gui.setActiveUnit(unitInFront);
+            } else {
+                gui.setFocus(newTile);
+                changeViewMode(GUI.VIEW_TERRAIN_MODE);
+                ret = true;
             }
         }
 
@@ -1044,17 +1043,14 @@ public final class MapViewer extends FreeColClientHolder {
     boolean setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
         // The user might what to check the status of a unit - SG
+System.err.println("SAU " + activeUnit);
         Tile tile = (activeUnit == null) ? null : activeUnit.getTile();
         this.activeUnit = activeUnit;
-
-        // The user activated a unit
-        if (viewMode == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
-            changeViewMode(GUI.MOVE_UNITS_MODE);
-        }
 
         if (activeUnit == null || tile == null) {
             gui.getCanvas().stopGoto();
         } else {
+            changeViewMode(GUI.MOVE_UNITS_MODE);
             updateCurrentPathForActiveUnit();
             if (!gui.setSelectedTile(tile)
                 || getClientOptions().getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {

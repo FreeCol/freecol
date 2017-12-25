@@ -4477,7 +4477,6 @@ public final class InGameController extends FreeColClientHolder {
         Unit newUnit = askEmigrate(player.getEurope(),
                                    MigrationType.migrantIndexToSlot(index));
         if (newUnit != null) {
-            player.setNextActiveUnit(newUnit);
             getGUI().setActiveUnit(newUnit);
             updateGUI(null);
         }
@@ -4972,7 +4971,6 @@ public final class InGameController extends FreeColClientHolder {
             && (newUnit = europeWas.getNewUnit()) != null;
         if (ret) {
             europeWas.fireChanges();
-            player.setNextActiveUnit(newUnit);
             getGUI().setActiveUnit(newUnit);
             updateGUI(null);
         }
