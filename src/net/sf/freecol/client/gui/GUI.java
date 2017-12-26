@@ -257,13 +257,6 @@ public class GUI extends FreeColClientHolder {
     public void reconnect(Unit active, Tile tile) {}
 
     /**
-     * In game initializations.
-     *
-     * Called from PreGameController.startGame().
-     */
-    public void initializeInGame() {}
-
-    /**
      * Set up the mouse listeners for the canvas and map viewer.
      */
     public void setupMouseListeners() {}

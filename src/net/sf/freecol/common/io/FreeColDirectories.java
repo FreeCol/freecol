@@ -102,8 +102,6 @@ public class FreeColDirectories {
 
     private static final String RULES_DIRECTORY = "rules";
 
-    private static final String SAVE_GAME_SUFFIX = ".fsg";
-
     private static final String SAVE_DIRECTORY = "save";
 
     private static final String SPECIFICATION_FILE_NAME = "specification.xml";
@@ -155,7 +153,14 @@ public class FreeColDirectories {
      */
     public static final Predicate<File> saveGameFilter = f ->
         f.isFile() && f.canRead()
-            && f.getName().endsWith(SAVE_GAME_SUFFIX);
+            && f.getName().endsWith("." + FreeCol.FREECOL_SAVE_EXTENSION);
+
+    /**
+     * Predicate to select readable files that look like maps.
+     */
+    private static final Predicate<File> mapFilter = f ->
+        f.isFile() && f.canRead()
+            && f.getName().endsWith("." + FreeCol.FREECOL_MAP_EXTENSION);
 
     /** Predicate to filter suitable candidates to be made into TCs. */
     private static final Predicate<File> tcFileFilter = f ->
@@ -965,7 +970,7 @@ public class FreeColDirectories {
         List<File> ret = new ArrayList<>();
         for (File f : new File[] { getMapsDirectory(), getUserMapsDirectory() }) {
             if (f != null && f.isDirectory()) {
-                ret.addAll(collectFiles(f, saveGameFilter));
+                ret.addAll(collectFiles(f, mapFilter));
             }
         }
         return ret;

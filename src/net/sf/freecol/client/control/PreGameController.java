@@ -294,7 +294,7 @@ public final class PreGameController extends FreeColClientHolder {
         
         // Switch to InGame mode
         fcc.changeClientState(true);
-        gui.initializeInGame();
+        fcc.restoreGUI(player);
         
         // Clean up autosaves
         final ClientOptions co = getClientOptions();
@@ -304,11 +304,6 @@ public final class PreGameController extends FreeColClientHolder {
             if (logMe != null) logger.info(logMe);
         }
         
-        // Sort out the unit initialization
-        final Game game = getGame();
-        fcc.restoreGUI(player);
-        game.setInitialActiveUnitId(null);
-        
         // Check for debug skipping
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && FreeColDebugger.getDebugRunTurns() > 0) {
@@ -317,7 +312,7 @@ public final class PreGameController extends FreeColClientHolder {
         }
         
         // Tutorial message if needed
-        if (game.getTurn().getNumber() == 1) {
+        if (getGame().getTurn().getNumber() == 1) {
             player.addStartGameMessage();
         }
         igc().nextModelMessage();

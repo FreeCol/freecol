@@ -95,7 +95,7 @@ public final class FreeCol {
     public static final String  FREECOL_SAVE_EXTENSION = "fsg";
 
     /** The extension for FreeCol maps. */
-    public static final String  FREECOL_MAP_EXTENSION = "fsg";
+    public static final String  FREECOL_MAP_EXTENSION = "fsm";
 
     /** The Java version. */
     private static final String JAVA_VERSION

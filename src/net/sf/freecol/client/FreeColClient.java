@@ -771,14 +771,7 @@ public final class FreeColClient {
      * @param player The client {@code Player}.
      */
     public void restoreGUI(Player player) {
-        final Game game = getGame();
-        Unit u = game.getInitialActiveUnit();
-        if (u != null) {
-            player.setNextActiveUnit(u);
-        } else {
-            player.resetIterators();
-        }
-        u = player.getNextActiveUnit();
+        Unit u = player.restoreActiveUnit();
         getGUI().reconnect((u != null && player.owns(u)) ? u : null,
                            player.getFallbackTile());
     }

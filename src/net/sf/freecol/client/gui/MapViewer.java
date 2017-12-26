@@ -36,6 +36,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +68,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.option.GameOptions;
 
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -946,17 +948,16 @@ public final class MapViewer extends FreeColClientHolder {
         boolean ret = false;
         selectedTile = newTile;
 
-        if (viewMode == GUI.MOVE_UNITS_MODE) {
-            if (activeUnit == null || activeUnit.getTile() != newTile) {
-                // select a unit on the selected tile
-                Unit unitInFront = findUnitInFront(newTile);
-                if (unitInFront != null) {
-                    ret = gui.setActiveUnit(unitInFront);
-                    updateCurrentPathForActiveUnit();
-                } else {
-                    gui.setFocus(newTile);
-                    ret = true;
-                }
+        if (viewMode == GUI.MOVE_UNITS_MODE
+            && (activeUnit == null || activeUnit.getTile() != newTile)) {
+            // select a unit on the selected tile
+            Unit unitInFront = findUnitInFront(newTile);
+            if (unitInFront != null) {
+                ret = gui.setActiveUnit(unitInFront);
+            } else {
+                gui.setFocus(newTile);
+                changeViewMode(GUI.VIEW_TERRAIN_MODE);
+                ret = true;
             }
         }
 
@@ -1042,17 +1043,14 @@ public final class MapViewer extends FreeColClientHolder {
     boolean setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
         // The user might what to check the status of a unit - SG
+System.err.println("SAU " + activeUnit);
         Tile tile = (activeUnit == null) ? null : activeUnit.getTile();
         this.activeUnit = activeUnit;
-
-        // The user activated a unit
-        if (viewMode == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
-            changeViewMode(GUI.MOVE_UNITS_MODE);
-        }
 
         if (activeUnit == null || tile == null) {
             gui.getCanvas().stopGoto();
         } else {
+            changeViewMode(GUI.MOVE_UNITS_MODE);
             updateCurrentPathForActiveUnit();
             if (!gui.setSelectedTile(tile)
                 || getClientOptions().getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
@@ -1364,12 +1362,35 @@ public final class MapViewer extends FreeColClientHolder {
                 });
         }
 
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_OFF);
+
+        // Apply fog of war to flat parts of all tiles
+        if (getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
+            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+                (Tile tile) -> {
+                    if (!tile.isExplored())
+                        return;
+
+                    final int x = tile.getX();
+                    final int y = tile.getY();
+                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                    final int yt = (y-y0) * halfHeight;
+                    g.translate(xt, yt);
+
+                    tv.displayFogOfWar(g, tile);
+
+                    g.translate(-xt, -yt);
+                });
+        }
+
         // Display the Tile overlays
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
         boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                           RenderingHints.VALUE_ANTIALIAS_OFF);
+        RescaleOp fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
+                                      new float[] { 0, 0, 0, 0 },
+                                      null);
         map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
             (Tile tile) -> {
                 if (!tile.isExplored())
@@ -1381,15 +1402,18 @@ public final class MapViewer extends FreeColClientHolder {
                 final int yt = (y-y0) * halfHeight;
                 g.translate(xt, yt);
 
+                RescaleOp rop = tv.hasFogOfWar(tile) ? fow : null;
+
                 BufferedImage overlayImage = lib.getOverlayImage(tile, overlayCache);
-                tv.displayTileItems(g, tile, overlayImage);
+                tv.displayTileItems(g, tile, rop, overlayImage);
                 tv.displaySettlementWithChipsOrPopulationNumber(
-                    g, tile, withNumbers);
-                tv.displayFogOfWar(g, tile);
+                    g, tile, withNumbers, rop);
+
                 tv.displayOptionalTileText(g, tile);
 
                 g.translate(-xt, -yt);
             });
+
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
 

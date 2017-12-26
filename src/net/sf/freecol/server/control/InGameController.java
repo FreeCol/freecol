@@ -978,19 +978,11 @@ public final class InGameController extends Controller {
             for (Tile t : tile.getSurroundingTiles(settlement.getRadius())) {
                 t.cacheUnseen();//+til
             }
-            serverPlayer.addSettlement(settlement);
-            settlement.placeSettlement(false);//-vis(serverPlayer,?),-til
+            Set<Tile> visible = settlement.getVisibleTileSet();
+            
+            // Check new sightings before placing the settlement
             cs.add(See.only(serverPlayer),
-                   serverPlayer.exploreForSettlement(settlement));
-
-            cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
-                    HistoryEvent.HistoryEventType.FOUND_COLONY, serverPlayer)
-                .addName("%colony%", settlement.getName()));
-
-            // Remove equipment from founder in case role confuses
-            // placement.
-            settlement.equipForRole(unit, spec.getDefaultRole(), 0);
-
+                   serverPlayer.collectNewTiles(visible));
             // Coronado
             for (ServerPlayer sp : transform(game.getConnectedPlayers(serverPlayer),
                                              coronadoPred)) {
@@ -1005,6 +997,17 @@ public final class InGameController extends Controller {
                         .addStringTemplate("%region%",
                             tile.getRegion().getLabel()));
             }
+
+            // Place settlement
+            serverPlayer.addSettlement(settlement);
+            settlement.placeSettlement(false);//-vis(serverPlayer,?),-til
+            cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
+                    HistoryEvent.HistoryEventType.FOUND_COLONY, serverPlayer)
+                .addName("%colony%", settlement.getName()));
+
+            // Remove equipment from founder in case role confuses
+            // placement.
+            settlement.equipForRole(unit, spec.getDefaultRole(), 0);
         } else {
             IndianNationType nationType
                 = (IndianNationType) serverPlayer.getNationType();
@@ -1017,13 +1020,17 @@ public final class InGameController extends Controller {
                     .getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
                 skill = getRandomMember(logger, "Choose scout", scouts, random);
             }
+
             settlement = new ServerIndianSettlement(game, serverPlayer, name,
                                                     tile, false, skill, null);
             for (Tile t : tile.getSurroundingTiles(settlement.getRadius())) {
                 t.cacheUnseen();//+til
             }
+
+            // Place settlement
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(true);//-vis(serverPlayer),-til
+
             for (Player p : getGame().getLivePlayerList(serverPlayer)) {
                 ((IndianSettlement)settlement).setAlarm(p, (p.isIndian())
                     ? new Tension(Tension.Level.CONTENT.getLimit())

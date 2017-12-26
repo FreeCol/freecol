@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 
@@ -41,6 +43,9 @@ public class FileOption extends AbstractOption<File> {
     /** The value of this option. */
     private File value = null;
 
+    /** Extra optional qualifier for what the file is to be used for. */
+    private String type = null;
+
 
     /**
      * Creates a new {@code FileOption}.
@@ -49,6 +54,25 @@ public class FileOption extends AbstractOption<File> {
      */
     public FileOption(Specification specification) {
         super(specification);
+    }
+
+
+    /**
+     * Trivial type accessor.
+     *
+     * @return The type.
+     */
+    public String getType() {
+        return this.type;
+    }
+
+    /**
+     * Trivial type mutator.
+     *
+     * @param type The new type.
+     */
+    public void setType(String type) {
+        this.type = type;
     }
 
 
@@ -61,6 +85,7 @@ public class FileOption extends AbstractOption<File> {
     public FileOption clone() {
         FileOption result = new FileOption(getSpecification());
         result.setValues(this);
+        result.setType(this.getType());
         return result;
     }
 
@@ -114,6 +139,8 @@ public class FileOption extends AbstractOption<File> {
 
     // Serialization
 
+    private static final String TYPE_TAG = "type";
+
 
     /**
      * {@inheritDoc}
@@ -125,6 +152,29 @@ public class FileOption extends AbstractOption<File> {
         if (value != null) {
             xw.writeAttribute(VALUE_TAG, value.getAbsolutePath());
         }
+
+        if (type != null) {
+            xw.writeAttribute(TYPE_TAG, type);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
+        type = xr.getAttribute(TYPE_TAG, (String)null);
+
+        // @compat 0.11.6
+        // Type attribute added
+        if (type == null) {
+            setType((value != null && value.getPath()
+                    .endsWith("." + FreeCol.FREECOL_MAP_EXTENSION)) ? "map"
+                : "save");
+        }
+        // end @compat 0.11.6
     }
 
     /**
@@ -143,6 +193,7 @@ public class FileOption extends AbstractOption<File> {
         StringBuilder sb = new StringBuilder(16);
         sb.append('[').append(getId())
             .append(" value=").append((value == null) ? "null":value.getName())
+            .append(" type=").append((type == null) ? "null" : type)
             .append(']');
         return sb.toString();
     }

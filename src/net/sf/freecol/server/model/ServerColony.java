@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -345,10 +344,7 @@ public class ServerColony extends Colony implements TurnTaker {
         final ServerPlayer oldOwner = (ServerPlayer)getOwner();
         final Tile tile = getTile();
         final Set<Tile> owned = getOwnedTiles();
-        final Set<Tile> unseen
-            = transform(tile.getSurroundingTiles(1, getLineOfSight()),
-                        t -> !newOwner.hasExplored(t) || !newOwner.canSee(t),
-                        Function.identity(), Collectors.toSet());
+        final Set<Tile> unseen = newOwner.collectNewTiles(getVisibleTileSet());
 
         for (Tile t : owned) t.cacheUnseen(newOwner);//+til
         changeOwner(newOwner);//-vis(both),-til

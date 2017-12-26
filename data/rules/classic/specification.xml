@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.119">
+<freecol-specification id="classic" version="0.120">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -4717,7 +4717,7 @@
     <optionGroup id="mapGeneratorOptions">
       <optionGroup id="mapGeneratorOptions.import" >
         <!-- Option for setting a file to be imported (map etc). -->
-        <fileOption id="model.option.importFile"/>
+        <fileOption id="model.option.importFile" type="map"/>
         <!-- Option for using the terrain imported from a file. -->
         <booleanOption id="model.option.importTerrain"
                        defaultValue="true"/>
