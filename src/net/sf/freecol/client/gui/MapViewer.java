@@ -1044,7 +1044,6 @@ public final class MapViewer extends FreeColClientHolder {
     boolean setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
         // The user might what to check the status of a unit - SG
-System.err.println("SAU " + activeUnit);
         Tile tile = (activeUnit == null) ? null : activeUnit.getTile();
         this.activeUnit = activeUnit;
 
