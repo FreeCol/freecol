@@ -4028,6 +4028,14 @@ public class Player extends FreeColGameObject implements Nameable {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColObject getDisplayObject() {
+        return getNation();
+    }
+
 
     // Serialization
 

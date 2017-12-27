@@ -453,41 +453,38 @@ public final class ImageLibrary {
      * Returns the appropriate BufferedImage for a FreeColObject.
      * Please, use a more specific method!
      *
-     * @param display The FreeColObject to display.
+     * @param display The {@code FreeColObject} to display.
      * @param scale How much the image should be scaled.
-     * @return The appropriate BufferedImage.
+     * @return The appropriate {@code BufferedImage}.
      */
     public BufferedImage getObjectImage(FreeColObject display, float scale) {
         try {
             final float combinedScale = scaleFactor * scale;
             final Dimension size = scaleDimension(ICON_SIZE, combinedScale);
             BufferedImage image;
-            if (display instanceof Goods) {
-                display = ((Goods)display).getType();
-            } else if (display instanceof Player) {
-                display = ((Player)display).getNation();
-            }
+            FreeColObject derived = display.getDisplayObject();
 
-            if (display instanceof Unit) {
-                Unit unit = (Unit)display;
-                image = getUnitImage(unit, size);
-            } else if (display instanceof UnitType) {
-                UnitType unitType = (UnitType)display;
-                image = getUnitImage(unitType, size);
-            } else if (display instanceof Settlement) {
-                Settlement settlement = (Settlement)display;
-                image = getSettlementImage(settlement, size);
-            } else if (display instanceof LostCityRumour) {
-                image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, size);
-            } else if (display instanceof GoodsType) {
-                FreeColSpecObjectType type = (FreeColSpecObjectType)display;
-                image = getIconImage(type);
-            } else if (display instanceof Nation) {
-                FreeColSpecObjectType type = (FreeColSpecObjectType)display;
-                image = getMiscIconImage(type, size);
-            } else if (display instanceof BuildingType) {
-                BuildingType type = (BuildingType)display;
+            // Not all types have a meaningful image.
+            if (derived instanceof BuildingType) {
+                BuildingType type = (BuildingType)derived;
                 image = getBuildingImage(type, size);
+            } else if (derived instanceof GoodsType) {
+                FreeColSpecObjectType type = (FreeColSpecObjectType)derived;
+                image = getIconImage(type);
+            } else if (derived instanceof LostCityRumour) {
+                image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, size);
+            } else if (derived instanceof Nation) {
+                FreeColSpecObjectType type = (FreeColSpecObjectType)derived;
+                image = getMiscIconImage(type, size);
+            } else if (derived instanceof Settlement) {
+                Settlement settlement = (Settlement)derived;
+                image = getSettlementImage(settlement, size);
+            } else if (derived instanceof TileType) {
+                TileType type = (TileType)derived;
+                image = getTerrainImage(type, 0, 0, size);
+            } else if (derived instanceof UnitType) {
+                UnitType unitType = (UnitType)derived;
+                image = getUnitImage(unitType, size);
             } else {
                 logger.warning("could not find image of unknown type for " + display);
                 return null;

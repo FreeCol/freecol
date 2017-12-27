@@ -2399,6 +2399,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColObject getDisplayObject() {
+        return getType();
+    }
+
 
     // Serialization
 

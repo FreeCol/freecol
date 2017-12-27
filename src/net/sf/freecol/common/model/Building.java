@@ -669,6 +669,14 @@ public class Building extends WorkLocation
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColObject getDisplayObject() {
+        return getType();
+    }
+
 
     // Serialization
 
