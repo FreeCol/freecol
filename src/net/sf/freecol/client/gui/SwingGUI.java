@@ -677,11 +677,8 @@ public class SwingGUI extends GUI {
         if (fcc.getAnimationSpeed(attacker.getOwner()) <= 0
             && fcc.getAnimationSpeed(defender.getOwner()) <= 0) return;
 
-        if (!Animations.unitAttack(fcc, attacker, defender,
-                                   attackerTile, defenderTile, success)) {
-            logger.warning("Attack animation failure: " + attacker
-                + " v " + defender);
-        }
+        Animations.unitAttack(fcc, attacker, defender,
+                              attackerTile, defenderTile, success);
     }
 
     /**
@@ -697,10 +694,7 @@ public class SwingGUI extends GUI {
         final FreeColClient fcc = getFreeColClient();
         if (fcc.getAnimationSpeed(unit.getOwner()) <= 0) return;
 
-        if (!Animations.unitMove(fcc, unit, srcTile, dstTile)) {
-            logger.warning("Move animation failure: " + unit
-                + " " + srcTile + " " + dstTile);
-        }
+        Animations.unitMove(fcc, unit, srcTile, dstTile);
     }
 
 
@@ -1895,11 +1889,17 @@ public class SwingGUI extends GUI {
             labelWidth, labelHeight, tileP);
     }
 
-    public void executeWithUnitOutForAnimation(final Unit unit,
-                                               final Tile sourceTile,
-                                               final OutForAnimationCallback r) {
-        invokeNowOrWait(() ->
-            mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r));
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
+                                               OutForAnimationCallback r) {
+        invokeNowOrWait(() -> {
+                requireFocus(sourceTile);
+                paintImmediatelyCanvasInItsBounds();
+                mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
+            });
     }
 
     /**
@@ -1930,10 +1930,18 @@ public class SwingGUI extends GUI {
         return mapViewer.getSelectedTile();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Rectangle getTileBounds(Tile tile) {
         return mapViewer.calculateTileBounds(tile);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Point getTilePosition(Tile tile) {
         return mapViewer.calculateTilePosition(tile);
     }

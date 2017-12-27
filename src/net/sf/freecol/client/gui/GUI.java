@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -1497,6 +1498,9 @@ public class GUI extends FreeColClientHolder {
 
     public void changeViewMode(int newViewMode) {}
 
+    public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
+                                               OutForAnimationCallback r) {}
+
     public Unit getActiveUnit() {
         return null;
     }
@@ -1509,6 +1513,14 @@ public class GUI extends FreeColClientHolder {
         return null;
     }
 
+    public Rectangle getTileBounds(Tile tile) {
+        return null;
+    }
+
+    public Point getTilePosition(Tile tile) {
+        return null;
+    }
+        
     public int getViewMode() {
         return -1;
     }

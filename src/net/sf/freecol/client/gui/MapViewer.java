@@ -401,9 +401,10 @@ public final class MapViewer extends FreeColClientHolder {
             final JLabel unitLabel = createUnitLabel(unit);
 
             i = 1;
-            unitLabel.setLocation(calculateUnitLabelPositionInTile(
-                    unitLabel.getWidth(), unitLabel.getHeight(),
-                    calculateTilePosition(sourceTile)));
+            Point tileP = calculateTilePosition(sourceTile);
+            Point unitP = calculateUnitLabelPositionInTile(unitLabel.getWidth(),
+                unitLabel.getHeight(), tileP);
+            unitLabel.setLocation(unitP);
             unitsOutForAnimationLabels.put(unit, unitLabel);
             gui.getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
         } else {

@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import java.util.logging.Logger;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.SwingGUI;
@@ -33,6 +35,8 @@ import net.sf.freecol.common.resources.ResourceManager;
  * Class for the animation of units attacks.
  */
 final class UnitAttackAnimation extends FreeColClientHolder {
+
+    private static final Logger logger = Logger.getLogger(UnitAttackAnimation.class.getName());
 
     private final Unit attacker;
     private final Unit defender;
@@ -87,14 +91,18 @@ final class UnitAttackAnimation extends FreeColClientHolder {
         }
 
         Direction mirrored = direction.getEWMirroredDirection();
+        String mirroredId = "";
         if (mirrored != direction) {
-            specialId = startStr + mirrored.toString().toLowerCase();
-            if (ResourceManager.hasSZAResource(specialId)) {
-                this.sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
+            mirroredId = startStr + mirrored.toString().toLowerCase();
+            if (ResourceManager.hasSZAResource(mirroredId)) {
+                this.sza = ResourceManager.getSimpleZippedAnimation(mirroredId,
+                                                                    scale);
                 this.mirror = true;
                 return true;
             }
         }
+        logger.warning("Attack animation missing: " + specialId
+            + "/" + mirroredId);
         return false;
     }
 
@@ -145,34 +153,37 @@ final class UnitAttackAnimation extends FreeColClientHolder {
     /**
      * Do the animation.
      *
-     * @return True if the required animations were found and executed,
+     * @return True if the required animations were found and launched,
      *     false on error.
      */
     public boolean animate() {
-        Direction direction = this.attackerTile.getDirection(this.defenderTile);
-        if (direction == null) return false; // Fail fast
+        Direction dirn = this.attackerTile.getDirection(this.defenderTile);
+        if (dirn == null) {
+            logger.warning("Attack animation null direction: " + attacker
+                + " v " + defender);
+            return false; // Fail fast
+        }
 
         final FreeColClient fcc = getFreeColClient();
-        final SwingGUI gui = (SwingGUI)getGUI();
-        boolean ret = true;
+        boolean att = true, def = true;
 
         if (fcc.getAnimationSpeed(this.attacker.getOwner()) > 0) {
-            if (loadAnimation(this.attacker, direction)) {
-                new UnitImageAnimation(gui, this.attacker, this.attackerTile,
+            att = loadAnimation(this.attacker, dirn);
+            if (att) {
+                new UnitImageAnimation(fcc, this.attacker, this.attackerTile,
                                        this.sza, this.mirror).animate();
-            } else {
-                ret = false;
             }
         }
 
-        if (!success && fcc.getAnimationSpeed(this.defender.getOwner()) > 0) {
-            if (loadAnimation(this.defender, direction.getReverseDirection())) {
-                new UnitImageAnimation(gui, this.defender, this.defenderTile,
+        if (fcc.getAnimationSpeed(this.defender.getOwner()) > 0
+            && !success) {
+            def = loadAnimation(this.defender, dirn.getReverseDirection());
+            if (def) {
+                new UnitImageAnimation(fcc, this.defender, this.defenderTile,
                                        this.sza, this.mirror).animate();
-            } else {
-                ret = false;
             }
         }
-        return ret;
+
+        return att && def;
     }
 }
