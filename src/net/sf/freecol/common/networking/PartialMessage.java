@@ -88,7 +88,8 @@ public class PartialMessage extends AttributeMessage {
      */
     @Override
     public MessagePriority getPriority() {
-        return Message.MessagePriority.UPDATE;
+        // Sort just ahead of updates
+        return Message.MessagePriority.PARTIAL;
     }
 
     /**

@@ -77,6 +77,7 @@ public abstract class Message {
         REMOVE(100),   // Do removes last
         STANCE(5),     // Do stance before updates
         OWNED(20),     // Do owned changes after updates
+        PARTIAL(9),    // There are a lot of partial updates
         UPDATE(10),    // There are a lot of updates
         // Symbolic priorities used by various non-fixed types
         EARLY(1),
