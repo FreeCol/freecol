@@ -463,8 +463,10 @@ public class ModelMessage extends StringTemplate {
         if (this == o) return true;
         if (o instanceof ModelMessage) {
             ModelMessage m = (ModelMessage)o;
-            return sourceId.equals(m.sourceId)
+            return Utils.equals(sourceId, m.sourceId)
+                && Utils.equals(displayId, m.displayId)
                 && messageType == m.messageType
+                && displayed == m.displayed
                 && super.equals(m);
         }
         return false;
@@ -476,8 +478,11 @@ public class ModelMessage extends StringTemplate {
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 37 * hash + sourceId.hashCode();
-        return 37 * hash + messageType.ordinal();
+        if (sourceId != null) hash = 37 * hash + sourceId.hashCode();
+        if (displayId != null) hash = 37 * hash + displayId.hashCode();
+        hash = 37 * hash + messageType.ordinal();
+        hash = 37 * hash + ((displayed) ? 1 : 0);
+        return hash;
     }
 
     /**
