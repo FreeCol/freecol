@@ -1579,17 +1579,20 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get this player's Market.
      *
+     * Beware, this *can* be null in special cases such as when spying
+     * on another player's settlement.
+     *
      * @return The {@code Market}.
      */
     public Market getMarket() {
-        return market;
+        return this.market;
     }
 
     /**
      * Resets this player's Market.
      */
     public void reinitialiseMarket() {
-        market = new Market(getGame(), this);
+        this.market = new Market(getGame(), this);
     }
 
     /**
@@ -1674,7 +1677,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The arrears due for this type of goods.
      */
     public int getArrears(GoodsType type) {
-        return getMarket().getArrears(type);
+        final Market market = getMarket();
+        return (market == null) ? 0 : market.getArrears(type);
     }
 
     /**
@@ -1695,7 +1699,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if type of goods can be traded.
      */
     public boolean canTrade(GoodsType type, Market.Access access) {
-        return getMarket().getArrears(type) == 0
+        return getArrears(type) == 0
             || (access == Market.Access.CUSTOM_HOUSE
                 && (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
                     || (hasAbility(Ability.CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES)
@@ -1711,7 +1715,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The current sales.
      */
     public int getSales(GoodsType goodsType) {
-        return getMarket().getSales(goodsType);
+        final Market market = getMarket();
+        return (market == null) ? 0 : market.getSales(goodsType);
     }
 
     /**
@@ -1721,7 +1726,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param amount The new sales.
      */
     public void modifySales(GoodsType goodsType, int amount) {
-        getMarket().modifySales(goodsType, amount);
+        final Market market = getMarket();
+        if (market != null) market.modifySales(goodsType, amount);
     }
 
     /**
@@ -1731,7 +1737,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return Whether these goods have been traded.
      */
     public boolean hasTraded(GoodsType goodsType) {
-        return getMarket().hasBeenTraded(goodsType);
+        final Market market = getMarket();
+        return (market == null) ? false : market.hasBeenTraded(goodsType);
     }
 
     /**
@@ -1745,6 +1752,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Goods getMostValuableGoods() {
         if (!isEuropean()) return null;
+        final Market market = getMarket();
+        if (market == null) return null;
         final Predicate<Goods> boycottPred = g ->
             getArrears(g.getType()) <= 0 && hasTraded(g.getType());
         final Comparator<Goods> tradedValueComp = Comparator.comparingInt(g ->
@@ -1762,7 +1771,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The current incomeBeforeTaxes.
      */
     public int getIncomeBeforeTaxes(GoodsType goodsType) {
-        return getMarket().getIncomeBeforeTaxes(goodsType);
+        final Market market = getMarket();
+        return (market == null) ? 0 : market.getIncomeBeforeTaxes(goodsType);
     }
 
     /**
@@ -1772,7 +1782,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param amount The new incomeBeforeTaxes.
      */
     public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
-        getMarket().modifyIncomeBeforeTaxes(goodsType, amount);
+        final Market market = getMarket();
+        if (market != null) market.modifyIncomeBeforeTaxes(goodsType, amount);
     }
 
     /**
@@ -1782,7 +1793,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The current incomeAfterTaxes.
      */
     public int getIncomeAfterTaxes(GoodsType goodsType) {
-        return getMarket().getIncomeAfterTaxes(goodsType);
+        final Market market = getMarket();
+        return (market == null) ? 0 : market.getIncomeAfterTaxes(goodsType);
     }
 
     /**
@@ -1792,7 +1804,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param amount The new incomeAfterTaxes.
      */
     public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
-        getMarket().modifyIncomeAfterTaxes(goodsType, amount);
+        final Market market = getMarket();
+        if (market != null) market.modifyIncomeAfterTaxes(goodsType, amount);
     }
 
 
@@ -1847,10 +1860,11 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getEuropeanPurchasePrice(AbstractUnit au) {
         final Specification spec = getSpecification();
         final UnitType unitType = au.getType(spec);
-        if (!unitType.hasPrice()) return INFINITY;
+        final Market market = getMarket();
+        if (market == null || !unitType.hasPrice()) return INFINITY;
 
         return au.getNumber() * (getEurope().getUnitPrice(unitType)
-            + au.getRole(spec).getRequiredGoodsPrice(getMarket()));
+            + au.getRole(spec).getRequiredGoodsPrice(market));
     }
 
     /**
