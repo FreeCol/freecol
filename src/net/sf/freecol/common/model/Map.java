@@ -756,13 +756,16 @@ public class Map extends FreeColGameObject implements Location {
         int getValue(Tile tile);
     }
 
+    /** A trivial search heuristic that always returns zero. */
+    private SearchHeuristic trivialSearchHeuristic = (Tile t) -> 0;
+
     /**
      * Gets a search heuristic using the Manhatten distance to an end tile.
      *
      * @param endTile The {@code Tile} to aim for.
      * @return A new {@code SearchHeuristic} aiming for the end tile.
      */
-    private SearchHeuristic getManhattenHeuristic(Tile endTile) {
+    private SearchHeuristic getManhattenHeuristic(final Tile endTile) {
         return (Tile tile) -> tile.getDistanceTo(endTile);
     }
 
@@ -778,7 +781,7 @@ public class Map extends FreeColGameObject implements Location {
      * @throws IllegalArgumentException If there are any argument problems.
      */
     private Location findRealStart(final Unit unit, final Location start,
-        final Unit carrier) {
+                                   final Unit carrier) {
         // Unit checks.
         if (unit == null) {
             throw new IllegalArgumentException("Null unit.");
@@ -870,7 +873,7 @@ public class Map extends FreeColGameObject implements Location {
      *     map at, or null if none found.
      */
     private PathNode getBestEntryPath(Unit unit, Tile tile, Unit carrier,
-        CostDecider costDecider) {
+                                      CostDecider costDecider) {
         return searchMap(unit, tile, GoalDeciders.getHighSeasGoalDecider(),
             ((costDecider != null) ? costDecider
                 : CostDeciders.avoidSettlementsAndBlockingUnits()),
@@ -889,7 +892,7 @@ public class Map extends FreeColGameObject implements Location {
      *     if none found.
      */
     public Tile getBestEntryTile(Unit unit, Tile tile, Unit carrier,
-        CostDecider costDecider) {
+                                 CostDecider costDecider) {
         PathNode path = getBestEntryPath(unit, tile, carrier, costDecider);
         return (path == null) ? null : path.getLastNode().getTile();
     }
@@ -910,7 +913,7 @@ public class Map extends FreeColGameObject implements Location {
      *     tile, or null if none found.
      */
     private PathNode findMapPath(Unit unit, Tile start, Tile end, Unit carrier,
-        CostDecider costDecider, LogBuilder lb) {
+                                 CostDecider costDecider, LogBuilder lb) {
         final Unit offMapUnit = (carrier != null) ? carrier
             : (unit != null && unit.isNaval()) ? unit
             : null;
@@ -1014,9 +1017,9 @@ public class Map extends FreeColGameObject implements Location {
      *     {@link #findRealStart}.
      */
     public PathNode findPath(final Unit unit,
-        final Location start, final Location end,
-        final Unit carrier, CostDecider costDecider,
-        LogBuilder lb) {
+                             final Location start, final Location end,
+                             final Unit carrier, CostDecider costDecider,
+                             LogBuilder lb) {
         if (traceSearch) lb = new LogBuilder(1024);
 
         // Validate the arguments, reducing to either Europe or a Tile.
@@ -1176,10 +1179,10 @@ public class Map extends FreeColGameObject implements Location {
      *     combination is bogus.
      */
     public PathNode search(final Unit unit, Location start,
-        final GoalDecider goalDecider,
-        final CostDecider costDecider,
-        final int maxTurns, final Unit carrier,
-        LogBuilder lb) {
+                           final GoalDecider goalDecider,
+                           final CostDecider costDecider,
+                           final int maxTurns, final Unit carrier,
+                           LogBuilder lb) {
         if (traceSearch) lb = new LogBuilder(1024);
 
         final Location realStart = findRealStart(unit, start, carrier);
@@ -1205,12 +1208,12 @@ public class Map extends FreeColGameObject implements Location {
                 // FIXME: do something better.
             } else {
                 path = findPath(unit, realStart, p.getLastNode().getTile(),
-                    carrier, costDecider, lb);
+                                carrier, costDecider, lb);
             }
 
         } else {
             path = searchMap(unit, realStart.getTile(), goalDecider,
-                costDecider, maxTurns, carrier, null, lb);
+                             costDecider, maxTurns, carrier, null, lb);
         }
 
         finishPath(path, unit, lb);
@@ -1285,8 +1288,8 @@ public class Map extends FreeColGameObject implements Location {
          * @param decider The {@code CostDecider} to use.
          */
         public MoveCandidate(Unit unit, PathNode current, Location dst,
-            int movesLeft, int turns, boolean onCarrier,
-            CostDecider decider) {
+                             int movesLeft, int turns, boolean onCarrier,
+                             CostDecider decider) {
             this.unit = unit;
             this.current = current;
             this.dst = dst;
@@ -1295,7 +1298,7 @@ public class Map extends FreeColGameObject implements Location {
             this.onCarrier = onCarrier;
             this.decider = decider;
             this.cost = decider.getCost(unit, current.getLocation(),
-                dst, movesLeft);
+                                        dst, movesLeft);
             if (this.cost != CostDecider.ILLEGAL_MOVE) {
                 this.turns += decider.getNewTurns();
                 this.movesLeft = decider.getMovesLeft();
@@ -1331,7 +1334,7 @@ public class Map extends FreeColGameObject implements Location {
          */
         public void resetPath(boolean goal) {
             path = new PathNode(dst, movesLeft, turns, onCarrier,
-                current, null);
+                                current, null);
             if (goal) {
                 // Do not let the CostDecider (which may be
                 // conservative) block a final destination.  This
@@ -1348,7 +1351,7 @@ public class Map extends FreeColGameObject implements Location {
                     movesLeft = unit.getInitialMovesLeft();
                     turns++;
                     path = new PathNode(dst, movesLeft, turns, onCarrier,
-                        current, null);
+                                        current, null);
                 }
 
                 // Add an extra step to disembark from a carrier at a
@@ -1378,7 +1381,7 @@ public class Map extends FreeColGameObject implements Location {
             return cost != CostDecider.ILLEGAL_MOVE
                 && (best == null || cost < best.getCost()
                     || (cost == best.getCost()
-                        && best.getLength() < path.getLength()));
+                        && path.getLength() < best.getLength()));
         }
 
         /**
@@ -1387,21 +1390,34 @@ public class Map extends FreeColGameObject implements Location {
          * @param openMap The list of available nodes.
          * @param openMapQueue The queue of available nodes.
          * @param f The heuristic values for A*.
-         * @param sh An optional {@code SearchHeuristic} to apply.
+         * @param sh A {@code SearchHeuristic} to apply.
          */
         public void improve(HashMap<String, PathNode> openMap,
-            PriorityQueue<PathNode> openMapQueue,
-            HashMap<String, Integer> f,
-            SearchHeuristic sh) {
+                            PriorityQueue<PathNode> openMapQueue,
+                            HashMap<String, Integer> f,
+                            SearchHeuristic sh) {
             PathNode best = openMap.get(dst.getId());
             if (best != null) {
                 openMap.remove(dst.getId());
                 openMapQueue.remove(best);
             }
+            add(openMap, openMapQueue, f, sh);
+        }
+
+        /**
+         * Add this candidate to the open map+queue.
+         *
+         * @param openMap The list of available nodes.
+         * @param openMapQueue The queue of available nodes.
+         * @param cost The provisional cost for the path.
+         * @param sh A {@code SearchHeuristic} to apply.
+         */
+        public void add(HashMap<String, PathNode> openMap,
+                        PriorityQueue<PathNode> openMapQueue,
+                        HashMap<String, Integer> f,
+                        SearchHeuristic sh) {
             int fcost = cost;
-            if (sh != null && dst.getTile() != null) {
-                fcost += sh.getValue(dst.getTile());
-            }
+            if (dst.getTile() != null) fcost += sh.getValue(dst.getTile());
             f.put(dst.getId(), fcost);
             openMap.put(dst.getId(), path);
             openMapQueue.offer(path);
@@ -1463,16 +1479,18 @@ public class Map extends FreeColGameObject implements Location {
      *     {@code GoalDecider}.
      */
     private PathNode searchMap(final Unit unit, final Tile start,
-        final GoalDecider goalDecider,
-        final CostDecider costDecider,
-        final int maxTurns, final Unit carrier,
-        final SearchHeuristic searchHeuristic,
-        final LogBuilder lb) {
+                               final GoalDecider goalDecider,
+                               final CostDecider costDecider,
+                               final int maxTurns, final Unit carrier,
+                               final SearchHeuristic searchHeuristic,
+                               final LogBuilder lb) {
         final HashMap<String, PathNode> openMap = new HashMap<>();
         final HashMap<String, PathNode> closedMap = new HashMap<>();
         final HashMap<String, Integer> f = new HashMap<>();
         final PriorityQueue<PathNode> openMapQueue = new PriorityQueue<>(1024,
             Comparator.comparingInt(p -> f.get(p.getLocation().getId())));
+        final SearchHeuristic sh = (searchHeuristic == null)
+            ? trivialSearchHeuristic : searchHeuristic;
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
             ? ((start.hasSettlement()
@@ -1483,14 +1501,14 @@ public class Map extends FreeColGameObject implements Location {
         if (lb != null) lb.add("Search trace(unit=", unit,
             ", from=", start,
             ", max=", ((maxTurns == INFINITY)?"-":Integer.toString(maxTurns)),
-            ", carrier=", carrier, ")");
+            ", carrier=", carrier, ")",
+            "\n", net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
 
         // Create the start node and put it on the open list.
         final PathNode firstNode = new PathNode(start,
             ((currentUnit != null) ? currentUnit.getMovesLeft() : -1),
             0, carrier != null && currentUnit == carrier, null, null);
-        f.put(start.getId(), (searchHeuristic == null) ? 0
-            : searchHeuristic.getValue(start));
+        f.put(start.getId(), sh.getValue(start));
         openMap.put(start.getId(), firstNode);
         openMapQueue.offer(firstNode);
 
@@ -1560,11 +1578,14 @@ public class Map extends FreeColGameObject implements Location {
                 }
 
                 // Skip neighbouring tiles already too expensive.
-                int cc;
-                if ((closed = closedMap.get(moveTile.getId())) != null
-                    && (cc = closed.getCost()) <= currentNode.getCost()) {
-                    if (lb != null) lb.add(" ", cc);
-                    continue;
+                closed = closedMap.get(moveTile.getId());
+                if (closed != null) {
+                    if (lb != null) lb.add(" cm=", closed);
+                    int cc = closed.getCost();
+                    if (cc <= currentNode.getCost()) {
+                        if (lb != null) lb.add(" worse ", cc);
+                        continue;
+                    }
                 }
 
                 // Is this move to the goal?  Use fake high cost so
@@ -1699,24 +1720,24 @@ public class Map extends FreeColGameObject implements Location {
                 String stepLog;
                 if (move == null) {
                     stepLog = "!";
+                } else if (move.getCost() < 0) {
+                    stepLog = "#";
                 } else {
                     move.resetPath(isGoal);
                     // Tighten the bounds on a previously seen case if possible
                     if (closed != null) {
                         if (move.canImprove(closed)) {
                             closedMap.remove(moveTile.getId());
-                            move.improve(openMap, openMapQueue, f,
-                                searchHeuristic);
+                            move.improve(openMap, openMapQueue, f, sh);
                             stepLog = "^" + Integer.toString(move.getCost());
                         } else {
                             stepLog = ".";
                         }
                     } else if (move.canImprove(openMap.get(moveTile.getId()))){
-                        move.improve(openMap, openMapQueue, f,
-                            searchHeuristic);
-                        stepLog = "+" + Integer.toString(move.getCost());
+                        move.improve(openMap, openMapQueue, f, sh);
+                        stepLog = "+" + f.get(moveTile.getId());
                     } else {
-                        stepLog = "-";
+                        stepLog = "#";
                     }
                 }
                 if (lb != null) lb.add(" ", step, stepLog);
