@@ -302,6 +302,17 @@ public class Connection implements Closeable {
     }
 
     /**
+     * Set the output write scope.
+     *
+     * @param ws The new write scope.
+     */
+    public void setWriteScope(FreeColXMLWriter.WriteScope ws) {
+        synchronized (this.outputLock) {
+            if (this.xw != null) this.xw.setWriteScope(ws);
+        }
+    }
+
+    /**
      * Gets the connection name.
      *
      * @return The connection name.

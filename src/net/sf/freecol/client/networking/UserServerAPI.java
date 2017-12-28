@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
@@ -88,6 +89,7 @@ public class UserServerAPI extends ServerAPI {
                     this.name = name;
                     this.host = host;
                     this.port = port;
+                    this.connection.setWriteScope(FreeColXMLWriter.WriteScope.toServer());
                     break;
                 }
             } catch (IOException e) {

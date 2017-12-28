@@ -229,7 +229,11 @@ public class LoginMessage extends ObjectMessage {
             }
 
             // Add the connection, send back the game
-            freeColServer.addPlayerConnection(serverPlayer.getConnection());
+            Connection conn = serverPlayer.getConnection();
+            freeColServer.addPlayerConnection(conn);
+            conn.setWriteScope(FreeColXMLWriter.WriteScope
+                .toClient(serverPlayer));
+            
             ret.add(See.only(serverPlayer),
                 new LoginMessage(serverPlayer, userName, getVersion(),
                                  freeColServer.getServerState(),
@@ -297,6 +301,8 @@ public class LoginMessage extends ObjectMessage {
 
             // Add the connection, send back the game.
             freeColServer.addPlayerConnection(connection);
+            connection.setWriteScope(FreeColXMLWriter.WriteScope
+                .toClient(present));
             ret = ChangeSet.simpleChange(present,
                 new LoginMessage(present, userName, getVersion(),
                     freeColServer.getServerState(),
@@ -349,6 +355,8 @@ public class LoginMessage extends ObjectMessage {
 
             // Add the connection, send back the game
             freeColServer.addPlayerConnection(connection);
+            connection.setWriteScope(FreeColXMLWriter.WriteScope
+                .toClient(present));
             ret = ChangeSet.simpleChange(present,
                 new LoginMessage(present, userName, getVersion(),
                                  freeColServer.getServerState(),
