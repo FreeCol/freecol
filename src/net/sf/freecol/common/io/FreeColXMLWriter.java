@@ -117,7 +117,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
         }
 
         public String toString() {
-            String ret = super.toString();
+            String ret = this.scopeType.toString();
             if (this.scopeType == WriteScopeType.CLIENT) {
                 ret += ":" + ((this.player == null) ? "INVALID"
                     : this.player.getId());
