@@ -82,6 +82,8 @@ public class FreeColDirectories {
 
     private static final String LOG_FILE = "FreeCol.log";
 
+    private static final String LOG_COMMS_FILE_NAME = "FreeColComms.log";
+
     private static final String MAPS_DIRECTORY = "maps";
 
     private static final String MESSAGE_FILE_PREFIX = "FreeColMessages";
@@ -952,6 +954,33 @@ public class FreeColDirectories {
         return writer;
     }
 
+    /**
+     * Get a writer for the comms log file.
+     *
+     * @return A suitable {@code Writer}.
+     * @exception FreeColException on error.
+     */
+    public static Writer getLogCommsWriter() throws FreeColException {
+        File file = new File(getUserCacheDirectory(), LOG_COMMS_FILE_NAME);
+        if (file.exists()) {
+            try {
+                file.delete();
+            } catch (SecurityException se) {
+                throw new FreeColException("Comms log file exists, delete failed: " + file.getPath(), se);
+            }
+        }
+        try {
+            file.createNewFile();
+        } catch (IOException ioe) {
+            throw new FreeColException("Comms log file could not be created: " + file.getPath(), ioe);
+        }
+        Writer writer = Utils.getFileUTF8Writer(file);
+        if (writer == null) {
+            throw new FreeColException("Can not create writer for comms log file: " + file.getPath());
+        }
+        return writer;
+    }        
+                             
     /**
      * Gets the directory containing the predefined maps.
      *

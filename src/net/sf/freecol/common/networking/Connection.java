@@ -40,6 +40,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
@@ -319,9 +320,12 @@ public class Connection implements Closeable {
         FreeColXMLWriter lw = null;
         if (log) {
             try {
-                lw = new FreeColXMLWriter(Utils.getUTF8Writer(System.err),
+                lw = new FreeColXMLWriter(FreeColDirectories.getLogCommsWriter(),
                     FreeColXMLWriter.WriteScope.toSave(), true);
-            } catch (IOException ioe) {} // Ignore failure, just do not log
+            } catch (FreeColException|IOException ex) {
+                lw = null; // Just do not log
+                logger.log(Level.WARNING, "Comms logs disabled", ex);
+            }
         }
         this.lw = lw;
         return this;
