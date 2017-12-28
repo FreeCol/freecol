@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
@@ -462,10 +464,9 @@ public class ClientOptions extends OptionGroup {
     /** Compare by ascending age. */
     private static final Comparator<Colony> colonyAgeComparator
         = Comparator.comparingInt(c -> c.getEstablished().getNumber());
-
-    /** Compare by name. */
-    private static final Comparator<Colony> colonyNameComparator
-        = Comparator.comparing(Colony::getName);
+	
+    /** Compare by name, initialized at run time. */
+    private static Comparator<Colony> colonyNameComparator = null;
 
     /** Compare by descending size then liberty. */
     private static final Comparator<Colony> colonySizeComparator
@@ -672,6 +673,11 @@ public class ClientOptions extends OptionGroup {
         case COLONY_COMPARATOR_SOL:
             return colonySoLComparator;
         case COLONY_COMPARATOR_NAME:
+            if (colonyNameComparator == null) {
+                // Can not be done statically, must wait for CLI parsing
+                colonyNameComparator = Comparator.comparing(Colony::getName,
+                    Collator.getInstance(FreeCol.getLocale()));
+            }
             return colonyNameComparator;
         default:
             throw new IllegalStateException("Unknown comparator");
