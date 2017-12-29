@@ -180,30 +180,31 @@ public final class CostDeciders {
     private static class AvoidNavalDangerCostDecider
         extends AvoidSettlementsAndBlockingUnitsCostDecider {
 
+        // How much to increase cost due to bombardment threat.
+        private static final int DANGER_FACTOR = 2;
+
         @Override
         public int getCost(Unit unit, Location oldLocation,
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
             Tile tile = newLocation.getTile();
             if (cost != ILLEGAL_MOVE && cost != Map.INFINITY && tile != null) {
-                if (tile.isDangerousToShip(unit)) {
-                    cost = ILLEGAL_MOVE;
-                } else {
-                    // Move might end if there is a credible naval
-                    // threat in an adjacent tile.
-                    final Player owner = unit.getOwner();
-                    final Predicate<Unit> threatPred = u ->
-                        (u.getOwner() != owner
-                            && (u.hasAbility(Ability.PIRACY)
-                                || (u.getOwner().atWarWith(owner)
-                                    && u.isOffensiveUnit())));
-                    if (any(flatten(tile.getSurroundingTiles(1,1),
-                                    Tile::getUnits),
-                            threatPred)) {
-                        this.movesLeft = 0;
-                        this.newTurns++;
-                    }
+                // Move might end if there is a credible naval
+                // threat in an adjacent tile.
+                final Player owner = unit.getOwner();
+                final Predicate<Unit> threatPred = u ->
+                    (!owner.owns(u) && u.isNaval()
+                        && (u.hasAbility(Ability.PIRACY)
+                            || (u.getOwner().atWarWith(owner)
+                                && u.isOffensiveUnit())));
+                if (any(flatten(tile.getSurroundingTiles(1,1),
+                            Tile::getUnits),
+                        threatPred)) {
+                    cost += this.movesLeft;
+                    this.movesLeft = 0;
+                    this.newTurns++;
                 }
+                if (tile.isDangerousToShip(unit)) cost *= DANGER_FACTOR;
             }
             return cost;
         }
