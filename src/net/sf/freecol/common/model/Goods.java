@@ -237,6 +237,14 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         throw new RuntimeException("Can not set game");
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColObject getDisplayObject() {
+        return getType();
+    }
+
     
     // Override FreeColObject
 

@@ -77,34 +77,52 @@ public class FeatureChangeMessage extends ObjectMessage {
         throws XMLStreamException {
         super(TAG, xr, ID_TAG, ADD_TAG);
 
+        List<FreeColObject> fcos = new ArrayList<>();
         FreeColXMLReader.ReadScope rs
             = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
         try {
+            // Defend against colliding identifiers, so do *not* just call
+            // xr.readFreeColObject.
             while (xr.moreTags()) {
                 String tag = xr.getLocalName();
                 FreeColObject fco = null;
                 if (Ability.TAG.equals(tag)) {
-                    fco = xr.readFreeColObject(game, Ability.class);
+                    fco = new Ability(game.getSpecification());
+                    fco.readFromXML(xr);
                 } else if (Modifier.TAG.equals(tag)) {
-                    fco = xr.readFreeColObject(game, Modifier.class);
+                    fco = new Modifier(game.getSpecification());
+                    fco.readFromXML(xr);
                 } else if (HistoryEvent.TAG.equals(tag)) {
-                    fco = xr.readFreeColObject(game, HistoryEvent.class);
+                    fco = new HistoryEvent();
+                    fco.readFromXML(xr);
                 } else if (LastSale.TAG.equals(tag)) {
-                    fco = xr.readFreeColObject(game, LastSale.class);
+                    fco = new LastSale();
+                    fco.readFromXML(xr);
                 } else if (ModelMessage.TAG.equals(tag)) {
-                    fco = xr.readFreeColObject(game, ModelMessage.class);
+                    fco = new ModelMessage();
+                    fco.readFromXML(xr);
                 } else {
                     expected("Feature", tag);
                 }
-                appendChild(fco);
+                fcos.add(fco);
                 xr.expectTag(tag);
             }
             xr.expectTag(TAG);
+            setChildren(fcos);
         } finally {
             xr.replaceScope(rs);
         }
     }
 
+
+    /**
+     * Get the parent object identifier.
+     *
+     * @return The parent identifier.
+     */
+    private String getParentId() {
+        return getStringAttribute(ID_TAG);
+    }
 
     /**
      * Get the parent object to add/remove to.
@@ -113,7 +131,7 @@ public class FeatureChangeMessage extends ObjectMessage {
      * @return The parent {@code FreeColGameObject}.
      */
     private FreeColGameObject getParent(Game game) {
-        return game.getFreeColGameObject(getStringAttribute(ID_TAG));
+        return game.getFreeColGameObject(getParentId());
     }
 
     /**
@@ -133,6 +151,22 @@ public class FeatureChangeMessage extends ObjectMessage {
         return Message.MessagePriority.OWNED;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean merge(Message message) {
+        if (message instanceof FeatureChangeMessage) {
+            FeatureChangeMessage other = (FeatureChangeMessage)message;
+            if (getParentId().equals(other.getParentId())
+                && getAdd() == other.getAdd()) {
+                appendChildren(other.getChildren());
+                return true;
+            }
+        }
+        return false;
+    }
+              
     /**
      * {@inheritDoc}
      */

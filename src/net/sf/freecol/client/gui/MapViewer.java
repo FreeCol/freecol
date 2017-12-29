@@ -401,9 +401,10 @@ public final class MapViewer extends FreeColClientHolder {
             final JLabel unitLabel = createUnitLabel(unit);
 
             i = 1;
-            unitLabel.setLocation(calculateUnitLabelPositionInTile(
-                    unitLabel.getWidth(), unitLabel.getHeight(),
-                    calculateTilePosition(sourceTile)));
+            Point tileP = calculateTilePosition(sourceTile);
+            Point unitP = calculateUnitLabelPositionInTile(unitLabel.getWidth(),
+                unitLabel.getHeight(), tileP);
+            unitLabel.setLocation(unitP);
             unitsOutForAnimationLabels.put(unit, unitLabel);
             gui.getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
         } else {
@@ -1043,7 +1044,6 @@ public final class MapViewer extends FreeColClientHolder {
     boolean setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
         // The user might what to check the status of a unit - SG
-System.err.println("SAU " + activeUnit);
         Tile tile = (activeUnit == null) ? null : activeUnit.getTile();
         this.activeUnit = activeUnit;
 

@@ -820,7 +820,19 @@ public abstract class FreeColObject
         return defaultValue;
     }
 
-
+    /**
+     * Get an object to display when showing the user messages for this object.
+     *
+     * Example: If this object is a Building, the object to display will be the
+     * BuildingType.
+     *
+     * @return A suitable {@code FreeColObject} to display, defaults to this.
+     */
+    public FreeColObject getDisplayObject() {
+        return this;
+    }
+           
+    
     // Serialization
 
     /** XML tag name for identifier attribute. */

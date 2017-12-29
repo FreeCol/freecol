@@ -5081,11 +5081,6 @@ public final class InGameController extends FreeColClientHolder {
             }
         }
         player.invalidateCanSeeTiles(); //+vis(player)
-        if (active != null) { // Kick the GUI, unit may have changed its cargo
-            // FIXME: this is a hack, provide a proper method
-            getGUI().setActiveUnit(null);
-            getGUI().setActiveUnit(active);
-        }
     }
 
     /**

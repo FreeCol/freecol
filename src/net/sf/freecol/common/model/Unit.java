@@ -4321,6 +4321,14 @@ public class Unit extends GoodsLocation
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColObject getDisplayObject() {
+        return getType();
+    }
+
 
     // Serialization
 

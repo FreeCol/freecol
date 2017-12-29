@@ -675,9 +675,12 @@ public final class FreeColServer {
         DummyConnection theConnection
             = new DummyConnection("Server-to-AI-" + aiPlayer.getSuffix());
         theConnection.setMessageHandler(this.inputHandler);
+        theConnection.setWriteScope(FreeColXMLWriter.WriteScope
+            .toClient(aiPlayer));
         DummyConnection aiConnection
             = new DummyConnection("AI-" + aiPlayer.getSuffix() + "-to-Server");
         aiConnection.setMessageHandler(new AIInGameInputHandler(this, aiPlayer, getAIMain()));
+        aiConnection.setWriteScope(FreeColXMLWriter.WriteScope.toServer());
         aiConnection.setOtherConnection(theConnection);
         theConnection.setOtherConnection(aiConnection);
         aiPlayer.setConnection(theConnection);

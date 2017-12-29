@@ -63,5 +63,4 @@ public class Animations {
                                        attackerTile, defenderTile, success)
             .animate();
     }
-
 }

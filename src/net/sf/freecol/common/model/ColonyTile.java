@@ -535,6 +535,14 @@ public class ColonyTile extends WorkLocation {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColObject getDisplayObject() {
+        return getTile().getDisplayObject();
+    }
+
 
     // Serialization
 
