@@ -1549,14 +1549,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showSpyColonyPanel(final Tile tile) {
-        canvas.showSpyColonyPanel(tile);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Parameters showParametersDialog() {
         return canvas.showParametersDialog();
     }

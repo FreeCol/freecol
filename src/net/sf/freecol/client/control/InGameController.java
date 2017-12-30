@@ -4944,7 +4944,7 @@ public final class InGameController extends FreeColClientHolder {
      */
     public void spySettlementHandler(Tile tile) {
         invokeLater(() ->
-            getGUI().showSpyColonyPanel(tile));
+            getGUI().showTileSettlement(tile));
     }
     
     /**

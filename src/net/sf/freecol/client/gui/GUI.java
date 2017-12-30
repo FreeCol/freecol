@@ -1423,8 +1423,6 @@ public class GUI extends FreeColClientHolder {
         }
     }
         
-    public void showSpyColonyPanel(final Tile tile) {}
-
     public Parameters showParametersDialog() {
         return null;
     }
