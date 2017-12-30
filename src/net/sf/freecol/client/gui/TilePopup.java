@@ -192,7 +192,7 @@ public final class TilePopup extends JPopupMenu {
             if (hasAnItem) addSeparator();
         }
 
-        if (tile.isExplored()) addTile(tile);
+        addTile(tile);
         addSeparator();
 
         int lineCount = 0;
@@ -481,9 +481,11 @@ public final class TilePopup extends JPopupMenu {
      */
     private void addTile(final Tile tile) {
         JMenuItem menuItem = new JMenuItem(Messages.message(tile.getLabel()));
-        menuItem.addActionListener((ActionEvent ae) -> {
-                gui.showTilePanel(tile);
-            });
+        if (tile.isExplored()) {
+            menuItem.addActionListener((ActionEvent ae) -> {
+                    gui.showTilePanel(tile);
+                });
+        }
 
         add(menuItem);
         /**

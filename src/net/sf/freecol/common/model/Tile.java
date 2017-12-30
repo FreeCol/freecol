@@ -1028,7 +1028,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The description label for this {@code Tile}.
      */
     public StringTemplate getLabel() {
-        StringTemplate label = StringTemplate.key(type);
+        StringTemplate label = (type != null) ? StringTemplate.key(type)
+            : StringTemplate.key("unexplored");
         if (tileItemContainer != null) {
             List<TileItem> keys = tileItemContainer.getCompleteItems();
             if (!keys.isEmpty()) {
