@@ -255,6 +255,9 @@ public final class Canvas extends JDesktopPane {
     /** Number of tries to find a clear spot on the canvas. */
     private static final int MAXTRY = 3;
 
+    /** Number of pixels that must be moved before a goto is enabled. */
+    private static final int DRAG_THRESHOLD = 16;
+
     /** A class for frames being used as tool boxes. */
     private static class ToolBoxFrame extends JInternalFrame {}
 
@@ -521,6 +524,19 @@ public final class Canvas extends JDesktopPane {
      */
     public void setDragPoint(int x, int y) {
         gotoDragPoint = new Point(x, y);
+    }
+
+    /**
+     * Is mouse movement differnce above the drag threshold?
+     *
+     * @param x The new mouse x position.
+     * @param y The new mouse y position.
+     */
+    public boolean isDrag(int x, int y) {
+        Point dragPoint = getDragPoint();
+        int deltaX = Math.abs(x - dragPoint.x);
+        int deltaY = Math.abs(y - dragPoint.y);
+        return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
     }
 
     /**

@@ -38,15 +38,6 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
 
     private static final Logger logger = Logger.getLogger(CanvasMouseMotionListener.class.getName());
 
-    /** Number of pixels that must be moved before a goto is enabled. */
-    private static final int DRAG_THRESHOLD = 16;
-
-    /**
-     * Temporary variable for checking if we need to recalculate the
-     * path when dragging units.
-     */
-    private Tile lastTile;
-    
 
     /**
      * Creates a new listener for mouse movement.
@@ -60,73 +51,33 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
     }
 
 
+    // Interface MouseMotionListener
+
     /**
-     * Invoked when the mouse has been moved.
-     *
-     * @param e The MouseEvent that holds all the information.
+     * {@inheritDoc}
      */
     @Override
     public void mouseMoved(MouseEvent e) {
         performAutoScrollIfActive(e, true);
 
         if (canvas.isGotoStarted()) {
-            if (getGUI().getActiveUnit() == null) {
-                canvas.stopGoto();
-            }
-
-            Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
-
-            if (tile != null) {
-                if (lastTile != tile) {
-                    Unit active = getGUI().getActiveUnit();
-                    lastTile = tile;
-                    PathNode dragPath = null;
-                    // Only call the expensive path finder if there
-                    // are no obvious showstoppers.
-                    if (active != null && active.getTile() != tile
-                        && tile.isExplored()
-                        && active.getSimpleMoveType(tile).isLegal()) {
-                        dragPath = active.findPath(tile);
-                    }
-                    canvas.setGotoPath(dragPath);
-                }
-            }
+            getGUI().updateGotoPath(canvas.convertToMapTile(e.getX(), e.getY()));
         }
     }
 
     /**
-     * Invoked when the mouse has been dragged.
-     *
-     * @param e The MouseEvent that holds all the information.
+     * {@inheritDoc}
      */
     @Override
     public void mouseDragged(MouseEvent e) {
-
+        if ((e.getModifiers() & MouseEvent.BUTTON1_MASK)
+            != MouseEvent.BUTTON1_MASK) return; // Do not use getButton!
         performDragScrollIfActive(e);
 
-        Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
-        if (tile != null
-            && ((e.getModifiers() & MouseEvent.BUTTON1_MASK)
-                == MouseEvent.BUTTON1_MASK)) {
-            // only perform the goto for the left mouse button
-            if (canvas.isGotoStarted()) {
-                Unit active = getGUI().getActiveUnit();
-                if (active == null) {
-                    canvas.stopGoto();
-                } else if (lastTile != tile) {
-                    lastTile = tile;
-                    PathNode dragPath = active.findPath(tile);
-                    canvas.setGotoPath(dragPath);
-                }
-            } else {
-                // Only start a goto if the drag is 16 pixels or more
-                Point dragPoint = canvas.getDragPoint();
-                int deltaX = Math.abs(e.getX() - dragPoint.x);
-                int deltaY = Math.abs(e.getY() - dragPoint.y);
-                if (deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD) {
-                    canvas.startGoto();
-                }
-            }
-        }
+        if (canvas.isGotoStarted()) {
+            getGUI().updateGotoPath(canvas.convertToMapTile(e.getX(), e.getY()));
+        } else if (canvas.isDrag(e.getX(), e.getY())) {
+            canvas.startGoto();
+        }            
     }
 }

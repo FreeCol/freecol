@@ -3394,17 +3394,19 @@ public final class InGameController extends FreeColClientHolder {
      * Called from CanvasMouseListener, TilePopup
      *
      * @param unit The {@code Unit} to move.
-     * @param tile The {@code Tile} to move to.
+     * @param path The {@code Path} to move along.
      * @return True if the destination change was successful.
      */
-    public boolean goToTile(Unit unit, Tile tile) {
+    public boolean goToTile(Unit unit, PathNode path) {
         if (!requireOurTurn() || unit == null
-            || !getMyPlayer().owns(unit)) return false;
+            || !getMyPlayer().owns(unit)
+            || path == null) return false;
 
         if (!getGUI().confirmClearTradeRoute(unit)) return false;
 
+        // FIXME: should follow path directly rather than delegating
         UnitWas unitWas = new UnitWas(unit);
-        boolean ret = askSetDestination(unit, tile);
+        boolean ret = askSetDestination(unit, path.getLastNode().getLocation());
         if (ret) {
             moveToDestination(unit, null);
             unitWas.fireChanges();

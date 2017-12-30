@@ -301,8 +301,7 @@ public class GUI extends FreeColClientHolder {
      */
     public void startMapEditorGUI() {}
 
-
-    // Non-trivial public routines.
+    // Goto-path handling
 
     /**
      * Start/stop the goto path display.
@@ -310,9 +309,23 @@ public class GUI extends FreeColClientHolder {
     public void activateGotoPath() {}
 
     /**
+     * Update the goto path to a new tile.
+     *
+     * @param tile The new {@code Tile} to go to.
+     */
+    public void updateGotoPath(Tile tile) {}
+
+    /**
      * Stop the goto path display.
      */
     public void clearGotoPath() {}
+
+    /**
+     * Send the active unit along the current goto path as far as possible.
+     */
+    public void traverseGotoPath() {}
+
+    // Other non-trivial public routines.
 
     /**
      * Close a panel.
