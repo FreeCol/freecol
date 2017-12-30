@@ -37,6 +37,7 @@ import javax.swing.event.ChangeEvent;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -1056,6 +1057,25 @@ public class DebugUtils {
             .setType(rumourChoice);
     }
 
+    /**
+     * Consider showing a foreign colony.
+     *
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param colony The {@code Colony} to display.
+     */
+    public static void showForeignColony(FreeColClient freeColClient,
+                                         Colony colony) {
+        if (colony == null
+            || !FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
+            return;
+        // Get the full details from the server if possible
+        final FreeColServer server = freeColClient.getFreeColServer();
+        if (server == null) return;
+        colony = server.getGame()
+            .getFreeColGameObject(colony.getId(), Colony.class);
+        freeColClient.getGUI().showColonyPanel(colony, null);
+    }
+        
     /**
      * Debug action to skip turns.
      *

@@ -1476,19 +1476,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         return value;
     }
 
-    /**
-     * Display the appropriate panel for a given {@code IndianSettlement}
-     *
-     * @param canvas The instance of the FreeCol canvas to display.
-     * @param p The FreeCol Player, used to check ownership of a Colony.
-     * @throws IllegalStateException If a non-Colony or non-IndianSettlement
-     *                               attempts to call this method.
-     */
-    @Override
-    public void showSettlement(Canvas canvas, Player p) throws IllegalStateException {
-        canvas.showIndianSettlementPanel(this);
-    }
-
 
     // Interface TradeLocation
     //   getGoodsCount provided by GoodsLocation

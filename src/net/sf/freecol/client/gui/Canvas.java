@@ -2060,19 +2060,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Detailed view of a foreign colony when in debug mode.
-     *
-     * @param settlement The {@code Settlement} with the colony
-     */
-    public void showForeignColony(Settlement settlement) {
-        if (settlement instanceof Colony) {
-            Colony colony = freeColClient.getFreeColServer().getGame()
-                .getFreeColGameObject(settlement.getId(), Colony.class);
-            showColonyPanel(colony, null);
-        }
-    }
-
-    /**
      * Display the GameOptionsDialog.
      *
      * @param editable Should the game options be editable?

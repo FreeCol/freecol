@@ -43,6 +43,7 @@ import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -1214,15 +1215,6 @@ public class GUI extends FreeColClientHolder {
 
     public void showClientOptionsDialog() {}
 
-    /**
-     * Display the appropriate panel for a given settlement.
-     *
-     * @param settlement The {@code Settlement} to display.
-     */
-    void showSettlement(Settlement settlement) {}
-
-    protected void showForeignColony(Settlement settlement) {}
-
     public void showColonyPanel(Colony colony, Unit unit) {}
 
     public void showColopediaPanel(String nodeId) {}
@@ -1312,7 +1304,7 @@ public class GUI extends FreeColClientHolder {
 
     public void showHighScoresPanel(String messageId, List<HighScore> scores) {}
 
-    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {}
+    public void showIndianSettlement(IndianSettlement indianSettlement) {}
 
     public void showInformationMessage(String messageId) {
         alertSound();
@@ -1413,6 +1405,24 @@ public class GUI extends FreeColClientHolder {
 
     public void showNewPanel(Specification specification) {}
 
+    /**
+     * Show a settlement.
+     *
+     * @param settlement The {@code Settlement} to display.
+     */
+    public final void showSettlement(Settlement settlement) {
+        if (settlement instanceof Colony) {
+            if (getMyPlayer().owns(settlement)) {
+                showColonyPanel((Colony)settlement, null);
+            } else {
+                DebugUtils.showForeignColony(getFreeColClient(),
+                                             (Colony)settlement);
+            }
+        } else if (settlement instanceof IndianSettlement) {
+            showIndianSettlement((IndianSettlement)settlement);
+        }
+    }
+        
     public void showSpyColonyPanel(final Tile tile) {}
 
     public Parameters showParametersDialog() {
@@ -1489,6 +1499,21 @@ public class GUI extends FreeColClientHolder {
     public void showTilePanel(Tile tile) {}
 
     public void showTilePopUpAtSelectedTile() {}
+
+    /**
+     * Display the appropriate panel for any settlement on a tile, as visible
+     * to a given player.
+     *
+     * @param tile The {@code Tile} to check for settlements.
+     * @param foriegn If true, use the foreign settlement functionality
+     *     for colonies.
+     */
+    public final void showTileSettlement(Tile tile) {
+        if (tile == null) return;
+        Settlement settlement = tile.getSettlement();
+        if (settlement == null) return;
+        showSettlement(settlement);
+    }
 
     public void showTradeRoutePanel(Unit unit) {}
 
