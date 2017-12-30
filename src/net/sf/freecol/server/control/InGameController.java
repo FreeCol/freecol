@@ -3915,7 +3915,9 @@ public final class InGameController extends Controller {
 
         // Check for upgrade.
         UnitTypeChange uc = unit.getUnitChange(UnitChangeType.ENTER_COLONY);
-        if (uc != null) unit.changeType(uc.to);//-vis: safe in colony
+        if (uc != null && uc.appliesTo(unit)) {
+            unit.changeType(uc.to);//-vis: safe in colony
+        }
 
         // Change the location.
         // We could avoid updating the whole tile if we knew that this
