@@ -70,7 +70,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
         performAutoScrollIfActive(e, true);
 
         if (canvas.isGotoStarted()) {
-            if (canvas.getActiveUnit() == null) {
+            if (getGUI().getActiveUnit() == null) {
                 canvas.stopGoto();
             }
 
@@ -78,7 +78,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
 
             if (tile != null) {
                 if (lastTile != tile) {
-                    Unit active = canvas.getActiveUnit();
+                    Unit active = getGUI().getActiveUnit();
                     lastTile = tile;
                     PathNode dragPath = null;
                     // Only call the expensive path finder if there
@@ -110,7 +110,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
                 == MouseEvent.BUTTON1_MASK)) {
             // only perform the goto for the left mouse button
             if (canvas.isGotoStarted()) {
-                Unit active = canvas.getActiveUnit();
+                Unit active = getGUI().getActiveUnit();
                 if (active == null) {
                     canvas.stopGoto();
                 } else if (lastTile != tile) {

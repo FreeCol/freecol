@@ -75,7 +75,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
             canvas.stopGoto();
             if (path != null) { // Move the unit
                 getFreeColClient().getInGameController()
-                        .goToTile(canvas.getActiveUnit(),
+                    .goToTile(getGUI().getActiveUnit(),
                                 path.getLastNode().getTile());
             }
             return true;
@@ -93,7 +93,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
         Unit unit;
         PathNode path;
         if (tile != null
-                && (unit = canvas.getActiveUnit()) != null
+                && (unit = getGUI().getActiveUnit()) != null
                 && unit.getTile() != tile
                 && (path = unit.findPath(tile)) != null) {
             canvas.startGoto();
@@ -129,7 +129,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
         case GUI.MOVE_UNITS_MODE:
             // Clear goto order when active unit is on the tile, else
             // try to display a settlement.
-            Unit unit = canvas.getActiveUnit();
+            Unit unit = getGUI().getActiveUnit();
             if (unit != null && unit.getTile() == tile) {
                 igc().clearGotoOrders(unit);
                 canvas.updateCurrentPathForActiveUnit();

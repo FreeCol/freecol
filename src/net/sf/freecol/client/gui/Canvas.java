@@ -489,15 +489,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Gets the active unit.
-     *
-     * @return The {@code Unit}.
-     */
-    public Unit getActiveUnit() {
-        return mapViewer.getActiveUnit();
-    }
-
-    /**
      * Set the current active unit path.
      *
      * @param path The current {@code PathNode}.
