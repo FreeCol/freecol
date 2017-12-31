@@ -1015,11 +1015,6 @@ public final class MapViewer extends FreeColClientHolder {
                     bestScore = score;
                     result = u;
                 }
-                if (!active) {
-                    // Also consider units on carriers if the carrier itself
-                    // is not active.
-                    units.addAll(u.getUnitList());
-                }
             }
         }
         return result;
