@@ -798,7 +798,7 @@ public final class InGameController extends Controller {
         case MONARCH_MERCENARIES:
             final List<AbstractUnit> mercenaries = new ArrayList<>();
             final int mercPrice = monarch.loadMercenaries(random, mercenaries);
-            if (mercPrice < 0) break;
+            if (mercPrice <= 0) break;
             cs.add(See.only(serverPlayer),
                    new MonarchActionMessage(action, StringTemplate
                        .template(messageId)
@@ -1580,8 +1580,16 @@ public final class InGameController extends Controller {
         // Make the mercenary force offer
         List<AbstractUnit> mercs = new ArrayList<>();
         int mercPrice = monarch.loadMercenaryForce(random, mercs);
-        serverPlayer.csMercenaries(mercPrice, mercs,
-            Monarch.MonarchAction.HESSIAN_MERCENARIES, random, cs);
+        if (mercPrice > 0) {
+            serverPlayer.csMercenaries(mercPrice, mercs,
+                Monarch.MonarchAction.HESSIAN_MERCENARIES, random, cs);
+            logger.info("Mercenary force offer on declaration ("
+                + Messages.message(AbstractUnit.getListLabel(", ", mercs))
+                + ") for " + mercPrice);
+        } else {
+            logger.info("Mercenary force offer on declaration not affordable.");
+        }
+            
 
         // Pity to have to update such a heavy object as the player,
         // but we do this, at most, once per player.  Other players
