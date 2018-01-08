@@ -124,6 +124,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
         doubleClickTimer.stop();
         Tile tile = canvas.convertToMapTile(centerX, centerY);
         if (tile == null) return;
+        if (flushGoto()) return;
 
         switch (canvas.getViewMode()) {
         case GUI.MOVE_UNITS_MODE:
@@ -210,7 +211,5 @@ public final class CanvasMouseListener extends FreeColClientHolder
      */
     public void mouseReleased(MouseEvent e) {
         if (!e.getComponent().isEnabled()) return;
-
-        flushGoto();
     }
 }
