@@ -874,10 +874,10 @@ public class Map extends FreeColGameObject implements Location {
      */
     private PathNode getBestEntryPath(Unit unit, Tile tile, Unit carrier,
                                       CostDecider costDecider) {
+        if (costDecider == null)
+            costDecider = CostDeciders.avoidSettlementsAndBlockingUnits();
         return searchMap(unit, tile, GoalDeciders.getHighSeasGoalDecider(),
-            ((costDecider != null) ? costDecider
-                : CostDeciders.avoidSettlementsAndBlockingUnits()),
-            INFINITY, carrier, null, null);
+                         costDecider, INFINITY, carrier, null, null);
     }
 
     /**
@@ -929,10 +929,10 @@ public class Map extends FreeColGameObject implements Location {
             // faster, but not always, e.g. mounted units on a good
             // road system.
             path = searchMap(unit, start, gd, costDecider,
-                INFINITY, null, sh, lb);
+                             INFINITY, null, sh, lb);
             PathNode carrierPath = (carrier == null) ? null
                 : searchMap(unit, start, gd, costDecider,
-                    INFINITY, carrier, sh, lb);
+                            INFINITY, carrier, sh, lb);
             if (carrierPath != null
                 && (path == null
                     || (path.getLastNode().getCost()
@@ -946,7 +946,7 @@ public class Map extends FreeColGameObject implements Location {
             // to capture with the contiguity test, so just allow the
             // search to proceed.
             path = searchMap(unit, start, gd, costDecider,
-                INFINITY, carrier, sh, lb);
+                             INFINITY, carrier, sh, lb);
 
         } else if (unit != null && unit.isOnCarrier()
             && !start.isLand() && end.isLand()
@@ -954,7 +954,7 @@ public class Map extends FreeColGameObject implements Location {
             // Special case where a land unit is trying to move off a
             // ship to adjacent land.
             path = searchMap(unit, start, gd, costDecider, INFINITY,
-                carrier, sh, lb);
+                             carrier, sh, lb);
 
         } else if (start.isLand() && !end.isLand()
             && end.getFirstUnit() != null
@@ -964,8 +964,8 @@ public class Map extends FreeColGameObject implements Location {
             // Special case where a land unit is trying to move from
             // land to an adjacent ship.
             path = searchMap(unit, start,
-                GoalDeciders.getAdjacentLocationGoalDecider(end), costDecider,
-                INFINITY, null, null, lb);
+                             GoalDeciders.getAdjacentLocationGoalDecider(end),
+                             costDecider, INFINITY, null, null, lb);
             if (path != null) {
                 PathNode last = path.getLastNode();
                 last.next = new PathNode(embarkTo, 0, last.getTurns()+1, true,
@@ -1130,22 +1130,22 @@ public class Map extends FreeColGameObject implements Location {
 
         } else if (realStart instanceof Tile && realEnd instanceof Tile) {
             // 3: Tile->Tile
-            // Short circuit if adjacent and blocked
             Direction d;
             Unit.MoveType mt;
+            // Short circuit if adjacent and blocked
             if (unit != null
                 && (d = ((Tile)realStart).getDirection((Tile)realEnd)) != null
                 && (mt = unit.getMoveType(d)).isLegal()
                 && !mt.isProgress()) {
                 path = new PathNode(realStart, unit.getMovesLeft(), 0,
-                    carrier != null, null, null);
+                                    carrier != null, null, null);
                 int cost = unit.getMoveCost((Tile)realStart, (Tile)realEnd,
-                    unit.getMovesLeft());
+                                            unit.getMovesLeft());
                 path.next = new PathNode(realEnd, unit.getMovesLeft() - cost,
-                    0, false, path, null);
+                                         0, false, path, null);
             } else {
                 path = findMapPath(unit, (Tile)realStart, (Tile)realEnd,
-                    carrier, costDecider, lb);
+                                   carrier, costDecider, lb);
             }
         } else {
             throw new IllegalStateException("Can not happen: " + realStart
@@ -1270,9 +1270,7 @@ public class Map extends FreeColGameObject implements Location {
         private int movesLeft;
         private int turns;
         private final boolean onCarrier;
-        private final CostDecider decider;
         private int cost;
-        private PathNode path;
 
 
         /**
@@ -1296,15 +1294,12 @@ public class Map extends FreeColGameObject implements Location {
             this.movesLeft = movesLeft;
             this.turns = turns;
             this.onCarrier = onCarrier;
-            this.decider = decider;
             this.cost = decider.getCost(unit, current.getLocation(),
                                         dst, movesLeft);
-            if (this.cost != CostDecider.ILLEGAL_MOVE) {
-                this.turns += decider.getNewTurns();
-                this.movesLeft = decider.getMovesLeft();
-                this.cost = PathNode.getCost(this.turns, this.movesLeft);
-            }
-            this.path = null;
+            assert this.cost != CostDecider.ILLEGAL_MOVE;
+            this.turns += decider.getNewTurns();
+            this.movesLeft = decider.getMovesLeft();
+            this.cost = PathNode.getCost(this.turns, this.movesLeft);
         }
 
         /**
@@ -1324,51 +1319,8 @@ public class Map extends FreeColGameObject implements Location {
         public void embarkUnit(Unit unit) {
             this.unit = unit;
             this.movesLeft = unit.getInitialMovesLeft();
-            this.cost = PathNode.getCost(turns, movesLeft);
-        }
-
-        /**
-         * Resets the path.  Required after the parameters change.
-         *
-         * @param goal True if this is a goal node.
-         */
-        public void resetPath(boolean goal) {
-            path = new PathNode(dst, movesLeft, turns, onCarrier,
-                                current, null);
-            if (goal) {
-                // Do not let the CostDecider (which may be
-                // conservative) block a final destination.  This
-                // allows planning routines to compute paths to tiles
-                // temporarily occupied by an enemy unit, or for an
-                // empty ship to find a compound path to a native
-                // settlement where the first step is to collect the
-                // cargo it needs to make the final move legal.
-                if (cost == CostDecider.ILLEGAL_MOVE
-                    && unit != null
-                    && current.getTile() != null
-                    && dst.getTile() != null) {
-                    // Pretend it finishes the move.
-                    movesLeft = unit.getInitialMovesLeft();
-                    turns++;
-                    path = new PathNode(dst, movesLeft, turns, onCarrier,
-                                        current, null);
-                }
-
-                // Add an extra step to disembark from a carrier at a
-                // settlement.  If this is omitted, then a path that
-                // disembarks a unit from its carrier on an adjacent
-                // tile looks unfairly expensive.
-                Settlement s;
-                if (unit != null && path.isOnCarrier()
-                    && (s = path.getLocation().getSettlement()) != null
-                    && unit.getOwner().owns(s)) {
-                    movesLeft = 0;
-                    if (path.embarkedThisTurn(turns)) turns++;
-                    path = new PathNode(s.getTile(), 0, turns, false,
-                        path, null);
-                }
-                cost = PathNode.getCost(turns, movesLeft);
-            }
+            this.turns++;
+            this.cost = PathNode.getCost(this.turns, this.movesLeft);
         }
 
         /**
@@ -1378,10 +1330,7 @@ public class Map extends FreeColGameObject implements Location {
          * @return True if this candidate is an improvement.
          */
         public boolean canImprove(PathNode best) {
-            return cost != CostDecider.ILLEGAL_MOVE
-                && (best == null || cost < best.getCost()
-                    || (cost == best.getCost()
-                        && path.getLength() < best.getLength()));
+            return best == null || this.cost < best.getCost();
         }
 
         /**
@@ -1416,10 +1365,14 @@ public class Map extends FreeColGameObject implements Location {
                         PriorityQueue<PathNode> openMapQueue,
                         HashMap<String, Integer> f,
                         SearchHeuristic sh) {
-            int fcost = cost;
-            if (dst.getTile() != null) fcost += sh.getValue(dst.getTile());
-            f.put(dst.getId(), fcost);
-            openMap.put(dst.getId(), path);
+            int fcost = this.cost;
+            if (this.dst.getTile() != null) {
+                fcost += sh.getValue(this.dst.getTile());
+            }
+            f.put(this.dst.getId(), fcost);
+            PathNode path = new PathNode(this.dst, this.movesLeft, this.turns,
+                this.onCarrier, this.current, null);
+            openMap.put(this.dst.getId(), path);
             openMapQueue.offer(path);
         }
 
@@ -1437,7 +1390,6 @@ public class Map extends FreeColGameObject implements Location {
                 .append(" movesLeft=").append(movesLeft)
                 .append(" turns=").append(turns)
                 .append(" onCarrier=").append(onCarrier)
-                .append(" decider=").append(decider)
                 .append(" cost=").append(cost)
                 .append(']');
             return sb.toString();
@@ -1514,7 +1466,7 @@ public class Map extends FreeColGameObject implements Location {
 
         PathNode best = null;
         int bestScore = INFINITY;
-        while (!openMap.isEmpty()) {
+ok:     while (!openMap.isEmpty()) {
             // Choose the node with the lowest f.
             final PathNode currentNode = openMapQueue.poll();
             final Location currentLocation = currentNode.getLocation();
@@ -1530,14 +1482,17 @@ public class Map extends FreeColGameObject implements Location {
                     currentNode.getCost(), ")***");
                 best = goalDecider.getGoal();
                 bestScore = best.getCost();
-                if (!goalDecider.hasSubGoals()) break;
+                if (!goalDecider.hasSubGoals()) break ok;
                 continue;
             }
 
+            // Valid candidate for the closed list.
+            closedMap.put(currentLocation.getId(), currentNode);
+            if (lb != null) lb.add(" closing");
+
             // Skip nodes that can not beat the current best path.
             if (bestScore < currentNode.getCost()) {
-                closedMap.put(currentLocation.getId(), currentNode);
-                if (lb != null) lb.add(" ...goal cost wins(",
+                if (lb != null) lb.add("...goal cost wins(",
                     bestScore, " < ", currentNode.getCost(), ")...");
                 continue;
             }
@@ -1547,10 +1502,6 @@ public class Map extends FreeColGameObject implements Location {
                 if (lb != null) lb.add("...out-of-range");
                 continue;
             }
-
-            // Valid candidate for the closed list.
-            closedMap.put(currentLocation.getId(), currentNode);
-            if (lb != null) lb.add("...close");
 
             // Collect the parameters for the current node.
             final int currentMovesLeft = currentNode.getMovesLeft();
@@ -1573,39 +1524,65 @@ public class Map extends FreeColGameObject implements Location {
                 if (lb != null) lb.add("\n    ", moveTile);
                 if (currentNode.previous != null
                     && currentNode.previous.getTile() == moveTile) {
-                    if (lb != null) lb.add(" prev");
+                    if (lb != null) lb.add(" !prev");
                     continue;
                 }
 
                 // Skip neighbouring tiles already too expensive.
                 closed = closedMap.get(moveTile.getId());
                 if (closed != null) {
-                    if (lb != null) lb.add(" cm=", closed);
                     int cc = closed.getCost();
                     if (cc <= currentNode.getCost()) {
-                        if (lb != null) lb.add(" worse ", cc);
+                        if (lb != null) lb.add(" !worse ", cc);
                         continue;
                     }
                 }
 
+                // Prepare to consider move validity
+                Unit.MoveType umt = unit.getSimpleMoveType(currentTile,
+                                                           moveTile);
+                boolean unitMove = umt.isProgress();
+                boolean carrierMove = carrier != null
+                    && carrier.isTileAccessible(moveTile);
+                if (lb != null) lb.add(" ", ((unitMove) ? "U" : ""),
+                    ((carrierMove) ? "C" : ""));
+                MoveCandidate move;
+                String stepLog;
+                
                 // Is this move to the goal?  Use fake high cost so
                 // this does not become cached inside the goal decider
                 // as the preferred path.
                 boolean isGoal = goalDecider.check(unit,
                     new PathNode(moveTile, 0, INFINITY/2, false,
-                        currentNode, null));
-                if (isGoal && lb != null) lb.add(" *goal*");
+                                 currentNode, null));
+                if (isGoal && lb != null) lb.add(" *goal*", umt);
 
-                // Is this move possible for the base unit?
-                // Allow some seemingly impossible moves if it is to
-                // the goal (see the comment to recoverMove).
-                Unit.MoveType umt = unit.getSimpleMoveType(currentTile,
-                    moveTile);
-                boolean carrierMove = carrier != null
-                    && carrier.isTileAccessible(moveTile);
-                boolean unitMove = umt.isProgress();
+                // Special processing for moves-to-goal.
                 if (isGoal) {
-                    if (!unitMove) {
+                    if (unitMove) {
+                        if (moveTile.hasSettlement() && currentOnCarrier
+                            && carrierMove) {
+                            // If the goal has a settlement and the
+                            // unit is travelling by carrier, dock the
+                            // carrier.
+                            move = new MoveCandidate(carrier, currentNode,
+                                moveTile, currentMovesLeft, currentTurns,
+                                true, CostDeciders.tileCost());
+                        } else {
+                            // Otherwise let the unit complete the path.
+                            int left = currentMovesLeft;
+                            if (currentOnCarrier && unit != null) {
+                                left = (currentNode.embarkedThisTurn(currentTurns))
+                                    ? 0
+                                    : unit.getInitialMovesLeft();
+                            }
+                            move = new MoveCandidate(unit, currentNode,
+                                moveTile, left, currentTurns, false,
+                                CostDeciders.tileCost());
+                        }
+                    } else {
+                        // Handle some special cases where the move may not
+                        // necessarily progress, but still can do useful work.
                         switch (umt) {
                         case ATTACK_UNIT:
                         case ATTACK_SETTLEMENT:
@@ -1617,130 +1594,140 @@ public class Map extends FreeColGameObject implements Location {
                             // Can not move to the tile, but there is
                             // a valid interaction with the unit or
                             // settlement that is there.
+                            move = new MoveCandidate(unit, currentNode,
+                                moveTile, currentMovesLeft, currentTurns,
+                                false, CostDeciders.tileCost());
+                            unitMove = true;
+                            break;
+                        case EMBARK:
+                            move = new MoveCandidate(unit, currentNode,
+                                moveTile, currentMovesLeft, currentTurns,
+                                true, CostDeciders.tileCost());
                             unitMove = true;
                             break;
                         case MOVE_NO_ATTACK_MARINE:
                         case MOVE_NO_ATTACK_CIVILIAN:
-                            if (moveTile.hasSettlement()) break;
+                            // There is a settlement in the way, this
+                            // path can never succeed.
+                            if (moveTile.hasSettlement()) {
+                                if (lb != null) lb.add(" !FAIL-SETTLEMENT");
+                                if (!goalDecider.hasSubGoals()) break ok;
+                                continue;
+                            }
                             // There is a unit in the way.  Unless this
                             // unit can arrive there this turn, assume the
                             // condition is transient as long as the tile
                             // is not in a constrained position such as a
                             // small island or river.
-                            unitMove = currentNode.getTurns() > 0
-                                && moveTile.getAvailableAdjacentCount() >= 3;
+                            if (currentNode.getTurns() <= 0
+                                || moveTile.getAvailableAdjacentCount() < 3) {
+                                if (lb != null) lb.add(" !FAIL-ATTACK");
+                                if (!goalDecider.hasSubGoals()) break ok;
+                                continue;
+                            }
+                            if (lb != null) lb.add(" blocked");
+                            unitMove = true;
+                            move = new MoveCandidate(unit, currentNode,
+                                moveTile, currentMovesLeft, currentTurns,
+                                false, CostDeciders.tileCost());
                             break;
                         case MOVE_NO_ACCESS_WATER:
-                            // The unit can not disembark directly to the
-                            // goal along this path, but the goal is still
-                            // available by other paths.
+                            // The unit can not disembark directly to
+                            // the goal along this path, but the unit
+                            // could disembark onto land and then move
+                            // to the goal.
                             if (lb != null) lb.add(" !disembark");
                             continue;
                         default:
-                            break;
-                        }
-                        if (!unitMove && unit == currentUnit) {
-                            // This search can never succeed if the unit
-                            // can not reach the goal, except if there is
-                            // a carrier involved that might still succeed.
-                            if (lb != null) lb.add(" fail-at-GOAL(", umt, ")");
+                            if (lb != null) lb.add(" !FAIL-", umt);
+                            if (!goalDecider.hasSubGoals()) break ok;
                             continue;
                         }
                     }
-                    // Special case where the carrier is adjacent to
-                    // an accessible goal settlement but out of moves,
-                    // in which case we let the unit finish the job
-                    // if it can move.
-                    if (unitMove && carrierMove && currentOnCarrier) {
-                        carrierMove = currentNode.getMovesLeft() > 0
-                            || currentNode.embarkedThisTurn(currentTurns);
-                    }
-                }
-                if (lb != null) lb.add(" ", umt, "/",
-                    ((unitMove) ? "U" : ""), ((carrierMove) ? "C" : ""));
-
-                // Check for a carrier change at the new tile,
-                // creating a MoveCandidate for each case.
-                //
-                // Do *not* allow units to re-embark on the carrier.
-                // Note that embarking can actually increase the moves
-                // left because the carrier might be not have spent
-                // any moves yet that turn.
-                //
-                // Note that we always favour using the carrier if
-                // both carrier and non-carrier moves are possible,
-                // which can only be true moving into a settlement.
-                // Usually when moving into a settlement it will be
-                // useful to dock the carrier so it can collect new
-                // cargo.  OTOH if the carrier is just passing through
-                // the right thing is to keep the passenger on board.
-                // However, see the goal settlement exception above.
-                MoveStep step = (currentOnCarrier)
-                    ? ((carrierMove) ? MoveStep.BYWATER
-                        : (unitMove) ? MoveStep.DISEMBARK
-                        : MoveStep.FAIL)
-                    : ((carrierMove && !usedCarrier(currentNode))
+                    assert unitMove == true;
+                    assert move != null;
+                    stepLog = "@";
+                } else {
+                    // Ordinary non-goal moves.
+                    //
+                    // Check for a carrier change at the new tile,
+                    // creating a MoveCandidate for each case.
+                    //
+                    // Do *not* allow units to re-embark on the carrier.
+                    // Note that embarking can actually increase the moves
+                    // left because the carrier might be not have spent
+                    // any moves yet that turn.
+                    //
+                    // Note that we always favour using the carrier if
+                    // both carrier and non-carrier moves are possible,
+                    // which can only be true moving into a settlement.
+                    // Usually when moving into a settlement it will be
+                    // useful to dock the carrier so it can collect new
+                    // cargo.  OTOH if the carrier is just passing through
+                    // the right thing is to keep the passenger on board.
+                    // However, see the goal settlement exception above.
+                    MoveStep step = (currentOnCarrier)
+                        ? ((carrierMove) ? MoveStep.BYWATER
+                            : (unitMove) ? MoveStep.DISEMBARK
+                            : MoveStep.FAIL)
+                        : (carrierMove && !usedCarrier(currentNode))
                         ? MoveStep.EMBARK
-                        : (unitMove || isGoal) ? ((unit.isNaval())
+                        : (unitMove) ? ((unit.isNaval())
                             ? MoveStep.BYWATER
                             : MoveStep.BYLAND)
-                        : MoveStep.FAIL);
-                MoveCandidate move;
-                switch (step) {
-                case BYLAND:
-                    move = new MoveCandidate(unit, currentNode, moveTile, 
-                        currentMovesLeft, currentTurns, false,
-                        ((costDecider != null) ? costDecider
-                            : CostDeciders.defaultCostDeciderFor(unit)));
-                    break;
-                case BYWATER:
-                    move = new MoveCandidate(offMapUnit, currentNode, moveTile,
-                        currentMovesLeft, currentTurns, currentOnCarrier,
-                        ((costDecider != null) ? costDecider
-                            : CostDeciders.defaultCostDeciderFor(offMapUnit)));
-                    break;
-                case EMBARK:
-                    move = new MoveCandidate(unit, currentNode, moveTile,
-                        currentMovesLeft, currentTurns, true,
-                        ((costDecider != null) ? costDecider
-                            : CostDeciders.defaultCostDeciderFor(unit)));
-                    move.embarkUnit(carrier);
-                    break;
-                case DISEMBARK:
-                    move = new MoveCandidate(unit, currentNode, moveTile,
-                        0, currentTurns, false,
-                        ((costDecider != null) ? costDecider
-                            : CostDeciders.defaultCostDeciderFor(unit)));
-                    break;
-                case FAIL: default: // Loop on failure.
-                    move = null;
-                    break;
+                        : MoveStep.FAIL;
+                    switch (step) {
+                    case BYLAND:
+                        move = new MoveCandidate(unit, currentNode, moveTile, 
+                            currentMovesLeft, currentTurns, false,
+                            ((costDecider != null) ? costDecider
+                                : CostDeciders.defaultCostDeciderFor(unit)));
+                        break;
+                    case BYWATER:
+                        move = new MoveCandidate(offMapUnit, currentNode, moveTile,
+                            currentMovesLeft, currentTurns, currentOnCarrier,
+                            ((costDecider != null) ? costDecider
+                                : CostDeciders.defaultCostDeciderFor(offMapUnit)));
+                        break;
+                    case EMBARK:
+                        move = new MoveCandidate(unit, currentNode, moveTile,
+                            currentMovesLeft, currentTurns, true,
+                            ((costDecider != null) ? costDecider
+                                : CostDeciders.defaultCostDeciderFor(unit)));
+                        move.embarkUnit(carrier);
+                        break;
+                    case DISEMBARK:
+                        move = new MoveCandidate(unit, currentNode, moveTile,
+                            0, currentTurns, false,
+                            ((costDecider != null) ? costDecider
+                                : CostDeciders.defaultCostDeciderFor(unit)));
+                        break;
+                    case FAIL: default: // Loop on failure.
+                        if (lb != null) lb.add("!");
+                        continue;
+                    }
+                    stepLog = " " + step + "_";
                 }
 
-                String stepLog;
-                if (move == null) {
-                    stepLog = "!";
-                } else if (move.getCost() < 0) {
-                    stepLog = "#";
-                } else {
-                    move.resetPath(isGoal);
-                    // Tighten the bounds on a previously seen case if possible
-                    if (closed != null) {
-                        if (move.canImprove(closed)) {
-                            closedMap.remove(moveTile.getId());
-                            move.improve(openMap, openMapQueue, f, sh);
-                            stepLog = "^" + Integer.toString(move.getCost());
-                        } else {
-                            stepLog = ".";
-                        }
-                    } else if (move.canImprove(openMap.get(moveTile.getId()))){
+                assert move != null && move.getCost() >= 0;
+                // Tighten the bounds on a previously seen case if possible
+                if (closed != null) {
+                    if (move.canImprove(closed)) {
+                        closedMap.remove(moveTile.getId());
                         move.improve(openMap, openMapQueue, f, sh);
-                        stepLog = "+" + f.get(moveTile.getId());
+                        stepLog += "^" + Integer.toString(move.getCost());
                     } else {
-                        stepLog = "#";
+                        stepLog += "v";
+                    }
+                } else {
+                    if (move.canImprove(openMap.get(moveTile.getId()))){
+                        move.improve(openMap, openMapQueue, f, sh);
+                        stepLog += "+" + Integer.toString(move.getCost());
+                    } else {
+                        stepLog += "-";
                     }
                 }
-                if (lb != null) lb.add(" ", step, stepLog);
+                if (lb != null) lb.add(stepLog);
             }
         }
 
