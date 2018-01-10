@@ -1531,6 +1531,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         boolean ownedBySelf = false;
         boolean ownedByIndians = false;
 
+        // Collect the building and food goods types
         java.util.Map<GoodsType, Integer> goodsMap = new HashMap<>();
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (goodsType.isBuildingMaterial()) {
@@ -1540,17 +1541,23 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             } else if (!goodsType.isFoodType()) {
                 continue;
             }
-            for (ProductionType productionType : getType()
-                     .getAvailableProductionTypes(false)) {
-                int potential = (productionType.getOutput(goodsType) == null)
-                    ? 0 : getPotentialProduction(goodsType, null);
+            goodsMap.put(goodsType, 0);
+        }
+        // Supercede with positive unattended production from this tile
+        for (ProductionType productionType : getType()
+                 .getAvailableProductionTypes(true)) {
+            for (AbstractGoods ag : productionType.getOutputList()) {
+                GoodsType goodsType = ag.getType();
+                if (!goodsMap.containsKey(goodsType)) continue;
+                // Use full production with the tile bonuses
+                int potential = getPotentialProduction(goodsType, null);
                 Integer oldPotential = goodsMap.get(goodsType);
                 if (oldPotential == null || potential > oldPotential) {
                     goodsMap.put(goodsType, potential);
                 }
             }
         }
-
+        // Add in potential attended production from other tiles
         for (Tile t : getSurroundingTiles(1)) {
             if (!t.isLand()) landLocked = false;
             forEachMapEntry(goodsMap, e -> e.setValue(e.getValue()
