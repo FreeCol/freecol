@@ -949,19 +949,6 @@ public final class MapViewer extends FreeColClientHolder {
         boolean ret = false;
         selectedTile = newTile;
 
-        if (viewMode == GUI.MOVE_UNITS_MODE
-            && (activeUnit == null || activeUnit.getTile() != newTile)) {
-            // select a unit on the selected tile
-            Unit unitInFront = findUnitInFront(newTile);
-            if (unitInFront != null) {
-                ret = gui.setActiveUnit(unitInFront);
-            } else {
-                gui.setFocus(newTile);
-                changeViewMode(GUI.VIEW_TERRAIN_MODE);
-                ret = true;
-            }
-        }
-
         // Check for refocus
         if (!onScreen(newTile)
             || getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
@@ -1014,11 +1001,6 @@ public final class MapViewer extends FreeColClientHolder {
                 if (bestScore < score) {
                     bestScore = score;
                     result = u;
-                }
-                if (!active) {
-                    // Also consider units on carriers if the carrier itself
-                    // is not active.
-                    units.addAll(u.getUnitList());
                 }
             }
         }

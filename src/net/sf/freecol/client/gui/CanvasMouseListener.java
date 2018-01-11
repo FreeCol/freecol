@@ -38,17 +38,11 @@ import net.sf.freecol.common.model.Unit;
  * Listens to mouse buttons being pressed at the level of the Canvas.
  */
 public final class CanvasMouseListener extends FreeColClientHolder
-        implements ActionListener, MouseListener {
+        implements MouseListener {
 
     private static final Logger logger = Logger.getLogger(CanvasMouseListener.class.getName());
 
-    private static final int doubleClickDelay = 200; // Milliseconds
-
     private final Canvas canvas;
-
-    private final Timer doubleClickTimer = new Timer(doubleClickDelay, this);
-
-    private int centerX, centerY;
 
 
     /**
@@ -64,86 +58,6 @@ public final class CanvasMouseListener extends FreeColClientHolder
     }
 
 
-    /**
-     * If a goto order is underway, perform it.
-     *
-     * @return True if a goto was underway.
-     */
-    private boolean flushGoto() {
-        if (canvas.isGotoStarted()) {
-            PathNode path = canvas.getGotoPath();
-            canvas.stopGoto();
-            if (path != null) { // Move the unit
-                getFreeColClient().getInGameController()
-                        .goToTile(canvas.getActiveUnit(),
-                                path.getLastNode().getTile());
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Perform a goto order to the given tile with the active unit, if
-     * possible.
-     *
-     * @param tile The {@code Tile} to go to.
-     */
-    private void immediateGoto(Tile tile) {
-        Unit unit;
-        PathNode path;
-        if (tile != null
-                && (unit = canvas.getActiveUnit()) != null
-                && unit.getTile() != tile
-                && (path = unit.findPath(tile)) != null) {
-            canvas.startGoto();
-            canvas.setGotoPath(path);
-            flushGoto();
-        }
-    }
-
-    private void immediatePopup(Tile tile, int x, int y) {
-        if (canvas.isGotoStarted()) canvas.stopGoto();
-        canvas.showTilePopup(tile, x, y);
-    }
-
-    private void immediateSettlement(Tile tile) {
-        if (tile.hasSettlement()) {
-            getFreeColClient().getGUI().showSettlement(tile.getSettlement());
-        }
-    }
-
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        doubleClickTimer.stop();
-        Tile tile = canvas.convertToMapTile(centerX, centerY);
-        if (tile == null) return;
-
-        switch (canvas.getViewMode()) {
-        case GUI.MOVE_UNITS_MODE:
-            // Clear goto order when active unit is on the tile, else
-            // try to display a settlement.
-            Unit unit = canvas.getActiveUnit();
-            if (unit != null && unit.getTile() == tile) {
-                igc().clearGotoOrders(unit);
-                canvas.updateCurrentPathForActiveUnit();
-            } else {
-                immediateSettlement(tile);
-            }
-            break;
-        case GUI.VIEW_TERRAIN_MODE: default:
-            break;
-        }
-        getGUI().setSelectedTile(tile);
-    }
-
-
     // Interface MouseListener
 
     /**
@@ -152,12 +66,33 @@ public final class CanvasMouseListener extends FreeColClientHolder
     public void mouseClicked(MouseEvent e) {
         if (!e.getComponent().isEnabled()) return;
 
-        Tile tile;
+        // Only process clicks on Button1
+        if (e.getButton() != MouseEvent.BUTTON1) return;
+
+        final Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
+        if (tile == null) return;
+
+        // Only process events that could not have been gotos.
+        final Unit unit = getGUI().getActiveUnit();
         if (e.getClickCount() > 1
-            && (tile = canvas.convertToMapTile(e.getX(), e.getY())) != null) {
-            immediateSettlement(tile);
-        } else {
-            canvas.requestFocus();
+            || unit == null
+            || unit.getTile() == tile
+            || !canvas.isDrag(e.getX(), e.getY())) {
+            if (tile.hasSettlement()) {
+                getGUI().showTileSettlement(tile);
+            } else if (unit == null || unit.getTile() != tile) {
+                Unit other = tile.getFirstUnit();
+                if (other != null && getMyPlayer().owns(other)) {
+                    getGUI().setActiveUnit(other);
+                    getGUI().changeViewMode(GUI.MOVE_UNITS_MODE);
+                } else {
+                    getGUI().setSelectedTile(tile);
+                    getGUI().changeViewMode(GUI.VIEW_TERRAIN_MODE);
+                }
+            } else {
+                getGUI().setSelectedTile(tile);
+                getGUI().changeViewMode(GUI.VIEW_TERRAIN_MODE);
+            }
         }
     }
 
@@ -178,27 +113,26 @@ public final class CanvasMouseListener extends FreeColClientHolder
         if (!e.getComponent().isEnabled()) return;
 
         final Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
+        final Unit unit = getGUI().getActiveUnit();
         final int me = (e.isPopupTrigger()) ? MouseEvent.BUTTON3
             : e.getButton();
+        if (canvas.isGotoStarted()) canvas.stopGoto();
         switch (me) {
-        case MouseEvent.BUTTON1:
-            // Record initial click point for purposes of dragging,
-            // @see CanvasMouseMotionListener#mouseDragged.
+        case MouseEvent.BUTTON1: // Drag and selection
+            // Enable dragging with button 1
+            // @see CanvasMouseMotionListener#mouseDragged
             canvas.setDragPoint(e.getX(), e.getY());
-
-            // New click sequence? Remember position to use when timer expires
-            if (!doubleClickTimer.isRunning()) {
-                centerX = e.getX();
-                centerY = e.getY();
-            }
-            doubleClickTimer.start();
             canvas.requestFocus();
             break;
-        case MouseEvent.BUTTON2:
-            immediateGoto(tile);
+        case MouseEvent.BUTTON2: // Immediate goto
+            if (tile != null && unit != null) {
+                canvas.startGoto();
+                getGUI().updateGotoPath(tile);
+                getGUI().traverseGotoPath();
+            }
             break;
-        case MouseEvent.BUTTON3:
-            immediatePopup(tile, e.getX(), e.getY());
+        case MouseEvent.BUTTON3: // Immediate tile popup
+            canvas.showTilePopup(tile, e.getX(), e.getY());
             break;
         default:
             break;
@@ -211,6 +145,13 @@ public final class CanvasMouseListener extends FreeColClientHolder
     public void mouseReleased(MouseEvent e) {
         if (!e.getComponent().isEnabled()) return;
 
-        flushGoto();
+        // Only process clicks on Button1
+        if (e.getButton() != MouseEvent.BUTTON1) return;
+
+        // Handle goto immediately on release.  Do not try to do this in
+        // mouseClicked as long presses will not generate calls to it.
+        if (canvas.isGotoStarted()) {
+            getGUI().traverseGotoPath();
+        }
     }
 }

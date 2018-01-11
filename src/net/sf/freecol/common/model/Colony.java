@@ -38,8 +38,6 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.GameOptions;
@@ -2825,23 +2823,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             value -= 200 * this.getStockade().getLevel();
         }
         return value;
-    }
-
-    /**
-     * Display the appropriate panel for a given {@code Colony}
-     *
-     * @param canvas The instance of the FreeCol canvas to display.
-     * @param p The FreeCol Player, used to check ownership of a Colony.
-     * @throws IllegalStateException If a non-Colony or non-IndianSettlement
-     *                               attempts to call this method.
-     */
-    @Override
-    public void showSettlement(Canvas canvas, Player p) throws IllegalStateException {
-        if (this.getOwner().equals(p)) {
-            canvas.showColonyPanel(this, null);
-        } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-            canvas.showForeignColony(this);
-        }
     }
 
 

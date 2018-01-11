@@ -21,6 +21,7 @@ package net.sf.freecol.common.networking;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.TradeRoute;
@@ -45,6 +46,41 @@ public class UpdateTradeRouteMessage extends ObjectMessage {
     public UpdateTradeRouteMessage(TradeRoute tradeRoute) {
         super(TAG);
 
+        appendChild(tradeRoute);
+    }
+
+    /**
+     * Create a new {@code UpdateTradeRouteMessage} from a stream.
+     *
+     * @param game The {@code Game} this message belongs to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public UpdateTradeRouteMessage(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
+        this(null);
+
+        FreeColXMLReader.ReadScope rs
+            = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);
+        TradeRoute tradeRoute = null;
+        try {
+            while (xr.moreTags()) {
+                String tag = xr.getLocalName();
+                if (TradeRoute.TAG.equals(tag)) {
+                    if (tradeRoute == null) {
+                        tradeRoute = xr.readFreeColObject(game, TradeRoute.class);
+                    } else {
+                        expected(TAG, tag);
+                    }
+                } else {
+                    expected(TradeRoute.TAG, tag);
+                }
+                xr.expectTag(tag);
+            }
+            xr.expectTag(TAG);
+        } finally {
+            xr.replaceScope(rs);
+        }
         appendChild(tradeRoute);
     }
 

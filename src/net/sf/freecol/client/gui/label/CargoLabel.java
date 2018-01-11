@@ -25,7 +25,8 @@ import net.sf.freecol.common.model.Unit;
 import java.awt.Component;
 
 /**
- * An interface used for updating a {@code CargoPanel} to add or remove a {@code Component}
+ * An interface used for updating a {@code CargoPanel} to add or
+ * remove a {@code Component}
  */
 public interface CargoLabel {
 

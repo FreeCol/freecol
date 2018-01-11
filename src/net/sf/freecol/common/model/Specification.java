@@ -2066,12 +2066,13 @@ public final class Specification implements OptionContainer {
 
     // @compat 0.11.6
     private void fixUnitChanges() {
-        // Unlike roles, we can not trust what is already there, as the changes
-        // are deeper.
-
         if (compareVersion("0.116") > 0) return;
 
-        unitChangeTypeList.clear();
+        // Unlike roles, we can not trust what is already there, as the changes
+        // are deeper.  However we preserve the ENTER_COLONY change as that
+        // comes in from the convertUpgrade mod.
+        UnitChangeType enter = find(unitChangeTypeList,
+            matchKeyEquals(UnitChangeType.ENTER_COLONY, UnitChangeType::getId));
         File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME);
         try (
              FileInputStream fis = new FileInputStream(uctf);
@@ -2080,6 +2081,9 @@ public final class Specification implements OptionContainer {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to load unit changes.", e);
             return;
+        }
+        if (enter != null) {
+            unitChangeTypeList.add(enter);
         }
 
         logger.info("Loading unit-changes backward compatibility fragment: "

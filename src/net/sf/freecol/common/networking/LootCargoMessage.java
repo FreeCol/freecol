@@ -74,12 +74,8 @@ public class LootCargoMessage extends ObjectMessage {
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (Goods.TAG.equals(tag)) {
-                if (goods == null) {
-                    Goods g = xr.readFreeColObject(game, Goods.class);
-                    if (g != null) goods.add(g);
-                } else {
-                    expected(TAG, tag);
-                }
+                Goods g = xr.readFreeColObject(game, Goods.class);
+                if (g != null) goods.add(g);
             } else {
                 expected(Goods.TAG, tag);
             }

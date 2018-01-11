@@ -255,6 +255,9 @@ public final class Canvas extends JDesktopPane {
     /** Number of tries to find a clear spot on the canvas. */
     private static final int MAXTRY = 3;
 
+    /** Number of pixels that must be moved before a goto is enabled. */
+    private static final int DRAG_THRESHOLD = 16;
+
     /** A class for frames being used as tool boxes. */
     private static class ToolBoxFrame extends JInternalFrame {}
 
@@ -489,15 +492,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Gets the active unit.
-     *
-     * @return The {@code Unit}.
-     */
-    public Unit getActiveUnit() {
-        return mapViewer.getActiveUnit();
-    }
-
-    /**
      * Set the current active unit path.
      *
      * @param path The current {@code PathNode}.
@@ -530,6 +524,19 @@ public final class Canvas extends JDesktopPane {
      */
     public void setDragPoint(int x, int y) {
         gotoDragPoint = new Point(x, y);
+    }
+
+    /**
+     * Is mouse movement differnce above the drag threshold?
+     *
+     * @param x The new mouse x position.
+     * @param y The new mouse y position.
+     */
+    public boolean isDrag(int x, int y) {
+        Point dragPoint = getDragPoint();
+        int deltaX = Math.abs(x - dragPoint.x);
+        int deltaY = Math.abs(y - dragPoint.y);
+        return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
     }
 
     /**
@@ -2060,19 +2067,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Detailed view of a foreign colony when in debug mode.
-     *
-     * @param settlement The {@code Settlement} with the colony
-     */
-    public void showForeignColony(Settlement settlement) {
-        if (settlement instanceof Colony) {
-            Colony colony = freeColClient.getFreeColServer().getGame()
-                .getFreeColGameObject(settlement.getId(), Colony.class);
-            showColonyPanel(colony, null);
-        }
-    }
-
-    /**
      * Display the GameOptionsDialog.
      *
      * @param editable Should the game options be editable?
@@ -2551,22 +2545,6 @@ public final class Canvas extends JDesktopPane {
 
         serverListPanel.initialize(serverList);
         showSubPanel(serverListPanel, true);
-    }
-
-    /**
-     * Displays the colony panel of the given {@code Colony}
-     * following a spying action.
-     *
-     * @param tile The {@code Tile} containing the colony to display.
-     * @return The colony panel.
-     * @see ColonyPanel
-     */
-    public ColonyPanel showSpyColonyPanel(Tile tile) {
-        Colony colony = tile.getColony();
-        if (colony == null) return null;
-        ColonyPanel panel = new ColonyPanel(freeColClient, colony);
-        showFreeColPanel(panel, tile, true);
-        return panel;
     }
 
     /**

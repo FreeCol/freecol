@@ -110,12 +110,9 @@ public final class TilePopup extends JPopupMenu {
                         if (!freeColClient.currentPlayerIsMyPlayer()) return;
                         Tile currTile = activeUnit.getTile();
                         if (currTile == tile) return; // already at destination
-                        freeColClient.getInGameController()
-                            .goToTile(activeUnit, tile);
-                        // if unit did not move, we should show the goto path
-                        if (activeUnit.getTile() == currTile) {
-                            canvas.updateCurrentPathForActiveUnit();
-                        }
+                        canvas.startGoto();
+                        gui.updateGotoPath(tile);
+                        gui.traverseGotoPath();
                     });
                 add(gotoMenuItem);
             }
@@ -192,7 +189,7 @@ public final class TilePopup extends JPopupMenu {
             if (hasAnItem) addSeparator();
         }
 
-        if (tile.isExplored()) addTile(tile);
+        addTile(tile);
         addSeparator();
 
         int lineCount = 0;
@@ -468,7 +465,7 @@ public final class TilePopup extends JPopupMenu {
             FontLibrary.FontSize.TINY, Font.BOLD,
             gui.getImageLibrary().getScaleFactor()));
         menuItem.addActionListener((ActionEvent ae) -> {
-                gui.showIndianSettlementPanel(is);
+                gui.showIndianSettlement(is);
             });
         add(menuItem);
         hasAnItem = true;
@@ -481,9 +478,11 @@ public final class TilePopup extends JPopupMenu {
      */
     private void addTile(final Tile tile) {
         JMenuItem menuItem = new JMenuItem(Messages.message(tile.getLabel()));
-        menuItem.addActionListener((ActionEvent ae) -> {
-                gui.showTilePanel(tile);
-            });
+        if (tile.isExplored()) {
+            menuItem.addActionListener((ActionEvent ae) -> {
+                    gui.showTilePanel(tile);
+                });
+        }
 
         add(menuItem);
         /**

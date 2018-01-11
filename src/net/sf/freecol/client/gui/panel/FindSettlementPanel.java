@@ -198,7 +198,7 @@ public final class FindSettlementPanel extends FreeColPanel
             getGUI().showColonyPanel((Colony)settlement, null);
         } else if (settlement instanceof IndianSettlement) {
             getGUI().removeFromCanvas(FindSettlementPanel.this);
-            getGUI().showIndianSettlementPanel((IndianSettlement)settlement);
+            getGUI().showIndianSettlement((IndianSettlement)settlement);
         }
     }
 

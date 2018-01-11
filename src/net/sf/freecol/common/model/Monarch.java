@@ -759,6 +759,8 @@ public final class Monarch extends FreeColGameObject implements Named {
                 mercs.add(au);
                 price += newPrice * n;
                 count -= n;
+            } else {
+                unitTypes.remove(unitType);
             }
         }
         return price;
@@ -809,7 +811,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
         return -1;
     }
-
 
 
     // Interface Named

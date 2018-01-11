@@ -42,7 +42,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
@@ -82,9 +81,11 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -484,8 +485,6 @@ public class SwingGUI extends GUI {
     @Override
     public void activateGotoPath() {
         Unit unit = getActiveUnit();
-
-        // Action should be disabled if there is no active unit, but make sure
         if (unit == null) return;
 
         // Enter "goto mode" if not already activated; otherwise cancel it
@@ -498,12 +497,8 @@ public class SwingGUI extends GUI {
             // mouse is over the screen; see also
             // CanvasMouseMotionListener.
             Point pt = canvas.getMousePosition();
-            if (pt != null) {
-                Tile tile = canvas.convertToMapTile(pt.x, pt.y);
-                if (tile != null && unit.getTile() != tile) {
-                    canvas.setGotoPath(unit.findPath(tile));
-                }
-            }
+            updateGotoPath((pt == null) ? null
+                : canvas.convertToMapTile(pt.x, pt.y));
         }
     }
 
@@ -511,14 +506,58 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void clearGotoPath() {
-        Unit unit = getActiveUnit();
+    public void updateGotoPath(Tile tile) {
+        final Unit unit = getActiveUnit();
+        if (tile == null || unit == null) {
+            canvas.stopGoto();
+            return;
+        }
 
-        // Action should be disabled if there is no active unit, but make sure
-        if (unit == null) return;
+        if (!canvas.isGotoStarted()) return;
+
+        // Do nothing if the tile has not changed.
+        PathNode oldPath = canvas.getGotoPath();
+        Tile lastTile = (oldPath == null) ? null
+            : oldPath.getLastNode().getTile();
+        if (lastTile == tile) return;
+
+        // Do not show a path if it will be invalid, avoiding calling
+        // the expensive path finder if possible.
+        PathNode newPath = (unit.getTile() == tile
+            || !tile.isExplored()
+            || !unit.getSimpleMoveType(tile).isLegal()) ? null
+            : unit.findPath(tile);
+        canvas.setGotoPath(newPath);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clearGotoPath() {
         canvas.stopGoto();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void traverseGotoPath() {
+        final Unit unit = getActiveUnit();
+        if (unit == null || !canvas.isGotoStarted()) return;
+
+        final PathNode path = canvas.getGotoPath();
+        canvas.stopGoto();
+        if (path == null) {
+            igc().clearGotoOrders(unit);
+        } else {
+            igc().goToTile(unit, path);
+            // FIXME? Unit may have been deselected on reaching destination
+            setActiveUnit(unit);
+        }
+        canvas.updateCurrentPathForActiveUnit();
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -1191,23 +1230,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    void showSettlement(Settlement settlement) {
-        settlement.showSettlement(this.canvas, getMyPlayer());
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void showForeignColony(Settlement settlement) {
-        canvas.showForeignColony(settlement);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void showColonyPanel(Colony colony, Unit unit) {
         canvas.showColonyPanel(colony, unit);
     }
@@ -1351,7 +1373,7 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
+    public void showIndianSettlement(IndianSettlement indianSettlement) {
         canvas.showIndianSettlementPanel(indianSettlement);
     }
 
@@ -1566,14 +1588,6 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showSpyColonyPanel(final Tile tile) {
-        canvas.showSpyColonyPanel(tile);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Parameters showParametersDialog() {
         return canvas.showParametersDialog();
     }
@@ -1660,7 +1674,7 @@ public class SwingGUI extends GUI {
     }
 
     public void showReportLabourDetailPanel(UnitType unitType,
-            Map<UnitType, Map<Location, Integer>> data,
+            java.util.Map<UnitType, java.util.Map<Location, Integer>> data,
             TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
         canvas.showReportLabourDetailPanel(unitType, data, unitCount,
                                            colonies);
@@ -1794,8 +1808,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showStatisticsPanel(Map<String, String> serverStats,
-                                    Map<String, String> clientStats) {
+    public void showStatisticsPanel(java.util.Map<String, String> serverStats,
+                                    java.util.Map<String, String> clientStats) {
         canvas.showStatisticsPanel(serverStats, clientStats);
     }
 
@@ -1907,7 +1921,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Unit getActiveUnit() {
-        return mapViewer==null ? null : mapViewer.getActiveUnit();
+        return (mapViewer == null) ? null : mapViewer.getActiveUnit();
     }
 
     /**
