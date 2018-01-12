@@ -80,7 +80,6 @@ public final class CostDeciders {
                 return 1;
             if (newLocation.getTile() == null
                 || oldLocation.getTile() == null) return ILLEGAL_MOVE;
-            this.newTurns = 0;
             return adjust(unit, oldLocation.getTile(), newLocation.getTile(),
                           movesLeft);
         }

@@ -132,6 +132,7 @@ class BaseCostDecider implements CostDecider {
         int cost = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
         if (cost <= movesLeftBefore) {
             this.movesLeft = movesLeftBefore - cost;
+            this.newTurns = 0;
         } else { // This move takes an extra turn to complete:
             final int thisTurnMovesLeft = movesLeftBefore;
             int initialMoves = unit.getInitialMovesLeft();
@@ -139,7 +140,7 @@ class BaseCostDecider implements CostDecider {
                                                           initialMoves);
             cost = thisTurnMovesLeft + moveCostNextTurn;
             this.movesLeft = initialMoves - moveCostNextTurn;
-            this.newTurns++;
+            this.newTurns = 1;
         }
         return cost;
     }
@@ -152,7 +153,7 @@ class BaseCostDecider implements CostDecider {
      */
     @Override
     public int getMovesLeft() {
-        return movesLeft;
+        return this.movesLeft;
     }
     
     /**
@@ -163,6 +164,6 @@ class BaseCostDecider implements CostDecider {
      */      
     @Override
     public int getNewTurns() {
-        return newTurns;
+        return this.newTurns;
     }
 }
