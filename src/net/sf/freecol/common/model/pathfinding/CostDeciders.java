@@ -88,22 +88,23 @@ public final class CostDeciders {
    
 
     /**
-     * A {@code CostDecider} that only considers the number of tiles
-     * visited when determining the cost, but extends TileCostDecider
-     * to also check the legality of the move.
+     * A {@code CostDecider} that only considers the number of legal
+     * tiles visited when determining the cost.
      */
-    private static final CostDecider legalTileCostDecider = new TileCostDecider() {
+    private static final CostDecider legalTileCountDecider = new CostDecider() {
             @Override
             public int getCost(Unit unit, Location oldLocation,
                                Location newLocation, int movesLeft) {
-                int cost = ((TileCostDecider)this)
-                    .getCost(unit, oldLocation, newLocation, movesLeft);
-                if (cost == ILLEGAL_MOVE) return cost;
-                Tile newTile = newLocation.getTile();
-                return (newTile != null && !unit.isTileAccessible(newTile))
-                    ? ILLEGAL_MOVE
-                    : cost;
+                return (newLocation == null) ? ILLEGAL_MOVE
+                    : (newLocation instanceof Europe) ? 1
+                    : (newLocation.getTile() == null) ? ILLEGAL_MOVE
+                    : (unit.isTileAccessible(newLocation.getTile())) ? 1
+                    : ILLEGAL_MOVE;
             }
+            @Override
+            public int getMovesLeft() { return 0; }
+            @Override
+            public int getNewTurns() { return 1; }
         };
 
 
@@ -331,7 +332,7 @@ public final class CostDeciders {
      * @return The {@code CostDecider}.
      */
     public static CostDecider numberOfLegalTiles() {
-        return legalTileCostDecider;
+        return legalTileCountDecider;
     }
 
     /**
