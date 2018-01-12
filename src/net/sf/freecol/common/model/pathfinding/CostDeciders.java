@@ -64,26 +64,46 @@ public final class CostDeciders {
             public int getNewTurns() { return 0; }
         };
 
+    /**
+     * A simple {@code CostDecider} that considers only the base tile
+     * cost.  Totally ignores the legality of the move as this is used
+     * when considering paths to temporarily blocked goals.
+     */
+    private static class TileCostDecider extends BaseCostDecider {
+
+        @Override
+        public int getCost(Unit unit, Location oldLocation,
+                           Location newLocation, int movesLeft) {
+            if (oldLocation == null || newLocation == null)
+                return ILLEGAL_MOVE;
+            if (newLocation instanceof Europe || oldLocation instanceof Europe)
+                return 1;
+            if (newLocation.getTile() == null
+                || oldLocation.getTile() == null) return ILLEGAL_MOVE;
+            this.newTurns = 0;
+            return adjust(unit, oldLocation.getTile(), newLocation.getTile(),
+                          movesLeft);
+        }
+    };
+   
 
     /**
-     * A {@code CostDecider} that only considers the number of
-     * tiles visited when determining the cost, but differs from the
-     * trivialCostDecider in checking the legality of the move.
+     * A {@code CostDecider} that only considers the number of tiles
+     * visited when determining the cost, but extends TileCostDecider
+     * to also check the legality of the move.
      */
-    private static final CostDecider tileCostDecider = new CostDecider() {
+    private static final CostDecider legalTileCostDecider = new TileCostDecider() {
             @Override
             public int getCost(Unit unit, Location oldLocation,
                                Location newLocation, int movesLeft) {
-                return (newLocation == null) ? ILLEGAL_MOVE
-                    : (newLocation instanceof Europe) ? 1
-                    : (newLocation.getTile() == null) ? ILLEGAL_MOVE
-                    : (unit.isTileAccessible(newLocation.getTile())) ? 1
-                    : ILLEGAL_MOVE;
+                int cost = ((TileCostDecider)this)
+                    .getCost(unit, oldLocation, newLocation, movesLeft);
+                if (cost == ILLEGAL_MOVE) return cost;
+                Tile newTile = newLocation.getTile();
+                return (newTile != null && !unit.isTileAccessible(newTile))
+                    ? ILLEGAL_MOVE
+                    : cost;
             }
-            @Override
-            public int getMovesLeft() { return 0; }
-            @Override
-            public int getNewTurns() { return 1; }
         };
 
 
@@ -197,8 +217,7 @@ public final class CostDeciders {
                         && (u.hasAbility(Ability.PIRACY)
                             || (u.getOwner().atWarWith(owner)
                                 && u.isOffensiveUnit())));
-                if (any(flatten(tile.getSurroundingTiles(1,1),
-                            Tile::getUnits),
+                if (any(flatten(tile.getSurroundingTiles(1,1), Tile::getUnits),
                         threatPred)) {
                     cost += this.movesLeft;
                     this.movesLeft = 0;
@@ -293,13 +312,26 @@ public final class CostDeciders {
     }
 
     /**
-     * A {@code CostDecider} only considering the number of tiles
+     * Get a {@code CostDecider} that considers only tile cost, but otherwise
+     * ignores legality.
+     *
+     * This is useful for path finding to a tile that is temporarily blocked
+     * by another nations unit.
+     *
+     * @return The {@code CostDecider}.
+     */
+    public static CostDecider tileCost() {
+        return new TileCostDecider();
+    }
+
+    /**
+     * A {@code CostDecider} only considering the number of legal tiles
      * visited when determining the cost.
      *
      * @return The {@code CostDecider}.
      */
     public static CostDecider numberOfLegalTiles() {
-        return tileCostDecider;
+        return legalTileCostDecider;
     }
 
     /**
