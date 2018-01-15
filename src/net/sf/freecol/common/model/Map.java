@@ -1606,6 +1606,10 @@ ok:     while (!openMap.isEmpty()) {
                             unitMove = true;
                             break;
                         case MOVE_NO_ATTACK_MARINE:
+                            // Ampibious attack disallowed, disembark to
+                            // reach the goal.
+                            if (lb != null) lb.add(" !amphibious");
+                            continue;
                         case MOVE_NO_ATTACK_CIVILIAN:
                             // There is a settlement in the way, this
                             // path can never succeed.
