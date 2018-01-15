@@ -508,6 +508,9 @@ public final class InGameController extends Controller {
                 .getBoolean(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF))) {
             is.setScouted(serverPlayer);
         }
+        // Force the settlement tile to become uncached.  Should not
+        // be necessary but this might mitigate BR#3128.
+        is.getTile().seeTile(serverPlayer);
     }
 
     /**
