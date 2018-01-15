@@ -362,14 +362,12 @@ public class TradeRoute extends FreeColGameObject
         final Game game = getGame();
         this.name = o.getName();
         this.owner = o.getOwner();
-        synchronized (this.stops) {
-            this.stops.clear();
-            this.stops.addAll(o.getStopList());
+        clearStops();
+        for (TradeRouteStop trs : o.getStopList()) {
+            addStop(new TradeRouteStop(trs));
         }
-        this.silent = o.isSilent();
         return true;
     }
-
 
     // Serialization
 

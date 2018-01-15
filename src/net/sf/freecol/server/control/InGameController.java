@@ -3890,11 +3890,8 @@ public final class InGameController extends Controller {
             return serverPlayer.clientError("Not an existing trade route: "
                 + tradeRoute.getId());
         }
-        tr.setId(tradeRoute.getId());
         tr.copyIn(tradeRoute);
-
-        // Have to update the whole player alas.
-        return new ChangeSet().add(See.only(serverPlayer), serverPlayer);
+        return new ChangeSet().add(See.only(serverPlayer), tr);
     }
 
 
