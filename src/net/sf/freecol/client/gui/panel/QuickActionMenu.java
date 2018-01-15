@@ -184,7 +184,8 @@ public final class QuickActionMenu extends JPopupMenu {
             if (colony != null) {
                 if (addTileItem(unitLabel)) this.addSeparator();
                 if (addWorkItems(unitLabel)) this.addSeparator();
-                if (addEducationItems(unitLabel)) this.addSeparator();
+                if (unit.isInColony()
+                    && addEducationItems(unitLabel)) this.addSeparator();
                 if (unit.isInColony() && colony.canReducePopulation()) {
                     JMenuItem menuItem = Utility.localizedMenuItem("quickActionMenu.leaveTown");
                     menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
