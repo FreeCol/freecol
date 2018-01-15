@@ -932,7 +932,7 @@ public final class InGameController extends Controller {
             : null);
         unit.setTradeRoute(tradeRoute);
         if (tradeRoute != null) {
-            List<TradeRouteStop> stops = tradeRoute.getStops();
+            List<TradeRouteStop> stops = tradeRoute.getStopList();
             int found = -1;
             for (int i = 0; i < stops.size(); i++) {
                 if (Map.isSameLocation(unit.getLocation(),
@@ -3651,9 +3651,9 @@ public final class InGameController extends Controller {
         TradeRoute tr = unit.getTradeRoute();
         if (tr == null) {
             return serverPlayer.clientError("Unit has no trade route to set stop for.");
-        } else if (index < 0 || index >= tr.getStops().size()) {
+        } else if (index < 0 || index >= tr.getStopCount()) {
             return serverPlayer.clientError("Stop index out of range [0.."
-                + tr.getStops().size() + "]: " + index);
+                + tr.getStopCount() + "]: " + index);
         }
 
         unit.setCurrentStop(index);

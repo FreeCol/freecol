@@ -1626,7 +1626,7 @@ public class Unit extends GoodsLocation
      */
     public TradeRouteStop getStop() {
         return (validateCurrentStop() < 0) ? null
-            : getTradeRoute().getStops().get(currentStop);
+            : getTradeRoute().getStop(currentStop);
     }
 
     /**
@@ -1636,8 +1636,7 @@ public class Unit extends GoodsLocation
      */
     public List<TradeRouteStop> getCurrentStops() {
         if (validateCurrentStop() < 0) return null;
-        List<TradeRouteStop> stops
-            = new ArrayList<TradeRouteStop>(getTradeRoute().getStops());
+        List<TradeRouteStop> stops = getTradeRoute().getStopList();
         rotate(stops, currentStop);
         return stops;
     }
@@ -1669,15 +1668,13 @@ public class Unit extends GoodsLocation
         if (tradeRoute == null) {
             currentStop = -1;
         } else {
-            List<TradeRouteStop> stops = tradeRoute.getStops();
-            if (stops == null || stops.isEmpty()) {
+            int stopCount = tradeRoute.getStopCount();
+            if (stopCount <= 0) {
                 currentStop = -1;
-            } else {
-                if (currentStop < 0 || currentStop >= stops.size()) {
-                    // The current stop can become out of range if the trade
-                    // route is modified.
-                    currentStop = 0;
-                }
+            } else if (currentStop < 0 || currentStop >= stopCount) {
+                // The current stop can become out of range if the trade
+                // route is modified.
+                currentStop = 0;
             }
         }
         return currentStop;

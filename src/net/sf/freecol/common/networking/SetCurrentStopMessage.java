@@ -100,7 +100,7 @@ public class SetCurrentStopMessage extends AttributeMessage {
             return serverPlayer.clientError("Stop index is not an integer: " +
                 indexString);
         }
-        if (count < 0 || count > tr.getStops().size()) {
+        if (count < 0 || count >= tr.getStopCount()) {
             return serverPlayer.clientError("Invalid stop index: "
                 + indexString);
         }
