@@ -1082,22 +1082,33 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
-     * Seek to an identifier in this stream.
+     * Fill in the identifier values supplied in a map.
      *
-     * @param id The identifier to find.
-     * @return This {@code FreeColXMLReader} positioned such that the
-     *     required identifier is current, or null on error or if not found.
+     * Special case for early reads of the client options.
+     *
+     * @param map A map containing identifiers to find as keys.
+     * @param attr The attribute to get for each identifier found.
+     * @return The number of identifiers found or negative on error.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public FreeColXMLReader seek(String id) throws XMLStreamException {
-        nextTag();
-        for (int type = getEventType(); type != XMLEvent.END_DOCUMENT;
-             type = getEventType()) {
-            if (type == XMLEvent.START_ELEMENT
-                && id.equals(readId())) return this;
-            nextTag();
+    public int readAttributeValues(Map<String, String> map,
+                                   String attr) throws XMLStreamException {
+        int ret = 0;
+        while (hasNext()) {
+            String id;
+            try {
+                nextTag();
+            } catch (XMLStreamException xse) {
+                break;
+            }
+            if (getEventType() == XMLEvent.START_ELEMENT
+                && (id = readId()) != null
+                && map.containsKey(id)) {
+                map.put(id, getAttribute(attr, (String)null));
+                ret++;
+            }
         }
-        return null;
+        return ret;
     }
 }

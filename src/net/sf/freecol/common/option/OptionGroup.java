@@ -381,32 +381,6 @@ public class OptionGroup extends AbstractOption<OptionGroup>
         return ret;
     }
 
-    /**
-     * Read a option file until an option identifier is found.
-     *
-     * @param file The {@code File} to read.
-     * @param optionId The option identifier to look for.
-     * @return A {@code FreeColXMLReader} positions such that the
-     *     required identifier current, or null on error or if not found.
-     */
-    public static FreeColXMLReader findOption(File file, String optionId) {
-        if (file.canRead() && optionId != null) {
-            try {
-                FreeColXMLReader xr = new FreeColXMLReader(file);
-                try {
-                    return xr.seek(optionId);
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, "Failure finding option: "
-                        + optionId, ex);
-                }
-                xr.close();
-            } catch (FileNotFoundException|XMLStreamException xse) {
-                logger.log(Level.WARNING, "IO error with " + file, xse);
-            }
-        }
-        return null;
-    }
-
 
     // Interface OptionContainer
 

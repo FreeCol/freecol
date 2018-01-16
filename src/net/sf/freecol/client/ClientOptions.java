@@ -22,19 +22,23 @@ package net.sf.freecol.client;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
@@ -460,6 +464,10 @@ public class ClientOptions extends OptionGroup {
         = "clientOptions.etc";
 
 
+    // The special keys that are read early.
+    private static final List<String> specialKeys
+        = makeUnmodifiableList(LANGUAGE, USE_PIXMAPS, USE_OPENGL);
+        
     // Comparators for sorting colonies.
     /** Compare by ascending age. */
     private static final Comparator<Colony> colonyAgeComparator
@@ -608,22 +616,6 @@ public class ClientOptions extends OptionGroup {
             FreeColModFile.getFreeColModFile(m.getId());
         return transform(getModList(ClientOptions.USER_MODS), validModPred,
                          modFileMapper, toListNoNulls());
-    }
-
-    /**
-     * Extracts the value of the LANGUAGE option from the client options file.
-     *
-     * @return The language option value, or null if none or IO error.
-     */
-    public static String getLanguageOption() {
-        final File optionsFile = FreeColDirectories.getClientOptionsFile();
-        FreeColXMLReader xr = findOption(optionsFile, LANGUAGE);
-        if (xr != null) {
-            String ret = xr.getAttribute("value", null);
-            xr.close();
-            return ret;
-        }
-        return null;
     }
 
     /**
@@ -832,6 +824,30 @@ public class ClientOptions extends OptionGroup {
                                  etc.getInteger(className + ".h"));
         } catch (Exception e) {}
         return null;
+    }
+
+    /**
+     * Extracts the special options from the client options file.
+     *
+     * Note: called early, the logger is not yet reliably available.
+     *
+     * @return A map of the special options and the values found for them.
+     * @exception FreeColException if there is a problem reading the stream.
+     */
+    public static Map<String,String> getSpecialOptions()
+        throws FreeColException {
+        // Initialize the map
+        Map<String, String> ret = new HashMap<>();
+        for (String key : specialKeys) ret.put(key, null);
+
+        // Extract the values and return
+        final File optionsFile = FreeColDirectories.getClientOptionsFile();
+        try (FreeColXMLReader xr = new FreeColXMLReader(optionsFile)) {
+            xr.readAttributeValues(ret, "value");
+        } catch (FileNotFoundException|XMLStreamException xe) {
+            throw new FreeColException(xe);
+        }
+        return ret;
     }
 
 
