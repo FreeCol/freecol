@@ -549,7 +549,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         this.dropListener = new DropListener();
 
         this.stopListModel = new DefaultListModel<>();
-        for (TradeRouteStop stop : tradeRoute.getStops()) {
+        for (TradeRouteStop stop : tradeRoute.getStopList()) {
             this.stopListModel.addElement(stop);
         }
 

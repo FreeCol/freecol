@@ -56,7 +56,7 @@ class BaseCostDecider implements CostDecider {
     public int getCost(final Unit unit, final Location oldLocation,
                        final Location newLocation, int movesLeftBefore) {
         int cost = 0;
-        newTurns = 0;
+        this.newTurns = 0;
               
         Tile oldTile = oldLocation.getTile();
         Tile newTile = newLocation.getTile();
@@ -107,26 +107,44 @@ class BaseCostDecider implements CostDecider {
                 return ILLEGAL_MOVE;
             }
 
-            cost = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
-            if (cost <= movesLeftBefore) {
-                movesLeft = movesLeftBefore - cost;
-            } else { // This move takes an extra turn to complete:
-                final int thisTurnMovesLeft = movesLeftBefore;
-                int initialMoves = unit.getInitialMovesLeft();
-                final int moveCostNextTurn = unit.getMoveCost(oldTile, newTile,
-                                                              initialMoves);
-                cost = thisTurnMovesLeft + moveCostNextTurn;
-                movesLeft = initialMoves - moveCostNextTurn;
-                newTurns++;
-            }
+            cost = adjust(unit, oldTile, newTile, movesLeftBefore);
             if (consumeMove) {
-                cost += movesLeft;
-                movesLeft = 0;
+                cost += this.movesLeft;
+                this.movesLeft = 0;
             }
         }
         return cost;
     }
-    
+
+    /**
+     * Given an unit, a source and destination tile, and the moves
+     * left, calculate actual moves left and new turns.
+     *
+     * @param unit The {@code Unit} to use.
+     * @param oldTile The source {@code Tile}.
+     * @param newTile The destination {@code Tile}.
+     * @param movesLeftBefore An initial number of moves left.
+     * @return The new movement cost, with this.movesLeft and this.newTurns
+     *     adjusted.
+     */
+    public int adjust(Unit unit, Tile oldTile, Tile newTile,
+                      int movesLeftBefore) {
+        int cost = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
+        if (cost <= movesLeftBefore) {
+            this.movesLeft = movesLeftBefore - cost;
+            this.newTurns = 0;
+        } else { // This move takes an extra turn to complete:
+            final int thisTurnMovesLeft = movesLeftBefore;
+            int initialMoves = unit.getInitialMovesLeft();
+            final int moveCostNextTurn = unit.getMoveCost(oldTile, newTile,
+                                                          initialMoves);
+            cost = thisTurnMovesLeft + moveCostNextTurn;
+            this.movesLeft = initialMoves - moveCostNextTurn;
+            this.newTurns = 1;
+        }
+        return cost;
+    }
+
     /**
      * Gets the number of moves left after the proposed move.
      * This method should be called after invoking {@link #getCost}.
@@ -135,7 +153,7 @@ class BaseCostDecider implements CostDecider {
      */
     @Override
     public int getMovesLeft() {
-        return movesLeft;
+        return this.movesLeft;
     }
     
     /**
@@ -146,6 +164,6 @@ class BaseCostDecider implements CostDecider {
      */      
     @Override
     public int getNewTurns() {
-        return newTurns;
+        return this.newTurns;
     }
 }

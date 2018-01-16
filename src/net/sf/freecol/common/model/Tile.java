@@ -1820,7 +1820,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @return The map of cached tiles.
      */
-    protected java.util.Map<Player, Tile> getCachedTiles() {
+    private java.util.Map<Player, Tile> getCachedTiles() {
         return this.cachedTiles;
     }
 
@@ -1829,7 +1829,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @param cachedTiles The new map of cached {@code Tile}s.
      */
-    protected void setCachedTiles(java.util.Map<Player, Tile> cachedTiles) {
+    private void setCachedTiles(java.util.Map<Player, Tile> cachedTiles) {
         if (this.cachedTiles != null) {
             this.cachedTiles.clear();
             if (cachedTiles != null) this.cachedTiles.putAll(cachedTiles);
@@ -1842,7 +1842,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param player The {@code Player} who owns the view.
      * @return The view of this {@code Tile}.
      */
-    public Tile getCachedTile(Player player) {
+    private Tile getCachedTile(Player player) {
         return (cachedTiles == null) ? null
             : (player.isEuropean()) ? cachedTiles.get(player)
             : this;

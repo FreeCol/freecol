@@ -508,6 +508,9 @@ public final class InGameController extends Controller {
                 .getBoolean(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF))) {
             is.setScouted(serverPlayer);
         }
+        // Force the settlement tile to become uncached.  Should not
+        // be necessary but this might mitigate BR#3128.
+        is.getTile().seeTile(serverPlayer);
     }
 
     /**
@@ -932,7 +935,7 @@ public final class InGameController extends Controller {
             : null);
         unit.setTradeRoute(tradeRoute);
         if (tradeRoute != null) {
-            List<TradeRouteStop> stops = tradeRoute.getStops();
+            List<TradeRouteStop> stops = tradeRoute.getStopList();
             int found = -1;
             for (int i = 0; i < stops.size(); i++) {
                 if (Map.isSameLocation(unit.getLocation(),
@@ -3651,9 +3654,9 @@ public final class InGameController extends Controller {
         TradeRoute tr = unit.getTradeRoute();
         if (tr == null) {
             return serverPlayer.clientError("Unit has no trade route to set stop for.");
-        } else if (index < 0 || index >= tr.getStops().size()) {
+        } else if (index < 0 || index >= tr.getStopCount()) {
             return serverPlayer.clientError("Stop index out of range [0.."
-                + tr.getStops().size() + "]: " + index);
+                + tr.getStopCount() + "]: " + index);
         }
 
         unit.setCurrentStop(index);
@@ -3890,11 +3893,8 @@ public final class InGameController extends Controller {
             return serverPlayer.clientError("Not an existing trade route: "
                 + tradeRoute.getId());
         }
-        tr.setId(tradeRoute.getId());
         tr.copyIn(tradeRoute);
-
-        // Have to update the whole player alas.
-        return new ChangeSet().add(See.only(serverPlayer), serverPlayer);
+        return new ChangeSet().add(See.only(serverPlayer), tr);
     }
 
 

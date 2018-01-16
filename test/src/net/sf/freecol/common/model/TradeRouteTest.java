@@ -74,7 +74,7 @@ public class TradeRouteTest extends FreeColTestCase {
        
         // Build towards validity
         assertNotNull(tr.verify()); // Invalid, no stops
-        assertTrue(tr.getStops().isEmpty());
+        assertEquals(0, tr.getStopCount());
         TradeRouteStop trs1 = new TradeRouteStop(game, colony1);
         assertTrue(trs1.isValid(player));
         tr.addStop(trs1);

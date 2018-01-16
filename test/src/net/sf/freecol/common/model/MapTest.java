@@ -461,8 +461,7 @@ public class MapTest extends FreeColTestCase {
 
         // Nearest port should be Europe
         Tile seaTile = map.getTile(13, 2);
-        Unit galleon = new ServerUnit(game, seaTile, dutch,
-                                      galleonType);
+        Unit galleon = new ServerUnit(game, seaTile, dutch, galleonType);
         path = galleon.findOurNearestPort();
         assertNotNull("Nearest port should exist.", path);
         assertEquals("Nearest port should be Europe.", europe,

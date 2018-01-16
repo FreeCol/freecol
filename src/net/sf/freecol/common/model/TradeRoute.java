@@ -104,12 +104,39 @@ public class TradeRoute extends FreeColGameObject
     }
 
     /**
+     * Get the number of stops in this trade route.
+     *
+     * @return The number of stops, or negative on error.
+     */
+    public final int getStopCount() {
+        synchronized (this.stops) {
+            return this.stops.size();
+        }
+    }
+
+    /**
+     * Get a stop in the trade route by index.
+     *
+     * @return The {@code TradeRouteStop} found, or null if the index
+     *     is invalid.
+     */
+    public final TradeRouteStop getStop(int index) {
+        synchronized (this.stops) {
+            return (index >= 0 && index < this.stops.size())
+                ? this.stops.get(index)
+                : null;
+        }
+    }
+
+    /**
      * Get the stops in this trade route.
      *
      * @return A list of {@code TradeRouteStop}s.
      */
-    public final List<TradeRouteStop> getStops() {
-        return this.stops;
+    public final List<TradeRouteStop> getStopList() {
+        synchronized (this.stops) {
+            return new ArrayList<>(this.stops);
+        }
     }
 
     /**
@@ -125,9 +152,11 @@ public class TradeRoute extends FreeColGameObject
         int i0 = getIndex(start), in = getIndex(end);
         if (i0 < 0 || in < 0) return null;
         List<TradeRouteStop> result = new ArrayList<>();
-        while (i0 != in) {
-            result.add(this.stops.get(i0));
-            if (++i0 >= this.stops.size()) i0 = 0;
+        synchronized (this.stops) {
+            while (i0 != in) {
+                result.add(this.stops.get(i0));
+                if (++i0 >= this.stops.size()) i0 = 0;
+            }
         }
         return result;
     }
@@ -138,7 +167,9 @@ public class TradeRoute extends FreeColGameObject
      * @param stop The {@code TradeRouteStop} to add.
      */
     public void addStop(TradeRouteStop stop) {
-        if (stop != null) this.stops.add(stop);
+        synchronized (this.stops) {
+            this.stops.add(stop);
+        }
     }
 
     /**
@@ -147,7 +178,9 @@ public class TradeRoute extends FreeColGameObject
      * @param stop The {@code TradeRouteStop} to remove.
      */
     public void removeStop(TradeRouteStop stop) {
-        if (stop != null) this.stops.remove(stop);
+        synchronized (this.stops) {
+            this.stops.remove(stop);
+        }
     }
 
     /**
@@ -157,8 +190,10 @@ public class TradeRoute extends FreeColGameObject
      * @return True if any stop was removed.
      */
     public boolean removeMatchingStops(Location loc) {
-        return removeInPlace(stops,
-                             trs -> Map.isSameLocation(trs.getLocation(), loc));
+        synchronized (this.stops) {
+            return removeInPlace(this.stops,
+                trs -> Map.isSameLocation(trs.getLocation(), loc));
+        }
     }
 
     /**
@@ -168,10 +203,12 @@ public class TradeRoute extends FreeColGameObject
      * @return The index of the given stop, or negative on failure.
      */
     public int getIndex(TradeRouteStop stop) {
-        int i = 0;
-        for (TradeRouteStop trs : this.stops) {
-            if (trs == stop) return i;
-            i++;
+        synchronized (this.stops) {
+            int i = 0;
+            for (TradeRouteStop trs : this.stops) {
+                if (trs == stop) return i;
+                i++;
+            }
         }
         return -1;
     }
@@ -180,7 +217,9 @@ public class TradeRoute extends FreeColGameObject
      * Clear the stops in this trade route.
      */
     public void clearStops() {
-        this.stops.clear();
+        synchronized (this.stops) {
+            this.stops.clear();
+        }
     }
 
     /**
@@ -243,7 +282,7 @@ public class TradeRoute extends FreeColGameObject
         }
 
         // Verify that it has at least two stops
-        if (this.stops.size() < 2) {
+        if (getStopCount() < 2) {
             return StringTemplate.template("model.tradeRoute.notEnoughStops");
         }
 
@@ -251,9 +290,11 @@ public class TradeRoute extends FreeColGameObject
         // - all stops are valid
         // - there is at least one non-empty stop
         // - there is no goods that is present unmaintained at all stops
-        Set<GoodsType> always = new HashSet<>(this.stops.get(0).getCargo());
+        Set<GoodsType> always = new HashSet<>(getStop(0).getCargo());
         boolean empty = true;
-        for (TradeRouteStop stop : this.stops) {
+        int n = getStopCount();
+        for (int i = 0; i < n; i++){
+            TradeRouteStop stop = getStop(i);
             if (!TradeRoute.isStopValid(owner, stop)) {
                 return stop.invalidStopLabel(owner);
             }
@@ -321,12 +362,12 @@ public class TradeRoute extends FreeColGameObject
         final Game game = getGame();
         this.name = o.getName();
         this.owner = o.getOwner();
-        this.stops.clear();
-        this.stops.addAll(game.updateRef(o.getStops()));
-        this.silent = o.isSilent();
+        clearStops();
+        for (TradeRouteStop trs : o.getStopList()) {
+            addStop(new TradeRouteStop(trs));
+        }
         return true;
     }
-
 
     // Serialization
 
@@ -393,7 +434,8 @@ public class TradeRoute extends FreeColGameObject
         final String tag = xr.getLocalName();
 
         if (TradeRouteStop.TAG.equals(tag)) {
-            addStop(new TradeRouteStop(getGame(), xr));
+            TradeRouteStop trs = new TradeRouteStop(getGame(), xr);
+            if (trs != null) addStop(trs);
             
         } else {
             super.readChild(xr);
@@ -418,7 +460,7 @@ public class TradeRoute extends FreeColGameObject
             .append(" \"").append(this.name).append('"');
         if (this.owner != null) sb.append(" owner=").append(this.owner.getId());
         sb.append(" silent=").append(Boolean.toString(this.silent));
-        for (TradeRouteStop stop : getStops()) sb.append(' ').append(stop);
+        for (TradeRouteStop stop : getStopList()) sb.append(' ').append(stop);
         sb.append(']');
         return sb.toString();
     }
