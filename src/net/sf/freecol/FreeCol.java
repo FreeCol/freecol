@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.common.util.OSUtils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.Controller;
 
@@ -405,8 +406,22 @@ public final class FreeCol {
         } else {
             lb.add(", ", openGL, " overrides client option: ", openGLValue);
         }
+
+        // XRender is available for most unix (not MacOS?)
+        if (OSUtils.onUnix()) {
+            final String xrender = "sun.java2d.xrender";
+            final String xrValue = System.getProperty(xrender);
+            if (xrValue == null) {
+                String useXR = specialOptions.get(ClientOptions.USE_XRENDER);
+                System.setProperty(xrender, useXR);
+                lb.add(", ", xrender, " using client option: ", useXR);
+            } else {
+                lb.add(", ", xrender, " overrides client option: ", xrValue);
+            }
+        }
+
         lb.log(logger, Level.INFO);
-    }        
+    }
 
     /**
      * Get the JarURLConnection from a class.

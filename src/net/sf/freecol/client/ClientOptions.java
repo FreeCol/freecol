@@ -189,9 +189,13 @@ public class ClientOptions extends OptionGroup {
     public static final String USE_PIXMAPS
         = "model.option.usePixmaps";
 
-    /** Pixmap setting to work around another Java 2D graphics bug. */
+    /** Enable use of openGL pipeline. */
     public static final String USE_OPENGL
         = "model.option.useOpenGL";
+
+    /** Enable use of XRender pipeline (unix specific). */
+    public static final String USE_XRENDER
+        = "model.option.useXRender";
 
     /** Whether to remember the positions of various dialogs and panels. */
     public static final String REMEMBER_PANEL_POSITIONS
@@ -466,7 +470,7 @@ public class ClientOptions extends OptionGroup {
 
     // The special keys that are read early.
     private static final List<String> specialKeys
-        = makeUnmodifiableList(LANGUAGE, USE_PIXMAPS, USE_OPENGL);
+        = makeUnmodifiableList(LANGUAGE, USE_OPENGL, USE_PIXMAPS, USE_XRENDER);
         
     // Comparators for sorting colonies.
     /** Compare by ascending age. */
@@ -753,6 +757,8 @@ public class ClientOptions extends OptionGroup {
         addBooleanOption("model.option.guiShowDisasters",
                          ClientOptions.MESSAGES, true);
         addBooleanOption("model.option.useOpenGL2D",
+                         ClientOptions.GUI, true);
+        addBooleanOption("model.option.useXRender",
                          ClientOptions.GUI, true);
         // end @compat 0.11.6
     }
