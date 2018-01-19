@@ -390,8 +390,12 @@ public final class FreeCol {
         final String pmoValue = System.getProperty(pmoffscreen);
         if (pmoValue == null) {
             String usePixmaps = specialOptions.get(ClientOptions.USE_PIXMAPS);
-            System.setProperty(pmoffscreen, usePixmaps);
-            lb.add(pmoffscreen, " using client option: ", usePixmaps);
+            if (usePixmaps != null) {
+                System.setProperty(pmoffscreen, usePixmaps);
+                lb.add(pmoffscreen, " using client option: ", usePixmaps);
+            } else {
+                lb.add(pmoffscreen, " unset/ignored: ");
+            }                
         } else {
             lb.add(pmoffscreen, " overrides client option: ", pmoValue);
         }
@@ -401,8 +405,12 @@ public final class FreeCol {
         final String openGLValue = System.getProperty(openGL);
         if (openGLValue == null) {
             String useOpenGL = specialOptions.get(ClientOptions.USE_OPENGL);
-            System.setProperty(openGL, useOpenGL);
-            lb.add(", ", openGL, " using client option: ", useOpenGL);
+            if (useOpenGL != null) {
+                System.setProperty(openGL, useOpenGL);
+                lb.add(", ", openGL, " using client option: ", useOpenGL);
+            } else {
+                lb.add(", ", openGL, " unset/ignored");
+            }                
         } else {
             lb.add(", ", openGL, " overrides client option: ", openGLValue);
         }
@@ -413,8 +421,12 @@ public final class FreeCol {
             final String xrValue = System.getProperty(xrender);
             if (xrValue == null) {
                 String useXR = specialOptions.get(ClientOptions.USE_XRENDER);
-                System.setProperty(xrender, useXR);
-                lb.add(", ", xrender, " using client option: ", useXR);
+                if (useXR != null) {
+                    System.setProperty(xrender, useXR);
+                    lb.add(", ", xrender, " using client option: ", useXR);
+                } else {
+                    lb.add(", ", xrender, " unset/ignored");
+                }
             } else {
                 lb.add(", ", xrender, " overrides client option: ", xrValue);
             }
