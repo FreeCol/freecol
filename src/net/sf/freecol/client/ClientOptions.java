@@ -704,26 +704,21 @@ public class ClientOptions extends OptionGroup {
      */
     public void fixClientOptions() {
         // @compact 0.11.0
-        addBooleanOption(MINIMAP_TOGGLE_BORDERS,
-            ClientOptions.GUI, true);
-        addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR,
-            ClientOptions.GUI, true);
-        addTextOption(AUTO_SAVE_PREFIX,
-            ClientOptions.SAVEGAMES, "Autosave");
-        addTextOption(LAST_TURN_NAME,
-            ClientOptions.SAVEGAMES, "last-turn");
+        addBooleanOption(MINIMAP_TOGGLE_BORDERS, ClientOptions.GUI, true);
+        addBooleanOption(MINIMAP_TOGGLE_FOG_OF_WAR, ClientOptions.GUI, true);
+        addTextOption(AUTO_SAVE_PREFIX, ClientOptions.SAVEGAMES, "Autosave");
+        addTextOption(LAST_TURN_NAME, ClientOptions.SAVEGAMES, "last-turn");
         addTextOption(BEFORE_LAST_TURN_NAME,
-            ClientOptions.SAVEGAMES, "before-last-turn");
+                      ClientOptions.SAVEGAMES, "before-last-turn");
         // end @compact 0.11.0
 
         // @compat 0.11.1
         addBooleanOption(STOCK_ACCOUNTS_FOR_PRODUCTION,
-            ClientOptions.WAREHOUSE, false);
+                         ClientOptions.WAREHOUSE, false);
         // end @compat 0.11.1
 
         // @compat 0.11.3
-        addBooleanOption(AUTOLOAD_SENTRIES,
-            ClientOptions.OTHER, false);
+        addBooleanOption(AUTOLOAD_SENTRIES, ClientOptions.OTHER, false);
         try { // Zoom range was increased
             RangeOption ro = getOption(DEFAULT_MINIMAP_ZOOM,
                                        RangeOption.class);
@@ -756,10 +751,8 @@ public class ClientOptions extends OptionGroup {
                          ClientOptions.MESSAGES, true);
         addBooleanOption("model.option.guiShowDisasters",
                          ClientOptions.MESSAGES, true);
-        addBooleanOption("model.option.useOpenGL2D",
-                         ClientOptions.GUI, true);
-        addBooleanOption("model.option.useXRender",
-                         ClientOptions.GUI, true);
+        addBooleanOption(USE_OPENGL, ClientOptions.GUI, true);
+        addBooleanOption(USE_XRENDER, ClientOptions.GUI, true);
         // end @compat 0.11.6
     }
 
