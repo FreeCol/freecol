@@ -30,6 +30,7 @@ import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.jar.JarFile;
@@ -37,6 +38,7 @@ import java.util.jar.Manifest;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
@@ -57,6 +59,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.common.util.OSUtils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.Controller;
 
@@ -220,6 +223,9 @@ public final class FreeCol {
     /** How much gui elements get scaled. */
     private static float guiScale = GUI_SCALE_DEFAULT;
 
+    /** The special client options that must be processed early. */
+    private static Map<String,String> specialOptions = null;
+    
    
     private FreeCol() {} // Hide constructor
 
@@ -326,13 +332,19 @@ public final class FreeCol {
         //
         // If the user has selected automatic language selection, do
         // nothing, since we have already set up the default locale.
-        String clientLanguage;
+        try {
+            specialOptions = ClientOptions.getSpecialOptions();
+        } catch (FreeColException fce) {
+            specialOptions = new HashMap<>();
+            logger.log(Level.WARNING, "Special options unavailable", fce);
+        }
+        String cLang;
         if (localeArg == null
-            && (clientLanguage = ClientOptions.getLanguageOption()) != null
-            && !Messages.AUTOMATIC.equalsIgnoreCase(clientLanguage)
-            && setLocale(clientLanguage)) {
+            && (cLang = specialOptions.get(ClientOptions.LANGUAGE)) != null
+            && !Messages.AUTOMATIC.equalsIgnoreCase(cLang)
+            && setLocale(cLang)) {
             Messages.loadMessageBundle(getLocale());
-            logger.info("Loaded messages for " + locale);
+            logger.info("Loaded messages for " + getLocale());
         }
 
         // Now we have the user mods directory and the locale is now
@@ -340,6 +352,9 @@ public final class FreeCol {
         FreeColTcFile.loadTCs();
         FreeColModFile.loadMods();
         Messages.loadModMessageBundle(getLocale());
+
+        // Handle other special options
+        processSpecialOptions();
 
         // Report on where we are.
         if (userMsg != null) logger.info(Messages.message(userMsg));
@@ -353,6 +368,72 @@ public final class FreeCol {
         }
     }
 
+    /**
+     * Handle the special options that need to be processed early.
+     */
+    private static void processSpecialOptions() {
+        LogBuilder lb = new LogBuilder(64);
+        // Work around a Java 2D bug that seems to be X11 specific.
+        // According to:
+        //   http://www.oracle.com/technetwork/java/javase/index-142560.html
+        //
+        //   ``The use of pixmaps typically results in better
+        //     performance. However, in certain cases, the opposite is true.''
+        //
+        // The standard workaround is to use -Dsun.java2d.pmoffscreen=false,
+        // but this is too hard for some users, so provide an option to
+        // do it easily.  However respect the initial value if present.
+        //
+        // Remove this if Java 2D is ever fixed.  DHYB.
+        //
+        final String pmoffscreen = "sun.java2d.pmoffscreen";
+        final String pmoValue = System.getProperty(pmoffscreen);
+        if (pmoValue == null) {
+            String usePixmaps = specialOptions.get(ClientOptions.USE_PIXMAPS);
+            if (usePixmaps != null) {
+                System.setProperty(pmoffscreen, usePixmaps);
+                lb.add(pmoffscreen, " using client option: ", usePixmaps);
+            } else {
+                lb.add(pmoffscreen, " unset/ignored: ");
+            }                
+        } else {
+            lb.add(pmoffscreen, " overrides client option: ", pmoValue);
+        }
+
+        // There is also this option, BR#3102.
+        final String openGL = "sun.java2d.opengl";
+        final String openGLValue = System.getProperty(openGL);
+        if (openGLValue == null) {
+            String useOpenGL = specialOptions.get(ClientOptions.USE_OPENGL);
+            if (useOpenGL != null) {
+                System.setProperty(openGL, useOpenGL);
+                lb.add(", ", openGL, " using client option: ", useOpenGL);
+            } else {
+                lb.add(", ", openGL, " unset/ignored");
+            }                
+        } else {
+            lb.add(", ", openGL, " overrides client option: ", openGLValue);
+        }
+
+        // XRender is available for most unix (not MacOS?)
+        if (OSUtils.onUnix()) {
+            final String xrender = "sun.java2d.xrender";
+            final String xrValue = System.getProperty(xrender);
+            if (xrValue == null) {
+                String useXR = specialOptions.get(ClientOptions.USE_XRENDER);
+                if (useXR != null) {
+                    System.setProperty(xrender, useXR);
+                    lb.add(", ", xrender, " using client option: ", useXR);
+                } else {
+                    lb.add(", ", xrender, " unset/ignored");
+                }
+            } else {
+                lb.add(", ", xrender, " overrides client option: ", xrValue);
+            }
+        }
+
+        lb.log(logger, Level.INFO);
+    }
 
     /**
      * Get the JarURLConnection from a class.
@@ -1355,7 +1436,7 @@ public final class FreeCol {
             .append("\n  version     ").append(getRevision())
             .append("\n  java:       ").append(JAVA_VERSION)
             .append("\n  memory:     ").append(MEMORY_MAX)
-            .append("\n  locale:     ").append(locale)
+            .append("\n  locale:     ").append(getLocale())
             .append("\n  data:       ")
             .append(FreeColDirectories.getDataDirectory().getPath())
             .append("\n  userConfig: ")
@@ -1402,6 +1483,13 @@ public final class FreeCol {
             }
             // savegame was specified on command line
         }
+
+        // Sort out the special graphics options before touching the GUI
+        // (which is initialized by FreeColClient).  These options control
+        // graphics pipeline initialization, and are ineffective if twiddled
+        // after the first Java2D call is made.
+        
+
         final FreeColClient freeColClient
             = new FreeColClient(splashStream, fontName, guiScale, headless);
         freeColClient.startClient(windowSize, userMsg, sound, introVideo,

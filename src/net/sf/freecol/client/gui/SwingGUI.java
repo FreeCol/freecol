@@ -382,58 +382,6 @@ public class SwingGUI extends GUI {
     @Override
     public void startGUI(final Dimension desiredWindowSize) {
         final ClientOptions opts = getClientOptions();
-
-        // Work around a Java 2D bug that seems to be X11 specific.
-        // According to:
-        //   http://www.oracle.com/technetwork/java/javase/index-142560.html
-        //
-        //   ``The use of pixmaps typically results in better
-        //     performance. However, in certain cases, the opposite is true.''
-        //
-        // The standard workaround is to use -Dsun.java2d.pmoffscreen=false,
-        // but this is too hard for some users, so provide an option to
-        // do it easily.  However respect the initial value if present.
-        //
-        // Remove this if Java 2D is ever fixed.  DHYB.
-        //
-        final String pmoffscreen = "sun.java2d.pmoffscreen";
-        boolean usePixmaps = opts.getBoolean(ClientOptions.USE_PIXMAPS);
-        String pmoffscreenValue = System.getProperty(pmoffscreen);
-        if (pmoffscreenValue == null) {
-            System.setProperty(pmoffscreen, Boolean.toString(usePixmaps));
-            logger.info(pmoffscreen + " using client option: " + usePixmaps);
-        } else {
-            opts.setBoolean(ClientOptions.USE_PIXMAPS,
-                            Boolean.valueOf(pmoffscreenValue));
-            logger.info(pmoffscreen + " overrides client option: "
-                + pmoffscreenValue);
-        }
-        opts.getOption(ClientOptions.USE_PIXMAPS, BooleanOption.class)
-            .addPropertyChangeListener((PropertyChangeEvent e) -> {
-                String newValue = e.getNewValue().toString();
-                System.setProperty(pmoffscreen, newValue);
-                logger.info("Set " + pmoffscreen + " to: " + newValue);
-            });
-
-        // There is also this option, BR#3102.
-        final String openGL = "sun.java2d.opengl";
-        boolean useOpenGL = opts.getBoolean(ClientOptions.USE_OPENGL);
-        String openGLValue = System.getProperty(openGL);
-        if (openGLValue == null) {
-            System.setProperty(openGL, Boolean.toString(useOpenGL));
-            logger.info(openGL + " using client option: " + useOpenGL);
-        } else {
-            opts.setBoolean(ClientOptions.USE_OPENGL,
-                            Boolean.valueOf(openGLValue));
-            logger.info(openGL + " overrides client option: " + openGLValue);
-        }
-        opts.getOption(ClientOptions.USE_OPENGL, BooleanOption.class)
-            .addPropertyChangeListener((PropertyChangeEvent e) -> {
-                String newValue = e.getNewValue().toString();
-                System.setProperty(openGL, newValue);
-                logger.info("Set " + openGL + " to: " + newValue);
-            });
-        
         this.mapViewer = new MapViewer(getFreeColClient());
         this.canvas = new Canvas(getFreeColClient(), graphicsDevice, this,
                                  desiredWindowSize, mapViewer);
@@ -455,9 +403,11 @@ public class SwingGUI extends GUI {
                         .addName("%language%", l.getDisplayName()));
                 }
             });
+        // No longer doing anything special for pmoffscreen et al as
+        // changing these in-game does not change the now initialized
+        // graphics pipeline.
 
-        logger.info("GUI created.");
-        logger.info("Starting in Move Units View Mode");
+        logger.info("GUI started.");
     }
 
     /**

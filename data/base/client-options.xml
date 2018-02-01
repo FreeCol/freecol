@@ -70,11 +70,14 @@
       <!-- Whether to have a delay on a unit's last move or not. -->
       <booleanOption id="model.option.unitLastMoveDelay"
                      defaultValue="true"/>
+      <!-- Use openGL or not? -->
+      <booleanOption id="model.option.useOpenGL"
+                     defaultValue="true"/>
       <!-- Use pixmaps or not? -->
       <booleanOption id="model.option.usePixmaps"
                      defaultValue="true"/>
-      <!-- Use openGL or not? -->
-      <booleanOption id="model.option.useOpenGL"
+      <!-- Use XRender or not? -->
+      <booleanOption id="model.option.useXRender"
                      defaultValue="true"/>
       <!-- Remember panel positions? -->
       <booleanOption id="model.option.rememberPanelPositions"
