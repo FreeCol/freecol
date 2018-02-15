@@ -326,8 +326,6 @@ public final class MapViewer extends FreeColClientHolder {
         // Since rows are shifted, we need to correct.
         int newCol = focus.getX() + dcol;
         int newRow = focus.getY() + drow * 2;
-        logger.finest("Old focus was " + focus.getX() + ", " + focus.getY()
-                      + ". Preliminary focus is " + newCol + ", " + newRow + ".");
         // Now, we check whether the central diamond of the calculated
         // rectangle was clicked, and adjust rows and columns
         // accordingly. See Direction.
