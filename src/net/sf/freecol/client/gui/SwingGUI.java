@@ -164,14 +164,17 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean isWindowed() {
-        return this.canvas.isWindowed();
-    }
-
     public ImageLibrary getTileImageLibrary() {
         return tileViewer.getImageLibrary();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isWindowed() {
+        return this.canvas.isWindowed();
+    }
 
     // Initialization related methods
 
