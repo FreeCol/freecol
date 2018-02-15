@@ -123,7 +123,7 @@ public class BuildingToolTip extends JToolTip {
 
         if (outputType != null) {
             for (Unit unit : building.getUnitList()) {
-                UnitLabel unitLabel = new UnitLabel(freeColClient, unit, false);
+                UnitLabel unitLabel = new UnitLabel(freeColClient, unit);
                 int amount = building.getUnitProduction(unit, outputType);
                 if (amount > 0) {
                     add(unitLabel);
@@ -135,13 +135,12 @@ public class BuildingToolTip extends JToolTip {
             }
         } else if (building.canTeach()) {
             for (Unit unit : building.getUnitList()) {
-                UnitLabel unitLabel = new UnitLabel(freeColClient, unit, false);
+                UnitLabel unitLabel = new UnitLabel(freeColClient, unit);
                 if (unit.getStudent() != null) {
                     JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/"
                         + unit.getNeededTurnsOfTraining());
                     UnitLabel sLabel = new UnitLabel(freeColClient,
-                            unit.getStudent(), true);
-                    sLabel.setIgnoreLocation(true);
+                        unit.getStudent(), true, true);
                     add(unitLabel);
                     add(progress, "split 2, flowy");
                     add(sLabel);
