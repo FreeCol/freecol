@@ -55,7 +55,6 @@ import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
-import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -643,29 +642,28 @@ public final class TileViewer extends FreeColClientHolder {
 
         if (settlement != null) {
             if (settlement instanceof Colony) {
-                Colony colony = (Colony)settlement;
+                final Colony colony = (Colony)settlement;
 
                 // Draw image of colony in center of the tile.
                 BufferedImage colonyImage = lib.getSettlementImage(settlement);
                 displayLargeCenteredImage(g, colonyImage);
 
                 if (withNumber) {
-                    String populationString = Integer.toString(
-                        colony.getApparentUnitCount());
-                    int bonus = colony.getProductionBonus();
-                    Color theColor = ResourceManager.getColor(
-                        "color.map.productionBonus." + bonus);
-                    // if government admits even more units, use
-                    // italic and bigger number icon
-                    Font font = (colony.getPreferredSizeChange() > 0)
-                        ? FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                            FontLibrary.FontSize.SMALLER, Font.BOLD | Font.ITALIC,
-                            lib.getScaleFactor())
-                        : FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                            FontLibrary.FontSize.TINY, Font.BOLD,
-                            lib.getScaleFactor());
-                    BufferedImage stringImage = lib.getStringImage(g,
-                        populationString, theColor, font);
+                    String populationString
+                        = Integer.toString(colony.getApparentUnitCount());
+                    String bonusString = "color.map.productionBonus."
+                        + colony.getProductionBonus();
+                    // If more units can be added, go larger and use italic
+                    BufferedImage stringImage
+                        = (colony.getPreferredSizeChange() > 0)
+                        ? lib.getStringImage(g, populationString, bonusString,
+                            FontLibrary.FontType.SIMPLE,
+                            FontLibrary.FontSize.SMALLER,
+                            Font.BOLD | Font.ITALIC)
+                        : lib.getStringImage(g, populationString, bonusString,
+                            FontLibrary.FontType.SIMPLE,
+                            FontLibrary.FontSize.TINY,
+                            Font.BOLD);
                     displayCenteredImage(g, stringImage);
                 }
 
@@ -803,17 +801,11 @@ public final class TileViewer extends FreeColClientHolder {
         if (ti.isComplete()) {
             if (ti.isRoad()) {
                 rp.displayRoad(g, tile);
-            } else if (ti.isRiver()) {
-                TileImprovementStyle style = ti.getStyle();
-                g.drawImage(lib.getRiverImage(style), 0, 0, null);
             } else {
-                String key = "image.tile." + ti.getType().getId();
-                if (ResourceManager.hasImageResource(key)) {
-                    // Has its own Overlay Image in Misc, use it
-                    BufferedImage overlay = ResourceManager.getImage(key,
-                        lib.tileSize);
-                    g.drawImage(overlay, 0, 0, null);
-                }
+                BufferedImage im = (ti.isRiver())
+                    ? lib.getRiverImage(ti.getStyle())
+                    : lib.getTileImprovementImage(ti.getType().getId());
+                if (im != null) g.drawImage(im, 0, 0, null);
             }
         }
     }

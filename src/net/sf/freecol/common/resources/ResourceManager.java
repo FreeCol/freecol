@@ -69,6 +69,7 @@ public class ResourceManager {
      */
     private static ResourceMapping mergedContainer;
 
+    /** The thread that handles preloading of resources. */
     private static volatile Thread preloadThread = null;
 
 
@@ -336,6 +337,7 @@ public class ResourceManager {
 
     /**
      * Returns the image specified by the given key.
+     *
      * Trying to get non-existing images from any of the below methods
      * is an error. To make modding easier and prevent edited resource
      * files from crashing the game, a replacement image is returned
@@ -345,99 +347,72 @@ public class ResourceManager {
      * @return The image identified by {@code resource}.
      */
     public static BufferedImage getImage(final String key) {
-        BufferedImage image = getImageResource(key).getImage();
-        if(image == null) {
-            logger.warning("getImage(" + key + ") failed");
-            image = getImageResource(REPLACEMENT_IMAGE).getImage();
-            if(image == null) {
-                FreeColClient.fatal("Failed getting replacement image.");
-            }
-        }
-        return image;
+        final ImageResource ir = getImageResource(key);
+        return ir.getImage();
     }
 
     /**
-     * Returns the image specified by the given name.
-     * Please, avoid using too many different scaling factors!
+     * Returns the image specified by the given name, scale and
+     * grayscale choice.
+     *
+     * @param key The name of the resource to return.
+     * @param scale The size of the requested image (with 1 being normal size,
+     *     2 twice the size, 0.5 half the size etc). Rescaling
+     *     will be performed unless using 1.
+     * @param grayscale If true return a grayscale image.
+     * @return The image identified by {@code resource}.
+     */
+    public static BufferedImage getImage(final String key, final float scale,
+                                         boolean grayscale) {
+        final ImageResource ir = getImageResource(key);
+        final BufferedImage image = ir.getImage();
+        // Shortcut trivial cases
+        if (image == null || (scale == 1f && !grayscale)) return image;
+
+        Dimension d = new Dimension(Math.round(image.getWidth() * scale),
+                                    Math.round(image.getHeight() * scale));
+        return getImage(ir, key, d, grayscale);
+    }
+
+    /**
+     * Returns the image specified by the given name, size and grayscale.
+     *
+     * Please, avoid using too many different sizes!
      * For each is a scaled image cached here for a long time,
      * which wastes memory if you are not careful.
      *
      * @param key The name of the resource to return.
-     * @param scale The size of the requested image (with 1 being normal size,
-     *      2 twice the size, 0.5 half the size etc). Rescaling
-     *      will be performed unless using 1.
+     * @param size The size of the requested image.
+     *     Rescaling will be performed if necessary.
+     * @param grayscale If true return a grayscale image.
      * @return The image identified by {@code resource}.
      */
-    public static BufferedImage getImage(final String key, final float scale) {
-        BufferedImage image = getImageResource(key).getImage(scale);
-        if(image == null) {
-            logger.warning("getImage(" + key + ", " + scale + ") failed");
-            image = getImageResource(REPLACEMENT_IMAGE).getImage(scale);
-            if(image == null) {
-                FreeColClient.fatal("Failed getting replacement image.");
-            }
-        }
-        return image;
+    public static BufferedImage getImage(final String key,
+                                         final Dimension size,
+                                         final boolean grayscale) {
+        return getImage(getImageResource(key), key, size, grayscale);
     }
 
     /**
-     * Returns the image specified by the given name.
-     * Please, avoid using this, as for each size another scaled version
-     * of the image is cached!
+     * Low level image access.
      *
+     * @param ir The {@code ImageResource} to load from.
      * @param key The name of the resource to return.
-     * @param size The size of the requested image. Rescaling
-     *      will be performed if necessary.
+     * @param size The size of the requested image.
+     *     Rescaling will be performed if necessary.
+     * @param grayscale If true return a grayscale image.
      * @return The image identified by {@code resource}.
      */
-    public static BufferedImage getImage(final String key, final Dimension size) {
-        BufferedImage image = getImageResource(key).getImage(size);
-        if(image == null) {
-            logger.warning("getImage(" + key + ", " + size + ") failed");
-            image = getImageResource(REPLACEMENT_IMAGE).getImage(size);
-            if(image == null) {
-                FreeColClient.fatal("Failed getting replacement image.");
-            }
-        }
-        return image;
-    }
-
-    /**
-     * Returns the a grayscale version of the image specified by
-     * the given name.
-     *
-     * @param key The name of the resource to return.
-     * @param size The size of the requested image. Rescaling
-     *      will be performed if necessary.
-     * @return The image identified by {@code resource}.
-     */
-    public static BufferedImage getGrayscaleImage(final String key, final Dimension size) {
-        BufferedImage image = getImageResource(key).getGrayscaleImage(size);
-        if(image == null) {
-            logger.warning("getGrayscaleImage(" + key + ", " + size + ") failed");
-            image = getImageResource(REPLACEMENT_IMAGE).getGrayscaleImage(size);
-            if(image == null) {
-                FreeColClient.fatal("Failed getting replacement image.");
-            }
-        }
-        return image;
-    }
-
-    /**
-     * Returns the grayscale version of the image specified by the given name.
-     *
-     * @param key The name of the resource to return.
-     * @param scale The size of the requested image (with 1 being normal size,
-     *      2 twice the size, 0.5 half the size etc). Rescaling
-     *      will be performed unless using 1.
-     * @return The image identified by {@code resource}.
-     */
-    public static BufferedImage getGrayscaleImage(final String key, final float scale) {
-        BufferedImage image = getImageResource(key).getGrayscaleImage(scale);
-        if(image == null) {
-            logger.warning("getGrayscaleImage(" + key + ", " + scale + ") failed");
-            image = getImageResource(REPLACEMENT_IMAGE).getGrayscaleImage(scale);
-            if(image == null) {
+    private static BufferedImage getImage(final ImageResource ir,
+                                          final String key,
+                                          final Dimension size,
+                                          final boolean grayscale) {
+        BufferedImage image = ir.getImage(size, grayscale);
+        if (image == null) {
+            logger.warning("getImage(" + key + ", " + size + ", " + grayscale
+                + ") failed");
+            if ((image = getImageResource(REPLACEMENT_IMAGE)
+                    .getImage(size, grayscale)) == null) {
                 FreeColClient.fatal("Failed getting replacement image.");
             }
         }
@@ -446,6 +421,7 @@ public class ResourceManager {
 
     /**
      * Returns the animation specified by the given name.
+     *
      * As the artwork is still incomplete and animations exist only for
      * some military units, null can still be returned in many cases.
      * FIXME: Check using hasResource before calling this, then replace
