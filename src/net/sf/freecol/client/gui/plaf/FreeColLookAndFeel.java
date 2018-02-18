@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.plaf;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +33,7 @@ import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
@@ -84,37 +82,37 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         setCurrentTheme(new DefaultMetalTheme() {
                 @Override
                 protected ColorUIResource getPrimary1() {
-                    return new ColorUIResource(ResourceManager.getColor("color.primary1.LookAndFeel"));
+                    return new ColorUIResource(ImageLibrary.getColor("color.primary1.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getPrimary2() {
-                    return new ColorUIResource(ResourceManager.getColor("color.backgroundSelect.LookAndFeel"));
+                    return new ColorUIResource(ImageLibrary.getColor("color.backgroundSelect.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getPrimary3() {
-                    return new ColorUIResource(ResourceManager.getColor("color.primary3.LookAndFeel"));
+                    return new ColorUIResource(ImageLibrary.getColor("color.primary3.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getSecondary1() {
-                    return new ColorUIResource(ResourceManager.getColor("color.secondary1.LookAndFeel"));
+                    return new ColorUIResource(ImageLibrary.getColor("color.secondary1.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getSecondary2() {
-                    return new ColorUIResource(ResourceManager.getColor("color.disabled.LookAndFeel"));
+                    return new ColorUIResource(ImageLibrary.getColor("color.disabled.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getSecondary3() {
-                    return new ColorUIResource(ResourceManager.getColor("color.background.LookAndFeel"));
+                    return new ColorUIResource(ImageLibrary.getColor("color.background.LookAndFeel"));
                 }
 
                 @Override
                 public ColorUIResource getMenuDisabledForeground() {
-                    return new ColorUIResource(ResourceManager.getColor("color.disabledMenu.LookAndFeel"));
+                    return new ColorUIResource(ImageLibrary.getColor("color.disabledMenu.LookAndFeel"));
                 }
             });
     }
@@ -178,16 +176,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         u.put("ColorButtonUI", "javax.swing.plaf.metal.MetalButtonUI");
 
         // Add cursors:
-        String key = "image.icon.cursor.go";
-        if (ResourceManager.hasImageResource(key)) {
-            Image im = ResourceManager.getImage(key);
-            u.put("cursor.go",
-                Toolkit.getDefaultToolkit().createCustomCursor(im,
-                    new Point(im.getWidth(null)/2, im.getHeight(null)/2),
-                    "go"));
-        } else {
-            u.put("cursor.go", Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        }
+        u.put("cursor.go", ImageLibrary.getCursor());
 
         return u;
     }

@@ -36,7 +36,6 @@ import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -114,7 +113,7 @@ public final class RoadPainter {
      */
     public void displayRoad(Graphics2D g, Tile tile) {
         Color oldColor = g.getColor();
-        g.setColor(ResourceManager.getColor("color.map.road"));
+        g.setColor(ImageLibrary.getRoadColor());
         g.setStroke(roadStroke);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);

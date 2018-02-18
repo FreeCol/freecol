@@ -58,7 +58,7 @@ public class ColorResource extends Resource {
 
         String colorName = resourceLocator.getSchemeSpecificPart()
             .substring(SCHEME.length());
-        this.color = getColor(colorName);
+        this.color = createColor(colorName);
     }
 
 
@@ -91,7 +91,7 @@ public class ColorResource extends Resource {
      * @param colorName a {@code String} value
      * @return a {@code Color} value
      */
-    public static Color getColor(String colorName) {
+    public static Color createColor(String colorName) {
         if (isHexString(colorName)) {
             try {
                 int col = Integer.decode(colorName);

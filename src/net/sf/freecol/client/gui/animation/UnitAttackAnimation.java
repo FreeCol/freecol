@@ -85,7 +85,7 @@ final class UnitAttackAnimation extends FreeColClientHolder {
                                   Direction direction) {
         String specialId = startStr + direction.toString().toLowerCase();
         if (ResourceManager.hasSZAResource(specialId)) {
-            this.sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
+            this.sza = ResourceManager.getSZA(specialId, scale);
             this.mirror = false;
             return true;
         }
@@ -95,8 +95,7 @@ final class UnitAttackAnimation extends FreeColClientHolder {
         if (mirrored != direction) {
             mirroredId = startStr + mirrored.toString().toLowerCase();
             if (ResourceManager.hasSZAResource(mirroredId)) {
-                this.sza = ResourceManager.getSimpleZippedAnimation(mirroredId,
-                                                                    scale);
+                this.sza = ResourceManager.getSZA(mirroredId, scale);
                 this.mirror = true;
                 return true;
             }

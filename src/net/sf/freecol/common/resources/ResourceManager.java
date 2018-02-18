@@ -150,12 +150,11 @@ public class ResourceManager {
      */
     private static void update(boolean newItems) {
         logger.finest("update(" + newItems + ")");
-        if(newItems) {
-            preloadThread = null;
-        }
+        if (newItems) preloadThread = null;
         createMergedContainer();
-        if(newItems) {
-            // TODO: This should wait for the thread to exit, if one was running.
+        if (newItems) {
+            // TODO: This should wait for the thread to exit, if one
+            // was running.
             startBackgroundPreloading();
         }
     }
@@ -163,7 +162,7 @@ public class ResourceManager {
     /**
      * Creates a merged container containing all the resources.
      */
-    private static void createMergedContainer() {
+    private static synchronized void createMergedContainer() {
         ResourceMapping mc = new ResourceMapping();
         mc.addAll(baseMapping);
         mc.addAll(tcMapping);
@@ -206,72 +205,6 @@ public class ResourceManager {
             };
         preloadThread.setPriority(2);
         preloadThread.start();
-    }
-
-    /**
-     * When it is anticipated that a resource could not exist use
-     * this method for checking beforehand.
-     * Other metods below are specializations running faster or
-     * allowing to check for many keys at once.
-     * 
-     * @param key The resource to check for.
-     * @return true when the resource exists.
-     */
-    public static synchronized boolean hasResource(final String key) {
-        return mergedContainer.containsKey(key);
-    }
-
-    public static synchronized boolean hasImageResource(final String key) {
-        return mergedContainer.containsImageKey(key);
-    }
-
-    public static synchronized boolean hasColorResource(final String key) {
-        return mergedContainer.containsColorKey(key);
-    }
-
-    public static synchronized boolean hasSZAResource(final String key) {
-        return mergedContainer.containsSZAKey(key);
-    }
-    
-    public static synchronized Map<String, Resource> getResources() {
-        return mergedContainer.getResources();
-    }
-
-    public static synchronized Map<String, ImageResource> getImageResources() {
-        return mergedContainer.getImageResources();
-    }
-
-    /**
-     * Returns a list of all keys starting with the given prefix.
-     *
-     * @param prefix the prefix
-     * @return a list of all keys starting with the given prefix
-     */
-    public static synchronized List<String> getImageKeys(String prefix) {
-        return mergedContainer.getImageKeys(prefix);
-    }
-
-    /**
-     * Returns a list of all keys starting with the given prefix and
-     * ending with the given suffix.
-     *
-     * @param prefix the prefix
-     * @param suffix the suffix
-     * @return a list of all resulting keys
-     */
-    public static synchronized List<String> getImageKeys(String prefix,
-                                                         String suffix) {
-        return mergedContainer.getImageKeys(prefix, suffix);
-    }
-
-    /**
-     * Returns a set of all keys starting with the given prefix.
-     *
-     * @param prefix the prefix
-     * @return a set of all keysstarting with the given prefix
-     */
-    public static synchronized Set<String> getImageKeySet(String prefix) {
-        return mergedContainer.getImageKeySet(prefix);
     }
 
     /**
@@ -328,69 +261,11 @@ public class ResourceManager {
         if (r == null) {
             logger.warning("getImageResource(" + key + ") failed");
             r = mergedContainer.getImageResource(REPLACEMENT_IMAGE);
-            if(r == null) {
+            if (r == null) {
                 FreeColClient.fatal("Failed getting replacement image.");
             }
         }
         return r;
-    }
-
-    /**
-     * Returns the image specified by the given key.
-     *
-     * Trying to get non-existing images from any of the below methods
-     * is an error. To make modding easier and prevent edited resource
-     * files from crashing the game, a replacement image is returned
-     * and a warning logged.
-     *
-     * @param key The name of the resource to return.
-     * @return The image identified by {@code resource}.
-     */
-    public static BufferedImage getImage(final String key) {
-        final ImageResource ir = getImageResource(key);
-        return ir.getImage();
-    }
-
-    /**
-     * Returns the image specified by the given name, scale and
-     * grayscale choice.
-     *
-     * @param key The name of the resource to return.
-     * @param scale The size of the requested image (with 1 being normal size,
-     *     2 twice the size, 0.5 half the size etc). Rescaling
-     *     will be performed unless using 1.
-     * @param grayscale If true return a grayscale image.
-     * @return The image identified by {@code resource}.
-     */
-    public static BufferedImage getImage(final String key, final float scale,
-                                         boolean grayscale) {
-        final ImageResource ir = getImageResource(key);
-        final BufferedImage image = ir.getImage();
-        // Shortcut trivial cases
-        if (image == null || (scale == 1f && !grayscale)) return image;
-
-        Dimension d = new Dimension(Math.round(image.getWidth() * scale),
-                                    Math.round(image.getHeight() * scale));
-        return getImage(ir, key, d, grayscale);
-    }
-
-    /**
-     * Returns the image specified by the given name, size and grayscale.
-     *
-     * Please, avoid using too many different sizes!
-     * For each is a scaled image cached here for a long time,
-     * which wastes memory if you are not careful.
-     *
-     * @param key The name of the resource to return.
-     * @param size The size of the requested image.
-     *     Rescaling will be performed if necessary.
-     * @param grayscale If true return a grayscale image.
-     * @return The image identified by {@code resource}.
-     */
-    public static BufferedImage getImage(final String key,
-                                         final Dimension size,
-                                         final boolean grayscale) {
-        return getImage(getImageResource(key), key, size, grayscale);
     }
 
     /**
@@ -419,70 +294,31 @@ public class ResourceManager {
         return image;
     }
 
-    /**
-     * Returns the animation specified by the given name.
-     *
-     * As the artwork is still incomplete and animations exist only for
-     * some military units, null can still be returned in many cases.
-     * FIXME: Check using hasResource before calling this, then replace
-     *        null return with calling FreeColClient.fatal on error.
-     *
-     * @param key The name of the resource to return.
-     * @return The animation identified by {@code resource}
-     *      or {@code null} if there is no animation
-     *      identified by that name.
-     */
-    public static SimpleZippedAnimation getSimpleZippedAnimation(final String key) {
-        final SZAResource r = getSZAResource(key);
-        return (r != null) ? r.getSimpleZippedAnimation() : null;
+
+    // Public resource accessors
+
+    public static synchronized boolean hasColorResource(final String key) {
+        return mergedContainer.containsColorKey(key);
     }
 
-    /**
-     * Returns the animation specified by the given name.
-     *
-     * @param key The name of the resource to return.
-     * @param scale The size of the requested animation (with 1
-     *      being normal size, 2 twice the size, 0.5 half the
-     *      size etc). Rescaling will be performed unless using 1.
-     * @return The animation identified by {@code resource}
-     *      or {@code null} if there is no animation
-     *      identified by that name.
-     */
-    public static SimpleZippedAnimation getSimpleZippedAnimation(final String key, final float scale) {
-        final SZAResource r = getSZAResource(key);
-        return (r != null) ? r.getSimpleZippedAnimation(scale) : null;
+    public static synchronized boolean hasImageResource(final String key) {
+        return mergedContainer.containsImageKey(key);
     }
 
-    /**
-     * Returns the {@code Color} with the given name.
-     * Trying to get a non-existing color is an error and will return
-     * magenta as replacement color to prevent crashes when modding.
-     *
-     * @param key The name of the resource to return.
-     * @return An {@code Color} created with the image
-     *      identified by {@code resource} or
-     *      a replacement color if there is no color identified
-     *      by that name.
-     */
-    public static Color getColor(final String key) {
-        final ColorResource r = getColorResource(key);
-        return (r == null) ? ColorResource.REPLACEMENT_COLOR : r.getColor();
+    public static synchronized boolean hasStringResource(final String key) {
+        return mergedContainer.containsStringKey(key);
     }
 
-    /**
-     * Gets the font with the given name.
-     * Trying to get a nonexisting font is an error and will result
-     * in only getting the emergency font to prevent crashes when modding.
-     *
-     * @param key The name of the resource to query.
-     * @return The {@code Font} found in a FontResource, which
-     *     may default to the Java default font if the resource failed
-     *     to load.
-     */
-    public static Font getFont(final String key) {
-        final FontResource r = getFontResource(key);
-        if (r == null) return FontResource.getEmergencyFont();
-        return r.getFont();
+    public static synchronized boolean hasSZAResource(final String key) {
+        return mergedContainer.containsSZAKey(key);
+    }
+    
+    public static synchronized Map<String, Resource> getResources() {
+        return mergedContainer.getResources();
+    }
+
+    public static synchronized Map<String, ImageResource> getImageResources() {
+        return mergedContainer.getImageResources();
     }
 
     /**
@@ -501,16 +337,17 @@ public class ResourceManager {
     }
 
     /**
-     * Gets the {@code Video} represented by the given resource.
-     * This can return null as there is only one video in FreeCol.
-     * FIXME: Consider calling FreeColClient.fatal on error.
-     * 
-     * @param key The name of the resource to return.
-     * @return The {@code Video} in it's original size.
+     * Gets a color resource with the given name.
+     *
+     * @param key The name of the resource to query.
+     * @return The {@code Color} found, or if not found, the replacement color,
+     *     or finally the generic replacement color.
      */
-    public static Video getVideo(final String key) {
-        final VideoResource r = getVideoResource(key);
-        return (r != null) ? r.getVideo() : null;
+    public static Color getColor(final String key, Color replacement) {
+        final ColorResource r = getColorResource(key);
+        return (r != null) ? r.getColor()
+            : (replacement != null) ? replacement
+            : ColorResource.REPLACEMENT_COLOR;
     }
 
     /**
@@ -527,6 +364,109 @@ public class ResourceManager {
     }
 
     /**
+     * Gets the font with the given name.
+     *
+     * @param key The name of the resource to query.
+     * @return The {@code Font} found in a FontResource, or the default
+     *     Java font if not found.
+     */
+    public static Font getFont(final String key) {
+        final FontResource r = getFontResource(key);
+        if (r == null) return FontResource.getEmergencyFont();
+        return r.getFont();
+    }
+
+    /**
+     * Get the image specified by the given key.
+     *
+     * Trying to get non-existing images from any of the below methods
+     * is an error. To make modding easier and prevent edited resource
+     * files from crashing the game, a replacement image is returned
+     * and a warning logged.
+     *
+     * @param key The name of the resource to return.
+     * @return The image identified by {@code resource}.
+     */
+    public static BufferedImage getImage(final String key) {
+        final ImageResource ir = getImageResource(key);
+        return ir.getImage();
+    }
+
+    /**
+     * Get the image specified by the given name, scale and grayscale.
+     *
+     * @param key The name of the resource to return.
+     * @param scale The size of the requested image (with 1 being normal size,
+     *     2 twice the size, 0.5 half the size etc). Rescaling
+     *     will be performed unless using 1.
+     * @param grayscale If true return a grayscale image.
+     * @return The image identified by {@code resource}.
+     */
+    public static BufferedImage getImage(final String key, final float scale,
+                                         boolean grayscale) {
+        final ImageResource ir = getImageResource(key);
+        final BufferedImage image = ir.getImage();
+        // Shortcut trivial cases
+        if (image == null || (scale == 1f && !grayscale)) return image;
+
+        Dimension d = new Dimension(Math.round(image.getWidth() * scale),
+                                    Math.round(image.getHeight() * scale));
+        return getImage(ir, key, d, grayscale);
+    }
+
+    /**
+     * Get the image specified by the given name, size and grayscale.
+     *
+     * Please, avoid using too many different sizes!
+     * For each is a scaled image cached here for a long time,
+     * which wastes memory if you are not careful.
+     *
+     * @param key The name of the resource to return.
+     * @param size The size of the requested image.
+     *     Rescaling will be performed if necessary.
+     * @param grayscale If true return a grayscale image.
+     * @return The image identified by {@code resource}.
+     */
+    public static BufferedImage getImage(final String key,
+                                         final Dimension size,
+                                         final boolean grayscale) {
+        return getImage(getImageResource(key), key, size, grayscale);
+    }
+
+    /**
+     * Returns a list of all keys starting with the given prefix.
+     *
+     * @param prefix the prefix
+     * @return a list of all keys starting with the given prefix
+     */
+    public static synchronized List<String> getImageKeys(String prefix) {
+        return mergedContainer.getImageKeys(prefix);
+    }
+
+    /**
+     * Returns a list of all keys starting with the given prefix and
+     * ending with the given suffix.
+     *
+     * @param prefix the prefix
+     * @param suffix the suffix
+     * @return a list of all resulting keys
+     */
+    public static synchronized List<String> getImageKeys(String prefix,
+                                                         String suffix) {
+        return mergedContainer.getImageKeys(prefix, suffix);
+    }
+
+    /**
+     * Returns a set of all keys starting with the given prefix.
+     *
+     * @param prefix the prefix
+     * @return a set of all keysstarting with the given prefix
+     */
+    public static synchronized Set<String> getImageKeySet(String prefix) {
+        return mergedContainer.getImageKeySet(prefix);
+    }
+
+    /**
      * Gets a string resource with the given name.
      * Trying to get a nonexisting string is an error, but returns
      * a replacement string to prevent crashes.
@@ -539,4 +479,51 @@ public class ResourceManager {
         return (r == null) ? REPLACEMENT_STRING : r.getString();
     }
 
+    /**
+     * Returns the animation specified by the given name.
+     *
+     * As the artwork is still incomplete and animations exist only for
+     * some military units, null can still be returned in many cases.
+     * FIXME: Check using hasResource before calling this, then replace
+     *        null return with calling FreeColClient.fatal on error.
+     *
+     * @param key The name of the resource to return.
+     * @return The animation identified by {@code resource}
+     *      or {@code null} if there is no animation
+     *      identified by that name.
+     */
+    public static SimpleZippedAnimation getSZA(final String key) {
+        final SZAResource r = getSZAResource(key);
+        return (r != null) ? r.getSimpleZippedAnimation() : null;
+    }
+
+    /**
+     * Returns the animation specified by the given name.
+     *
+     * @param key The name of the resource to return.
+     * @param scale The size of the requested animation (with 1
+     *      being normal size, 2 twice the size, 0.5 half the
+     *      size etc). Rescaling will be performed unless using 1.
+     * @return The animation identified by {@code resource}
+     *      or {@code null} if there is no animation
+     *      identified by that name.
+     */
+    public static SimpleZippedAnimation getSZA(final String key,
+                                               final float scale) {
+        final SZAResource r = getSZAResource(key);
+        return (r != null) ? r.getSimpleZippedAnimation(scale) : null;
+    }
+
+    /**
+     * Gets the {@code Video} represented by the given resource.
+     * This can return null as there is only one video in FreeCol.
+     * FIXME: Consider calling FreeColClient.fatal on error.
+     * 
+     * @param key The name of the resource to return.
+     * @return The {@code Video} in it's original size.
+     */
+    public static Video getVideo(final String key) {
+        final VideoResource r = getVideoResource(key);
+        return (r != null) ? r.getVideo() : null;
+    }
 }

@@ -1767,7 +1767,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         g2.setColor(backgroundColor);
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
-        g2.setColor(ImageLibrary.getForegroundColor(backgroundColor));
+        g2.setColor(ImageLibrary.makeForegroundColor(backgroundColor));
         float y = vPadding / 2.0f;
         for (i = 0; i < labels.length; i++) {
             Rectangle textRectangle = labels[i].getPixelBounds(null, 0, 0);
@@ -1822,7 +1822,7 @@ public final class MapViewer extends FreeColClientHolder {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(backgroundColor);
         g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-        g.setColor(ImageLibrary.getForegroundColor(backgroundColor));
+        g.setColor(ImageLibrary.makeForegroundColor(backgroundColor));
         if (expertMissionary) {
             g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g.draw(circle);

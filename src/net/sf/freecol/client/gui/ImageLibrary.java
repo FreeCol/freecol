@@ -20,18 +20,21 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
-import java.awt.image.BufferedImage;
-import java.awt.image.RescaleOp;
+import java.awt.Toolkit;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +49,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColSpecObjectType;
@@ -53,6 +57,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -233,10 +238,10 @@ public final class ImageLibrary {
     }
 
 
-    // Color accessors
+    // Color handling
 
     /**
-     * Gets a suitable foreground color given a background color.
+     * Derive a suitable foreground color from a background color.
      *
      * Our eyes have different sensitivity towards red, green and
      * blue.  We want a foreground color with the inverse brightness.
@@ -244,7 +249,7 @@ public final class ImageLibrary {
      * @param background The background {@code Color} to complement.
      * @return A suitable foreground {@code Color}.
      */
-    public static Color getForegroundColor(Color background) {
+    public static Color makeForegroundColor(Color background) {
         return (background == null
             || (background.getRed() * 0.3 + background.getGreen() * 0.59
                 + background.getBlue() * 0.11 >= 126))
@@ -253,22 +258,112 @@ public final class ImageLibrary {
     }
 
     /**
-     * The string border colors should be black unless the color of
-     * the string is really dark.
+     * Derive a string border color from the string color.  Black
+     * unless the color of the string is really dark.
      *
      * @param color The {@code Color} to complement.
      * @return A suitable border {@code Color}.
      */
-    public static Color getStringBorderColor(Color color) {
+    public static Color makeStringBorderColor(Color color) {
         return (color.getRed() * 0.3
             + color.getGreen() * 0.59
             + color.getBlue() * 0.11 < 10) ? Color.WHITE
             : Color.BLACK;
     }
 
+    /**
+     * Get a color.
+     *
+     * @param key The color name.
+     * @return The {@code Color} found by the resource manager.
+     */
+    public static Color getColor(final String key) {
+        return getColor(key, null);
+    }
+
+    /**
+     * Get a color.
+     *
+     * @param key The color name.
+     * @param replacement A replacement {@code Color} to use if the named color
+     *     can not be found by the resource manager.
+     * @return The {@code Color} found by the resource manager.
+     */
+    public static Color getColor(final String key, final Color replacement) {
+        return ResourceManager.getColor(key, replacement);
+    }
+
+    /**
+     * Get a foreground color for a given goods type and amount in a
+     * given location.
+     *
+     * @param goodsType The {@code GoodsType} to use.
+     * @param amount The amount of goods.
+     * @param location The {@code Location} for the goods.
+     * @return A suitable {@code Color}.
+     */
+    public static Color getGoodsColor(GoodsType goodsType, int amount,
+                                      Location location) {
+        final String key = (!goodsType.limitIgnored()
+            && location instanceof Colony
+            && ((Colony)location).getWarehouseCapacity() < amount)
+            ? "color.foreground.GoodsLabel.capacityExceeded"
+            : (location instanceof Colony && goodsType.isStorable()
+                && ((Colony)location).getExportData(goodsType).getExported())
+            ? "color.foreground.GoodsLabel.exported"
+            : (amount == 0)
+            ? "color.foreground.GoodsLabel.zeroAmount"
+            : (amount < 0)
+            ? "color.foreground.GoodsLabel.negativeAmount"
+            : "color.foreground.GoodsLabel.positiveAmount";
+        return getColor(key, Color.BLACK);
+    }
+
+    public static Color getMinimapBackgroundColor() {
+        return getColor("color.background.MiniMap");
+    }
+
+    public static Color getMinimapBorderColor() {
+        return getColor("color.border.MiniMap");
+    }
+
+    public static Color getMinimapEconomicColor(TileType type) {
+        final String key = "color.economic.MiniMap." + type.getId();
+        return getColor(key);
+    }
+
+    public static Color getMinimapPoliticsColor(TileType type) {
+        final String key = "color.politics.MiniMap." + type.getId();
+        return getColor(key);
+    }
+
+    /**
+     * Get the road color.
+     *
+     * @return The road color.
+     */
+    public static Color getRoadColor() {
+        return getColor("color.map.road");
+    }
+
 
     // Miscellaneous image manipulation
 
+    /**
+     * Get the standard cursor.
+     *
+     * @return A suitable default {@code Cursor}.
+     */
+    public static Cursor getCursor() {
+        String key = "image.icon.cursor.go";
+        if (ResourceManager.hasImageResource(key)) {
+            Image im = ResourceManager.getImage(key);
+            return Toolkit.getDefaultToolkit().createCustomCursor(im,
+                new Point(im.getWidth(null)/2, im.getHeight(null)/2), "go");
+        }
+        return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+    }
+    
     /**
      * Draw a (usually small) background image into a (usually larger)
      * space specified by a component, tiling the image to fill up the
@@ -544,6 +639,14 @@ public final class ImageLibrary {
             + buildingType.getId(), size, false);
     }
 
+    public static BufferedImage getColorCellRendererBackground() {
+        return ResourceManager.getImage("image.background.ColorCellRenderer");
+    }
+    
+    public static BufferedImage getMinimapBackground() {
+        return ResourceManager.getImage("image.background.MiniMap");
+    }
+    
     public BufferedImage getSmallerIconImage(FreeColSpecObjectType type) {
         return getMiscImage("image.icon." + type.getId(),
             scaleDimension(ICON_SIZE, this.scaleFactor * SMALLER_SCALE));
@@ -1071,7 +1174,7 @@ public final class ImageLibrary {
             amount = (alarm == null) ? 4 : alarm.getLevel().ordinal();
             if (amount == 0) amount = 1; // Show *something*!
         }
-        Color foreground = getForegroundColor(enemyColor);
+        Color foreground = makeForegroundColor(enemyColor);
         final String text = ResourceManager.getString((is.worthScouting(player))
             ? "indianAlarmChip.contacted" : "indianAlarmChip.scouted");
         return createChip(g, text, Color.BLACK,
@@ -1091,7 +1194,7 @@ public final class ImageLibrary {
             + ((is.getType().isCapital()) ? "capital" : "normal"));
         Color background = is.getOwner().getNationColor();
         return createChip(g, key, Color.BLACK, background, 0, Color.BLACK,
-                          getForegroundColor(background), true);
+                          makeForegroundColor(background), true);
     }
 
     /**
@@ -1104,15 +1207,11 @@ public final class ImageLibrary {
      */
     public BufferedImage getMissionChip(Graphics2D g,
                                         Player owner, boolean expert) {
-        Color background = owner.getNationColor();
+        final Color background = owner.getNationColor();
         final String key = "color.foreground.mission."
             + ((expert) ? "expert" : "normal");
-        Color foreground;
-        if (ResourceManager.hasColorResource(key)) {
-            foreground = ResourceManager.getColor(key);
-        } else {
-            foreground = (expert) ? Color.BLACK : Color.GRAY;
-        }
+        final Color foreground = getColor(key,
+            (expert) ? Color.BLACK : Color.GRAY);
         return createChip(g, ResourceManager.getString("cross"), Color.BLACK,
                           background, 0, Color.BLACK, foreground, true);
     }
@@ -1128,9 +1227,9 @@ public final class ImageLibrary {
      */
     public BufferedImage getOccupationIndicatorChip(Graphics2D g,
                                                     Unit unit, String text) {
-        Color background = unit.getOwner().getNationColor();
-        Color foreground = (unit.getState() == Unit.UnitState.FORTIFIED)
-            ? Color.GRAY : getForegroundColor(background);
+        final Color background = unit.getOwner().getNationColor();
+        final Color foreground = (unit.getState() == Unit.UnitState.FORTIFIED)
+            ? Color.GRAY : makeForegroundColor(background);
         return createChip(g, text, Color.BLACK,
                           background, 0, Color.BLACK, foreground, true);
     }
@@ -1186,8 +1285,7 @@ public final class ImageLibrary {
     public BufferedImage getStringImage(Graphics g, String text, String color,
                                         FontLibrary.FontType type,
                                         FontLibrary.FontSize size, int style) {
-        return getStringImage(g, text, ResourceManager.getColor(color),
-                              type, size, style);
+        return getStringImage(g, text, getColor(color), type, size, style);
     }
     
     public BufferedImage getStringImage(Graphics g, String text, Color color,
@@ -1244,13 +1342,13 @@ public final class ImageLibrary {
                                               BufferedImage.TYPE_INT_ARGB);
         // draw the string with selected color
         Graphics2D g = img.createGraphics();
-        g.setColor(getStringBorderColor(color));
+        g.setColor(makeStringBorderColor(color));
         g.setFont(font);
         g.drawString(text, 2, fm.getMaxAscent());
 
         // draw the border around letters
         int borderWidth = 1;
-        int borderColor = getStringBorderColor(color).getRGB();
+        int borderColor = makeStringBorderColor(color).getRGB();
         int srcRGB, dstRGB, srcA;
         for (int biY = 0; biY < height; biY++) {
             for (int biX = borderWidth; biX < width - borderWidth; biX++) {
