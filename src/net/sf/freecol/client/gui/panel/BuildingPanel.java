@@ -264,15 +264,12 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             getIcon().paintIcon(null, g, 0, 0);
             GUI gui = freeColClient.getGUI();
             ImageLibrary lib = gui.getImageLibrary();
-            BufferedImage image = lib.getStringImage(
-                g,
-                Integer.toString(number), getForeground(),
-                FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                    FontLibrary.FontSize.TINY, Font.BOLD,
-                    lib.getScaleFactor()));
-            g.drawImage(image,
-                (getIcon().getIconWidth() - image.getWidth(null))/2,
-                (getIcon().getIconHeight() - image.getHeight(null))/2, null);
+            BufferedImage img = lib.getStringImage(g, Integer.toString(number),
+                getForeground(),
+                FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD);
+            g.drawImage(img,
+                (getIcon().getIconWidth() - img.getWidth(null))/2,
+                (getIcon().getIconHeight() - img.getHeight(null))/2, null);
         }
     }
 }
