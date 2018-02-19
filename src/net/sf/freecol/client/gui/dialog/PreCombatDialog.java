@@ -100,7 +100,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             Settlement settlement = (Settlement) defender;
             defenderName = settlement.getName();
             defenderLabel = new JLabel(new ImageIcon(
-                lib.getSettlementImage(settlement)));
+                lib.getScaledSettlementImage(settlement)));
 
         } else {
             throw new IllegalStateException("Bogus attack");

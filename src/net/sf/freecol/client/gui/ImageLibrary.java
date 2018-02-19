@@ -678,6 +678,17 @@ public final class ImageLibrary {
 
     // Nation image handling
 
+    /**
+     * Returns the monarch-image for the given tile.
+     *
+     * @param nation The nation this monarch rules.
+     * @return the monarch-image for the given nation.
+     */
+    public static BufferedImage getMonarchImage(Nation nation) {
+        final String key = "image.flavor.monarch." + nation.getId();
+        return ResourceManager.getImage(key);
+    }
+
     private static String getNationKey(Nation nation) {
         return "image.miscicon." + nation.getId();
     }
@@ -702,19 +713,7 @@ public final class ImageLibrary {
     public BufferedImage getSmallerNationImage(Nation nation) {
         return getNationImage(nation, this.scaleFactor * SMALLER_SCALE);
     }
-    
-    /**
-     * Returns the monarch-image for the given tile.
-     *
-     * @param nation The nation this monarch rules.
-     * @return the monarch-image for the given nation.
-     */
-    public static BufferedImage getMonarchImage(Nation nation) {
-        final String key = "image.flavor.monarch." + nation.getId();
-        return ResourceManager.getImage(key);
-    }
 
-    
 
     // Path type image handling
 
@@ -896,6 +895,7 @@ public final class ImageLibrary {
         return getRandomizedImage(keys, id, size);
     }
 
+
     /**
      * Returns the river image with the given style.
      *
@@ -947,6 +947,7 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key, this.tileSize, false);
     }
 
+
     /**
      * Get the tile improvement image with for a given identifier.
      *
@@ -961,18 +962,32 @@ public final class ImageLibrary {
             : null;
     }
 
-    public BufferedImage getSmallSettlementImage(Settlement settlement) {
-        return getSettlementImage(settlement, this.scaleFactor * SMALL_SCALE);
+
+    private static String getSettlementTypeKey(SettlementType settlementType) {
+        return "image.tileitem." + settlementType.getId();
+    }
+    
+    public static BufferedImage getSettlementTypeImage(SettlementType settlementType,
+                                                       float scale) {
+        final String key = getSettlementTypeKey(settlementType);
+        return ResourceManager.getImage(key, scale, false);
     }
 
+    public static BufferedImage getSettlementTypeImage(SettlementType settlementType,
+                                                       Dimension size) {
+        final String key = getSettlementTypeKey(settlementType);
+        return ResourceManager.getImage(key, size, false);
+    }
+    
     /**
      * Returns the graphics that will represent the given settlement.
      *
-     * @param settlement The settlement whose graphics type is needed.
+     * @param settlementType The type of settlement whose graphics
+     *     type is needed.
      * @return The graphics that will represent the given settlement.
      */
-    public BufferedImage getSettlementImage(Settlement settlement) {
-        return getSettlementImage(settlement, this.scaleFactor);
+    public BufferedImage getScaledSettlementTypeImage(SettlementType settlementType) {
+        return getSettlementTypeImage(settlementType, this.scaleFactor);
     }
 
     /**
@@ -995,19 +1010,17 @@ public final class ImageLibrary {
     /**
      * Returns the graphics that will represent the given settlement.
      *
-     * @param settlementType The type of settlement whose graphics
-     *     type is needed.
+     * @param settlement The settlement whose graphics type is needed.
      * @return The graphics that will represent the given settlement.
      */
-    public BufferedImage getSettlementImage(SettlementType settlementType) {
-        return getSettlementImage(settlementType, this.scaleFactor);
+    public BufferedImage getScaledSettlementImage(Settlement settlement) {
+        return getSettlementImage(settlement, this.scaleFactor);
     }
 
-    public static BufferedImage getSettlementImage(SettlementType settlementType,
-                                                   float scale) {
-        final String key = "image.tileitem." + settlementType.getId();
-        return ResourceManager.getImage(key, scale, false);
+    public BufferedImage getSmallSettlementImage(Settlement settlement) {
+        return getSettlementImage(settlement, this.scaleFactor * SMALL_SCALE);
     }
+
 
     /**
      * Returns the terrain-image for the given type.

@@ -645,7 +645,7 @@ public final class TileViewer extends FreeColClientHolder {
                 final Colony colony = (Colony)settlement;
 
                 // Draw image of colony in center of the tile.
-                BufferedImage colonyImage = lib.getSettlementImage(settlement);
+                BufferedImage colonyImage = lib.getScaledSettlementImage(settlement);
                 displayLargeCenteredImage(g, colonyImage);
 
                 if (withNumber) {
@@ -669,7 +669,7 @@ public final class TileViewer extends FreeColClientHolder {
 
             } else if (settlement instanceof IndianSettlement) {
                 IndianSettlement is = (IndianSettlement)settlement;
-                BufferedImage settlementImage = lib.getSettlementImage(settlement);
+                BufferedImage settlementImage = lib.getScaledSettlementImage(settlement);
 
                 // Draw image of indian settlement in center of the tile.
                 displayCenteredImage(g, settlementImage);

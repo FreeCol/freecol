@@ -60,8 +60,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap 2, gapx 20", "", ""));
 
         ImageLibrary lib = getImageLibrary();
-        JLabel settlementLabel = new JLabel(new ImageIcon(
-            lib.getSettlementImage(is)));
+        JLabel settlementLabel = new JLabel(new ImageIcon(lib
+                .getScaledSettlementImage(is)));
         final Player indian = is.getOwner();
         final Player player = getMyPlayer();
         boolean contacted = is.hasContacted(player);

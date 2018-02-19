@@ -101,9 +101,8 @@ public final class ReportIndianPanel extends ReportPanel {
 
         ImageLibrary lib = getImageLibrary();
         JLabel villageLabel = new JLabel();
-        villageLabel.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(
-            opponent.getNationType().getCapitalType(),
-            lib.getScaleFactor())));
+        villageLabel.setIcon(new ImageIcon(lib
+                .getScaledSettlementTypeImage(opponent.getNationType().getCapitalType())));
         reportPanel.add(villageLabel, SPAN_SPLIT_2);
         JLabel headline = Utility.localizedLabel(opponent.getNationLabel());
         headline.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,

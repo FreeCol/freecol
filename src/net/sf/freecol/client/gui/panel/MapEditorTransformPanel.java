@@ -151,7 +151,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                   Messages.getName(ModelMessage.MessageType.LOST_CITY_RUMOUR),
                                   new LostCityRumourTransform()));
         SettlementType settlementType = nativeNation.getType().getCapitalType();
-        settlementButton = buildButton(ImageLibrary.getSettlementImage(settlementType, 0.5f),
+        settlementButton = buildButton(ImageLibrary.getSettlementTypeImage(settlementType, 0.5f),
                                        Messages.message("settlement"),
                                        new SettlementTransform());
         listPanel.add(settlementButton);
