@@ -111,11 +111,11 @@ public class BuildingToolTip extends JToolTip {
                 add(productionOutput);
             } else {
                 add(new JLabel(new ImageIcon(lib
-                            .getIconImage(consumption.getType()))),
+                            .getScaledGoodsTypeImage(consumption.getType()))),
                     "span, split 3");
                 add(arrow);
                 add(new JLabel(new ImageIcon(lib
-                            .getIconImage(production.getType()))));
+                            .getScaledGoodsTypeImage(production.getType()))));
             }
         }
 

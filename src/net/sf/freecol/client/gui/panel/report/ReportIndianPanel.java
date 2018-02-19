@@ -219,8 +219,8 @@ public final class ReportIndianPanel extends ReportPanel {
                     List<StringTemplate> gl = is.getWantedGoodsLabel(i, player);
                     if (visited && (gt = is.getWantedGoods(i)) != null) {
                         goodsLabel = new JLabel("");
-                        goodsLabel.setIcon(new ImageIcon(
-                            lib.getSmallIconImage(gt)));
+                        goodsLabel.setIcon(new ImageIcon(lib
+                                .getSmallGoodsTypeImage(gt)));
                         Utility.localizeToolTip(goodsLabel,
                             Messages.message(gl.get(0)));
                     } else {

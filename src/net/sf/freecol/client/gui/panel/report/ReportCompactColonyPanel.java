@@ -1052,7 +1052,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             reportPanel.add(newLabel(key, null, null, stpld(key)));
         }
         for (GoodsType gt : this.goodsTypes) {
-            ImageIcon icon = new ImageIcon(this.lib.getSmallIconImage(gt));
+            ImageIcon icon = new ImageIcon(this.lib.getSmallGoodsTypeImage(gt));
             JLabel l = newLabel(null, icon, null,
                                 stpl("report.colony.production.header")
                                     .addNamed("%goods%", gt));

@@ -54,7 +54,7 @@ public class AbstractGoodsLabel extends FreeColLabel {
      *     will visually represent.
      */
     public AbstractGoodsLabel(ImageLibrary lib, AbstractGoods abstractGoods) {
-        super(new ImageIcon(lib.getIconImage(abstractGoods.getType())));
+        super(new ImageIcon(lib.getScaledGoodsTypeImage(abstractGoods.getType())));
 
         this.abstractGoods = abstractGoods;
 

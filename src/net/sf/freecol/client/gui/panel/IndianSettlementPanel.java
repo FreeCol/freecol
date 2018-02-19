@@ -112,7 +112,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
             "newline");
         JLabel label = Utility.localizedLabel(wants.get(0),
             ((visited && (gt = is.getWantedGoods(0)) != null)
-                ? new ImageIcon(lib.getIconImage(gt))
+                ? new ImageIcon(lib.getScaledGoodsTypeImage(gt))
                 : null),
             JLabel.CENTER);
         if (wants.size() > 1) Utility.localizeToolTip(label, wants.get(1));
@@ -125,7 +125,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
             wants = is.getWantedGoodsLabel(i, player);
             label = Utility.localizedLabel(wants.get(0),
                 ((visited && (gt = is.getWantedGoods(i)) != null)
-                    ? new ImageIcon(lib.getIconImage(gt))
+                    ? new ImageIcon(lib.getScaledGoodsTypeImage(gt))
                     : null),
                 JLabel.CENTER);
             if (wants.size() > 1) Utility.localizeToolTip(label, wants.get(1));

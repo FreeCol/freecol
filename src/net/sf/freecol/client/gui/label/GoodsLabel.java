@@ -119,10 +119,10 @@ public final class GoodsLabel extends AbstractGoodsLabel
     @Override
     public void setPartialChosen(boolean partialChosen) {
         super.setPartialChosen(partialChosen);
-        ImageLibrary lib = gui.getImageLibrary();
-        Image image = partialChosen
-                      ? lib.getSmallIconImage(getType())
-                      : lib.getIconImage(getType());
+        final ImageLibrary lib = gui.getImageLibrary();
+        Image image = (partialChosen)
+            ? lib.getSmallGoodsTypeImage(getType())
+            : lib.getScaledGoodsTypeImage(getType());
         setIcon(new ImageIcon(image));
     }
 

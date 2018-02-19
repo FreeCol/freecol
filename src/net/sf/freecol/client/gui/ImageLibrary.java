@@ -494,6 +494,10 @@ public final class ImageLibrary {
 
     // Miscellaneous image handling
 
+    public static BufferedImage getColorCellRendererBackground() {
+        return ResourceManager.getImage("image.background.ColorCellRenderer");
+    }
+    
     /**
      * Get the standard cursor.
      *
@@ -522,27 +526,8 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key, NORMAL_SCALE, grayscale);
     }
 
-    public static BufferedImage getColorCellRendererBackground() {
-        return ResourceManager.getImage("image.background.ColorCellRenderer");
-    }
-    
     public static BufferedImage getMinimapBackground() {
         return ResourceManager.getImage("image.background.MiniMap");
-    }
-    
-    public BufferedImage getSmallerIconImage(FreeColSpecObjectType type) {
-        return getMiscImage("image.icon." + type.getId(),
-            scaleDimension(ICON_SIZE, this.scaleFactor * SMALLER_SCALE));
-    }
-
-    public BufferedImage getSmallIconImage(FreeColSpecObjectType type) {
-        return getMiscImage("image.icon." + type.getId(),
-            scaleDimension(ICON_SIZE, this.scaleFactor * SMALL_SCALE));
-    }
-
-    public BufferedImage getIconImage(FreeColSpecObjectType type) {
-        return getMiscImage("image.icon." + type.getId(),
-            scaleDimension(ICON_SIZE, this.scaleFactor));
     }
 
     /**
@@ -583,8 +568,7 @@ public final class ImageLibrary {
                 BuildingType type = (BuildingType)derived;
                 image = getBuildingImage(type, size);
             } else if (derived instanceof GoodsType) {
-                FreeColSpecObjectType type = (FreeColSpecObjectType)derived;
-                image = getIconImage(type);
+                image = getGoodsTypeImage((GoodsType)derived, size);
             } else if (derived instanceof LostCityRumour) {
                 image = getMiscImage(LOST_CITY_RUMOUR, size);
             } else if (derived instanceof Nation) {
@@ -666,6 +650,30 @@ public final class ImageLibrary {
             + buildingType.getId(), size, false);
     }
 
+
+    // Goods image handling
+
+    private static BufferedImage getGoodsTypeImage(GoodsType gt,
+                                                   Dimension size) {
+        final String key = "image.icon." + gt.getId();
+        return ResourceManager.getImage(key, size, false);
+    }
+    
+    public BufferedImage getScaledGoodsTypeImage(GoodsType gt) {
+        return getGoodsTypeImage(gt,
+            scaleDimension(ICON_SIZE, this.scaleFactor));
+    }
+
+    public BufferedImage getSmallGoodsTypeImage(GoodsType gt) {
+        return getGoodsTypeImage(gt,
+            scaleDimension(ICON_SIZE, this.scaleFactor * SMALL_SCALE));
+    }
+
+    public BufferedImage getSmallerGoodsTypeImage(GoodsType gt) {
+        return getGoodsTypeImage(gt,
+            scaleDimension(ICON_SIZE, this.scaleFactor * SMALLER_SCALE));
+    }
+    
 
     // Nation image handling
 
