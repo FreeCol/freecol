@@ -174,8 +174,7 @@ public class ConstructionPanel extends MigPanel
             }
         } else {
             int turns = colony.getTurnsToComplete(buildable);
-            Image image = lib.getSmallBuildableImage(
-                buildable, colony.getOwner());
+            Image image = lib.getSmallBuildableTypeImage(buildable, colony.getOwner());
             add(new JLabel(new ImageIcon(image)), "spany");
             JLabel label0 = Utility.localizedLabel(buildable.getCurrentlyBuildingLabel());
             label0.setFont(font);

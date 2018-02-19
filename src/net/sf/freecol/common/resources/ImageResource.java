@@ -54,9 +54,8 @@ public class ImageResource extends Resource
     private static final Comparator<BufferedImage> biComp
         = Comparator.<BufferedImage>comparingInt(bi -> bi.getWidth() * bi.getHeight());
 
-    private final Object loadingLock = new Object();
     private volatile BufferedImage image = null;
-    private List<URI> alternativeLocators = new ArrayList<>();
+    private List<URI> alternativeLocators = null;
     private List<BufferedImage> loadedImages = null;
 
     private HashMap<Dimension, BufferedImage> scaledImages = new HashMap<>();
@@ -66,108 +65,75 @@ public class ImageResource extends Resource
     /**
      * Do not use directly.
      *
-     * @param resourceLocator The {@code URI} used when loading this
-     *      resource.
+     * @param resourceLocator The {@code URI} used when loading this resource.
      */
     public ImageResource(URI resourceLocator) {
         super(resourceLocator);
     }
 
+
     /**
      * Adds another URI for loading a differently sized version of the image.
      * Only use before preload got called!
      *
-     * @param resourceLocator The {@code URI} used when loading.
+     * @param uri The {@code URI} used when loading.
      */
-    public void addAlternativeResourceLocator(URI resourceLocator) {
-        alternativeLocators.add(resourceLocator);
+    public synchronized void addAlternativeResourceLocator(URI uri) {
+        if (this.alternativeLocators == null)
+            this.alternativeLocators = new ArrayList<>();
+        this.alternativeLocators.add(uri);
     }
 
     /**
-     * Preload the image.
+     * Get the number of cached images.
+     *
+     * @return The image count.
      */
-    @Override
-    public void preload() {
-        synchronized (loadingLock) {
-            if (image == null) {
-                BufferedImage baseImage = loadImage(getResourceLocator());
-
-                loadedImages = transform(alternativeLocators, alwaysTrue(),
-                                         uri -> loadImage(uri),
-                                         toListNoNulls());
-                if (baseImage != null) loadedImages.add(baseImage);
-                loadedImages.sort(biComp);
-                image = (baseImage != null) ? baseImage : first(loadedImages);
-            }
-        }
-    }
-
-    private static BufferedImage loadImage(URI uri) {
-        try {
-            URL url = uri.toURL();
-            BufferedImage image = ImageIO.read(url);
-            if(image != null)
-                return image;
-            logger.log(Level.WARNING, "Failed to load image from: "
-                + uri);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to load image from: "
-                + uri, e);
-        }
-        return null;
-    }
-
-    /**
-     * Clean up old cached copies.
-     */
-    @Override
-    public void clean() {
-        scaledImages = new HashMap<>();
-        grayscaleImages = new HashMap<>();
+    public int getCount() {
+        return this.grayscaleImages.size() + this.scaledImages.size();
     }
 
     /**
      * Gets the {@code Image} represented by this resource.
      *
-     * @return The image in it's original size.
+     * @return The image in its original size and color.
      */
     public BufferedImage getImage() {
-        if (image == null) {
+        if (this.image == null) {
             logger.finest("Preload not ready for " + getResourceLocator());
             preload();
         }
-        return image;
+        return this.image;
     }
 
     /**
-     * Gets the image using the specified scale.
+     * Gets the image using the specified dimension and choice of grayscale.
      * 
-     * @param scale The size of the requested image (with 1 being
-     *     normal size, 2 twice the size, 0.5 half the size etc).
+     * @param d The {@code Dimension} of the requested image.
+     * @param grayscale If true return a grayscale image.
      * @return The scaled {@code BufferedImage}.
      */
-    public BufferedImage getImage(float scale) {
-        final BufferedImage im = getImage();
-        if(scale == 1.0f || im == null)
-            return im;
-        return getImage(new Dimension(Math.round(im.getWidth() * scale),
-                                      Math.round(im.getHeight() * scale)));
+    public BufferedImage getImage(Dimension d, boolean grayscale) {
+        return (grayscale) ? getGrayscaleImage(d) : getColorImage(d);
     }
 
     /**
      * Gets the image using the specified dimension.
      * 
-     * @param d The {@code Dimension} of the requested
-     *      image.  Rescaling will be performed if necessary.
+     * @param d The {@code Dimension} of the requested image.
+     *     Rescaling will be performed if necessary.
      * @return The {@code BufferedImage} with the required dimension.
      */
-    public BufferedImage getImage(Dimension d) {
+    private BufferedImage getColorImage(Dimension d) {
+        final BufferedImage cached = this.scaledImages.get(d);
+        if (cached != null) return cached; // Cache hit
+
         BufferedImage im = getImage();
-        if (im == null) return null;
+        if (im == null) return null; // Preload failed
         
         int wNew = d.width;
         int hNew = d.height;
-        if (wNew < 0 && hNew < 0) return im;
+        if (wNew < 0 && hNew < 0) return im; // Wildcard dimensions
 
         int w = im.getWidth();
         int h = im.getHeight();
@@ -176,28 +142,28 @@ public class ImageResource extends Resource
         } else if (hNew < 0 || wNew*h < w*hNew) {
             hNew = (2*h*wNew + (w+1)) / (2*w);
         }
-        if (wNew == w && hNew == h) return im;
+        if (wNew == w && hNew == h) return im; // Matching dimension
 
-        final BufferedImage cached = scaledImages.get(d);
-        if (cached != null) return cached;
-
-        final int fwNew = wNew, fhNew = hNew;
-        final Predicate<BufferedImage> sizePred = img ->
-            img.getWidth() >= fwNew && img.getHeight() >= fhNew;
-        BufferedImage oim = find(loadedImages, sizePred);
-        im = (oim != null) ? oim : loadedImages.get(loadedImages.size() - 1);
-        w = im.getWidth();
-        h = im.getHeight();
-        if (wNew*h > w*hNew) {
-            wNew = (2*w*hNew + (h+1)) / (2*h);
-        } else if (wNew*h < w*hNew) {
-            hNew = (2*h*wNew + (w+1)) / (2*w);
+        if (this.loadedImages != null) {
+            final int fwNew = wNew, fhNew = hNew;
+            final Predicate<BufferedImage> sizePred = img ->
+                img.getWidth() >= fwNew && img.getHeight() >= fhNew;
+            BufferedImage oim = find(this.loadedImages, sizePred);
+            im = (oim != null) ? oim
+                : this.loadedImages.get(this.loadedImages.size() - 1);
+            w = im.getWidth();
+            h = im.getHeight();
+            if (wNew*h > w*hNew) {
+                wNew = (2*w*hNew + (h+1)) / (2*h);
+            } else if (wNew*h < w*hNew) {
+                hNew = (2*h*wNew + (w+1)) / (2*w);
+            }
+            if (wNew == w && hNew == h) return im; // Found loaded image
         }
-        if (wNew == w && hNew == h) return im;
 
         // Directly scaling to less than half size would ignore some pixels.
         // Prevent that by halving the base image size as often as needed.
-        while(wNew*2 <= w && hNew*2 <= h) {
+        while (wNew*2 <= w && hNew*2 <= h) {
             w = (w+1)/2;
             h = (h+1)/2;
             BufferedImage halved = new BufferedImage(w, h,
@@ -211,7 +177,7 @@ public class ImageResource extends Resource
             im = halved;
         }
 
-        if(wNew != w || hNew != h) {
+        if (wNew != w || hNew != h) {
             BufferedImage scaled = new BufferedImage(wNew, hNew,
                 BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = scaled.createGraphics();
@@ -222,7 +188,7 @@ public class ImageResource extends Resource
             g.dispose();
             im = scaled;
         }
-        scaledImages.put(d, im);
+        this.scaledImages.put(d, im);
         return im;
     }
 
@@ -232,11 +198,14 @@ public class ImageResource extends Resource
      * @param d The requested size.
      * @return The {@code BufferedImage}.
      */
-    public BufferedImage getGrayscaleImage(Dimension d) {
-        final BufferedImage cached = grayscaleImages.get(d);
-        if (cached != null) return cached;
-        final BufferedImage im = getImage(d);
+    private BufferedImage getGrayscaleImage(Dimension d) {
+        final BufferedImage cached = this.grayscaleImages.get(d);
+        if (cached != null) return cached; // Cache hit
+
+        // Get the correctly scaled image
+        final BufferedImage im = getColorImage(d);
         if (im == null) return null;
+
         int width = im.getWidth();
         int height = im.getHeight();
         // TODO: Find out why making a copy is necessary here to prevent
@@ -249,26 +218,62 @@ public class ImageResource extends Resource
         ColorConvertOp filter = new ColorConvertOp(
             ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         final BufferedImage grayscaleImage = filter.filter(srcImage, null);
-        grayscaleImages.put(d, grayscaleImage);
+        this.grayscaleImages.put(d, grayscaleImage);
         return grayscaleImage;
     }
 
+
+    // Interface Preloadable
+
     /**
-     * Returns the image using the specified scale.
-     * 
-     * @param scale The size of the requested image (with 1 being normal size,
-     *      2 twice the size, 0.5 half the size etc). Rescaling
-     *      will be performed unless using 1.
-     * @return The {@code BufferedImage}.
+     * {@inheritDoc}
      */
-    public BufferedImage getGrayscaleImage(float scale) {
-        final BufferedImage im = getImage();
-        if (im == null) return null;
-        return getGrayscaleImage(new Dimension(Math.round(im.getWidth() * scale),
-                                               Math.round(im.getHeight() * scale)));
+    @Override
+    public synchronized void preload() {
+        if (this.image == null) {
+            this.image = loadImage(getResourceLocator());
+            if (this.alternativeLocators != null) {
+                this.loadedImages = new ArrayList<>();
+                if (this.image != null) this.loadedImages.add(this.image);
+                for (URI uri : alternativeLocators) {
+                    BufferedImage image = loadImage(uri);
+                    if (image != null) this.loadedImages.add(image);
+                }
+                this.loadedImages.sort(biComp);
+                if (this.image == null && !this.loadedImages.isEmpty()) {
+                    this.image = first(this.loadedImages);
+                }
+            }
+        }
     }
 
-    public int getCount() {
-        return grayscaleImages.size() + scaledImages.size();
+    /**
+     * Load an image from a URI.
+     *
+     * @return The loaded {@code BufferedImage}, or null on error.
+     */
+    private static BufferedImage loadImage(URI uri) {
+        try {
+            URL url = uri.toURL();
+            BufferedImage image = ImageIO.read(url);
+            if (image != null) return image;
+            logger.log(Level.WARNING, "Failed to read image from: " + uri);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Exception to loading image from: "
+                + uri, ioe);
+        }
+        return null;
+    }
+
+
+    // Interface Cleanable
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clean() {
+        this.scaledImages = new HashMap<>();
+        this.grayscaleImages = new HashMap<>();
     }
 }

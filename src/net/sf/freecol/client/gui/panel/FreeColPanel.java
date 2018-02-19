@@ -241,8 +241,8 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      */
     public BufferedImage getSmallAbstractUnitImage(AbstractUnit au) {
         final Specification spec = getSpecification();
-        return getImageLibrary().getSmallUnitImage(au.getType(spec),
-                                                   au.getRoleId(), false);
+        return getImageLibrary().getSmallUnitTypeImage(au.getType(spec),
+                                                       au.getRoleId(), false);
     }
 
 

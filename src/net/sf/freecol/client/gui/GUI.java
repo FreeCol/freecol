@@ -166,10 +166,33 @@ public class GUI extends FreeColClientHolder {
 
     // Simple accessors
 
+    /**
+     * Get the canvas.
+     *
+     * @return Null here, real implementations will override.
+     */
+    public Canvas getCanvas() {
+        return null;
+    }
+
+    /**
+     * Get the image library.
+     *
+     * @return The base image library at the current scale.
+     */
     public ImageLibrary getImageLibrary() {
         return this.imageLibrary;
     }
 
+    /**
+     * Get the tile image library.
+     *
+     * @return Null here, real implementations will override.
+     */
+    public ImageLibrary getTileImageLibrary() {
+        return null;
+    }
+    
     /**
      * Is this GUI in windowed mode?
      *
@@ -179,14 +202,6 @@ public class GUI extends FreeColClientHolder {
         return true;
     }
 
-    /**
-     * Get the canvas.
-     *
-     * @return Null here, real implementations will override.
-     */
-    public Canvas getCanvas() {
-        return null;
-    }
 
 
     // Error handlers

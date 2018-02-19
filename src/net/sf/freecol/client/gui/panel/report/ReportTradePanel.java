@@ -48,7 +48,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -69,7 +68,7 @@ public final class ReportTradePanel extends ReportPanel {
         super(freeColClient, "reportTradeAction");
 
         final Player player = getMyPlayer();
-        Color warnColor = ResourceManager.getColor("color.report.trade.warn");
+        Color warnColor = ImageLibrary.getColor("color.report.trade.warn");
 
         this.colonies = freeColClient.getMySortedColonies();
 
@@ -172,7 +171,7 @@ public final class ReportTradePanel extends ReportPanel {
                                                JLabel.TRAILING);
                 goodsLabel.setBorder((first) ? Utility.TOPCELLBORDER
                     : Utility.CELLBORDER);
-                goodsLabel.setForeground(GoodsLabel.getColor(goodsType, amount,
+                goodsLabel.setForeground(ImageLibrary.getGoodsColor(goodsType, amount,
                                                              colony));
                 ExportData ed = colony.getExportData(goodsType);
                 if (ed.getExported()) {
@@ -185,7 +184,7 @@ public final class ReportTradePanel extends ReportPanel {
 
                 int production = colony.getNetProductionOf(goodsType);
                 JLabel productionLabel = createNumberLabel(production, true);
-                productionLabel.setForeground(GoodsLabel.getColor(goodsType,
+                productionLabel.setForeground(ImageLibrary.getGoodsColor(goodsType,
                         production, colony));
                 Collection<StringTemplate> warnings
                     = colony.getProductionWarnings(goodsType);

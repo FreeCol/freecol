@@ -203,7 +203,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
     }
 
     protected JButton getUnitButton(Unit unit) {
-        ImageIcon icon = new ImageIcon(getImageLibrary().getUnitImage(unit));
+        ImageIcon icon = new ImageIcon(getImageLibrary().getScaledUnitImage(unit));
         JButton button = Utility.getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
         StringTemplate tip = StringTemplate.label("\n")

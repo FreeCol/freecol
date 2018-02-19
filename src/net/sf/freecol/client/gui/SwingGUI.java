@@ -164,14 +164,17 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean isWindowed() {
-        return this.canvas.isWindowed();
-    }
-
     public ImageLibrary getTileImageLibrary() {
         return tileViewer.getImageLibrary();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isWindowed() {
+        return this.canvas.isWindowed();
+    }
 
     // Initialization related methods
 
@@ -816,7 +819,7 @@ public class SwingGUI extends GUI {
                            String okKey, String cancelKey) {
         return canvas.showConfirmDialog(tile,
             Utility.localizedTextArea(template),
-            new ImageIcon(imageLibrary.getUnitImage(unit)),
+            new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
             okKey, cancelKey);
     }
 
@@ -829,7 +832,7 @@ public class SwingGUI extends GUI {
                            String okKey, String cancelKey) {
         return canvas.showConfirmDialog(tile,
             Utility.localizedTextArea(template),
-            new ImageIcon(imageLibrary.getSettlementImage(settlement)),
+            new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
             okKey, cancelKey);
     }
 
@@ -842,7 +845,7 @@ public class SwingGUI extends GUI {
                            String okKey, String cancelKey) {
         return canvas.showConfirmDialog(tile,
             Utility.localizedTextArea(template),
-            new ImageIcon(imageLibrary.getIconImage(goodsType)),
+            new ImageIcon(imageLibrary.getScaledGoodsTypeImage(goodsType)),
             okKey, cancelKey);
     }
 
@@ -871,7 +874,7 @@ public class SwingGUI extends GUI {
     public <T> T getChoice(Tile tile, Object explain, Unit unit,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return canvas.showChoiceDialog(tile, explain,
-            new ImageIcon(imageLibrary.getUnitImage(unit)),
+            new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
             cancelKey, choices);
     }
 
@@ -882,7 +885,7 @@ public class SwingGUI extends GUI {
     public <T> T getChoice(Tile tile, Object explain, Settlement settlement,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return canvas.showChoiceDialog(tile, explain,
-            new ImageIcon(imageLibrary.getSettlementImage(settlement)),
+            new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
             cancelKey, choices);
     }
 
@@ -893,7 +896,7 @@ public class SwingGUI extends GUI {
     public <T> T getChoice(Tile tile, Object explain, GoodsType goodsType,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return canvas.showChoiceDialog(tile, explain,
-            new ImageIcon(imageLibrary.getIconImage(goodsType)),
+            new ImageIcon(imageLibrary.getScaledGoodsTypeImage(goodsType)),
             cancelKey, choices);
     }
 
@@ -904,7 +907,7 @@ public class SwingGUI extends GUI {
     public <T> T getChoice(Tile tile, Object explain, Nation nation,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return canvas.showChoiceDialog(tile, explain,
-            new ImageIcon(imageLibrary.getMiscIconImage(nation)),
+            new ImageIcon(imageLibrary.getScaledNationImage(nation)),
             cancelKey, choices);
     }
 
@@ -1355,8 +1358,8 @@ public class SwingGUI extends GUI {
         super.showInformationMessage(displayObject, template);
         ImageIcon icon = null;
         Tile tile = null;
-        if(displayObject != null) {
-            icon = new ImageIcon(imageLibrary.getSettlementImage(displayObject));
+        if (displayObject != null) {
+            icon = new ImageIcon(imageLibrary.getScaledSettlementImage(displayObject));
             tile = displayObject.getTile();
         }
         canvas.showInformationMessage(displayObject, tile, icon, template);
@@ -1372,7 +1375,7 @@ public class SwingGUI extends GUI {
         ImageIcon icon = null;
         Tile tile = null;
         if(displayObject != null) {
-            icon = new ImageIcon(imageLibrary.getUnitImage(displayObject));
+            icon = new ImageIcon(imageLibrary.getScaledUnitImage(displayObject));
             tile = displayObject.getTile();
         }
         canvas.showInformationMessage(displayObject, tile, icon, template);

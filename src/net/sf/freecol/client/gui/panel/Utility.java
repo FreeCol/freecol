@@ -47,6 +47,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColSpecObjectType;
@@ -56,7 +57,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -67,15 +67,15 @@ public final class Utility {
 
     /** The color to use for borders. */
     public static final Color BORDER_COLOR
-        = ResourceManager.getColor("color.border.LookAndFeel");
+        = ImageLibrary.getColor("color.border.LookAndFeel", Color.BLACK);
 
     /** The color to use for links. */
     public static final Color LINK_COLOR
-        = ResourceManager.getColor("color.link.LookAndFeel");
+        = ImageLibrary.getColor("color.link.LookAndFeel", Color.BLUE);
 
     /** The color to use for things the player probably should not do. */
     public static final Color WARNING_COLOR
-        = ResourceManager.getColor("color.warning.LookAndFeel");
+        = ImageLibrary.getColor("color.warning.LookAndFeel", Color.RED);
 
 
     /** Useful static borders. */
@@ -88,7 +88,7 @@ public final class Utility {
     public static final Border COLOR_CELL_BORDER = BorderFactory
         .createCompoundBorder(
             BorderFactory.createMatteBorder(5, 10, 5, 10,
-                new ImageIcon(ResourceManager.getImage("image.background.ColorCellRenderer"))),
+                new ImageIcon(ImageLibrary.getColorCellRendererBackground())),
             BorderFactory.createLineBorder(BORDER_COLOR));
 
     public static final Border DIALOG_BORDER = BorderFactory

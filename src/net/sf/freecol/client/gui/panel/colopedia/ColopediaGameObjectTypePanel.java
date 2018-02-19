@@ -139,10 +139,10 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
                 ? ImageLibrary.getMiscImage("image.tileitem." + type.getId(),
                                             ImageLibrary.ICON_SIZE)
                 : (type instanceof Nation)
-                ? ImageLibrary.getMiscIconImage(type, ImageLibrary.ICON_SIZE)
+                ? ImageLibrary.getNationImage((Nation)type, ImageLibrary.ICON_SIZE)
                 : (type instanceof BuildableType)
-                ? ImageLibrary.getBuildableImage((BuildableType)type,
-                                                 ImageLibrary.ICON_SIZE)
+                ? ImageLibrary.getBuildableTypeImage((BuildableType)type,
+                                                     ImageLibrary.ICON_SIZE)
                 : ImageLibrary.getMiscImage(ResourceManager.REPLACEMENT_IMAGE,
                                             ImageLibrary.ICON_SIZE);
             int x = (width - image.getWidth(null)) / 2;
@@ -203,7 +203,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
 
     protected JButton getGoodsButton(final GoodsType goodsType, String text) {
         JButton result = getButton(goodsType, text,
-            new ImageIcon(getImageLibrary().getIconImage(goodsType)));
+            new ImageIcon(getImageLibrary().getScaledGoodsTypeImage(goodsType)));
         result.setToolTipText(Messages.getName(goodsType));
         return result;
     }
@@ -213,8 +213,8 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
     }
 
     protected JButton getUnitButton(final UnitType unitType, String roleId) {
-        ImageIcon unitIcon = new ImageIcon(
-            getImageLibrary().getSmallUnitImage(unitType, roleId, false));
+        ImageIcon unitIcon = new ImageIcon(getImageLibrary()
+            .getSmallUnitTypeImage(unitType, roleId, false));
         JButton unitButton = getButton(unitType, null, unitIcon);
         unitButton.setHorizontalAlignment(JButton.LEFT);
         return unitButton;

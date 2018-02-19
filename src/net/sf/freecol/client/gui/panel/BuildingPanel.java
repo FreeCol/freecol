@@ -171,7 +171,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         }
 
         ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        Image buildingImage = lib.getBuildingImage(building);
+        Image buildingImage = lib.getScaledBuildingImage(building);
         setPreferredSize(new Dimension(buildingImage.getWidth(null), 
                                        buildingImage.getHeight(null)));
         revalidate();
@@ -233,7 +233,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     @Override
     public void paintComponent(Graphics g) {
         ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        g.drawImage(lib.getBuildingImage(building), 0, 0, this);
+        g.drawImage(lib.getScaledBuildingImage(building), 0, 0, this);
     }
 
 
@@ -264,15 +264,12 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             getIcon().paintIcon(null, g, 0, 0);
             GUI gui = freeColClient.getGUI();
             ImageLibrary lib = gui.getImageLibrary();
-            BufferedImage image = lib.getStringImage(
-                g,
-                Integer.toString(number), getForeground(),
-                FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                    FontLibrary.FontSize.TINY, Font.BOLD,
-                    lib.getScaleFactor()));
-            g.drawImage(image,
-                (getIcon().getIconWidth() - image.getWidth(null))/2,
-                (getIcon().getIconHeight() - image.getHeight(null))/2, null);
+            BufferedImage img = lib.getStringImage(g, Integer.toString(number),
+                getForeground(),
+                FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD);
+            g.drawImage(img,
+                (getIcon().getIconWidth() - img.getWidth(null))/2,
+                (getIcon().getIconHeight() - img.getHeight(null))/2, null);
         }
     }
 }

@@ -111,19 +111,19 @@ public class BuildingToolTip extends JToolTip {
                 add(productionOutput);
             } else {
                 add(new JLabel(new ImageIcon(lib
-                            .getIconImage(consumption.getType()))),
+                            .getScaledGoodsTypeImage(consumption.getType()))),
                     "span, split 3");
                 add(arrow);
                 add(new JLabel(new ImageIcon(lib
-                            .getIconImage(production.getType()))));
+                            .getScaledGoodsTypeImage(production.getType()))));
             }
         }
 
-        add(new JLabel(new ImageIcon(lib.getBuildingImage(building))));
+        add(new JLabel(new ImageIcon(lib.getScaledBuildingImage(building))));
 
         if (outputType != null) {
             for (Unit unit : building.getUnitList()) {
-                UnitLabel unitLabel = new UnitLabel(freeColClient, unit, false);
+                UnitLabel unitLabel = new UnitLabel(freeColClient, unit);
                 int amount = building.getUnitProduction(unit, outputType);
                 if (amount > 0) {
                     add(unitLabel);
@@ -135,13 +135,12 @@ public class BuildingToolTip extends JToolTip {
             }
         } else if (building.canTeach()) {
             for (Unit unit : building.getUnitList()) {
-                UnitLabel unitLabel = new UnitLabel(freeColClient, unit, false);
+                UnitLabel unitLabel = new UnitLabel(freeColClient, unit);
                 if (unit.getStudent() != null) {
                     JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/"
                         + unit.getNeededTurnsOfTraining());
                     UnitLabel sLabel = new UnitLabel(freeColClient,
-                            unit.getStudent(), true);
-                    sLabel.setIgnoreLocation(true);
+                        unit.getStudent(), true, true);
                     add(unitLabel);
                     add(progress, "split 2, flowy");
                     add(sLabel);

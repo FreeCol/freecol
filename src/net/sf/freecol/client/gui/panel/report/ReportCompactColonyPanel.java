@@ -399,21 +399,11 @@ public final class ReportCompactColonyPanel extends ReportPanel
     private synchronized void loadResources() {
         if (cAlarm != null) return;
 
-        cAlarm = (ResourceManager.hasColorResource(cAlarmKey))
-            ? ResourceManager.getColor(cAlarmKey)
-            : Color.RED;
-        cWarn = (ResourceManager.hasColorResource(cWarnKey))
-            ? ResourceManager.getColor(cWarnKey)
-            : Color.MAGENTA;
-        cPlain = (ResourceManager.hasColorResource(cPlainKey))
-            ? ResourceManager.getColor(cPlainKey)
-            : Color.DARK_GRAY;
-        cExport = (ResourceManager.hasColorResource(cExportKey))
-            ? ResourceManager.getColor(cExportKey)
-            : Color.GREEN;
-        cGood = (ResourceManager.hasColorResource(cGoodKey))
-            ? ResourceManager.getColor(cGoodKey)
-            : Color.BLUE;
+        cAlarm = ImageLibrary.getColor(cAlarmKey, Color.RED);
+        cWarn = ImageLibrary.getColor(cWarnKey, Color.MAGENTA);
+        cPlain = ImageLibrary.getColor(cPlainKey, Color.DARK_GRAY);
+        cExport = ImageLibrary.getColor(cExportKey, Color.GREEN);
+        cGood = ImageLibrary.getColor(cGoodKey, Color.BLUE);
     }
 
     private static StringTemplate stpl(String messageId) {
@@ -495,7 +485,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             key = "annotation." + building.getType().getSuffix();
             t.add(Messages.message(building.getLabel()));
         }
-        if (ResourceManager.hasResource(key))
+        if (ResourceManager.hasStringResource(key))
             annotations += ResourceManager.getString(key);
         if (!s.colony.getTile().isCoastland()) {
             key = "annotation.inland";
@@ -507,7 +497,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             key = "annotation." + building.getType().getSuffix();
             t.add(Messages.message(building.getLabel()));
         }
-        if (ResourceManager.hasResource(key))
+        if (ResourceManager.hasStringResource(key))
             annotations += ResourceManager.getString(key);
         /* Omit for now, too much detail.
         for (GoodsType gt : spec.getLibertyGoodsTypeList()) {
@@ -782,8 +772,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         for (Entry<Unit, Integer> e
                  : mapEntriesByValue(s.teachers, descendingIntegerComparator)) {
             Unit u = e.getKey();
-            ImageIcon ii
-                = new ImageIcon(this.lib.getTinyUnitImage(u.getType(), false));
+            ImageIcon ii = new ImageIcon(this.lib.getTinyUnitImage(u));
             if (e.getValue() <= 0) {
                 t = stpld("report.colony.making.noteach")
                         .addName("%colony%", s.colony.getName())
@@ -805,7 +794,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         if (empty > 0) {
             final ImageIcon emptyIcon
-                = new ImageIcon(this.lib.getTinyUnitImage(defaultUnitType, true));
+                = new ImageIcon(this.lib.getTinyUnitTypeImage(defaultUnitType, true));
             t = stpld("report.colony.making.educationVacancy")
                     .addName("%colony%", s.colony.getName())
                     .addAmount("%number%", empty);
@@ -844,7 +833,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);
             ImageIcon icon
-                = new ImageIcon(this.lib.getTinyUnitImage(type, false));
+                = new ImageIcon(this.lib.getTinyUnitTypeImage(type, false));
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpld("report.colony.wanting")
                     .addName("%colony%", colony.getName())
@@ -1029,7 +1018,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         for (Entry<UnitType, Integer> e
                  : mapEntriesByValue(unitTypeMap, descendingIntegerComparator)) {
             ImageIcon icon
-                = new ImageIcon(this.lib.getTinyUnitImage(e.getKey(), false));
+                = new ImageIcon(this.lib.getTinyUnitTypeImage(e.getKey(), false));
             result.add(newLabel(Integer.toString(e.getValue()), icon,
                                 cPlain, t));
             if (++n >= maxSize) break;
@@ -1062,7 +1051,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             reportPanel.add(newLabel(key, null, null, stpld(key)));
         }
         for (GoodsType gt : this.goodsTypes) {
-            ImageIcon icon = new ImageIcon(this.lib.getSmallIconImage(gt));
+            ImageIcon icon = new ImageIcon(this.lib.getSmallGoodsTypeImage(gt));
             JLabel l = newLabel(null, icon, null,
                                 stpl("report.colony.production.header")
                                     .addNamed("%goods%", gt));
@@ -1072,7 +1061,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         final UnitType type = spec.getDefaultUnitType(getMyPlayer());
         ImageIcon colonistIcon
-            = new ImageIcon(this.lib.getTinyUnitImage(type, false));
+            = new ImageIcon(this.lib.getTinyUnitTypeImage(type));
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpld("report.colony.birth")));
         reportPanel.add(newLabel("report.colony.making.header", null, null,

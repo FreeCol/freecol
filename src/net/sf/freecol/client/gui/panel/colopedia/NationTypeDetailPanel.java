@@ -186,7 +186,8 @@ public class NationTypeDetailPanel
 
         panel.add(Utility.localizedLabel("colopedia.nationType.typeOfSettlements"));
         panel.add(new JLabel(Messages.getName(nationType.getCapitalType()),
-            new ImageIcon(getImageLibrary().getSettlementImage(nationType.getCapitalType())),
+            new ImageIcon(getImageLibrary()
+                .getScaledSettlementTypeImage(nationType.getCapitalType())),
             SwingConstants.CENTER));
 
         List<String> regionNames = new ArrayList<>();

@@ -304,7 +304,7 @@ public final class QuickActionMenu extends JPopupMenu {
             t.addName("%claim%", "");
         }
         JMenuItem menuItem = Utility.localizedMenuItem(t,
-            new ImageIcon(gui.getImageLibrary().getSmallIconImage(type)));
+            new ImageIcon(gui.getImageLibrary().getSmallGoodsTypeImage(type)));
         menuItem.setActionCommand(getWorkLabel(wl)
             + "/" + wl.getId() + "/" + type.getId()
             + "/" + ((claim) ? "!" : ""));
@@ -471,7 +471,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 JPanel experiencePanel = new MigPanel();
                 experiencePanel.setLayout(new MigLayout("wrap 3"));
                 experiencePanel.add(new JLabel(new ImageIcon(
-                        lib.getSmallerUnitImage(expertType))),
+                        lib.getSmallerUnitTypeImage(expertType))),
                     "spany 2");
                 experiencePanel.add(Utility.localizedLabel(StringTemplate
                         .template("quickActionMenu.experience")
@@ -631,7 +631,7 @@ public final class QuickActionMenu extends JPopupMenu {
             break;
         }
         Icon icon = (change == null) ? null : new ImageIcon(
-            gui.getImageLibrary().getSmallIconImage(change.getType()));
+            gui.getImageLibrary().getSmallGoodsTypeImage(change.getType()));
         JMenuItem item = new JMenuItem(text, icon);
         final InGameController igc = freeColClient.getInGameController();
         item.addActionListener((ActionEvent ae) -> {
@@ -696,7 +696,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (uc != null) {
             if (separatorNeeded) this.addSeparator();
             JMenuItem menuItem = Utility.localizedMenuItem("quickActionMenu.clearSpeciality",
-                new ImageIcon(gui.getImageLibrary().getTinyUnitImage(uc.to)));
+                new ImageIcon(gui.getImageLibrary().getTinyUnitTypeImage(uc.to)));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             this.add(menuItem);
@@ -723,8 +723,8 @@ public final class QuickActionMenu extends JPopupMenu {
         this.setLabel(Messages.message("cargo"));
         JMenuItem name = new JMenuItem(
             Messages.getName(goods) + " (" + Messages.message("colopedia") + ")",
-            new ImageIcon(
-                gui.getImageLibrary().getSmallIconImage(goods.getType())));
+            new ImageIcon(gui.getImageLibrary()
+                .getSmallGoodsTypeImage(goods.getType())));
         name.addActionListener((ActionEvent ae) -> {
                 gui.showColopediaPanel(goods.getType().getId());
             });
@@ -824,8 +824,8 @@ public final class QuickActionMenu extends JPopupMenu {
         this.setLabel(Messages.message("cargo"));
         JMenuItem name = new JMenuItem(
             Messages.getName(ag) + " (" + Messages.message("colopedia") + ")",
-            new ImageIcon(
-                gui.getImageLibrary().getSmallIconImage(ag.getType())));
+            new ImageIcon(gui.getImageLibrary()
+                .getSmallGoodsTypeImage(ag.getType())));
         name.addActionListener((ActionEvent ae) -> {
                 gui.showColopediaPanel(ag.getType().getId());
             });

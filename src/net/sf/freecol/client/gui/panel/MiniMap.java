@@ -42,7 +42,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -199,18 +198,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             || freeColClient.getGame().getMap() == null) {
             return;
         }
-        graphics.drawImage(ResourceManager.getImage("image.background.MiniMap"),
-            0, 0, null);
+        graphics.drawImage(ImageLibrary.getMinimapBackground(), 0, 0, null);
         paintMap(graphics);
      }
-
-    private Color getMinimapEconomicColor(TileType type) {
-        return ResourceManager.getColor("color.economic.MiniMap." + type.getId());
-    }
-
-    private Color getMinimapPoliticsColor(TileType type) {
-        return ResourceManager.getColor("color.politics.MiniMap." + type.getId());
-    }
 
     /**
      * Paints a representation of the mapboard onto this component.
@@ -230,7 +220,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                            RenderingHints.VALUE_RENDER_QUALITY);
 
         /* Fill the rectangle with background color */
-        g.setColor(ResourceManager.getColor("color.background.MiniMap"));
+        g.setColor(ImageLibrary.getMinimapBackgroundColor());
         g.fillRect(0, 0, width, height);
 
         if (getGUI().getFocus() == null) {
@@ -326,7 +316,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 Tile tile = map.getTile(column, row);
                 if (tile.isExplored()) {
                     if (clientOptions.getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS)) {
-                        g.setColor(getMinimapPoliticsColor(tile.getType()));
+                        g.setColor(ImageLibrary.getMinimapPoliticsColor(tile.getType()));
                         g.fill(tilePath);
                         
                         if (tile.getOwner() != null) {
@@ -337,7 +327,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                             g.fill(paintFull);
                         }
                     } else {
-                        g.setColor(getMinimapEconomicColor(tile.getType()));
+                        g.setColor(ImageLibrary.getMinimapEconomicColor(tile.getType()));
                         g.fill(tilePath);
                     }
                     if (!tile.hasSettlement()) {
@@ -391,7 +381,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 miniRectY = miniRectHeight / 2;
             }
 
-            g.setColor(ResourceManager.getColor("color.border.MiniMap"));
+            g.setColor(ImageLibrary.getMinimapBorderColor());
             // Use Math max and min to prevent the rect from being larger than the minimap.
             int miniRectMaxX = Math.max(miniRectX - miniRectWidth / 2, 0);
             int miniRectMaxY = Math.max(miniRectY - miniRectHeight / 2, 0);
@@ -408,7 +398,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             g.drawRect(miniRectMaxX, miniRectMaxY, miniRectMinWidth, miniRectMinHeight);
             // Draw an additional rect, if the whole map is shown on the minimap
             if (adjustX > 0 && adjustY > 0) {
-                g.setColor(ResourceManager.getColor("color.border.MiniMap"));
+                g.setColor(ImageLibrary.getMinimapBorderColor());
                 g.drawRect(0, 0, width - 1, height - 1);
             }
         }

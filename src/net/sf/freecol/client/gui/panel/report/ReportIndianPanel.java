@@ -101,9 +101,8 @@ public final class ReportIndianPanel extends ReportPanel {
 
         ImageLibrary lib = getImageLibrary();
         JLabel villageLabel = new JLabel();
-        villageLabel.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(
-            opponent.getNationType().getCapitalType(),
-            lib.getScaleFactor())));
+        villageLabel.setIcon(new ImageIcon(lib
+                .getScaledSettlementTypeImage(opponent.getNationType().getCapitalType())));
         reportPanel.add(villageLabel, SPAN_SPLIT_2);
         JLabel headline = Utility.localizedLabel(opponent.getNationLabel());
         headline.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
@@ -198,8 +197,8 @@ public final class ReportIndianPanel extends ReportPanel {
                 JLabel skillLabel;
                 if (visited && skillType != null) {
                     skillLabel = new JLabel("");
-                    skillLabel.setIcon(new ImageIcon(
-                        lib.getSmallUnitImage(skillType)));
+                    skillLabel.setIcon(new ImageIcon(lib
+                            .getSmallUnitTypeImage(skillType)));
                     Utility.localizeToolTip(skillLabel, Messages
                         .message(is.getLearnableSkillLabel(visited)));
                 } else {
@@ -219,8 +218,8 @@ public final class ReportIndianPanel extends ReportPanel {
                     List<StringTemplate> gl = is.getWantedGoodsLabel(i, player);
                     if (visited && (gt = is.getWantedGoods(i)) != null) {
                         goodsLabel = new JLabel("");
-                        goodsLabel.setIcon(new ImageIcon(
-                            lib.getSmallIconImage(gt)));
+                        goodsLabel.setIcon(new ImageIcon(lib
+                                .getSmallGoodsTypeImage(gt)));
                         Utility.localizeToolTip(goodsLabel,
                             Messages.message(gl.get(0)));
                     } else {

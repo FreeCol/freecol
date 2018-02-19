@@ -1022,8 +1022,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         updateDialog();
 
         ImageIcon icon = new ImageIcon((otherColony != null)
-                ? getImageLibrary().getSettlementImage(otherColony)
-                : getImageLibrary().getUnitImage(otherUnit));
+                ? getImageLibrary().getScaledSettlementImage(otherColony)
+                : getImageLibrary().getScaledUnitImage(otherUnit));
         initializeDialog(frame, DialogType.QUESTION, true, panel, icon, c);
     }
 

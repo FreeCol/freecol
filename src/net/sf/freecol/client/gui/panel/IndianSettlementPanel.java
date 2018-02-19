@@ -60,8 +60,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap 2, gapx 20", "", ""));
 
         ImageLibrary lib = getImageLibrary();
-        JLabel settlementLabel = new JLabel(new ImageIcon(
-            lib.getSettlementImage(is)));
+        JLabel settlementLabel = new JLabel(new ImageIcon(lib
+                .getScaledSettlementImage(is)));
         final Player indian = is.getOwner();
         final Player player = getMyPlayer();
         boolean contacted = is.hasContacted(player);
@@ -93,7 +93,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final UnitType skillType = is.getLearnableSkill();
         add(Utility.localizedLabel(is.getLearnableSkillLabel(visited),
                 ((visited && skillType != null)
-                    ? new ImageIcon(lib.getSmallUnitImage(skillType))
+                    ? new ImageIcon(lib.getSmallUnitTypeImage(skillType))
                     : null),
                 JLabel.CENTER));
 
@@ -102,7 +102,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final Player mostHated = is.getMostHated();
         add(Utility.localizedLabel(is.getMostHatedLabel(contacted),
                 ((contacted && mostHated != null)
-                    ? new ImageIcon(lib.getSmallMiscIconImage(mostHated.getNation()))
+                    ? new ImageIcon(lib.getSmallNationImage(mostHated.getNation()))
                     : null),
                 JLabel.CENTER));
 
@@ -112,7 +112,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
             "newline");
         JLabel label = Utility.localizedLabel(wants.get(0),
             ((visited && (gt = is.getWantedGoods(0)) != null)
-                ? new ImageIcon(lib.getIconImage(gt))
+                ? new ImageIcon(lib.getScaledGoodsTypeImage(gt))
                 : null),
             JLabel.CENTER);
         if (wants.size() > 1) Utility.localizeToolTip(label, wants.get(1));
@@ -125,7 +125,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
             wants = is.getWantedGoodsLabel(i, player);
             label = Utility.localizedLabel(wants.get(0),
                 ((visited && (gt = is.getWantedGoods(i)) != null)
-                    ? new ImageIcon(lib.getIconImage(gt))
+                    ? new ImageIcon(lib.getScaledGoodsTypeImage(gt))
                     : null),
                 JLabel.CENTER);
             if (wants.size() > 1) Utility.localizeToolTip(label, wants.get(1));

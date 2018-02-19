@@ -188,7 +188,7 @@ public final class InfoPanel extends FreeColPanel {
                             GoodsType type = ag.getType();
                             int n = tile.getPotentialProduction(type, null);
                             JLabel label = new JLabel(String.valueOf(n),
-                                new ImageIcon(lib.getSmallIconImage(type)),
+                                new ImageIcon(lib.getSmallGoodsTypeImage(type)),
                                 JLabel.RIGHT);
                             label.setToolTipText(Messages.getName(type));
                             label.setFont(font);
@@ -289,7 +289,7 @@ public final class InfoPanel extends FreeColPanel {
             String text;
             JLabel textLabel;
             if (unit != null) {
-                ImageIcon ii = new ImageIcon(lib.getUnitImage(unit));
+                ImageIcon ii = new ImageIcon(lib.getScaledUnitImage(unit));
                 JLabel imageLabel = new JLabel(ii);
                 add(imageLabel, "spany, gapafter 5px");
                 int width = getWidth() - ii.getIconWidth() - SLACK;
@@ -317,10 +317,10 @@ public final class InfoPanel extends FreeColPanel {
                         GoodsType gt = goods.getType();
                         // FIXME: Get size of full stack from appropriate place.
                         if(amount == 100) {
-                            icon = new ImageIcon(lib.getIconImage(gt));
+                            icon = new ImageIcon(lib.getScaledGoodsTypeImage(gt));
                             label = new JLabel(icon);
                         } else {
-                            icon = new ImageIcon(lib.getSmallIconImage(gt));
+                            icon = new ImageIcon(lib.getSmallGoodsTypeImage(gt));
                             label = new JLabel(String.valueOf(amount),
                                                icon, JLabel.RIGHT);
                         }

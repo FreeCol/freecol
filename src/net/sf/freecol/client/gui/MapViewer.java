@@ -326,8 +326,6 @@ public final class MapViewer extends FreeColClientHolder {
         // Since rows are shifted, we need to correct.
         int newCol = focus.getX() + dcol;
         int newRow = focus.getY() + drow * 2;
-        logger.finest("Old focus was " + focus.getX() + ", " + focus.getY()
-                      + ". Preliminary focus is " + newCol + ", " + newRow + ".");
         // Now, we check whether the central diamond of the calculated
         // rectangle was clicked, and adjust rows and columns
         // accordingly. See Direction.
@@ -445,7 +443,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @return A JLabel object with the unit's image.
      */
     private JLabel createUnitLabel(Unit unit) {
-        final BufferedImage unitImg = lib.getUnitImage(unit);
+        final BufferedImage unitImg = lib.getScaledUnitImage(unit);
         final int width = halfWidth + unitImg.getWidth()/2;
         final int height = unitImg.getHeight();
 
@@ -1769,7 +1767,7 @@ public final class MapViewer extends FreeColClientHolder {
 
         g2.setColor(backgroundColor);
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
-        g2.setColor(ImageLibrary.getForegroundColor(backgroundColor));
+        g2.setColor(ImageLibrary.makeForegroundColor(backgroundColor));
         float y = vPadding / 2.0f;
         for (i = 0; i < labels.length; i++) {
             Rectangle textRectangle = labels[i].getPixelBounds(null, 0, 0);
@@ -1824,7 +1822,7 @@ public final class MapViewer extends FreeColClientHolder {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(backgroundColor);
         g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-        g.setColor(ImageLibrary.getForegroundColor(backgroundColor));
+        g.setColor(ImageLibrary.makeForegroundColor(backgroundColor));
         if (expertMissionary) {
             g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g.draw(circle);
@@ -1906,7 +1904,7 @@ public final class MapViewer extends FreeColClientHolder {
         boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
             || (unit.hasTile()
                 && player != null && !player.canSee(unit.getTile()));
-        BufferedImage image = lib.getUnitImage(unit, fade);
+        BufferedImage image = lib.getScaledUnitImage(unit, fade);
         Point p = calculateUnitImagePositionInTile(image);
         g.drawImage(image, p.x, p.y, null);
 

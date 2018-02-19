@@ -106,8 +106,7 @@ public class GrayLayer extends Component {
             colour = Color.WHITE;
 
         } else {
-            coatOfArmsIcon = new ImageIcon(
-                ImageLibrary.getMiscIconImage(player.getNation(), 1f));
+            coatOfArmsIcon = new ImageIcon(ImageLibrary.getNationImage(player.getNation(), 1f));
             message = Messages.message(player.getWaitingLabel());
             colour = player.getNationColor();
         }

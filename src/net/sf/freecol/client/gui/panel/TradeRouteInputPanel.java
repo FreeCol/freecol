@@ -97,7 +97,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
 
         public TradeRouteCargoLabel(GoodsType type) {
-            super(new ImageIcon(getImageLibrary().getIconImage(type)));
+            super(new ImageIcon(getImageLibrary().getScaledGoodsTypeImage(type)));
 
             this.goodsType = type;
             setDisabledIcon(getDisabledIcon());
@@ -468,8 +468,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
             if (location instanceof Europe) {
                 Europe europe = (Europe) location;
-                Image image = lib.getSmallerMiscIconImage(
-                    europe.getOwner().getNation());
+                Image image = lib.getSmallerNationImage(europe.getOwner().getNation());
                 icon = new JLabel(new ImageIcon(image));
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
@@ -482,7 +481,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             panel.add(name, "span, wrap");
             for (GoodsType cargo : value.getCargo()) {
                 panel.add(new JLabel(new ImageIcon(
-                    lib.getSmallerIconImage(cargo))));
+                    lib.getSmallerGoodsTypeImage(cargo))));
             }
             return panel;
         }

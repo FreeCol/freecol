@@ -40,7 +40,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -96,7 +95,8 @@ public final class GoodsLabel extends AbstractGoodsLabel
             setIcon(getDisabledIcon());
         }
 
-        setForeground(getColor(type, goods.getAmount(), location));
+        setForeground(ImageLibrary.getGoodsColor(type, goods.getAmount(),
+                                                 location));
         setText(String.valueOf(goods.getAmount()));
     }
 
@@ -119,41 +119,11 @@ public final class GoodsLabel extends AbstractGoodsLabel
     @Override
     public void setPartialChosen(boolean partialChosen) {
         super.setPartialChosen(partialChosen);
-        ImageLibrary lib = gui.getImageLibrary();
-        Image image = partialChosen
-                      ? lib.getSmallIconImage(getType())
-                      : lib.getIconImage(getType());
+        final ImageLibrary lib = gui.getImageLibrary();
+        Image image = (partialChosen)
+            ? lib.getSmallGoodsTypeImage(getType())
+            : lib.getScaledGoodsTypeImage(getType());
         setIcon(new ImageIcon(image));
-    }
-
-
-    // Override AbstractGoods
-
-
-    /**
-     * Public routine to get a foreground color for a given goods type and
-     * amount in a given location.
-     *
-     * @param goodsType The {@code GoodsType} to use.
-     * @param amount The amount of goods.
-     * @param location The {@code Location} for the goods.
-     * @return A suitable {@code color}.
-     */
-    public static Color getColor(GoodsType goodsType, int amount,
-                                 Location location) {
-        String key = (!goodsType.limitIgnored()
-                && location instanceof Colony
-                && ((Colony) location).getWarehouseCapacity() < amount)
-                     ? "color.foreground.GoodsLabel.capacityExceeded"
-                     : (location instanceof Colony && goodsType.isStorable()
-                && ((Colony) location).getExportData(goodsType).getExported())
-                       ? "color.foreground.GoodsLabel.exported"
-                       : (amount == 0)
-                         ? "color.foreground.GoodsLabel.zeroAmount"
-                         : (amount < 0)
-                           ? "color.foreground.GoodsLabel.negativeAmount"
-                           : "color.foreground.GoodsLabel.positiveAmount";
-        return ResourceManager.getColor(key);
     }
 
 

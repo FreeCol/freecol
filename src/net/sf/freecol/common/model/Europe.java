@@ -430,8 +430,8 @@ public class Europe extends UnitLocation
     @Override
     public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
         Nation nation = this.getOwner().getNation();
-        return new ImageIcon(ImageLibrary.getMiscIconImage(nation,
-                                                           new Dimension(-1, cellHeight)));
+        return new ImageIcon(ImageLibrary.getNationImage(nation,
+                new Dimension(-1, cellHeight)));
     }
 
 
