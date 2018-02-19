@@ -579,8 +579,7 @@ public final class ImageLibrary {
                 TileType type = (TileType)derived;
                 image = getTerrainImage(type, 0, 0, size);
             } else if (derived instanceof UnitType) {
-                UnitType unitType = (UnitType)derived;
-                image = getUnitImage(unitType, size);
+                image = getUnitTypeImage((UnitType)derived, size);
             } else {
                 logger.warning("Could not find image of unknown type for "
                     + display);
@@ -640,7 +639,7 @@ public final class ImageLibrary {
                                                       Dimension size) {
         return (buildable instanceof BuildingType)
             ? getBuildingTypeImage((BuildingType)buildable, size)
-            : getUnitImage((UnitType)buildable, size);
+            : getUnitTypeImage((UnitType)buildable, size);
     }
 
     public BufferedImage getSmallBuildableTypeImage(BuildableType buildable,
@@ -648,7 +647,7 @@ public final class ImageLibrary {
         float scale = this.scaleFactor * SMALL_SCALE;
         return (buildable instanceof BuildingType)
             ? getBuildingTypeImage((BuildingType)buildable, player, scale)
-            : getUnitImage((UnitType)buildable, scale);
+            : getUnitTypeImage((UnitType)buildable, scale);
     }
 
 
@@ -1047,84 +1046,6 @@ public final class ImageLibrary {
 
     // Unit image handling
     
-    public BufferedImage getSmallerUnitImage(Unit unit) {
-        return getUnitImage(unit.getType(), unit.getRole().getId(),
-                            unit.hasNativeEthnicity(), false,
-                            this.scaleFactor * SMALLER_SCALE);
-    }
-
-    public BufferedImage getSmallUnitImage(Unit unit) {
-        return getUnitImage(unit.getType(), unit.getRole().getId(),
-                            unit.hasNativeEthnicity(), false,
-                            this.scaleFactor * SMALL_SCALE);
-    }
-
-    public BufferedImage getSmallUnitImage(Unit unit, boolean grayscale) {
-        return getUnitImage(unit.getType(), unit.getRole().getId(),
-                            unit.hasNativeEthnicity(), grayscale,
-                            this.scaleFactor * SMALL_SCALE);
-    }
-
-    public BufferedImage getUnitImage(Unit unit) {
-        return getUnitImage(unit.getType(), unit.getRole().getId(),
-                            unit.hasNativeEthnicity(), false,
-                            this.scaleFactor);
-    }
-
-    public BufferedImage getUnitImage(Unit unit, boolean grayscale) {
-        return getUnitImage(unit.getType(), unit.getRole().getId(),
-                            unit.hasNativeEthnicity(), grayscale,
-                            this.scaleFactor);
-    }
-
-    public static BufferedImage getUnitImage(Unit unit, float scale) {
-        return getUnitImage(unit.getType(), unit.getRole().getId(),
-                            unit.hasNativeEthnicity(), false, scale);
-    }
-
-    public BufferedImage getTinyUnitImage(UnitType unitType) {
-        return getUnitImage(unitType, unitType.getDisplayRoleId(),
-                            false, false, this.scaleFactor * TINY_SCALE);
-    }
-
-    public BufferedImage getTinyUnitImage(UnitType unitType,
-                                          boolean grayscale) {
-        return getUnitImage(unitType, unitType.getDisplayRoleId(),
-                            false, grayscale, this.scaleFactor * TINY_SCALE);
-    }
-
-    public BufferedImage getSmallerUnitImage(UnitType unitType) {
-        return getUnitImage(unitType, unitType.getDisplayRoleId(),
-                            false, false, this.scaleFactor * SMALLER_SCALE);
-    }
-
-    public BufferedImage getSmallUnitImage(UnitType unitType) {
-        return getUnitImage(unitType, unitType.getDisplayRoleId(),
-                            false, false, this.scaleFactor * SMALL_SCALE);
-    }
-
-    public BufferedImage getSmallUnitImage(UnitType unitType,
-                                           boolean grayscale) {
-        return getUnitImage(unitType, unitType.getDisplayRoleId(),
-                            false, grayscale, this.scaleFactor * SMALL_SCALE);
-    }
-
-    public BufferedImage getSmallUnitImage(UnitType unitType, String roleId,
-                                           boolean grayscale) {
-        return getUnitImage(unitType, roleId,
-                            false, grayscale, this.scaleFactor * SMALL_SCALE);
-    }
-
-    public BufferedImage getUnitImage(UnitType unitType) {
-        return getUnitImage(unitType, unitType.getDisplayRoleId(),
-                           false, false, this.scaleFactor);
-    }
-
-    public static BufferedImage getUnitImage(UnitType unitType, float scale) {
-        return getUnitImage(unitType, unitType.getDisplayRoleId(),
-                            false, false, scale);
-    }
-
     /**
      * Get the unit image key for the given parameters.
      *
@@ -1133,8 +1054,8 @@ public final class ImageLibrary {
      * @param nativeEthnicity If true the unit is a former native.
      * @return A suitable key.
      */
-    private static String getUnitImageKey(UnitType unitType, String roleId,
-                                          boolean nativeEthnicity) {
+    private static String getUnitTypeImageKey(UnitType unitType, String roleId,
+                                              boolean nativeEthnicity) {
         // Units that can only be native don't need the .native key part
         if (nativeEthnicity
             && unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)) {
@@ -1161,26 +1082,107 @@ public final class ImageLibrary {
      * @param scale How much the image is scaled.
      * @return A suitable {@code BufferedImage}.
      */
-    private static BufferedImage getUnitImage(UnitType unitType, String roleId,
-                                              boolean nativeEthnicity,
-                                              boolean grayscale, float scale) {
-        final String key = getUnitImageKey(unitType, roleId, nativeEthnicity);
+    private static BufferedImage getUnitTypeImage(UnitType unitType,
+                                                  String roleId,
+                                                  boolean nativeEthnicity,
+                                                  boolean grayscale,
+                                                  float scale) {
+        final String key = getUnitTypeImageKey(unitType, roleId,
+                                               nativeEthnicity);
         return ResourceManager.getImage(key, scale, grayscale);
     }
 
-    private static BufferedImage getUnitImage(UnitType unitType,
-                                              Dimension size) {
-        return getUnitImage(unitType, unitType.getDisplayRoleId(), false,
-                            size);
+    public static BufferedImage getUnitTypeImage(UnitType unitType,
+                                                 float scale) {
+        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(), false,
+                                false, scale);
     }
 
-    private static BufferedImage getUnitImage(UnitType unitType, String roleId,
-                                              boolean nativeEthnicity,
-                                              Dimension size) {
-        final String key = getUnitImageKey(unitType, roleId, nativeEthnicity);
+    private static BufferedImage getUnitTypeImage(UnitType unitType,
+                                                  String roleId,
+                                                  boolean nativeEthnicity,
+                                                  Dimension size) {
+        final String key = getUnitTypeImageKey(unitType, roleId,
+                                               nativeEthnicity);
         return ResourceManager.getImage(key, size, false);
     }
 
+    private static BufferedImage getUnitTypeImage(UnitType unitType,
+                                                  Dimension size) {
+        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(), false,
+                                size);
+    }
+
+    public BufferedImage getScaledUnitTypeImage(UnitType unitType) {
+        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(), false,
+                                false, this.scaleFactor);
+    }
+
+    public BufferedImage getSmallUnitTypeImage(UnitType unitType, String roleId,
+                                               boolean grayscale) {
+        return getUnitTypeImage(unitType, roleId, false,
+                                grayscale, this.scaleFactor * SMALL_SCALE);
+    }
+
+    public BufferedImage getSmallUnitTypeImage(UnitType unitType,
+                                               boolean grayscale) {
+        return getSmallUnitTypeImage(unitType, unitType.getDisplayRoleId(),
+                                     grayscale);
+    }
+
+    public BufferedImage getSmallUnitTypeImage(UnitType unitType) {
+        return getSmallUnitTypeImage(unitType, unitType.getDisplayRoleId(),
+                                     false);
+    }
+
+    public BufferedImage getSmallerUnitTypeImage(UnitType unitType) {
+        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(),
+                                false, false, this.scaleFactor * SMALLER_SCALE);
+    }
+
+    public BufferedImage getTinyUnitTypeImage(UnitType unitType,
+                                              boolean grayscale) {
+        return getUnitTypeImage(unitType, unitType.getDisplayRoleId(), false,
+                                grayscale, this.scaleFactor * TINY_SCALE);
+    }
+
+    public BufferedImage getTinyUnitTypeImage(UnitType unitType) {
+        return getTinyUnitTypeImage(unitType, false);
+    }
+
+    private static BufferedImage getUnitImage(Unit unit, boolean grayscale,
+                                              float scale) {
+        return getUnitTypeImage(unit.getType(), unit.getRole().getId(),
+                                unit.hasNativeEthnicity(), grayscale, scale);
+    }
+
+    public BufferedImage getScaledUnitImage(Unit unit, boolean grayscale) {
+        return getUnitImage(unit, grayscale, this.scaleFactor);
+    }
+
+    public BufferedImage getScaledUnitImage(Unit unit) {
+        return getScaledUnitImage(unit, false);
+    }
+
+    public BufferedImage getSmallUnitImage(Unit unit, boolean grayscale) {
+        return getUnitImage(unit, grayscale,
+                            this.scaleFactor * SMALL_SCALE);
+    }
+
+    public BufferedImage getSmallUnitImage(Unit unit) {
+        return getSmallUnitImage(unit, false);
+    }
+
+    public BufferedImage getSmallerUnitImage(Unit unit) {
+        return getUnitImage(unit, false,
+                            this.scaleFactor * SMALLER_SCALE);
+    }
+
+    public BufferedImage getTinyUnitImage(Unit unit) {
+        return getUnitImage(unit, false,
+                            this.scaleFactor * TINY_SCALE);
+    }
+    
 
     // Accessors for small "chip" images.
     // TODO: cache these too?

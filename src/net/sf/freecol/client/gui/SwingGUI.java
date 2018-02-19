@@ -819,7 +819,7 @@ public class SwingGUI extends GUI {
                            String okKey, String cancelKey) {
         return canvas.showConfirmDialog(tile,
             Utility.localizedTextArea(template),
-            new ImageIcon(imageLibrary.getUnitImage(unit)),
+            new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
             okKey, cancelKey);
     }
 
@@ -874,7 +874,7 @@ public class SwingGUI extends GUI {
     public <T> T getChoice(Tile tile, Object explain, Unit unit,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return canvas.showChoiceDialog(tile, explain,
-            new ImageIcon(imageLibrary.getUnitImage(unit)),
+            new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
             cancelKey, choices);
     }
 
@@ -1375,7 +1375,7 @@ public class SwingGUI extends GUI {
         ImageIcon icon = null;
         Tile tile = null;
         if(displayObject != null) {
-            icon = new ImageIcon(imageLibrary.getUnitImage(displayObject));
+            icon = new ImageIcon(imageLibrary.getScaledUnitImage(displayObject));
             tile = displayObject.getTile();
         }
         canvas.showInformationMessage(displayObject, tile, icon, template);

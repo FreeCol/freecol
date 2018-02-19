@@ -471,7 +471,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 JPanel experiencePanel = new MigPanel();
                 experiencePanel.setLayout(new MigLayout("wrap 3"));
                 experiencePanel.add(new JLabel(new ImageIcon(
-                        lib.getSmallerUnitImage(expertType))),
+                        lib.getSmallerUnitTypeImage(expertType))),
                     "spany 2");
                 experiencePanel.add(Utility.localizedLabel(StringTemplate
                         .template("quickActionMenu.experience")
@@ -696,7 +696,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (uc != null) {
             if (separatorNeeded) this.addSeparator();
             JMenuItem menuItem = Utility.localizedMenuItem("quickActionMenu.clearSpeciality",
-                new ImageIcon(gui.getImageLibrary().getTinyUnitImage(uc.to)));
+                new ImageIcon(gui.getImageLibrary().getTinyUnitTypeImage(uc.to)));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             this.add(menuItem);

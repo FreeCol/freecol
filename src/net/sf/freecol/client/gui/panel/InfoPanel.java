@@ -289,7 +289,7 @@ public final class InfoPanel extends FreeColPanel {
             String text;
             JLabel textLabel;
             if (unit != null) {
-                ImageIcon ii = new ImageIcon(lib.getUnitImage(unit));
+                ImageIcon ii = new ImageIcon(lib.getScaledUnitImage(unit));
                 JLabel imageLabel = new JLabel(ii);
                 add(imageLabel, "spany, gapafter 5px");
                 int width = getWidth() - ii.getIconWidth() - SLACK;

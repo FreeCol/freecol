@@ -221,7 +221,7 @@ public final class UnitLabel extends FreeColLabel
             setIcon(new ImageIcon(lib.getSmallUnitImage(unit)));
             setBorder(Utility.blankBorder(0, 2, 0, 0));
         } else {
-            Icon imageIcon = new ImageIcon(lib.getUnitImage(unit));
+            Icon imageIcon = new ImageIcon(lib.getScaledUnitImage(unit));
             if (unit.getLocation() instanceof ColonyTile) {
                 Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
                 tileSize.width /= 2;
@@ -468,7 +468,7 @@ public final class UnitLabel extends FreeColLabel
             ImageLibrary lib = getImageLibrary();
             Icon disabledImageIcon = (this.isSmall)
                 ? new ImageIcon(lib.getSmallUnitImage(unit, true))
-                : new ImageIcon(lib.getUnitImage(unit, true));
+                : new ImageIcon(lib.getScaledUnitImage(unit, true));
             setDisabledIcon(disabledImageIcon);
         }
         super.setEnabled(b);

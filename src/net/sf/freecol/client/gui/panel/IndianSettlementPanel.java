@@ -93,7 +93,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final UnitType skillType = is.getLearnableSkill();
         add(Utility.localizedLabel(is.getLearnableSkillLabel(visited),
                 ((visited && skillType != null)
-                    ? new ImageIcon(lib.getSmallUnitImage(skillType))
+                    ? new ImageIcon(lib.getSmallUnitTypeImage(skillType))
                     : null),
                 JLabel.CENTER));
 

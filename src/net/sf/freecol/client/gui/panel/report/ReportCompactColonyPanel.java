@@ -772,8 +772,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         for (Entry<Unit, Integer> e
                  : mapEntriesByValue(s.teachers, descendingIntegerComparator)) {
             Unit u = e.getKey();
-            ImageIcon ii
-                = new ImageIcon(this.lib.getTinyUnitImage(u.getType(), false));
+            ImageIcon ii = new ImageIcon(this.lib.getTinyUnitImage(u));
             if (e.getValue() <= 0) {
                 t = stpld("report.colony.making.noteach")
                         .addName("%colony%", s.colony.getName())
@@ -795,7 +794,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         if (empty > 0) {
             final ImageIcon emptyIcon
-                = new ImageIcon(this.lib.getTinyUnitImage(defaultUnitType, true));
+                = new ImageIcon(this.lib.getTinyUnitTypeImage(defaultUnitType, true));
             t = stpld("report.colony.making.educationVacancy")
                     .addName("%colony%", s.colony.getName())
                     .addAmount("%number%", empty);
@@ -834,7 +833,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);
             ImageIcon icon
-                = new ImageIcon(this.lib.getTinyUnitImage(type, false));
+                = new ImageIcon(this.lib.getTinyUnitTypeImage(type, false));
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpld("report.colony.wanting")
                     .addName("%colony%", colony.getName())
@@ -1019,7 +1018,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         for (Entry<UnitType, Integer> e
                  : mapEntriesByValue(unitTypeMap, descendingIntegerComparator)) {
             ImageIcon icon
-                = new ImageIcon(this.lib.getTinyUnitImage(e.getKey(), false));
+                = new ImageIcon(this.lib.getTinyUnitTypeImage(e.getKey(), false));
             result.add(newLabel(Integer.toString(e.getValue()), icon,
                                 cPlain, t));
             if (++n >= maxSize) break;
@@ -1062,7 +1061,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         final UnitType type = spec.getDefaultUnitType(getMyPlayer());
         ImageIcon colonistIcon
-            = new ImageIcon(this.lib.getTinyUnitImage(type, false));
+            = new ImageIcon(this.lib.getTinyUnitTypeImage(type));
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpld("report.colony.birth")));
         reportPanel.add(newLabel("report.colony.making.header", null, null,

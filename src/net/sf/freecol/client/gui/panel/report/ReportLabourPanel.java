@@ -71,8 +71,8 @@ public final class ReportLabourPanel extends ReportPanel {
             this.unitType = unitType;
             setOpaque(false);
             setLayout(new MigLayout("wrap 2", "[60, right][left]"));
-            add(new JLabel(new ImageIcon(getImageLibrary().getSmallUnitImage(
-                    unitType, (count == 0)))),
+            add(new JLabel(new ImageIcon(getImageLibrary()
+                        .getSmallUnitTypeImage(unitType, (count == 0)))),
                 "spany 2");
             add(new JLabel(Messages.getName(unitType)));
             add(new JLabel(Integer.toString(count)));

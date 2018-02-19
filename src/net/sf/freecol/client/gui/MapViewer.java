@@ -443,7 +443,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @return A JLabel object with the unit's image.
      */
     private JLabel createUnitLabel(Unit unit) {
-        final BufferedImage unitImg = lib.getUnitImage(unit);
+        final BufferedImage unitImg = lib.getScaledUnitImage(unit);
         final int width = halfWidth + unitImg.getWidth()/2;
         final int height = unitImg.getHeight();
 
@@ -1904,7 +1904,7 @@ public final class MapViewer extends FreeColClientHolder {
         boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
             || (unit.hasTile()
                 && player != null && !player.canSee(unit.getTile()));
-        BufferedImage image = lib.getUnitImage(unit, fade);
+        BufferedImage image = lib.getScaledUnitImage(unit, fade);
         Point p = calculateUnitImagePositionInTile(image);
         g.drawImage(image, p.x, p.y, null);
 
