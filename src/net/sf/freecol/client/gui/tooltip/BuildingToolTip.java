@@ -119,7 +119,7 @@ public class BuildingToolTip extends JToolTip {
             }
         }
 
-        add(new JLabel(new ImageIcon(lib.getBuildingImage(building))));
+        add(new JLabel(new ImageIcon(lib.getScaledBuildingImage(building))));
 
         if (outputType != null) {
             for (Unit unit : building.getUnitList()) {

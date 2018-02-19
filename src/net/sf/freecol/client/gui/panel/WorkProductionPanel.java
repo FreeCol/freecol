@@ -89,7 +89,7 @@ public class WorkProductionPanel extends FreeColPanel {
             final Building building = (Building)wl;
             shortName = Messages.getName(building.getType());
             longName = shortName;
-            image = lib.getBuildingImage(building);
+            image = lib.getScaledBuildingImage(building);
         }
 
         add(new JLabel(longName), "span, align center, wrap 30");

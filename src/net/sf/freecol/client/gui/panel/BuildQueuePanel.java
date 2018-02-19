@@ -485,7 +485,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             JPanel panel = (isSelected) ? selectedPanel : itemPanel;
             panel.removeAll();
 
-            ((ImageIcon)imageLabel.getIcon()).setImage(ImageLibrary.getBuildableImage(value, buildingDimension));
+            ((ImageIcon)imageLabel.getIcon()).setImage(ImageLibrary
+                .getBuildableTypeImage(value, buildingDimension));
 
             nameLabel.setText(Messages.getName(value));
             panel.setToolTipText(lockReasons.get(value));

@@ -565,8 +565,7 @@ public final class ImageLibrary {
 
             // Not all types have a meaningful image.
             if (derived instanceof BuildingType) {
-                BuildingType type = (BuildingType)derived;
-                image = getBuildingImage(type, size);
+                image = getBuildingTypeImage((BuildingType)derived, size);
             } else if (derived instanceof GoodsType) {
                 image = getGoodsTypeImage((GoodsType)derived, size);
             } else if (derived instanceof LostCityRumour) {
@@ -602,52 +601,54 @@ public final class ImageLibrary {
 
     // BuildingType/Building/Buildable handling
 
-    public BufferedImage getSmallBuildableImage(BuildableType buildable,
-                                                Player player) {
-        // FIXME: distinguish national unit types
-        float scale = this.scaleFactor * SMALL_SCALE;
-        return (buildable instanceof BuildingType)
-            ? getBuildingImage((BuildingType)buildable, player, scale)
-            : getUnitImage((UnitType)buildable, scale);
+    private static String getBuildingTypeKey(BuildingType buildingType) {
+        return "image.buildingicon." + buildingType.getId();
+    }
+    
+    public static BufferedImage getBuildingTypeImage(BuildingType buildingType,
+                                                     Player player, float scale) {
+        final String key = getBuildingTypeKey(buildingType);
+        final String extraKey = key + "." + player.getNationResourceKey();
+        final boolean hasExtra = ResourceManager.hasImageResource(extraKey);
+        return ResourceManager.getImage((hasExtra) ? extraKey : key,
+            scale, false);
     }
 
-    public static BufferedImage getBuildableImage(BuildableType buildable,
-                                                  Dimension size) {
-        return (buildable instanceof BuildingType)
-            ? getBuildingImage((BuildingType) buildable, size)
-            : getUnitImage((UnitType)buildable, size);
-    }
-
-    public BufferedImage getSmallBuildingImage(Building building) {
-        return getBuildingImage(building.getType(), building.getOwner(),
-                                this.scaleFactor * SMALL_SCALE);
-    }
-
-    public BufferedImage getBuildingImage(Building building) {
-        return getBuildingImage(building.getType(), building.getOwner(),
-                                this.scaleFactor);
-    }
-
-    public static BufferedImage getBuildingImage(BuildingType buildingType,
-                                                 Player player, float scale) {
-        String key = "image.buildingicon." + buildingType.getId()
-            + "." + player.getNationResourceKey();
-        if (!ResourceManager.hasImageResource(key)) {
-            key = "image.buildingicon." + buildingType.getId();
-        }
+    public static BufferedImage getBuildingTypeImage(BuildingType buildingType,
+                                                     float scale) {
+        final String key = getBuildingTypeKey(buildingType);
         return ResourceManager.getImage(key, scale, false);
     }
 
-    public static BufferedImage getBuildingImage(BuildingType buildingType,
-                                                 float scale) {
-        return ResourceManager.getImage("image.buildingicon."
-            + buildingType.getId(), scale, false);
+    public static BufferedImage getBuildingTypeImage(BuildingType buildingType,
+                                                     Dimension size) {
+        final String key = getBuildingTypeKey(buildingType);
+        return ResourceManager.getImage(key, size, false);
     }
 
-    public static BufferedImage getBuildingImage(BuildingType buildingType,
-                                                 Dimension size) {
-        return ResourceManager.getImage("image.buildingicon."
-            + buildingType.getId(), size, false);
+    public BufferedImage getScaledBuildingImage(Building building) {
+        return getBuildingTypeImage(building.getType(), building.getOwner(),
+                                    this.scaleFactor);
+    }
+
+    public BufferedImage getSmallBuildingImage(Building building) {
+        return getBuildingTypeImage(building.getType(), building.getOwner(),
+                                    this.scaleFactor * SMALL_SCALE);
+    }
+
+    public static BufferedImage getBuildableTypeImage(BuildableType buildable,
+                                                      Dimension size) {
+        return (buildable instanceof BuildingType)
+            ? getBuildingTypeImage((BuildingType)buildable, size)
+            : getUnitImage((UnitType)buildable, size);
+    }
+
+    public BufferedImage getSmallBuildableTypeImage(BuildableType buildable,
+                                                    Player player) {
+        float scale = this.scaleFactor * SMALL_SCALE;
+        return (buildable instanceof BuildingType)
+            ? getBuildingTypeImage((BuildingType)buildable, player, scale)
+            : getUnitImage((UnitType)buildable, scale);
     }
 
 
