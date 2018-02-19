@@ -102,7 +102,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final Player mostHated = is.getMostHated();
         add(Utility.localizedLabel(is.getMostHatedLabel(contacted),
                 ((contacted && mostHated != null)
-                    ? new ImageIcon(lib.getSmallMiscIconImage(mostHated.getNation()))
+                    ? new ImageIcon(lib.getSmallNationImage(mostHated.getNation()))
                     : null),
                 JLabel.CENTER));
 

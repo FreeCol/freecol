@@ -907,7 +907,7 @@ public class SwingGUI extends GUI {
     public <T> T getChoice(Tile tile, Object explain, Nation nation,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return canvas.showChoiceDialog(tile, explain,
-            new ImageIcon(imageLibrary.getMiscIconImage(nation)),
+            new ImageIcon(imageLibrary.getScaledNationImage(nation)),
             cancelKey, choices);
     }
 

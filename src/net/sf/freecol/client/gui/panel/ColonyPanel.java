@@ -1203,8 +1203,7 @@ public final class ColonyPanel extends PortPanel
 
             removeAll();
 
-            rebelShield.setIcon(new ImageIcon(
-                lib.getSmallerMiscIconImage(nation)));
+            rebelShield.setIcon(new ImageIcon(lib.getSmallerNationImage(nation)));
             add(rebelShield, "bottom");
 
             t = StringTemplate.template("colonyPanel.rebelLabel")
@@ -1248,8 +1247,7 @@ public final class ColonyPanel extends PortPanel
                 ? nation.getRebelNation()
                 : nation.getREFNation();
             try {
-                royalistShield.setIcon(new ImageIcon(
-                    lib.getSmallerMiscIconImage(other)));
+                royalistShield.setIcon(new ImageIcon(lib.getSmallerNationImage(other)));
                 add(royalistShield, "bottom");
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Shield: " + nation + "/" + other, e);

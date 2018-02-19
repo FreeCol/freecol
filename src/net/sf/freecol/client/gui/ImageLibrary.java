@@ -203,20 +203,6 @@ public final class ImageLibrary {
 
 
     /**
-     * Should the tile with the given coordinates be considered "even"?
-     *
-     * This is useful to select different images for the same tile
-     * type in order to prevent big stripes or a checker-board effect.
-     *
-     * @param x The tile x coordinate.
-     * @param y The tile y coordinate.
-     * @return True if the tile should be considered even.
-     */
-    private static boolean isSpecialEven(int x, int y) {
-        return ((y % 8 <= 2) || ((x + y) % 2 == 0 ));
-    }
-
-    /**
      * Get the scaling factor used when creating this {@code ImageLibrary}.
      *
      * It is 1f if the constructor without scaling factor was used to create
@@ -235,6 +221,35 @@ public final class ImageLibrary {
     public static Dimension scaleDimension(Dimension size, float scaleFactor) {
         return new Dimension(Math.round(size.width * scaleFactor),
                              Math.round(size.height * scaleFactor));
+    }
+
+    /**
+     * Should the tile with the given coordinates be considered "even"?
+     *
+     * This is useful to select different images for the same tile
+     * type in order to prevent big stripes or a checker-board effect.
+     *
+     * @param x The tile x coordinate.
+     * @param y The tile y coordinate.
+     * @return True if the tile should be considered even.
+     */
+    private static boolean isSpecialEven(int x, int y) {
+        return ((y % 8 <= 2) || ((x + y) % 2 == 0 ));
+    }
+
+    private static BufferedImage getRandomizedImage(List<String> keys,
+                                                    String id, Dimension size) {
+        final int count = keys.size();
+        switch (count) {
+        case 0:
+            return null;
+        case 1:
+            return ResourceManager.getImage(keys.get(0), size, false);
+        default:
+            keys.sort(Comparator.naturalOrder());
+            String key = keys.get(Math.abs(id.hashCode() % count));
+            return ResourceManager.getImage(key, size, false);
+        }
     }
 
 
@@ -347,23 +362,8 @@ public final class ImageLibrary {
     }
 
 
-    // Miscellaneous image manipulation
+    // Image manipulation
 
-    /**
-     * Get the standard cursor.
-     *
-     * @return A suitable default {@code Cursor}.
-     */
-    public static Cursor getCursor() {
-        String key = "image.icon.cursor.go";
-        if (ResourceManager.hasImageResource(key)) {
-            Image im = ResourceManager.getImage(key);
-            return Toolkit.getDefaultToolkit().createCustomCursor(im,
-                new Point(im.getWidth(null)/2, im.getHeight(null)/2), "go");
-        }
-        return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-    }
-    
     /**
      * Draw a (usually small) background image into a (usually larger)
      * space specified by a component, tiling the image to fill up the
@@ -492,92 +492,23 @@ public final class ImageLibrary {
     }
 
 
-    // Specialized image retrieval
+    // Miscellaneous image handling
 
     /**
-     * Returns the beach corner image at the given index.
+     * Get the standard cursor.
      *
-     * @param index The index of the image to return.
-     * @param x an {@code int} value
-     * @param y an {@code int} value
-     * @return The image at the given index.
+     * @return A suitable default {@code Cursor}.
      */
-    public BufferedImage getBeachCornerImage(int index, int x, int y) {
-        final String key = "image.tile.model.tile.beach.corner" + index
-            + ".r" + ((isSpecialEven(x, y)) ? "0" : "1");
-        return ResourceManager.getImage(key, this.tileSize, false);
-    }
-
-    /**
-     * Returns the beach edge image at the given index.
-     *
-     * @param index The index of the image to return.
-     * @param x an {@code int} value
-     * @param y an {@code int} value
-     * @return The image at the given index.
-     */
-    public BufferedImage getBeachEdgeImage(int index, int x, int y) {
-        final String key = "image.tile.model.tile.beach.edge" + index
-            + ".r"+ ((isSpecialEven(x, y)) ? "0" : "1");
-        return ResourceManager.getImage(key, this.tileSize, false);
-    }
-
-    /**
-     * Returns the border terrain-image for the given type.
-     *
-     * @param type The type of the terrain-image to return.
-     * @param direction a {@code Direction} value
-     * @param x The x-coordinate of the tile that is being drawn.
-     * @param y The x-coordinate of the tile that is being drawn.
-     * @return The terrain-image at the given index.
-     */
-    public BufferedImage getBorderImage(TileType type, Direction direction,
-                                int x, int y) {
-        final String key = "image.tile."
-            + ((type==null) ? "model.tile.unexplored" : type.getId())
-            + ".border." + direction
-            + ".r" + ((isSpecialEven(x, y)) ?  "0" : "1");
-        return ResourceManager.getImage(key, this.tileSize, false);
-    }
-
-    /**
-     * Returns the forest image for a terrain type.
-     *
-     * @param type The type of the terrain-image to return.
-     * @return The image at the given index.
-     */
-    public BufferedImage getForestImage(TileType type) {
-        return getForestImage(type, this.tileForestSize);
-    }
-
-    public static BufferedImage getForestImage(TileType type, Dimension size) {
-        return ResourceManager.getImage("image.tileforest." + type.getId(),
-                                        size, false);
-    }
-
-    public BufferedImage getForestImage(TileType type,
-                                        TileImprovementStyle riverStyle) {
-        return getForestImage(type, riverStyle, this.tileForestSize);
-    }
-
-    public static BufferedImage getForestImage(TileType type,
-                                               TileImprovementStyle riverStyle,
-                                               Dimension size) {
-        String key;
-        if (riverStyle != null) {
-            String mask = riverStyle.getMask();
-            // Ensure unconnected river tiles are visible in map editor
-            key = "image.tileforest." + type.getId() + ".s"
-                + ((mask.equals("0000")) ? "0100" : mask);
-            // Safety check providing fallback for incomplete mods
-            if (ResourceManager.hasImageResource(key)) {
-                return ResourceManager.getImage(key, size, false);
-            }
+    public static Cursor getCursor() {
+        String key = "image.icon.cursor.go";
+        if (ResourceManager.hasImageResource(key)) {
+            Image im = ResourceManager.getImage(key);
+            return Toolkit.getDefaultToolkit().createCustomCursor(im,
+                new Point(im.getWidth(null)/2, im.getHeight(null)/2), "go");
         }
-        key = "image.tileforest." + type.getId();
-        return ResourceManager.getImage(key, size, false);
+        return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     }
-
+    
     /**
      * Returns the portrait of this Founding Father.
      *
@@ -590,6 +521,102 @@ public final class ImageLibrary {
         final String key = "image.flavor." + father.getId();
         return ResourceManager.getImage(key, NORMAL_SCALE, grayscale);
     }
+
+    public static BufferedImage getColorCellRendererBackground() {
+        return ResourceManager.getImage("image.background.ColorCellRenderer");
+    }
+    
+    public static BufferedImage getMinimapBackground() {
+        return ResourceManager.getImage("image.background.MiniMap");
+    }
+    
+    public BufferedImage getSmallerIconImage(FreeColSpecObjectType type) {
+        return getMiscImage("image.icon." + type.getId(),
+            scaleDimension(ICON_SIZE, this.scaleFactor * SMALLER_SCALE));
+    }
+
+    public BufferedImage getSmallIconImage(FreeColSpecObjectType type) {
+        return getMiscImage("image.icon." + type.getId(),
+            scaleDimension(ICON_SIZE, this.scaleFactor * SMALL_SCALE));
+    }
+
+    public BufferedImage getIconImage(FreeColSpecObjectType type) {
+        return getMiscImage("image.icon." + type.getId(),
+            scaleDimension(ICON_SIZE, this.scaleFactor));
+    }
+
+    /**
+     * Returns the image with the given identifier.
+     *
+     * @param id The object identifier.
+     * @return The image.
+     */
+    public BufferedImage getMiscImage(String id) {
+        return getMiscImage(id, this.scaleFactor);
+    }
+
+    public static BufferedImage getMiscImage(String id, float scale) {
+        return ResourceManager.getImage(id, scale, false);
+    }
+
+    public static BufferedImage getMiscImage(String id, Dimension size) {
+        return ResourceManager.getImage(id, size, false);
+    }
+
+    /**
+     * Returns the appropriate BufferedImage for a FreeColObject.
+     * Please, use a more specific method!
+     *
+     * @param display The {@code FreeColObject} to display.
+     * @param scale How much the image should be scaled.
+     * @return The appropriate {@code BufferedImage}.
+     */
+    public BufferedImage getObjectImage(FreeColObject display, float scale) {
+        try {
+            final float combinedScale = this.scaleFactor * scale;
+            final Dimension size = scaleDimension(ICON_SIZE, combinedScale);
+            BufferedImage image;
+            FreeColObject derived = display.getDisplayObject();
+
+            // Not all types have a meaningful image.
+            if (derived instanceof BuildingType) {
+                BuildingType type = (BuildingType)derived;
+                image = getBuildingImage(type, size);
+            } else if (derived instanceof GoodsType) {
+                FreeColSpecObjectType type = (FreeColSpecObjectType)derived;
+                image = getIconImage(type);
+            } else if (derived instanceof LostCityRumour) {
+                image = getMiscImage(LOST_CITY_RUMOUR, size);
+            } else if (derived instanceof Nation) {
+                image = getNationImage((Nation)derived, size);
+            } else if (derived instanceof Settlement) {
+                Settlement settlement = (Settlement)derived;
+                image = getSettlementImage(settlement, size);
+            } else if (derived instanceof TileType) {
+                TileType type = (TileType)derived;
+                image = getTerrainImage(type, 0, 0, size);
+            } else if (derived instanceof UnitType) {
+                UnitType unitType = (UnitType)derived;
+                image = getUnitImage(unitType, size);
+            } else {
+                logger.warning("Could not find image of unknown type for "
+                    + display);
+                return null;
+            }
+
+            if (image == null) {
+                logger.warning("Could not find image for " + display);
+                return null;
+            }
+            return image;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception finding image", e);
+            return null;
+        }
+    }
+
+
+    // BuildingType/Building/Buildable handling
 
     public BufferedImage getSmallBuildableImage(BuildableType buildable,
                                                 Player player) {
@@ -639,124 +666,34 @@ public final class ImageLibrary {
             + buildingType.getId(), size, false);
     }
 
-    public static BufferedImage getColorCellRendererBackground() {
-        return ResourceManager.getImage("image.background.ColorCellRenderer");
+
+    // Nation image handling
+
+    private static String getNationKey(Nation nation) {
+        return "image.miscicon." + nation.getId();
     }
     
-    public static BufferedImage getMinimapBackground() {
-        return ResourceManager.getImage("image.background.MiniMap");
+    public static BufferedImage getNationImage(Nation nation, Dimension size) {
+        
+        return ResourceManager.getImage(getNationKey(nation), size, false);
+    }
+
+    public static BufferedImage getNationImage(Nation nation, float scale) {
+        return ResourceManager.getImage(getNationKey(nation), scale, false);
     }
     
-    public BufferedImage getSmallerIconImage(FreeColSpecObjectType type) {
-        return getMiscImage("image.icon." + type.getId(),
-            scaleDimension(ICON_SIZE, this.scaleFactor * SMALLER_SCALE));
+    public BufferedImage getScaledNationImage(Nation nation) {
+        return getNationImage(nation, this.scaleFactor);
     }
 
-    public BufferedImage getSmallIconImage(FreeColSpecObjectType type) {
-        return getMiscImage("image.icon." + type.getId(),
-            scaleDimension(ICON_SIZE, this.scaleFactor * SMALL_SCALE));
+    public BufferedImage getSmallNationImage(Nation nation) {
+        return getNationImage(nation, this.scaleFactor * SMALL_SCALE);
     }
 
-    public BufferedImage getIconImage(FreeColSpecObjectType type) {
-        return getMiscImage("image.icon." + type.getId(),
-            scaleDimension(ICON_SIZE, this.scaleFactor));
+    public BufferedImage getSmallerNationImage(Nation nation) {
+        return getNationImage(nation, this.scaleFactor * SMALLER_SCALE);
     }
-
-    public BufferedImage getSmallerMiscIconImage(FreeColSpecObjectType type) {
-        return getMiscIconImage(type, this.scaleFactor * SMALLER_SCALE);
-    }
-
-    public BufferedImage getSmallMiscIconImage(FreeColSpecObjectType type) {
-        return getMiscIconImage(type, this.scaleFactor * SMALL_SCALE);
-    }
-
-    public BufferedImage getMiscIconImage(FreeColSpecObjectType type) {
-        return getMiscIconImage(type, this.scaleFactor);
-    }
-
-    public static BufferedImage getMiscIconImage(FreeColSpecObjectType type,
-                                                 float scale) {
-        return ResourceManager.getImage("image.miscicon." + type.getId(),
-                                        scale, false);
-    }
-
-    public static BufferedImage getMiscIconImage(FreeColSpecObjectType type,
-                                                 Dimension size) {
-        return ResourceManager.getImage("image.miscicon." + type.getId(),
-                                        size, false);
-    }
-
-    /**
-     * Returns the image with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The image.
-     */
-    public BufferedImage getMiscImage(String id) {
-        return getMiscImage(id, this.scaleFactor);
-    }
-
-    public static BufferedImage getMiscImage(String id, float scale) {
-        return ResourceManager.getImage(id, scale, false);
-    }
-
-    public static BufferedImage getMiscImage(String id, Dimension size) {
-        return ResourceManager.getImage(id, size, false);
-    }
-
-    /**
-     * Returns the appropriate BufferedImage for a FreeColObject.
-     * Please, use a more specific method!
-     *
-     * @param display The {@code FreeColObject} to display.
-     * @param scale How much the image should be scaled.
-     * @return The appropriate {@code BufferedImage}.
-     */
-    public BufferedImage getObjectImage(FreeColObject display, float scale) {
-        try {
-            final float combinedScale = this.scaleFactor * scale;
-            final Dimension size = scaleDimension(ICON_SIZE, combinedScale);
-            BufferedImage image;
-            FreeColObject derived = display.getDisplayObject();
-
-            // Not all types have a meaningful image.
-            if (derived instanceof BuildingType) {
-                BuildingType type = (BuildingType)derived;
-                image = getBuildingImage(type, size);
-            } else if (derived instanceof GoodsType) {
-                FreeColSpecObjectType type = (FreeColSpecObjectType)derived;
-                image = getIconImage(type);
-            } else if (derived instanceof LostCityRumour) {
-                image = getMiscImage(LOST_CITY_RUMOUR, size);
-            } else if (derived instanceof Nation) {
-                FreeColSpecObjectType type = (FreeColSpecObjectType)derived;
-                image = getMiscIconImage(type, size);
-            } else if (derived instanceof Settlement) {
-                Settlement settlement = (Settlement)derived;
-                image = getSettlementImage(settlement, size);
-            } else if (derived instanceof TileType) {
-                TileType type = (TileType)derived;
-                image = getTerrainImage(type, 0, 0, size);
-            } else if (derived instanceof UnitType) {
-                UnitType unitType = (UnitType)derived;
-                image = getUnitImage(unitType, size);
-            } else {
-                logger.warning("Could not find image of unknown type for "
-                    + display);
-                return null;
-            }
-
-            if (image == null) {
-                logger.warning("Could not find image for " + display);
-                return null;
-            }
-            return image;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception finding image", e);
-            return null;
-        }
-    }
-
+    
     /**
      * Returns the monarch-image for the given tile.
      *
@@ -767,6 +704,143 @@ public final class ImageLibrary {
         final String key = "image.flavor.monarch." + nation.getId();
         return ResourceManager.getImage(key);
     }
+
+    
+
+    // Path type image handling
+
+    /**
+     * Gets an image to represent the path of given path type.
+     *
+     * @param pt The {@code PathType}
+     * @return The {@code BufferedImage}.
+     */
+    public static BufferedImage getPathImage(PathType pt) {
+        return (pt == null) ? null
+            : ResourceManager.getImage(pt.getImageKey());
+    }
+
+    /**
+     * Gets an image to represent the path of the given {@code Unit}.
+     *
+     * @param u The {@code Unit}
+     * @return The {@code BufferedImage}.
+     */
+    public static BufferedImage getPathImage(Unit u) {
+        return (u == null) ? null
+            : getPathImage(PathType.getPathType(u));
+    }
+
+    /**
+     * Gets an image to represent the path of the given {@code Unit}.
+     *
+     * @param pt The {@code PathType}
+     * @return The {@code BufferedImage}.
+     */
+    public static BufferedImage getPathNextTurnImage(PathType pt) {
+        return (pt == null) ? null
+            : ResourceManager.getImage(pt.getNextTurnImageKey());
+    }
+
+    /**
+     * Gets an image to represent the path of the given {@code Unit}.
+     *
+     * @param u The {@code Unit}
+     * @return The {@code BufferedImage}.
+     */
+    public static BufferedImage getPathNextTurnImage(Unit u) {
+        return (u == null) ? null
+            : getPathNextTurnImage(PathType.getPathType(u));
+    }
+
+
+    // Terrain image handling
+
+    /**
+     * Returns the beach corner image at the given index.
+     *
+     * @param index The index of the image to return.
+     * @param x an {@code int} value
+     * @param y an {@code int} value
+     * @return The image at the given index.
+     */
+    public BufferedImage getBeachCornerImage(int index, int x, int y) {
+        final String key = "image.tile.model.tile.beach.corner" + index
+            + ".r" + ((isSpecialEven(x, y)) ? "0" : "1");
+        return ResourceManager.getImage(key, this.tileSize, false);
+    }
+
+    /**
+     * Returns the beach edge image at the given index.
+     *
+     * @param index The index of the image to return.
+     * @param x an {@code int} value
+     * @param y an {@code int} value
+     * @return The image at the given index.
+     */
+    public BufferedImage getBeachEdgeImage(int index, int x, int y) {
+        final String key = "image.tile.model.tile.beach.edge" + index
+            + ".r"+ ((isSpecialEven(x, y)) ? "0" : "1");
+        return ResourceManager.getImage(key, this.tileSize, false);
+    }
+
+    /**
+     * Returns the border terrain-image for the given type.
+     *
+     * @param type The type of the terrain-image to return.
+     * @param direction a {@code Direction} value
+     * @param x The x-coordinate of the tile that is being drawn.
+     * @param y The x-coordinate of the tile that is being drawn.
+     * @return The terrain-image at the given index.
+     */
+    public BufferedImage getBorderImage(TileType type, Direction direction,
+                                int x, int y) {
+        final String key = "image.tile."
+            + ((type==null) ? "model.tile.unexplored" : type.getId())
+            + ".border." + direction
+            + ".r" + ((isSpecialEven(x, y)) ?  "0" : "1");
+        return ResourceManager.getImage(key, this.tileSize, false);
+    }
+
+
+    /**
+     * Returns the forest image for a terrain type.
+     *
+     * @param type The type of the terrain-image to return.
+     * @return The image at the given index.
+     */
+    public BufferedImage getForestImage(TileType type) {
+        return getForestImage(type, this.tileForestSize);
+    }
+
+    public static BufferedImage getForestImage(TileType type, Dimension size) {
+        return ResourceManager.getImage("image.tileforest." + type.getId(),
+                                        size, false);
+    }
+
+    public BufferedImage getForestImage(TileType type,
+                                        TileImprovementStyle riverStyle) {
+        return getForestImage(type, riverStyle, this.tileForestSize);
+    }
+
+    public static BufferedImage getForestImage(TileType type,
+                                               TileImprovementStyle riverStyle,
+                                               Dimension size) {
+        String key;
+        if (riverStyle != null) {
+            String mask = riverStyle.getMask();
+            // Ensure unconnected river tiles are visible in map editor
+            key = "image.tileforest." + type.getId() + ".s"
+                + ((mask.equals("0000")) ? "0100" : mask);
+            // Safety check providing fallback for incomplete mods
+            if (ResourceManager.hasImageResource(key)) {
+                return ResourceManager.getImage(key, size, false);
+            }
+        }
+        key = "image.tileforest." + type.getId();
+        return ResourceManager.getImage(key, size, false);
+    }
+
 
     /**
      * Returns the overlay image for the given tile.
@@ -811,65 +885,6 @@ public final class ImageLibrary {
         final List<String> keys = transform(overlayCache,
                                             k -> k.startsWith(prefix));
         return getRandomizedImage(keys, id, size);
-    }
-
-    private static BufferedImage getRandomizedImage(List<String> keys,
-                                                    String id, Dimension size) {
-        final int count = keys.size();
-        switch (count) {
-        case 0:
-            return null;
-        case 1:
-            return ResourceManager.getImage(keys.get(0), size, false);
-        default:
-            keys.sort(Comparator.naturalOrder());
-            String key = keys.get(Math.abs(id.hashCode() % count));
-            return ResourceManager.getImage(key, size, false);
-        }
-    }
-
-    /**
-     * Gets an image to represent the path of given path type.
-     *
-     * @param pt The {@code PathType}
-     * @return The {@code BufferedImage}.
-     */
-    public static BufferedImage getPathImage(PathType pt) {
-        return (pt == null) ? null
-            : ResourceManager.getImage(pt.getImageKey());
-    }
-
-    /**
-     * Gets an image to represent the path of the given {@code Unit}.
-     *
-     * @param u The {@code Unit}
-     * @return The {@code BufferedImage}.
-     */
-    public static BufferedImage getPathImage(Unit u) {
-        return (u == null) ? null
-            : getPathImage(PathType.getPathType(u));
-    }
-
-    /**
-     * Gets an image to represent the path of the given {@code Unit}.
-     *
-     * @param pt The {@code PathType}
-     * @return The {@code BufferedImage}.
-     */
-    public static BufferedImage getPathNextTurnImage(PathType pt) {
-        return (pt == null) ? null
-            : ResourceManager.getImage(pt.getNextTurnImageKey());
-    }
-
-    /**
-     * Gets an image to represent the path of the given {@code Unit}.
-     *
-     * @param u The {@code Unit}
-     * @return The {@code BufferedImage}.
-     */
-    public static BufferedImage getPathNextTurnImage(Unit u) {
-        return (u == null) ? null
-            : getPathNextTurnImage(PathType.getPathType(u));
     }
 
     /**
@@ -1007,6 +1022,9 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key, size, false);
     }
 
+
+    // Unit image handling
+    
     public BufferedImage getSmallerUnitImage(Unit unit) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
                             unit.hasNativeEthnicity(), false,
@@ -1143,7 +1161,7 @@ public final class ImageLibrary {
 
 
     // Accessors for small "chip" images.
-    // TODO: cache these too
+    // TODO: cache these too?
 
     /**
      * Gets a chip image for the alarm at an Indian settlement.

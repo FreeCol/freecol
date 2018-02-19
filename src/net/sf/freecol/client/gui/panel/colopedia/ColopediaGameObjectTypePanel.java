@@ -139,7 +139,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
                 ? ImageLibrary.getMiscImage("image.tileitem." + type.getId(),
                                             ImageLibrary.ICON_SIZE)
                 : (type instanceof Nation)
-                ? ImageLibrary.getMiscIconImage(type, ImageLibrary.ICON_SIZE)
+                ? ImageLibrary.getNationImage((Nation)type, ImageLibrary.ICON_SIZE)
                 : (type instanceof BuildableType)
                 ? ImageLibrary.getBuildableImage((BuildableType)type,
                                                  ImageLibrary.ICON_SIZE)

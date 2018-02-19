@@ -468,8 +468,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
             if (location instanceof Europe) {
                 Europe europe = (Europe) location;
-                Image image = lib.getSmallerMiscIconImage(
-                    europe.getOwner().getNation());
+                Image image = lib.getSmallerNationImage(europe.getOwner().getNation());
                 icon = new JLabel(new ImageIcon(image));
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
