@@ -61,6 +61,8 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Resource;
+import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
@@ -760,7 +762,7 @@ public final class ImageLibrary {
             : getPathNextTurnImage(PathType.getPathType(u));
     }
 
-
+    
     // Terrain image handling
 
     /**
@@ -895,6 +897,40 @@ public final class ImageLibrary {
     }
 
 
+    private static String getResourceTypeKey(ResourceType rt) {
+        return "image.tileitem." + rt.getId();
+    }
+    
+    public static BufferedImage getResourceTypeImage(ResourceType rt,
+                                                     boolean grayscale,
+                                                     Dimension size) {
+        return ResourceManager.getImage(getResourceTypeKey(rt),
+                                        size, grayscale);
+    }
+
+    public static BufferedImage getResourceTypeImage(ResourceType rt,
+                                                     boolean grayscale,
+                                                     float scale) {
+        return ResourceManager.getImage(getResourceTypeKey(rt),
+                                        scale, grayscale);
+    }
+
+    public BufferedImage getScaledResourceTypeImage(ResourceType rt) {
+        return getResourceTypeImage(rt, false,
+                                    this.scaleFactor);
+    }
+
+    public BufferedImage getSmallResourceTypeImage(ResourceType rt) {
+        return getResourceTypeImage(rt, false,
+                                    this.scaleFactor * SMALL_SCALE);
+    }
+
+    public BufferedImage getScaledResourceImage(Resource resource) {
+        return getResourceTypeImage(resource.getType(), false,
+                                    this.scaleFactor);
+    }
+
+    
     /**
      * Returns the river image with the given style.
      *

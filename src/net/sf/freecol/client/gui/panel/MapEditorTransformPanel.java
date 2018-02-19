@@ -123,6 +123,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      */
     private void buildList() {
         final Specification spec = getSpecification();
+        final ImageLibrary lib = getImageLibrary();
         List<TileType> tileList = spec.getTileTypeList();
         Dimension terrainSize = ImageLibrary.scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE, 0.5f);
         for (TileType type : tileList) {
@@ -143,10 +144,11 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(ImageLibrary.getRiverImage("1022", riverSize),
                                   Messages.message("mapEditorTransformPanel.setRiverStyle"),
                                   new RiverStyleTransform(RiverStyleTransform.SET_STYLE)));
-        listPanel.add(buildButton(ImageLibrary.getMiscImage("image.tileitem."
-                    + first(getSpecification().getResourceTypeList()).getId(), 0.75f),
-            Messages.message("mapEditorTransformPanel.resource"),
-            new ResourceTransform()));
+        final ResourceType firstResourceType
+            = first(spec.getResourceTypeList());
+        listPanel.add(buildButton(lib.getResourceTypeImage(firstResourceType, false, 0.75f),
+                                  Messages.message("mapEditorTransformPanel.resource"),
+                                  new ResourceTransform()));
         listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.5f),
                                   Messages.getName(ModelMessage.MessageType.LOST_CITY_RUMOUR),
                                   new LostCityRumourTransform()));

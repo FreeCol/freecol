@@ -136,10 +136,11 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
                 ? ImageLibrary.getMiscImage("image.icon." + type.getId(),
                                             ImageLibrary.ICON_SIZE)
                 : (type instanceof ResourceType)
-                ? ImageLibrary.getMiscImage("image.tileitem." + type.getId(),
-                                            ImageLibrary.ICON_SIZE)
+                ? ImageLibrary.getResourceTypeImage((ResourceType)type, false,
+                                                    ImageLibrary.ICON_SIZE)
                 : (type instanceof Nation)
-                ? ImageLibrary.getNationImage((Nation)type, ImageLibrary.ICON_SIZE)
+                ? ImageLibrary.getNationImage((Nation)type,
+                                              ImageLibrary.ICON_SIZE)
                 : (type instanceof BuildableType)
                 ? ImageLibrary.getBuildableTypeImage((BuildableType)type,
                                                      ImageLibrary.ICON_SIZE)
@@ -186,7 +187,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
 
     protected JButton getResourceButton(final ResourceType resourceType) {
         return getButton(resourceType, null, new ImageIcon(getImageLibrary()
-            .getMiscImage("image.tileitem." + resourceType.getId())));
+                .getScaledResourceTypeImage(resourceType)));
     }
 
     protected JButton getGoodsButton(final GoodsType goodsType) {
