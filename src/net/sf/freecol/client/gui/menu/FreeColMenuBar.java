@@ -239,7 +239,8 @@ public abstract class FreeColMenuBar extends JMenuBar {
         if (isOpaque()) {
             super.paintComponent(g);
         } else {
-            ImageLibrary.drawTiledImage("image.background.FreeColMenuBar", g, this, getInsets());
+            ImageLibrary.drawTiledImage("image.background.FreeColMenuBar",
+                                        g, this, getInsets());
         }
     }
 }

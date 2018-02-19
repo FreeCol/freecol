@@ -37,7 +37,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.util.OSUtils;
 
 
@@ -93,8 +93,8 @@ public final class AboutPanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap"));
 
         // Header with image
-        Image tempImage = ResourceManager.getImage("image.flavor.Title");
-        JLabel apLogoLabel = new JLabel(new ImageIcon(tempImage));
+        JLabel apLogoLabel = new JLabel(new ImageIcon(ImageLibrary
+                .getUnscaledImage("image.flavor.Title")));
         apLogoLabel.setBorder(
             new CompoundBorder(new EmptyBorder(2,2,2,2),
                                new BevelBorder(BevelBorder.LOWERED)));

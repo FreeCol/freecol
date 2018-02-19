@@ -3748,7 +3748,8 @@ public final class InGameController extends FreeColClientHolder {
      * @param monarchKey A key for the monarch involved.
      */
     public void monarchActionHandler(MonarchAction action,
-                                     StringTemplate template, String monarchKey) {
+                                     StringTemplate template,
+                                     String monarchKey) {
         invokeLater(() ->
             getGUI().showMonarchDialog(action, template, monarchKey,
                 (Boolean b) -> monarchAction(action, b)));
@@ -4126,8 +4127,8 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = unit.getOwner();
         StringTemplate t = StringTemplate.template("event.firstLanding")
             .addName("%name%", name);
-        getGUI().showEventPanel(Messages.message(t), "image.flavor.event.firstLanding",
-                           null);
+        getGUI().showEventPanel(Messages.message(t),
+                                "image.flavor.event.firstLanding", null);
 
         // Add tutorial message.
         final String key = FreeColActionUI

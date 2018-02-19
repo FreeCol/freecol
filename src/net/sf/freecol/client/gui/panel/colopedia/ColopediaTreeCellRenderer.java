@@ -27,7 +27,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
@@ -59,9 +59,8 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
         if (nodeItem.getIcon() != null) {
             setIcon(nodeItem.getIcon());
         } else {
-            String key = "image.icon.Colopedia."
-                + ((expanded) ? "open" : "closed") + "Section";
-            setIcon(new ImageIcon(ResourceManager.getImage(key)));
+            setIcon(new ImageIcon(ImageLibrary
+                    .getColopediaCellImage(expanded)));
         }
         return this;
     }

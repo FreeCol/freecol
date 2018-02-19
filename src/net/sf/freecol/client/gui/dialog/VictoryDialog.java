@@ -28,9 +28,10 @@ import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -51,7 +52,7 @@ public final class VictoryDialog extends FreeColConfirmDialog {
         panel.add(Utility.localizedHeader(Messages.message("victory.text"),
                                           false),
                   "align center, wrap 20");
-        Image image = ResourceManager.getImage("image.flavor.Victory");
+        Image image = ImageLibrary.getUnscaledImage("image.flavor.Victory");
         panel.add(new JLabel(new ImageIcon(image)),
                   "align center");
 

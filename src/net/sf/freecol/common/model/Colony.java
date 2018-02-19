@@ -2670,25 +2670,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public String getImageKey() {
-        String key;
-        if (isUndead()) {
-            key = ".undead";
-        } else {
-            int count = getApparentUnitCount();
-            key = (count <= 3) ? ".small"
-                    : (count <= 7) ? ".medium"
-                    : ".large";
-            String stockade = getStockadeKey();
-            if (stockade != null) key += "." + stockade;
-        }
-        return "image.tileitem." + getType().getId() + key;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Unit getDefendingUnit(Unit attacker) {
         if (displayUnitCount > 0) {
             // There are units, but we don't see them

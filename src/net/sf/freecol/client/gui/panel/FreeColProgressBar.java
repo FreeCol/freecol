@@ -138,7 +138,7 @@ public class FreeColProgressBar extends JPanel {
      */
     private Image getImage() {
         return (this.goodsType == null) ? null
-            : ImageLibrary.getMiscImage("image.icon." + this.goodsType.getId(),
+            : ImageLibrary.getGoodsTypeImage(this.goodsType,
                 new Dimension(-1, ImageLibrary.ICON_SIZE.height / 2));
     }
 

@@ -62,7 +62,8 @@ public class FreeColButtonUI extends MetalButtonUI {
         LAFUtilities.setProperties(g, c);
 
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColButton", g, c, null);
+            ImageLibrary.drawTiledImage("image.background.FreeColButton",
+                                        g, c, null);
         }
         super.paint(g, c);
 

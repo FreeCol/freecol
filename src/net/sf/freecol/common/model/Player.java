@@ -525,15 +525,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get a resource key for the player monarch image.
-     *
-     * @return The monarch image key.
-     */
-    public String getMonarchKey() {
-        return "image.flavor.monarch." + nationId;
-    }
-
-    /**
      * What is the name of the player's market?
      * Following a declaration of independence we are assumed to trade
      * broadly with any European market rather than a specific port.

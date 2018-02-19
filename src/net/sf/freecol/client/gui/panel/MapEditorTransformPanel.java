@@ -28,7 +28,6 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -60,10 +59,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.resources.ResourceManager;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
-
 import net.sf.freecol.server.model.ServerIndianSettlement;
 
 
@@ -123,40 +119,46 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      */
     private void buildList() {
         final Specification spec = getSpecification();
-        final ImageLibrary lib = getImageLibrary();
-        List<TileType> tileList = spec.getTileTypeList();
-        Dimension terrainSize = ImageLibrary.scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE, 0.5f);
-        for (TileType type : tileList) {
+        final Dimension terrainSize = ImageLibrary
+            .scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE,
+                            ImageLibrary.SMALLER_SCALE);
+        final Dimension riverSize = ImageLibrary
+            .scaleDimension(ImageLibrary.TILE_SIZE,
+                            ImageLibrary.SMALLER_SCALE);
+
+        for (TileType type : spec.getTileTypeList()) {
             listPanel.add(buildButton(SwingGUI.createTileImageWithOverlayAndForest(type, terrainSize),
-                                      Messages.getName(type),
-                                      new TileTypeTransform(type)));
+                    Messages.getName(type),
+                    new TileTypeTransform(type)));
         }
-        Dimension riverSize = ImageLibrary.scaleDimension(ImageLibrary.TILE_SIZE, 0.5f);
+
         listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", riverSize),
-                                  Messages.message("mapEditorTransformPanel.minorRiver"),
-                                  new RiverTransform(TileImprovement.SMALL_RIVER)));
+                Messages.message("mapEditorTransformPanel.minorRiver"),
+                new RiverTransform(TileImprovement.SMALL_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", riverSize),
-                                  Messages.message("mapEditorTransformPanel.majorRiver"),
-                                  new RiverTransform(TileImprovement.LARGE_RIVER)));
+                Messages.message("mapEditorTransformPanel.majorRiver"),
+                new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getRiverImage("2022", riverSize),
-                                  Messages.message("mapEditorTransformPanel.changeRiverConnections"),
-                                  new RiverStyleTransform(RiverStyleTransform.CHANGE_CONNECTIONS)));
+                Messages.message("mapEditorTransformPanel.changeRiverConnections"),
+                new RiverStyleTransform(RiverStyleTransform.CHANGE_CONNECTIONS)));
         listPanel.add(buildButton(ImageLibrary.getRiverImage("1022", riverSize),
-                                  Messages.message("mapEditorTransformPanel.setRiverStyle"),
-                                  new RiverStyleTransform(RiverStyleTransform.SET_STYLE)));
-        final ResourceType firstResourceType
-            = first(spec.getResourceTypeList());
-        listPanel.add(buildButton(lib.getResourceTypeImage(firstResourceType, false, 0.75f),
-                                  Messages.message("mapEditorTransformPanel.resource"),
-                                  new ResourceTransform()));
-        listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.5f),
-                                  Messages.getName(ModelMessage.MessageType.LOST_CITY_RUMOUR),
-                                  new LostCityRumourTransform()));
+                Messages.message("mapEditorTransformPanel.setRiverStyle"),
+                new RiverStyleTransform(RiverStyleTransform.SET_STYLE)));
+
+        final ResourceType rt = first(spec.getResourceTypeList());
+        listPanel.add(buildButton(ImageLibrary.getResourceTypeImage(rt, false, riverSize),
+                Messages.message("mapEditorTransformPanel.resource"),
+                new ResourceTransform()));
+
+        listPanel.add(buildButton(ImageLibrary
+                .getScaledImage(ImageLibrary.LOST_CITY_RUMOUR, riverSize, false),
+                Messages.getName(ModelMessage.MessageType.LOST_CITY_RUMOUR),
+                new LostCityRumourTransform()));
+
         SettlementType settlementType = nativeNation.getType().getCapitalType();
-        settlementButton = buildButton(ImageLibrary.getSettlementTypeImage(settlementType, 0.5f),
-                                       Messages.message("settlement"),
-                                       new SettlementTransform());
-        listPanel.add(settlementButton);
+        listPanel.add(buildButton(ImageLibrary.getSettlementTypeImage(settlementType, riverSize),
+                Messages.message("settlement"),
+                new SettlementTransform()));
     }
 
     /**
@@ -169,6 +171,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      */
     private JToggleButton buildButton(Image image, String text,
                                       final MapTransform mt) {
+        final MapEditorController ctlr
+            = getFreeColClient().getMapEditorController();
         JPanel descriptionPanel = new JPanel(new BorderLayout());
         descriptionPanel.add(new JLabel(new ImageIcon(image)),
                              BorderLayout.CENTER);
@@ -183,31 +187,21 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         button.setOpaque(false);
         group.add(button);
         button.addActionListener((ActionEvent ae) -> {
-                MapEditorController ctlr
-                    = getFreeColClient().getMapEditorController();
                 MapTransform newMapTransform = null;
                 if (ctlr.getMapTransform() != mt) {
-                    if(mt instanceof RiverStyleTransform) {
+                    if (mt instanceof RiverStyleTransform) {
                         RiverStyleTransform rst = (RiverStyleTransform)mt;
-                        int type = rst.getType();
-                        List<String> styles = ResourceManager
-                            .getImageKeys(RiverStyleDialog.PREFIX).stream()
-                            .map(key -> key.substring(
-                                RiverStyleDialog.PREFIX.length()))
-                            .filter(style ->
-                                (type != RiverStyleTransform.CHANGE_CONNECTIONS
-                                    || !style.contains("1"))
-                                && !style.equals("0000"))
-                            .sorted().collect(Collectors.toList());
-                        String style = getGUI().showRiverStyleDialog(styles);
-                        if(style != null)
-                            rst.setStyle(style);
+                        boolean all = rst.getType() != RiverStyleTransform.CHANGE_CONNECTIONS;
+                        String style = getGUI()
+                            .showRiverStyleDialog(ImageLibrary
+                                .getRiverStyleKeys(all));
+                        if (style != null) rst.setStyle(style);
                     }
                     newMapTransform = mt;
                 }
                 ctlr.setMapTransform(newMapTransform);
                 if (newMapTransform == null && mt != null) {
-                    //select the invisible button, de-selecting all others
+                    // Select the invisible button, de-selecting all others
                     group.setSelected(group.getElements().nextElement()
                         .getModel(), true);
                 }

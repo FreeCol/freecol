@@ -676,7 +676,7 @@ public final class InGameController extends Controller {
         String messageId = action.getTextKey();
         StringTemplate template;
         MonarchActionMessage message;
-        String monarchKey = serverPlayer.getMonarchKey();
+        String monarchKey = serverPlayer.getNationId();
 
         switch (action) {
         case NO_ACTION:

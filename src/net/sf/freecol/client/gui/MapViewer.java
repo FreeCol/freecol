@@ -1492,7 +1492,7 @@ public final class MapViewer extends FreeColClientHolder {
 
                     if (unit.isUndead()) {
                         // Rescale dark halo only in rare case its needed!
-                        BufferedImage darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
+                        BufferedImage darkness = lib.getScaledImage(ImageLibrary.DARKNESS);
                         tv.displayCenteredImage(g, darkness);
                     }
                     if (!isOutForAnimation(unit))
@@ -1973,8 +1973,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     private void displayCursor(Graphics2D g) {
-        BufferedImage cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
-        g.drawImage(cursorImage, 0, 0, null);
+        g.drawImage(lib.getScaledImage(ImageLibrary.UNIT_SELECT), 0, 0, null);
     }
 
     /**

@@ -31,7 +31,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.*;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -44,8 +43,6 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RiverStyleDialog.class.getName());
-
-    public static final String PREFIX = "image.tile.model.improvement.river.s";
 
 
     /**
@@ -66,7 +63,7 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
         List<ChoiceItem<String>> c = FreeColDialog.choices();
         for (String style : styles) {
             c.add(new ChoiceItem<>(null, style)
-                .setIcon(new ImageIcon(getImageLibrary().getRiverImage(style, 0.5f))));
+                .setIcon(new ImageIcon(getImageLibrary().getSmallerRiverImage(style))));
         }
 
         initializeChoiceDialog(frame, true, panel, null, "cancel", c);

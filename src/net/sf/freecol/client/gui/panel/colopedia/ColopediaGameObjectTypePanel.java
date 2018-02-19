@@ -51,7 +51,6 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -133,8 +132,8 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
         int height = ImageLibrary.ICON_SIZE.height;
         for (FreeColSpecObjectType type : types) {
             Image image = (type instanceof GoodsType)
-                ? ImageLibrary.getMiscImage("image.icon." + type.getId(),
-                                            ImageLibrary.ICON_SIZE)
+                ? ImageLibrary.getGoodsTypeImage((GoodsType)type,
+                                                 ImageLibrary.ICON_SIZE)
                 : (type instanceof ResourceType)
                 ? ImageLibrary.getResourceTypeImage((ResourceType)type, false,
                                                     ImageLibrary.ICON_SIZE)
@@ -144,8 +143,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
                 : (type instanceof BuildableType)
                 ? ImageLibrary.getBuildableTypeImage((BuildableType)type,
                                                      ImageLibrary.ICON_SIZE)
-                : ImageLibrary.getMiscImage(ResourceManager.REPLACEMENT_IMAGE,
-                                            ImageLibrary.ICON_SIZE);
+                : ImageLibrary.getReplacementImage(ImageLibrary.ICON_SIZE);
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
             BufferedImage centeredImage

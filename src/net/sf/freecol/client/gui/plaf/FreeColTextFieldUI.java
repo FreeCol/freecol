@@ -56,7 +56,8 @@ public class FreeColTextFieldUI extends BasicTextFieldUI {
         JComponent c = getComponent();
 
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColTextField", g, c, null);
+            ImageLibrary.drawTiledImage("image.background.FreeColTextField",
+                                        g, c, null);
         }
     }
 

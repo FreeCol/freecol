@@ -2616,7 +2616,7 @@ ok:     while (!openMap.isEmpty()) {
      */
     @Override
     public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
-        return new ImageIcon(library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
+        return new ImageIcon(library.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR));
     }
 
 

@@ -45,7 +45,6 @@ import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -87,7 +86,8 @@ public class FatherDetailPanel
         for (FoundingFather foundingFather : spec.getFoundingFathers()) {
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
-        ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, ImageLibrary.ICON_SIZE));
+        ImageIcon icon = new ImageIcon(ImageLibrary
+            .getScaledImage(ImageLibrary.BELLS, ImageLibrary.ICON_SIZE, false));
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             String id = FoundingFather.getTypeKey(fatherType);
             String typeName = Messages.message(id);
@@ -107,32 +107,15 @@ public class FatherDetailPanel
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        try {
-            FoundingFather father = getSpecification().getFoundingFather(id);
-            buildDetail(father, panel);
-        } catch (IllegalArgumentException e) {
-            // this is not a founding father
-            panel.setLayout(new MigLayout("wrap 1, align center", "align center"));
-            if (getId().equals(id)) {
-                JLabel header = Utility.localizedHeaderLabel(Messages.nameKey(id),
-                    SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
-                panel.add(header, "align center, wrap 20");
-                panel.add(Utility.localizedTextArea("colopedia.foundingFather.description", 40));
-            } else {
-                JLabel header = Utility.localizedHeaderLabel(Messages.message(id),
-                    SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
-                panel.add(header, "align center, wrap 20");
-                Image image = ResourceManager.getImage("image.flavor." + id);
-                panel.add(new JLabel(new ImageIcon(image)));
-            }
-        }
+        FoundingFather father = getSpecification().getFoundingFather(id);
+        buildDetail(father, panel);
     }
 
     /**
      * Builds the details panel for the given FoundingFather.
      *
-     * @param father a FoundingFather
-     * @param panel the detail panel to build
+     * @param father The {@code FoundingFather} to build a panel for.
+     * @param panel The detail panel to build.
      */
     public void buildDetail(FoundingFather father, JPanel panel) {
         panel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));

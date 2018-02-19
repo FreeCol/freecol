@@ -35,9 +35,9 @@ import javax.swing.border.BevelBorder;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -82,7 +82,8 @@ public final class CornerMapControls extends MapControls {
     public CornerMapControls(final FreeColClient freeColClient) {
         super(freeColClient, true);
 
-        compassRose = new JLabel(new ImageIcon(ResourceManager.getImage("image.skin.compass")));
+        compassRose = new JLabel(new ImageIcon(ImageLibrary
+                .getUnscaledImage("image.skin.compass")));
         compassRose.setFocusable(false);
         compassRose.setSize(compassRose.getPreferredSize());
         compassRose.addMouseListener(new MouseAdapter() {
@@ -121,9 +122,7 @@ public final class CornerMapControls extends MapControls {
         miniMapPanel.add(miniMapZoomOutButton);
         miniMapPanel.add(miniMap);
 
-        String miniMapSkinKey = "image.skin.MiniMap";
-        if (ResourceManager.hasImageResource(miniMapSkinKey)) {
-            miniMapSkin = ResourceManager.getImage(miniMapSkinKey);
+        if ((this.miniMapSkin = ImageLibrary.getMiniMapSkin()) != null) {
             miniMapPanel.setBorder(null);
             miniMapPanel.setSize(miniMapSkin.getWidth(null),
                                  miniMapSkin.getHeight(null));
@@ -136,7 +135,6 @@ public final class CornerMapControls extends MapControls {
             miniMapZoomInButton.setLocation(4, 174);
             miniMapZoomOutButton.setLocation(264, 174);
         } else {
-            miniMapSkin = null;
             int width = miniMapZoomOutButton.getWidth()
                 + miniMapZoomInButton.getWidth() + 4 * GAP;
             miniMapPanel.setOpaque(true);

@@ -35,6 +35,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -43,9 +44,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.resources.ImageResource;
-import net.sf.freecol.common.resources.ResourceManager;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -263,7 +261,7 @@ public class DebugMenu extends JMenu {
         final JMenuItem monarchDialog = Utility.localizedMenuItem("menuBar.debug.displayMonarchPanel");
         monarchDialog.addActionListener((ActionEvent ae) -> {
                 gui.showMonarchDialog(
-                    Monarch.MonarchAction.RAISE_TAX_WAR, null, player.getMonarchKey(),
+                    Monarch.MonarchAction.RAISE_TAX_WAR, null, player.getNationId(),
                     (Boolean b) ->
                         freeColClient.getInGameController().monarchAction(Monarch.MonarchAction.RAISE_TAX_WAR, b));
             });
@@ -333,13 +331,7 @@ public class DebugMenu extends JMenu {
         //showResourceKeys.setMnemonic(KeyEvent.VK_R);
         this.add(showResourceKeys);
         showResourceKeys.addActionListener((ActionEvent ae) -> {
-                StringBuilder builder = new StringBuilder();
-                Map<String, ImageResource> resources
-                    = ResourceManager.getImageResources();
-                forEach(mapEntriesByKey(resources),
-                    e -> builder.append(e.getKey()).append(" (")
-                            .append(e.getValue().getCount()).append(")\n"));
-                gui.showInformationMessage(builder.toString());
+                gui.showInformationMessage(ImageLibrary.getImageResourceSummary());
             });
         showResourceKeys.setEnabled(true);
 

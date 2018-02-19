@@ -52,6 +52,7 @@ import javax.swing.Timer;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
@@ -102,7 +103,6 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.Video;
 
 import static net.sf.freecol.common.util.StringUtils.lastPart;
@@ -273,7 +273,7 @@ public class SwingGUI extends GUI {
     @Override
     public void showOpeningVideo(final String userMsg) {
         canvas.closeMenus();
-        final Video video = ResourceManager.getVideo("video.opening");
+        final Video video = ImageLibrary.getVideo("video.opening");
         boolean muteAudio = !getSoundController().canPlaySound();
         final VideoComponent vp = new VideoComponent(video, muteAudio);
 

@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
@@ -40,7 +41,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -71,7 +71,9 @@ public class InformationPanel extends FreeColPanel {
     /** Standard dimensions for the inner panel. */
     private static final int BASE_WIDTH = 470, BASE_HEIGHT = 75;
 
+    private BufferedImage skin = null;
 
+    
     /**
      * Creates an information panel that shows the given texts and
      * images, and an "OK" button.
@@ -102,6 +104,8 @@ public class InformationPanel extends FreeColPanel {
                             FreeColObject[] fcos, ImageIcon[] images) {
         super(freeColClient, createLayout(freeColClient));
 
+        this.skin = ImageLibrary.getInformationPanelSkin(freeColClient
+            .getMyPlayer());
         final SwingGUI gui = getGUI();
         JPanel textPanel = new MigPanel();
         textPanel.setOpaque(false);
@@ -160,27 +164,11 @@ public class InformationPanel extends FreeColPanel {
      * @return A new MigLayout containing the outer layout
      */
     private static MigLayout createLayout(FreeColClient freeColClient) {
-        BufferedImage skin = getSkin(freeColClient);
+        BufferedImage skin = ImageLibrary.getInformationPanelSkin(freeColClient.getMyPlayer());
         int w = skin.getWidth();
         int h = skin.getHeight();
         return new MigLayout("wrap 1, insets " + (h-290) + " 10 10 10",
                 "[" + (w-2*10) + "]", "[240]10[20]");
-    }
-
-    /**
-     * Get a skin for this panel.
-     *
-     * @param freeColClient The {@code FreeColClient} for the game.
-     * @return A skin image.
-     */
-    private static BufferedImage getSkin(FreeColClient freeColClient) {
-        Player player = freeColClient.getMyPlayer();
-        String key = (player == null) ? "image.skin.InformationPanel"
-            : (player.isRebel()) ? "image.skin.InformationPanel.rebel"
-            : "image.skin.InformationPanel." + player.getNationResourceKey();
-        if (!ResourceManager.hasImageResource(key))
-            key = "image.skin.InformationPanel";
-        return ResourceManager.getImage(key);
     }
 
     /**
@@ -207,6 +195,6 @@ public class InformationPanel extends FreeColPanel {
 
     @Override
     public void paintComponent(Graphics g) {
-        g.drawImage(getSkin(getFreeColClient()), 0, 0, this);
+        g.drawImage(this.skin, 0, 0, this);
     }
 }

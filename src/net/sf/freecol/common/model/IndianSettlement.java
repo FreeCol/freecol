@@ -1328,16 +1328,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public String getImageKey() {
-        String key = getType().getId();
-        if(hasMissionary()) key += ".mission";
-        return "image.tileitem." + key;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Unit getDefendingUnit(Unit attacker) {
         Unit defender = null;
         double defencePower = -1.0;

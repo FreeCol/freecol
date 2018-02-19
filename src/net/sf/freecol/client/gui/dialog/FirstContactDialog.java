@@ -29,13 +29,14 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -44,10 +45,8 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class FirstContactDialog extends FreeColConfirmDialog {
 
     private static final String BASE_KEY = "firstContactDialog.meeting.";
-    private static final String IMAGE_BASE_KEY = "image.flavor.event.meeting.";
-    private static final String NATIVES_KEY = "natives";
-    private static final String TUTORIAL_KEY = BASE_KEY + NATIVES_KEY + ".tutorial";
-
+    private static final String NATIVES = "natives";
+    private static final String TUTORIAL_KEY = BASE_KEY + NATIVES + ".tutorial";
 
     /**
      * Create an FirstContactDialog.
@@ -69,15 +68,11 @@ public class FirstContactDialog extends FreeColConfirmDialog {
         panel.setOpaque(false);
 
         String headerKey = BASE_KEY + other.getNation().getSuffix();
-        String imageKey = IMAGE_BASE_KEY + other.getNationResourceKey();
-        if (!Messages.containsKey(headerKey)) {
-            headerKey = BASE_KEY + NATIVES_KEY;
-            imageKey = IMAGE_BASE_KEY + NATIVES_KEY;
-        }
+        if (!Messages.containsKey(headerKey)) headerKey = BASE_KEY + NATIVES;
         JLabel header = Utility.localizedHeaderLabel(headerKey,
             SwingConstants.LEADING, FontLibrary.FontSize.MEDIUM);
-        JLabel image
-            = new JLabel(new ImageIcon(ResourceManager.getImage(imageKey)));
+        JLabel image = new JLabel(new ImageIcon(ImageLibrary
+                .getMeetingImage(other)));
         image.setOpaque(false);
 
         JTextArea tutorial = null;

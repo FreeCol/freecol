@@ -175,7 +175,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -1556,12 +1555,11 @@ public final class Canvas extends JDesktopPane {
             /* main menu */
             // TODO: Check if its right to sometimes have an unfocused map
             //       ingame and end up here after clicking outside map.
-            final String bgImageKey = "image.flavor.Canvas.map";
-            if (ResourceManager.hasImageResource(bgImageKey)) {
+            final Image bgImage = ImageLibrary.getCanvasBackgroundImage();
+            if (bgImage != null) {
                 // Get the background without scaling, to avoid wasting
                 // memory needlessly keeping an unbounded number of rescaled
                 // versions of the largest image in FreeCol, forever.
-                final Image bgImage = ResourceManager.getImage(bgImageKey);
                 // Draw background image with scaling.
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                     RenderingHints.VALUE_INTERPOLATION_BILINEAR);
