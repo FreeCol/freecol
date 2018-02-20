@@ -630,13 +630,31 @@ public final class ImageLibrary {
         return getScaledImage(key, NORMAL_SCALE, grayscale);
     }
 
+    /**
+     * Get a summary of the current image resources.
+     *
+     * Called from DebugMenu.
+     *
+     * @return A string summary.
+     */
     public static String getImageResourceSummary() {
         StringBuilder sb = new StringBuilder();
         Map<String, ImageResource> resources
             = ResourceManager.getImageResources();
-        forEach(mapEntriesByKey(resources),
-            e -> sb.append(e.getKey()).append(" (")
-                    .append(e.getValue().getCount()).append(")\n"));
+        Map<Integer, String> decode = new HashMap<>();
+        forEach(mapEntriesByKey(resources), e -> {
+                String key = e.getKey();
+                decode.put(key.hashCode(), key);
+                sb.append(key).append("\n");
+            });
+        sb.append("Cache\n");
+        forEachMapEntry(ResourceManager.getImageCache(), e -> {
+                Long key = e.getKey();
+                String rep = ResourceManager.imageUnhash(key);
+                Integer i = Integer.parseInt(firstPart(rep, "."));
+                sb.append(decode.get(i)).append('.').append(lastPart(rep, "."))
+                    .append('\n');
+            });
         return sb.toString();
     }        
 
@@ -952,7 +970,7 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public BufferedImage getBorderImage(TileType type, Direction direction,
-                                int x, int y) {
+                                        int x, int y) {
         final String key = "image.tile."
             + ((type==null) ? "model.tile.unexplored" : type.getId())
             + ".border." + direction
