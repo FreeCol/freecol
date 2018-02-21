@@ -1227,7 +1227,7 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param g The Graphics2D object on which to draw the Map.
      */
-    void displayMap(Graphics2D g) {
+    public void displayMap(Graphics2D g) {
         final ClientOptions options = getClientOptions();
         final Game game = getGame();
         Map map = game.getMap();
@@ -1271,19 +1271,19 @@ public final class MapViewer extends FreeColClientHolder {
         // Display the base Tiles
         final int x0 = firstColumn;
         final int y0 = firstRow;
-        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
-            (Tile tile) -> {
-                final int x = tile.getX();
-                final int y = tile.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
-                g.translate(xt, yt);
+        for (Tile t : map.subMap(x0, y0, lastColumn-firstColumn+1,
+                                         lastRow-firstRow+1)) {
+            final int x = t.getX();
+            final int y = t.getY();
+            final int xt = (x-x0) * tileWidth + (((y&1)==1) ? halfWidth : 0);
+            final int yt = (y-y0) * halfHeight;
+            g.translate(xt, yt);
 
-                tv.displayTileWithBeachAndBorder(g, tile);
-                tv.displayUnknownTileBorder(g, tile);
+            tv.displayTileWithBeachAndBorder(g, t);
+            tv.displayUnknownTileBorder(g, t);
 
-                g.translate(-xt, -yt);
-            });
+            g.translate(-xt, -yt);
+        }
 
         // Draw the grid, if needed
         if (options.getBoolean(ClientOptions.DISPLAY_GRID)) {
@@ -1314,32 +1314,32 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         // Paint full region borders
-        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) ==
-                ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
-            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
-                (Tile tile) -> {
-                    final int x = tile.getX();
-                    final int y = tile.getY();
-                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                    final int yt = (y-y0) * halfHeight;
-                    g.translate(xt, yt);
-                    displayTerritorialBorders(g, tile, BorderType.REGION, true);
-                    g.translate(-xt, -yt);
-                });
+        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT)
+                == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
+            for (Tile t : map.subMap(x0, y0-1, lastColumn-firstColumn+1,
+                                               lastRow-firstRow+1+1)) {
+                final int x = t.getX();
+                final int y = t.getY();
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
+                displayTerritorialBorders(g, t, BorderType.REGION, true);
+                g.translate(-xt, -yt);
+            }
         }
 
         // Paint full country borders
         if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
-            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
-                (Tile tile) -> {
-                    final int x = tile.getX();
-                    final int y = tile.getY();
-                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                    final int yt = (y-y0) * halfHeight;
-                    g.translate(xt, yt);
-                    displayTerritorialBorders(g, tile, BorderType.COUNTRY, true);
-                    g.translate(-xt, -yt);
-                });
+            for (Tile t : map.subMap(x0, y0-1, lastColumn-firstColumn+1,
+                                               lastRow-firstRow+1+1)) {
+                final int x = t.getX();
+                final int y = t.getY();
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
+                displayTerritorialBorders(g, t, BorderType.COUNTRY, true);
+                g.translate(-xt, -yt);
+            }
         }
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -1347,21 +1347,17 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Apply fog of war to flat parts of all tiles
         if (getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
-            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
-                (Tile tile) -> {
-                    if (!tile.isExplored())
-                        return;
-
-                    final int x = tile.getX();
-                    final int y = tile.getY();
-                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                    final int yt = (y-y0) * halfHeight;
-                    g.translate(xt, yt);
-
-                    tv.displayFogOfWar(g, tile);
-
-                    g.translate(-xt, -yt);
-                });
+            for (Tile t : map.subMap(x0, y0, lastColumn-firstColumn+1,
+                                             lastRow-firstRow+1)) {
+                if (!t.isExplored()) continue;
+                final int x = t.getX();
+                final int y = t.getY();
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
+                tv.displayFogOfWar(g, t);
+                g.translate(-xt, -yt);
+            }
         }
 
         // Display the Tile overlays
@@ -1371,59 +1367,54 @@ public final class MapViewer extends FreeColClientHolder {
         RescaleOp fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
                                       new float[] { 0, 0, 0, 0 },
                                       null);
-        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
-            (Tile tile) -> {
-                if (!tile.isExplored())
-                    return;
+        for (Tile t : map.subMap(x0, y0, lastColumn-firstColumn+1,
+                                         lastRow-firstRow+1)) {
+            if (!t.isExplored()) continue;
+            final int x = t.getX();
+            final int y = t.getY();
+            final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+            final int yt = (y-y0) * halfHeight;
+            g.translate(xt, yt);
 
-                final int x = tile.getX();
-                final int y = tile.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
-                g.translate(xt, yt);
-
-                RescaleOp rop = tv.hasFogOfWar(tile) ? fow : null;
-
-                BufferedImage overlayImage = lib.getOverlayImage(tile, overlayCache);
-                tv.displayTileItems(g, tile, rop, overlayImage);
-                tv.displaySettlementWithChipsOrPopulationNumber(
-                    g, tile, withNumbers, rop);
-
-                tv.displayOptionalTileText(g, tile);
-
-                g.translate(-xt, -yt);
-            });
+            RescaleOp rop = tv.hasFogOfWar(t) ? fow : null;
+            BufferedImage overlayImage = lib.getOverlayImage(t, overlayCache);
+            tv.displayTileItems(g, t, rop, overlayImage);
+            tv.displaySettlementWithChipsOrPopulationNumber(g, t, withNumbers,
+                                                            rop);
+            tv.displayOptionalTileText(g, t);
+            g.translate(-xt, -yt);
+        }
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Paint transparent region borders
-        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) ==
-                ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
-            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
-                (Tile tile) -> {
-                    final int x = tile.getX();
-                    final int y = tile.getY();
-                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                    final int yt = (y-y0) * halfHeight;
-                    g.translate(xt, yt);
-                    displayTerritorialBorders(g, tile, BorderType.REGION, false);
-                    g.translate(-xt, -yt);
-                });
+        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT)
+            == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
+            for (Tile t : map.subMap(x0, y0-1, lastColumn-firstColumn+1,
+                                               lastRow-firstRow+1+1)) {
+                final int x = t.getX();
+                final int y = t.getY();
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
+                displayTerritorialBorders(g, t, BorderType.REGION, false);
+                g.translate(-xt, -yt);
+            }
         }
 
         // Paint transparent country borders
         if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
-            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
-                (Tile tile) -> {
-                    final int x = tile.getX();
-                    final int y = tile.getY();
-                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                    final int yt = (y-y0) * halfHeight;
-                    g.translate(xt, yt);
-                    displayTerritorialBorders(g, tile, BorderType.COUNTRY, false);
-                    g.translate(-xt, -yt);
-                });
+            for (Tile t : map.subMap(x0, y0-1, lastColumn-firstColumn+1,
+                                               lastRow-firstRow+1+1)) {
+                final int x = t.getX();
+                final int y = t.getY();
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
+                displayTerritorialBorders(g, t, BorderType.COUNTRY, false);
+                g.translate(-xt, -yt);
+            }
         }
 
         // Display cursor for selected tile or active unit
@@ -1456,50 +1447,41 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display units
         g.setColor(Color.BLACK);
-        if(!game.isInRevengeMode()) {
-            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
-                (Tile tile) -> {
-                    // check for units
-                    Unit unit = findUnitInFront(tile);
-                    if (unit == null || isOutForAnimation(unit))
-                        return;
-
-                    final int x = tile.getX();
-                    final int y = tile.getY();
-                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                    final int yt = (y-y0) * halfHeight;
-                    g.translate(xt, yt);
-
-                    displayUnit(g, unit);
-
-                    g.translate(-xt, -yt);
-                });
+        if (!game.isInRevengeMode()) {
+            for (Tile t : map.subMap(x0, y0, lastColumn-firstColumn+1,
+                                             lastRow-firstRow+1)) {
+                // check for units
+                Unit unit = findUnitInFront(t);
+                if (unit == null || isOutForAnimation(unit)) continue;
+                final int x = t.getX();
+                final int y = t.getY();
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
+                displayUnit(g, unit);
+                g.translate(-xt, -yt);
+            }
         } else {
             /* Add extra rows and colums, as the dark halo is huge to enable
                a very slow fade into transparency, see BR#2580 */
-            map.forSubMap(x0-2, y0-4, lastColumn-firstColumn+1+4, lastRow-firstRow+1+8,
-                (Tile tile) -> {
-                    // check for units
-                    Unit unit = findUnitInFront(tile);
-                    if (unit == null)
-                        return;
+            BufferedImage darkness = lib.getScaledImage(ImageLibrary.DARKNESS);
+            for (Tile t : map.subMap(x0-2, y0-4, lastColumn-firstColumn+1+4,
+                                                 lastRow-firstRow+1+8)) {
+                // check for units
+                Unit unit = findUnitInFront(t);
+                if (unit == null || isOutForAnimation(unit)) continue;
+                final int x = t.getX();
+                final int y = t.getY();
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
 
-                    final int x = tile.getX();
-                    final int y = tile.getY();
-                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                    final int yt = (y-y0) * halfHeight;
-                    g.translate(xt, yt);
-
-                    if (unit.isUndead()) {
-                        // Rescale dark halo only in rare case its needed!
-                        BufferedImage darkness = lib.getScaledImage(ImageLibrary.DARKNESS);
-                        tv.displayCenteredImage(g, darkness);
-                    }
-                    if (!isOutForAnimation(unit))
-                        displayUnit(g, unit);
-
-                    g.translate(-xt, -yt);
-                });
+                if (unit.isUndead()) {
+                    tv.displayCenteredImage(g, darkness);
+                }
+                displayUnit(g, unit);
+                g.translate(-xt, -yt);
+            }
         }
 
         // Display the colony names, if needed
@@ -1519,23 +1501,21 @@ public final class MapViewer extends FreeColClientHolder {
             /* For settlement names and territorial borders 1 extra row needs
                to be drawn in north to prevent missing parts on partial redraws,
                as they can reach below their tiles, see BR#2580 */
-            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
-                (Tile tile) -> {
-                    Settlement settlement = tile.getSettlement();
-                    if(settlement == null)
-                        return;
+            for (Tile t : map.subMap(x0, y0-1, lastColumn-firstColumn+1,
+                                               lastRow-firstRow+1+1)) {
+                Settlement settlement = t.getSettlement();
+                if (settlement == null) continue;
+                final int x = t.getX();
+                final int y = t.getY();
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
 
-                    final int x = tile.getX();
-                    final int y = tile.getY();
-                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                    final int yt = (y-y0) * halfHeight;
-                    g.translate(xt, yt);
+                displaySettlementLabels(g, settlement, player, colonyLabels,
+                                        font, italicFont, productionFont);
 
-                    displaySettlementLabels(g, settlement, player, colonyLabels,
-                                            font, italicFont, productionFont);
-
-                    g.translate(-xt, -yt);
-                });
+                g.translate(-xt, -yt);
+            }
         }
 
         // Restore original transform to allow for more drawing
