@@ -41,7 +41,8 @@ public class AbstractGoodsLabel extends FreeColLabel {
     private boolean fullChosen;
 
     /**
-     * Special flag for SHIFT+ALT drag functionality on {@code DefaultTransferHandler}
+     * Special flag for SHIFT+ALT drag functionality on
+     * {@code DefaultTransferHandler}.
      */
     private boolean superFullChosen;
 
