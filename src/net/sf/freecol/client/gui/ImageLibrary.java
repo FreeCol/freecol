@@ -667,50 +667,53 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the appropriate BufferedImage for a FreeColObject.
-     * Please, use a more specific method!
+     * Get the appropriate BufferedImage for a FreeColObject.  Please,
+     * use a more specific method!
+     *
+     * @param display The {@code FreeColObject} to display.
+     * @param size The image size.
+     * @return The appropriate {@code BufferedImage}.
+     */
+    public static BufferedImage getObjectImage(FreeColObject display,
+                                               Dimension size) {
+        final FreeColObject derived = display.getDisplayObject();
+        // Not all types have a meaningful image.
+        BufferedImage image = (derived instanceof BuildingType)
+            ? getBuildingTypeImage((BuildingType)derived, size)
+            : (derived instanceof GoodsType)
+            ? getGoodsTypeImage((GoodsType)derived, size)
+            : (derived instanceof LostCityRumour)
+            ? getScaledImage(LOST_CITY_RUMOUR, size, false)
+            : (derived instanceof Nation)
+            ? getNationImage((Nation)derived, size)
+            : (derived instanceof ResourceType)
+            ? getResourceTypeImage((ResourceType)derived, size, false)
+            : (derived instanceof Settlement)
+            ? getSettlementImage((Settlement)derived, size)
+            : (derived instanceof TileType)
+            ? getTerrainImage((TileType)derived, 0, 0, size)
+            : (derived instanceof UnitType)
+            ? getUnitTypeImage((UnitType)derived, size)
+            : null;
+        if (image == null) {
+            logger.warning("Could not find image for " + display);
+            return null;
+        }
+        return image;
+    }
+
+    /**
+     * Get the appropriate BufferedImage for a FreeColObject.  Please,
+     * use a more specific method!
      *
      * @param display The {@code FreeColObject} to display.
      * @param scale How much the image should be scaled.
      * @return The appropriate {@code BufferedImage}.
      */
     public BufferedImage getObjectImage(FreeColObject display, float scale) {
-        try {
-            final float combinedScale = this.scaleFactor * scale;
-            final Dimension size = scaleDimension(ICON_SIZE, combinedScale);
-            BufferedImage image;
-            FreeColObject derived = display.getDisplayObject();
-
-            // Not all types have a meaningful image.
-            if (derived instanceof BuildingType) {
-                image = getBuildingTypeImage((BuildingType)derived, size);
-            } else if (derived instanceof GoodsType) {
-                image = getGoodsTypeImage((GoodsType)derived, size);
-            } else if (derived instanceof LostCityRumour) {
-                image = getScaledImage(LOST_CITY_RUMOUR, size, false);
-            } else if (derived instanceof Nation) {
-                image = getNationImage((Nation)derived, size);
-            } else if (derived instanceof Settlement) {
-                image = getSettlementImage((Settlement)derived, size);
-            } else if (derived instanceof TileType) {
-                image = getTerrainImage((TileType)derived, 0, 0, size);
-            } else if (derived instanceof UnitType) {
-                image = getUnitTypeImage((UnitType)derived, size);
-            } else {
-                logger.warning("Could not find image of unknown type for "
-                    + display);
-                return null;
-            }
-
-            if (image == null) {
-                logger.warning("Could not find image for " + display);
-                return null;
-            }
-            return image;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception finding image", e);
-            return null;
-        }
+        final float combinedScale = this.scaleFactor * scale;
+        final Dimension size = scaleDimension(ICON_SIZE, combinedScale);
+        return getObjectImage(display, size);
     }
 
     public static BufferedImage getReplacementImage(Dimension size) {
@@ -1048,30 +1051,30 @@ public final class ImageLibrary {
     }
     
     public static BufferedImage getResourceTypeImage(ResourceType rt,
-                                                     boolean grayscale,
-                                                     Dimension size) {
+                                                     Dimension size,
+                                                     boolean grayscale) {
         return getScaledImage(getResourceTypeKey(rt), size, grayscale);
     }
 
     public static BufferedImage getResourceTypeImage(ResourceType rt,
-                                                     boolean grayscale,
-                                                     float scale) {
+                                                     float scale,
+                                                     boolean grayscale) {
         return getScaledImage(getResourceTypeKey(rt), scale, grayscale);
     }
 
     public BufferedImage getScaledResourceTypeImage(ResourceType rt) {
-        return getResourceTypeImage(rt, false,
-                                    this.scaleFactor);
+        return getResourceTypeImage(rt,
+                                    this.scaleFactor, false);
     }
 
     public BufferedImage getSmallResourceTypeImage(ResourceType rt) {
-        return getResourceTypeImage(rt, false,
-                                    this.scaleFactor * SMALL_SCALE);
+        return getResourceTypeImage(rt,
+                                    this.scaleFactor * SMALL_SCALE, false);
     }
 
     public BufferedImage getScaledResourceImage(Resource resource) {
-        return getResourceTypeImage(resource.getType(), false,
-                                    this.scaleFactor);
+        return getResourceTypeImage(resource.getType(),
+                                    this.scaleFactor, false);
     }
 
 

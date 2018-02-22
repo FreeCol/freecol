@@ -146,7 +146,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 new RiverStyleTransform(RiverStyleTransform.SET_STYLE)));
 
         final ResourceType rt = first(spec.getResourceTypeList());
-        listPanel.add(buildButton(ImageLibrary.getResourceTypeImage(rt, false, riverSize),
+        listPanel.add(buildButton(ImageLibrary.getResourceTypeImage(rt,
+                    riverSize, false),
                 Messages.message("mapEditorTransformPanel.resource"),
                 new ResourceTransform()));
 

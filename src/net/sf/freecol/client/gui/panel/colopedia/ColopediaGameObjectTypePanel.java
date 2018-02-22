@@ -131,19 +131,8 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
         int width = ImageLibrary.ICON_SIZE.width;
         int height = ImageLibrary.ICON_SIZE.height;
         for (FreeColSpecObjectType type : types) {
-            Image image = (type instanceof GoodsType)
-                ? ImageLibrary.getGoodsTypeImage((GoodsType)type,
-                                                 ImageLibrary.ICON_SIZE)
-                : (type instanceof ResourceType)
-                ? ImageLibrary.getResourceTypeImage((ResourceType)type, false,
-                                                    ImageLibrary.ICON_SIZE)
-                : (type instanceof Nation)
-                ? ImageLibrary.getNationImage((Nation)type,
-                                              ImageLibrary.ICON_SIZE)
-                : (type instanceof BuildableType)
-                ? ImageLibrary.getBuildableTypeImage((BuildableType)type,
-                                                     ImageLibrary.ICON_SIZE)
-                : ImageLibrary.getReplacementImage(ImageLibrary.ICON_SIZE);
+            Image image = ImageLibrary
+                .getObjectImage(type, ImageLibrary.ICON_SIZE);
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
             BufferedImage centeredImage
