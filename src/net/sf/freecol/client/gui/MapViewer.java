@@ -1229,6 +1229,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @param g The Graphics2D object on which to draw the Map.
      */
     public void displayMap(Graphics2D g) {
+        final long now = System.currentTimeMillis();
         final ClientOptions options = getClientOptions();
         final int colonyLabels
             = options.getInteger(ClientOptions.COLONY_LABELS);
@@ -1568,6 +1569,14 @@ public final class MapViewer extends FreeColClientHolder {
         if (gotoPath != null) {
             displayPath(g, gotoPath);
         }
+
+        // Timing log
+        final long gap = System.currentTimeMillis() - now;
+        logger.finest("displayMap time = " + gap
+            + " for " + firstColumn + " " + firstRow
+            + " to " + lastColumn + " " + lastRow
+            + " average "
+            + ((double)gap) / ((lastRow-firstRow) * (lastColumn-firstColumn)));
     }
 
     private void displaySettlementLabels(Graphics2D g, Settlement settlement,
