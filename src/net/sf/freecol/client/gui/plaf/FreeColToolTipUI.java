@@ -72,7 +72,8 @@ public class FreeColToolTipUI extends BasicToolTipUI {
     @Override
     public void paint(Graphics g, JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColToolTip", g, c, null);
+            ImageLibrary.drawTiledImage("image.background.FreeColToolTip",
+                                        g, c, null);
         }
 
         g.setColor(Color.BLACK); // FIXME: find out why this is necessary

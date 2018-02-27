@@ -330,14 +330,13 @@ public final class TileViewer extends FreeColClientHolder {
         case NONE: case COLONY_CENTER: case CLAIM_REQUIRED:
             break;
         default:
-            g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN),
+            g.drawImage(lib.getScaledImage(ImageLibrary.TILE_TAKEN),
                         0, 0, null);
         }
         int price = colony.getOwner().getLandPrice(tile);
         if (price > 0 && !tile.hasSettlement()) {
-            BufferedImage image = lib.getMiscImage(
-                ImageLibrary.TILE_OWNED_BY_INDIANS);
-            displayCenteredImage(g, image);
+            displayCenteredImage(g, lib
+                .getScaledImage(ImageLibrary.TILE_OWNED_BY_INDIANS));
         }
 
         Unit unit = colonyTile.getOccupyingUnit();
@@ -786,14 +785,12 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     private void displayResourceTileItem(Graphics2D g, Resource item) {
-        BufferedImage bonusImage = lib.getMiscImage(
-            "image.tileitem." + item.getType().getId());
-        displayCenteredImage(g, bonusImage);
+        displayCenteredImage(g, getImageLibrary().getScaledResourceImage(item));
     }
 
     private void displayLostCityRumour(Graphics2D g) {
         displayCenteredImage(g,
-            lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
+            lib.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR));
     }
 
     private void displayTileImprovement(Graphics2D g,

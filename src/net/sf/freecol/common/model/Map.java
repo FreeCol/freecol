@@ -2060,6 +2060,19 @@ ok:     while (!openMap.isEmpty()) {
      */
     public void forSubMap(int x, int y, int w, int h,
                           Consumer<Tile> consumer) {
+        for (Tile t : subMap(x, y, w, h)) consumer.accept(t);
+    }
+
+    /**
+     * Collect the tiles in a rectangular portion of the map.
+     * 
+     * @param x X-component of the position of first tile.
+     * @param y Y-component of the position of first tile.
+     * @param w Width of the rectangle.
+     * @param h Height of the rectangle.
+     * @return A list of {@code Tile}s found (empty on error).
+     */
+    public List<Tile> subMap(int x, int y, int w, int h) {
         if (x < 0) {
             w += x;
             x = 0;
@@ -2068,19 +2081,21 @@ ok:     while (!openMap.isEmpty()) {
             h += y;
             y = 0;
         }
-        if (w <= 0 || h <= 0) return;
-        int width = getWidth();
-        int height = getHeight();
-        if (x > width || y > height) return;
+        final int width = getWidth();
+        final int height = getHeight();
+        if (w <= 0 || h <= 0 || x > width || y > height)
+            return Collections.<Tile>emptyList();
         if (x+w > width) w = width - x;
         if (y+h > height) h = height - y;
-        for (int yi = y; yi < y+h; ++yi) {
-            for (int xi = x; xi < x+w; ++xi) {
-                consumer.accept(getTile(xi, yi));
+        List<Tile> ret = new ArrayList<>();
+        for (int yi = y; yi < y+h; yi++) {
+            for (int xi = x; xi < x+w; xi++) {
+                ret.add(getTile(xi, yi));
             }
         }
+        return ret;
     }
-
+        
 
     // Useful customers for tile iteration.
 
@@ -2616,7 +2631,7 @@ ok:     while (!openMap.isEmpty()) {
      */
     @Override
     public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
-        return new ImageIcon(library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
+        return new ImageIcon(library.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR));
     }
 
 

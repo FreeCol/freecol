@@ -44,7 +44,8 @@ public class FreeColPopupMenuUI extends BasicPopupMenuUI {
     @Override
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColPopupMenu", g, c, null);
+            ImageLibrary.drawTiledImage("image.background.FreeColPopupMenu",
+                                        g, c, null);
         }
     }
 

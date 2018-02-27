@@ -32,6 +32,7 @@ import javax.swing.border.EmptyBorder;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.AboutAction;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.ContinueAction;
@@ -41,7 +42,6 @@ import net.sf.freecol.client.gui.action.OpenAction;
 import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -77,8 +77,8 @@ public final class MainPanel extends FreeColPanel {
                 ? ContinueAction.id
                 : NewAction.id));
 
-        Image tempImage = ResourceManager.getImage("image.flavor.Title");
-        JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
+        JLabel logoLabel = new JLabel(new ImageIcon(ImageLibrary
+                .getUnscaledImage("image.flavor.Title")));
         logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,0,2),
                 new BevelBorder(BevelBorder.LOWERED)));
         add(logoLabel);

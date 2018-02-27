@@ -4006,7 +4006,6 @@ outer:  for (Effect effect : effects) {
         GoodsType goodsType = goods.getType();
         Colony colony = (Colony) goods.getLocation();
         int amount = Math.min(goods.getAmount(), GoodsContainer.CARGO_SIZE);
-        String monarchKey = getMonarchKey();
 
         if (accepted) {
             csSetTax(tax, cs);
@@ -4020,7 +4019,7 @@ outer:  for (Effect effect : effects) {
                    new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,
                        StringTemplate.template(Monarch.MonarchAction.FORCE_TAX.getTextKey())
                        .addAmount("%amount%", tax + extraTax),
-                       monarchKey));
+                       getNationId()));
             logger.info("Forced tax raise to: " + (tax + extraTax));
         } else { // Tea party
             Specification spec = getGame().getSpecification();
@@ -4103,13 +4102,13 @@ outer:  for (Effect effect : effects) {
         if (price <= 0 || mercenaries.isEmpty()) return;
         final int n = NameCache.getMercenaryLeaderIndex(random);
         cs.add(See.only(this),
-               new MonarchActionMessage(action, StringTemplate
-                   .template(action.getTextKey())
-                   .addName("%leader%", NameCache.getMercenaryLeaderName(n))
-                   .addAmount("%gold%", price)
-                   .addStringTemplate("%mercenaries%",
-                       AbstractUnit.getListLabel(", ", mercenaries)),
-                   "image.flavor.model.mercenaries." + n));
+            new MonarchActionMessage(action, StringTemplate
+                .template(action.getTextKey())
+                .addName("%leader%", NameCache.getMercenaryLeaderName(n))
+                .addAmount("%gold%", price)
+                .addStringTemplate("%mercenaries%",
+                    AbstractUnit.getListLabel(", ", mercenaries)),
+                Integer.toString(n)));
         new MonarchSession(this, action, mercenaries, price);
     }
         
@@ -4174,7 +4173,7 @@ outer:  for (Effect effect : effects) {
             cs.add(See.only(this),
                    new MonarchActionMessage(Monarch.MonarchAction.DISPLEASURE,
                        StringTemplate.template(Monarch.MonarchAction.DISPLEASURE.getTextKey()),
-                       getMonarchKey()));
+                       getNationId()));
         }
     }
 

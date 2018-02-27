@@ -62,6 +62,7 @@ public class ProductionCache {
     /**
      * Flag to indicate whether the cache is up to date, or not and
      * needs {@link #update} to be called.
+     * Synchronize access to this variable.
      */
     private boolean upToDate = false;
 
@@ -77,7 +78,19 @@ public class ProductionCache {
 
 
     /**
-     * Updates all data structures.  The method has no side effects.
+     * Updates all data structures.
+     *
+     * Front end for reallyUpdate, split out to keep the wrapping of
+     * upToDate distinct, and to make reallyUpdate visible when profiling.
+     */
+    private synchronized void update() {
+        if (upToDate) return; // nothing to do
+        reallyUpdate();
+        upToDate = true;
+    }
+
+    /**
+     * Really update everything.
      *
      * For now, there is a hard assumption that ColonyTiles do not
      * consume but Buildings do.  One day we may want to generalize
@@ -92,8 +105,7 @@ public class ProductionCache {
      * WorkLocation.getProductionInfo with the Building-form
      * arguments.
      */
-    private synchronized void update() {
-        if (upToDate) return; // nothing to do
+    private void reallyUpdate() {
         final Specification spec = colony.getSpecification();
         final GoodsType bells = spec.getGoodsType("model.goods.bells");
 
@@ -176,7 +188,6 @@ public class ProductionCache {
                 productionAndConsumption.put(consumer, info);
             }
         }
-        upToDate = true;
     }
 
 

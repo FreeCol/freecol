@@ -20,10 +20,12 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
+import java.awt.Image;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
@@ -34,6 +36,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.dialog.*;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -41,7 +44,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.option.Option;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -232,20 +234,26 @@ public abstract class FreeColAction extends AbstractAction
      * @param key The identifier of the action.
      */
     protected void addImageIcons(String key) {
-        String normalKey = "image.miscicon.button.normal." + key;
-        String highlightedKey = "image.miscicon.button.highlighted." + key;
-        String pressedKey = "image.miscicon.button.pressed." + key;
-        String disabledKey = "image.miscicon.button.disabled." + key;
-        orderButtonImageCount = (ResourceManager.hasImageResource(normalKey) ? 1 : 0)
-            + (ResourceManager.hasImageResource(highlightedKey) ? 1 : 0)
-            + (ResourceManager.hasImageResource(pressedKey) ? 1 : 0)
-            + (ResourceManager.hasImageResource(disabledKey) ? 1 : 0);
-        if (hasOrderButtons()) {
-            putValue(BUTTON_IMAGE, normalKey);
-            putValue(BUTTON_ROLLOVER_IMAGE, highlightedKey);
-            putValue(BUTTON_PRESSED_IMAGE, pressedKey);
-            putValue(BUTTON_DISABLED_IMAGE, disabledKey);
-        } else {
+        orderButtonImageCount = 0;
+        Image[] images = ImageLibrary.getButtonImages(key);
+        if (images[0] != null) {
+            putValue(BUTTON_IMAGE, new ImageIcon(images[0]));
+            orderButtonImageCount++;
+        }
+        if (images[1] != null) {
+            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(images[1]));
+            orderButtonImageCount++;
+        }
+        if (images[2] != null) {
+            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images[2]));
+            orderButtonImageCount++;
+        }
+        if (images[3] != null) {
+            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images[3]));
+            orderButtonImageCount++;
+        }
+
+        if (!hasOrderButtons()) {
             logger.warning("Missing " + (4-orderButtonImageCount)
                 + " order button images for " + getId());
         }

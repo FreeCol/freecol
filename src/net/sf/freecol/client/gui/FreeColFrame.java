@@ -39,7 +39,6 @@ import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -85,7 +84,7 @@ public class FreeColFrame extends JFrame {
             ? new WindowedFrameListener(freeColClient)
             : new FullScreenFrameListener(freeColClient, this));
         setCanvas();
-        setIconImage(ResourceManager.getImage("image.miscicon.FrameIcon"));
+        setIconImage(ImageLibrary.getUnscaledImage("image.miscicon.FrameIcon"));
 
         pack(); // necessary for getInsets
         Insets insets = getInsets();

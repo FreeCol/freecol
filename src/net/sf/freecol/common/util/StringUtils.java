@@ -77,6 +77,20 @@ public class StringUtils {
     }
 
     /**
+     * Gets the first part of a string before a supplied delimiter.
+     *
+     * @param s The string to operate on.
+     * @param delim The delimiter.
+     * @return The first part of the string before the first instance of
+     *     the delimiter, or the original string if the delimiter is
+     *     not present.
+     */
+    public static String firstPart(String s, String delim) {
+        int idx = (s == null) ? -1 : s.indexOf(delim);
+        return (idx >= 0) ? s.substring(0, idx) : s;
+    }
+
+    /**
      * Gets the last part of a string after a supplied delimiter.
      *
      * @param s The string to operate on.
@@ -86,9 +100,8 @@ public class StringUtils {
      *     not present.
      */
     public static String lastPart(String s, String delim) {
-        int last = (s == null) ? -1 : s.lastIndexOf(delim);
-        return (last > 0) ? s.substring(last+delim.length(), s.length())
-            : s;
+        int idx = (s == null) ? -1 : s.lastIndexOf(delim);
+        return (idx >= 0) ? s.substring(idx+delim.length(), s.length()) : s;
     }
 
     /**

@@ -29,7 +29,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.border.AbstractBorder;
 
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -55,14 +54,14 @@ public class FreeColImageBorder extends AbstractBorder {
      * Creates the default border.
      */
     public FreeColImageBorder() {
-        this(ResourceManager.getImage("image.menuborder.nw"),
-             ResourceManager.getImage("image.menuborder.n"),
-             ResourceManager.getImage("image.menuborder.ne"),
-             ResourceManager.getImage("image.menuborder.e"),
-             ResourceManager.getImage("image.menuborder.se"),
-             ResourceManager.getImage("image.menuborder.s"),
-             ResourceManager.getImage("image.menuborder.sw"),
-             ResourceManager.getImage("image.menuborder.w"));
+        this(ImageLibrary.getUnscaledImage("image.menuborder.nw"),
+             ImageLibrary.getUnscaledImage("image.menuborder.n"),
+             ImageLibrary.getUnscaledImage("image.menuborder.ne"),
+             ImageLibrary.getUnscaledImage("image.menuborder.e"),
+             ImageLibrary.getUnscaledImage("image.menuborder.se"),
+             ImageLibrary.getUnscaledImage("image.menuborder.s"),
+             ImageLibrary.getUnscaledImage("image.menuborder.sw"),
+             ImageLibrary.getUnscaledImage("image.menuborder.w"));
     }
 
 
@@ -119,10 +118,18 @@ public class FreeColImageBorder extends AbstractBorder {
      */
     @Override
     public Insets getBorderInsets(Component c, Insets insets) {        
-        int top = Math.max(Math.max(getHeight(topImage), getHeight(topLeftCornerImage)), getHeight(topRightCornerImage));
-        int left = Math.max(Math.max(getWidth(leftImage), getWidth(topLeftCornerImage)), getWidth(bottomLeftCornerImage));
-        int bottom = Math.max(Math.max(getHeight(bottomImage), getHeight(bottomLeftCornerImage)), getHeight(bottomRightCornerImage));
-        int right = Math.max(Math.max(getWidth(rightImage), getWidth(topRightCornerImage)), getWidth(bottomRightCornerImage));
+        int top = Math.max(Math.max(getHeight(topImage),
+                getHeight(topLeftCornerImage)),
+            getHeight(topRightCornerImage));
+        int left = Math.max(Math.max(getWidth(leftImage),
+                getWidth(topLeftCornerImage)),
+            getWidth(bottomLeftCornerImage));
+        int bottom = Math.max(Math.max(getHeight(bottomImage),
+                getHeight(bottomLeftCornerImage)),
+            getHeight(bottomRightCornerImage));
+        int right = Math.max(Math.max(getWidth(rightImage),
+                getWidth(topRightCornerImage)),
+            getWidth(bottomRightCornerImage));
 
         if (topImage == null) {
             top = 0;
@@ -253,5 +260,4 @@ public class FreeColImageBorder extends AbstractBorder {
     private static int getWidth(Image im) {
         return (im == null) ? 0 : im.getWidth(null);
     }        
-
 }

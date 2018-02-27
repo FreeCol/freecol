@@ -699,13 +699,6 @@ public abstract class Settlement extends GoodsLocation
     // Settlement routines to be implemented by subclasses.
 
     /**
-     * Gets an image key for this settlement.
-     *
-     * @return An image key
-     */
-    public abstract String getImageKey();
-
-    /**
      * Gets the {@code Unit} that is currently defending this
      * {@code Settlement}.
      *

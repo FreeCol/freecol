@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.resources.FAFile;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -70,7 +71,7 @@ public final class DeclarationPanel extends FreeColPanel {
     public DeclarationPanel(FreeColClient freeColClient) {
         super(freeColClient, null);
 
-        Image image = ResourceManager.getImage("image.flavor.Declaration");
+        Image image = ImageLibrary.getUnscaledImage("image.flavor.Declaration");
         setSize(image.getWidth(null), image.getHeight(null));
         setOpaque(false);
         setBorder(null);
@@ -130,7 +131,7 @@ public final class DeclarationPanel extends FreeColPanel {
      */
     @Override
     public void paintComponent(Graphics g) {
-        Image image = ResourceManager.getImage("image.flavor.Declaration");
+        Image image = ImageLibrary.getUnscaledImage("image.flavor.Declaration");
         g.drawImage(image, 0, 0, null);
     }
 
@@ -154,7 +155,7 @@ public final class DeclarationPanel extends FreeColPanel {
 
 
         SignaturePanel() {
-            faFile = ResourceManager.getFAFile("animatedfont.signature");
+            this.faFile = ResourceManager.getFAFile("animatedfont.signature");
             setOpaque(false);
         }
 

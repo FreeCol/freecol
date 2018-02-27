@@ -26,7 +26,8 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Date;
 
-import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.client.gui.ImageLibrary;
+
 
 /**
  * ChatDisplay manages use of {@code GUIMessage}.
@@ -107,15 +108,19 @@ public class ChatDisplay {
                     xx, yy, null);
                 yy += si.getHeight(null);
             }
-            Image decoration = ResourceManager.getImage("image.menuborder.shadow.s");
+            Image decoration = ImageLibrary
+                .getUnscaledImage("image.menuborder.shadow.s");
             int width = decoration.getWidth(null);
             for (int index = 0; index < size.width; index += width) {
                 g.drawImage(decoration, index, 0, null);
             }
-            decoration = ResourceManager.getImage("image.menuborder.shadow.sw");
+            decoration = ImageLibrary
+                .getUnscaledImage("image.menuborder.shadow.sw");
             g.drawImage(decoration, 0, 0, null);
-            decoration = ResourceManager.getImage("image.menuborder.shadow.se");
-            g.drawImage(decoration, size.width - decoration.getWidth(null), 0, null);
+            decoration = ImageLibrary
+                .getUnscaledImage("image.menuborder.shadow.se");
+            g.drawImage(decoration, size.width - decoration.getWidth(null),
+                        0, null);
         }
     }
 

@@ -23,12 +23,12 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -84,8 +84,7 @@ final class UnitAttackAnimation extends FreeColClientHolder {
     private boolean loadAnimation(String startStr, float scale,
                                   Direction direction) {
         String specialId = startStr + direction.toString().toLowerCase();
-        if (ResourceManager.hasSZAResource(specialId)) {
-            this.sza = ResourceManager.getSZA(specialId, scale);
+        if ((this.sza = ImageLibrary.getSZA(specialId, scale)) != null) {
             this.mirror = false;
             return true;
         }
@@ -94,8 +93,7 @@ final class UnitAttackAnimation extends FreeColClientHolder {
         String mirroredId = "";
         if (mirrored != direction) {
             mirroredId = startStr + mirrored.toString().toLowerCase();
-            if (ResourceManager.hasSZAResource(mirroredId)) {
-                this.sza = ResourceManager.getSZA(mirroredId, scale);
+            if ((this.sza = ImageLibrary.getSZA(mirroredId, scale)) != null) {
                 this.mirror = true;
                 return true;
             }

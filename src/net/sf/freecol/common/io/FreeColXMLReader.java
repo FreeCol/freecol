@@ -281,6 +281,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @return The identifier found, or null if none present.
      */
     public String readId() {
+        
         String id = getAttribute(FreeColObject.ID_ATTRIBUTE_TAG, (String)null);
 
         if (id == null) return null;
@@ -811,7 +812,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
             // end @compat 0.11.x
             getAttribute(attributeName, (String)null);
-
         T ret = null;
         if (id == null) {
             if (required) {

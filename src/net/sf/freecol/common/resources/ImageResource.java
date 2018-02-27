@@ -30,7 +30,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -46,7 +45,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * @see Resource
  */
 public class ImageResource extends Resource
-                           implements Resource.Preloadable, Resource.Cleanable {
+                           implements Resource.Preloadable {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
@@ -57,9 +56,6 @@ public class ImageResource extends Resource
     private volatile BufferedImage image = null;
     private List<URI> alternativeLocators = null;
     private List<BufferedImage> loadedImages = null;
-
-    private HashMap<Dimension, BufferedImage> scaledImages = new HashMap<>();
-    private HashMap<Dimension, BufferedImage> grayscaleImages = new HashMap<>();
 
 
     /**
@@ -82,15 +78,6 @@ public class ImageResource extends Resource
         if (this.alternativeLocators == null)
             this.alternativeLocators = new ArrayList<>();
         this.alternativeLocators.add(uri);
-    }
-
-    /**
-     * Get the number of cached images.
-     *
-     * @return The image count.
-     */
-    public int getCount() {
-        return this.grayscaleImages.size() + this.scaledImages.size();
     }
 
     /**
@@ -125,9 +112,6 @@ public class ImageResource extends Resource
      * @return The {@code BufferedImage} with the required dimension.
      */
     private BufferedImage getColorImage(Dimension d) {
-        final BufferedImage cached = this.scaledImages.get(d);
-        if (cached != null) return cached; // Cache hit
-
         BufferedImage im = getImage();
         if (im == null) return null; // Preload failed
         
@@ -188,7 +172,6 @@ public class ImageResource extends Resource
             g.dispose();
             im = scaled;
         }
-        this.scaledImages.put(d, im);
         return im;
     }
 
@@ -199,11 +182,7 @@ public class ImageResource extends Resource
      * @return The {@code BufferedImage}.
      */
     private BufferedImage getGrayscaleImage(Dimension d) {
-        final BufferedImage cached = this.grayscaleImages.get(d);
-        if (cached != null) return cached; // Cache hit
-
-        // Get the correctly scaled image
-        final BufferedImage im = getColorImage(d);
+        final BufferedImage im = getColorImage(d); // Get the scaled image
         if (im == null) return null;
 
         int width = im.getWidth();
@@ -217,9 +196,7 @@ public class ImageResource extends Resource
         g.dispose();
         ColorConvertOp filter = new ColorConvertOp(
             ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-        final BufferedImage grayscaleImage = filter.filter(srcImage, null);
-        this.grayscaleImages.put(d, grayscaleImage);
-        return grayscaleImage;
+        return filter.filter(srcImage, null);
     }
 
 
@@ -263,17 +240,5 @@ public class ImageResource extends Resource
                 + uri, ioe);
         }
         return null;
-    }
-
-
-    // Interface Cleanable
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clean() {
-        this.scaledImages = new HashMap<>();
-        this.grayscaleImages = new HashMap<>();
     }
 }

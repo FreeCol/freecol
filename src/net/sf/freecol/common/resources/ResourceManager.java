@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,9 @@ public class ResourceManager {
 
     /** The thread that handles preloading of resources. */
     private static volatile Thread preloadThread = null;
+
+    /** A cache of scaled (and possibly greyed) images. */
+    private static Map<Long, BufferedImage> imageCache = new HashMap<>();
 
 
     /**
@@ -124,22 +128,7 @@ public class ResourceManager {
      * Clean up easily replaced modified copies in caches.
      */
     public static synchronized void clean() {
-        if (baseMapping != null) {
-            forEachMapEntry(baseMapping.getImageResources(),
-                            e -> e.getValue().clean());
-        }
-        if (tcMapping != null) {
-            forEachMapEntry(tcMapping.getImageResources(),
-                            e -> e.getValue().clean());
-        }
-        if (scenarioMapping != null) {
-            forEachMapEntry(scenarioMapping.getImageResources(),
-                            e -> e.getValue().clean());
-        }
-        if (modMapping != null) {
-            forEachMapEntry(modMapping.getImageResources(),
-                            e -> e.getValue().clean());
-        }
+        imageCache.clear();
         System.gc();
     }
 
@@ -169,6 +158,15 @@ public class ResourceManager {
         mc.addAll(scenarioMapping);
         mc.addAll(modMapping);
         mergedContainer = mc;
+    }
+
+    /**
+     * Get the image cache.
+     *
+     * @return The image cache.
+     */
+    public static Map<Long, BufferedImage> getImageCache() {
+        return imageCache;
     }
 
     /**
@@ -269,7 +267,50 @@ public class ResourceManager {
     }
 
     /**
+     * Hash function for images.
+     *
+     * We accept the standard 32-bit int hashCode of the key, and
+     * or it with 15 bits of the width and height, and one more bit for the
+     * grayscale boolean.
+     *
+     * @param key The image key.
+     * @param size The size of the image.
+     * @param grayscale True if grayscale.
+     * @return A unique hash of these parameters.
+     */
+    private static long imageHash(final String key, final Dimension size,
+                                  final boolean grayscale) {
+        return (key.hashCode() & 0xFFFFFFFFL)
+            | ((size.width & 0x7FFFL) << 32)
+            | ((size.height & 0x7FFFL) << 47)
+            | ((grayscale) ? (0x1L << 62) : 0L);
+    }
+
+    /**
+     * Invert imageHash.
+     *
+     * Public for ImageLibrary.getImageResourceSummary.
+     *
+     * @param h A hash code from imageHash.
+     * @return A string in the form "key.width(g|_)height", except the
+     *     image key is a hash code.
+     */
+    public static String imageUnhash(long h) {
+        int key = (int)(h & 0xFFFFFFFFL); h >>= 32;
+        int width = (int)(h & 0x7FFFL); h >>= 15;
+        int height = (int)(h & 0x7FFFL); h >>= 15;
+        boolean grey = (h & 0x1L)==1L;
+        StringBuilder sb = new StringBuilder(32);
+        sb.append(key).append('.').append(width)
+            .append((grey) ? 'g' : '_').append(height);
+        return sb.toString();
+    }
+
+    /**
      * Low level image access.
+     *
+     * All requests for scaled images come through here, so this is
+     * where to maintain the image cache.
      *
      * @param ir The {@code ImageResource} to load from.
      * @param key The name of the resource to return.
@@ -282,6 +323,10 @@ public class ResourceManager {
                                           final String key,
                                           final Dimension size,
                                           final boolean grayscale) {
+        final long hashKey = imageHash(key, size, grayscale);
+        final BufferedImage cached = imageCache.get(hashKey);
+        if (cached != null) return cached;
+
         BufferedImage image = ir.getImage(size, grayscale);
         if (image == null) {
             logger.warning("getImage(" + key + ", " + size + ", " + grayscale
@@ -290,6 +335,8 @@ public class ResourceManager {
                     .getImage(size, grayscale)) == null) {
                 FreeColClient.fatal("Failed getting replacement image.");
             }
+        } else {
+            imageCache.put(hashKey, image);
         }
         return image;
     }

@@ -51,7 +51,6 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -132,19 +131,8 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
         int width = ImageLibrary.ICON_SIZE.width;
         int height = ImageLibrary.ICON_SIZE.height;
         for (FreeColSpecObjectType type : types) {
-            Image image = (type instanceof GoodsType)
-                ? ImageLibrary.getMiscImage("image.icon." + type.getId(),
-                                            ImageLibrary.ICON_SIZE)
-                : (type instanceof ResourceType)
-                ? ImageLibrary.getMiscImage("image.tileitem." + type.getId(),
-                                            ImageLibrary.ICON_SIZE)
-                : (type instanceof Nation)
-                ? ImageLibrary.getNationImage((Nation)type, ImageLibrary.ICON_SIZE)
-                : (type instanceof BuildableType)
-                ? ImageLibrary.getBuildableTypeImage((BuildableType)type,
-                                                     ImageLibrary.ICON_SIZE)
-                : ImageLibrary.getMiscImage(ResourceManager.REPLACEMENT_IMAGE,
-                                            ImageLibrary.ICON_SIZE);
+            Image image = ImageLibrary
+                .getObjectImage(type, ImageLibrary.ICON_SIZE);
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
             BufferedImage centeredImage
@@ -186,7 +174,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
 
     protected JButton getResourceButton(final ResourceType resourceType) {
         return getButton(resourceType, null, new ImageIcon(getImageLibrary()
-            .getMiscImage("image.tileitem." + resourceType.getId())));
+                .getScaledResourceTypeImage(resourceType)));
     }
 
     protected JButton getGoodsButton(final GoodsType goodsType) {

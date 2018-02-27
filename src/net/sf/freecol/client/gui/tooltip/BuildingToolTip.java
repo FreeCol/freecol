@@ -152,8 +152,9 @@ public class BuildingToolTip extends JToolTip {
 
         int diff = building.getUnitCapacity() - building.getUnitCount();
         for (int index = 0; index < diff; index++) {
-            add(new JLabel(new ImageIcon(
-                lib.getMiscImage("image.unit.placeholder"))), "span 2");
+            add(new JLabel(new ImageIcon(lib
+                        .getScaledImage("image.unit.placeholder"))),
+                "span 2");
         }
 
         int breed = (outputType == null || !outputType.isBreedable()) ? -1

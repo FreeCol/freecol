@@ -49,11 +49,6 @@ import net.sf.freecol.common.option.GameOptions;
 public final class GoodsLabel extends AbstractGoodsLabel
         implements CargoLabel, Draggable {
 
-    /**
-     * The {@code} GUI instance
-     */
-    private final GUI gui;
-
 
     /**
      * Initializes this FreeColLabel with the given goods data.
@@ -64,7 +59,6 @@ public final class GoodsLabel extends AbstractGoodsLabel
     public GoodsLabel(GUI gui, Goods goods) {
         super(gui.getImageLibrary(), goods);
 
-        this.gui = gui;
         initialize();
     }
 
@@ -83,21 +77,21 @@ public final class GoodsLabel extends AbstractGoodsLabel
 
         if (getAmount() < GoodsContainer.CARGO_SIZE) setPartialChosen(true);
 
+        setForeground(ImageLibrary.getGoodsColor(type, goods.getAmount(),
+                                                 location));
+        setText(String.valueOf(goods.getAmount()));
+
         if (player == null
-                || !type.isStorable()
-                || player.canTrade(type)
-                || (location instanceof Colony
+            || !type.isStorable()
+            || player.canTrade(type)
+            || (location instanceof Colony
                 && spec.getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
-                && ((Colony) location).hasAbility(Ability.EXPORT))) {
+                && ((Colony)location).hasAbility(Ability.EXPORT))) {
             Utility.localizeToolTip(this, goods.getLabel(true));
         } else {
             Utility.localizeToolTip(this, goods.getLabel(false));
             setIcon(getDisabledIcon());
         }
-
-        setForeground(ImageLibrary.getGoodsColor(type, goods.getAmount(),
-                                                 location));
-        setText(String.valueOf(goods.getAmount()));
     }
 
 
@@ -108,22 +102,6 @@ public final class GoodsLabel extends AbstractGoodsLabel
      */
     public Goods getGoods() {
         return (Goods) getAbstractGoods();
-    }
-
-
-    /**
-     * Set whether only a partial amount is to be selected.
-     *
-     * @param partialChosen The new partial choice.
-     */
-    @Override
-    public void setPartialChosen(boolean partialChosen) {
-        super.setPartialChosen(partialChosen);
-        final ImageLibrary lib = gui.getImageLibrary();
-        Image image = (partialChosen)
-            ? lib.getSmallGoodsTypeImage(getType())
-            : lib.getScaledGoodsTypeImage(getType());
-        setIcon(new ImageIcon(image));
     }
 
 
@@ -140,8 +118,7 @@ public final class GoodsLabel extends AbstractGoodsLabel
     }
 
 
-    //Interface CargoLabel
-
+    // Interface CargoLabel
 
     /**
      * {@inheritDoc}
@@ -159,7 +136,6 @@ public final class GoodsLabel extends AbstractGoodsLabel
         cargoPanel.update();
         return comp;
     }
-
 
     /**
      * {@inheritDoc}

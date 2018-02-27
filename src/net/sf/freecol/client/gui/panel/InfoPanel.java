@@ -54,7 +54,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -399,8 +398,8 @@ public final class InfoPanel extends FreeColPanel {
         this.mapEditorPanel.setOpaque(false);
         this.tileInfoPanel = new TileInfoPanel();
         this.unitInfoPanel = new UnitInfoPanel();
-        this.skin = (useSkin) ? ResourceManager.getImage("image.skin.InfoPanel")
-            : null;
+        this.skin = (!useSkin) ? null
+            : ImageLibrary.getUnscaledImage("image.skin.InfoPanel");
 
         setLayout(null);
         int internalPanelTop = 0;
