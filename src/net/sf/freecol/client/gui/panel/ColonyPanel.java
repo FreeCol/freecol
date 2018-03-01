@@ -935,13 +935,18 @@ public final class ColonyPanel extends PortPanel
      */
     public void closeColonyPanel() {
         final Colony colony = getColony();
+        final Player player = getMyPlayer();
         boolean abandon = false;
         BuildableType buildable;
-        if (getMyPlayer().owns(colony)) {
+        if (player.owns(colony)) {
             if (colony.getUnitCount() == 0) {
-                if (!getGUI().confirm(null, StringTemplate
-                        .key("abandonColony.text"),
-                             "abandonColony.yes", "abandonColony.no")) return;
+                final String key = (player.isRebel()
+                    && player.getNumberOfPorts() == 1
+                    && colony.isConnectedPort())
+                    ? "abandonColony.lastPort.text"
+                    : "abandonColony.text";
+                if (!getGUI().confirm(null, StringTemplate.key(key),
+                        "abandonColony.yes", "abandonColony.no")) return;
                 abandon = true;
             } else if ((buildable = colony.getCurrentlyBuilding()) != null) {
                 int required = buildable.getRequiredPopulation();
