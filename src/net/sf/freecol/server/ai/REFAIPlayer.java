@@ -187,7 +187,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final CachingFunction<Colony, PathNode> pathMapper
             = new CachingFunction<Colony, PathNode>(c ->
                 unit.findPath(carrier, c, carrier, null));
-        final Predicate<Colony> portPred = c ->
+        final Predicate<Colony> pathPred = c ->
             pathMapper.apply(c) != null;
         final Function<Colony, TargetTuple> newTupleMapper = c -> {
             PathNode path = pathMapper.apply(c);
@@ -196,8 +196,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         };
         final List<TargetTuple> targets
             = transform(flatten(player.getRebels(),
-                    ((port) ? Player::getConnectedPorts : Player::getColonies)),
-                portPred, newTupleMapper);
+                    ((port) ? Player::getConnectedPorts :Player::getColonies)),
+                pathPred, newTupleMapper);
+        if (targets.isEmpty()) return targets; // Should not happen
 
         // Increase score for drydock/s, musket and tools suppliers,
         // but decrease for fortifications.
@@ -222,14 +223,23 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 * (1.0 + 0.01 * (twiddle[twidx++] - percentTwiddle));
         }
         targets.sort(Comparator.naturalOrder());
-
-        LogBuilder lb = new LogBuilder(64);
-        lb.add("REF found colony targets:");
-        for (TargetTuple t : targets) lb.add(" ", t.colony, "(", t.score, ")");
-        lb.log(logger, Level.FINE);
         return targets;
     }
 
+    /**
+     * Find suitable colony targets.
+     *
+     * @param aiu The {@code AIUnit} to search with.
+     * @param aiCarrier The {@code AIUnit} to use as a carrier.
+     * @return A list of {@code TargetTuple} target choices.
+     */
+    private List<TargetTuple> findColonyTargets(AIUnit aiu, AIUnit aiCarrier) {
+        List<TargetTuple> targets = findColonyTargets(aiu, true, aiCarrier);
+        if (targets.isEmpty())
+            targets = findColonyTargets(aiu, false, aiCarrier);
+        return targets;
+    }
+                
     /**
      * Initialize the REF.
      * - Find the initial target
@@ -277,11 +287,18 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             return false;
         }
 
-        List<TargetTuple> targets = findColonyTargets(aiUnit, true, aiCarrier);
+        List<TargetTuple> targets = findColonyTargets(aiUnit, aiCarrier);
         if (targets.isEmpty()) {
             logger.warning("REF found no targets.");
             return false;
-        }
+        } else {
+            LogBuilder lb = new LogBuilder(64);
+            lb.add("REF found colony targets:");
+            for (TargetTuple t : targets) {
+                lb.add(" ", t.colony, "(", t.score, ")");
+            }
+            lb.log(logger, Level.FINE);
+        }            
 
         final Player rebel = targets.get(0).colony.getOwner();
         double ratio = getStrengthRatio(rebel);
@@ -748,14 +765,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 }
                 if (target == null) {
                     AIUnit aiCarrier = getAIUnit(found.getUnit().getCarrier());
-                    List<TargetTuple> ct = findColonyTargets(found, true,
-                                                             aiCarrier);
-                    if (ct.isEmpty()) {
-                        ct = findColonyTargets(found, false, aiCarrier);
-                    }
-                    if (!ct.isEmpty()) {
-                        target = ct.get(0).colony;
-                    }
+                    List<TargetTuple> ct = findColonyTargets(found, aiCarrier);
+                    if (!ct.isEmpty()) target = ct.get(0).colony;
                 }
                 if (target == null) continue; // No target for these idlers
 

@@ -732,8 +732,7 @@ public class ServerPlayer extends Player implements TurnTaker {
     public void csWithdraw(ChangeSet cs, ModelMessage mm, HistoryEvent he) {
         final Game game = getGame();
         if (mm == null) {
-            final String key = (isEuropean()
-                && getPlayerType() == PlayerType.COLONIAL)
+            final String key = (isEuropean())
                 ? "model.player.dead.european"
                 : "model.player.dead.native";
             mm = new ModelMessage(MessageType.FOREIGN_DIPLOMACY, key, this)
