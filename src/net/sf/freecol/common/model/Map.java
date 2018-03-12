@@ -26,11 +26,13 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -277,6 +279,18 @@ public class Map extends FreeColGameObject implements Location {
     /** The search tracing status. */
     private boolean traceSearch = false;
 
+    /**
+     * A cache of all tiles as a set.  This is just a {@code Map}
+     * local cache, and is unrelated to the player-specific caching
+     * within {@code Tile} iteself.
+     */
+    private final Set<Tile> cachedTiles = new HashSet<>();
+    /**
+     * Validity flag for the cachedTiles set, invalidation occurs in
+     * {@link Map#setTile}, revalidation in {@link Map#resetCachedTiles}.
+     */
+    private volatile boolean cachedTilesValid = false;
+
 
     /**
      * Create a new {@code Map} from a collection of tiles.
@@ -373,24 +387,18 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Get the tiles.
-     *
-     * @param An doubly indexed array of tiles.
-     */
-    protected synchronized Tile[][] getTiles() {
-        return this.tiles;
-    }
-
-    /**
      * Set the tiles to a new shape.
      *
      * @param width The new map width.
      * @param height The new map height.
+     * @return The old tiles array.
      */
-    public synchronized void setTiles(int width, int height) {
+    public synchronized Tile[][] setTiles(int width, int height) {
+        Tile[][] ret = this.tiles;
         this.width = width;
         this.height = height;
         this.tiles = new Tile[width][height];
+        return ret;
     }
 
     /**
@@ -425,7 +433,10 @@ public class Map extends FreeColGameObject implements Location {
      * @param tile The {@code Tile} to set.
      */
     public synchronized void setTile(Tile tile, int x, int y) {
-        if (isValid(x, y)) this.tiles[x][y] = tile;
+        if (isValid(x, y)) {
+            this.tiles[x][y] = tile;
+            this.cachedTilesValid = false;
+        }
     }
 
     /**
@@ -600,6 +611,33 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Reset the tile cache.
+     */
+    private synchronized void resetCachedTiles() {
+        if (this.cachedTilesValid) return;
+        this.cachedTiles.clear();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                this.cachedTiles.add(this.tiles[x][y]);
+            }
+        }
+        this.cachedTilesValid = true;
+    }
+
+    /**
+     * Get all the tiles in the map as a set.
+     *
+     * @return A {@code Set} of all {@code Tile}s in this {@code Map}.
+     */
+    public Set<Tile> getAllTilesSet() {
+        if (!this.cachedTilesValid) resetCachedTiles();
+        return this.cachedTiles;
+    }
+
+
+    // Useful location and direction utilities
+    
+    /**
      * Are two locations non-null and either the same or at the same tile.
      * This routine is here because Location is an interface.
      *
@@ -746,6 +784,266 @@ public class Map extends FreeColGameObject implements Location {
         return null;
     }
 
+
+    // Support for various kinds of map iteration.
+
+    /**
+     * Get a stream of all the tiles in the map using an underlying
+     * WholeMapIterator.
+     *
+     * @return A {@code Stream} of all {@code Tile}s in this {@code Map}.
+     */
+    public Stream<Tile> getAllTiles() {
+        return toStream(getAllTilesSet());
+    }
+
+    /**
+     * Perform an action on each tile.
+     *
+     * @param consumer The {@code Consumer} action to perform.
+     */
+    public void forEachTile(Consumer<Tile> consumer) {
+        for (Tile t : getAllTilesSet()) consumer.accept(t);
+    }
+
+    /**
+     * Perform an action on each tile that matches a predicate.
+     *
+     * @param predicate The {@code Predicate} to match.
+     * @param consumer The {@code Consumer} action to perform.
+     */
+    public void forEachTile(Predicate<Tile> predicate,
+                            Consumer<Tile> consumer) {
+        for (Tile t : getAllTilesSet()) {
+            if (predicate.test(t)) consumer.accept(t);
+        }
+    }
+
+    /**
+     * Iterates through a rectangular subpart of the Map.
+     * Intentionally avoids calling methods doing redundant checks,
+     * which would slow down map display.
+     * 
+     * @param x X-component of the position of first tile.
+     * @param y Y-component of the position of first tile.
+     * @param w Width of the rectangle.
+     * @param h Height of the rectangle.
+     * @param consumer Provides a function to call for each tile.
+     */
+    public void forSubMap(int x, int y, int w, int h,
+                          Consumer<Tile> consumer) {
+        for (Tile t : subMap(x, y, w, h)) consumer.accept(t);
+    }
+
+    /**
+     * Collect the tiles in a rectangular portion of the map.
+     * 
+     * @param x X-component of the position of first tile.
+     * @param y Y-component of the position of first tile.
+     * @param w Width of the rectangle.
+     * @param h Height of the rectangle.
+     * @return A list of {@code Tile}s found (empty on error).
+     */
+    public List<Tile> subMap(int x, int y, int w, int h) {
+        if (x < 0) {
+            w += x;
+            x = 0;
+        }
+        if (y < 0) {
+            h += y;
+            y = 0;
+        }
+        final int width = getWidth();
+        final int height = getHeight();
+        if (w <= 0 || h <= 0 || x > width || y > height)
+            return Collections.<Tile>emptyList();
+        if (x+w > width) w = width - x;
+        if (y+h > height) h = height - y;
+        List<Tile> ret = new ArrayList<>();
+        for (int yi = y; yi < y+h; yi++) {
+            for (int xi = x; xi < x+w; xi++) {
+                ret.add(getTile(xi, yi));
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * An iterator returning positions in a spiral starting at a given
+     * center tile.  The center tile is never included in the returned
+     * tiles, and all returned tiles are valid.
+     */
+    private final class CircleIterator implements Iterator<Tile> {
+
+        /** The maximum radius. */
+        private final int radius;
+        /** The current radius of the iteration. */
+        private int currentRadius;
+        /** The current index in the circle with the current radius: */
+        private int n;
+        /** The current position in the circle. */
+        private int x, y;
+
+
+        /**
+         * Create a new Circle Iterator.
+         *
+         * @param center The center {@code Tile} of the circle.
+         * @param isFilled True to get all of the positions within the circle.
+         * @param radius The radius of the circle.
+         */
+        public CircleIterator(Tile center, boolean isFilled, int radius) {
+            if (center == null) {
+                throw new IllegalArgumentException("center must not be null.");
+            }
+            this.radius = radius;
+            n = 0;
+
+            Position step;
+            if (isFilled || radius == 1) {
+                step = Direction.NE.step(center.getX(), center.getY());
+                x = step.x;
+                y = step.y;
+                currentRadius = 1;
+            } else {
+                this.currentRadius = radius;
+                x = center.getX();
+                y = center.getY();
+                for (int i = 1; i < radius; i++) {
+                    step = Direction.N.step(x, y);
+                    x = step.x;
+                    y = step.y;
+                }
+                step = Direction.NE.step(x, y);
+                x = step.x;
+                y = step.y;
+            }
+            if (!isValid(x, y)) nextTile();
+        }
+
+        /**
+         * Gets the current radius of the circle.
+         *
+         * @return The distance from the center tile this
+         *     {@code CircleIterator} was initialized with.
+         */
+        public int getCurrentRadius() {
+            return currentRadius;
+        }
+
+        /**
+         * Finds the next position.
+         */
+        private void nextTile() {
+            boolean started = n != 0;
+            do {
+                n++;
+                final int width = currentRadius * 2;
+                if (n >= width * 4) {
+                    currentRadius++;
+                    if (currentRadius > radius) {
+                        x = y = UNDEFINED;
+                        break;
+                    } else if (!started) {
+                        x = y = UNDEFINED;
+                        break;
+                    } else {
+                        n = 0;
+                        started = false;
+                        Position step = Direction.NE.step(x, y);
+                        x = step.x;
+                        y = step.y;
+                    }
+                } else {
+                    int i = n / width;
+                    Direction direction;
+                    switch (i) {
+                    case 0:
+                        direction = Direction.SE;
+                        break;
+                    case 1:
+                        direction = Direction.SW;
+                        break;
+                    case 2:
+                        direction = Direction.NW;
+                        break;
+                    case 3:
+                        direction = Direction.NE;
+                        break;
+                    default:
+                        throw new IllegalStateException("i=" + i + ", n=" + n
+                            + ", width=" + width);
+                    }
+                    Position step = direction.step(x, y);
+                    x = step.x;
+                    y = step.y;
+                }
+            } while (!isValid(x, y));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean hasNext() {
+            return x != UNDEFINED && y != UNDEFINED;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Tile next() throws NoSuchElementException {
+            if (!hasNext()) {
+                throw new NoSuchElementException("CircleIterator exhausted");
+            }
+            Tile result = getTile(x, y);
+            nextTile();
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * Gets a circle iterator.
+     *
+     * @param center The center {@code Tile} to iterate around.
+     * @param isFilled True to get all of the positions in the circle.
+     * @param radius The radius of circle.
+     * @return The circle iterator.
+     */
+    public Iterator<Tile> getCircleIterator(Tile center, boolean isFilled,
+        int radius) {
+        return new CircleIterator(center, isFilled, radius);
+    }
+
+    /**
+     * Gets an iterable for all the tiles in a circle using an
+     * underlying CircleIterator.
+     *
+     * @param center The center {@code Tile} to iterate around.
+     * @param isFilled True to get all of the positions in the circle.
+     * @param radius The radius of circle.
+     * @return An {@code Iterable} for a circle of tiles.
+     */
+    public Iterable<Tile> getCircleTiles(final Tile center,
+        final boolean isFilled,
+        final int radius) {
+        return new Iterable<Tile>() {
+            @Override
+            public Iterator<Tile> iterator() {
+                return getCircleIterator(center, isFilled, radius);
+            }
+        };
+    }
+        
 
     // Path-finding/searching infrastructure and routines
 
@@ -1774,329 +2072,6 @@ ok:     while (!openMap.isEmpty()) {
     }
 
     
-    // Support for various kinds of map iteration.
-
-    /**
-     * An iterator returning positions in a spiral starting at a given
-     * center tile.  The center tile is never included in the returned
-     * tiles, and all returned tiles are valid.
-     */
-    private final class CircleIterator implements Iterator<Tile> {
-
-        /** The maximum radius. */
-        private final int radius;
-        /** The current radius of the iteration. */
-        private int currentRadius;
-        /** The current index in the circle with the current radius: */
-        private int n;
-        /** The current position in the circle. */
-        private int x, y;
-
-
-        /**
-         * Create a new Circle Iterator.
-         *
-         * @param center The center {@code Tile} of the circle.
-         * @param isFilled True to get all of the positions within the circle.
-         * @param radius The radius of the circle.
-         */
-        public CircleIterator(Tile center, boolean isFilled, int radius) {
-            if (center == null) {
-                throw new IllegalArgumentException("center must not be null.");
-            }
-            this.radius = radius;
-            n = 0;
-
-            Position step;
-            if (isFilled || radius == 1) {
-                step = Direction.NE.step(center.getX(), center.getY());
-                x = step.x;
-                y = step.y;
-                currentRadius = 1;
-            } else {
-                this.currentRadius = radius;
-                x = center.getX();
-                y = center.getY();
-                for (int i = 1; i < radius; i++) {
-                    step = Direction.N.step(x, y);
-                    x = step.x;
-                    y = step.y;
-                }
-                step = Direction.NE.step(x, y);
-                x = step.x;
-                y = step.y;
-            }
-            if (!isValid(x, y)) nextTile();
-        }
-
-        /**
-         * Gets the current radius of the circle.
-         *
-         * @return The distance from the center tile this
-         *     {@code CircleIterator} was initialized with.
-         */
-        public int getCurrentRadius() {
-            return currentRadius;
-        }
-
-        /**
-         * Finds the next position.
-         */
-        private void nextTile() {
-            boolean started = n != 0;
-            do {
-                n++;
-                final int width = currentRadius * 2;
-                if (n >= width * 4) {
-                    currentRadius++;
-                    if (currentRadius > radius) {
-                        x = y = UNDEFINED;
-                        break;
-                    } else if (!started) {
-                        x = y = UNDEFINED;
-                        break;
-                    } else {
-                        n = 0;
-                        started = false;
-                        Position step = Direction.NE.step(x, y);
-                        x = step.x;
-                        y = step.y;
-                    }
-                } else {
-                    int i = n / width;
-                    Direction direction;
-                    switch (i) {
-                    case 0:
-                        direction = Direction.SE;
-                        break;
-                    case 1:
-                        direction = Direction.SW;
-                        break;
-                    case 2:
-                        direction = Direction.NW;
-                        break;
-                    case 3:
-                        direction = Direction.NE;
-                        break;
-                    default:
-                        throw new IllegalStateException("i=" + i + ", n=" + n
-                            + ", width=" + width);
-                    }
-                    Position step = direction.step(x, y);
-                    x = step.x;
-                    y = step.y;
-                }
-            } while (!isValid(x, y));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean hasNext() {
-            return x != UNDEFINED && y != UNDEFINED;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Tile next() throws NoSuchElementException {
-            if (!hasNext()) {
-                throw new NoSuchElementException("CircleIterator exhausted");
-            }
-            Tile result = getTile(x, y);
-            nextTile();
-            return result;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    /**
-     * Gets a circle iterator.
-     *
-     * @param center The center {@code Tile} to iterate around.
-     * @param isFilled True to get all of the positions in the circle.
-     * @param radius The radius of circle.
-     * @return The circle iterator.
-     */
-    public Iterator<Tile> getCircleIterator(Tile center, boolean isFilled,
-        int radius) {
-        return new CircleIterator(center, isFilled, radius);
-    }
-
-    /**
-     * Gets an iterable for all the tiles in a circle using an
-     * underlying CircleIterator.
-     *
-     * @param center The center {@code Tile} to iterate around.
-     * @param isFilled True to get all of the positions in the circle.
-     * @param radius The radius of circle.
-     * @return An {@code Iterable} for a circle of tiles.
-     */
-    public Iterable<Tile> getCircleTiles(final Tile center,
-        final boolean isFilled,
-        final int radius) {
-        return new Iterable<Tile>() {
-            @Override
-            public Iterator<Tile> iterator() {
-                return getCircleIterator(center, isFilled, radius);
-            }
-        };
-    }
-
-    /**
-     * An iterator for the whole map.
-     */
-    private class WholeMapIterator implements Iterator<Tile> {
-       
-        /** The current coordinate position in the iteration. */
-        private int x, y;
-
-
-        /**
-         * Default constructor.
-         */
-        public WholeMapIterator() {
-            x = y = 0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean hasNext() {
-            return y < getHeight();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Tile next() throws NoSuchElementException {
-            if (!hasNext()) {
-                throw new NoSuchElementException("WholeMapIterator exhausted");
-            }
-            Tile result = getTile(x, y);
-            x++;
-            if (x >= getWidth()) {
-                x = 0;
-                y++;
-            }
-            return result;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    /**
-     * Gets an {@code Iterator} of every {@code Tile} on the map.
-     *
-     * @return An {@code Iterator} for the whole map.
-     */
-    public Iterator<Tile> getWholeMapIterator() {
-        return new WholeMapIterator();
-    }
-
-    /**
-     * Get a stream of all the tiles in the map using an underlying
-     * WholeMapIterator.
-     *
-     * @return A {@code Stream} of all tiles of the map.
-     */
-    public Stream<Tile> getAllTiles() {
-        return toStream(new WholeMapIterator());
-    }
-
-    /**
-     * Perform an action on each tile.
-     *
-     * @param consumer The {@code Consumer} action to perform.
-     */
-    public void forEachTile(Consumer<Tile> consumer) {
-        forEachTile(alwaysTrue(), consumer);
-    }
-
-    /**
-     * Perform an action on each tile that matches a predicate.
-     *
-     * @param predicate The {@code Predicate} to match.
-     * @param consumer The {@code Consumer} action to perform.
-     */
-    public void forEachTile(Predicate<Tile> predicate,
-                            Consumer<Tile> consumer) {
-        final int hgt = getHeight(), wid = getWidth();
-        for (int y = 0; y < hgt; y++) {
-            for (int x = 0; x < wid; x++) {
-                Tile t = getTile(x, y);
-                if (predicate.test(t)) consumer.accept(t);
-            }
-        }
-    }
-
-    /**
-     * Iterates through a rectangular subpart of the Map.
-     * Intentionally avoids calling methods doing redundant checks,
-     * which would slow down map display.
-     * 
-     * @param x X-component of the position of first tile.
-     * @param y Y-component of the position of first tile.
-     * @param w Width of the rectangle.
-     * @param h Height of the rectangle.
-     * @param consumer Provides a function to call for each tile.
-     */
-    public void forSubMap(int x, int y, int w, int h,
-                          Consumer<Tile> consumer) {
-        for (Tile t : subMap(x, y, w, h)) consumer.accept(t);
-    }
-
-    /**
-     * Collect the tiles in a rectangular portion of the map.
-     * 
-     * @param x X-component of the position of first tile.
-     * @param y Y-component of the position of first tile.
-     * @param w Width of the rectangle.
-     * @param h Height of the rectangle.
-     * @return A list of {@code Tile}s found (empty on error).
-     */
-    public List<Tile> subMap(int x, int y, int w, int h) {
-        if (x < 0) {
-            w += x;
-            x = 0;
-        }
-        if (y < 0) {
-            h += y;
-            y = 0;
-        }
-        final int width = getWidth();
-        final int height = getHeight();
-        if (w <= 0 || h <= 0 || x > width || y > height)
-            return Collections.<Tile>emptyList();
-        if (x+w > width) w = width - x;
-        if (y+h > height) h = height - y;
-        List<Tile> ret = new ArrayList<>();
-        for (int yi = y; yi < y+h; yi++) {
-            for (int xi = x; xi < x+w; xi++) {
-                ret.add(getTile(xi, yi));
-            }
-        }
-        return ret;
-    }
-        
-
     // Useful customers for tile iteration.
 
     /**
@@ -2257,8 +2232,9 @@ ok:     while (!openMap.isEmpty()) {
         }
 
         // Reset all highSeas tiles to the default ocean type.
-        forEachTile(matchKeyEquals(highSeas, Tile::getType),
-            t -> t.setType(ocean));
+        for (Tile t : getAllTilesSet()) {
+            if (t.getType() == highSeas) t.setType(ocean);
+        }
 
         final int width = getWidth(), height = getHeight();
         Tile t, seaL = null, seaR = null;
@@ -2333,22 +2309,22 @@ ok:     while (!openMap.isEmpty()) {
         List<Tile> curr = new ArrayList<>();
         List<Tile> next = new ArrayList<>();
         int hsc = 0;
-        forEachTile(t -> {
-                t.setHighSeasCount(-1);
-                if (!t.isLand()) {
-                    if ((t.getX() == 0 || t.getX() == getWidth()-1)
-                        && t.getType() != null
-                        && t.getType().isHighSeasConnected()
-                        && !t.getType().isDirectlyHighSeasConnected()
-                        && t.getMoveToEurope() == null) {
-                        t.setMoveToEurope(Boolean.TRUE);
-                    }
-                    if (t.isDirectlyHighSeasConnected()) {
-                        t.setHighSeasCount(0);
-                        next.add(t);
-                    }
+        for (Tile t : getAllTilesSet()) {
+            t.setHighSeasCount(-1);
+            if (!t.isLand()) {
+                if ((t.getX() == 0 || t.getX() == getWidth()-1)
+                    && t.getType() != null
+                    && t.getType().isHighSeasConnected()
+                    && !t.getType().isDirectlyHighSeasConnected()
+                    && t.getMoveToEurope() == null) {
+                    t.setMoveToEurope(Boolean.TRUE);
                 }
-            });
+                if (t.isDirectlyHighSeasConnected()) {
+                    t.setHighSeasCount(0);
+                    next.add(t);
+                }
+            }
+        }
         while (!next.isEmpty()) {
             hsc++;
             curr.addAll(next);
@@ -2437,12 +2413,14 @@ ok:     while (!openMap.isEmpty()) {
      */
     public void scale(final int width, final int height) {
         // FIXME: the scaling above can omit or double tiles, which will
-        // break the river and road connections.  We should fix them.
+        // break the river and road connections.
+        // FIXME: tile ownership is borked again
+        // FIXME: settlements?!? what settlements?
+        // Note: can not use Tile.copyIn as that sets x,y
         final Game game = getGame();
         final int oldWidth = getWidth();
         final int oldHeight = getHeight();
-        Tile oldTiles[][] = getTiles();
-        setTiles(width, height);
+        Tile oldTiles[][] = setTiles(width, height);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 final int oldX = (x * oldWidth) / width;
@@ -2450,7 +2428,8 @@ ok:     while (!openMap.isEmpty()) {
                 // FIXME: This tile should be based on the average as
                 // mentioned at the top of this method.
                 Tile importTile = oldTiles[oldX][oldY];
-                Tile t = new Tile(game, importTile.getType(), x, y);
+                Tile t = getTile(x, y);
+                t.setType(importTile.getType());
                 if (importTile.getMoveToEurope() != null) {
                     t.setMoveToEurope(importTile.getMoveToEurope());
                 }
@@ -2458,9 +2437,11 @@ ok:     while (!openMap.isEmpty()) {
                     t.getTileItemContainer().copyFrom(importTile
                         .getTileItemContainer(), Map.Layer.ALL);
                 }
-                setTile(t, x, y);
+                // FIXME: t.setRegion(importTile.getRegion());
             }
         }
+        resetContiguity();
+        resetHighSeasCount();
     }
         
     
@@ -2668,9 +2649,10 @@ ok:     while (!openMap.isEmpty()) {
         clearRegions();
         for (Region r : o.getRegions()) addRegion(game.update(r, true));
         this.setTiles(o.getWidth(), o.getHeight());
-        o.forEachTile((Tile t) ->
+        for (Tile ot : o.getAllTilesSet()) {
             // Allow creating new tiles in first map update
-            this.setTile(game.update(t, true), t.getX(), t.getY()));
+            this.setTile(game.update(ot, true), ot.getX(), ot.getY());
+        }
         this.layer = o.getLayer();
         this.minimumLatitude = o.getMinimumLatitude();
         this.maximumLatitude = o.getMaximumLatitude();
@@ -2760,11 +2742,11 @@ ok:     while (!openMap.isEmpty()) {
         super.readChildren(xr);
 
         // Fix up settlement tile ownership in one hit here, avoiding
-        // complications with cached tiles within the Tile serialization.
-        forEachTile(t -> {
-                Settlement s = t.getOwningSettlement();
-                if (s != null) s.addTile(t);
-            });
+        // complications with Tile-internal cached tiles.
+        for (Tile t : getAllTilesSet()) {
+            Settlement s = t.getOwningSettlement();
+            if (s != null) s.addTile(t);
+        }
 
         // @compat 0.11.3
         // Maps with incorrect parent/child chains were occurring.
