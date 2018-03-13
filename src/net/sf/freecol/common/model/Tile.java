@@ -2363,6 +2363,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (tileItemContainer != null) {
             result = Math.min(result, tileItemContainer.checkIntegrity(fix, lb));
         }
+        if (type == null) {
+            result = -1; // Fundamentally unfixable
+        } else if (isLand() && moveToEurope == Boolean.TRUE) {
+            if (fix) {
+                moveToEurope = false;
+            } else {
+                result = -1;
+            }
+        }
         return result;
     }
 
