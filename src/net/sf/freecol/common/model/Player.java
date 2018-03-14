@@ -315,6 +315,12 @@ public class Player extends FreeColGameObject implements Nameable {
     private final java.util.Map<Player, NationSummary> nationCache
         = new HashMap<>();
 
+    /**
+     * A comparator to enforce the player prefered colony order.  Only
+     * relevant client-side.
+     */
+    private Comparator<Colony> colonyComparator = null;
+
 
     //
     // Constructors
@@ -2328,6 +2334,9 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Adds a given settlement to this player's list of settlements.
      *
+     * Note: if the comparator is present, insert the settlement in the
+     * preferred order.
+     *
      * @param settlement The {@code Settlement} to add.
      * @return True if the settlements container changed.
      */
@@ -2338,7 +2347,18 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         if (hasSettlement(settlement)) return false;
         synchronized (this.settlements) {
-            this.settlements.add(settlement);
+            if (this.colonyComparator == null) {
+                this.settlements.add(settlement);
+            } else {
+                Colony c = (Colony)settlement;
+                int i = this.settlements.size() - 1;
+                while (i >= 0) {
+                    Colony s = (Colony)this.settlements.get(i);
+                    if (this.colonyComparator.compare(c, s) >= 0) break;
+                    i--;
+                }
+                this.settlements.add(i+1, settlement);
+            }
         }
         return true;
     }
@@ -3935,6 +3955,15 @@ public class Player extends FreeColGameObject implements Nameable {
             throw new RuntimeException("Not ownable: " + id + "/" + t);
         }
         return t;
+    }
+
+    /**
+     * Set the local colony comparator.
+     *
+     * @param cc The new {@code Comparator}.
+     */
+    public void setColonyComparator(Comparator<Colony> cc) {
+        this.colonyComparator = cc;
     }
 
 

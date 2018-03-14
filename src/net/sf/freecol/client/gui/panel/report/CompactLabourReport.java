@@ -48,6 +48,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -401,6 +402,8 @@ public final class CompactLabourReport extends ReportPanel {
     }
 
     private void addLocations() {
+        final Player player = getMyPlayer();
+
         LabourData.LocationData unitTotal = unitData.getTotal();
 
         int row = 1;
@@ -411,7 +414,7 @@ public final class CompactLabourReport extends ReportPanel {
 
         row = addLocationData(unitTotal, null, row);
 
-        for (Colony colony : getFreeColClient().getMySortedColonies()) {
+        for (Colony colony : player.getColonyList()) {
             LabourData.LocationData colonyData
                 = unitData.getDetails().get(colony);
             if (colonyData != null) {

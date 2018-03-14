@@ -50,6 +50,7 @@ import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -135,9 +136,10 @@ public final class ReportLabourPanel extends ReportPanel {
     public ReportLabourPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportLabourAction");
 
+        final Player player = getMyPlayer();
         this.data = new HashMap<>();
         this.unitCount = new TypeCountMap<>();
-        for (Unit unit : getMyPlayer().getUnitList()) {
+        for (Unit unit : player.getUnitList()) {
             UnitType type = unit.getType();
             this.unitCount.incrementCount(type, 1);
             Map<Location, Integer> unitMap = this.data.get(type);
@@ -152,7 +154,7 @@ public final class ReportLabourPanel extends ReportPanel {
             } else if (location.getSettlement() != null) {
                 location = location.getSettlement();
             } else if (unit.isInEurope()) {
-                location = getMyPlayer().getEurope();
+                location = player.getEurope();
             } else if (location.getTile() != null) {
                 location = location.getTile();
             }
@@ -164,12 +166,12 @@ public final class ReportLabourPanel extends ReportPanel {
             }
         }
 
-        this.colonies = freeColClient.getMySortedColonies();
+        this.colonies = player.getColonyList();
 
         DefaultListModel<LabourUnitPanel> model
             = new DefaultListModel<>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (unitType.isPerson() && unitType.isAvailableTo(getMyPlayer())) {
+            if (unitType.isPerson() && unitType.isAvailableTo(player)) {
                 int count = this.unitCount.getCount(unitType);
                 model.addElement(new LabourUnitPanel(unitType, count));
             }

@@ -81,7 +81,7 @@ public final class ReportClassicColonyPanel extends ReportPanel
     public ReportClassicColonyPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportColonyAction");
         
-        this.colonies.addAll(freeColClient.getMySortedColonies());
+        this.colonies.addAll(freeColClient.getMyPlayer().getColonyList());
         update();
     }
 

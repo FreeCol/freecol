@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -53,7 +54,8 @@ public final class ReportEducationPanel extends ReportPanel {
 
         reportPanel.setLayout(new MigLayout("wrap 2, fill",
                                             "[]20[fill, growprio 200]"));
-        List<Colony> colonies = freeColClient.getMySortedColonies();
+        final Player player = getMyPlayer();
+        List<Colony> colonies = player.getColonyList();
         for (Colony colony : colonies) {
             for (Building building : colony.getBuildings()) {
                 if (building.canTeach()) {

@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
@@ -101,12 +102,13 @@ public abstract class ReportUnitPanel extends ReportPanel {
                         "newline, span, growx, wrap 40");
 
         // Colonies first, sorted according to user preferences
-        for (Colony colony : freeColClient.getMySortedColonies()) {
+        final Player player = getMyPlayer();
+        for (Colony colony : player.getColonyList()) {
             handleLocation(colony, colony.getName(), inColonies.get(colony));
         }
 
         // Europe next
-        Europe europe = getMyPlayer().getEurope();
+        Europe europe = player.getEurope();
         if (europe != null) {
             handleLocation(europe, Messages.getName(europe), inEurope);
         }

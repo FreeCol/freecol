@@ -70,7 +70,7 @@ public final class ReportTradePanel extends ReportPanel {
         final Player player = getMyPlayer();
         Color warnColor = ImageLibrary.getColor("color.report.trade.warn");
 
-        this.colonies = freeColClient.getMySortedColonies();
+        this.colonies = player.getColonyList();
 
         JPanel goodsHeader = new MigPanel("ReportPanelUI");
         goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));

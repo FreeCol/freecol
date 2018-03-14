@@ -259,10 +259,11 @@ public final class ColonyPanel extends PortPanel
                           + "[growprio 150,shrinkprio 50]"
                           + "[growprio 150,shrinkprio 50][]"));
 
+        final Player player = getMyPlayer();
         // Do not just use colony.getOwner() == getMyPlayer() because
         // in debug mode we are in the *server* colony, and the equality
         // will fail.
-        editable = colony.getOwner().getId().equals(getMyPlayer().getId());
+        editable = colony.getOwner().getId().equals(player.getId());
 
         // Only enable the set goods button in debug mode when not spying
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
@@ -332,7 +333,7 @@ public final class ColonyPanel extends PortPanel
             FontLibrary.FontSize.SMALL, getImageLibrary().getScaleFactor());
         boolean incompatibleFont = false;
         if (editable) {
-            for (Colony c : freeColClient.getMySortedColonies()) {
+            for (Colony c : player.getColonyList()) {
                 this.nameBox.addItem(c);
                 if(!incompatibleFont &&
                     nameBoxFont.canDisplayUpTo(c.getName()) != -1) {

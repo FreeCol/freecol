@@ -586,7 +586,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         if (player.getEurope() != null) {
             this.destinationSelector.addItem(player.getEurope().getId());
         }
-        for (Colony colony : freeColClient.getMySortedColonies()) {
+        for (Colony colony : player.getColonyList()) {
             this.destinationSelector.addItem(colony.getId());
         }
 
