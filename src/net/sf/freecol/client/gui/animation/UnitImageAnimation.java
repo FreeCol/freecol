@@ -90,13 +90,13 @@ public final class UnitImageAnimation extends FreeColClientHolder
         final GUI gui = getGUI();
 
         // Tile position should now be valid.
-        if (gui.getTilePosition(this.tile) == null) {
+        if (gui.getAnimationTilePosition(this.tile) == null) {
             logger.warning("Failed attack animation for " + this.unit
                 + " at tile: " + this.tile);
             return;
         }
 
-        final Rectangle rect = gui.getTileBounds(this.tile);
+        final Rectangle rect = gui.getAnimationTileBounds(this.tile);
         final ImageIcon icon = (ImageIcon)unitLabel.getIcon();
         for (AnimationEvent event : animation) {
             long time = System.nanoTime();
@@ -108,7 +108,7 @@ public final class UnitImageAnimation extends FreeColClientHolder
                     image = ImageLibrary.createMirroredImage(image);
                 }
                 icon.setImage(image);
-                gui.paintImmediatelyCanvasIn(rect);
+                gui.paintImmediately(rect);
                 time = ievent.getDurationInMs()
                     - (System.nanoTime() - time) / 1000000;
                 if (time > 0) Utils.delay(time, "Animation delayed.");

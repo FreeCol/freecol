@@ -27,9 +27,9 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
-import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.Utils;
@@ -100,23 +100,23 @@ final class UnitMoveAnimation extends FreeColClientHolder
      */
     @Override
     public void executeWithUnitOutForAnimation(JLabel unitLabel) {
-        final SwingGUI gui = (SwingGUI)getGUI();
-        final float scale = gui.getMapScale();
+        final GUI gui = getGUI();
+        final float scale = gui.getAnimationScale();
         final int movementRatio = (int)(Math.pow(2, this.speed + 1) * scale);
-        final Rectangle r1 = gui.getTileBounds(this.sourceTile);
-        final Rectangle r2 = gui.getTileBounds(this.destinationTile);
+        final Rectangle r1 = gui.getAnimationTileBounds(this.sourceTile);
+        final Rectangle r2 = gui.getAnimationTileBounds(this.destinationTile);
         final Rectangle bounds = r1.union(r2);
         final double xratio = ImageLibrary.TILE_SIZE.width
             / (double)ImageLibrary.TILE_SIZE.height;
 
         // Tile positions should be valid at this point.
-        final Point srcP = gui.getTilePosition(this.sourceTile);
+        final Point srcP = gui.getAnimationTilePosition(this.sourceTile);
         if (srcP == null) {
             logger.warning("Failed move animation for " + this.unit
                 + " at source tile: " + this.sourceTile);
             return;
         }
-        final Point dstP = gui.getTilePosition(this.destinationTile);
+        final Point dstP = gui.getAnimationTilePosition(this.destinationTile);
         if (dstP == null) {
             logger.warning("Failed move animation for " + this.unit
                 + " at destination tile: " + this.destinationTile);
@@ -125,10 +125,8 @@ final class UnitMoveAnimation extends FreeColClientHolder
             
         final int labelWidth = unitLabel.getWidth();
         final int labelHeight = unitLabel.getHeight();
-        final Point srcPoint = gui.calculateUnitLabelPositionInTile(labelWidth,
-            labelHeight, srcP);
-        final Point dstPoint = gui.calculateUnitLabelPositionInTile(labelWidth,
-            labelHeight, dstP);
+        final Point srcPoint = gui.getAnimationPosition(labelWidth, labelHeight, srcP);
+        final Point dstPoint = gui.getAnimationPosition(labelWidth, labelHeight, dstP);
         final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
             : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
         final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0
@@ -150,7 +148,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
             }
             if (dropFrames <= 0) {
                 unitLabel.setLocation(point);
-                gui.paintImmediatelyCanvasIn(bounds);
+                gui.paintImmediately(bounds);
                 int timeTaken = (int)(System.currentTimeMillis()-time);
                 final int waitTime = ANIMATION_DELAY - timeTaken;
                 if (waitTime > 0) {

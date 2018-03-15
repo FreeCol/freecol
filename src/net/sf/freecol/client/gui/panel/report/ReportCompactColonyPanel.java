@@ -1119,13 +1119,14 @@ public final class ReportCompactColonyPanel extends ReportPanel
             command = command.substring(BUILDQUEUE.length());
             Colony colony = game.getFreeColGameObject(command, Colony.class);
             if (colony != null) {
-                getGUI().showBuildQueuePanel(colony, () -> { update(); });
+                getGUI().showBuildQueuePanel(colony)
+                    .addClosingCallback(() -> { update(); });
                 return;
             }
         } else {
             Colony colony = game.getFreeColGameObject(command, Colony.class);
             if (colony != null) {
-                getGUI().showColonyPanel2(colony, null)
+                getGUI().showColonyPanel(colony, null)
                     .addClosingCallback(() -> { update(); });
                 return;
             }

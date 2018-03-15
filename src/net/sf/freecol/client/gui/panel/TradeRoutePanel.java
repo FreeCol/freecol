@@ -133,18 +133,19 @@ public final class TradeRoutePanel extends FreeColPanel {
         this.editRouteButton.addActionListener((ActionEvent ae) -> {
                 final TradeRoute selected = tradeRoutes.getSelectedValue();
                 final String name = selected.getName();
-                getGUI().showTradeRouteInputPanel(selected, () -> {
-                        StringTemplate template = null;
-                        if (selected.getName() == null) { // Cancelled
-                            selected.setName(name);
-                        } else if ((template = selected.verify()) == null
-                            && (template = selected.verifyUniqueName()) == null) {
-                            igc().updateTradeRoute(selected);
-                            updateList(selected);
-                        } else {
-                            getGUI().showInformationMessage(template);
-                        }
-                    });
+                getGUI().showTradeRouteInputPanel(selected)
+                    .addClosingCallback(() -> {
+                            StringTemplate template = null;
+                            if (selected.getName() == null) { // Cancelled
+                                selected.setName(name);
+                            } else if ((template = selected.verify()) == null
+                                && (template = selected.verifyUniqueName()) == null) {
+                                igc().updateTradeRoute(selected);
+                                updateList(selected);
+                            } else {
+                                getGUI().showInformationMessage(template);
+                            }
+                        });
             });
 
         this.deleteRouteButton = Utility.localizedButton("tradeRoutePanel.deleteRoute");
@@ -166,12 +167,12 @@ public final class TradeRoutePanel extends FreeColPanel {
                 if (this.unit != null && getRoute() == this.unit.getTradeRoute()) {
                     igc().clearOrders(this.unit);
                 }
-                getGUI().removeFromCanvas(this);
+                getGUI().removeComponent(this);
             });
 
         JButton cancelButton = Utility.localizedButton("cancel");
         cancelButton.addActionListener((ae) ->
-            getGUI().removeTradeRoutePanel(this));
+            getGUI().getCanvas().removeTradeRoutePanel(this));
         setCancelComponent(cancelButton);
 
         updateButtons();
@@ -218,22 +219,23 @@ public final class TradeRoutePanel extends FreeColPanel {
         final Player player = getMyPlayer();
         final Unit u = this.unit;
         final TradeRoute newRoute = igc().newTradeRoute(player);
-        getGUI().showTradeRouteInputPanel(newRoute, () -> {
-                StringTemplate template = null;
-                String name = newRoute.getName();
-                if (name == null) { // Cancelled
-                    igc().deleteTradeRoute(newRoute);
-                    updateList(null);
-                } else if ((template = newRoute.verify()) != null
-                    && (template = newRoute.verifyUniqueName()) != null) {
-                    updateList(null);
-                    getGUI().showInformationMessage(template);
-                } else {
-                    igc().updateTradeRoute(newRoute);
-                    if (u != null) igc().assignTradeRoute(u, newRoute);
-                    updateList(newRoute);
-                }
-            });
+        getGUI().showTradeRouteInputPanel(newRoute)
+            .addClosingCallback(() -> {
+                    StringTemplate template = null;
+                    String name = newRoute.getName();
+                    if (name == null) { // Cancelled
+                        igc().deleteTradeRoute(newRoute);
+                        updateList(null);
+                    } else if ((template = newRoute.verify()) != null
+                        && (template = newRoute.verifyUniqueName()) != null) {
+                        updateList(null);
+                        getGUI().showInformationMessage(template);
+                    } else {
+                        igc().updateTradeRoute(newRoute);
+                        if (u != null) igc().assignTradeRoute(u, newRoute);
+                        updateList(newRoute);
+                    }
+                });
     }
 
     /**

@@ -399,13 +399,13 @@ public final class ConnectController extends FreeColClientHolder {
             || (!defaultSinglePlayer
                 && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER);
         if (show) {
-            if (!getGUI().showLoadingSavegameDialog(defaultPublicServer,
-                                                    defaultSinglePlayer))
-                return false;
-            LoadingSavegameInfo lsd = getGUI().getLoadingSavegameInfo();
-            singlePlayer = lsd.isSinglePlayer();
-            serverName = lsd.getServerName();
-            port = lsd.getPort();
+            LoadingSavegameInfo lsi = getGUI()
+                .showLoadingSavegameDialog(defaultPublicServer,
+                                           defaultSinglePlayer);
+            if (lsi == null) return false;
+            singlePlayer = lsi.isSinglePlayer();
+            serverName = lsi.getServerName();
+            port = lsi.getPort();
         } else {
             singlePlayer = defaultSinglePlayer;
             serverName = null;
@@ -536,7 +536,7 @@ public final class ConnectController extends FreeColClientHolder {
             
         fcc.stopServer();
         getGUI().removeInGameComponents();
-        getGUI().mainTitle();
+        getGUI().showMainTitle();
     }
     
     /**

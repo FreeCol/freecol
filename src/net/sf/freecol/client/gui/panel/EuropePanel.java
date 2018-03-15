@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -729,7 +730,8 @@ public final class EuropePanel extends PortPanel {
         if (u == null) setSelectedUnitLabel(null); else setSelectedUnit(u);
 
         float scale = getImageLibrary().getScaleFactor();
-        getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
+        getGUI().restoreSavedSize(this,
+            new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
     }
 
     /**
@@ -806,7 +808,7 @@ public final class EuropePanel extends PortPanel {
      */
     private void exitAction() {
         cleanup();
-        getGUI().removeFromCanvas(this);
+        getGUI().removeComponent(this);
         igc().nextModelMessage();
     }
 

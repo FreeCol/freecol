@@ -185,7 +185,7 @@ public final class ReportLabourPanel extends ReportPanel {
         Action quitAction = new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent ae) {
-                    getGUI().removeFromCanvas(ReportLabourPanel.this);
+                    getGUI().removeComponent(ReportLabourPanel.this);
                 }
             };
 

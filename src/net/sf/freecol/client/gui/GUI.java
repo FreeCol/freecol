@@ -19,11 +19,13 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -34,19 +36,28 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
 
+import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.gui.panel.BuildQueuePanel;
+import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.ColorChooserPanel;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MiniMap;
+import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
+import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
+import net.sf.freecol.client.gui.dialog.FreeColDialog;
 import net.sf.freecol.client.gui.dialog.Parameters;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -74,8 +85,11 @@ import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -164,16 +178,9 @@ public class GUI extends FreeColClientHolder {
     }
 
 
-    // Simple accessors
+    // Useful utilities provided in addition to the implementable interface
 
-    /**
-     * Get the canvas.
-     *
-     * @return Null here, real implementations will override.
-     */
-    public Canvas getCanvas() {
-        return null;
-    }
+    // Miscellaneous
 
     /**
      * Get the image library.
@@ -185,26 +192,15 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Get the tile image library.
-     *
-     * @return Null here, real implementations will override.
+     * Toggle the current view mode.
      */
-    public ImageLibrary getTileImageLibrary() {
-        return null;
+    public void toggleViewMode() {
+        int vm = getViewMode();
+        if (vm >= 0) setViewMode(1 - vm);
     }
+
     
-    /**
-     * Is this GUI in windowed mode?
-     *
-     * @return True by default, real implementations will override.
-     */
-    public boolean isWindowed() {
-        return true;
-    }
-
-
-
-    // Error handlers
+    // Error handling
 
     /**
      * Create a new error job from a given exception and message key.
@@ -249,322 +245,108 @@ public class GUI extends FreeColClientHolder {
     }
     
     
-    // Initialization related methods
-
-    /** 
-     * Swing system and look-and-feel initialization.
-     * 
-     * @param fontName An optional font name to be used.
-     * @exception FreeColException if the LAF is incompatible with the GUI.
-     */
-    public void installLookAndFeel(String fontName) throws FreeColException {}
+    // Invocation methods
 
     /**
-     * Quit the GUI.  All that is required is to exit the full screen.
-     */
-    public void quit() {}
-
-    /**
-     * Reset the GUI on reconnect.
+     * Wrapper for SwingUtilities.invokeLater that handles the case
+     * where we are already in the EDT.
      *
-     * @param active An optional active {@code Unit}.
-     * @param tile An optional {@code Tile} to focus on if there is no
-     *     active unit.
+     * @param runnable A {@code Runnable} to run.
      */
-    public void reconnect(Unit active, Tile tile) {}
-
-    /**
-     * Set up the mouse listeners for the canvas and map viewer.
-     */
-    public void setupMouseListeners() {}
-
-    /**
-     * Display the splash screen.
-     *
-     * @param splashStream A stream to find the image in.
-     */
-    public void displaySplashScreen(final InputStream splashStream) {}
-
-    /**
-     * Hide the splash screen.
-     */
-    public void hideSplashScreen() {}
-
-    /**
-     * Shows the {@code VideoPanel}.
-     *
-     * @param userMsg An optional user message.
-     */
-    public void showOpeningVideo(final String userMsg) {}
-
-    /**
-     * Starts the GUI by creating and displaying the GUI-objects.
-     *
-     * @param desiredWindowSize The desired size of the GUI window.
-     */
-    public void startGUI(final Dimension desiredWindowSize) {
-        logger.info("It seems that the GraphicsEnvironment is headless!");
+    public void invokeNowOrLater(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
     }
 
     /**
-     * Change the windowed mode.
-     */
-    public void changeWindowedMode() {}
-
-    /**
-     * Start the GUI for the map editor.
-     */
-    public void startMapEditorGUI() {}
-
-    // Goto-path handling
-
-    /**
-     * Start/stop the goto path display.
-     */
-    public void activateGotoPath() {}
-
-    /**
-     * Update the goto path to a new tile.
+     * Wrapper for SwingUtilities.invokeAndWait that handles the case
+     * where we are already in the EDT.
      *
-     * @param tile The new {@code Tile} to go to.
+     * @param runnable A {@code Runnable} to run.
      */
-    public void updateGotoPath(Tile tile) {}
-
-    /**
-     * Stop the goto path display.
-     */
-    public void clearGotoPath() {}
-
-    /**
-     * Send the active unit along the current goto path as far as possible.
-     */
-    public void traverseGotoPath() {}
-
-    // Other non-trivial public routines.
-
-    /**
-     * Close a panel.
-     *
-     * @param panel The panel to close.
-     */
-    public void closePanel(String panel) {}
-    
-    /**
-     * Create a thumbnail for the minimap.
-     * 
-     * FIXME: Delete all code inside this method and replace it with
-     *        sensible code directly drawing in necessary size,
-     *        without creating a throwaway GUI panel, drawing in wrong
-     *        size and immediately resizing.
-     * @return The created {@code BufferedImage}.
-     */
-    public BufferedImage createMiniMapThumbNail() {
-        MiniMap miniMap = new MiniMap(getFreeColClient());
-        miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
-        Game game = getGame();
-        int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
-            + MiniMap.MAX_TILE_SIZE / 2;
-        int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
-        miniMap.setSize(width, height);
-        BufferedImage image = new BufferedImage(
-            width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g1 = image.createGraphics();
-        miniMap.paintMap(g1);
-        g1.dispose();
-
-        int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
-        BufferedImage scaledImage = new BufferedImage(scaledWidth, 64,
-            BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = scaledImage.createGraphics();
-        g2.drawImage(image, 0, 0, scaledWidth, 64, null);
-        g2.dispose();
-        return scaledImage;
+    public void invokeNowOrWait(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                logger.log(Level.WARNING, "Client GUI interaction", ex);
+            }
+        }
     }
 
+
+    // High level dialogs, usually using the dialog primitives
+
     /**
-     * Tells the map controls that a chat message was received.
+     * Primitive modal confirmation dialog.
      *
-     * @param player The player who sent the chat message.
-     * @param message The chat message.
-     * @param privateChat True if the message is private.
-     */
-    public void displayChat(Player player, String message,
-                            boolean privateChat) {}
-
-    /**
-     * A chat message was received during the pre-game setup.
-     *
-     * @param player The player who sent the chat message.
-     * @param message The chat message.
-     * @param privateChat True if the message is private.
-     */
-    public void displayStartChat(Player player, String message,
-                                 boolean privateChat) {}
-    
-    /**
-     * Refresh the GUI.
-     */
-    public void refresh() {}
-
-    /**
-     * Reset the menu bar.
-     */
-    public void resetMenuBar() {}
-
-    protected void resetMapZoom() {
-        ResourceManager.clean();
-    }
-
-    public boolean canZoomInMap() {
-        return false;
-    }
-
-    public boolean canZoomOutMap() {
-        return false;
-    }
-
-    public void zoomInMap() {
-        ResourceManager.clean();
-    }
-
-    public void zoomOutMap() {
-        ResourceManager.clean();
-    }
-
-    /**
-     * Set the active unit.
-     *
-     * @param unit The {@code Unit} to activate.
-     * @return True if the focus was set.
-     */
-    public boolean setActiveUnit(Unit unit) {
-        return false;
-    }
-
-    /**
-     * Update the menu bar.
-     */
-    public void updateMenuBar() {}
-
-
-    // Animation handling
-
-    /**
-     * Require the given tile to be in the onScreen()-area.
-     *
-     * @param tile The {@code Tile} to check.
-     * @return True if the focus was set.
-     */
-    public boolean requireFocus(Tile tile) {
-        return false;
-    }
-    
-    /**
-     * Animate a unit attack.
-     *
-     * @param attacker The attacking {@code Unit}.
-     * @param defender The defending {@code Unit}.
-     * @param attackerTile The {@code Tile} to show the attacker on.
-     * @param defenderTile The {@code Tile} to show the defender on.
-     * @param success Did the attack succeed?
-     */
-    public void animateUnitAttack(Unit attacker, Unit defender,
-                                  Tile attackerTile, Tile defenderTile,
-                                  boolean success) {}
-
-    /**
-     * Animate a unit move.
-     *
-     * @param unit The {@code Unit} that is moving.
-     * @param srcTile The {@code Tile} the unit starts at.
-     * @param dstTile The {@code Tile} the unit moves to.
-     */
-    public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {}
-
-
-    // MapControls handling
-
-    /**
-     * Enable the map controls.
-     *
-     * Called from the MapControlsAction.
-     *
-     * @param enable If true then enable.
-     */
-    public void enableMapControls(boolean enable) {}
-
-    public void updateMapControls() {}
-
-    public void zoomInMapControls() {}
-
-    public void zoomOutMapControls() {}
-
-    public boolean canZoomInMapControls() {
-        return false;
-    }
-
-    public boolean canZoomOutMapControls() {
-        return false;
-    }
-
-    public void miniMapToggleViewControls() {}
-
-    public void miniMapToggleFogOfWarControls() {}
-
-
-    // Dialogs that return values
-
-    /**
-     * Simple modal confirmation dialog.
-     *
-     * @param textKey A string to use as the message key.
-     * @param okKey A key for the "ok" button.
-     * @param cancelKey A key for the "cancel" button.
-     * @return True if the "ok" button was selected.
-     */
-    public boolean confirm(String textKey, String okKey, String cancelKey) {
-        return false;
-    }
-
-    /**
-     * General modal confirmation dialog.
-     *
-     * @param tile An optional {@code Tile} to expose.
      * @param template The {@code StringTemplate} explaining the choice.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
-    public boolean confirm(Tile tile, StringTemplate template,
-                           String okKey, String cancelKey) {
-        return false;
+    public final boolean confirm(StringTemplate template,
+                                 String okKey, String cancelKey) {
+        return confirm(null, template, (ImageIcon)null,
+                       okKey, cancelKey);
     }
 
     /**
-     * General modal confirmation dialog.
+     * GoodsType-specific modal confirmation dialog.
      *
      * @param tile An optional {@code Tile} to expose.
      * @param template The {@code StringTemplate} explaining the choice.
-     * @param unit An optional unit to make an icon for the dialog from.
+     * @param goodsType A goods type to make an icon for the dialog from.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
-    public boolean confirm(Tile tile, StringTemplate template, Unit unit,
-                           String okKey, String cancelKey) {
-        return false;
+    public final boolean confirm(Tile tile, StringTemplate template,
+                                 GoodsType goodsType,
+                                 String okKey, String cancelKey) {
+        return confirm(tile, template,
+            new ImageIcon(imageLibrary.getScaledGoodsTypeImage(goodsType)),
+            okKey, cancelKey);
     }
 
-    public boolean confirm(Tile tile, StringTemplate template,
-                           Settlement settlement,
-                           String okKey, String cancelKey) {
-        return false;
+    /**
+     * Settlement-specific modal confirmation dialog.
+     *
+     * @param tile An optional {@code Tile} to expose.
+     * @param template The {@code StringTemplate} explaining the choice.
+     * @param settlement A settlement to make an icon for the dialog from.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public final boolean confirm(Tile tile, StringTemplate template,
+                                 Settlement settlement,
+                                 String okKey, String cancelKey) {
+        return confirm(tile, template,
+            new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
+            okKey, cancelKey);
     }
 
-    public boolean confirm(Tile tile, StringTemplate template,
-                           GoodsType goodsType,
-                           String okKey, String cancelKey) {
-        return false;
+    /**
+     * Unit-specific modal confirmation dialog.
+     *
+     * @param tile An optional {@code Tile} to expose.
+     * @param template The {@code StringTemplate} explaining the choice.
+     * @param unit A unit to make an icon for the dialog from.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public final boolean confirm(Tile tile, StringTemplate template, Unit unit,
+                                 String okKey, String cancelKey) {
+        return confirm(tile, template,
+            new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
+            okKey, cancelKey);
     }
 
     /**
@@ -620,15 +402,6 @@ public class GUI extends FreeColClientHolder {
                 unit.getLabel(Unit.UnitLabelType.NATIONAL))
             .addName("%route%", tr.getName());
         return confirm(unit.getTile(), template, unit, "yes", "no");
-    }
-
-    /**
-     * Confirm declaration of independence.
-     *
-     * @return A list of new nation and country names.
-     */
-    public List<String> confirmDeclaration() {
-        return Collections.<String>emptyList();
     }
 
     /**
@@ -874,6 +647,98 @@ public class GUI extends FreeColClientHolder {
 
         return getChoice(unit.getTile(), template,
                          goods.getType(), "cancel", choices);
+    }
+
+    /**
+     * General modal choice dialog.
+     *
+     * @param <T> The choice type.
+     * @param tile An optional {@code Tile} to expose.
+     * @param explain An object explaining the choice.
+     * @param cancelKey A key for the "cancel" button.
+     * @param choices A list a {@code ChoiceItem}s to choose from.
+     * @return The selected value of the selected {@code ChoiceItem},
+     *     or null if cancelled.
+     */
+    public final <T> T getChoice(Tile tile, Object explain,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return getChoice(tile, explain, (ImageIcon)null, cancelKey, choices);
+    }
+
+    /**
+     * Goods-specific modal choice dialog.
+     *
+     * @param <T> The choice type.
+     * @param tile An optional {@code Tile} to expose.
+     * @param explain An object explaining the choice.
+     * @param goodsType A {@code GoodsType} to display in dialog.
+     * @param cancelKey A key for the "cancel" button.
+     * @param choices A list a {@code ChoiceItem}s to choose from.
+     * @return The selected value of the selected {@code ChoiceItem},
+     *     or null if cancelled.
+     */
+    public final <T> T getChoice(Tile tile, Object explain, GoodsType goodsType,
+                                 String cancelKey, List<ChoiceItem<T>> choices) {
+        return getChoice(tile, explain,
+            new ImageIcon(imageLibrary.getScaledGoodsTypeImage(goodsType)),
+            cancelKey, choices);
+    }
+
+    /**
+     * Nation-specific modal choice dialog.
+     *
+     * @param <T> The choice type.
+     * @param tile An optional {@code Tile} to expose.
+     * @param explain An object explaining the choice.
+     * @param nation A {@code Nation} to display in dialog.
+     * @param cancelKey A key for the "cancel" button.
+     * @param choices A list a {@code ChoiceItem}s to choose from.
+     * @return The selected value of the selected {@code ChoiceItem},
+     *     or null if cancelled.
+     */
+    public final <T> T getChoice(Tile tile, Object explain, Nation nation,
+                                 String cancelKey, List<ChoiceItem<T>> choices) {
+        return getChoice(tile, explain,
+            new ImageIcon(imageLibrary.getScaledNationImage(nation)),
+            cancelKey, choices);
+    }
+
+    /**
+     * Settlement-specific modal choice dialog.
+     *
+     * @param <T> The choice type.
+     * @param tile An optional {@code Tile} to expose.
+     * @param explain An object explaining the choice.
+     * @param settlement A {@code Settlement} to display in dialog.
+     * @param cancelKey A key for the "cancel" button.
+     * @param choices A list a {@code ChoiceItem}s to choose from.
+     * @return The selected value of the selected {@code ChoiceItem},
+     *     or null if cancelled.
+     */
+    public final <T> T getChoice(Tile tile, Object explain, Settlement settlement,
+                                 String cancelKey, List<ChoiceItem<T>> choices) {
+        return getChoice(tile, explain,
+            new ImageIcon(imageLibrary.getScaledSettlementImage(settlement)),
+            cancelKey, choices);
+    }
+
+    /**
+     * Unit-specific modal choice dialog.
+     *
+     * @param <T> The choice type.
+     * @param tile An optional {@code Tile} to expose.
+     * @param explain An object explaining the choice.
+     * @param unit A {@code Unit} to display in dialog.
+     * @param cancelKey A key for the "cancel" button.
+     * @param choices A list a {@code ChoiceItem}s to choose from.
+     * @return The selected value of the selected {@code ChoiceItem},
+     *     or null if cancelled.
+     */
+    public final <T> T getChoice(Tile tile, Object explain, Unit unit,
+                                 String cancelKey, List<ChoiceItem<T>> choices) {
+        return getChoice(tile, explain,
+            new ImageIcon(imageLibrary.getScaledUnitImage(unit)),
+            cancelKey, choices);
     }
 
     /**
@@ -1127,147 +992,11 @@ public class GUI extends FreeColClientHolder {
                          goods.getType(), "cancel", choices);
     }
 
-
-    /**
-     * General modal choice dialog.
-     *
-     * @param <T> The choice type.
-     * @param tile An optional {@code Tile} to expose.
-     * @param explain An object explaining the choice.
-     * @param cancelKey A key for the "cancel" button.
-     * @param choices A list a {@code ChoiceItem}s to choose from.
-     * @return The selected value of the selected {@code ChoiceItem},
-     *     or null if cancelled.
-     */
-    public <T> T getChoice(Tile tile, Object explain,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
-        return null;
+    public final OptionGroup showDifficultyDialog() {
+        final Specification spec = getSpecification();
+        return showDifficultyDialog(spec, spec.getDifficultyOptionGroup(),
+                                    false);
     }
-
-    public <T> T getChoice(Tile tile, Object explain, Unit unit,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
-        return null;
-    }
-
-    public <T> T getChoice(Tile tile, Object explain, Settlement settlement,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
-        return null;
-    }
-
-    public <T> T getChoice(Tile tile, Object explain, GoodsType goodsType,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
-        return null;
-    }
-
-    public <T> T getChoice(Tile tile, Object explain, Nation nation,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
-        return null;
-    }
-
-    /**
-     * General modal string input dialog.
-     *
-     * @param tile An optional {@code Tile} to expose.
-     * @param template A {@code StringTemplate} explaining the choice.
-     * @param defaultValue The default value to show initially.
-     * @param okKey A key for the "ok" button.
-     * @param cancelKey A key for the "cancel" button.
-     * @return The chosen value.
-     */
-    public String getInput(Tile tile, StringTemplate template,
-                           String defaultValue,
-                           String okKey, String cancelKey) {
-        return null;
-    }
-
-    public void closeMainPanel() {}
-
-    public void closeMenus() {}
-
-    public void closeStatusPanel() {}
-
-    public boolean containsInGameComponents() {
-        return false;
-    }
-
-    public LoadingSavegameInfo getLoadingSavegameInfo() {
-        return null;
-    }
-
-    public boolean isClientOptionsDialogShowing() {
-        return false;
-    }
-
-    public boolean onClosingErrorPanel(Runnable callback) {
-        return false;
-    }
-
-    public boolean isMapboardActionsEnabled() {
-        return false;
-    }
-
-    public boolean isShowingSubPanel() {
-        return false;
-    }
-
-    public void paintImmediatelyCanvasIn(Rectangle rectangle) {}
-
-    public void paintImmediatelyCanvasInItsBounds() {}
-
-    public void refreshPlayersTable() {}
-
-    public void removeInGameComponents() {}
-
-    public void requestFocusForSubPanel() {}
-
-    public boolean requestFocusInWindow() {
-        return false;
-    }
-
-    /**
-     * Complete reset back to the main panel.
-     */
-    public void mainTitle() {}
-
-    public void showAboutPanel() {}
-
-    public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
-                                       DialogHandler<List<Goods>> handler) {
-    }
-
-    public void showChatPanel() {}
-
-    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs,
-            DialogHandler<FoundingFather> handler) {
-    }
-
-    public void showClientOptionsDialog() {}
-
-    public void showColonyPanel(Colony colony, Unit unit) {}
-
-    public void showColopediaPanel(String nodeId) {}
-
-    public void showCompactLabourReport() {}
-
-    public void showDeclarationPanel() {}
-
-    public OptionGroup showDifficultyDialog() {
-        return null;
-    }
-
-    public void showDumpCargoDialog(Unit unit,
-                                    DialogHandler<List<Goods>> handler) {}
-
-    public boolean showEditOptionDialog(Option option) {
-        return false;
-    }
-
-    public void showEmigrationDialog(final Player player,
-                                     final boolean fountainOfYouth,
-                                     DialogHandler<Integer> handler) {}
-
-    public void showEndTurnDialog(final List<Unit> units,
-                                  DialogHandler<Boolean> handler) {}
 
     /**
      * Show an i18n compliant error message derived from a template.
@@ -1308,80 +1037,42 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Show an error message.  The error message should be fully formatted
-     * by now.
+     * Show an information message.
      *
-     * @param message The actual final error message.
-     * @param callback Optional routine to run when the error panel is closed.
+     * @param messageId The message key.
      */
-    protected void showErrorMessage(String message, Runnable callback) {}
-
-    public void showEuropePanel() {}
-
-    public void showEventPanel(String header, String image, String footer) {}
-
-    public void showFindSettlementPanel() {}
-
-    public void showFirstContactDialog(final Player player, final Player other,
-                                       final Tile tile, int settlementCount,
-                                       DialogHandler<Boolean> handler) {}
-
-    public OptionGroup showGameOptionsDialog(boolean editable, boolean custom) {
-        return null;
+    public final void showInformationMessage(String messageId) {
+        showInformationMessage(StringTemplate.key(messageId));
     }
 
-    public void showHighScoresPanel(String messageId, List<HighScore> scores) {}
-
-    public void showIndianSettlement(IndianSettlement indianSettlement) {}
-
-    public void showInformationMessage(String messageId) {
-        alertSound();
+    /**
+     * Show an information message.
+     *
+     * @param template The message template.
+     */
+    public final void showInformationMessage(StringTemplate template) {
+        showInformationMessage(null, template);
     }
 
-    public void showInformationMessage(StringTemplate template) {
-        alertSound();
-    }
-
-    final public void showInformationMessage(Settlement displayObject,
-                                       String messageId) {
+    /**
+     * Show an information message.
+     *
+     * @param displayObject An optional object to display as an icon.
+     * @param messageId The message key.
+     */
+    public final void showInformationMessage(FreeColObject displayObject,
+                                             String messageId) {
         showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
 
-    public void showInformationMessage(Settlement displayObject,
-                                       StringTemplate template) {
-        alertSound();
-    }
-
-    public void showInformationMessage(Unit displayObject,
-                                       StringTemplate template) {
-        alertSound();
-    }
-
-    final public void showInformationMessage(Tile displayObject,
-                                       String messageId) {
-        showInformationMessage(displayObject, StringTemplate.key(messageId));
-    }
-
-    public void showInformationMessage(Tile displayObject,
-                                       StringTemplate template) {
-        alertSound();
-    }
-
-    public void showInformationMessage(FreeColObject displayObject,
-                                       String messageId) {
-        alertSound();
-    }
-
-    public void showInformationMessage(FreeColObject displayObject,
-                                       StringTemplate template) {
-        alertSound();
-    }
-
-    public File showLoadDialog(File directory, String extension) {
-        return null;
-    }
-
-    final public File showLoadSaveFileDialog(File root, String extension) {
+    /**
+     * Show a save file dialog, selecting one to load.
+     *
+     * @param root The root directory to look in.
+     * @param extension The file extension to look for.
+     * @return The {@code File} selected, or null on error.
+     */
+    public final File showLoadSaveFileDialog(File root, String extension) {
         File file = showLoadDialog(root, extension);
         if (file != null && !file.isFile()) {
             showErrorMessage(FreeCol.badFile("error.noSuchFile", file));
@@ -1390,48 +1081,12 @@ public class GUI extends FreeColClientHolder {
         return file;
     }
 
-    public boolean showLoadingSavegameDialog(boolean publicServer,
-                                             boolean singlePlayer) {
-        return false;
+    /**
+     * Show the NewPanel.
+     */
+    public final void showNewPanel() {
+        showNewPanel(null);
     }
-
-    public void showLogFilePanel() {}
-
-    public void showMainPanel(String userMsg) {}
-
-    public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
-        return null;
-    }
-
-    public Dimension showMapSizeDialog() {
-        return null;
-    }
-
-    public void showModelMessages(List<ModelMessage> modelMessages) {}
-
-    public void showMonarchDialog(final MonarchAction action,
-                                  StringTemplate template, String monarchKey,
-                                  DialogHandler<Boolean> handler) {}
-
-    public void showNamingDialog(StringTemplate template,
-                                 final String defaultName,
-                                 final Unit unit,
-                                 DialogHandler<String> handler) {}
-
-    public void showNativeDemandDialog(Unit unit, Colony colony,
-                                       GoodsType type, int amount,
-                                       DialogHandler<Boolean> handler) {}
-
-    public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
-                                                 FreeColGameObject other,
-                                                 DiplomaticTrade agreement,
-                                                 StringTemplate comment) {
-        return null;
-    }
-
-    public void showNewPanel() {}
-
-    public void showNewPanel(Specification specification) {}
 
     /**
      * Show a settlement.
@@ -1451,81 +1106,6 @@ public class GUI extends FreeColClientHolder {
         }
     }
         
-    public Parameters showParametersDialog() {
-        return null;
-    }
-
-    public boolean showPreCombatDialog(Unit attacker,
-                                       FreeColGameObject defender, Tile tile) {
-        return false;
-    }
-
-    public void showReportCargoPanel() {}
-
-    public void showReportColonyPanel() {}
-
-    public void showReportContinentalCongressPanel() {}
-
-    public void showReportEducationPanel() {}
-
-    public void showReportExplorationPanel() {}
-
-    public void showReportForeignAffairPanel() {}
-
-    public void showReportHistoryPanel() {}
-
-    public void showReportIndianPanel() {}
-
-    public void showReportLabourPanel() {}
-
-    public void showReportMilitaryPanel() {}
-
-    public void showReportNavalPanel() {}
-
-    public void showReportProductionPanel() {}
-
-    public void showReportReligiousPanel() {}
-
-    public void showReportRequirementsPanel() {}
-
-    public void showReportTradePanel() {}
-
-    public void showReportTurnPanel(List<ModelMessage> messages) {}
-
-    public File showSaveDialog(File directory, String defaultName) {
-        return null;
-    }
-
-    public Dimension showScaleMapSizeDialog() {
-        return null;
-    }
-
-    public int showSelectAmountDialog(GoodsType goodsType, int available,
-                                      int defaultAmount, boolean needToPay) {
-        return -1;
-    }
-
-    public int showSelectTributeAmountDialog(StringTemplate question,
-                                             int maximum) {
-        return -1;
-    }
-
-    public Location showSelectDestinationDialog(Unit unit) {
-        return null;
-    }
-
-    public void showStartGamePanel(Game game, Player player,
-                                   boolean singlePlayerMode) {}
-
-    public void showStatisticsPanel(Map<String, String> serverStats,
-                                    Map<String, String> clientStats) {}
-
-    public void showStatusPanel(String message) {}
-
-    public void showTilePanel(Tile tile) {}
-
-    public void showTilePopUpAtSelectedTile() {}
-
     /**
      * Display the appropriate panel for any settlement on a tile, as visible
      * to a given player.
@@ -1541,51 +1121,9 @@ public class GUI extends FreeColClientHolder {
         showSettlement(settlement);
     }
 
-    public void showTradeRoutePanel(Unit unit) {}
 
-    public void showVictoryDialog(DialogHandler<Boolean> handler) {}
-
-    public void centerActiveUnit() {}
-
-    public void changeViewMode(int newViewMode) {}
-
-    public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
-                                               OutForAnimationCallback r) {}
-
-    public Unit getActiveUnit() {
-        return null;
-    }
-
-    public Tile getFocus() {
-        return null;
-    }
-
-    public Tile getSelectedTile() {
-        return null;
-    }
-
-    public Rectangle getTileBounds(Tile tile) {
-        return null;
-    }
-
-    public Point getTilePosition(Tile tile) {
-        return null;
-    }
-        
-    public int getViewMode() {
-        return -1;
-    }
-
-    public void setFocus(Tile tileToFocus) {}
-
-    public boolean setSelectedTile(Tile newTileToSelect) {
-        return true; // Pretending again.
-    }
-
-    public void toggleViewMode() {}
-
-
-    // Forwarding to SoundController, only for gui classes in need of sound
+    // Sound routines, delegated to the SoundController, only useful
+    // for GUI classes in need of sound
 
     /**
      * Play a sound.
@@ -1617,37 +1155,1327 @@ public class GUI extends FreeColClientHolder {
         return getSoundController().getSoundMixerLabelText();
     }
 
-    // invoke method forwarding
+
+    // Miscellaneous higher level utilities
 
     /**
-     * Wrapper for SwingUtilities.invokeLater that handles the case
-     * where we are already in the EDT.
-     *
-     * @param runnable A {@code Runnable} to run.
+     * Create a thumbnail for the minimap.
+     * 
+     * FIXME: Delete all code inside this method and replace it with
+     *        sensible code directly drawing in necessary size,
+     *        without creating a throwaway GUI panel, drawing in wrong
+     *        size and immediately resizing.
+     * @return The created {@code BufferedImage}.
      */
-    public void invokeNowOrLater(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
-        }
+    public BufferedImage createMiniMapThumbNail() {
+        MiniMap miniMap = new MiniMap(getFreeColClient());
+        miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
+        Game game = getGame();
+        int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
+            + MiniMap.MAX_TILE_SIZE / 2;
+        int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
+        miniMap.setSize(width, height);
+        BufferedImage image = new BufferedImage(
+            width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g1 = image.createGraphics();
+        miniMap.paintMap(g1);
+        g1.dispose();
+
+        int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
+        BufferedImage scaledImage = new BufferedImage(scaledWidth, 64,
+            BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = scaledImage.createGraphics();
+        g2.drawImage(image, 0, 0, scaledWidth, 64, null);
+        g2.dispose();
+        return scaledImage;
+    }
+
+
+    // Below here, routines should be just stubs that need full
+    // implementations.
+
+    
+    // Simple accessors
+
+    /**
+     * Get the canvas.
+     *
+     * @return Null here, real implementations will override.
+     */
+    public Canvas getCanvas() {
+        return null;
     }
 
     /**
-     * Wrapper for SwingUtilities.invokeAndWait that handles the case
-     * where we are already in the EDT.
+     * Get the tile image library.
      *
-     * @param runnable A {@code Runnable} to run.
+     * @return Null here, real implementations will override.
      */
-    public void invokeNowOrWait(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            } catch (InterruptedException | InvocationTargetException ex) {
-                logger.log(Level.WARNING, "Client GUI interaction", ex);
-            }
-        }
+    public ImageLibrary getTileImageLibrary() {
+        return null;
     }
+
+    /**
+     * Is this GUI in windowed mode?
+     *
+     * @return True by default, real implementations will override.
+     */
+    public boolean isWindowed() {
+        return true;
+    }
+
+
+    // Initialization and teardown
+
+    /**
+     * Change the windowed mode.
+     */
+    public void changeWindowedMode() {}
+
+    /**
+     * Display the splash screen.
+     *
+     * @param splashStream A stream to find the image in.
+     */
+    public void displaySplashScreen(final InputStream splashStream) {}
+
+    /**
+     * Hide the splash screen.
+     */
+    public void hideSplashScreen() {}
+
+    /** 
+     * Swing system and look-and-feel initialization.
+     * 
+     * @param fontName An optional font name to be used.
+     * @exception FreeColException if the LAF is incompatible with the GUI.
+     */
+    public void installLookAndFeel(String fontName) throws FreeColException {}
+
+    /**
+     * Quit the GUI.  All that is required is to exit the full screen.
+     */
+    public void quit() {}
+
+    /**
+     * Reset the GUI on reconnect.
+     *
+     * @param active An optional active {@code Unit}.
+     * @param tile An optional {@code Tile} to focus on if there is no
+     *     active unit.
+     */
+    public void reconnect(Unit active, Tile tile) {}
+
+    /**
+     * Remove all in-game components (i.e. all the Listeners).
+     */    
+    public void removeInGameComponents() {}
+
+    /**
+     * Set up the mouse listeners for the canvas and map viewer.
+     */
+    public void setupMouseListeners() {}
+
+    /**
+     * Shows the {@code VideoPanel}.
+     *
+     * @param userMsg An optional user message.
+     */
+    public void showOpeningVideo(final String userMsg) {}
+
+    /**
+     * Starts the GUI by creating and displaying the GUI-objects.
+     *
+     * @param desiredWindowSize The desired size of the GUI window.
+     */
+    public void startGUI(final Dimension desiredWindowSize) {
+        logger.info("It seems that the GraphicsEnvironment is headless!");
+    }
+
+    /**
+     * Start the GUI for the map editor.
+     */
+    public void startMapEditorGUI() {}
+
+
+    // Animation handling
+
+    /**
+     * Animate a unit attack.
+     *
+     * @param attacker The attacking {@code Unit}.
+     * @param defender The defending {@code Unit}.
+     * @param attackerTile The {@code Tile} to show the attacker on.
+     * @param defenderTile The {@code Tile} to show the defender on.
+     * @param success Did the attack succeed?
+     */
+    public void animateUnitAttack(Unit attacker, Unit defender,
+                                  Tile attackerTile, Tile defenderTile,
+                                  boolean success) {}
+
+    /**
+     * Animate a unit move.
+     *
+     * @param unit The {@code Unit} that is moving.
+     * @param srcTile The {@code Tile} the unit starts at.
+     * @param dstTile The {@code Tile} the unit moves to.
+     */
+    public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {}
+
+    /**
+     * Update the GUI to warn that a unit is executing an animation and
+     * should be ignored for its duration.
+     *
+     * @param unit The {@code} Unit that is animating.
+     * @param sourceTile A {@code Tile} where the animation is occuring.
+     * @param r A callback for the end of animation.
+     */
+    public void executeWithUnitOutForAnimation(Unit unit, Tile sourceTile,
+                                               OutForAnimationCallback r) {}
+
+    /**
+     * Get the animation position.
+     *
+     * @return A point on the map to place a unit for movement.
+     */
+    public Point getAnimationPosition(int labelWidth, int labelHeight,
+                                      Point tileP) {
+        return tileP;
+    }
+
+    /**
+     * Get the scale for animations.
+     *
+     * @return A scale factor for animations.
+     */
+    public float getAnimationScale() {
+        return 1.0f;
+    }
+
+    /**
+     * Get the bounds for a tile.
+     *
+     * @param tile The {@code Tile} to check.
+     * @return The tile bounds.
+     */
+    public Rectangle getAnimationTileBounds(Tile tile) {
+        return null;
+    }
+
+    /**
+     * Get the map position for a tile.
+     *
+     * @param tile The {@code Tile} to check.
+     * @return The tile position.
+     */
+    public Point getAnimationTilePosition(Tile tile) {
+        return null;
+    }
+
+
+    // Dialog primitives
+
+    /**
+     * Simple modal confirmation dialog.
+     *
+     * @param textKey A string to use as the message key.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public boolean confirm(String textKey, String okKey, String cancelKey) {
+        return false;
+    }
+
+    /**
+     * General modal confirmation dialog.
+     *
+     * @param tile An optional {@code Tile} to expose.
+     * @param template The {@code StringTemplate} explaining the choice.
+     * @param icon An {@code ImageIcon} to display in dialog.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public boolean confirm(Tile tile, StringTemplate template,
+                           ImageIcon icon,
+                           String okKey, String cancelKey) {
+        return false;
+    }
+
+    /**
+     * General modal choice dialog.
+     *
+     * @param <T> The choice type.
+     * @param tile An optional {@code Tile} to expose.
+     * @param explain An object explaining the choice.
+     * @param icon An optional {@code ImageIcon} to display in dialog.
+     * @param cancelKey A key for the "cancel" button.
+     * @param choices A list a {@code ChoiceItem}s to choose from.
+     * @return The selected value of the selected {@code ChoiceItem},
+     *     or null if cancelled.
+     */
+    protected <T> T getChoice(Tile tile, Object explain, ImageIcon icon,
+                              String cancelKey, List<ChoiceItem<T>> choices) {
+        return null;
+    }
+
+    /**
+     * General modal string input dialog.
+     *
+     * @param tile An optional {@code Tile} to expose.
+     * @param template A {@code StringTemplate} explaining the choice.
+     * @param defaultValue The default value to show initially.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return The chosen value.
+     */
+    public String getInput(Tile tile, StringTemplate template,
+                           String defaultValue,
+                           String okKey, String cancelKey) {
+        return null;
+    }
+
+
+    // Focus control
+
+    /**
+     * Get the current focus tile.
+     *
+     * @return The focus {@code Tile}.
+     */
+    public Tile getFocus() {
+        return null;
+    }
+
+    /**
+     * Request the Java-level focus go to the current subpanel.
+     *
+     * @return False if the focus request can not succeed.
+     */
+    public boolean requestFocusForSubPanel() {
+        return false;
+    }
+
+    /**
+     * Request the Java-level focus to the main window.
+     *
+     * @return False if the focus request can not succeed.
+     */
+    public boolean requestFocusInWindow() {
+        return false;
+    }
+
+    /**
+     * Require the given tile to be in the onScreen()-area.
+     *
+     * @param tile The {@code Tile} to check.
+     * @return True if the focus was set.
+     */
+    public boolean requireFocus(Tile tile) {
+        return false;
+    }
+
+    /**
+     * Set the current focus tile.
+     *
+     * @param tileToFocus The new focus {@code Tile}.
+     */
+    public void setFocus(Tile tileToFocus) {}
+
+
+
+    // General GUI manipulation
+
+    /**
+     * Repaint the canvas now.
+     */
+    public void paintImmediately() {}
+
+    /**
+     * Repaint a part of the canvas now.
+     *
+     * @param rectangle The area to repaint.
+     */
+    public void paintImmediately(Rectangle rectangle) {}
+    
+    /**
+     * Refresh the whole GUI.
+     */
+    public void refresh() {}
+
+    /**
+     * Refresh a particular tile.
+     *
+     * @param tile The {@code Tile} to refresh.
+     */
+    public void refreshTile(Tile tile) {}
+    
+
+    // Goto-path handling
+
+    /**
+     * Start/stop the goto path display.
+     */
+    public void activateGotoPath() {}
+
+    /**
+     * Stop the goto path display.
+     */
+    public void clearGotoPath() {}
+
+    /**
+     * Send the active unit along the current goto path as far as possible.
+     */
+    public void traverseGotoPath() {}
+
+    /**
+     * Update the goto path to a new tile.
+     *
+     * @param tile The new {@code Tile} to go to.
+     */
+    public void updateGotoPath(Tile tile) {}
+
+
+    // MapControls handling
+
+    /**
+     * Is the map able to zoom in further?
+     *
+     * @return True if the map can zoom in.
+     */
+    public boolean canZoomInMapControls() {
+        return false;
+    }
+
+    /**
+     * Is the map able to zoom out further?
+     *
+     * @return True if the map can zoom out.
+     */
+    public boolean canZoomOutMapControls() {
+        return false;
+    }
+
+    /**
+     * Enable the map controls.
+     *
+     * Called from the MapControlsAction.
+     *
+     * @param enable If true then enable.
+     */
+    public void enableMapControls(boolean enable) {}
+
+    /**
+     * Toggle the fog of war control.
+     */
+    public void miniMapToggleFogOfWarControls() {}
+
+    /**
+     * Toggle the view control.
+     */
+    public void miniMapToggleViewControls() {}
+
+    /**
+     * Update the map controls, including the InfoPanel according to
+     * the view mode.
+     */
+    public void updateMapControls() {}
+
+    /**
+     * Map control update by removing and re-adding.
+     * TODO: does this overlap with the preceding?
+     */
+    public void updateMapControlsInCanvas() {}
+
+    /**
+     * Zoom in the map controls.
+     */
+    public void zoomInMapControls() {}
+
+    /**
+     * Zoom out the map controls.
+     */
+    public void zoomOutMapControls() {}
+
+
+    // Menu handling
+
+    /**
+     * Close any open menus.
+     */
+    public void closeMenus() {}
+
+    /**
+     * Reset the menu bar.
+     */
+    public void resetMenuBar() {}
+
+    /**
+     * Update the menu bar.
+     */
+    public void updateMenuBar() {}
+
+
+    // Tile image manipulation
+
+    public BufferedImage createTileImageWithOverlayAndForest(TileType type,
+                                                             Dimension size) {
+        return null;
+    }
+
+    public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
+        return null;
+    }
+
+    public BufferedImage createTileImage(Tile tile) {
+        return null;
+    }
+
+    public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
+        return null;
+    }
+
+    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
+    }
+
+
+    // View mode handling, including the active unit (for
+    // MOVE_UNITS_MODE) and the selected tile (for VIEW_TERRAIN_MODE).
+
+    /**
+     * Get the current view mode.
+     *
+     * @return One of the view mode constants, or negative on error.
+     */
+    public int getViewMode() {
+        return MOVE_UNITS_MODE;
+    }
+
+    /**
+     * Set the current view mode.
+     *
+     * @param newViewMode The new view mode to use.
+     */
+    public void setViewMode(int newViewMode) {}
+
+    /**
+     * Get the active unit.
+     *
+     * @return The current active {@code Unit}.
+     */
+    public Unit getActiveUnit() {
+        return null;
+    }
+
+    /**
+     * Set the active unit.
+     *
+     * @param unit The {@code Unit} to activate.
+     * @return True if the focus was set.
+     */
+    public boolean setActiveUnit(Unit unit) {
+        return false;
+    }
+
+    /**
+     * Center the active unit.
+     */
+    public void centerActiveUnit() {}
+
+    /**
+     * Get the selected tile.
+     *
+     * @return The selected {@code Tile}.
+     */
+    public Tile getSelectedTile() {
+        return null;
+    }
+
+    /**
+     * Set the selected tile.
+     *
+     * @param tile The new selected {@code Tile}.
+     * @return True if setting the tile changes the focus.
+     */
+    public boolean setSelectedTile(Tile tile) {
+        return true;
+    }
+
+
+    // Zoom controls
+
+    public boolean canZoomInMap() {
+        return false;
+    }
+
+    public boolean canZoomOutMap() {
+        return false;
+    }
+
+    protected void resetMapZoom() {
+        ResourceManager.clean();
+    }
+
+    public void zoomInMap() {
+        ResourceManager.clean();
+    }
+
+    public void zoomOutMap() {
+        ResourceManager.clean();
+    }
+
+
+    // High level panel manipulation
+    
+    /**
+     * Close a panel.
+     *
+     * @param panel The identifier for the panel to close.
+     */
+    public void closePanel(String panel) {}
+
+    /**
+     * Close the main panel if present.
+     */
+    public void closeMainPanel() {}
+
+    /**
+     * Close the status panel if present.
+     */
+    public void closeStatusPanel() {}
+
+    /**
+     * Confirm declaration of independence.
+     *
+     * @return A list of new nation and country names.
+     */
+    public List<String> confirmDeclaration() {
+        return Collections.<String>emptyList();
+    }
+
+    /**
+     * Update with a new chat message.
+     *
+     * @param player The player who sent the chat message.
+     * @param message The chat message.
+     * @param privateChat True if the message is private.
+     */
+    public void displayChat(Player player, String message,
+                            boolean privateChat) {}
+
+    /**
+     * Show the appropriate panel for an object.
+     *
+     * @param fco The {@code FreeColObject} to display.
+     */
+    public void displayObject(FreeColObject fco) {}
+
+    /**
+     * A chat message was received during the pre-game setup.
+     *
+     * @param player The player who sent the chat message.
+     * @param message The chat message.
+     * @param privateChat True if the message is private.
+     */
+    public void displayStartChat(Player player, String message,
+                                 boolean privateChat) {}
+
+    /**
+     * Checks if a client options dialog is present.
+     *
+     * @return True if the client options are showing.
+     */
+    public boolean isClientOptionsDialogShowing() {
+        return false;
+    }
+
+    /**
+     * Is another panel being displayed.
+     *
+     * @return True if there is another panel present.
+     */
+    public boolean isShowingSubPanel() {
+        return false;
+    }
+
+    /**
+     * Attach a closing callback to any current error panel.
+     *
+     * @param callback The {@code Runnable} to attach.
+     * @return True if an error panel was present.
+     */
+    public boolean onClosingErrorPanel(Runnable callback) {
+        return false;
+    }
+
+    /**
+     * Refresh the players table in the StartGamePanel.
+     */
+    public void refreshPlayersTable() {}
+
+    /**
+     * Remove a component from the GUI.
+     *
+     * @param component The {@code Component} to remove.
+     */
+    public void removeComponent(Component component) {}
+
+    /**
+     * Remove a dialog from the GUI.
+     *
+     * @param fcd The {@code FreeColDialog} to remove.
+     */
+    public void removeDialog(FreeColDialog<?> fcd) {}
+
+    /**
+     * Set dialog preferred size to saved size or to the given
+     * {@code Dimension} if no saved size was found.
+     *
+     * Call this method in the constructor of a FreeColPanel in order
+     * to remember its size and position.
+     *
+     * @param comp The {@code Component} to use.
+     * @param d The {@code Dimension} to use as default.
+     */
+    public void restoreSavedSize(Component comp, Dimension d) {}
+
+    /**
+     * Show the AboutPanel.
+     */
+    public void showAboutPanel() {}
+
+    /**
+     * Show the build queue for a colony.
+     *
+     * @param colony The {@code Colony} to show a panel for.
+     * @return The {@code BuildQueuePanel} showing.
+     */
+    public BuildQueuePanel showBuildQueuePanel(Colony colony) {
+        return null;
+    }
+
+    /**
+     * Show the dialog to select captured goods.
+     *
+     * @param unit The {@code Unit} capturing goods.
+     * @param gl The list of {@code Goods} to choose from.
+     * @param handler A {@code DialogHandler} for the dialog response.
+     */
+    public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
+                                       DialogHandler<List<Goods>> handler) {}
+
+    /**
+     * Show the chat panel.
+     */
+    public void showChatPanel() {}
+
+    /**
+     * Show the founding father choice panel.
+     *
+     * @param ffs The list of {@code FoundingFather}s to choose from.
+     * @param handler The callback to pass the choice to.
+     */
+    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs,
+            DialogHandler<FoundingFather> handler) {
+    }
+
+    /**
+     * Show the client options dialog.
+     */
+    public void showClientOptionsDialog() {}
+
+    /**
+     * Show the colony panel
+     *
+     * @param colony The {@code Colony} to display.
+     * @param unit An optional {@code Unit} to select within the panel.
+     * @return The {@code ColonyPanel} that is showing.
+     */
+    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
+        return null;
+    }
+
+    /**
+     * Show a colopedia panel.
+     *
+     * @param nodeId The identifier for the colopedia node to show.
+     */
+    public void showColopediaPanel(String nodeId) {}
+
+    /**
+     * Show a color chooser panel.
+     *
+     * @param al An {@code ActionListener} to handle panel button presses.
+     * @return The {@code ColorChooserPanel} created.
+     */
+    public ColorChooserPanel showColorChooserPanel(ActionListener al) {
+        return null;
+    }
+
+    /**
+     * Show the compact labour report panel.
+     */
+    public void showCompactLabourReport() {}
+
+    /**
+     * Show the compact labour report for the specified unit data.
+     *
+     * @param unitData The {@code UnitData} to display.
+     */
+    public void showCompactLabourReport(UnitData unitData) {}
+    
+    /**
+     * Show the declaration panel with the declaration of independence and
+     * an animated signature.
+     */
+    public void showDeclarationPanel() {}
+
+    /**
+     * Show a dialog for a difficulty option group.
+     *
+     * @param spec The enclosing {@code Specification}.
+     * @param group The {@code OptionGroup} to show.
+     * @param editable If true, the option group can be edited.
+     * @return The (possibly modified) {@code OptionGroup}.
+     */
+    public OptionGroup showDifficultyDialog(Specification spec,
+                                            OptionGroup group,
+                                            boolean editable) {
+        return null;
+    }
+
+    /**
+     * Show a dialog to choose what goods to dump.
+     *
+     * @param unit The {@code Unit} that is dumping goods.
+     * @param handler A callback to pass the dumped goods list to.
+     */
+    public void showDumpCargoDialog(Unit unit,
+                                    DialogHandler<List<Goods>> handler) {}
+
+    /**
+     * Show a dialog for editing an individual option.
+     *
+     * @param option The {@code Option} to edit.
+     * @return True if the option edit was accepted.
+     */
+    public boolean showEditOptionDialog(Option option) {
+        return false;
+    }
+
+    /**
+     * Show a dialog to handle emigration.
+     *
+     * @param player The {@code Player} whose emigration state needs work.
+     * @param fountainOfYouth True if a Fountain of Youth event occurred.
+     * @param handler A callback to pass a selected emigration index to.
+     */
+    public void showEmigrationDialog(final Player player,
+                                     final boolean fountainOfYouth,
+                                     DialogHandler<Integer> handler) {}
+
+    /**
+     * Show a dialog for the end of turn.
+     *
+     * @param units A list of {@code Unit}s that can still move.
+     * @param handler A callback to handle the user selected end turn state.
+     */
+    public void showEndTurnDialog(final List<Unit> units,
+                                  DialogHandler<Boolean> handler) {}
+
+    /**
+     * Show an error message.  The error message should be fully formatted
+     * by now.
+     *
+     * @param message The actual final error message.
+     * @param callback Optional routine to run when the error panel is closed.
+     */
+    protected void showErrorMessage(String message, Runnable callback) {}
+
+    /**
+     * Show the Europe panel.
+     */
+    public void showEuropePanel() {}
+
+    /**
+     * Show an event panel.
+     *
+     * @param header The title.
+     * @param image A resource key for the image to display.
+     * @param footer Optional footer text.
+     */
+    public void showEventPanel(String header, String image, String footer) {}
+
+    /**
+     * Show the FindSettlement panel.
+     */
+    public void showFindSettlementPanel() {}
+
+    /**
+     * Show a first contact dialog.
+     *
+     * @param player The {@code Player} making contact.
+     * @param other The {@code Player} being contacted.
+     * @param tile The {@code Tile} where the contact occurs.
+     * @param settlementCount A count of settlements described by the
+     *     other player.
+     * @param handler A callback to handle the player decision to be friendly.
+     */
+    public void showFirstContactDialog(final Player player, final Player other,
+                                       final Tile tile, int settlementCount,
+                                       DialogHandler<Boolean> handler) {}
+
+    /**
+     * Show the Game options dialog.
+     *
+     * @param editable True if the options can be edited.
+     * @return The game options {@code OptionGroup}.
+     */
+    public OptionGroup showGameOptionsDialog(boolean editable) {
+        return null;
+    }
+
+    /**
+     * Show the high scores panel.
+     */
+    public void showHighScoresPanel(String messageId, List<HighScore> scores) {}
+
+    /**
+     * Show a panel for a native settlement.
+     *
+     * @param indianSettlement The {@code IndianSettlement} to display.
+     */
+    public void showIndianSettlement(IndianSettlement indianSettlement) {}
+
+    /**
+     * Show an information message.
+     *
+     * @param displayObject Optional object for displaying as an icon.
+     * @param template The {@code StringTemplate} to display.
+     */
+    public void showInformationMessage(FreeColObject displayObject,
+                                       StringTemplate template) {
+        alertSound();
+    }
+
+    /**
+     * Show a dialog where the user may choose a file.
+     *
+     * @param directory The directory containing the files.
+     * @param extension An extension to select with.
+     * @return The selected {@code File}.
+     */
+    public File showLoadDialog(File directory, String extension) {
+        return null;
+    }
+
+    /**
+     * Show the LoadingSavegameDialog.
+     *
+     * @param publicServer FIXME
+     * @param singlePlayer FIXME
+     * @return The {@code LoadingSavegameInfo} from the dialog.
+     */
+    public LoadingSavegameInfo showLoadingSavegameDialog(boolean publicServer,
+                                                         boolean singlePlayer) {
+        return null;
+    }
+
+    /**
+     * Show the log file panel.
+     */
+    public void showLogFilePanel() {}
+
+    /**
+     * Show the main panel.
+     *
+     * @parm userMsg An optional user message to display.
+     */
+    public void showMainPanel(String userMsg) {}
+
+    /**
+     * Complete reset back to the main panel.
+     */
+    public void showMainTitle() {}
+
+    /**
+     * Show the map generator options.
+     *
+     * @param editable If true, allow edits.
+     * @return The map generator {@code OptionGroup}.
+     */
+    public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
+        return null;
+    }
+
+    /**
+     * Show the map size dialog.
+     *
+     * @return The selected map size as a {@code Dimension}.
+     */
+    public Dimension showMapSizeDialog() {
+        return null;
+    }
+
+    /**
+     * Show model messages.
+     *
+     * @param modelMessages A list of {@code ModelMessage}s to display.
+     */
+    public void showModelMessages(List<ModelMessage> modelMessages) {}
+
+    /**
+     * Show the monarch dialog.
+     *
+     * @param action The action the monarch is taking.
+     * @param template A message template.
+     * @param monarchKey The identifier for the monarch.
+     * @param handler A callback to handle the user response to the
+     *     monarch action.
+     */
+    public void showMonarchDialog(final MonarchAction action,
+                                  StringTemplate template, String monarchKey,
+                                  DialogHandler<Boolean> handler) {}
+
+    /**
+     * Show the naming dialog.
+     *
+     * @param template A message template.
+     * @param defaultName The default name for the object.
+     * @param unit The {@code Unit} that is naming.
+     * @param handler A callback to handle the user response.
+     */
+    public void showNamingDialog(StringTemplate template,
+                                 final String defaultName,
+                                 final Unit unit,
+                                 DialogHandler<String> handler) {}
+
+    /**
+     * Show the native demand dialog.
+     *
+     * @param unit The demanding {@code Unit}.
+     * @param colony The {@code Colony} being demanded of.
+     * @param type The {@code GoodsType} demanded (null for gold).
+     * @param amount The amount of goods or gold demanded.
+     * @param handler A callback to handle the user response.
+     */
+    public void showNativeDemandDialog(Unit unit, Colony colony,
+                                       GoodsType type, int amount,
+                                       DialogHandler<Boolean> handler) {}
+
+    /**
+     * Show the negotiation dialog.
+     *
+     * @param our Our {@code FreeColGameObject} that is negotiating.
+     * @param other The other {@code FreeColGameObject}.
+     * @param agreement The current {@code DiplomaticTrade} agreement.
+     * @param comment An optional {@code StringTemplate} containing a
+     *     commentary message.
+     * @return The negotiated {@code DiplomaticTrade} agreement.
+     */
+    public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
+                                                 FreeColGameObject other,
+                                                 DiplomaticTrade agreement,
+                                                 StringTemplate comment) {
+        return null;
+    }
+
+    /**
+     * Show the NewPanel.
+     *
+     * @param spec The {@code Specification} to use.
+     */
+    public void showNewPanel(Specification spec) {}
+
+    /**
+     * Show the parameter choice dialog.
+     *
+     * @return The chosen parameters.
+     */
+    public Parameters showParametersDialog() {
+        return null;
+    }
+
+    /**
+     * Show the pre-combat dialog.
+     *
+     * @param attacker The {@code Unit} that is attacking.
+     * @param defender The {@code FreeColObject} that is defending.
+     * @param tile The {@code Tile} where the attack occurs.
+     * @return True if the player decided to attack.
+     */
+    public boolean showPreCombatDialog(Unit attacker,
+                                       FreeColGameObject defender, Tile tile) {
+        return false;
+    }
+
+    /**
+     * Displays the purchase panel.
+     */
+    public void showPurchasePanel() {}
+
+    /**
+     * Displays the recruit panel.
+     */
+    public void showRecruitPanel() {}
+
+    /**
+     * Show the Cargo Report.
+     */
+    public void showReportCargoPanel() {}
+
+    /**
+     * Show the Colony Report.
+     */
+    public void showReportColonyPanel() {}
+
+    /**
+     * Show the Continental Congress Report.
+     */
+    public void showReportContinentalCongressPanel() {}
+
+    /**
+     * Show the Education Report.
+     */
+    public void showReportEducationPanel() {}
+
+    /**
+     * Show the Exploration Report.
+     */
+    public void showReportExplorationPanel() {}
+
+    /**
+     * Show the Foreign Affairs Report.
+     */
+    public void showReportForeignAffairPanel() {}
+
+    /**
+     * Show the History Report.
+     */
+    public void showReportHistoryPanel() {}
+
+    /**
+     * Show the Native Affairs Report.
+     */
+    public void showReportIndianPanel() {}
+
+    /**
+     * Show the Labour Report.
+     */
+    public void showReportLabourPanel() {}
+
+    /**
+     * Display the labour detail panel.
+     *
+     * @param unitType The {@code UnitType} to display.
+     * @param data The labour data.
+     * @param unitCount A map of unit distribution.
+     * @param colonies The list of player {@code Colony}s.
+     */
+    public void showReportLabourDetailPanel(UnitType unitType,
+        Map<UnitType, Map<Location, Integer>> data,
+        TypeCountMap<UnitType> unitCount, List<Colony> colonies) {}
+
+    /**
+     * Show the Military Report.
+     */
+    public void showReportMilitaryPanel() {}
+
+    /**
+     * Show the Naval Report.
+     */
+    public void showReportNavalPanel() {}
+
+    /**
+     * Show the Production Report.
+     */
+    public void showReportProductionPanel() {}
+
+    /**
+     * Show the Religion Report.
+     */
+    public void showReportReligiousPanel() {}
+
+    /**
+     * Show the Requirements Report.
+     */
+    public void showReportRequirementsPanel() {}
+
+    /**
+     * Show the Trade Report.
+     */
+    public void showReportTradePanel() {}
+
+    /**
+     * Show the Turn Report.
+     */
+    public void showReportTurnPanel(List<ModelMessage> messages) {}
+
+    /**
+     * Show the river style dialog.
+     *
+     * @param styles The river styles a choice is made from.
+     * @return The response returned by the dialog.
+     */
+    public String showRiverStyleDialog(List<String> styles) {
+        return null;
+    }
+
+    /**
+     * Show the save dialog.
+     *
+     * @param directory The directory containing the files.
+     * @param defaultName The default game to save.
+     * @return The selected file.
+     */
+    public File showSaveDialog(File directory, String defaultName) {
+        return null;
+    }
+
+    /**
+     * Show the map scale dialog.
+     *
+     * @return The map scale as a {@code Dimension}.
+     */
+    public Dimension showScaleMapSizeDialog() {
+        return null;
+    }
+
+    /**
+     * Show a dialog allowing selecting an amount of goods.
+     *
+     * @param goodsType The {@code GoodsType} to select an amount of.
+     * @param available The amount of goods available.
+     * @param defaultAmount The amount to select to start with.
+     * @param needToPay If true, check the player has sufficient funds.
+     * @return The amount selected.
+     */
+    public int showSelectAmountDialog(GoodsType goodsType, int available,
+                                      int defaultAmount, boolean needToPay) {
+        return -1;
+    }
+
+    /**
+     * Show a dialog allowing the user to select a destination for
+     * a given unit.
+     *
+     * @param unit The {@code Unit} to select a destination for.
+     * @return A destination for the unit, or null.
+     */
+    public Location showSelectDestinationDialog(Unit unit) {
+        return null;
+    }
+
+    /**
+     * Show the select-tribute-amount dialog.
+     *
+     * @param question a {@code StringTemplate} describing the
+     *     amount of tribute to demand.
+     * @param maximum The maximum amount available.
+     * @return The amount selected.
+     */
+    public int showSelectTributeAmountDialog(StringTemplate question,
+                                             int maximum) {
+        return -1;
+    }
+
+    /**
+     * Show the {@code ServerListPanel}.
+     *
+     * @param serverList The list containing the servers retrieved from the
+     *     metaserver.
+     */
+    public void showServerListPanel(List<ServerInfo> serverList) {}
+
+    /**
+     * Show the StartGamePanel.
+     *
+     * @param game The {@code Game} that is about to start.
+     * @param player The {@code Player} using this client.
+     * @param singlePlayerMode True to start a single player game.
+     */
+    public void showStartGamePanel(Game game, Player player,
+                                   boolean singlePlayerMode) {}
+
+    /**
+     * Show the statistics panel.
+     *
+     * @param serverStats A map of server statistics key,value pairs.
+     * @param clientStats A map of client statistics key,value pairs.
+     */
+    public void showStatisticsPanel(Map<String, String> serverStats,
+                                    Map<String, String> clientStats) {}
+
+    /**
+     * Shows a status message which goes away when a new component is added.
+     *
+     * @param message The text message to display on the status panel.
+     */
+    public void showStatusPanel(String message) {}
+
+    /**
+     * Show the tile panel for a given tile.
+     *
+     * @param tile The {@code Tile} to display.
+     */
+    public void showTilePanel(Tile tile) {}
+
+    /**
+     * Show the tile popup for the current selected tile.
+     */
+    public void showTilePopUpAtSelectedTile() {}
+
+    /**
+     * Show the trade route input panel for a given trade route.
+     *
+     * @param tr The {@code TradeRoute} to display.
+     * @return The {@code TradeRouteInputPanel}.
+     */
+    public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute tr) {
+        return null;
+    }
+
+    /**
+     * Show a panel to select a trade route for a unit.
+     *
+     * @param unit An optional {@code Unit} to select a trade route for.
+     */
+    public void showTradeRoutePanel(Unit unit) {}
+
+    /**
+     * Show the training panel.
+     */
+    public void showTrainPanel() {}
+
+    /**
+     * Show the victory dialog.
+     *
+     * @param handler A callback to handle the continuation decision.
+     */
+    public void showVictoryDialog(DialogHandler<Boolean> handler) {}
+
+    /**
+     * Show the warehouse dialog for a colony.
+     *
+     * Run out of ColonyPanel, so the tile is already displayed.
+     *
+     * @param colony The {@code Colony} to display.
+     * @return The response returned by the dialog.
+     */
+    public boolean showWarehouseDialog(Colony colony) {
+        return false;
+    }
+
+    /**
+     * Show the production of a unit.
+     *
+     * @param unit The {@code Unit} to display.
+     */
+    public void showWorkProductionPanel(Unit unit) {}
+
+    /**
+     * Update all panels derived from the EuropePanel.
+     */
+    public void updateEuropeanSubpanels() {}
 }

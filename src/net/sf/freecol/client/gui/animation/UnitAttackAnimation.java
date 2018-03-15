@@ -111,7 +111,7 @@ final class UnitAttackAnimation extends FreeColClientHolder {
      * @return True if the animation is loaded.
      */
     private boolean loadAnimation(Unit unit, Direction direction) {
-        float scale = ((SwingGUI)getGUI()).getMapScale();
+        final float scale = getGUI().getAnimationScale();
         String roleStr = (unit.hasDefaultRole()) ? ""
             : "." + unit.getRoleSuffix();
         String startStr = "animation.unit." + unit.getType().getId() + roleStr

@@ -134,7 +134,7 @@ public final class RecruitPanel extends FreeColPanel {
                 if (Europe.MigrationType.validMigrantIndex(index)) {
                     igc().recruitUnitInEurope(index);
                     getGUI().updateEuropeanSubpanels();
-                    if (!shouldEnable) getGUI().removeFromCanvas(this);
+                    if (!shouldEnable) getGUI().removeComponent(this);
                     return;
                 }
             } catch (NumberFormatException e) {}

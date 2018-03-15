@@ -1616,7 +1616,7 @@ public final class InGameController extends FreeColClientHolder {
         // option is enabled.
         if (unit.getMovesLeft() <= 0
             && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
-            getGUI().paintImmediatelyCanvasInItsBounds();
+            getGUI().paintImmediately();
             Utils.delay(UNIT_LAST_MOVE_DELAY, "Last move delay interrupted.");
         }
 

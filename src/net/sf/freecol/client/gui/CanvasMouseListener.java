@@ -84,14 +84,14 @@ public final class CanvasMouseListener extends FreeColClientHolder
                 Unit other = tile.getFirstUnit();
                 if (other != null && getMyPlayer().owns(other)) {
                     getGUI().setActiveUnit(other);
-                    getGUI().changeViewMode(GUI.MOVE_UNITS_MODE);
+                    getGUI().setViewMode(GUI.MOVE_UNITS_MODE);
                 } else {
                     getGUI().setSelectedTile(tile);
-                    getGUI().changeViewMode(GUI.VIEW_TERRAIN_MODE);
+                    getGUI().setViewMode(GUI.VIEW_TERRAIN_MODE);
                 }
             } else {
                 getGUI().setSelectedTile(tile);
-                getGUI().changeViewMode(GUI.VIEW_TERRAIN_MODE);
+                getGUI().setViewMode(GUI.VIEW_TERRAIN_MODE);
             }
         }
     }

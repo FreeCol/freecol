@@ -713,7 +713,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     public void cancelTradeRoute() {
         this.newRoute.setName(null);
-        getGUI().removeFromCanvas(this);
+        getGUI().removeComponent(this);
     }
 
     /**

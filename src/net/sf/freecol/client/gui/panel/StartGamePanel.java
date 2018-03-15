@@ -84,7 +84,7 @@ public final class StartGamePanel extends FreeColPanel {
     private final ActionListener cancelCmd = ae -> {
         final SwingGUI gui = getGUI();
         getFreeColClient().getConnectController().newGame();
-        gui.removeFromCanvas(this);
+        gui.removeComponent(this);
         gui.showNewPanel();
     };
 
@@ -103,7 +103,7 @@ public final class StartGamePanel extends FreeColPanel {
 
     private final ActionListener gameOptionsCmd = ae -> {
         final FreeColClient fcc = getFreeColClient();
-        OptionGroup go = getGUI().showGameOptionsDialog(fcc.isAdmin(), true);
+        OptionGroup go = getGUI().showGameOptionsDialog(fcc.isAdmin());
         if (go != null) {
             fcc.getGame().setGameOptions(go);
             fcc.getPreGameController().updateGameOptions();

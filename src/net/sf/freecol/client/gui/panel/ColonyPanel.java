@@ -411,7 +411,8 @@ public final class ColonyPanel extends PortPanel
 
         initialize(colony);
         float scale = getImageLibrary().getScaleFactor();
-        getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
+        getGUI().restoreSavedSize(this,
+            new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
     }
 
 
@@ -946,7 +947,7 @@ public final class ColonyPanel extends PortPanel
                     && colony.isConnectedPort())
                     ? "abandonColony.lastPort.text"
                     : "abandonColony.text";
-                if (!getGUI().confirm(null, StringTemplate.key(key),
+                if (!getGUI().confirm(null, StringTemplate.key(key), colony,
                         "abandonColony.yes", "abandonColony.no")) return;
                 abandon = true;
             } else if ((buildable = colony.getCurrentlyBuilding()) != null) {
@@ -957,13 +958,13 @@ public final class ColonyPanel extends PortPanel
                             .addName("%colony%", colony.getName())
                             .addAmount("%number%", required)
                             .addNamed("%buildable%", buildable),
-                        "ok", "cancel")) return;
+                        colony, "ok", "cancel")) return;
             }
         }
 
         cleanup();
 
-        getGUI().removeFromCanvas(this);
+        getGUI().removeComponent(this);
         getGUI().updateMapControls();
 
         // Talk to the controller last, allow all the cleanup to happen first.

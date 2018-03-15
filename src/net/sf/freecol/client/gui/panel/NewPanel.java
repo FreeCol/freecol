@@ -260,7 +260,8 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         this.difficultyButton = Utility.localizedButton("newPanel.showDifficulty");
         this.difficultyButton.addActionListener(ae -> {
                 OptionGroup newDifficulty = getGUI()
-                    .showDifficultyDialog(this.specification, this.difficulty);
+                    .showDifficultyDialog(this.specification, this.difficulty,
+                                          this.difficulty.isEditable());
                 if (newDifficulty != null) {
                     this.difficulty = newDifficulty;
                     update(true); // Brings in new difficulty if edited
@@ -282,7 +283,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         cancel.setActionCommand(String.valueOf(NewPanelAction.CANCEL));
         cancel.addActionListener(ae -> {
                 final SwingGUI gui = getGUI();
-                gui.removeFromCanvas(this);
+                gui.removeComponent(this);
                 if (getFreeColClient().isMapEditor()) {
                     gui.startMapEditorGUI();
                 } else {

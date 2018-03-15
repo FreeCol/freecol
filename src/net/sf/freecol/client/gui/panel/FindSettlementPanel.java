@@ -121,7 +121,7 @@ public final class FindSettlementPanel extends FreeColPanel
         Action quitAction = new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent ae) {
-                    getGUI().removeFromCanvas(FindSettlementPanel.this);
+                    getGUI().removeComponent(FindSettlementPanel.this);
                 }
             };
         this.settlementList.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"),
@@ -194,10 +194,10 @@ public final class FindSettlementPanel extends FreeColPanel
         Settlement settlement = this.settlementList.getSelectedValue();
         if (settlement instanceof Colony
             && settlement.getOwner() == getMyPlayer()) {
-            getGUI().removeFromCanvas(FindSettlementPanel.this);
+            getGUI().removeComponent(FindSettlementPanel.this);
             getGUI().showColonyPanel((Colony)settlement, null);
         } else if (settlement instanceof IndianSettlement) {
-            getGUI().removeFromCanvas(FindSettlementPanel.this);
+            getGUI().removeComponent(FindSettlementPanel.this);
             getGUI().showIndianSettlement((IndianSettlement)settlement);
         }
     }

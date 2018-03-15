@@ -1133,8 +1133,7 @@ public class DebugUtils {
         boolean more = true;
         while (more) {
             int val = server.getInGameController().stepRandom();
-            more = gui.confirm(null, StringTemplate
-                .template("prompt.stepRNG")
+            more = gui.confirm(StringTemplate.template("prompt.stepRNG")
                 .addAmount("%value%", val),
                 "more", "cancel");
         }
