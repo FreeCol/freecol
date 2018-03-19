@@ -259,10 +259,11 @@ public final class ColonyPanel extends PortPanel
                           + "[growprio 150,shrinkprio 50]"
                           + "[growprio 150,shrinkprio 50][]"));
 
+        final Player player = getMyPlayer();
         // Do not just use colony.getOwner() == getMyPlayer() because
         // in debug mode we are in the *server* colony, and the equality
         // will fail.
-        editable = colony.getOwner().getId().equals(getMyPlayer().getId());
+        editable = colony.getOwner().getId().equals(player.getId());
 
         // Only enable the set goods button in debug mode when not spying
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
@@ -332,7 +333,7 @@ public final class ColonyPanel extends PortPanel
             FontLibrary.FontSize.SMALL, getImageLibrary().getScaleFactor());
         boolean incompatibleFont = false;
         if (editable) {
-            for (Colony c : freeColClient.getMySortedColonies()) {
+            for (Colony c : player.getColonyList()) {
                 this.nameBox.addItem(c);
                 if(!incompatibleFont &&
                     nameBoxFont.canDisplayUpTo(c.getName()) != -1) {
@@ -410,7 +411,8 @@ public final class ColonyPanel extends PortPanel
 
         initialize(colony);
         float scale = getImageLibrary().getScaleFactor();
-        getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
+        getGUI().restoreSavedSize(this,
+            new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
     }
 
 
@@ -945,7 +947,7 @@ public final class ColonyPanel extends PortPanel
                     && colony.isConnectedPort())
                     ? "abandonColony.lastPort.text"
                     : "abandonColony.text";
-                if (!getGUI().confirm(null, StringTemplate.key(key),
+                if (!getGUI().confirm(null, StringTemplate.key(key), colony,
                         "abandonColony.yes", "abandonColony.no")) return;
                 abandon = true;
             } else if ((buildable = colony.getCurrentlyBuilding()) != null) {
@@ -956,13 +958,13 @@ public final class ColonyPanel extends PortPanel
                             .addName("%colony%", colony.getName())
                             .addAmount("%number%", required)
                             .addNamed("%buildable%", buildable),
-                        "ok", "cancel")) return;
+                        colony, "ok", "cancel")) return;
             }
         }
 
         cleanup();
 
-        getGUI().removeFromCanvas(this);
+        getGUI().removeComponent(this);
         getGUI().updateMapControls();
 
         // Talk to the controller last, allow all the cleanup to happen first.

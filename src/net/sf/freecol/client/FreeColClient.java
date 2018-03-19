@@ -755,17 +755,6 @@ public final class FreeColClient {
     }
 
     /**
-     * Get a list of the player colonies.
-     *
-     * @return The players colonies sorted according to the chosen comparator.
-     */
-    public List<Colony> getMySortedColonies() {
-        return (clientOptions == null || player == null)
-            ? Collections.<Colony>emptyList()
-            : clientOptions.getSortedColonies(player);
-    }
-
-    /**
      * Set up the GUI after the game starts or a player reconnects.
      *
      * @param player The client {@code Player}.
@@ -927,6 +916,10 @@ public final class FreeColClient {
         setMyPlayer(player);
         setSinglePlayer(single);
         addSpecificationActions(game.getSpecification());
+        if (player != null) {
+            final ClientOptions co = getClientOptions();
+            player.setColonyComparator(co.getColonyComparator());
+        }        
     }
 
     /**

@@ -1045,7 +1045,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     break;
             }
         }
-        getGUI().removeFromCanvas(this);
+        getGUI().removeComponent(this);
     }
 
 

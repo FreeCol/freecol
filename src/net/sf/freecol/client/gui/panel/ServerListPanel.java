@@ -110,7 +110,7 @@ public final class ServerListPanel extends FreeColPanel {
             });
 
         cancel.addActionListener(ae -> {
-                getGUI().removeFromCanvas(this);
+                getGUI().removeComponent(this);
                 getGUI().showNewPanel();
             });
 

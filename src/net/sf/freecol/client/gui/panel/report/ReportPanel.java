@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel.report;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
@@ -88,7 +89,8 @@ public class ReportPanel extends FreeColPanel {
         add(okButton, "cell 0 2, tag ok");
 
         float scale = getImageLibrary().getScaleFactor();
-        getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
+        getGUI().restoreSavedSize(this,
+            new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
     }
 
 
@@ -145,7 +147,7 @@ public class ReportPanel extends FreeColPanel {
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
         if (OK.equals(command)) {
-            getGUI().removeFromCanvas(this);
+            getGUI().removeComponent(this);
         } else {
             FreeColGameObject fco = getGame().getFreeColGameObject(command);
             if (fco != null) {

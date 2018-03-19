@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -86,7 +87,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
     public ReportRequirementsPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportRequirementsAction");
 
-        colonies = freeColClient.getMySortedColonies();
+        final Player player = getMyPlayer();
+        colonies = player.getColonyList();
 
         // Display Panel
 

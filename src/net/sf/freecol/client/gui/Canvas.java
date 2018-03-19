@@ -264,7 +264,7 @@ public final class Canvas extends JDesktopPane {
     private final FreeColClient freeColClient;
 
     /** The parent GUI. */
-    private final SwingGUI gui;
+    private final GUI gui;
 
     private final GraphicsDevice graphicsDevice;
 
@@ -296,8 +296,6 @@ public final class Canvas extends JDesktopPane {
 
     private boolean clientOptionsDialogShowing = false;
 
-    private LoadingSavegameDialog loadingSavegameDialog;
-
     /** The dialogs in view. */
     private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
 
@@ -314,7 +312,7 @@ public final class Canvas extends JDesktopPane {
      */
     public Canvas(final FreeColClient freeColClient,
                   final GraphicsDevice graphicsDevice,
-                  final SwingGUI gui,
+                  final GUI gui,
                   final Dimension desiredSize,
                   MapViewer mapViewer) {
         this.freeColClient = freeColClient;
@@ -502,7 +500,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Sets the path of the active unit to display it.
      */
-    public void updateCurrentPathForActiveUnit() {
+    public void updateUnitPath() {
         mapViewer.updateCurrentPathForActiveUnit();
     }
 
@@ -1200,30 +1198,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Checks if this {@code Canvas} contains any in game components.
-     *
-     * @return {@code true} if there is any in game components.
-     */
-    public boolean containsInGameComponents() {
-        KeyListener[] keyListeners = getKeyListeners();
-        if (keyListeners.length > 0) {
-            return true;
-        }
-
-        MouseListener[] mouseListeners = getMouseListeners();
-        if (mouseListeners.length > 0) {
-            return true;
-        }
-
-        MouseMotionListener[] mouseMotionListeners = getMouseMotionListeners();
-        if (mouseMotionListeners.length > 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Tells that a chat message was received.
      *
      * @param message The chat message.
@@ -1295,17 +1269,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Gets the last {@code LoadingSavegameDialog}.
-     *
-     * FIXME: clean this up
-     *
-     * @return The {@code LoadingSavegameDialog}.
-     */
-    public LoadingSavegameDialog getLoadingSavegameDialog() {
-        return loadingSavegameDialog;
-    }
-
-    /**
      * Get any panel this {@code Canvas} is displaying.
      *
      * @return A {@code Component} the {@code Canvas} is
@@ -1332,15 +1295,6 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean isClientOptionsDialogShowing() {
         return clientOptionsDialogShowing;
-    }
-
-    /**
-     * Checks if mapboard actions should be enabled.
-     *
-     * @return {@code true} if no internal frames are open.
-     */
-    public boolean isMapboardActionsEnabled() {
-        return !isShowingSubPanel();
     }
 
     /**
@@ -1507,7 +1461,6 @@ public final class Canvas extends JDesktopPane {
             oldSize = getSize();
         }
     }
-
 
     // Override JComponent
 
@@ -1732,25 +1685,15 @@ public final class Canvas extends JDesktopPane {
      * Show the BuildQueuePanel for a given colony.
      *
      * @param colony The {@code Colony} to show the build queue of.
+     * @return The {@code BuildQueuePanel}.
      */
-    public void showBuildQueuePanel(Colony colony) {
+    public BuildQueuePanel showBuildQueuePanel(Colony colony) {
         BuildQueuePanel panel = getExistingFreeColPanel(BuildQueuePanel.class);
         if (panel == null || panel.getColony() != colony) {
-            showSubPanel(new BuildQueuePanel(freeColClient, colony), true);
+            panel = new BuildQueuePanel(freeColClient, colony);
+            showSubPanel(panel, true);
         }
-    }
-
-    /**
-     * Show a build queue panel, with a special callback when it is closed.
-     *
-     * @param colony The {@code Colony} to show the build queue of.
-     * @param callBack The {@code Runnable} that is run when the
-     *     panel closes.
-     */
-    public void showBuildQueuePanel(Colony colony, Runnable callBack) {
-        FreeColPanel panel = new BuildQueuePanel(freeColClient, colony);
-        panel.addClosingCallback(callBack);
-        showSubPanel(panel, true);
+        return panel;
     }
 
     /**
@@ -1759,9 +1702,6 @@ public final class Canvas extends JDesktopPane {
      * @param unit The {@code Unit} capturing goods.
      * @param gl The list of {@code Goods} to choose from.
      * @param handler A {@code DialogHandler} for the dialog response.
-     *
-     * @see CaptureGoodsDialog
-     * @see SwingGUI#showCaptureGoodsDialog(Unit, List, DialogHandler)
      */
     public void showCaptureGoodsDialog(Unit unit, List<Goods> gl,
                                        DialogHandler<List<Goods>> handler) {
@@ -1821,8 +1761,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param colony The colony whose panel needs to be displayed.
      * @param unit An optional {@code Unit} to select within the panel.
-     * @return The colony panel.
-     * @see ColonyPanel
+     * @return The {@code ColonyPanel}.
      */
     public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
         if (colony == null) return null;
@@ -2068,13 +2007,10 @@ public final class Canvas extends JDesktopPane {
      * Display the GameOptionsDialog.
      *
      * @param editable Should the game options be editable?
-     * @param custom Whether to load custom options.
      * @return The {@code OptionGroup} selected.
      */
-    public OptionGroup showGameOptionsDialog(boolean editable,
-                                             boolean custom) {
-        GameOptionsDialog god = new GameOptionsDialog(freeColClient, frame, editable,
-                                                      custom);
+    public OptionGroup showGameOptionsDialog(boolean editable) {
+        GameOptionsDialog god = new GameOptionsDialog(freeColClient, frame, editable);
         return showFreeColDialog(god, null);
     }
 
@@ -2162,7 +2098,7 @@ public final class Canvas extends JDesktopPane {
      * Displays a dialog where the user may choose a file.
      *
      * @param directory The directory containing the files.
-     * @param filters The file filters which the user can select in the dialog.
+     * @param extension An extension to select with.
      * @return The selected {@code File}.
      */
     public File showLoadDialog(File directory, String extension) {
@@ -2184,15 +2120,16 @@ public final class Canvas extends JDesktopPane {
      * settings can be retrieved directly from {@link LoadingSavegameDialog}
      * after calling this method.
      *
-     * @param publicServer Default value.
-     * @param singlePlayer Default value.
-     * @return {@code true} if the "ok"-button was pressed and
-     *         {@code false} otherwise.
+     * @param pubSer Default value.
+     * @param single Default value.
+     * @return The {@code LoadingSavegameInfo} if the dialog was accepted,
+     *     or null otherwise.
      */
-    public boolean showLoadingSavegameDialog(boolean publicServer,
-                                             boolean singlePlayer) {
-        loadingSavegameDialog = new LoadingSavegameDialog(freeColClient, frame);
-        return showFreeColDialog(loadingSavegameDialog, null);
+    public LoadingSavegameInfo showLoadingSavegameDialog(boolean pubSer,
+                                                         boolean single) {
+        LoadingSavegameDialog lsd
+            = new LoadingSavegameDialog(freeColClient, frame);
+        return (showFreeColDialog(lsd, null)) ? lsd.getInfo() : null;
     }
 
     /**
@@ -2319,7 +2256,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param unit The demanding {@code Unit}.
      * @param colony The {@code Colony} being demanded of.
-     * @param type The {@code GoodsType} demanded (may be null for gold).
+     * @param type The {@code GoodsType} demanded (null for gold).
      * @param amount The amount of goods demanded.
      * @param handler A {@code DialogHandler} for the dialog response.
      */
@@ -2364,21 +2301,6 @@ public final class Canvas extends JDesktopPane {
      */
     public void showNewPanel(Specification specification) {
         showSubPanel(new NewPanel(freeColClient, specification), false);
-    }
-
-    /**
-     * Shows the given video Component.
-     *
-     * @param vp The video Component.
-     * @param ml A MouseListener for stopping the video.
-     * @param kl A KeyListener for stopping the video.
-     */
-    public void showVideoComponent(final Component vp,
-                                   final MouseListener ml,
-                                   final KeyListener kl) {
-        addMouseListener(ml);
-        addKeyListener(kl);
-        addCentered(vp, JLayeredPane.PALETTE_LAYER);
     }
 
     /**
@@ -2504,7 +2426,19 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * display the select-tribute-amount dialog.
+     * Display a dialog allowing the user to select a destination for
+     * a given unit.
+     *
+     * @param unit The {@code Unit} to select a destination for.
+     * @return A destination for the unit, or null.
+     */
+    public Location showSelectDestinationDialog(Unit unit) {
+        return showFreeColDialog(new SelectDestinationDialog(freeColClient, frame,
+                unit), unit.getTile());
+    }
+
+    /**
+     * Display the select-tribute-amount dialog.
      *
      * @param question a {@code stringtemplate} describing the
      *     amount of tribute to demand.
@@ -2517,18 +2451,6 @@ public final class Canvas extends JDesktopPane {
             = new SelectTributeAmountDialog(freeColClient, frame, question, maximum);
         Integer result = showFreeColDialog(fcd, null);
         return (result == null) ? -1 : result;
-    }
-
-    /**
-     * Display a dialog allowing the user to select a destination for
-     * a given unit.
-     *
-     * @param unit The {@code Unit} to select a destination for.
-     * @return A destination for the unit, or null.
-     */
-    public Location showSelectDestinationDialog(Unit unit) {
-        return showFreeColDialog(new SelectDestinationDialog(freeColClient, frame,
-                unit), unit.getTile());
     }
 
     /**
@@ -2626,6 +2548,21 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Display the trade route input panel for a given trade route.
+     *
+     * @param newRoute The {@code TradeRoute} to display.
+     * @param callBack The {@code Runnable} that is run when the
+     *     panel closes.
+     * @return The {@code TradeRouteInputPanel}.
+     */
+    public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute newRoute) {
+        TradeRouteInputPanel panel
+            = new TradeRouteInputPanel(freeColClient, newRoute);
+        showSubPanel(panel, null, true);
+        return panel;
+    }
+
+    /**
      * Display a panel to select a trade route for a unit.
      *
      * @param unit An optional {@code Unit} to select a trade route for.
@@ -2633,20 +2570,6 @@ public final class Canvas extends JDesktopPane {
     public void showTradeRoutePanel(Unit unit) {
         showFreeColPanel(new TradeRoutePanel(freeColClient, unit),
                          (unit == null) ? null : unit.getTile(), true);
-    }
-
-    /**
-     * Display the trade route input panel for a given trade route.
-     *
-     * @param newRoute The {@code TradeRoute} to display.
-     * @param callBack The {@code Runnable} that is run when the
-     *     panel closes.
-     */
-    public void showTradeRouteInputPanel(TradeRoute newRoute,
-                                         Runnable callBack) {
-        FreeColPanel panel = new TradeRouteInputPanel(freeColClient, newRoute);
-        panel.addClosingCallback(callBack);
-        showSubPanel(panel, null, true);
     }
 
     /**
@@ -2854,5 +2777,20 @@ public final class Canvas extends JDesktopPane {
         } else {
             r.setMessages(messages);
         }
+    }
+
+    /**
+     * Shows the given video Component.
+     *
+     * @param vp The video Component.
+     * @param ml A MouseListener for stopping the video.
+     * @param kl A KeyListener for stopping the video.
+     */
+    public void showVideoComponent(final Component vp,
+                                   final MouseListener ml,
+                                   final KeyListener kl) {
+        addMouseListener(ml);
+        addKeyListener(kl);
+        addCentered(vp, JLayeredPane.PALETTE_LAYER);
     }
 }

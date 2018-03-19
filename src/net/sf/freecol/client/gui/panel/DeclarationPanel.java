@@ -78,13 +78,13 @@ public final class DeclarationPanel extends FreeColPanel {
         addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyPressed(KeyEvent k) {
-                    getGUI().removeFromCanvas(DeclarationPanel.this);
+                    getGUI().removeComponent(DeclarationPanel.this);
                 }
             });
         addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    getGUI().removeFromCanvas(DeclarationPanel.this);
+                    getGUI().removeComponent(DeclarationPanel.this);
                 }
             });
 
@@ -114,7 +114,7 @@ public final class DeclarationPanel extends FreeColPanel {
         final String command = ae.getActionCommand();
         if (ANIMATION_STOPPED.equals(command)) {
             Timer t = new Timer(FINISH_DELAY, (x) -> {
-                    getGUI().removeFromCanvas(DeclarationPanel.this);
+                    getGUI().removeComponent(DeclarationPanel.this);
                 });
             t.setRepeats(false);
             t.start();

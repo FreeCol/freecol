@@ -127,7 +127,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                             ImageLibrary.SMALLER_SCALE);
 
         for (TileType type : spec.getTileTypeList()) {
-            listPanel.add(buildButton(SwingGUI.createTileImageWithOverlayAndForest(type, terrainSize),
+            listPanel.add(buildButton(getGUI().createTileImageWithOverlayAndForest(type, terrainSize),
                     Messages.getName(type),
                     new TileTypeTransform(type)));
         }

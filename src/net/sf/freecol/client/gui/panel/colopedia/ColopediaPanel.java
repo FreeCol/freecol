@@ -96,7 +96,8 @@ public final class ColopediaPanel extends FreeColPanel
         add(okButton, "newline 20, span, tag ok");
 
         float scale = getImageLibrary().getScaleFactor();
-        getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
+        getGUI().restoreSavedSize(this,
+            new Dimension(200 + (int)(scale*850), 200 + (int)(scale*525)));
         tree = buildTree();
 
         select(id);
@@ -231,7 +232,7 @@ public final class ColopediaPanel extends FreeColPanel
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
         if (OK.equals(command)) {
-            getGUI().removeFromCanvas(this);
+            getGUI().removeComponent(this);
         } else {
             select(command);
         }

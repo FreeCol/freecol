@@ -102,7 +102,7 @@ public final class ChatPanel extends FreeColPanel {
             case CHAT:
                 String message = getChatText();
                 igc().chat(message);
-                getGUI().removeFromCanvas(this);
+                getGUI().removeComponent(this);
                 break;
             default:
                 super.actionPerformed(ae);

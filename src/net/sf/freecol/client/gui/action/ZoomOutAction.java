@@ -27,7 +27,7 @@ import net.sf.freecol.client.FreeColClient;
 /**
  * An action for zooming out on the main map.
  */
-public class ZoomOutAction extends FreeColAction {
+public class ZoomOutAction extends MapboardAction {
 
     public static final String id = "zoomOutAction";
 
@@ -50,8 +50,6 @@ public class ZoomOutAction extends FreeColAction {
     @Override
     protected boolean shouldBeEnabled() {
         if (!super.shouldBeEnabled()) return false;
-
-        if (!getGUI().isMapboardActionsEnabled()) return false;
 
         return getGUI().canZoomOutMap();
     }

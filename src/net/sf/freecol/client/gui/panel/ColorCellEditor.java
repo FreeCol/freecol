@@ -32,7 +32,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -60,7 +60,7 @@ public final class ColorCellEditor extends AbstractCellEditor
 
         this.colorEditButton = new JButton();
         this.colorEditButton.addActionListener(ae ->
-            this.colorChooserPanel = ((SwingGUI)freeColClient.getGUI())
+            this.colorChooserPanel = freeColClient.getGUI()
                 .showColorChooserPanel(this));
         this.colorEditButton.setBorderPainted(false);
     }
@@ -97,18 +97,18 @@ public final class ColorCellEditor extends AbstractCellEditor
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
-        SwingGUI gui = (SwingGUI)freeColClient.getGUI();
+        GUI gui = freeColClient.getGUI();
         if (null != command) switch (command) {
             case FreeColPanel.OK:
                 if (this.colorChooserPanel != null) {
                     this.currentColor = this.colorChooserPanel.getColor();
-                    gui.removeFromCanvas(this.colorChooserPanel);
+                    gui.removeComponent(this.colorChooserPanel);
                 }
                 fireEditingStopped();
                 break;
             case FreeColPanel.CANCEL:
                 if (this.colorChooserPanel != null) {
-                    gui.removeFromCanvas(this.colorChooserPanel);
+                    gui.removeComponent(this.colorChooserPanel);
                 }
                 fireEditingCanceled();
                 break;

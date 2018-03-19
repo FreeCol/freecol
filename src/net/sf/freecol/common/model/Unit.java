@@ -4473,7 +4473,9 @@ public class Unit extends GoodsLocation
 
         final Specification spec = getSpecification();
         final Game game = getGame();
-
+        final WorkLocation oldWorkLocation = getWorkLocation();
+        final GoodsType oldWorkType = getWorkType();
+        
         name = xr.getAttribute(NAME_TAG, (String)null);
 
         Player oldOwner = owner;
@@ -4537,8 +4539,12 @@ public class Unit extends GoodsLocation
 
         visibleGoodsCount = xr.getAttribute(VISIBLE_GOODS_COUNT_TAG, -1);
 
-        // Make sure you do this after experience and location stuff.
-        changeWorkType(xr.getType(spec, WORK_TYPE_TAG, GoodsType.class, null));
+        setWorkType(xr.getType(spec, WORK_TYPE_TAG, GoodsType.class, null));
+
+        // Fix changes to experience and production
+        if (workType != oldWorkType) experienceType = workType;
+        WorkLocation wl = getWorkLocation();
+        if (wl != null && wl != oldWorkLocation) wl.updateProductionType();
     }
 
     /**

@@ -315,6 +315,12 @@ public class Player extends FreeColGameObject implements Nameable {
     private final java.util.Map<Player, NationSummary> nationCache
         = new HashMap<>();
 
+    /**
+     * A comparator to enforce the player prefered colony order.  Only
+     * relevant client-side.
+     */
+    private Comparator<Colony> colonyComparator = null;
+
 
     //
     // Constructors
@@ -2328,6 +2334,9 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Adds a given settlement to this player's list of settlements.
      *
+     * Note: if the comparator is present, insert the settlement in the
+     * preferred order.
+     *
      * @param settlement The {@code Settlement} to add.
      * @return True if the settlements container changed.
      */
@@ -2338,7 +2347,18 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         if (hasSettlement(settlement)) return false;
         synchronized (this.settlements) {
-            this.settlements.add(settlement);
+            if (this.colonyComparator == null) {
+                this.settlements.add(settlement);
+            } else {
+                Colony c = (Colony)settlement;
+                int i = this.settlements.size() - 1;
+                while (i >= 0) {
+                    Colony s = (Colony)this.settlements.get(i);
+                    if (this.colonyComparator.compare(c, s) >= 0) break;
+                    i--;
+                }
+                this.settlements.add(i+1, settlement);
+            }
         }
         return true;
     }
@@ -2710,53 +2730,13 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the set of tiles visible to this player.
-     *
-     * @return A set of visible {@code Tile}s.
-     */
-    public Set<Tile> getVisibleTileSet() {
-        Set<Tile> tiles = new HashSet<>();
-        List<? extends Settlement> settlements
-            = (hasAbility(Ability.SEE_ALL_COLONIES))
-            ? getGame().getAllColoniesList(null)
-            : getSettlementList();
-        for (Settlement s : settlements) tiles.addAll(s.getVisibleTileSet());
-        for (Unit u : getUnitList()) {
-            if (u.getLocation() instanceof Tile) {
-                tiles.addAll(u.getVisibleTileSet());
-            }
-        }
-        final Specification spec = getSpecification();
-        if (isEuropean()
-            && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-            for (Player other : getGame().getLiveNativePlayerList(this)) {
-                for (IndianSettlement is : getIndianSettlementsWithMissionaryList(this)) {
-                    tiles.addAll(is.getVisibleTileSet());
-                }
-            }
-        }
-        return tiles;
-    }
-
-    /**
-     * Can this player see a given tile.
-     *
-     * The tile can be seen if it is in a unit or settlement's line of sight.
+     * Checks if this player has explored the given tile.
      *
      * @param tile The {@code Tile} to check.
-     * @return True if this player can see the given {@code Tile}.
+     * @return True if the {@code Tile} has been explored.
      */
-    public boolean canSee(Tile tile) {
-        if (tile == null) return false;
-
-        do {
-            synchronized (canSeeLock) {
-                if (canSeeValid) {
-                    return canSeeTiles[tile.getX()][tile.getY()];
-                }
-            }
-        } while (resetCanSeeTiles());
-        return false;
+    public boolean hasExplored(Tile tile) {
+        return tile.isExplored();
     }
 
     /**
@@ -2767,8 +2747,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * The method {@link #resetCanSeeTiles} will be called whenever it
      * is needed.
      *
-     * So what is "significant"?  Looking at the makeCanSeeTiles routine
-     * suggests the following:
+     * So what is "significant"?
      *
      * - Unit added to map
      * - Unit removed from map
@@ -2785,6 +2764,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * - Mission ownership changes (Spanish succession with enhanced
      *                              missionaries enabled)
      * - Map is unexplored (debug mode)
+     * - All the cases that have been forgotten
      *
      * Ideally then when any of these events occurs we should call
      * invalidateCanSeeTiles().  However while iCST is quick and
@@ -2807,102 +2787,86 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Resets this player's "can see"-tiles.  This is done by setting
-     * all the tiles within each {@link Unit} and {@link Settlement}s
-     * line of sight visible.  The other tiles are made invisible.
+     * Can this player see a given tile.
      *
-     * Use {@link #invalidateCanSeeTiles} whenever possible.
+     * The tile can be seen if it is in a unit or settlement's line of sight.
      *
-     * @return True if successful.
+     * @param tile The {@code Tile} to check.
+     * @return True if this player can see the given {@code Tile}.
      */
-    private boolean resetCanSeeTiles() {
-        Map map = getGame().getMap();
+    public boolean canSee(Tile tile) {
+        if (tile == null) return false;
+        final Map map = getGame().getMap();
         if (map == null) return false;
 
-        boolean[][] cST = makeCanSeeTiles(map);
         synchronized (canSeeLock) {
-            canSeeTiles = cST;
-            canSeeValid = true;
+            if (!canSeeValid) {
+                // Build new visibility and mark as valid
+                canSeeTiles = makeCanSeeTiles(map);
+                canSeeValid = true;
+            }
+            return canSeeTiles[tile.getX()][tile.getY()];
         }
-        return true;
     }
 
     /**
-     * Checks if this player has explored the given tile.
+     * Get the set of tiles visible to this player.
      *
-     * @param tile The {@code Tile} to check.
-     * @return True if the {@code Tile} has been explored.
+     * @return A set of visible {@code Tile}s.
      */
-    public boolean hasExplored(Tile tile) {
-        return tile.isExplored();
+    public Set<Tile> getVisibleTileSet() {
+        final Specification spec = getSpecification();
+        Set<Tile> tiles = new HashSet<>();
+        if (spec.getBoolean(GameOptions.FOG_OF_WAR)) {
+            // When there is fog, have to trace all locations where the
+            // player has units, settlements (including visible with
+            // Coronado), (optionally) missions, and extra visibility.
+            List<? extends Settlement> settlements
+                = (hasAbility(Ability.SEE_ALL_COLONIES))
+                ? getGame().getAllColoniesList(null)
+                : getSettlementList();
+            for (Settlement s : settlements) tiles.addAll(s.getVisibleTileSet());
+            for (Unit u : getUnitList()) {
+                if (u.getLocation() instanceof Tile) {
+                    tiles.addAll(u.getVisibleTileSet());
+                }
+            }
+            if (isEuropean()
+                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+                for (Player other : getGame().getLiveNativePlayerList(this)) {
+                    for (IndianSettlement is : getIndianSettlementsWithMissionaryList(this)) {
+                        tiles.addAll(is.getVisibleTileSet());
+                    }
+                }
+            }
+        } else {
+            // Otherwise it is just the explored tiles
+            for (Tile t : getGame().getMap().getAllTilesSet()) {
+                if (hasExplored(t)) tiles.add(t);
+            }
+        }
+        return tiles;
     }
 
     /**
      * Builds a canSeeTiles array.
      *
-     * Note that tiles must be tested for null as they may be both
-     * valid tiles but yet null during a save game load.
-     *
-     * Note the use of copies of the unit and settlement lists to
-     * avoid nasty surprises due to asynchronous disappearance of
-     * members of either.  FIXME: see if this can be relaxed.
-     *
      * @param map The {@code Map} to use.
-     * @return A canSeeTiles array.
+     * @return A new visibility array.
      */
     private boolean[][] makeCanSeeTiles(Map map) {
         final Specification spec = getSpecification();
-        // Simple case when there is no fog of war: a tile is
-        // visible once it is explored.
-        if (!spec.getBoolean(GameOptions.FOG_OF_WAR)) {
-            boolean[][] cST = (canSeeTiles != null) ? canSeeTiles
-                : new boolean[map.getWidth()][map.getHeight()];
-            getGame().getMap().forEachTile(t -> {
-                    cST[t.getX()][t.getY()] = hasExplored(t);
-                });
-            return cST;
-        }
-
-        // When there is fog, have to trace all locations where the
-        // player has units, settlements, (optionally) missions, and
-        // extra visibility.
-        // Set the PET for visible tiles to the tile itself.
         boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
-
-        // Only consider units directly on the map, not those on a
-        // carrier or in Europe.
-        for (Unit unit : transform(getUnits(),
-                                   u -> u.getLocation() instanceof Tile)) {
-            // All the units.
-            for (Tile t : unit.getVisibleTileSet()) {
+        Set<Tile> visible = getVisibleTileSet();
+        if (spec.getBoolean(GameOptions.FOG_OF_WAR)) {
+            for (Tile t : getVisibleTileSet()) {
                 cST[t.getX()][t.getY()] = true;
+                // Set the PET for visible tiles to the tile itself.
                 t.seeTile(this);
             }
-        }
-        // All the settlements.
-        for (Settlement settlement : getSettlementList()) {
-            for (Tile t : settlement.getVisibleTileSet()) {
+        } else {
+            for (Tile t : getVisibleTileSet()) {
                 cST[t.getX()][t.getY()] = true;
-                t.seeTile(this);
-            }
-        }
-        // All missions if using enhanced missionaries.
-        if (isEuropean()
-                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-            for (Player other : getGame().getLiveNativePlayerList(this)) {
-                for (Tile t : iterable(flatten(getIndianSettlementsWithMissionary(this),
-                                               is -> is.getVisibleTileSet().stream()))) {
-                    cST[t.getX()][t.getY()] = true;
-                    t.seeTile(this);
-                }
-            }
-        }
-        // All other European settlements if can see all colonies.
-        if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
-            for (Tile t : iterable(flatten(getGame().getAllColonies(this),
-                                           c -> c.getVisibleTileSet().stream()))) {
-                cST[t.getX()][t.getY()] = true;
-                t.seeTile(this);
             }
         }
         return cST;
@@ -3935,6 +3899,15 @@ public class Player extends FreeColGameObject implements Nameable {
             throw new RuntimeException("Not ownable: " + id + "/" + t);
         }
         return t;
+    }
+
+    /**
+     * Set the local colony comparator.
+     *
+     * @param cc The new {@code Comparator}.
+     */
+    public void setColonyComparator(Comparator<Colony> cc) {
+        this.colonyComparator = cc;
     }
 
 

@@ -145,7 +145,7 @@ public class NewUnitPanel extends FreeColPanel {
             igc().trainUnitInEurope(unitType);
             // Close early if there is nothing affordable remaining.
             getGUI().updateEuropeanSubpanels();
-            if (!shouldEnable) getGUI().removeFromCanvas(this);            
+            if (!shouldEnable) getGUI().removeComponent(this);            
         }
     }
 

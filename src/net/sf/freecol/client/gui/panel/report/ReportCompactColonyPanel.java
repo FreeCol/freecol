@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Specification;
@@ -370,11 +371,12 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         this.spec = getSpecification();
         this.lib = getImageLibrary();
-        this.market = getMyPlayer().getMarket();
+        final Player player = getMyPlayer();
+        this.market = player.getMarket();
         
         // Sort the colonies by continent.
         final Map<Integer, List<Colony>> continents = new HashMap<>();
-        for (Colony c : freeColClient.getMySortedColonies()) {
+        for (Colony c : player.getColonyList()) {
             if (c.getUnitCount() > 0) {
                 // Do not include colonies that have been abandoned
                 // but are still on the colonies list.
@@ -1117,13 +1119,14 @@ public final class ReportCompactColonyPanel extends ReportPanel
             command = command.substring(BUILDQUEUE.length());
             Colony colony = game.getFreeColGameObject(command, Colony.class);
             if (colony != null) {
-                getGUI().showBuildQueuePanel(colony, () -> { update(); });
+                getGUI().showBuildQueuePanel(colony)
+                    .addClosingCallback(() -> { update(); });
                 return;
             }
         } else {
             Colony colony = game.getFreeColGameObject(command, Colony.class);
             if (colony != null) {
-                getGUI().showColonyPanel2(colony, null)
+                getGUI().showColonyPanel(colony, null)
                     .addClosingCallback(() -> { update(); });
                 return;
             }

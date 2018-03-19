@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -138,7 +139,8 @@ public final class ReportProductionPanel extends ReportPanel {
                 }
             }
 
-            for (Colony colony : getFreeColClient().getMySortedColonies()) {
+            final Player player = getMyPlayer();
+            for (Colony colony : player.getColonyList()) {
                 // colonyButton
                 JButton colonyButton = Utility.getLinkButton(colony.getName(),
                     null, colony.getId());

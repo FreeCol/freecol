@@ -68,7 +68,7 @@ public final class ReportReligiousPanel extends ReportPanel {
                 player.getTotalImmigrationProduction());
             reportPanel.add(progressBar, "span");
 
-            for (Colony colony : freeColClient.getMySortedColonies()) {
+            for (Colony colony : player.getColonyList()) {
                 WorkLocation wl = first(colony.getWorkLocationsForProducing(gt));
                 if (wl instanceof Building) {
                     reportPanel.add(createColonyButton(colony),
