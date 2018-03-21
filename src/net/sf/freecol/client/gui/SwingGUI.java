@@ -532,7 +532,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Point getAnimationTilePosition(Tile tile) {
-        return mapViewer.calculateTilePosition(tile);
+        return mapViewer.calculateTilePosition(tile, false);
     }
 
 
@@ -1820,9 +1820,7 @@ public class SwingGUI extends GUI {
     public void showTilePopUpAtSelectedTile() {
         Tile tile = mapViewer.getSelectedTile();
         if (tile == null) return;
-        Point point = mapViewer.calculateTilePosition(tile);
-        if (point == null) return;
-        canvas.showTilePopup(tile, point.x+mapViewer.getTileWidth(), point.y);
+        canvas.showTilePopup(tile, mapViewer.calculateTilePosition(tile, true));
     }
 
     /**
