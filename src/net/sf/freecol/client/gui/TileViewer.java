@@ -128,6 +128,12 @@ public final class TileViewer extends FreeColClientHolder {
 
     private final GeneralPath fog = new GeneralPath();
 
+    /** Standard rescaling used in displayTile. */
+    private final RescaleOp standardRescale
+        = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
+                        new float[] { 0, 0, 0, 0 },
+                        null);
+
 
     /**
      * The constructor to use.
@@ -229,23 +235,25 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      *
+     * Public for {@see GUI.createTileImage}.
+     *
      * @param tile The {@code Tile} to draw.
+     * @param player The {@code Player} to draw for.
      * @return The image.
      */
-    BufferedImage createTileImage(Tile tile) {
+    public BufferedImage createTileImage(Tile tile, Player player) {
         final TileType tileType = tile.getType();
         Dimension terrainTileSize = lib.tileSize;
         BufferedImage overlayImage = lib.getOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
-            : tileType.isForested()
-                ? lib.tileForestSize.height
-                : terrainTileSize.height;
-        BufferedImage image = new BufferedImage(
-            terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
+            : (tileType.isForested()) ? lib.tileForestSize.height
+            : terrainTileSize.height;
+        BufferedImage image = new BufferedImage(terrainTileSize.width,
+            compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.translate(0, compoundHeight - terrainTileSize.height);
-        displayTile(g, tile, overlayImage);
+        displayTile(g, tile, player, overlayImage);
         g.dispose();
         return image;
     }
@@ -322,10 +330,11 @@ public final class TileViewer extends FreeColClientHolder {
      */
     private void displayColonyTile(Graphics2D g, Tile tile, Colony colony,
                                   BufferedImage overlayImage) {
-        displayTile(g, tile, overlayImage);
+        displayTile(g, tile, colony.getOwner(), overlayImage);
 
         ColonyTile colonyTile = colony.getColonyTile(tile);
         if (colonyTile == null) return;
+
         switch (colonyTile.getNoWorkReason()) {
         case NONE: case COLONY_CENTER: case CLAIM_REQUIRED:
             break;
@@ -359,21 +368,19 @@ public final class TileViewer extends FreeColClientHolder {
      *
      * @param g The Graphics2D on which to draw the {@code Tile}.
      * @param tile The {@code Tile} to draw.
+     * @param player The {@code Player} to draw for.
      * @param overlayImage The BufferedImage for the tile overlay.
      */
-    private void displayTile(Graphics2D g, Tile tile, BufferedImage overlayImage) {
+    private void displayTile(Graphics2D g, Tile tile, Player player,
+                             BufferedImage overlayImage) {
         displayTileWithBeachAndBorder(g, tile);
-        if (tile.isExplored()) {
-            RescaleOp rop = hasFogOfWar(tile)
-                ? new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
-                                new float[] { 0, 0, 0, 0 },
-                                null)
-                : null;
-            displayTileItems(g, tile, rop, overlayImage);
-            displaySettlementWithChipsOrPopulationNumber(g, tile, false, rop);
+        if (!tile.isExplored()) return;
+        
+        RescaleOp rop = (player.canSee(tile)) ? null : standardRescale;
+        displayTileItems(g, tile, rop, overlayImage);
+        displaySettlementWithChipsOrPopulationNumber(g, tile, false, rop);
 
-            displayOptionalTileText(g, tile);
-        }
+        displayOptionalTileText(g, tile);
     }
 
     /**

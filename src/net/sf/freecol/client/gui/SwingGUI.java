@@ -906,8 +906,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage createTileImage(Tile tile) {
-        return tileViewer.createTileImage(tile);
+    public BufferedImage createTileImage(Tile tile, Player player) {
+        return tileViewer.createTileImage(tile, player);
     }
 
     /**
