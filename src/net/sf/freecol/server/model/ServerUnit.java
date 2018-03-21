@@ -134,6 +134,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             game.getSpecification().getDefaultRole());
 
         final Specification spec = getSpecification();
+        if (template.getName() != null) setName(template.getName());
         setNationality(template.getNationality());
         setEthnicity(template.getEthnicity());
         workLeft = template.getWorkLeft();
@@ -166,8 +167,8 @@ public class ServerUnit extends Unit implements TurnTaker {
         super(game);
 
         final Specification spec = getSpecification();
-        this.type = type;
         this.owner = owner;
+        this.type = type;
         this.state = UnitState.ACTIVE; // placeholder
         this.role = getSpecification().getDefaultRole(); // placeholder
         this.location = null;

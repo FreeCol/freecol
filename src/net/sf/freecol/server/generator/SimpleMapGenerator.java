@@ -884,8 +884,10 @@ public class SimpleMapGenerator implements MapGenerator {
         // In debug mode give each player a few more units and a colony.
         UnitType unitType = spec.getUnitType("model.unit.galleon");
         Unit galleon = new ServerUnit(game, startTile, player, unitType);
+        galleon.setName(player.getNameForUnit(unitType, random));
         unitType = spec.getUnitType("model.unit.privateer");
         Unit privateer = new ServerUnit(game, startTile, player, unitType);
+        privateer.setName(player.getNameForUnit(unitType, random));
         ((ServerPlayer)player).exploreForUnit(privateer);
         unitType = spec.getUnitType("model.unit.freeColonist");
         new ServerUnit(game, galleon, player, unitType);

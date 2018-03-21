@@ -155,6 +155,7 @@ public class ServerColony extends Colony implements TurnTaker {
         UnitType type = (UnitType)buildQueue.getCurrentlyBuilding();
         Unit unit = new ServerUnit(getGame(), getTile(), owner,
                                    type);//-vis: safe, within colony
+        unit.setName(owner.getNameForUnit(type, random));
         if (unit.hasAbility(Ability.BORN_IN_COLONY)) {
             cs.addMessage(owner,
                           new ModelMessage(MessageType.UNIT_ADDED,
