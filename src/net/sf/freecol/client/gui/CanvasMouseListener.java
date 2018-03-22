@@ -74,25 +74,29 @@ public final class CanvasMouseListener extends FreeColClientHolder
         if (tile == null) return;
 
         // Only process events that could not have been gotos.
-        final Unit unit = getGUI().getActiveUnit();
+        final GUI gui = getGUI();
+        final Unit active = gui.getActiveUnit();
         if (e.getClickCount() > 1
-            || unit == null
-            || unit.getTile() == tile
+            || active == null
+            || active.getTile() == tile
             || !canvas.isDrag(e.getX(), e.getY())) {
-            if (tile.hasSettlement()) {
-                getGUI().showTileSettlement(tile);
-            } else if (unit == null || unit.getTile() != tile) {
+            if (!tile.isExplored()) {
+                gui.setSelectedTile(tile);
+                gui.setViewMode(GUI.VIEW_TERRAIN_MODE);
+            } if (tile.hasSettlement()) {
+                gui.showTileSettlement(tile);
+            } else if (active == null || active.getTile() != tile) {
                 Unit other = tile.getFirstUnit();
                 if (other != null && getMyPlayer().owns(other)) {
-                    getGUI().setActiveUnit(other);
-                    getGUI().setViewMode(GUI.MOVE_UNITS_MODE);
+                    gui.setActiveUnit(other);
+                    gui.setViewMode(GUI.MOVE_UNITS_MODE);
                 } else {
-                    getGUI().setSelectedTile(tile);
-                    getGUI().setViewMode(GUI.VIEW_TERRAIN_MODE);
+                    gui.setSelectedTile(tile);
+                    gui.setViewMode(GUI.VIEW_TERRAIN_MODE);
                 }
             } else {
-                getGUI().setSelectedTile(tile);
-                getGUI().setViewMode(GUI.VIEW_TERRAIN_MODE);
+                gui.setSelectedTile(tile);
+                gui.setViewMode(GUI.VIEW_TERRAIN_MODE);
             }
         }
     }
