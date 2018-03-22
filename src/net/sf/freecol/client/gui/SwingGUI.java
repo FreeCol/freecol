@@ -174,6 +174,26 @@ public class SwingGUI extends GUI {
         return null;
     }
 
+    /**
+     * Internal version of setSelectedTile allowing focus override.
+     *
+     * @param newTile The new {@code Tile} to select.
+     * @param refocus If true, always refocus.
+     */
+    private void setSelectedTile(Tile newTile, boolean refocus) {
+        final Tile oldTile = getSelectedTile();
+        refocus = newTile != null && (refocus || !mapViewer.onScreen(newTile)
+            || getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER));
+        if (refocus) {
+            setFocus(newTile);
+        } else {
+            if (oldTile != null) refreshTile(oldTile);
+            if (newTile != null) refreshTile(newTile);
+        }
+        mapViewer.setSelectedTile(newTile);
+    }
+
+    // TODO
     private void setFocusImmediately(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
         Dimension size = canvas.getSize();
@@ -957,14 +977,34 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean setActiveUnit(Unit unit) {
-        boolean result = mapViewer.setActiveUnit(unit);
+    public void setActiveUnit(Unit unit) {
+        final Unit old = getActiveUnit();
+
+        Tile tile = null;
+        if (unit == null || (tile = unit.getTile()) == null) {
+            canvas.stopGoto();
+        }
+        mapViewer.setActiveUnit(unit);
+        // Automatic mode switch when switching to/from null active unit
+        if (unit != null && old == null) {
+            setViewMode(GUI.MOVE_UNITS_MODE);
+            // Bring the selected tile along with the unit
+            if (tile != getSelectedTile()) {
+                setSelectedTile(tile, tile != null
+                    && getClientOptions().getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT));
+            }
+        } else if (unit == null && old != null) {
+            tile = getSelectedTile();
+            if (tile != null) setViewMode(GUI.VIEW_TERRAIN_MODE);
+        }
+
         updateMapControls();
         updateMenuBar();
+        
+        // TODO: why do we have to refresh the entire canvas?
         if (unit != null && !getMyPlayer().owns(unit)) {
             canvas.refresh();
         }
-        return result;
     }
 
     /**
@@ -990,11 +1030,10 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean setSelectedTile(Tile newTileToSelect) {
-        boolean result = mapViewer.setSelectedTile(newTileToSelect);
+    public void setSelectedTile(Tile newTile) {
+        setSelectedTile(newTile, false);
         updateMapControls();
         updateMenuBar();
-        return result;
     }
 
 

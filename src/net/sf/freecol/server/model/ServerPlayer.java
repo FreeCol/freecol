@@ -1127,10 +1127,11 @@ public class ServerPlayer extends Player implements TurnTaker {
      *     create.
      * @param location The {@code Location} where the units will
      *     be created.
+     * @param random A pseudo-random number source.
      * @return A list of units created.
      */
     public List<Unit> createUnits(List<AbstractUnit> abstractUnits,
-                                  Location location) {
+                                  Location location, Random random) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         List<Unit> units = new ArrayList<>();
@@ -1150,6 +1151,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             for (int i = 0; i < au.getNumber(); i++) {
                 ServerUnit su = new ServerUnit(game, location, this, type,
                                                role);//-vis(this)
+                su.setName(this.getNameForUnit(type, random));
                 units.add(su);
                 lb.add(' ', su);
             }
@@ -1974,7 +1976,7 @@ outer:  for (Effect effect : effects) {
 
         List<AbstractUnit> units = father.getUnitList();
         if (units != null && !units.isEmpty() && europe != null) {
-            createUnits(units, europe);//-vis: safe, Europe
+            createUnits(units, europe, random);//-vis: safe, Europe
             europeDirty = true;
         }
 
@@ -4138,7 +4140,7 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csAddMercenaries(List<AbstractUnit> mercs, int price,
-                                 ChangeSet cs) {
+                                 Random random, ChangeSet cs) {
         if (checkGold(price)) {
             final Specification spec = getSpecification();
             final Predicate<AbstractUnit> isNaval = au ->
@@ -4149,12 +4151,12 @@ outer:  for (Effect effect : effects) {
             Tile dst;
             if (naval.isEmpty()) { // Deliver to first settlement
                 dst = first(getColonies()).getTile();
-                createUnits(mercs, dst);//-vis: safe, in colony
+                createUnits(mercs, dst, null);//-vis: safe, in colony
                 cs.add(See.only(this), dst);
             } else { // Let them sail in
                 dst = getEntryTile();
-                loadShips(createUnits(transform(mercs, isLand), null),
-                          createUnits(naval, dst),//-vis
+                loadShips(createUnits(transform(mercs, isLand), null, null),
+                          createUnits(naval, dst, random),//-vis
                           null);
                 invalidateCanSeeTiles();//+vis(this)
                 cs.add(See.perhaps(), dst);
@@ -4524,9 +4526,9 @@ outer:  for (Effect effect : effects) {
                 // Create the force.
                 Force ivf = getMonarch().getInterventionForce();
                 List<Unit> land = createUnits(ivf.getLandUnitsList(),
-                                              entry);//-vis(this)
+                                              entry, random);//-vis(this)
                 List<Unit> naval = createUnits(ivf.getNavalUnitsList(),
-                                               entry);//-vis(this)
+                                               entry, random);//-vis(this)
                 List<Unit> leftOver = loadShips(land, naval, random);//-vis(this)
                 for (Unit unit : leftOver) {
                     // no use for left over units

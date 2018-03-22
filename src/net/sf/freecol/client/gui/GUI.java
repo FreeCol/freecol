@@ -1672,11 +1672,8 @@ public class GUI extends FreeColClientHolder {
      * Set the active unit.
      *
      * @param unit The {@code Unit} to activate.
-     * @return True if the focus was set.
      */
-    public boolean setActiveUnit(Unit unit) {
-        return false;
-    }
+    public void setActiveUnit(Unit unit) {}
 
     /**
      * Center the active unit.
@@ -1696,11 +1693,8 @@ public class GUI extends FreeColClientHolder {
      * Set the selected tile.
      *
      * @param tile The new selected {@code Tile}.
-     * @return True if setting the tile changes the focus.
      */
-    public boolean setSelectedTile(Tile tile) {
-        return true;
-    }
+    public void setSelectedTile(Tile tile) {}
 
 
     // Zoom controls

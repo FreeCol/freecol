@@ -257,6 +257,42 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
+     * Gets the active unit.
+     *
+     * @return The {@code Unit}.
+     */
+    public Unit getActiveUnit() {
+        return this.activeUnit;
+    }
+
+    /**
+     * Sets the active unit.
+     *
+     * @param activeUnit The new active {@code Unit}.
+     */
+    public void setActiveUnit(Unit activeUnit) {
+        this.activeUnit = activeUnit;
+    }
+
+    /**
+     * Gets the selected tile.
+     *
+     * @return The {@code Tile} selected.
+     */
+    public Tile getSelectedTile() {
+        return this.selectedTile;
+    }
+
+    /**
+     * Sets the selected tile.
+     *
+     * @param tile The new selected {@code Tile}.
+     */
+    public void setSelectedTile(Tile tile) {
+        this.selectedTile = tile;
+    }
+
+    /**
      * Centers the map on the selected unit.
      */
     void centerActiveUnit() {
@@ -919,56 +955,6 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Gets the selected tile.
-     *
-     * @return The {@code Tile} selected.
-     */
-    Tile getSelectedTile() {
-        return selectedTile;
-    }
-
-    /**
-     * Selects the tile at the specified position.  There are two
-     * possible cases:
-     *
-     * <ol>
-     *   <li>If the tile contains a unit that can become active, then
-     *       that unit will be set as the active unit.
-     *   <li>If not, the {@code selectedTile} will become the map focus.
-     * </ol>
-     *
-     * If a unit is active and is located on the selected tile,
-     * then nothing (except perhaps a map reposition) will happen.
-     *
-     * @param newTile The {@code Tile}, the tile to be selected
-     * @return True if the focus was set.
-     * @see #getSelectedTile
-     * @see #setActiveUnit
-     * @see #setFocus(Tile)
-     */
-    boolean setSelectedTile(Tile newTile) {
-        Tile oldTile = this.selectedTile;
-        boolean ret = false;
-        selectedTile = newTile;
-
-        // Check for refocus
-        if (!onScreen(newTile)
-            || getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
-            gui.setFocus(newTile);
-            ret = true;
-        } else {
-            if (oldTile != null) {
-                gui.refreshTile(oldTile);
-            }
-
-            if (newTile != null) {
-                gui.refreshTile(newTile);
-            }
-        }
-        return ret;
-    }
-
-    /**
      * Gets the unit that should be displayed on the given tile.
      *
      * @param unitTile The {@code Tile} to check.
@@ -1007,42 +993,6 @@ public final class MapViewer extends FreeColClientHolder {
             }
         }
         return result;
-    }
-
-    /**
-     * Gets the active unit.
-     *
-     * @return The {@code Unit}.
-     * @see #setActiveUnit
-     */
-    Unit getActiveUnit() {
-        return activeUnit;
-    }
-
-    /**
-     * Sets the active unit.
-     *
-     * @param activeUnit The new active {@code Unit}.
-     * @return True if the focus was set.
-     */
-    boolean setActiveUnit(Unit activeUnit) {
-        // Don't select a unit with zero moves left. -sjm
-        // The user might what to check the status of a unit - SG
-        Tile tile = (activeUnit == null) ? null : activeUnit.getTile();
-        this.activeUnit = activeUnit;
-
-        if (activeUnit == null || tile == null) {
-            gui.getCanvas().stopGoto();
-        } else {
-            changeViewMode(GUI.MOVE_UNITS_MODE);
-            updateCurrentPathForActiveUnit();
-            if (!gui.setSelectedTile(tile)
-                || getClientOptions().getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
-                gui.setFocus(tile);
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
