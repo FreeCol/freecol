@@ -2528,19 +2528,14 @@ public final class Canvas extends JDesktopPane {
     /**
      * Shows a tile popup.
      *
-     * @param tile The Tile where the popup occurred.
-     * @param x The x-coordinate on the screen where the popup needs to be
-     *     placed.
-     * @param y The y-coordinate on the screen where the popup needs to be
-     *     placed.
-     * @see TilePopup
+     * @param tile The {@code Tile} where the popup occurred.
+     * @param point The {@code Point} to place the popup at.
      */
-    public void showTilePopup(Tile tile, int x, int y) {
-        if (tile == null)
-            return;
+    public void showTilePopup(Tile tile, Point point) {
+        if (tile == null || point == null) return;
         TilePopup tp = new TilePopup(freeColClient, this, tile);
         if (tp.hasItem()) {
-            tp.show(this, x, y);
+            tp.show(this, point.x, point.y);
             tp.repaint();
         } else if (tile.isExplored()) {
             showTilePanel(tile);

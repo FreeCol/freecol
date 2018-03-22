@@ -1628,7 +1628,7 @@ public class GUI extends FreeColClientHolder {
         return null;
     }
 
-    public BufferedImage createTileImage(Tile tile) {
+    public BufferedImage createTileImage(Tile tile, Player player) {
         return null;
     }
 
