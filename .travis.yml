@@ -26,5 +26,3 @@ deploy:
     repo: FreeCol/freecol
     branch: slim
 before_install: - .travis/merge-sourceforge.sh
-  on:
-    branch: test-sf-merge
