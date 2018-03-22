@@ -1456,7 +1456,7 @@ public final class Canvas extends JDesktopPane {
                 || oldSize.width != getWidth()
                 || oldSize.height != getHeight()) {
             gui.updateMapControlsInCanvas();
-            mapViewer.setSize(getSize());
+            mapViewer.changeSize(getSize());
             mapViewer.forceReposition();
             oldSize = getSize();
         }

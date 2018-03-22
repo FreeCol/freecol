@@ -88,26 +88,37 @@ public final class MapViewer extends FreeColClientHolder {
 
     private static enum BorderType { COUNTRY, REGION }
 
+    /** How the map can be scaled. */
+    private static final float MAP_SCALE_MIN = 0.25f;
+    private static final float MAP_SCALE_MAX = 2.0f;
+    private static final float MAP_SCALE_STEP = 0.25f;
+
+    /** The height offset to paint a Unit at (in pixels). */
+    private static final int UNIT_OFFSET = 20,
+        OTHER_UNITS_OFFSET_X = -5, // Relative to the state indicator.
+        OTHER_UNITS_OFFSET_Y = 1,
+        OTHER_UNITS_WIDTH = 3,
+        MAX_OTHER_UNITS = 10;
+
     private static class TextSpecification {
 
         public final String text;
         public final Font font;
 
         public TextSpecification(String newText, Font newFont) {
-            text = newText;
-            font = newFont;
+            this.text = newText;
+            this.font = newFont;
         }
     }
 
-
-    private final SwingGUI gui;
-
-    private Dimension size;
+    /** The internal tile viewer to use. */
+    private final TileViewer tv;
 
     /** Scaled ImageLibrary only used for map painting. */
     private ImageLibrary lib;
 
-    private final TileViewer tv;
+    /** The map size. */
+    private Dimension size = null;
 
     private TerrainCursor cursor;
 
@@ -157,18 +168,6 @@ public final class MapViewer extends FreeColClientHolder {
     private boolean alignedTop = false, alignedBottom = false,
         alignedLeft = false, alignedRight = false;
 
-    // How the map can be scaled
-    private static final float MAP_SCALE_MIN = 0.25f;
-    private static final float MAP_SCALE_MAX = 2.0f;
-    private static final float MAP_SCALE_STEP = 0.25f;
-
-    // The height offset to paint a Unit at (in pixels).
-    private static final int UNIT_OFFSET = 20,
-        OTHER_UNITS_OFFSET_X = -5, // Relative to the state indicator.
-        OTHER_UNITS_OFFSET_Y = 1,
-        OTHER_UNITS_WIDTH = 3,
-        MAX_OTHER_UNITS = 10;
-
     private final java.util.Map<Unit, Integer> unitsOutForAnimation;
     private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
@@ -189,14 +188,11 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param freeColClient The {@code FreeColClient} for the game.
      */
-    MapViewer(FreeColClient freeColClient) {
+    public MapViewer(FreeColClient freeColClient) {
         super(freeColClient);
         
-        this.gui = (SwingGUI)getGUI();
-        this.size = null;
-
-        tv = new TileViewer(freeColClient);
-        setImageLibraryAndUpdateData(new ImageLibrary());
+        this.tv = new TileViewer(freeColClient);
+        changeImageLibrary(new ImageLibrary());
 
         cursor = null;
 
@@ -205,14 +201,136 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
 
+    // Primitives
+
     /**
      * Gets the contained {@code ImageLibrary}.
      * 
      * @return The image library;
      */
-    ImageLibrary getImageLibrary() {
-        return lib;
+    public ImageLibrary getImageLibrary() {
+        return this.lib;
     }
+
+    /**
+     * Sets the contained {@code ImageLibrary}.
+     *
+     * @param lib The new image library;
+     */
+    private void setImageLibrary(ImageLibrary lib) {
+        this.lib = lib;
+    }
+
+    /**
+     * Get the map size.
+     *
+     * @return The size.
+     */
+    private Dimension getSize() {
+        return this.size;
+    }
+    
+    /**
+     * Get the displayed map width.
+     *
+     * @return The width.
+     */
+    private int getScreenWidth() {
+        return this.size.width;
+    }
+    
+    /**
+     * Get the displayed map height.
+     *
+     * @return The width.
+     */
+    private int getScreenHeight() {
+        return this.size.height;
+    }
+    
+    /**
+     * Set the map size.
+     *
+     * @param size The new map size.
+     */
+    private void setSize(Dimension size) {
+        this.size = size;
+    }
+    
+
+    // Internal calculations
+
+    /**
+     * Reset the ImageLibrary and update various items that depend on
+     * tile size.
+     *
+     * @param lib The new {@code ImageLibrary} to use.
+     */
+    private void changeImageLibrary(ImageLibrary lib) {
+        setImageLibrary(lib);
+        this.tv.changeImageLibrary(lib);
+        updateTileSizes();
+        
+        final int dx = this.tileWidth/16;
+        final int dy = this.tileHeight/16;
+        final int ddx = dx + dx/2;
+        final int ddy = dy + dy/2;
+
+        // small corners
+        controlPoints.put(Direction.N,
+                          new Point2D.Float(this.halfWidth, dy));
+        controlPoints.put(Direction.E,
+                          new Point2D.Float(this.tileWidth - dx, this.halfHeight));
+        controlPoints.put(Direction.S,
+                          new Point2D.Float(this.halfWidth, this.tileHeight - dy));
+        controlPoints.put(Direction.W,
+                          new Point2D.Float(dx, this.halfHeight));
+        // big corners
+        controlPoints.put(Direction.SE,
+                          new Point2D.Float(this.halfWidth, this.tileHeight));
+        controlPoints.put(Direction.NE,
+                          new Point2D.Float(this.tileWidth, this.halfHeight));
+        controlPoints.put(Direction.SW,
+                          new Point2D.Float(0, this.halfHeight));
+        controlPoints.put(Direction.NW,
+                          new Point2D.Float(this.halfWidth, 0));
+        // small corners
+        borderPoints.put(Direction.NW,
+                         new Point2D.Float(dx + ddx, this.halfHeight - ddy));
+        borderPoints.put(Direction.N,
+                         new Point2D.Float(this.halfWidth - ddx, dy + ddy));
+        borderPoints.put(Direction.NE,
+                         new Point2D.Float(this.halfWidth + ddx, dy + ddy));
+        borderPoints.put(Direction.E,
+                         new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight - ddy));
+        borderPoints.put(Direction.SE,
+                         new Point2D.Float(this.tileWidth - dx - ddx, this.halfHeight + ddy));
+        borderPoints.put(Direction.S,
+                         new Point2D.Float(this.halfWidth + ddx, this.tileHeight - dy - ddy));
+        borderPoints.put(Direction.SW,
+                         new Point2D.Float(this.halfWidth - ddx, this.tileHeight - dy - ddy));
+        borderPoints.put(Direction.W,
+                         new Point2D.Float(dx + ddx, this.halfHeight + ddy));
+
+        borderStroke = new BasicStroke(dy);
+        gridStroke = new BasicStroke(lib.getScaleFactor());
+    }
+
+    /**
+     * Update all the tile size variables.
+     */
+    private void updateTileSizes() {
+        // ATTENTION: we assume that all base tiles have the same size
+        final Dimension tileSize = lib.tileSize;
+        this.tileHeight = tileSize.height;
+        this.tileWidth = tileSize.width;
+        this.halfHeight = this.tileHeight/2;
+        this.halfWidth = this.tileWidth/2;
+    }
+
+   
+
+    // Cleanup underway below
 
     /**
      * Get the view mode.
@@ -247,12 +365,12 @@ public final class MapViewer extends FreeColClientHolder {
             if(activeUnit != null) {
                 Tile tile = activeUnit.getTile();
                 if(isTileVisible(tile))
-                    gui.refreshTile(tile);
+                    getGUI().refreshTile(tile);
                 if(selectedTile != tile && isTileVisible(selectedTile))
-                    gui.refreshTile(selectedTile);
+                    getGUI().refreshTile(selectedTile);
             } else if(isTileVisible(selectedTile))
-                gui.refreshTile(selectedTile);
-            gui.updateMapControls();
+                getGUI().refreshTile(selectedTile);
+            getGUI().updateMapControls();
         }
     }
 
@@ -297,7 +415,7 @@ public final class MapViewer extends FreeColClientHolder {
      */
     void centerActiveUnit() {
         if (activeUnit != null && activeUnit.getTile() != null) {
-            gui.setFocus(activeUnit.getTile());
+            getGUI().setFocus(activeUnit.getTile());
         }
     }
 
@@ -324,15 +442,15 @@ public final class MapViewer extends FreeColClientHolder {
         } else if (focus.getX() >= (game.getMap().getWidth() - getRightColumns())) {
             // we are at the right side of the map
             if ((focus.getY() & 1) == 0) {
-                leftOffset = size.width - (game.getMap().getWidth() - focus.getX()) * tileWidth;
+                leftOffset = getScreenWidth() - (game.getMap().getWidth() - focus.getX()) * tileWidth;
             } else {
-                leftOffset = size.width - (game.getMap().getWidth() - focus.getX() - 1) * tileWidth - halfWidth;
+                leftOffset = getScreenWidth() - (game.getMap().getWidth() - focus.getX() - 1) * tileWidth - halfWidth;
             }
         } else {
             if ((focus.getY() & 1) == 0) {
-                leftOffset = (size.width / 2);
+                leftOffset = (getScreenWidth() / 2);
             } else {
-                leftOffset = (size.width / 2) + halfWidth;
+                leftOffset = (getScreenWidth() / 2) + halfWidth;
             }
         }
 
@@ -342,9 +460,9 @@ public final class MapViewer extends FreeColClientHolder {
             topOffset = (focus.getY() + 1) * (halfHeight);
         } else if (focus.getY() >= (game.getMap().getHeight() - bottomRows)) {
             // we are at the bottom of the map
-            topOffset = size.height - (game.getMap().getHeight() - focus.getY()) * (halfHeight);
+            topOffset = getScreenHeight() - (game.getMap().getHeight() - focus.getY()) * (halfHeight);
         } else {
-            topOffset = (size.height / 2);
+            topOffset = (getScreenHeight() / 2);
         }
 
         // At this point (leftOffset, topOffset) is the center pixel
@@ -441,7 +559,7 @@ public final class MapViewer extends FreeColClientHolder {
                 unitLabel.getHeight(), tileP);
             unitLabel.setLocation(unitP);
             unitsOutForAnimationLabels.put(unit, unitLabel);
-            gui.getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
+            getGUI().getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
         } else {
             i++;
         }
@@ -456,7 +574,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
         if (i == 1) {
             unitsOutForAnimation.remove(unit);
-            gui.getCanvas().removeFromCanvas(unitsOutForAnimationLabels.remove(unit));
+            getGUI().getCanvas().removeFromCanvas(unitsOutForAnimationLabels.remove(unit));
         } else {
             i--;
             unitsOutForAnimation.put(unit, i);
@@ -513,7 +631,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @return The bounds {@code Rectangle}.
      */
     Rectangle calculateTileBounds(Tile tile) {
-        Rectangle result = new Rectangle(0, 0, size.width, size.height);
+        Rectangle result = new Rectangle(0, 0, getScreenWidth(), getScreenHeight());
         if (isTileVisible(tile)) {
             result.x = ((tile.getX() - leftColumn) * tileWidth) + leftColumnX;
             result.y = ((tile.getY() - topRow) * halfHeight) + topRowY - tileHeight;
@@ -602,7 +720,7 @@ public final class MapViewer extends FreeColClientHolder {
                 Unit unit = activeUnit;
                 if (unit != null) {
                     Tile tile = unit.getTile();
-                    if (isTileVisible(tile)) gui.refreshTile(tile);
+                    if (isTileVisible(tile)) getGUI().refreshTile(tile);
                 }
             });
         cursor.startBlinking();
@@ -657,7 +775,7 @@ public final class MapViewer extends FreeColClientHolder {
         final int tx = tile.getX(), ty = tile.getY(),
             width = rightColumn - leftColumn;
         int moveX = -1;
-        gui.setFocus(tile);
+        getGUI().setFocus(tile);
         positionMap(tile);
         if (leftColumn <= 0) { // At left edge already
             if (tx <= width / 4) {
@@ -683,7 +801,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
         if (moveX >= 0) {
             Tile other = map.getTile(moveX, ty);
-            gui.setFocus(other);
+            getGUI().setFocus(other);
             positionMap(other);
         }
         return where;
@@ -724,8 +842,8 @@ public final class MapViewer extends FreeColClientHolder {
         if (y < topRows) {
             alignedTop = true;
             // We are at the top of the map
-            bottomRow = (size.height / (halfHeight)) - 1;
-            if ((size.height % (halfHeight)) != 0) {
+            bottomRow = (getScreenHeight() / (halfHeight)) - 1;
+            if ((getScreenHeight() % (halfHeight)) != 0) {
                 bottomRow++;
             }
             topRow = 0;
@@ -736,13 +854,13 @@ public final class MapViewer extends FreeColClientHolder {
             // We are at the bottom of the map
             bottomRow = game.getMap().getHeight() - 1;
 
-            topRow = size.height / (halfHeight);
-            if ((size.height % (halfHeight)) > 0) {
+            topRow = getScreenHeight() / (halfHeight);
+            if ((getScreenHeight() % (halfHeight)) > 0) {
                 topRow++;
             }
             topRow = game.getMap().getHeight() - topRow;
 
-            bottomRowY = size.height - tileHeight;
+            bottomRowY = getScreenHeight() - tileHeight;
             topRowY = bottomRowY - (bottomRow - topRow) * (halfHeight);
         } else {
             // We are not at the top of the map and not at the bottom
@@ -769,8 +887,8 @@ public final class MapViewer extends FreeColClientHolder {
             // We are at the left side of the map
             leftColumn = 0;
 
-            rightColumn = size.width / tileWidth - 1;
-            if ((size.width % tileWidth) > 0) {
+            rightColumn = getScreenWidth() / tileWidth - 1;
+            if ((getScreenWidth() % tileWidth) > 0) {
                 rightColumn++;
             }
 
@@ -780,12 +898,12 @@ public final class MapViewer extends FreeColClientHolder {
             // We are at the right side of the map
             rightColumn = game.getMap().getWidth() - 1;
 
-            leftColumn = size.width / tileWidth;
-            if ((size.width % tileWidth) > 0) {
+            leftColumn = getScreenWidth() / tileWidth;
+            if ((getScreenWidth() % tileWidth) > 0) {
                 leftColumn++;
             }
 
-            leftColumnX = size.width - tileWidth - halfWidth -
+            leftColumnX = getScreenWidth() - tileWidth - halfWidth -
                 leftColumn * tileWidth;
             leftColumn = rightColumn - leftColumn;
             alignedRight = true;
@@ -793,7 +911,7 @@ public final class MapViewer extends FreeColClientHolder {
             // We are not at the left side of the map and not at the right side
             leftColumn = x - leftColumns;
             rightColumn = x + rightColumns;
-            leftColumnX = (size.width - tileWidth) / 2
+            leftColumnX = (getScreenWidth() - tileWidth) / 2
                 - leftColumns * tileWidth;
         }
     }
@@ -832,7 +950,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         if (x == fx && y == fy) return false;
-        gui.setFocus(getGame().getMap().getTile(x,y));
+        getGUI().setFocus(getGame().getMap().getTile(x,y));
         return true;
     }
 
@@ -1080,8 +1198,8 @@ public final class MapViewer extends FreeColClientHolder {
         this.currentPath = path;
     }
 
-    void setSize(Dimension size) {
-        this.size = size;
+    void changeSize(Dimension size) {
+        setSize(size);
         updateMapDisplayVariables();
     }
 
@@ -1089,7 +1207,7 @@ public final class MapViewer extends FreeColClientHolder {
      * Reset the scale of the map to the default.
      */
     void resetMapScale() {
-        setImageLibraryAndUpdateData(new ImageLibrary());
+        this.changeImageLibrary(new ImageLibrary());
         updateMapDisplayVariables();
     }
 
@@ -1105,7 +1223,7 @@ public final class MapViewer extends FreeColClientHolder {
         float newScale = lib.getScaleFactor() + MAP_SCALE_STEP;
         if (newScale >= MAP_SCALE_MAX)
             newScale = MAP_SCALE_MAX;
-        setImageLibraryAndUpdateData(new ImageLibrary(newScale));
+        this.changeImageLibrary(new ImageLibrary(newScale));
         updateMapDisplayVariables();
     }
 
@@ -1113,67 +1231,22 @@ public final class MapViewer extends FreeColClientHolder {
         float newScale = lib.getScaleFactor() - MAP_SCALE_STEP;
         if (newScale <= MAP_SCALE_MIN)
             newScale = MAP_SCALE_MIN;
-        setImageLibraryAndUpdateData(new ImageLibrary(newScale));
+        this.changeImageLibrary(new ImageLibrary(newScale));
         updateMapDisplayVariables();
     }
 
     private void updateMapDisplayVariables() {
         // Calculate the amount of rows that will be drawn above the
         // central Tile
-        topSpace = (size.height - tileHeight) / 2;
+        topSpace = (getScreenHeight() - tileHeight) / 2;
         if ((topSpace % (halfHeight)) != 0) {
             topRows = topSpace / (halfHeight) + 2;
         } else {
             topRows = topSpace / (halfHeight) + 1;
         }
         bottomRows = topRows;
-        leftSpace = (size.width - tileWidth) / 2;
+        leftSpace = (getScreenWidth() - tileWidth) / 2;
         rightSpace = leftSpace;
-    }
-
-    /**
-     * Sets the ImageLibrary and calculates various items that depend
-     * on tile size.
-     *
-     * @param lib an {@code ImageLibrary} value
-     */
-    private void setImageLibraryAndUpdateData(ImageLibrary lib) {
-        this.lib = lib;
-        tv.setImageLibraryAndUpdateData(lib);
-        // ATTENTION: we assume that all base tiles have the same size
-        Dimension tileSize = lib.tileSize;
-        tileHeight = tileSize.height;
-        tileWidth = tileSize.width;
-        halfHeight = tileHeight/2;
-        halfWidth = tileWidth/2;
-
-        int dx = tileWidth/16;
-        int dy = tileHeight/16;
-        int ddx = dx + dx/2;
-        int ddy = dy + dy/2;
-
-        // small corners
-        controlPoints.put(Direction.N, new Point2D.Float(halfWidth, dy));
-        controlPoints.put(Direction.E, new Point2D.Float(tileWidth - dx, halfHeight));
-        controlPoints.put(Direction.S, new Point2D.Float(halfWidth, tileHeight - dy));
-        controlPoints.put(Direction.W, new Point2D.Float(dx, halfHeight));
-        // big corners
-        controlPoints.put(Direction.SE, new Point2D.Float(halfWidth, tileHeight));
-        controlPoints.put(Direction.NE, new Point2D.Float(tileWidth, halfHeight));
-        controlPoints.put(Direction.SW, new Point2D.Float(0, halfHeight));
-        controlPoints.put(Direction.NW, new Point2D.Float(halfWidth, 0));
-        // small corners
-        borderPoints.put(Direction.NW, new Point2D.Float(dx + ddx, halfHeight - ddy));
-        borderPoints.put(Direction.N,  new Point2D.Float(halfWidth - ddx, dy + ddy));
-        borderPoints.put(Direction.NE, new Point2D.Float(halfWidth + ddx, dy + ddy));
-        borderPoints.put(Direction.E,  new Point2D.Float(tileWidth - dx - ddx, halfHeight - ddy));
-        borderPoints.put(Direction.SE, new Point2D.Float(tileWidth - dx - ddx, halfHeight + ddy));
-        borderPoints.put(Direction.S,  new Point2D.Float(halfWidth + ddx, tileHeight - dy - ddy));
-        borderPoints.put(Direction.SW, new Point2D.Float(halfWidth - ddx, tileHeight - dy - ddy));
-        borderPoints.put(Direction.W,  new Point2D.Float(dx + ddx, halfHeight + ddy));
-
-        borderStroke = new BasicStroke(dy);
-        gridStroke = new BasicStroke(lib.getScaleFactor());
     }
 
     /**

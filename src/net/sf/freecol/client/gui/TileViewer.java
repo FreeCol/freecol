@@ -115,16 +115,16 @@ public final class TileViewer extends FreeColClientHolder {
         }
     }
 
+    /** The height offset to paint at (in pixels). */
+    static final int STATE_OFFSET_X = 25,
+                     STATE_OFFSET_Y = 10;
+
     private ImageLibrary lib;
 
     private RoadPainter rp;
 
     // Helper variables for displaying.
     private int tileHeight, tileWidth, halfHeight, halfWidth;
-
-    // The height offset to paint at (in pixels).
-    static final int STATE_OFFSET_X = 25,
-                     STATE_OFFSET_Y = 10;
 
     private final GeneralPath fog = new GeneralPath();
 
@@ -143,18 +143,56 @@ public final class TileViewer extends FreeColClientHolder {
     public TileViewer(FreeColClient freeColClient) {
         super(freeColClient);
 
-        setImageLibraryAndUpdateData(new ImageLibrary());
+        changeImageLibrary(new ImageLibrary());
     }
 
+
+    // Primitives
 
     /**
      * Gets the contained {@code ImageLibrary}.
      * 
      * @return The image library;
      */
-    ImageLibrary getImageLibrary() {
-        return lib;
+    public ImageLibrary getImageLibrary() {
+        return this.lib;
     }
+
+    /**
+     * Set the {@code ImageLibrary}.
+     * 
+     * @param lib The new {@code ImageLibrary}.
+     */
+    private void setImageLibrary(ImageLibrary lib) {
+        this.lib = lib;
+    }
+
+    
+    /**
+     * Sets the ImageLibrary and calculates various items that depend
+     * on tile size.
+     *
+     * @param lib an {@code ImageLibrary} value
+     */
+    public void changeImageLibrary(ImageLibrary lib) {
+        setImageLibrary(lib);
+
+        // ATTENTION: we assume that all base tiles have the same size
+        Dimension tileSize = lib.tileSize;
+        rp = new RoadPainter(tileSize);
+        tileHeight = tileSize.height;
+        tileWidth = tileSize.width;
+        halfHeight = tileHeight/2;
+        halfWidth = tileWidth/2;
+
+        fog.reset();
+        fog.moveTo(halfWidth, 0);
+        fog.lineTo(tileWidth, halfHeight);
+        fog.lineTo(halfWidth, tileHeight);
+        fog.lineTo(0, halfHeight);
+        fog.closePath();
+    }
+
 
     /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
@@ -381,30 +419,6 @@ public final class TileViewer extends FreeColClientHolder {
         displaySettlementWithChipsOrPopulationNumber(g, tile, false, rop);
 
         displayOptionalTileText(g, tile);
-    }
-
-    /**
-     * Sets the ImageLibrary and calculates various items that depend
-     * on tile size.
-     *
-     * @param lib an {@code ImageLibrary} value
-     */
-    void setImageLibraryAndUpdateData(ImageLibrary lib) {
-        this.lib = lib;
-        // ATTENTION: we assume that all base tiles have the same size
-        Dimension tileSize = lib.tileSize;
-        rp = new RoadPainter(tileSize);
-        tileHeight = tileSize.height;
-        tileWidth = tileSize.width;
-        halfHeight = tileHeight/2;
-        halfWidth = tileWidth/2;
-
-        fog.reset();
-        fog.moveTo(halfWidth, 0);
-        fog.lineTo(tileWidth, halfHeight);
-        fog.lineTo(halfWidth, tileHeight);
-        fog.lineTo(0, halfHeight);
-        fog.closePath();
     }
 
     /**
