@@ -7,6 +7,10 @@ addons:
   apt:
     packages:
       - ant-optional
+before_install:
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "cron" ]]; then .travis/merge-sourceforge.sh; fi
+after_script:
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "cron" ]]; then .travis/deploy-sourceforge-merge.sh; fi
 script:
   - ant testci
 before_deploy:
