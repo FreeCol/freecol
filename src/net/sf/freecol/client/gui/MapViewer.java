@@ -400,7 +400,7 @@ public final class MapViewer extends FreeColClientHolder {
             final JLabel unitLabel = createUnitLabel(unit);
 
             i = 1;
-            Point tileP = calculateTilePosition(sourceTile);
+            Point tileP = calculateTilePosition(sourceTile, false);
             Point unitP = calculateUnitLabelPositionInTile(unitLabel.getWidth(),
                 unitLabel.getHeight(), tileP);
             unitLabel.setLocation(unitP);
@@ -495,17 +495,20 @@ public final class MapViewer extends FreeColClientHolder {
      * on the drawn map.
      *
      * @param t The {@code Tile} to check.
+     * @param rhs If true, find the right edge of the tile, otherwise
+     *     the left edge.
      * @return The position of the given {@code Tile}, or
      *     {@code null} if the {@code Tile} is not drawn on
      *     the mapboard.
      */
-    Point calculateTilePosition(Tile t) {
+    public Point calculateTilePosition(Tile t, boolean rhs) {
         repositionMapIfNeeded();
         if (!isTileVisible(t)) return null;
 
         int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
         int y = ((t.getY() - topRow) * halfHeight) + topRowY;
         if ((t.getY() & 1) != 0) x += halfWidth;
+        if (rhs) x += this.tileWidth;
         return new Point(x, y);
     }
 
@@ -1880,7 +1883,7 @@ public final class MapViewer extends FreeColClientHolder {
         for (PathNode p = path; p != null; p = p.next) {
             Tile tile = p.getTile();
             if (tile == null) continue;
-            Point point = calculateTilePosition(tile);
+            Point point = calculateTilePosition(tile, false);
             if (point == null) continue;
 
             BufferedImage image = (p.isOnCarrier())
