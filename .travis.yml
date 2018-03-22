@@ -25,9 +25,6 @@ deploy:
   on:
     repo: FreeCol/freecol
     branch: slim
-before_install:
-  - openssl aes-256-cbc -K $encrypted_57654742c400_key -iv $encrypted_57654742c400_iv
-    -in ./.travis/freecol-deploy-key.enc -out freecol-deploy-key -d
-  - chmod 600 github_deploy_key
-  - eval $(ssh-agent -s)
-  - ssh-add github_deploy_key
+before_install: - .travis/merge-sourceforge.sh
+  on:
+    branch: test-sf-merge
