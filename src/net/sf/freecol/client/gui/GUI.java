@@ -1536,7 +1536,14 @@ public class GUI extends FreeColClientHolder {
      */
     public void updateGotoPath(Tile tile) {}
 
-
+    /**
+     * Perform a full goto.
+     *
+     * @param tile The {@code Tile} to go to.
+     */
+    public void performGoto(Tile tile) {}
+        
+    
     // MapControls handling
 
     /**
@@ -1721,7 +1728,14 @@ public class GUI extends FreeColClientHolder {
 
 
     // High level panel manipulation
-    
+
+    /**
+     * Handle a click on a tile.
+     *
+     * @param tile The {@code Tile} that was clicked on.
+     */
+    public void clickAtTile(Tile tile) {}
+
     /**
      * Close a panel.
      *

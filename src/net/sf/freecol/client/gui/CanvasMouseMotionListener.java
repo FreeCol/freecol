@@ -51,33 +51,46 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
     }
 
 
+    /**
+     * Does a mouse event update an existing goto?
+     *
+     * @param me The {@code MouseEvent} to check.
+     * @return True if there is a goto underway.
+     */
+    private boolean updateGoto(MouseEvent me) {
+        if (!canvas.isGotoStarted()) return false;
+        
+        getGUI().updateGotoPath(canvas.convertToMapTile(me.getX(), me.getY()));
+        return true;
+    }
+        
+
     // Interface MouseMotionListener
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void mouseMoved(MouseEvent e) {
-        performAutoScrollIfActive(e, true);
+    public void mouseMoved(MouseEvent me) {
+        performAutoScrollIfActive(me, true);
 
-        if (canvas.isGotoStarted()) {
-            getGUI().updateGotoPath(canvas.convertToMapTile(e.getX(), e.getY()));
-        }
+        updateGoto(me);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void mouseDragged(MouseEvent e) {
-        if ((e.getModifiers() & MouseEvent.BUTTON1_MASK)
-            != MouseEvent.BUTTON1_MASK) return; // Do not use getButton!
-        performDragScrollIfActive(e);
+    public void mouseDragged(MouseEvent me) {
+        // getButton does not work here, TODO: find out why
+        if ((me.getModifiers() & MouseEvent.BUTTON1_MASK)
+            != MouseEvent.BUTTON1_MASK) return;
+        performDragScrollIfActive(me);
 
-        if (canvas.isGotoStarted()) {
-            getGUI().updateGotoPath(canvas.convertToMapTile(e.getX(), e.getY()));
-        } else if (canvas.isDrag(e.getX(), e.getY())) {
+        if (updateGoto(me)) {
+            ; // Pass
+        } else if (canvas.isDrag(me.getX(), me.getY())) {
             canvas.startGoto();
-        }            
+        }
     }
 }

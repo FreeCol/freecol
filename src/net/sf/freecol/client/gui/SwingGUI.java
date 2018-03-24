@@ -769,6 +769,23 @@ public class SwingGUI extends GUI {
         canvas.setGotoPath(newPath);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void performGoto(Tile tile) {
+        if (canvas.isGotoStarted()) canvas.stopGoto();
+
+        final Unit active = getActiveUnit();
+        if (tile == null || active == null) return;
+
+        if (active.getTile() != tile) {
+            canvas.startGoto();
+            updateGotoPath(tile);
+            traverseGotoPath();
+        }
+    }
+    
 
     // MapControls handling
 
@@ -1087,6 +1104,36 @@ public class SwingGUI extends GUI {
 
 
     // Highest level panel and dialog handling
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clickAtTile(Tile tile) {
+        Unit other;
+
+        if (!tile.isExplored()) {
+            // If the tile is unexplored, just select it
+            setSelectedTile(tile);
+            setViewMode(GUI.VIEW_TERRAIN_MODE);
+        } else if (tile.hasSettlement()) {
+            // If there is a settlement present, pop it up
+            showTileSettlement(tile);
+        } else if ((other = tile.getFirstUnit()) != null
+            && getMyPlayer().owns(other)) {
+            // If there is one of the player units present, select it
+            // as the active unit unless the active unit is at the tile.
+            final Unit active = getActiveUnit();
+            if (active == null || active.getTile() != tile) {
+                setActiveUnit(other);
+                setViewMode(GUI.MOVE_UNITS_MODE);
+            }
+        } else {
+            // Otherwise select the tile in terrain mode
+            setSelectedTile(tile);
+            setViewMode(GUI.VIEW_TERRAIN_MODE);
+        }
+    }    
 
     /**
      * {@inheritDoc}
@@ -1857,9 +1904,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void showTilePopUpAtSelectedTile() {
-        Tile tile = mapViewer.getSelectedTile();
-        if (tile == null) return;
-        canvas.showTilePopup(tile, mapViewer.calculateTilePosition(tile, true));
+        canvas.showTilePopup(getSelectedTile());
     }
 
     /**

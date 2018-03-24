@@ -285,7 +285,7 @@ public final class Canvas extends JDesktopPane {
 
     private final MapViewer mapViewer;
 
-    private Point gotoDragPoint;
+    private Point dragPoint = null;
 
     private GrayLayer greyLayer;
 
@@ -510,7 +510,7 @@ public final class Canvas extends JDesktopPane {
      * @return The Point where the mouse was initially clicked.
      */
     public Point getDragPoint() {
-        return gotoDragPoint;
+        return this.dragPoint;
     }
 
     /**
@@ -519,10 +519,22 @@ public final class Canvas extends JDesktopPane {
      * @param x The mouse's x position.
      * @param y The mouse's y position.
      */
-    public void setDragPoint(int x, int y) {
-        gotoDragPoint = new Point(x, y);
+    private void setDragPoint(int x, int y) {
+        this.dragPoint = new Point(x, y);
     }
 
+    /**
+     * Prepare a drag from the given coordinates.
+     *
+     * @param x Drag x coordinate.
+     * @param y Drag x coordinate.
+     */
+    public void prepareDrag(int x, int y) {
+        if (isGotoStarted()) stopGoto();
+        setDragPoint(x, y);
+        requestFocus();
+    }
+    
     /**
      * Is mouse movement differnce above the drag threshold?
      *
@@ -530,9 +542,9 @@ public final class Canvas extends JDesktopPane {
      * @param y The new mouse y position.
      */
     public boolean isDrag(int x, int y) {
-        Point dragPoint = getDragPoint();
-        int deltaX = Math.abs(x - dragPoint.x);
-        int deltaY = Math.abs(y - dragPoint.y);
+        Point drag = getDragPoint();
+        int deltaX = Math.abs(x - drag.x);
+        int deltaY = Math.abs(y - drag.y);
         return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
     }
 
@@ -2529,12 +2541,12 @@ public final class Canvas extends JDesktopPane {
      * Shows a tile popup.
      *
      * @param tile The {@code Tile} where the popup occurred.
-     * @param point The {@code Point} to place the popup at.
      */
-    public void showTilePopup(Tile tile, Point point) {
-        if (tile == null || point == null) return;
+    public void showTilePopup(Tile tile) {
+        if (tile == null) return;
         TilePopup tp = new TilePopup(freeColClient, this, tile);
         if (tp.hasItem()) {
+            Point point = mapViewer.calculateTilePosition(tile, true);
             tp.show(this, point.x, point.y);
             tp.repaint();
         } else if (tile.isExplored()) {
