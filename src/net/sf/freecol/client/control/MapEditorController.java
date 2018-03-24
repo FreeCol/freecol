@@ -127,7 +127,7 @@ public final class MapEditorController extends FreeColClientHolder {
             getGUI().closeMainPanel();
             getGUI().closeMenus();
             //fcc.changeClientState(true);
-            getGUI().setViewMode(GUI.ViewMode.TERRAIN);
+            getGUI().changeView((Tile)null);
             getGUI().startMapEditorGUI();
         } catch (IOException e) {
             getGUI().showErrorMessage(StringTemplate
@@ -155,8 +155,7 @@ public final class MapEditorController extends FreeColClientHolder {
      */
     public void setMapTransform(MapTransform mt) {
         currentMapTransform = mt;
-        getGUI().setViewMode((mt == null) ? GUI.ViewMode.TERRAIN
-            : GUI.ViewMode.MAP_TRANSFORM);
+        if (mt != null) getGUI().changeView(mt);
         getGUI().updateMapControls();
     }
 

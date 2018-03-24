@@ -43,6 +43,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
@@ -203,9 +204,14 @@ public class GUI extends FreeColClientHolder {
     public void toggleViewMode() {
         ViewMode vm = getViewMode();
         switch (vm) {
-        case MOVE_UNITS: setViewMode(ViewMode.TERRAIN); break;
-        case TERRAIN:    setViewMode(ViewMode.MOVE_UNITS); break;
-        default: break;
+        case MOVE_UNITS:
+            changeView(getSelectedTile());
+            break;
+        case TERRAIN:
+            changeView(getActiveUnit());
+            break;
+        default:
+            break;
         }
     }
 
@@ -1667,8 +1673,10 @@ public class GUI extends FreeColClientHolder {
     }
 
 
-    // View mode handling, including the active unit (for
-    // MOVE_UNITS_MODE) and the selected tile (for VIEW_TERRAIN_MODE).
+    // View mode handling, including accessors for the active unit for
+    // MOVE_UNITS mode, and the selected tile for VIEW_TERRAIN mode.
+    // In MAP_TRANSFORM mode the map transform lives in the
+    // MapEditorController.
 
     /**
      * Get the current view mode.
@@ -1676,15 +1684,8 @@ public class GUI extends FreeColClientHolder {
      * @return One of the view mode constants, or negative on error.
      */
     public ViewMode getViewMode() {
-        return ViewMode.MOVE_UNITS;
+        return ViewMode.END_TURN;
     }
-
-    /**
-     * Set the current view mode.
-     *
-     * @param newViewMode The new view mode to use.
-     */
-    public void setViewMode(ViewMode newViewMode) {}
 
     /**
      * Get the active unit.
@@ -1696,13 +1697,6 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Set the active unit.
-     *
-     * @param unit The {@code Unit} to activate.
-     */
-    public void setActiveUnit(Unit unit) {}
-
-    /**
      * Get the selected tile.
      *
      * @return The selected {@code Tile}.
@@ -1712,11 +1706,30 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Set the selected tile.
+     * Change to terrain mode and select a tile.
      *
-     * @param tile The new selected {@code Tile}.
+     * @param tile The {@code Tile} to select.
      */
-    public void setSelectedTile(Tile tile) {}
+    public void changeView(Tile tile) {}
+
+    /**
+     * Change to move units mode, and select a unit.
+     *
+     * @param unit The {@code Unit} to select.
+     */
+    public void changeView(Unit unit) {}
+
+    /**
+     * Change to map transform mode, and select a transform.
+     *
+     * @param mt The {@code MapTransform} to select.
+     */
+    public void changeView(MapTransform transform) {}
+    
+    /**
+     * Change to end turn mode.
+     */
+    public void changeView() {}
 
 
     // Zoom controls

@@ -211,7 +211,7 @@ public final class TilePopup extends JPopupMenu {
                 .template("activateAllUnits"));
             activateAllItem.addActionListener((ActionEvent ae) -> {
                     for (Unit unit : tile.getUnitList()) igc.clearOrders(unit);
-                    gui.setActiveUnit(tile.getFirstUnit());
+                    gui.changeView(tile.getFirstUnit());
                 });
             add(activateAllItem);
         }
@@ -383,7 +383,7 @@ public final class TilePopup extends JPopupMenu {
             FontLibrary.FontSize.TINY, Font.BOLD,
             gui.getImageLibrary().getScaleFactor()));
         menuItem.addActionListener((ActionEvent ae) -> {
-                gui.setActiveUnit(unit);
+                gui.changeView(unit);
             });
         if (indent) {
             menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));

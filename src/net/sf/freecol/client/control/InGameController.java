@@ -753,7 +753,7 @@ public final class InGameController extends FreeColClientHolder {
         for (Unit unit : transform(player.getUnits(), tradePred,
                                    Function.identity(),
                                    tradeRouteUnitComparator)) {
-            getGUI().setActiveUnit(unit);
+            getGUI().changeView(unit);
             if (!moveToDestination(unit, messages)) {
                 fail = true;
                 break;
@@ -780,7 +780,7 @@ public final class InGameController extends FreeColClientHolder {
         // Process all units.
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
-            getGUI().setActiveUnit(unit);
+            getGUI().changeView(unit);
             // Move the unit as much as possible
             if (!moveToDestination(unit, null)) {
                 fail = true;
@@ -789,9 +789,6 @@ public final class InGameController extends FreeColClientHolder {
         }
         // Might have LCR messages to display
         displayModelMessages(false, false);
-
-        // Restore original active unit if not at a problematic one.
-        if (!fail) getGUI().setActiveUnit(active);
         return !fail;
     }
 
@@ -837,9 +834,6 @@ public final class InGameController extends FreeColClientHolder {
         // Clean up lingering menus.
         getGUI().closeMenus();
 
-        // Clear active unit if any.
-        getGUI().setActiveUnit(null);
-
         // Restart the selection cycle.
         moveMode = MoveMode.NEXT_ACTIVE_UNIT;
 
@@ -873,23 +867,23 @@ public final class InGameController extends FreeColClientHolder {
 
         // Successfully found a unit to display
         if (player.hasNextActiveUnit()) {
-            getGUI().setActiveUnit(player.getNextActiveUnit());
+            getGUI().changeView(player.getNextActiveUnit());
             return true;
         }
-
-        // No unit to find.
-        getGUI().setActiveUnit(null);
 
         // No active units left.  Do the goto orders.
         if (!doExecuteGotoOrders()) return true;
 
         // If not already ending the turn, use the fallback tile if
         // supplied, then check for automatic end of turn, otherwise
-        // just select nothing and wait.
-        final ClientOptions options = getClientOptions();
+        // show the end turn button.
         if (tile != null) {
-            getGUI().setSelectedTile(tile);
-        } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
+            getGUI().changeView(tile);
+        } else {
+            getGUI().changeView();
+        }
+        final ClientOptions options = getClientOptions();
+        if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
             doEndTurn(options.getBoolean(ClientOptions.SHOW_END_TURN_DIALOG));
         }
         return true;
@@ -936,7 +930,7 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         } else {
             // Clear ordinary destinations if arrived.
-            getGUI().setActiveUnit(unit);
+            getGUI().changeView(unit);
             if (!movePath(unit, path)) return false;
         
             if (unit.isAtLocation(destination)) {
@@ -1774,7 +1768,7 @@ public final class InGameController extends FreeColClientHolder {
 
         } else if (settlement instanceof IndianSettlement) {
             askServer().newNativeTradeSession(unit, (IndianSettlement)settlement);
-            getGUI().setActiveUnit(unit); // Will be deselected on losing moves
+            getGUI().changeView(unit); // Will be deselected on losing moves
 
         } else {
             throw new RuntimeException("Bogus settlement: "
@@ -2429,7 +2423,7 @@ public final class InGameController extends FreeColClientHolder {
             && !tile.hasSettlement();
         if (ret) {
             player.invalidateCanSeeTiles();
-            updateGUI(null, false);
+            updateGUI(tile, false);
         }
         return ret;
     }
@@ -3655,7 +3649,6 @@ public final class InGameController extends FreeColClientHolder {
             && !getGUI().confirmStopGame()) return;
 
         turnReportMessages.clear();
-        getGUI().setActiveUnit(null);
         getGUI().removeInGameComponents();
         FreeColDirectories.setSavegameFile(file.getPath());
         getConnectController().startSavedGame(file);
@@ -3851,7 +3844,7 @@ public final class InGameController extends FreeColClientHolder {
         final Tile newTile = tile.getNeighbourOrNull(direction);
         if (newTile == null) return false;
 
-        getGUI().setSelectedTile(newTile);
+        getGUI().changeView(newTile);
         return true;
     } 
 
@@ -4001,11 +3994,11 @@ public final class InGameController extends FreeColClientHolder {
 
         invokeLater(() -> {
                 Unit current = gui.getActiveUnit();
-                gui.setActiveUnit(unit);
+                gui.changeView(unit);
                 UnitWas uw = new UnitWas(unit);
                 nativeTrade(nt, act, nti, prompt);
                 uw.fireChanges();
-                gui.setActiveUnit(current);
+                gui.changeView(current);
             });                
     }
 
@@ -4482,7 +4475,7 @@ public final class InGameController extends FreeColClientHolder {
         Unit newUnit = askEmigrate(player.getEurope(),
                                    MigrationType.migrantIndexToSlot(index));
         if (newUnit != null) {
-            getGUI().setActiveUnit(newUnit);
+            getGUI().changeView(newUnit);
             updateGUI(null, false);
         }
         return newUnit != null;
@@ -4497,7 +4490,7 @@ public final class InGameController extends FreeColClientHolder {
     public void removeHandler(List<FreeColGameObject> objects,
                               FreeColGameObject divert) {
         final Player player = getMyPlayer();
-        boolean visibilityChange = false;
+        boolean visibilityChange = false, updateUnit = false;
         for (FreeColGameObject fcgo : objects) {
             if (divert != null) player.divertModelMessages(fcgo, divert);
         
@@ -4511,9 +4504,7 @@ public final class InGameController extends FreeColClientHolder {
             } else if (fcgo instanceof Unit) {
                 // Deselect the object if it is the current active unit.
                 Unit u = (Unit)fcgo;
-                if (u == getGUI().getActiveUnit()) {
-                    getGUI().setActiveUnit(null);
-                }
+                updateUnit |= u == getGUI().getActiveUnit();
 
                 // Temporary hack until we have real containers.
                 if (u.getOwner() != null) u.getOwner().removeUnit(u);
@@ -4526,7 +4517,7 @@ public final class InGameController extends FreeColClientHolder {
             fcgo.disposeResources();
         }
         if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
-
+        if (updateUnit) updateGUI(null, true);
         getGUI().refresh();
     }
         
@@ -4976,7 +4967,7 @@ public final class InGameController extends FreeColClientHolder {
             && (newUnit = europeWas.getNewUnit()) != null;
         if (ret) {
             europeWas.fireChanges();
-            getGUI().setActiveUnit(newUnit);
+            getGUI().changeView(newUnit);
             updateGUI(null, false);
         }
         return ret;

@@ -374,7 +374,7 @@ public class DebugUtils {
         Unit unit = freeColClient.getGame()
             .getFreeColGameObject(sUnit.getId(), Unit.class);
         if (unit != null) {
-            gui.setActiveUnit(unit);
+            gui.changeView(unit);
             gui.refresh();
             gui.resetMenuBar();
         }
@@ -539,11 +539,7 @@ public class DebugUtils {
         server.getInGameController().debugChangeOwner(sUnit, sPlayer);
 
         Player myPlayer = freeColClient.getMyPlayer();
-        if (unit.getOwner() == myPlayer) {
-            gui.setActiveUnit(unit);
-        } else {
-            freeColClient.getInGameController().nextActiveUnit();
-        }
+        if (myPlayer.owns(unit)) gui.changeView(unit);
         gui.refresh();
         gui.resetMenuBar();
     }
@@ -915,7 +911,7 @@ public class DebugUtils {
             u.setMovesLeft(u.getInitialMovesLeft());
             su.setMovesLeft(su.getInitialMovesLeft());
             if (first) {
-                gui.setActiveUnit(u);
+                gui.changeView(u);
                 first = false;
             }
             for (Unit u2 : u.getUnitList()) {

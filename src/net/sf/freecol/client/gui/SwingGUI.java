@@ -52,6 +52,7 @@ import javax.swing.Timer;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.dialog.CaptureGoodsDialog;
@@ -176,23 +177,70 @@ public class SwingGUI extends GUI {
     }
 
     /**
-     * Internal version of setSelectedTile allowing focus override.
+     * Change the view mode.
+     *
+     * Always stop the blinking cursor if leaving MOVE_UNITS mode,
+     * but leave turning it on to changeActiveUnit, as there is no
+     * point enabling it if the active unit is null.     
+     *
+     * @param newViewMode The new {@code ViewMode}.
+     * @return True if the view mode changed.
+     */
+    private boolean changeViewMode(ViewMode newViewMode) {
+        ViewMode oldViewMode = getViewMode();
+        if (newViewMode == oldViewMode) return false;
+        this.mapViewer.setViewMode(newViewMode);
+        if (oldViewMode == ViewMode.MOVE_UNITS) {
+            this.mapViewer.stopCursorBlinking();
+        }
+        return true;
+    }
+
+    /**
+     * Change the active unit.
+     *
+     * If the unit changes, cancel any current gotos.
+     *
+     * @param newUnit The new active {@code Unit}.
+     * @return True if the active unit changed.
+     */
+    private boolean changeActiveUnit(Unit newUnit) {
+        final Unit oldUnit = getActiveUnit();
+        // System.err.println("CAU " + newUnit + " " + (newUnit != oldUnit));
+        if (newUnit == oldUnit) return false;
+        
+        canvas.stopGoto();
+        mapViewer.setActiveUnit(newUnit);
+        return true;
+    }
+
+    /**
+     * Change the selected tile.
+     *
+     * Also moves the focus tile to the selected tile if it differs
+     * and either is not on screen, or with the focus override.
+     *
+     * When the selected tile moves, the cursor needs to be redrawn, so
+     * a refresh of the old (if any) and new (if any) tile occurs.
      *
      * @param newTile The new {@code Tile} to select.
-     * @param refocus If true, always refocus.
+     * @param refocus If true force a refocus on all tile changes.
+     * @return True if the tile was changed.
      */
-    private void setSelectedTile(Tile newTile, boolean refocus) {
+    private boolean changeSelectedTile(Tile newTile, boolean refocus) {
         final Tile oldTile = getSelectedTile();
         refocus = newTile != null
-            && (refocus || !this.mapViewer.onScreen(newTile)
-            || getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER));
-        if (refocus) {
-            setFocus(newTile);
-        } else {
-            if (oldTile != null) refreshTile(oldTile);
-            if (newTile != null) refreshTile(newTile);
-        }
+            && newTile != getFocus()
+            && (refocus || !mapViewer.onScreen(newTile));
+        if (refocus) setFocus(newTile);
+
+        // System.err.println("CST " + newTile + " " + (newTile != oldTile) + " " + refocus);
+
+        if (newTile == oldTile) return false;
         this.mapViewer.setSelectedTile(newTile);
+        if (oldTile != null) refreshTile(oldTile);
+        if (newTile != null) refreshTile(newTile);
+        return true;
     }
 
     // TODO
@@ -314,12 +362,12 @@ public class SwingGUI extends GUI {
         clearGotoPath();
         resetMenuBar();
         resetMapZoom(); // This should refresh the map
-        setActiveUnit(active);
-        if (getActiveUnit() != null) {
-            focusActiveUnit();
+        if (active != null) {
+            changeView(active);
+        } else if (tile != null) {
+            changeView(tile);
         } else {
-            setViewMode(ViewMode.TERRAIN);
-            setSelectedTile(tile);
+            changeView((Unit)null);
         }
     }
         
@@ -739,7 +787,7 @@ public class SwingGUI extends GUI {
         } else {
             igc().goToTile(unit, path);
             // FIXME? Unit may have been deselected on reaching destination
-            setActiveUnit(unit);
+            changeActiveUnit(unit);
         }
         canvas.updateUnitPath();
     }
@@ -981,53 +1029,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void setViewMode(ViewMode newViewMode) {
-        if (newViewMode != getViewMode()) {
-            this.mapViewer.changeViewMode(newViewMode);
-            updateMapControls();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Unit getActiveUnit() {
         return this.mapViewer.getActiveUnit();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setActiveUnit(Unit unit) {
-        final Unit old = getActiveUnit();
-
-        Tile tile = null;
-        if (unit == null || (tile = unit.getTile()) == null) {
-            canvas.stopGoto();
-        }
-        this.mapViewer.setActiveUnit(unit);
-        // Automatic mode switch when switching to/from null active unit
-        if (unit != null && old == null) {
-            setViewMode(ViewMode.MOVE_UNITS);
-            // Bring the selected tile along with the unit
-            if (tile != getSelectedTile()) {
-                setSelectedTile(tile, tile != null
-                    && getClientOptions().getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT));
-            }
-        } else if (unit == null && old != null) {
-            tile = getSelectedTile();
-            if (tile != null) setViewMode(ViewMode.TERRAIN);
-        }
-
-        updateMapControls();
-        updateMenuBar();
-        
-        // TODO: why do we have to refresh the entire canvas?
-        if (unit != null && !getMyPlayer().owns(unit)) {
-            canvas.refresh();
-        }
     }
 
     /**
@@ -1042,11 +1045,70 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void setSelectedTile(Tile newTile) {
-        setSelectedTile(newTile, false);
-        updateMapControls();
-        updateMenuBar();
+    public void changeView(Tile tile) {
+        boolean change = changeViewMode(ViewMode.TERRAIN);
+        // Do not change active unit, we might come back to it
+        change |= changeSelectedTile(tile, getClientOptions()
+            .getBoolean(ClientOptions.ALWAYS_CENTER));
+
+        if (change) updateMapControls();
+        updateMenuBar(); // TODO: check
+        // System.err.println("CV " + tile + " " + change);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void changeView(Unit unit) {
+        boolean change = changeViewMode(ViewMode.MOVE_UNITS);
+        if (changeActiveUnit(unit)) {
+            change = true;
+            // Bring the selected tile along with the unit.
+            Tile tile = (unit == null) ? null : unit.getTile();
+            changeSelectedTile(tile, getClientOptions()
+                .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT));
+
+            // Switch the blink state.
+            if (unit != null) {
+                this.mapViewer.startCursorBlinking();
+            } else {
+                this.mapViewer.stopCursorBlinking();
+            }
+        }
+
+        if (change) updateMapControls();
+        updateMenuBar(); // TODO: check
+        // System.err.println("CV " + unit + " " + change);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void changeView(MapTransform mt) {
+        boolean change = changeViewMode(ViewMode.MAP_TRANSFORM);
+        // do not change selected tile
+
+        if (change) updateMapControls();
+        updateMenuBar(); // TODO: check
+        // System.err.println("CV " + mt + " " + change);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void changeView() {
+        boolean change = changeViewMode(ViewMode.END_TURN);
+        changeActiveUnit(null);
+        changeSelectedTile(null, false);
+
+        if (change) updateMapControls();
+        updateMenuBar(); // TODO: check
+        // System.err.println("CV end " + change);
+    }
+
 
 
     // Zoom control
@@ -1109,8 +1171,7 @@ public class SwingGUI extends GUI {
 
         if (!tile.isExplored()) {
             // If the tile is unexplored, just select it
-            setSelectedTile(tile);
-            setViewMode(ViewMode.TERRAIN);
+            changeView(tile);
         } else if (tile.hasSettlement()) {
             // If there is a settlement present, pop it up
             showTileSettlement(tile);
@@ -1120,13 +1181,11 @@ public class SwingGUI extends GUI {
             // as the active unit unless the active unit is at the tile.
             final Unit active = getActiveUnit();
             if (active == null || active.getTile() != tile) {
-                setActiveUnit(other);
-                setViewMode(ViewMode.MOVE_UNITS);
+                changeView(other);
             }
         } else {
             // Otherwise select the tile in terrain mode
-            setSelectedTile(tile);
-            setViewMode(ViewMode.TERRAIN);
+            changeView(tile);
         }
     }    
 

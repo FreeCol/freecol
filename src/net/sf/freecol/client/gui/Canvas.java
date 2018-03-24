@@ -1041,14 +1041,14 @@ public final class Canvas extends JDesktopPane {
         for (FreeColDialog<?> f : dialogs) {
             if (f.isModal()) return;
         }
-        mapViewer.restartBlinking();
+        mapViewer.startCursorBlinking();
     }
 
     /**
      * Stop blinking on the map.
      */
     private void stopBlinking() {
-        mapViewer.stopBlinking();
+        mapViewer.stopCursorBlinking();
     }
 
     /**

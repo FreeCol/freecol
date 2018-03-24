@@ -52,6 +52,7 @@ import javax.swing.JLayeredPane;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.GUI.ViewMode;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -123,14 +124,16 @@ public final class MapViewer extends FreeColClientHolder {
 
     /** The current focus Tile. */
     private Tile focus = null;
-    
-    private TerrainCursor cursor = null;
-
-    private Tile selectedTile;
-    private Unit activeUnit;
 
     /** The view mode in use. */
     private ViewMode viewMode = ViewMode.MOVE_UNITS;
+    /** The selected tile. */
+    private Tile selectedTile;
+    /** The active unit. */
+    private Unit activeUnit;
+
+    /** The cursor for the selected tile. */
+    private TerrainCursor cursor = new TerrainCursor();
 
     /** A path to be displayed on the map. */
     private PathNode currentPath;
@@ -198,6 +201,12 @@ public final class MapViewer extends FreeColClientHolder {
         
         this.tv = new TileViewer(freeColClient);
         changeImageLibrary(new ImageLibrary());
+        this.cursor.addActionListener((ActionEvent ae) -> {
+                Unit active = getActiveUnit();
+                if (active == null) return;
+                Tile tile = active.getTile();
+                if (isTileVisible(tile)) getGUI().refreshTile(tile);
+            });
     }
 
 
@@ -293,6 +302,43 @@ public final class MapViewer extends FreeColClientHolder {
         this.viewMode = vm;
     }
     
+    /**
+     * Gets the active unit.
+     *
+     * @return The {@code Unit}.
+     */
+    public Unit getActiveUnit() {
+        return this.activeUnit;
+    }
+
+    /**
+     * Sets the active unit.
+     *
+     * @param activeUnit The new active {@code Unit}.
+     */
+    public void setActiveUnit(Unit activeUnit) {
+        this.activeUnit = activeUnit;
+    }
+
+    /**
+     * Gets the selected tile.
+     *
+     * @return The {@code Tile} selected.
+     */
+    public Tile getSelectedTile() {
+        return this.selectedTile;
+    }
+
+    /**
+     * Sets the selected tile.
+     *
+     * @param tile The new selected {@code Tile}.
+     */
+    public void setSelectedTile(Tile tile) {
+        this.selectedTile = tile;
+    }
+
+
     // Internal calculations
 
     /**
@@ -384,67 +430,6 @@ public final class MapViewer extends FreeColClientHolder {
     }
     
     // Cleanup underway below
-
-    
-    /**
-     * Change the view mode to a new one.
-     *
-     * @param newViewMode The new view mode.
-     */
-    void changeViewMode(ViewMode newViewMode) {
-        if (newViewMode != getViewMode()) {
-            setViewMode(newViewMode);
-            if (newViewMode == ViewMode.MOVE_UNITS)
-                restartBlinking();
-            else
-                stopBlinking();
-            if(activeUnit != null) {
-                Tile tile = activeUnit.getTile();
-                if(isTileVisible(tile))
-                    getGUI().refreshTile(tile);
-                if(selectedTile != tile && isTileVisible(selectedTile))
-                    getGUI().refreshTile(selectedTile);
-            } else if(isTileVisible(selectedTile))
-                getGUI().refreshTile(selectedTile);
-            getGUI().updateMapControls();
-        }
-    }
-
-    /**
-     * Gets the active unit.
-     *
-     * @return The {@code Unit}.
-     */
-    public Unit getActiveUnit() {
-        return this.activeUnit;
-    }
-
-    /**
-     * Sets the active unit.
-     *
-     * @param activeUnit The new active {@code Unit}.
-     */
-    public void setActiveUnit(Unit activeUnit) {
-        this.activeUnit = activeUnit;
-    }
-
-    /**
-     * Gets the selected tile.
-     *
-     * @return The {@code Tile} selected.
-     */
-    public Tile getSelectedTile() {
-        return this.selectedTile;
-    }
-
-    /**
-     * Sets the selected tile.
-     *
-     * @param tile The new selected {@code Tile}.
-     */
-    public void setSelectedTile(Tile tile) {
-        this.selectedTile = tile;
-    }
 
     /**
      * Converts the given screen coordinates to Map coordinates.
@@ -739,26 +724,14 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Starts the unit-selection-cursor blinking animation.
+     * Starts the cursor blinking animation.
      */
     void startCursorBlinking() {
-        cursor = new TerrainCursor();
-        cursor.addActionListener((ActionEvent ae) -> {
-                Unit unit = activeUnit;
-                if (unit != null) {
-                    Tile tile = unit.getTile();
-                    if (isTileVisible(tile)) getGUI().refreshTile(tile);
-                }
-            });
         cursor.startBlinking();
     }
 
-    void stopBlinking() {
+    void stopCursorBlinking() {
         cursor.stopBlinking();
-    }
-
-    void restartBlinking() {
-        cursor.startBlinking();
     }
 
     /**
@@ -1473,21 +1446,7 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         // Display cursor for selected tile or active unit
-        Tile cursorTile = null;
-        switch (getViewMode()) {
-        case MOVE_UNITS:
-            if (activeUnit != null
-                && (cursor.isActive() || activeUnit.getMovesLeft() <= 0)) {
-                cursorTile = activeUnit.getTile();
-            }
-            break;
-        case TERRAIN:
-            if (selectedTile != null) cursorTile = selectedTile;
-            break;
-        default:
-            cursorTile = null;
-            break;
-        }
+        final Tile cursorTile = getSelectedTile();
         if (cursorTile != null) {
             final int x = cursorTile.getX();
             final int y = cursorTile.getY();
