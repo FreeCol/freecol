@@ -120,10 +120,12 @@ public final class MapViewer extends FreeColClientHolder {
     /** The map size. */
     private Dimension size = null;
 
-    private TerrainCursor cursor;
+    /** The current focus Tile. */
+    private Tile focus = null;
+    
+    private TerrainCursor cursor = null;
 
     private Tile selectedTile;
-    private Tile focus = null;
     private Unit activeUnit;
 
     /** The view mode in use. */
@@ -168,8 +170,10 @@ public final class MapViewer extends FreeColClientHolder {
     private boolean alignedTop = false, alignedBottom = false,
         alignedLeft = false, alignedRight = false;
 
-    private final java.util.Map<Unit, Integer> unitsOutForAnimation;
-    private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
+    private final java.util.Map<Unit, Integer> unitsOutForAnimation
+        = new HashMap<>();
+    private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels
+        = new HashMap<>();
 
     // borders
     private final EnumMap<Direction, Point2D.Float> borderPoints =
@@ -193,11 +197,6 @@ public final class MapViewer extends FreeColClientHolder {
         
         this.tv = new TileViewer(freeColClient);
         changeImageLibrary(new ImageLibrary());
-
-        cursor = null;
-
-        unitsOutForAnimation = new HashMap<>();
-        unitsOutForAnimationLabels = new HashMap<>();
     }
 
 
@@ -257,7 +256,25 @@ public final class MapViewer extends FreeColClientHolder {
         this.size = size;
     }
     
+    /**
+     * Gets the focus tile, that is, the center tile of the displayed map.
+     *
+     * @return The center {@code Tile}.
+     */
+    public Tile getFocus() {
+        return this.focus;
+    }
 
+    /**
+     * Sets the focus tile.
+     *
+     * @param focus The new focus {@code Tile}.
+     */
+    private void setFocus(Tile focus) {
+        this.focus = focus;
+    }
+
+    
     // Internal calculations
 
     /**
@@ -328,10 +345,29 @@ public final class MapViewer extends FreeColClientHolder {
         this.halfWidth = this.tileWidth/2;
     }
 
-   
 
+    // Higher level public routines
+
+    /**
+     * Change the focus tile.
+     *
+     * @param focus The new focus {@code Tile}.
+     */
+    public void changeFocus(Tile focus) {
+        setFocus(focus);
+        forceReposition();
+    }
+
+    /**
+     * Force the next screen repaint to reposition the tiles on the window.
+     */
+    public void forceReposition() {
+        bottomRow = -1;
+    }
+    
     // Cleanup underway below
 
+    
     /**
      * Get the view mode.
      *
@@ -735,29 +771,6 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Gets the focus of the map. That is the center tile of the displayed
-     * map.
-     *
-     * @return The center tile of the displayed map
-     * @see #setFocus(Tile)
-     */
-    Tile getFocus() {
-        return focus;
-    }
-
-    /**
-     * Sets the focus of the map.
-     *
-     * @param focus The {@code Position} of the center tile of the
-     *     displayed map.
-     * @see #getFocus
-     */
-    void setFocus(Tile focus) {
-        this.focus = focus;
-        forceReposition();
-    }
-
-    /**
      * Sets the focus of the map but offset to the left or right so
      * that the focus position can still be visible when a popup is
      * raised.  If successful, the supplied position will either be at
@@ -805,13 +818,6 @@ public final class MapViewer extends FreeColClientHolder {
             positionMap(other);
         }
         return where;
-    }
-
-    /**
-     * Force the next screen repaint to reposition the tiles on the window.
-     */
-    void forceReposition() {
-        bottomRow = -1;
     }
 
     private void repositionMapIfNeeded() {

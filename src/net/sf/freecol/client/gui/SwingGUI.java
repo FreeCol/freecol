@@ -195,7 +195,7 @@ public class SwingGUI extends GUI {
 
     // TODO
     private void setFocusImmediately(Tile tileToFocus) {
-        mapViewer.setFocus(tileToFocus);
+        mapViewer.changeFocus(tileToFocus);
         Dimension size = canvas.getSize();
         canvas.paintImmediately(0, 0, size.width, size.height);
     }
@@ -645,7 +645,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void setFocus(Tile tileToFocus) {
-        mapViewer.setFocus(tileToFocus);
+        mapViewer.changeFocus(tileToFocus);
         canvas.refresh();
     }
 
