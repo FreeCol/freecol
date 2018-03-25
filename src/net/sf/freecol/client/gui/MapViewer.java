@@ -19,8 +19,10 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -81,6 +83,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * 
  * This class is responsible for drawing the map/background on the
  * {@code Canvas}.
+ *
  * In addition, the graphical state of the map (focus, active unit..)
  * is currently handled by this class.
  */
@@ -141,6 +144,9 @@ public final class MapViewer extends FreeColClientHolder {
     /** A path for a current goto order. */
     private PathNode gotoPath = null;
     private boolean gotoStarted = false;
+
+    /** Fog of war area. */
+    private final GeneralPath fog = new GeneralPath();
 
     // Helper variables for displaying the map.
     private int tileHeight, tileWidth, halfHeight, halfWidth,
@@ -397,7 +403,7 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Update all the tile size variables.
+     * Update tile size variables and dependencies.
      */
     private void updateTileSizes() {
         // ATTENTION: we assume that all base tiles have the same size
@@ -406,6 +412,13 @@ public final class MapViewer extends FreeColClientHolder {
         this.tileWidth = tileSize.width;
         this.halfHeight = this.tileHeight/2;
         this.halfWidth = this.tileWidth/2;
+
+        this.fog.reset();
+        this.fog.moveTo(this.halfWidth, 0);
+        this.fog.lineTo(this.tileWidth, this.halfHeight);
+        this.fog.lineTo(this.halfWidth, this.tileHeight);
+        this.fog.lineTo(0, this.halfHeight);
+        this.fog.closePath();
     }
 
     /**
@@ -1259,6 +1272,7 @@ public final class MapViewer extends FreeColClientHolder {
             = options.getInteger(ClientOptions.COLONY_LABELS);
         final Game game = getGame();
         final Map map = game.getMap();
+        final Player player = getMyPlayer();
 
         // Remember transform
         AffineTransform originTransform = g.getTransform();
@@ -1387,27 +1401,36 @@ public final class MapViewer extends FreeColClientHolder {
                            RenderingHints.VALUE_ANTIALIAS_OFF);
 
         // Apply fog of war to flat parts of all tiles
+        RescaleOp fow = null;
         if (getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
+            // Knowing that we have FOW, prepare a rescaling for the
+            // overlay step below.
+            fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
+                                new float[] { 0, 0, 0, 0 },
+                                null);
+
+            final Composite oldComposite = g.getComposite();
+            g.setColor(Color.BLACK);
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                                                      0.2f));
             xt0 = yt0 = 0;
             for (Tile t : baseTiles) {
-                if (!t.isExplored()) continue;
+                if (!t.isExplored() || player.canSee(t)) continue;
                 final int x = t.getX();
                 final int y = t.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
+                final int xt = (x-x0) * this.tileWidth + (y&1) * this.halfWidth;
+                final int yt = (y-y0) * this.halfHeight;
                 g.translate(xt - xt0, yt - yt0);
                 xt0 = xt; yt0 = yt;
-                tv.displayFogOfWar(g, t);
+                g.fill(this.fog);
             }
             g.translate(-xt0, -yt0);
+            g.setComposite(oldComposite);
         }
 
         // Display the Tile overlays
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
-        RescaleOp fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
-                                      new float[] { 0, 0, 0, 0 },
-                                      null);
         xt0 = yt0 = 0;
         for (Tile t : baseTiles) {
             if (!t.isExplored()) continue;
@@ -1418,8 +1441,8 @@ public final class MapViewer extends FreeColClientHolder {
             g.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
 
-            RescaleOp rop = tv.hasFogOfWar(t) ? fow : null;
             BufferedImage overlayImage = lib.getOverlayImage(t, overlayCache);
+            RescaleOp rop = (player.canSee(t)) ? null : fow;
             tv.displayTileItems(g, t, rop, overlayImage);
             tv.displaySettlementWithChipsOrPopulationNumber(g, t, withNumbers,
                                                             rop);
@@ -1533,7 +1556,6 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display the colony names, if needed
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            final Player player = getMyPlayer();
             FontLibrary fontLibrary = new FontLibrary(lib.getScaleFactor());
             Font font = fontLibrary.createScaledFont(
                 FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER,
