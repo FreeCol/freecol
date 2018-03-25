@@ -133,7 +133,7 @@ public final class MapViewer extends FreeColClientHolder {
     private Unit activeUnit;
 
     /** The cursor for the selected tile. */
-    private TerrainCursor cursor = new TerrainCursor();
+    private TerrainCursor cursor;
 
     /** A path to be displayed on the map. */
     private PathNode currentPath;
@@ -201,10 +201,9 @@ public final class MapViewer extends FreeColClientHolder {
         
         this.tv = new TileViewer(freeColClient);
         changeImageLibrary(new ImageLibrary());
+        this.cursor = new TerrainCursor();
         this.cursor.addActionListener((ActionEvent ae) -> {
-                Unit active = getActiveUnit();
-                if (active == null) return;
-                Tile tile = active.getTile();
+                final Tile tile = getCursorTile(false);
                 if (isTileVisible(tile)) getGUI().refreshTile(tile);
             });
     }
@@ -409,6 +408,32 @@ public final class MapViewer extends FreeColClientHolder {
         this.halfWidth = this.tileWidth/2;
     }
 
+    /**
+     * Get the tile to display the cursor on.
+     *
+     * @param active If true, require the cursor to be active.
+     * @return The cursor {@code Tile}, or null if no cursor should be shown.
+     */
+    private Tile getCursorTile(boolean active) {
+        Tile ret = null;
+        switch (getViewMode()) {
+        case MOVE_UNITS:
+            final Unit unit = getActiveUnit();
+            if (unit != null
+                && (!active || this.cursor.isActive()
+                    || unit.getMovesLeft() <= 0)) {
+                ret = unit.getTile();
+            }
+            break;
+        case TERRAIN:
+            ret = getSelectedTile();
+            break;
+        default:
+            break;
+        }
+        return ret;
+    }
+
 
     // Higher level public routines
 
@@ -429,6 +454,20 @@ public final class MapViewer extends FreeColClientHolder {
         bottomRow = -1;
     }
     
+    /**
+     * Start the cursor blink.
+     */
+    public void startCursorBlinking() {
+        this.cursor.startBlinking();
+    }
+
+    /**
+     * Stop the cursor blink.
+     */
+    public void stopCursorBlinking() {
+        this.cursor.stopBlinking();
+    }
+
     // Cleanup underway below
 
     /**
@@ -721,17 +760,6 @@ public final class MapViewer extends FreeColClientHolder {
             && (tileToCheck.getY() + 4 < bottomRow || alignedBottom)
             && (tileToCheck.getX() - 1 > leftColumn || alignedLeft)
             && (tileToCheck.getX() + 2 < rightColumn || alignedRight);
-    }
-
-    /**
-     * Starts the cursor blinking animation.
-     */
-    void startCursorBlinking() {
-        cursor.startBlinking();
-    }
-
-    void stopCursorBlinking() {
-        cursor.stopBlinking();
     }
 
     /**
@@ -1446,15 +1474,16 @@ public final class MapViewer extends FreeColClientHolder {
         }
 
         // Display cursor for selected tile or active unit
-        final Tile cursorTile = getSelectedTile();
+        final Tile cursorTile = getCursorTile(true);
         if (cursorTile != null) {
             final int x = cursorTile.getX();
             final int y = cursorTile.getY();
-            if(x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
+            if (x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
                 final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
                 final int yt = (y-y0) * halfHeight;
                 g.translate(xt, yt);
-                displayCursor(g);
+                g.drawImage(lib.getScaledImage(ImageLibrary.UNIT_SELECT),
+                            0, 0, null);
                 g.translate(-xt, -yt);
             }
         }
@@ -1981,10 +2010,6 @@ public final class MapViewer extends FreeColClientHolder {
                     (int) (UNIT_OFFSET * lib.getScaleFactor());
 
         return new Point(unitX, unitY);
-    }
-
-    private void displayCursor(Graphics2D g) {
-        g.drawImage(lib.getScaledImage(ImageLibrary.UNIT_SELECT), 0, 0, null);
     }
 
     /**
