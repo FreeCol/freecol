@@ -146,7 +146,8 @@ public class SwingGUI extends GUI {
     public SwingGUI(FreeColClient freeColClient, float scaleFactor) {
         super(freeColClient, scaleFactor);
         
-        graphicsDevice = getGoodGraphicsDevice();
+        this.graphicsDevice = getGoodGraphicsDevice();
+        this.mapViewer = new MapViewer(freeColClient);
         logger.info("GUI constructed using scale factor " + scaleFactor);
     }
 
@@ -182,7 +183,8 @@ public class SwingGUI extends GUI {
      */
     private void setSelectedTile(Tile newTile, boolean refocus) {
         final Tile oldTile = getSelectedTile();
-        refocus = newTile != null && (refocus || !mapViewer.onScreen(newTile)
+        refocus = newTile != null
+            && (refocus || !this.mapViewer.onScreen(newTile)
             || getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER));
         if (refocus) {
             setFocus(newTile);
@@ -190,12 +192,12 @@ public class SwingGUI extends GUI {
             if (oldTile != null) refreshTile(oldTile);
             if (newTile != null) refreshTile(newTile);
         }
-        mapViewer.setSelectedTile(newTile);
+        this.mapViewer.setSelectedTile(newTile);
     }
 
     // TODO
     private void setFocusImmediately(Tile tileToFocus) {
-        mapViewer.changeFocus(tileToFocus);
+        this.mapViewer.changeFocus(tileToFocus);
         Dimension size = canvas.getSize();
         canvas.paintImmediately(0, 0, size.width, size.height);
     }
@@ -436,7 +438,7 @@ public class SwingGUI extends GUI {
         final ClientOptions opts = getClientOptions();
         this.mapViewer = new MapViewer(getFreeColClient());
         this.canvas = new Canvas(getFreeColClient(), graphicsDevice, this,
-                                 desiredWindowSize, mapViewer);
+                                 desiredWindowSize, this.mapViewer);
         this.tileViewer = new TileViewer(getFreeColClient());
 
         // Now that there is a canvas, prepare for language changes.
@@ -518,7 +520,7 @@ public class SwingGUI extends GUI {
         invokeNowOrWait(() -> {
                 requireFocus(sourceTile);
                 paintImmediately();
-                mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
+                this.mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
             });
     }
 
@@ -528,7 +530,7 @@ public class SwingGUI extends GUI {
     @Override
     public Point getAnimationPosition(int labelWidth,int labelHeight,
                                       Point tileP) {
-        return mapViewer.calculateUnitLabelPositionInTile(labelWidth, labelHeight, tileP);
+        return this.mapViewer.calculateUnitLabelPositionInTile(labelWidth, labelHeight, tileP);
     }
 
     /**
@@ -536,7 +538,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public float getAnimationScale() {
-        return mapViewer.getImageLibrary().getScaleFactor();
+        return this.mapViewer.getImageLibrary().getScaleFactor();
     }
 
     /**
@@ -544,7 +546,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Rectangle getAnimationTileBounds(Tile tile) {
-        return mapViewer.calculateTileBounds(tile);
+        return this.mapViewer.calculateTileBounds(tile);
     }
 
     /**
@@ -552,7 +554,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Point getAnimationTilePosition(Tile tile) {
-        return mapViewer.calculateTilePosition(tile, false);
+        return this.mapViewer.calculateTilePosition(tile, false);
     }
 
 
@@ -606,7 +608,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Tile getFocus() {
-        return mapViewer.getFocus();
+        return this.mapViewer.getFocus();
     }
 
     /**
@@ -633,7 +635,8 @@ public class SwingGUI extends GUI {
         // Account for the ALWAYS_CENTER client option.
         final boolean required = getClientOptions()
             .getBoolean(ClientOptions.ALWAYS_CENTER);
-        if ((required && tile != getFocus()) || !mapViewer.onScreen(tile)) {
+        if ((required && tile != getFocus())
+            || !this.mapViewer.onScreen(tile)) {
             setFocusImmediately(tile);
             return true;
         }
@@ -645,7 +648,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void setFocus(Tile tileToFocus) {
-        mapViewer.changeFocus(tileToFocus);
+        this.mapViewer.changeFocus(tileToFocus);
         canvas.refresh();
     }
 
@@ -673,7 +676,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void refresh() {
-        mapViewer.forceReposition();
+        this.mapViewer.forceReposition();
         canvas.refresh();
     }
 
@@ -683,7 +686,7 @@ public class SwingGUI extends GUI {
     @Override
     public void refreshTile(Tile tile) {
         if (tile.getX() >= 0 && tile.getY() >= 0) {
-            canvas.repaint(mapViewer.calculateTileBounds(tile));
+            canvas.repaint(this.mapViewer.calculateTileBounds(tile));
         }
     }
     
@@ -971,7 +974,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public ViewMode getViewMode() {
-        return mapViewer.getViewMode();
+        return this.mapViewer.getViewMode();
     }
 
     /**
@@ -980,7 +983,7 @@ public class SwingGUI extends GUI {
     @Override
     public void setViewMode(ViewMode newViewMode) {
         if (newViewMode != getViewMode()) {
-            mapViewer.changeViewMode(newViewMode);
+            this.mapViewer.changeViewMode(newViewMode);
             updateMapControls();
         }
     }
@@ -990,7 +993,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Unit getActiveUnit() {
-        return (mapViewer == null) ? null : mapViewer.getActiveUnit();
+        return this.mapViewer.getActiveUnit();
     }
 
     /**
@@ -1004,7 +1007,7 @@ public class SwingGUI extends GUI {
         if (unit == null || (tile = unit.getTile()) == null) {
             canvas.stopGoto();
         }
-        mapViewer.setActiveUnit(unit);
+        this.mapViewer.setActiveUnit(unit);
         // Automatic mode switch when switching to/from null active unit
         if (unit != null && old == null) {
             setViewMode(ViewMode.MOVE_UNITS);
@@ -1032,7 +1035,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public Tile getSelectedTile() {
-        return mapViewer.getSelectedTile();
+        return this.mapViewer.getSelectedTile();
     }
 
     /**
@@ -1053,7 +1056,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean canZoomInMap() {
-        return mapViewer != null && !mapViewer.isAtMaxMapScale();
+        return !this.mapViewer.isAtMaxMapScale();
     }
 
     /**
@@ -1061,7 +1064,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean canZoomOutMap() {
-        return mapViewer != null && !mapViewer.isAtMinMapScale();
+        return !this.mapViewer.isAtMinMapScale();
     }
 
     /**
@@ -1070,7 +1073,7 @@ public class SwingGUI extends GUI {
     @Override
     protected void resetMapZoom() {
         super.resetMapZoom();
-        mapViewer.resetMapScale();
+        this.mapViewer.resetMapScale();
         refresh();
     }
 
@@ -1080,7 +1083,7 @@ public class SwingGUI extends GUI {
     @Override
     public void zoomInMap() {
         super.zoomInMap();
-        mapViewer.increaseMapScale();
+        this.mapViewer.increaseMapScale();
         refresh();
     }
 
@@ -1090,7 +1093,7 @@ public class SwingGUI extends GUI {
     @Override
     public void zoomOutMap() {
         super.zoomOutMap();
-        mapViewer.decreaseMapScale();
+        this.mapViewer.decreaseMapScale();
         refresh();
     }
 
