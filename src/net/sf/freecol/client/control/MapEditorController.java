@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
@@ -60,20 +59,11 @@ public final class MapEditorController extends FreeColClientHolder {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorController.class.getName());
 
-    public interface IMapTransform {
-
-        /**
-         * Applies this transformation to the given tile.
-         * @param t The {@code Tile} to be transformed,
-         */
-        public abstract void transform(Tile t);
-    }
-
     /**
      * The transform that should be applied to a {@code Tile}
      * that is clicked on the map.
      */
-    private IMapTransform currentMapTransform = null;
+    private MapTransform currentMapTransform = null;
 
 
     /**
@@ -137,7 +127,7 @@ public final class MapEditorController extends FreeColClientHolder {
             getGUI().closeMainPanel();
             getGUI().closeMenus();
             //fcc.changeClientState(true);
-            getGUI().setViewMode(GUI.VIEW_TERRAIN_MODE);
+            getGUI().setViewMode(GUI.ViewMode.TERRAIN);
             getGUI().startMapEditorGUI();
         } catch (IOException e) {
             getGUI().showErrorMessage(StringTemplate
@@ -163,8 +153,10 @@ public final class MapEditorController extends FreeColClientHolder {
      * @param mt The transform that should be applied to a
      *     {@code Tile} that is clicked on the map.
      */
-    public void setMapTransform(IMapTransform mt) {
+    public void setMapTransform(MapTransform mt) {
         currentMapTransform = mt;
+        getGUI().setViewMode((mt == null) ? GUI.ViewMode.TERRAIN
+            : GUI.ViewMode.MAP_TRANSFORM);
         getGUI().updateMapControls();
     }
 
@@ -174,7 +166,7 @@ public final class MapEditorController extends FreeColClientHolder {
      * @return The transform that should be applied to a
      *     {@code Tile} that is clicked on the map.
      */
-    public IMapTransform getMapTransform() {
+    public MapTransform getMapTransform() {
         return currentMapTransform;
     }
 

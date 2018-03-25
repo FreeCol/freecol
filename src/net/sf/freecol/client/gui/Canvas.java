@@ -480,15 +480,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Get the view mode.
-     *
-     * @return The view mode.
-     */
-    public int getViewMode() {
-        return mapViewer.getViewMode();
-    }
-
-    /**
      * Set the current active unit path.
      *
      * @param path The current {@code PathNode}.
@@ -1046,7 +1037,7 @@ public final class Canvas extends JDesktopPane {
      * for the presence of other dialogs.
      */
     private void restartBlinking() {
-        if (mapViewer.getViewMode() != GUI.MOVE_UNITS_MODE) return;
+        if (mapViewer.getViewMode() != GUI.ViewMode.MOVE_UNITS) return;
         for (FreeColDialog<?> f : dialogs) {
             if (f.isModal()) return;
         }

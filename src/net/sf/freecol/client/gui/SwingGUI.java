@@ -316,7 +316,7 @@ public class SwingGUI extends GUI {
         if (getActiveUnit() != null) {
             centerActiveUnit();
         } else {
-            setViewMode(GUI.VIEW_TERRAIN_MODE);
+            setViewMode(ViewMode.TERRAIN);
             setSelectedTile(tile);
         }
     }
@@ -970,16 +970,19 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public int getViewMode() {
-        return (mapViewer == null) ? -1 : mapViewer.getViewMode();
+    public ViewMode getViewMode() {
+        return mapViewer.getViewMode();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setViewMode(int newViewMode) {
-        mapViewer.changeViewMode(newViewMode);
+    public void setViewMode(ViewMode newViewMode) {
+        if (newViewMode != getViewMode()) {
+            mapViewer.changeViewMode(newViewMode);
+            updateMapControls();
+        }
     }
 
     /**
@@ -1004,7 +1007,7 @@ public class SwingGUI extends GUI {
         mapViewer.setActiveUnit(unit);
         // Automatic mode switch when switching to/from null active unit
         if (unit != null && old == null) {
-            setViewMode(GUI.MOVE_UNITS_MODE);
+            setViewMode(ViewMode.MOVE_UNITS);
             // Bring the selected tile along with the unit
             if (tile != getSelectedTile()) {
                 setSelectedTile(tile, tile != null
@@ -1012,7 +1015,7 @@ public class SwingGUI extends GUI {
             }
         } else if (unit == null && old != null) {
             tile = getSelectedTile();
-            if (tile != null) setViewMode(GUI.VIEW_TERRAIN_MODE);
+            if (tile != null) setViewMode(ViewMode.TERRAIN);
         }
 
         updateMapControls();
@@ -1115,7 +1118,7 @@ public class SwingGUI extends GUI {
         if (!tile.isExplored()) {
             // If the tile is unexplored, just select it
             setSelectedTile(tile);
-            setViewMode(GUI.VIEW_TERRAIN_MODE);
+            setViewMode(ViewMode.TERRAIN);
         } else if (tile.hasSettlement()) {
             // If there is a settlement present, pop it up
             showTileSettlement(tile);
@@ -1126,12 +1129,12 @@ public class SwingGUI extends GUI {
             final Unit active = getActiveUnit();
             if (active == null || active.getTile() != tile) {
                 setActiveUnit(other);
-                setViewMode(GUI.MOVE_UNITS_MODE);
+                setViewMode(ViewMode.MOVE_UNITS);
             }
         } else {
             // Otherwise select the tile in terrain mode
             setSelectedTile(tile);
-            setViewMode(GUI.VIEW_TERRAIN_MODE);
+            setViewMode(ViewMode.TERRAIN);
         }
     }    
 

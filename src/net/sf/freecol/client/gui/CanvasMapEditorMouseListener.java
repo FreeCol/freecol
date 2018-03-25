@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
+import net.sf.freecol.client.gui.GUI.ViewMode;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
 import net.sf.freecol.client.gui.dialog.RiverStyleDialog;
 import net.sf.freecol.common.model.Map;
@@ -130,7 +131,10 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         try {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
-                if (tile != null) getGUI().setSelectedTile(tile);
+                if (tile != null) {
+                    getGUI().setSelectedTile(tile);
+                    getGUI().setViewMode(ViewMode.TERRAIN);
+                }
                 startPoint = endPoint = null;
 
             } else if (e.getButton() == MouseEvent.BUTTON2) {

@@ -38,7 +38,7 @@ import javax.swing.JToggleButton;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
-import net.sf.freecol.client.control.MapEditorController.IMapTransform;
+import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
@@ -236,50 +236,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      */
     public static void setNativeNation(Nation newNativeNation) {
         nativeNation = newNativeNation;
-    }
-
-    /**
-     * Represents a transformation that can be applied to
-     * a {@code Tile}.
-     *
-     * @see #transform(Tile)
-     */
-    public abstract static class MapTransform implements IMapTransform {
-
-        /**
-         * A panel with information about this transformation.
-         */
-        private JPanel descriptionPanel = null;
-
-        /**
-         * Applies this transformation to the given tile.
-         * @param t The {@code Tile} to be transformed,
-         */
-        @Override
-        public abstract void transform(Tile t);
-
-        /**
-         * A panel with information about this transformation.
-         * This panel is currently displayed on the
-         * {@link InfoPanel} when selected, but might be
-         * used elsewhere as well.
-         *
-         * @return The panel or {@code null} if no panel
-         *      has been set.
-         */
-        public JPanel getDescriptionPanel() {
-            return descriptionPanel;
-        }
-
-        /**
-         * Sets a panel that can be used for describing this
-         * transformation to the user.
-         *
-         * @param descriptionPanel The panel.
-         */
-        public void setDescriptionPanel(JPanel descriptionPanel) {
-            this.descriptionPanel = descriptionPanel;
-        }
     }
 
     public final class TileTypeTransform extends MapTransform {

@@ -52,6 +52,7 @@ import javax.swing.JLayeredPane;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.gui.GUI.ViewMode;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -129,7 +130,7 @@ public final class MapViewer extends FreeColClientHolder {
     private Unit activeUnit;
 
     /** The view mode in use. */
-    private int viewMode = 0;
+    private ViewMode viewMode = ViewMode.MOVE_UNITS;
 
     /** A path to be displayed on the map. */
     private PathNode currentPath;
@@ -274,6 +275,23 @@ public final class MapViewer extends FreeColClientHolder {
         this.focus = focus;
     }
 
+    /**
+     * Get the view mode.
+     *
+     * @return The view mode.
+     */
+    public ViewMode getViewMode() {
+        return this.viewMode;
+    }
+
+    /**
+     * Set the view mode.
+     *
+     * @param vm The new {@code ViewMode}.
+     */
+    public void setViewMode(ViewMode vm) {
+        this.viewMode = vm;
+    }
     
     // Internal calculations
 
@@ -369,32 +387,14 @@ public final class MapViewer extends FreeColClientHolder {
 
     
     /**
-     * Get the view mode.
-     *
-     * @return The view mode.
-     */
-    int getViewMode() {
-        return viewMode;
-    }
-
-    /**
-     * Toggle the current view mode.
-     */
-    void toggleViewMode() {
-        changeViewMode(1 - viewMode);
-    }
-
-    /**
      * Change the view mode to a new one.
      *
      * @param newViewMode The new view mode.
      */
-    void changeViewMode(int newViewMode) {
-        if (newViewMode != viewMode) {
-            logger.fine("Changed to " + ((newViewMode == GUI.MOVE_UNITS_MODE)
-                    ? "Move Units" : "View Terrain") + " mode");
-            viewMode = newViewMode;
-            if(viewMode == GUI.MOVE_UNITS_MODE)
+    void changeViewMode(ViewMode newViewMode) {
+        if (newViewMode != getViewMode()) {
+            setViewMode(newViewMode);
+            if (newViewMode == ViewMode.MOVE_UNITS)
                 restartBlinking();
             else
                 stopBlinking();
@@ -1483,14 +1483,14 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Display cursor for selected tile or active unit
         Tile cursorTile = null;
-        switch (viewMode) {
-        case GUI.MOVE_UNITS_MODE:
+        switch (getViewMode()) {
+        case MOVE_UNITS:
             if (activeUnit != null
                 && (cursor.isActive() || activeUnit.getMovesLeft() <= 0)) {
                 cursorTile = activeUnit.getTile();
             }
             break;
-        case GUI.VIEW_TERRAIN_MODE:
+        case TERRAIN:
             if (selectedTile != null) cursorTile = selectedTile;
             break;
         default:

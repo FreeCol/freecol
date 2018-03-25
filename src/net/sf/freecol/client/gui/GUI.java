@@ -102,6 +102,14 @@ public class GUI extends FreeColClientHolder {
 
     protected static final Logger logger = Logger.getLogger(GUI.class.getName());
 
+    /** View modes. */
+    public enum ViewMode {
+        MOVE_UNITS,
+        TERRAIN,
+        MAP_TRANSFORM,
+        END_TURN
+    };
+
     /**
      * Error handler class to display a message with this GUI.
      */
@@ -157,10 +165,6 @@ public class GUI extends FreeColClientHolder {
         "low", "normal", "high"
     };
 
-    /** View modes. */
-    public static final int MOVE_UNITS_MODE = 0;
-    public static final int VIEW_TERRAIN_MODE = 1;
-
     /** An image library to use. */
     protected final ImageLibrary imageLibrary;
 
@@ -193,10 +197,16 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Toggle the current view mode.
+     *
+     * Only really toggles between terrain and units modes.
      */
     public void toggleViewMode() {
-        int vm = getViewMode();
-        if (vm >= 0) setViewMode(1 - vm);
+        ViewMode vm = getViewMode();
+        switch (vm) {
+        case MOVE_UNITS: setViewMode(ViewMode.TERRAIN); break;
+        case TERRAIN:    setViewMode(ViewMode.MOVE_UNITS); break;
+        default: break;
+        }
     }
 
     
@@ -1655,8 +1665,8 @@ public class GUI extends FreeColClientHolder {
      *
      * @return One of the view mode constants, or negative on error.
      */
-    public int getViewMode() {
-        return MOVE_UNITS_MODE;
+    public ViewMode getViewMode() {
+        return ViewMode.MOVE_UNITS;
     }
 
     /**
@@ -1664,7 +1674,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param newViewMode The new view mode to use.
      */
-    public void setViewMode(int newViewMode) {}
+    public void setViewMode(ViewMode newViewMode) {}
 
     /**
      * Get the active unit.
