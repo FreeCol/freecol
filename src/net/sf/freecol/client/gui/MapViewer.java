@@ -447,15 +447,6 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Centers the map on the selected unit.
-     */
-    void centerActiveUnit() {
-        if (activeUnit != null && activeUnit.getTile() != null) {
-            getGUI().setFocus(activeUnit.getTile());
-        }
-    }
-
-    /**
      * Converts the given screen coordinates to Map coordinates.
      * It checks to see to which Tile the given pixel 'belongs'.
      *

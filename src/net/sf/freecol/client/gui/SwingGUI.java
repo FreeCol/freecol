@@ -314,7 +314,7 @@ public class SwingGUI extends GUI {
         resetMapZoom(); // This should refresh the map
         setActiveUnit(active);
         if (getActiveUnit() != null) {
-            centerActiveUnit();
+            focusActiveUnit();
         } else {
             setViewMode(ViewMode.TERRAIN);
             setSelectedTile(tile);
@@ -1024,17 +1024,6 @@ public class SwingGUI extends GUI {
         // TODO: why do we have to refresh the entire canvas?
         if (unit != null && !getMyPlayer().owns(unit)) {
             canvas.refresh();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void centerActiveUnit() {
-        final Unit active = getActiveUnit();
-        if (active != null && active.getTile() != null) {
-            setFocus(active.getTile());
         }
     }
 

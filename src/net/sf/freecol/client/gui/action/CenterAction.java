@@ -49,6 +49,6 @@ public class CenterAction extends UnitAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        getGUI().centerActiveUnit();
+        getGUI().focusActiveUnit();
     }
 }
