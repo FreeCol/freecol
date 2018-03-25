@@ -694,7 +694,7 @@ public final class InGameController extends FreeColClientHolder {
         final ClientOptions co = getClientOptions();
         final Player player = getMyPlayer();
         final Turn thisTurn = getGame().getTurn();
-        final ArrayList<ModelMessage> messages = new ArrayList<>();
+        final List<ModelMessage> messages = new ArrayList<>();
 
         for (ModelMessage m : ((allMessages) ? player.getModelMessages()
                 : player.getNewModelMessages())) {
@@ -1259,6 +1259,9 @@ public final class InGameController extends FreeColClientHolder {
             && getGUI().confirmHostileAction(unit, target)
             && getGUI().confirmPreCombat(unit, target)) {
             askServer().attack(unit, direction);
+            // Immediately display resulting message, allowing
+            // next updateGUI to select another unit.
+            displayModelMessages(false, false);
         }
         // Always return false, as the unit has either attacked and lost
         // its remaining moves, or the move can not proceed because it is
@@ -1293,6 +1296,9 @@ public final class InGameController extends FreeColClientHolder {
                 if (col != null && unit.getOwner().owns(col)) {
                     colonyPanel(col, unit);
                 }
+                // Immediately display resulting message, allowing
+                // next updateGUI to select another unit.
+                displayModelMessages(false, false);
             }
             break;
 

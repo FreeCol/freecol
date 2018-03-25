@@ -495,6 +495,7 @@ public class ModelMessage extends StringTemplate {
             .append(' ').append((sourceId == null) ? "null" : sourceId)
             .append('/').append((displayId == null) ? "null" : displayId)
             .append(' ').append(messageType)
+            .append(' ').append(displayed)
             .append(' ').append(super.toString())
             .append(']');
         return sb.toString();
