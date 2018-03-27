@@ -229,9 +229,10 @@ public class SwingGUI extends GUI {
      */
     private boolean changeSelectedTile(Tile newTile, boolean refocus) {
         final Tile oldTile = getSelectedTile();
+        final Tile oldFocus = getFocus();
         refocus = newTile != null
-            && newTile != getFocus()
-            && (refocus || !mapViewer.onScreen(newTile));
+            && newTile != oldFocus
+            && (oldFocus == null || refocus || !mapViewer.onScreen(newTile));
         if (refocus) setFocus(newTile);
 
         // System.err.println("CST " + newTile + " " + (newTile != oldTile) + " " + refocus);
