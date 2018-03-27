@@ -1860,10 +1860,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public Unit findTeacher(Unit student) {
         return (getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION))
-                ? null // No automatic assignment
-                : find(flatten(getBuildings(), Building::canTeach,
-                Building::getUnits),
-                u -> u.getStudent() == null);
+            ? null // No automatic assignment
+            : find(getTeachers(), u ->
+                u.getStudent() == null && student.canBeStudent(u));
     }
 
     /**
