@@ -344,7 +344,7 @@ public final class TilePopup extends JPopupMenu {
                         activeUnit.getTile(), tile, activeUnit.getCarrier(),
                         null, lb);
                     gui.showInformationMessage(lb.toString());
-                    canvas.setCurrentPath(path);
+                    gui.setUnitPath(path);
                     gui.refresh();                        
                 });
             add(menuItem);

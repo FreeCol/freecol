@@ -209,8 +209,8 @@ public class SwingGUI extends GUI {
         // System.err.println("CAU " + newUnit + " " + (newUnit != oldUnit));
         if (newUnit == oldUnit) return false;
         
-        canvas.stopGoto();
         mapViewer.setActiveUnit(newUnit);
+        clearGotoPath();
         return true;
     }
 
@@ -252,6 +252,28 @@ public class SwingGUI extends GUI {
     }
 
     /**
+     * Update the path for the active unit.
+     */
+    private void updateUnitPath() {
+        final Unit active = getActiveUnit();
+        if (active == null) return;
+
+        Location destination = active.getDestination();
+        PathNode path = null;
+        if (destination != null
+            && !((FreeColGameObject)destination).isDisposed()
+            && !Map.isSameLocation(active.getLocation(), destination)) {
+            try {
+                path = active.findPath(destination);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Path fail", e);
+                active.setDestination(null);
+            }
+        }
+        setUnitPath(path);
+    }
+
+    /**
      * Update the current goto to a given tile.
      *
      * @param tile The new goto {@code Tile}.
@@ -259,7 +281,7 @@ public class SwingGUI extends GUI {
     private void updateGotoTile(Tile tile) {
         final Unit unit = getActiveUnit();
         if (tile == null || unit == null) {
-            canvas.stopGoto();
+            clearGotoPath();
             return;
         }
 
@@ -760,7 +782,15 @@ public class SwingGUI extends GUI {
     }
     
 
-    // Goto-path handling
+    // Path handling
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUnitPath(PathNode path) {
+        mapViewer.setUnitPath(path);
+    }
 
     /**
      * {@inheritDoc}
@@ -772,7 +802,7 @@ public class SwingGUI extends GUI {
 
         // Enter "goto mode" if not already activated; otherwise cancel it
         if (canvas.isGotoStarted()) {
-            canvas.stopGoto();
+            clearGotoPath();
         } else {
             canvas.startGoto();
 
@@ -791,6 +821,7 @@ public class SwingGUI extends GUI {
     @Override
     public void clearGotoPath() {
         canvas.stopGoto();
+        updateUnitPath();
     }
 
     /**
@@ -801,13 +832,14 @@ public class SwingGUI extends GUI {
         if (canvas.isGotoStarted()) canvas.stopGoto();
 
         final Unit active = getActiveUnit();
-        if (tile == null || active == null) return;
+        if (active == null) return;
 
-        if (active.getTile() != tile) {
+        if (tile != null && active.getTile() != tile) {
             canvas.startGoto();
             updateGotoTile(tile);
             traverseGotoPath();
         }
+        updateUnitPath();
     }
 
     /**
@@ -835,7 +867,7 @@ public class SwingGUI extends GUI {
             // FIXME? Unit may have been deselected on reaching destination
             changeActiveUnit(unit);
         }
-        canvas.updateUnitPath();
+        updateUnitPath();
     }
 
     /**

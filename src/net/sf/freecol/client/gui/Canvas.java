@@ -480,22 +480,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Set the current active unit path.
-     *
-     * @param path The current {@code PathNode}.
-     */
-    public void setCurrentPath(PathNode path) {
-        mapViewer.setCurrentPath(path);
-    }
-
-    /**
-     * Sets the path of the active unit to display it.
-     */
-    public void updateUnitPath() {
-        mapViewer.updateCurrentPathForActiveUnit();
-    }
-
-    /**
      * Gets the point at which the map was clicked for a drag.
      *
      * @return The Point where the mouse was initially clicked.

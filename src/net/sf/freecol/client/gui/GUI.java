@@ -79,6 +79,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -1533,7 +1534,14 @@ public class GUI extends FreeColClientHolder {
     public void refreshTile(Tile tile) {}
     
 
-    // Goto-path handling
+    // Path handling
+
+    /**
+     * Set the path for the active unit.
+     *
+     * @param path The new unit path.
+     */
+    public void setUnitPath(PathNode path) {}
 
     /**
      * Start/stop the goto path display.

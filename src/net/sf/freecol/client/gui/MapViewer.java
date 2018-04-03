@@ -138,8 +138,8 @@ public final class MapViewer extends FreeColClientHolder {
     /** The cursor for the selected tile. */
     private TerrainCursor cursor;
 
-    /** A path to be displayed on the map. */
-    private PathNode currentPath;
+    /** A path for the active unit. */
+    private PathNode unitPath;
 
     /** A path for a current goto order. */
     private PathNode gotoPath = null;
@@ -341,6 +341,15 @@ public final class MapViewer extends FreeColClientHolder {
      */
     public void setSelectedTile(Tile tile) {
         this.selectedTile = tile;
+    }
+
+    /**
+     * Set the current active unit path.
+     *
+     * @param path The new {@code PathNode}.
+     */
+    public void setUnitPath(PathNode path) {
+        this.unitPath = path;
     }
 
 
@@ -1150,7 +1159,6 @@ public final class MapViewer extends FreeColClientHolder {
      */
     void stopGoto() {
         setGotoPath(null);
-        updateCurrentPathForActiveUnit();
         gotoStarted = false;
     }
 
@@ -1175,38 +1183,6 @@ public final class MapViewer extends FreeColClientHolder {
     void setGotoPath(PathNode gotoPath) {
         this.gotoPath = gotoPath;
         forceReposition();
-    }
-
-    /**
-     * Sets the path of the active unit to display it.
-     */
-    void updateCurrentPathForActiveUnit() {
-        PathNode path;
-        if (activeUnit == null
-            || activeUnit.getDestination() == null
-            || ((FreeColGameObject)activeUnit.getDestination()).isDisposed()
-            || Map.isSameLocation(activeUnit.getLocation(),
-                                  activeUnit.getDestination())) {
-            path = null;
-        } else {
-            try {
-                path = activeUnit.findPath(activeUnit.getDestination());
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Path fail", e);
-                path = null;
-                activeUnit.setDestination(null);
-            }
-        }
-        setCurrentPath(path);
-    }
-
-    /**
-     * Set the current active unit path.
-     *
-     * @param path The current {@code PathNode}.
-     */
-    void setCurrentPath(PathNode path) {
-        this.currentPath = path;
     }
 
     void changeSize(Dimension size) {
@@ -1596,12 +1572,8 @@ public final class MapViewer extends FreeColClientHolder {
         g.setTransform(originTransform);
 
         // Display goto path
-        if (currentPath != null) {
-            displayPath(g, currentPath);
-        }
-        if (gotoPath != null) {
-            displayPath(g, gotoPath);
-        }
+        if (this.unitPath != null) displayPath(g, this.unitPath);
+        else if (this.gotoPath != null) displayPath(g, this.gotoPath);
 
         // Timing log
         final long gap = System.currentTimeMillis() - now;
