@@ -25,7 +25,7 @@ import net.sf.freecol.client.FreeColClient;
 
 
 /**
- * An action for displaying a Tile Popup.
+ * An action for displaying a tile popup.
  */
 public class TilePopupAction extends MapboardAction {
 
@@ -49,6 +49,6 @@ public class TilePopupAction extends MapboardAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        getGUI().showTilePopUpAtSelectedTile();
+        getGUI().showTilePopup();
     }
 }

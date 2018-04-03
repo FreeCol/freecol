@@ -39,23 +39,18 @@ import net.sf.freecol.common.model.Unit;
  * Listens to mouse buttons being pressed at the level of the Canvas.
  */
 public final class CanvasMouseListener extends FreeColClientHolder
-        implements MouseListener {
+    implements MouseListener {
 
     private static final Logger logger = Logger.getLogger(CanvasMouseListener.class.getName());
 
-    private final Canvas canvas;
-
 
     /**
-     * Create a new canvas mouse listener.
+     * Create a new mouse listener.
      *
      * @param freeColClient The enclosing {@code FreeColClient}.
-     * @param canvas The {@code Canvas} to listen on.
      */
-    public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas) {
+    public CanvasMouseListener(FreeColClient freeColClient) {
         super(freeColClient);
-
-        this.canvas = canvas;
     }
 
 
@@ -77,26 +72,22 @@ public final class CanvasMouseListener extends FreeColClientHolder
     public void mousePressed(MouseEvent e) {
         if (!e.getComponent().isEnabled()) return;
 
-        final Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
-        if (tile == null) return;
-
         if (e.isPopupTrigger()) {
-            canvas.showTilePopup(tile);
+            getGUI().showTilePopup(e.getX(), e.getY());
             return;
         }
 
-        final Unit active = getGUI().getActiveUnit();
         switch (e.getButton()) {
         case MouseEvent.BUTTON1: // Drag and selection
             // Enable dragging with button 1
             // @see CanvasMouseMotionListener#mouseDragged
-            canvas.prepareDrag(e.getX(), e.getY());
+            getGUI().prepareDrag(e.getX(), e.getY());
             break;
         case MouseEvent.BUTTON2: // Immediate goto
-            getGUI().performGoto(tile);
+            getGUI().performGoto(e.getX(), e.getY());
             break;
         case MouseEvent.BUTTON3: // Immediate tile popup
-            canvas.showTilePopup(tile);
+            getGUI().showTilePopup(e.getX(), e.getY());
             break;
         default:
             break;
@@ -117,7 +108,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
         //
         // Do not try to do this in mouseClicked as long presses will
         // not generate calls there.
-        if (canvas.isGotoStarted()) getGUI().traverseGotoPath();
+        getGUI().traverseGotoPath();
     }
 
     /**
@@ -129,10 +120,6 @@ public final class CanvasMouseListener extends FreeColClientHolder
         // Only process clicks on Button1
         if (e.getButton() != MouseEvent.BUTTON1) return;
 
-        // This was a drag and has been processed in mouseReleased.
-        if (e.getClickCount() == 1 && canvas.isDrag(e.getX(), e.getY()))
-            return;
-
-        getGUI().clickAtTile(canvas.convertToMapTile(e.getX(), e.getY()));
+        getGUI().clickAt(e.getClickCount(), e.getX(), e.getY());
     }
 }

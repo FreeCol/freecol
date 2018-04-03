@@ -251,6 +251,34 @@ public class SwingGUI extends GUI {
         canvas.paintImmediately(0, 0, size.width, size.height);
     }
 
+    /**
+     * Update the current goto to a given tile.
+     *
+     * @param tile The new goto {@code Tile}.
+     */     
+    private void updateGotoTile(Tile tile) {
+        final Unit unit = getActiveUnit();
+        if (tile == null || unit == null) {
+            canvas.stopGoto();
+            return;
+        }
+
+        if (!canvas.isGotoStarted()) return;
+
+        // Do nothing if the tile has not changed.
+        PathNode oldPath = canvas.getGotoPath();
+        Tile lastTile = (oldPath == null) ? null
+            : oldPath.getLastNode().getTile();
+        if (lastTile == tile) return;
+
+        // Do not show a path if it will be invalid, avoiding calling
+        // the expensive path finder if possible.
+        PathNode newPath = (unit.getTile() == tile
+            || !tile.isExplored()
+            || !unit.getSimpleMoveType(tile).isLegal()) ? null
+            : unit.findPath(tile);
+        canvas.setGotoPath(newPath);
+    }
 
     // Implement GUI
 
@@ -354,7 +382,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void reconnect(Unit active, Tile tile) {
-        setupMouseListeners();
+        canvas.setupMouseListeners();
         requestFocusInWindow();
         canvas.initializeInGame();
         enableMapControls(getClientOptions()
@@ -378,14 +406,6 @@ public class SwingGUI extends GUI {
     @Override
     public void removeInGameComponents() {
         canvas.removeInGameComponents();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setupMouseListeners() {
-        canvas.setupMouseListeners();
     }
 
     /**
@@ -760,7 +780,7 @@ public class SwingGUI extends GUI {
             // mouse is over the screen; see also
             // CanvasMouseMotionListener.
             Point pt = canvas.getMousePosition();
-            updateGotoPath((pt == null) ? null
+            updateGotoTile((pt == null) ? null
                 : canvas.convertToMapTile(pt.x, pt.y));
         }
     }
@@ -771,6 +791,31 @@ public class SwingGUI extends GUI {
     @Override
     public void clearGotoPath() {
         canvas.stopGoto();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void performGoto(Tile tile) {
+        if (canvas.isGotoStarted()) canvas.stopGoto();
+
+        final Unit active = getActiveUnit();
+        if (tile == null || active == null) return;
+
+        if (active.getTile() != tile) {
+            canvas.startGoto();
+            updateGotoTile(tile);
+            traverseGotoPath();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void performGoto(int x, int y) {
+        performGoto(canvas.convertToMapTile(x, y));
     }
 
     /**
@@ -797,48 +842,25 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void updateGotoPath(Tile tile) {
-        final Unit unit = getActiveUnit();
-        if (tile == null || unit == null) {
-            canvas.stopGoto();
-            return;
+    public void updateGoto(int x, int y, boolean start) {
+        if (canvas.isGotoStarted()) {
+            updateGotoTile(canvas.convertToMapTile(x, y));
+        } else if (start && canvas.isDrag(x, y)) {
+            canvas.startGoto();
         }
-
-        if (!canvas.isGotoStarted()) return;
-
-        // Do nothing if the tile has not changed.
-        PathNode oldPath = canvas.getGotoPath();
-        Tile lastTile = (oldPath == null) ? null
-            : oldPath.getLastNode().getTile();
-        if (lastTile == tile) return;
-
-        // Do not show a path if it will be invalid, avoiding calling
-        // the expensive path finder if possible.
-        PathNode newPath = (unit.getTile() == tile
-            || !tile.isExplored()
-            || !unit.getSimpleMoveType(tile).isLegal()) ? null
-            : unit.findPath(tile);
-        canvas.setGotoPath(newPath);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void performGoto(Tile tile) {
+    public void prepareDrag(int x, int y) {
         if (canvas.isGotoStarted()) canvas.stopGoto();
-
-        final Unit active = getActiveUnit();
-        if (tile == null || active == null) return;
-
-        if (active.getTile() != tile) {
-            canvas.startGoto();
-            updateGotoPath(tile);
-            traverseGotoPath();
-        }
+        canvas.setDragPoint(x, y);
+        canvas.requestFocus();
     }
     
-
+    
     // MapControls handling
 
     /**
@@ -1167,7 +1189,13 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void clickAtTile(Tile tile) {
+    public void clickAt(int count, int x, int y) {
+        // This could be a drag, which would have already been processed
+        // in @see CanvasMouseListener#mouseReleased
+        if (count == 1 && canvas.isDrag(x, y)) return;
+        
+        final Tile tile = canvas.convertToMapTile(x, y);
+        if (tile == null) return;
         Unit other;
 
         if (!tile.isExplored()) {
@@ -1958,8 +1986,10 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showTilePopUpAtSelectedTile() {
-        canvas.showTilePopup(getSelectedTile());
+    public void showTilePopup(int x, int y) {
+        final Tile tile = canvas.convertToMapTile(x, y);
+        if (tile == null) return;
+        canvas.showTilePopup(tile);
     }
 
     /**

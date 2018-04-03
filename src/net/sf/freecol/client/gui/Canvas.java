@@ -510,22 +510,10 @@ public final class Canvas extends JDesktopPane {
      * @param x The mouse's x position.
      * @param y The mouse's y position.
      */
-    private void setDragPoint(int x, int y) {
+    public void setDragPoint(int x, int y) {
         this.dragPoint = new Point(x, y);
     }
 
-    /**
-     * Prepare a drag from the given coordinates.
-     *
-     * @param x Drag x coordinate.
-     * @param y Drag x coordinate.
-     */
-    public void prepareDrag(int x, int y) {
-        if (isGotoStarted()) stopGoto();
-        setDragPoint(x, y);
-        requestFocus();
-    }
-    
     /**
      * Is mouse movement differnce above the drag threshold?
      *
@@ -534,6 +522,7 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean isDrag(int x, int y) {
         Point drag = getDragPoint();
+        if (drag == null) return false;
         int deltaX = Math.abs(x - drag.x);
         int deltaY = Math.abs(y - drag.y);
         return deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD;
@@ -1447,7 +1436,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void setupMouseListeners() {
-        addMouseListener(new CanvasMouseListener(freeColClient, this));
+        addMouseListener(new CanvasMouseListener(freeColClient));
         addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, this));
     }
 
@@ -2534,7 +2523,6 @@ public final class Canvas extends JDesktopPane {
      * @param tile The {@code Tile} where the popup occurred.
      */
     public void showTilePopup(Tile tile) {
-        if (tile == null) return;
         TilePopup tp = new TilePopup(freeColClient, this, tile);
         if (tp.hasItem()) {
             Point point = mapViewer.calculateTilePosition(tile, true);

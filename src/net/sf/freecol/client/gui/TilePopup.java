@@ -106,8 +106,10 @@ public final class TilePopup extends JPopupMenu {
                 gotoMenuItem = Utility.localizedMenuItem("goToThisTile");
             }
             if (gotoMenuItem != null) {
-                gotoMenuItem.addActionListener((ActionEvent ae) ->
-                    this.followGoto(tile));
+                gotoMenuItem.addActionListener((ActionEvent ae) -> {
+                        if (!freeColClient.currentPlayerIsMyPlayer()) return;
+                        TilePopup.this.gui.performGoto(tile);
+                    });
                 add(gotoMenuItem);
             }
 
@@ -495,22 +497,5 @@ public final class TilePopup extends JPopupMenu {
      */
     public boolean hasItem() {
         return getComponentCount() > 0;
-    }
-
-    /**
-     * Order the current unit to follow its goto path.
-     *
-     * @param popupTile The {@code Tile} this is the popup for.
-     */
-    private void followGoto(Tile popupTile) {
-        if (!this.freeColClient.currentPlayerIsMyPlayer()) return;
-        final GUI gui = this.freeColClient.getGUI();
-        final Unit activeUnit = gui.getActiveUnit();
-        if (activeUnit == null) return;
-        final Tile unitTile = activeUnit.getTile();
-        if (unitTile == popupTile) return; // already at destination
-        canvas.startGoto();
-        gui.updateGotoPath(popupTile);
-        gui.traverseGotoPath();
     }
 }

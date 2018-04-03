@@ -51,20 +51,6 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
     }
 
 
-    /**
-     * Does a mouse event update an existing goto?
-     *
-     * @param me The {@code MouseEvent} to check.
-     * @return True if there is a goto underway.
-     */
-    private boolean updateGoto(MouseEvent me) {
-        if (!canvas.isGotoStarted()) return false;
-        
-        getGUI().updateGotoPath(canvas.convertToMapTile(me.getX(), me.getY()));
-        return true;
-    }
-        
-
     // Interface MouseMotionListener
 
     /**
@@ -74,7 +60,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
     public void mouseMoved(MouseEvent me) {
         performAutoScrollIfActive(me, true);
 
-        updateGoto(me);
+        getGUI().updateGoto(me.getX(), me.getY(), false);
     }
 
     /**
@@ -87,10 +73,6 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
             != MouseEvent.BUTTON1_MASK) return;
         performDragScrollIfActive(me);
 
-        if (updateGoto(me)) {
-            ; // Pass
-        } else if (canvas.isDrag(me.getX(), me.getY())) {
-            canvas.startGoto();
-        }
+        getGUI().updateGoto(me.getX(), me.getY(), true);
     }
 }

@@ -1288,11 +1288,6 @@ public class GUI extends FreeColClientHolder {
     public void removeInGameComponents() {}
 
     /**
-     * Set up the mouse listeners for the canvas and map viewer.
-     */
-    public void setupMouseListeners() {}
-
-    /**
      * Shows the {@code VideoPanel}.
      *
      * @param userMsg An optional user message.
@@ -1551,24 +1546,47 @@ public class GUI extends FreeColClientHolder {
     public void clearGotoPath() {}
 
     /**
+     * Perform an immediate goto to a tile with the active unit.
+     *
+     * Called from {@see TilePopup}.
+     *
+     * @param tile The {@code Tile} to go to.
+     */
+    public void performGoto(Tile tile) {}
+
+    /**
+     * Perform an immediate goto to a point on the map.
+     *
+     * Called from {@see CanvasMouseListener}.
+     *
+     * @param x The x coordinate of the goto destination (pixels).
+     * @param y The x coordinate of the goto destination (pixels).
+     */
+    public void performGoto(int x, int y) {}
+    
+    /**
      * Send the active unit along the current goto path as far as possible.
      */
     public void traverseGotoPath() {}
 
     /**
-     * Update the goto path to a new tile.
+     * Update the goto path to a new position on the map.
      *
-     * @param tile The new {@code Tile} to go to.
+     * @param x The x coordinate for the new goto path destination (pixels).
+     * @param y The y coordinate for the new goto path destination (pixels).
+     * @param start If true start a new goto if one is not underway.
      */
-    public void updateGotoPath(Tile tile) {}
+    public void updateGoto(int x, int y, boolean start) {}
 
     /**
-     * Perform a full goto.
+     * Prepare a drag from the given coordinates.  This may turn into
+     * a goto if further drag motion is detected.
      *
-     * @param tile The {@code Tile} to go to.
+     * @param x Drag x coordinate (pixels).
+     * @param y Drag x coordinate (pixels).
      */
-    public void performGoto(Tile tile) {}
-        
+    public void prepareDrag(int x, int y) {}
+
     
     // MapControls handling
 
@@ -1758,11 +1776,13 @@ public class GUI extends FreeColClientHolder {
     // High level panel manipulation
 
     /**
-     * Handle a click on a tile.
+     * Handle a click on the canvas.
      *
-     * @param tile The {@code Tile} that was clicked on.
+     * @param count The click count.
+     * @param x The x coordinate of the click.
+     * @param y The y coordinate of the click.
      */
-    public void clickAtTile(Tile tile) {}
+    public void clickAt(int count, int x, int y) {}
 
     /**
      * Close a panel.
@@ -2460,7 +2480,24 @@ public class GUI extends FreeColClientHolder {
     /**
      * Show the tile popup for the current selected tile.
      */
-    public void showTilePopUpAtSelectedTile() {}
+    public void showTilePopup() {
+        showTilePopup(getSelectedTile());
+    }
+
+    /**
+     * Shows a tile popup for a given tile.
+     *
+     * @param tile The {@code Tile} where the popup occurred.
+     */
+    public void showTilePopup(Tile tile) {}
+
+    /**
+     * Shows a tile popup at a given coordinate.
+     *
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     */
+    public void showTilePopup(int x, int y) {}
 
     /**
      * Show the trade route input panel for a given trade route.
