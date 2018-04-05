@@ -143,7 +143,6 @@ public final class MapViewer extends FreeColClientHolder {
 
     /** A path for a current goto order. */
     private PathNode gotoPath = null;
-    private boolean gotoStarted = false;
 
     /** Fog of war area. */
     private final GeneralPath fog = new GeneralPath();
@@ -352,6 +351,15 @@ public final class MapViewer extends FreeColClientHolder {
         this.unitPath = path;
     }
 
+    /**
+     * Get the current goto path.
+     *
+     * @return The goto {@code PathNode}.
+     */
+    public PathNode getGotoPath() {
+        return this.gotoPath;
+    }
+
 
     // Internal calculations
 
@@ -460,6 +468,17 @@ public final class MapViewer extends FreeColClientHolder {
     // Higher level public routines
 
     /**
+     * Change the displayed map size.
+     *
+     * @param size The new map size.
+     */
+    public void changeSize(Dimension size) {
+        setSize(size);
+        updateMapDisplayVariables();
+        forceReposition();
+    }
+
+    /**
      * Change the focus tile.
      *
      * @param focus The new focus {@code Tile}.
@@ -489,6 +508,20 @@ public final class MapViewer extends FreeColClientHolder {
     public void stopCursorBlinking() {
         this.cursor.stopBlinking();
     }
+
+    /**
+     * Change the goto path.
+     * 
+     * @param gotoPath The new goto {@code PathNode}.
+     * @return True if the goto path was changed.
+     */
+    public boolean changeGotoPath(PathNode gotoPath) {
+        if (this.gotoPath == gotoPath) return false;
+        this.gotoPath = gotoPath;
+        forceReposition();
+        return true;
+    }
+
 
     // Cleanup underway below
 
@@ -1133,62 +1166,6 @@ public final class MapViewer extends FreeColClientHolder {
         return result;
     }
 
-    /**
-     * Checks if there is currently a goto operation on the mapboard.
-     *
-     * @return True if a goto operation is in progress.
-     */
-    boolean isGotoStarted() {
-        return gotoStarted;
-    }
-
-    /**
-     * Starts a goto operation on the mapboard.
-     * 
-     * Dont use this directly, call the method in canvas!
-     */
-    void startGoto() {
-        gotoStarted = true;
-        setGotoPath(null);
-    }
-
-    /**
-     * Stops any ongoing goto operation on the mapboard.
-     * 
-     * Dont use this directly, call the method in canvas!
-     */
-    void stopGoto() {
-        setGotoPath(null);
-        gotoStarted = false;
-    }
-
-    /**
-     * Gets the path to be drawn on the map.
-     *
-     * @return The path that should be drawn on the map or
-     *     {@code null} if no path should be drawn.
-     */
-    PathNode getGotoPath() {
-        return gotoPath;
-    }
-
-    /**
-     * Sets the path to be drawn on the map.
-     * 
-     * Dont use this directly, call the method in canvas!
-     *
-     * @param gotoPath The path that should be drawn on the map
-     *     or {@code null} if no path should be drawn.
-     */
-    void setGotoPath(PathNode gotoPath) {
-        this.gotoPath = gotoPath;
-        forceReposition();
-    }
-
-    void changeSize(Dimension size) {
-        setSize(size);
-        updateMapDisplayVariables();
-    }
 
     /**
      * Reset the scale of the map to the default.

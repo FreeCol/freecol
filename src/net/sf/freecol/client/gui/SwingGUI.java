@@ -209,7 +209,7 @@ public class SwingGUI extends GUI {
         // System.err.println("CAU " + newUnit + " " + (newUnit != oldUnit));
         if (newUnit == oldUnit) return false;
         
-        mapViewer.setActiveUnit(newUnit);
+        this.mapViewer.setActiveUnit(newUnit);
         clearGotoPath();
         return true;
     }
@@ -232,7 +232,8 @@ public class SwingGUI extends GUI {
         final Tile oldFocus = getFocus();
         refocus = newTile != null
             && newTile != oldFocus
-            && (oldFocus == null || refocus || !mapViewer.onScreen(newTile));
+            && (oldFocus == null || refocus
+                || !this.mapViewer.onScreen(newTile));
         if (refocus) setFocus(newTile);
 
         // System.err.println("CST " + newTile + " " + (newTile != oldTile) + " " + refocus);
@@ -282,25 +283,11 @@ public class SwingGUI extends GUI {
         final Unit unit = getActiveUnit();
         if (tile == null || unit == null) {
             clearGotoPath();
-            return;
+        } else {
+            canvas.changeGoto(unit, tile);
         }
-
-        if (!canvas.isGotoStarted()) return;
-
-        // Do nothing if the tile has not changed.
-        PathNode oldPath = canvas.getGotoPath();
-        Tile lastTile = (oldPath == null) ? null
-            : oldPath.getLastNode().getTile();
-        if (lastTile == tile) return;
-
-        // Do not show a path if it will be invalid, avoiding calling
-        // the expensive path finder if possible.
-        PathNode newPath = (unit.getTile() == tile
-            || !tile.isExplored()
-            || !unit.getSimpleMoveType(tile).isLegal()) ? null
-            : unit.findPath(tile);
-        canvas.setGotoPath(newPath);
     }
+
 
     // Implement GUI
 
@@ -789,7 +776,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void setUnitPath(PathNode path) {
-        mapViewer.setUnitPath(path);
+        this.mapViewer.setUnitPath(path);
     }
 
     /**
@@ -858,8 +845,7 @@ public class SwingGUI extends GUI {
         final Unit unit = getActiveUnit();
         if (unit == null || !canvas.isGotoStarted()) return;
 
-        final PathNode path = canvas.getGotoPath();
-        canvas.stopGoto();
+        final PathNode path = canvas.stopGoto();
         if (path == null) {
             igc().clearGotoOrders(unit);
         } else {

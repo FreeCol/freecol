@@ -257,6 +257,10 @@ public final class Canvas extends JDesktopPane {
     /** Number of pixels that must be moved before a goto is enabled. */
     private static final int DRAG_THRESHOLD = 16;
 
+    /** The cursor to show for goto operations. */
+    private static final java.awt.Cursor GO_CURSOR
+        = (java.awt.Cursor)UIManager.get("cursor.go");
+    
     /** A class for frames being used as tool boxes. */
     private static class ToolBoxFrame extends JInternalFrame {}
 
@@ -285,7 +289,11 @@ public final class Canvas extends JDesktopPane {
 
     private final MapViewer mapViewer;
 
+    /** Where the map was drag-clicked. */
     private Point dragPoint = null;
+
+    /** Has a goto operation started? */
+    private boolean gotoStarted = false;
 
     private GrayLayer greyLayer;
 
@@ -491,8 +499,8 @@ public final class Canvas extends JDesktopPane {
     /**
      * Sets the point at which the map was clicked for a drag.
      *
-     * @param x The mouse's x position.
-     * @param y The mouse's y position.
+     * @param x The mouse x position.
+     * @param y The mouse y position.
      */
     public void setDragPoint(int x, int y) {
         this.dragPoint = new Point(x, y);
@@ -505,7 +513,7 @@ public final class Canvas extends JDesktopPane {
      * @param y The new mouse y position.
      */
     public boolean isDrag(int x, int y) {
-        Point drag = getDragPoint();
+        final Point drag = getDragPoint();
         if (drag == null) return false;
         int deltaX = Math.abs(x - drag.x);
         int deltaY = Math.abs(y - drag.y);
@@ -518,46 +526,55 @@ public final class Canvas extends JDesktopPane {
      * @return True if a goto operation is in progress.
      */
     public boolean isGotoStarted() {
-        return mapViewer.isGotoStarted();
-    }
-
-    /**
-     * Gets the path to be drawn on the map.
-     *
-     * @return The path that should be drawn on the map or
-     *     {@code null} if no path should be drawn.
-     */
-    public PathNode getGotoPath() {
-        return mapViewer.getGotoPath();
-    }
-
-    /**
-     * Sets the path to be drawn on the map.
-     *
-     * @param gotoPath The path that should be drawn on the map
-     *     or {@code null} if no path should be drawn.
-     */
-    public void setGotoPath(PathNode gotoPath) {
-        mapViewer.setGotoPath(gotoPath);
-        refresh();
+        return this.gotoStarted;
     }
 
     /**
      * Starts a goto operation.
      */
     public void startGoto() {
-        setCursor((java.awt.Cursor)UIManager.get("cursor.go"));
-        mapViewer.startGoto();
+        this.gotoStarted = true;
+        setCursor(GO_CURSOR);
+        mapViewer.changeGotoPath(null);
         refresh();
     }
 
     /**
      * Stops any ongoing goto operation.
+     *
+     * @return The old goto path if any.
      */
-    public void stopGoto() {
+    public PathNode stopGoto() {
+        PathNode ret = (this.gotoStarted) ? mapViewer.getGotoPath() : null;
+        this.gotoStarted = false;
         setCursor(null);
-        mapViewer.stopGoto();
+        mapViewer.changeGotoPath(null);
         refresh();
+        return ret;
+    }
+
+    /**
+     * Change the goto path for a unit to a new tile.
+     *
+     * @param unit The {@code Unit} that is travelling.
+     * @param tile The new {@code Tile} to go to.
+     */       
+    public void changeGoto(Unit unit, Tile tile) {
+        if (!isGotoStarted()) return;
+
+        // Do nothing if the tile has not changed.
+        PathNode oldPath = mapViewer.getGotoPath();
+        Tile lastTile = (oldPath == null) ? null
+            : oldPath.getLastNode().getTile();
+        if (lastTile == tile) return;
+
+        // Do not show a path if it will be invalid, avoiding calling
+        // the expensive path finder if possible.
+        PathNode newPath = (unit.getTile() == tile
+            || !tile.isExplored()
+            || !unit.getSimpleMoveType(tile).isLegal()) ? null
+            : unit.findPath(tile);
+        mapViewer.changeGotoPath(newPath);
     }
 
 
@@ -1433,7 +1450,6 @@ public final class Canvas extends JDesktopPane {
                 || oldSize.height != getHeight()) {
             gui.updateMapControlsInCanvas();
             mapViewer.changeSize(getSize());
-            mapViewer.forceReposition();
             oldSize = getSize();
         }
     }
