@@ -33,32 +33,33 @@ public class TerrainCursor implements ActionListener  {
 
     public static final int OFF = 0;
     public static final int ON = 1;
+    private static final int blinkDelay = 500; // Milliseconds
 
-    private final Timer blinkTimer;
+    /** Is the cursor active? */
     private boolean active;
-    private final EventListenerList listenerList;
+
+    /** A timer for the blinking action. */
+    private final Timer blinkTimer;
+
+    /** The listeners watching for a blink. */
+    private final EventListenerList listenerList = new EventListenerList();
 
 
     /**
      * Creates a new {@code TerrainCursor} instance.
      */
     public TerrainCursor() {
-        active = true;
-        
-        final int blinkDelay = 500; // Milliseconds
-        
-        blinkTimer = new Timer(blinkDelay,this);
-        
-        listenerList = new EventListenerList();
+        this.active = true;
+        this.blinkTimer = new Timer(blinkDelay, this);
     }
 
     /**
-     * Returns whether this TerrainCursor is active.
+     * Is this TerrainCursor active?
      *
-     * @return a {@code boolean} value
+     * @return True if the cursor is active.
      */
     public boolean isActive() {
-        return active;
+        return this.active;
     }
 
     /**
@@ -67,15 +68,15 @@ public class TerrainCursor implements ActionListener  {
      * @param newState a {@code boolean} value
      */
     public void setActive(boolean newState) {
-        active = newState;
+        this.active = newState;
     }
 
     public void startBlinking() {
-        if (!blinkTimer.isRunning()) blinkTimer.start();
+        if (!this.blinkTimer.isRunning()) this.blinkTimer.start();
     }
 
     public void stopBlinking() {
-        if (blinkTimer.isRunning()) blinkTimer.stop();
+        if (this.blinkTimer.isRunning()) this.blinkTimer.stop();
     }
 
     public void addActionListener(ActionListener listener) {
@@ -86,13 +87,6 @@ public class TerrainCursor implements ActionListener  {
         listenerList.remove(ActionListener.class, listener);
     }
 
-    public void fireActionEvent(ActionEvent ae) {
-        for (ActionListener al
-                 : listenerList.getListeners(ActionListener.class)) {
-            al.actionPerformed(ae);
-        }
-    }
-
 
     // Interface ActionListener
 
@@ -101,10 +95,12 @@ public class TerrainCursor implements ActionListener  {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        active = !active;
-        int eventId = active? ON : OFF;
-        ActionEvent blinkEvent = new ActionEvent(this,eventId,"blink");
-        
-        fireActionEvent(blinkEvent);
+        this.active = !this.active;
+        int eventId = (this.active) ? ON : OFF;
+        ActionEvent blinkEvent = new ActionEvent(this, eventId, "blink");
+        for (ActionListener al : listenerList
+                 .getListeners(ActionListener.class)) {
+            al.actionPerformed(blinkEvent);
+        }
     }
 }

@@ -638,7 +638,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 int aPrice = player.getMonarch().loadMercenaries(air, aMercs);
                 if (aPrice > 0) {
                     List<Unit> mercs = ((ServerPlayer)player)
-                        .createUnits(aMercs, europe);
+                        .createUnits(aMercs, europe, air);
                     for (Unit u : mercs) {
                         AIUnit aiu = getAIUnit(u);
                         if (aiu == null) continue; // Can not happen

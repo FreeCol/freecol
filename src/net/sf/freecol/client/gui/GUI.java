@@ -43,6 +43,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
@@ -78,6 +79,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -101,6 +103,14 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class GUI extends FreeColClientHolder {
 
     protected static final Logger logger = Logger.getLogger(GUI.class.getName());
+
+    /** View modes. */
+    public enum ViewMode {
+        MOVE_UNITS,
+        TERRAIN,
+        MAP_TRANSFORM,
+        END_TURN
+    };
 
     /**
      * Error handler class to display a message with this GUI.
@@ -157,10 +167,6 @@ public class GUI extends FreeColClientHolder {
         "low", "normal", "high"
     };
 
-    /** View modes. */
-    public static final int MOVE_UNITS_MODE = 0;
-    public static final int VIEW_TERRAIN_MODE = 1;
-
     /** An image library to use. */
     protected final ImageLibrary imageLibrary;
 
@@ -193,10 +199,21 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Toggle the current view mode.
+     *
+     * Only really toggles between terrain and units modes.
      */
     public void toggleViewMode() {
-        int vm = getViewMode();
-        if (vm >= 0) setViewMode(1 - vm);
+        ViewMode vm = getViewMode();
+        switch (vm) {
+        case MOVE_UNITS:
+            changeView(getSelectedTile());
+            break;
+        case TERRAIN:
+            changeView(getActiveUnit());
+            break;
+        default:
+            break;
+        }
     }
 
     
@@ -1272,11 +1289,6 @@ public class GUI extends FreeColClientHolder {
     public void removeInGameComponents() {}
 
     /**
-     * Set up the mouse listeners for the canvas and map viewer.
-     */
-    public void setupMouseListeners() {}
-
-    /**
      * Shows the {@code VideoPanel}.
      *
      * @param userMsg An optional user message.
@@ -1483,6 +1495,16 @@ public class GUI extends FreeColClientHolder {
      */
     public void setFocus(Tile tileToFocus) {}
 
+    /**
+     * Focus on the active unit.
+     */
+    public void focusActiveUnit() {
+        final Unit active = getActiveUnit();
+        if (active == null) return;
+        Tile tile = active.getTile();
+        if (tile == null) return;
+        setFocus(tile);
+    }
 
 
     // General GUI manipulation
@@ -1512,7 +1534,14 @@ public class GUI extends FreeColClientHolder {
     public void refreshTile(Tile tile) {}
     
 
-    // Goto-path handling
+    // Path handling
+
+    /**
+     * Set the path for the active unit.
+     *
+     * @param path The new unit path.
+     */
+    public void setUnitPath(PathNode path) {}
 
     /**
      * Start/stop the goto path display.
@@ -1525,18 +1554,48 @@ public class GUI extends FreeColClientHolder {
     public void clearGotoPath() {}
 
     /**
+     * Perform an immediate goto to a tile with the active unit.
+     *
+     * Called from {@see TilePopup}.
+     *
+     * @param tile The {@code Tile} to go to.
+     */
+    public void performGoto(Tile tile) {}
+
+    /**
+     * Perform an immediate goto to a point on the map.
+     *
+     * Called from {@see CanvasMouseListener}.
+     *
+     * @param x The x coordinate of the goto destination (pixels).
+     * @param y The x coordinate of the goto destination (pixels).
+     */
+    public void performGoto(int x, int y) {}
+    
+    /**
      * Send the active unit along the current goto path as far as possible.
      */
     public void traverseGotoPath() {}
 
     /**
-     * Update the goto path to a new tile.
+     * Update the goto path to a new position on the map.
      *
-     * @param tile The new {@code Tile} to go to.
+     * @param x The x coordinate for the new goto path destination (pixels).
+     * @param y The y coordinate for the new goto path destination (pixels).
+     * @param start If true start a new goto if one is not underway.
      */
-    public void updateGotoPath(Tile tile) {}
+    public void updateGoto(int x, int y, boolean start) {}
 
+    /**
+     * Prepare a drag from the given coordinates.  This may turn into
+     * a goto if further drag motion is detected.
+     *
+     * @param x Drag x coordinate (pixels).
+     * @param y Drag x coordinate (pixels).
+     */
+    public void prepareDrag(int x, int y) {}
 
+    
     // MapControls handling
 
     /**
@@ -1640,24 +1699,19 @@ public class GUI extends FreeColClientHolder {
     }
 
 
-    // View mode handling, including the active unit (for
-    // MOVE_UNITS_MODE) and the selected tile (for VIEW_TERRAIN_MODE).
+    // View mode handling, including accessors for the active unit for
+    // MOVE_UNITS mode, and the selected tile for VIEW_TERRAIN mode.
+    // In MAP_TRANSFORM mode the map transform lives in the
+    // MapEditorController.
 
     /**
      * Get the current view mode.
      *
      * @return One of the view mode constants, or negative on error.
      */
-    public int getViewMode() {
-        return MOVE_UNITS_MODE;
+    public ViewMode getViewMode() {
+        return ViewMode.END_TURN;
     }
-
-    /**
-     * Set the current view mode.
-     *
-     * @param newViewMode The new view mode to use.
-     */
-    public void setViewMode(int newViewMode) {}
 
     /**
      * Get the active unit.
@@ -1669,21 +1723,6 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Set the active unit.
-     *
-     * @param unit The {@code Unit} to activate.
-     * @return True if the focus was set.
-     */
-    public boolean setActiveUnit(Unit unit) {
-        return false;
-    }
-
-    /**
-     * Center the active unit.
-     */
-    public void centerActiveUnit() {}
-
-    /**
      * Get the selected tile.
      *
      * @return The selected {@code Tile}.
@@ -1693,14 +1732,30 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
-     * Set the selected tile.
+     * Change to terrain mode and select a tile.
      *
-     * @param tile The new selected {@code Tile}.
-     * @return True if setting the tile changes the focus.
+     * @param tile The {@code Tile} to select.
      */
-    public boolean setSelectedTile(Tile tile) {
-        return true;
-    }
+    public void changeView(Tile tile) {}
+
+    /**
+     * Change to move units mode, and select a unit.
+     *
+     * @param unit The {@code Unit} to select.
+     */
+    public void changeView(Unit unit) {}
+
+    /**
+     * Change to map transform mode, and select a transform.
+     *
+     * @param mt The {@code MapTransform} to select.
+     */
+    public void changeView(MapTransform transform) {}
+    
+    /**
+     * Change to end turn mode.
+     */
+    public void changeView() {}
 
 
     // Zoom controls
@@ -1727,7 +1782,16 @@ public class GUI extends FreeColClientHolder {
 
 
     // High level panel manipulation
-    
+
+    /**
+     * Handle a click on the canvas.
+     *
+     * @param count The click count.
+     * @param x The x coordinate of the click.
+     * @param y The y coordinate of the click.
+     */
+    public void clickAt(int count, int x, int y) {}
+
     /**
      * Close a panel.
      *
@@ -2424,7 +2488,24 @@ public class GUI extends FreeColClientHolder {
     /**
      * Show the tile popup for the current selected tile.
      */
-    public void showTilePopUpAtSelectedTile() {}
+    public void showTilePopup() {
+        showTilePopup(getSelectedTile());
+    }
+
+    /**
+     * Shows a tile popup for a given tile.
+     *
+     * @param tile The {@code Tile} where the popup occurred.
+     */
+    public void showTilePopup(Tile tile) {}
+
+    /**
+     * Shows a tile popup at a given coordinate.
+     *
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     */
+    public void showTilePopup(int x, int y) {}
 
     /**
      * Show the trade route input panel for a given trade route.

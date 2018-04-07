@@ -40,11 +40,11 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.EndTurnAction;
-import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
@@ -452,7 +452,7 @@ public final class InfoPanel extends FreeColPanel {
     private InfoPanelMode getMode() {
         return (getFreeColClient().isMapEditor())
             ? InfoPanelMode.MAP
-            : (getGUI().getViewMode() == GUI.VIEW_TERRAIN_MODE)
+            : (getGUI().getViewMode() == GUI.ViewMode.TERRAIN)
             ? InfoPanelMode.TILE
             : (unitInfoPanel.hasUnit())
             ? InfoPanelMode.UNIT

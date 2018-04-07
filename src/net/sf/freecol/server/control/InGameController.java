@@ -376,11 +376,11 @@ public final class InGameController extends Controller {
             // For now, do not fail completely
         }
         List<Unit> landUnits = refPlayer.createUnits(exf.getLandUnitsList(),
-                                                     europe);//-vis: safe!map
+            europe, null);//-vis: safe!map
         List<Unit> navalUnits = refPlayer.createUnits(exf.getNavalUnitsList(),
-                                                      europe);//-vis: safe!map
+            europe, random);//-vis: safe!map
         List<Unit> leftOver = refPlayer.loadShips(landUnits, navalUnits,
-                                                  random);//-vis: safe!map
+            random);//-vis: safe!map
         if (!leftOver.isEmpty()) {
             // Should not happen, make this return null one day
             logger.warning("Failed to board REF units: "
@@ -760,7 +760,7 @@ public final class InGameController extends Controller {
             int warGold = 0;
             if (!warSupport.isEmpty()) {
                 serverPlayer.createUnits(warSupport,
-                    serverPlayer.getEurope());//-vis: safe, Europe
+                    serverPlayer.getEurope(), random);//-vis: safe, Europe
                 warGold = spec.getInteger(GameOptions.WAR_SUPPORT_GOLD);
                 warGold += (warGold/10) * (randomInt(logger, "War support gold",
                                                      random, 5) - 2);
@@ -789,7 +789,7 @@ public final class InGameController extends Controller {
             List<AbstractUnit> support = monarch.getSupport(random, sea);
             if (support.isEmpty()) break;
             serverPlayer.createUnits(support,
-                serverPlayer.getEurope());//-vis: safe, Europe
+                serverPlayer.getEurope(), random);//-vis: safe, Europe
             cs.add(See.only(serverPlayer), serverPlayer.getEurope());
             cs.add(See.only(serverPlayer),
                    new MonarchActionMessage(action, StringTemplate

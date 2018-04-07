@@ -57,27 +57,22 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
      * {@inheritDoc}
      */
     @Override
-    public void mouseMoved(MouseEvent e) {
-        performAutoScrollIfActive(e, true);
+    public void mouseMoved(MouseEvent me) {
+        performAutoScrollIfActive(me, true);
 
-        if (canvas.isGotoStarted()) {
-            getGUI().updateGotoPath(canvas.convertToMapTile(e.getX(), e.getY()));
-        }
+        getGUI().updateGoto(me.getX(), me.getY(), false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void mouseDragged(MouseEvent e) {
-        if ((e.getModifiers() & MouseEvent.BUTTON1_MASK)
-            != MouseEvent.BUTTON1_MASK) return; // Do not use getButton!
-        performDragScrollIfActive(e);
+    public void mouseDragged(MouseEvent me) {
+        // getButton does not work here, TODO: find out why
+        if ((me.getModifiers() & MouseEvent.BUTTON1_MASK)
+            != MouseEvent.BUTTON1_MASK) return;
+        performDragScrollIfActive(me);
 
-        if (canvas.isGotoStarted()) {
-            getGUI().updateGotoPath(canvas.convertToMapTile(e.getX(), e.getY()));
-        } else if (canvas.isDrag(e.getX(), e.getY())) {
-            canvas.startGoto();
-        }            
+        getGUI().updateGoto(me.getX(), me.getY(), true);
     }
 }

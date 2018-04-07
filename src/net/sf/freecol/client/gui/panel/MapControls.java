@@ -27,6 +27,7 @@ import net.sf.freecol.client.ClientOptions;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
+import net.sf.freecol.client.control.MapTransform;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
@@ -41,7 +42,6 @@ import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
-import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
@@ -176,11 +176,18 @@ public abstract class MapControls extends FreeColClientHolder {
         Unit unit = gui.getActiveUnit();
 
         switch (gui.getViewMode()) {
-        case GUI.MOVE_UNITS_MODE:
+        case MOVE_UNITS:
             infoPanel.update(unit);
             break;
-        case GUI.VIEW_TERRAIN_MODE:
+        case TERRAIN:
             infoPanel.update(gui.getSelectedTile());
+            break;
+        case MAP_TRANSFORM:
+            infoPanel.update(getFreeColClient().getMapEditorController()
+                .getMapTransform());
+            break;
+        case END_TURN:
+            infoPanel.update((Unit)null);
             break;
         default:
             break;
@@ -190,17 +197,6 @@ public abstract class MapControls extends FreeColClientHolder {
         }
     }
 
-    /**
-     * Updates this {@code InfoPanel}.
-     *
-     * @param mapTransform The current MapTransform.
-     */
-    public void update(MapTransform mapTransform) {
-        if (infoPanel != null) {
-            infoPanel.update(mapTransform);
-        }
-    }
-    
     public void zoomIn() {
         miniMap.zoomIn();
         repaint();

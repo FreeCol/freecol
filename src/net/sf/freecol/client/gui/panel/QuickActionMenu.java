@@ -502,7 +502,7 @@ public final class QuickActionMenu extends JPopupMenu {
                     freeColClient.getInGameController()
                         .changeState(tempUnit, Unit.UnitState.ACTIVE);
                 }
-                gui.setActiveUnit(tempUnit);
+                gui.changeView(tempUnit);
             });
         menuItem.setEnabled(!isUnitAtSea);
         this.add(menuItem);

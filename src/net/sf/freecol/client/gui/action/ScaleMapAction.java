@@ -56,7 +56,6 @@ public class ScaleMapAction extends FreeColAction {
     private void scaleMapTo(final int width, final int height) {
         final Map map = getGame().getMap();
         map.scale(width, height);
-        getGUI().setSelectedTile(map.getTile(0, 0));
         getGUI().refresh();
     }
 

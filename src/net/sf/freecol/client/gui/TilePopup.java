@@ -106,8 +106,10 @@ public final class TilePopup extends JPopupMenu {
                 gotoMenuItem = Utility.localizedMenuItem("goToThisTile");
             }
             if (gotoMenuItem != null) {
-                gotoMenuItem.addActionListener((ActionEvent ae) ->
-                    this.followGoto(tile));
+                gotoMenuItem.addActionListener((ActionEvent ae) -> {
+                        if (!freeColClient.currentPlayerIsMyPlayer()) return;
+                        TilePopup.this.gui.performGoto(tile);
+                    });
                 add(gotoMenuItem);
             }
 
@@ -211,7 +213,7 @@ public final class TilePopup extends JPopupMenu {
                 .template("activateAllUnits"));
             activateAllItem.addActionListener((ActionEvent ae) -> {
                     for (Unit unit : tile.getUnitList()) igc.clearOrders(unit);
-                    gui.setActiveUnit(tile.getFirstUnit());
+                    gui.changeView(tile.getFirstUnit());
                 });
             add(activateAllItem);
         }
@@ -342,7 +344,7 @@ public final class TilePopup extends JPopupMenu {
                         activeUnit.getTile(), tile, activeUnit.getCarrier(),
                         null, lb);
                     gui.showInformationMessage(lb.toString());
-                    canvas.setCurrentPath(path);
+                    gui.setUnitPath(path);
                     gui.refresh();                        
                 });
             add(menuItem);
@@ -383,7 +385,7 @@ public final class TilePopup extends JPopupMenu {
             FontLibrary.FontSize.TINY, Font.BOLD,
             gui.getImageLibrary().getScaleFactor()));
         menuItem.addActionListener((ActionEvent ae) -> {
-                gui.setActiveUnit(unit);
+                gui.changeView(unit);
             });
         if (indent) {
             menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
@@ -495,22 +497,5 @@ public final class TilePopup extends JPopupMenu {
      */
     public boolean hasItem() {
         return getComponentCount() > 0;
-    }
-
-    /**
-     * Order the current unit to follow its goto path.
-     *
-     * @param popupTile The {@code Tile} this is the popup for.
-     */
-    private void followGoto(Tile popupTile) {
-        if (!this.freeColClient.currentPlayerIsMyPlayer()) return;
-        final GUI gui = this.freeColClient.getGUI();
-        final Unit activeUnit = gui.getActiveUnit();
-        if (activeUnit == null) return;
-        final Tile unitTile = activeUnit.getTile();
-        if (unitTile == popupTile) return; // already at destination
-        canvas.startGoto();
-        gui.updateGotoPath(popupTile);
-        gui.traverseGotoPath();
     }
 }

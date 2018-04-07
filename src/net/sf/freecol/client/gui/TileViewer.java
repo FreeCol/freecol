@@ -19,9 +19,7 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -115,18 +113,16 @@ public final class TileViewer extends FreeColClientHolder {
         }
     }
 
+    /** The height offset to paint at (in pixels). */
+    static final int STATE_OFFSET_X = 25,
+                     STATE_OFFSET_Y = 10;
+
     private ImageLibrary lib;
 
     private RoadPainter rp;
 
     // Helper variables for displaying.
     private int tileHeight, tileWidth, halfHeight, halfWidth;
-
-    // The height offset to paint at (in pixels).
-    static final int STATE_OFFSET_X = 25,
-                     STATE_OFFSET_Y = 10;
-
-    private final GeneralPath fog = new GeneralPath();
 
     /** Standard rescaling used in displayTile. */
     private final RescaleOp standardRescale
@@ -143,28 +139,63 @@ public final class TileViewer extends FreeColClientHolder {
     public TileViewer(FreeColClient freeColClient) {
         super(freeColClient);
 
-        setImageLibraryAndUpdateData(new ImageLibrary());
+        changeImageLibrary(new ImageLibrary());
     }
 
+
+    // Primitives
 
     /**
      * Gets the contained {@code ImageLibrary}.
+     *
+     * Public for {@see GUI.getTileImageLibrary}.
      * 
      * @return The image library;
      */
-    ImageLibrary getImageLibrary() {
-        return lib;
+    public ImageLibrary getImageLibrary() {
+        return this.lib;
     }
 
     /**
+     * Set the {@code ImageLibrary}.
+     * 
+     * @param lib The new {@code ImageLibrary}.
+     */
+    private void setImageLibrary(ImageLibrary lib) {
+        this.lib = lib;
+    }
+
+    
+    /**
+     * Sets the ImageLibrary and calculates various items that depend
+     * on tile size.
+     *
+     * @param lib an {@code ImageLibrary} value
+     */
+    public void changeImageLibrary(ImageLibrary lib) {
+        setImageLibrary(lib);
+
+        // ATTENTION: we assume that all base tiles have the same size
+        Dimension tileSize = lib.tileSize;
+        rp = new RoadPainter(tileSize);
+        tileHeight = tileSize.height;
+        tileWidth = tileSize.width;
+        halfHeight = tileHeight/2;
+        halfWidth = tileWidth/2;
+    }
+
+
+    /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
+     *
+     * Public for {@see GUI.createTileImageWithOverlayAndForest}.
      *
      * @param type The type of the terrain-image to return.
      * @param size The maximum size of the terrain image to return.
      * @return The terrain-image
      */
-    static BufferedImage createTileImageWithOverlayAndForest(
-            TileType type, Dimension size) {
+    public BufferedImage createTileImageWithOverlayAndForest(TileType type,
+                                                             Dimension size) {
         Dimension size2 = new Dimension(
             (size.width > 0) ? size.width
                              : (2*ImageLibrary.TILE_SIZE.width*size.height +
@@ -208,10 +239,12 @@ public final class TileViewer extends FreeColClientHolder {
      * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      * Draws the terrain and improvements.
      *
+     * Public for {@see GUI.createTileImageWithBeachBorderAndItems}.
+     *
      * @param tile The Tile to draw.
      * @return The image.
      */
-    BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
+    public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
         if (!tile.isExplored())
             return lib.getTerrainImage(null, tile.getX(), tile.getY());
         final TileType tileType = tile.getType();
@@ -264,13 +297,15 @@ public final class TileViewer extends FreeColClientHolder {
      * from the corresponding {@code ColonyTile} of the given
      * {@code Colony}.
      *
+     * Public for {@see GUI.createColonyTileImage}.
+     *
      * @param tile The {@code Tile} to draw.
      * @param colony The {@code Colony} to create the visualization
      *      of the {@code Tile} for. This object is also used to
      *      get the {@code ColonyTile} for the given {@code Tile}.
      * @return The image.
      */
-    BufferedImage createColonyTileImage(Tile tile, Colony colony) {
+    public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
         final TileType tileType = tile.getType();
         Dimension terrainTileSize = lib.tileSize;
         BufferedImage overlayImage = lib.getOverlayImage(tile);
@@ -291,13 +326,15 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Displays the 3x3 tiles for the TilesPanel in ColonyPanel.
      * 
+     * Public for {@see GUI.displayColonyTles}.
+     *
      * @param g The {@code Graphics2D} object on which to draw
      *      the {@code Tile}.
      * @param tiles The array containing the {@code Tile} objects to draw.
      * @param colony The {@code Colony} to create the visualization
      *      of the {@code Tile} objects for.
      */
-    void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
+    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         Dimension tileSize = lib.tileSize;
         for (int x = 0; x < 3; x++) {
@@ -329,7 +366,7 @@ public final class TileViewer extends FreeColClientHolder {
      * @param overlayImage The BufferedImage of the tile overlay.
      */
     private void displayColonyTile(Graphics2D g, Tile tile, Colony colony,
-                                  BufferedImage overlayImage) {
+                                   BufferedImage overlayImage) {
         displayTile(g, tile, colony.getOwner(), overlayImage);
 
         ColonyTile colonyTile = colony.getColonyTile(tile);
@@ -384,36 +421,12 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /**
-     * Sets the ImageLibrary and calculates various items that depend
-     * on tile size.
-     *
-     * @param lib an {@code ImageLibrary} value
-     */
-    void setImageLibraryAndUpdateData(ImageLibrary lib) {
-        this.lib = lib;
-        // ATTENTION: we assume that all base tiles have the same size
-        Dimension tileSize = lib.tileSize;
-        rp = new RoadPainter(tileSize);
-        tileHeight = tileSize.height;
-        tileWidth = tileSize.width;
-        halfHeight = tileHeight/2;
-        halfWidth = tileWidth/2;
-
-        fog.reset();
-        fog.moveTo(halfWidth, 0);
-        fog.lineTo(tileWidth, halfHeight);
-        fog.lineTo(halfWidth, tileHeight);
-        fog.lineTo(0, halfHeight);
-        fog.closePath();
-    }
-
-    /**
      * Centers the given Image on the tile.
      *
      * @param g a {@code Graphics2D}
      * @param image the BufferedImage
      */
-    void displayCenteredImage(Graphics2D g, BufferedImage image) {
+    public void displayCenteredImage(Graphics2D g, BufferedImage image) {
         g.drawImage(image,
                     (tileWidth - image.getWidth())/2,
                     (tileHeight - image.getHeight())/2,
@@ -427,10 +440,9 @@ public final class TileViewer extends FreeColClientHolder {
      * @param g a {@code Graphics2D}
      * @param image the BufferedImage
      */
-    void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
+    public void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
         int y = tileHeight - image.getHeight();
-        if(y > 0)
-            y /= 2;
+        if (y > 0) y /= 2;
         g.drawImage(image, (tileWidth - image.getWidth())/2, y, null);
     }
 
@@ -441,120 +453,81 @@ public final class TileViewer extends FreeColClientHolder {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
      */
-    void displayTileWithBeachAndBorder(Graphics2D g, Tile tile) {
-        if (tile != null) {
-            TileType tileType = tile.getType();
-            int x = tile.getX();
-            int y = tile.getY();
-            // ATTENTION: we assume that all base tiles have the same size
-            g.drawImage(lib.getTerrainImage(tileType, x, y),
-                        0, 0, null);
-            if (tile.isExplored()) {
-                if (!tile.isLand() && tile.getStyle() > 0) {
-                    int edgeStyle = tile.getStyle() >> 4;
-                    if (edgeStyle > 0) {
-                        g.drawImage(lib.getBeachEdgeImage(edgeStyle, x, y),
-                                    0, 0, null);
-                    }
-                    int cornerStyle = tile.getStyle() & 15;
-                    if (cornerStyle > 0) {
-                        g.drawImage(lib.getBeachCornerImage(cornerStyle, x, y),
-                                    0, 0, null);
-                    }
-                }
+    public void displayTileWithBeachAndBorder(Graphics2D g, Tile tile) {
+        final TileType tileType = tile.getType();
+        final int x = tile.getX();
+        final int y = tile.getY();
 
-                List<SortableImage> imageBorders = new ArrayList<>(8);
-                SortableImage si;
-                for (Direction direction : Direction.values()) {
-                    Tile borderingTile = tile.getNeighbourOrNull(direction);
-                    if (borderingTile != null && borderingTile.isExplored()) {
-                        TileType borderingTileType = borderingTile.getType();
-                        if (borderingTileType != tileType) {
-                            if (!tile.isLand() && borderingTile.isLand()) {
-                                // If there is a Coast image (eg. beach) defined, use it, otherwise skip
-                                // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                                si = new SortableImage(
-                                    lib.getBorderImage(borderingTileType, direction, x, y),
-                                    borderingTileType.getIndex());
-                                imageBorders.add(si);
-                                TileImprovement river = borderingTile.getRiver();
-                                if (river != null) {
-                                    int magnitude = river.getRiverConnection(
-                                        direction.getReverseDirection());
-                                    if (magnitude > 0) {
-                                        si = new SortableImage(
-                                            lib.getRiverMouthImage(direction,
-                                                magnitude, x, y),
-                                            -1);
-                                        imageBorders.add(si);
-                                    }
-                                }
-                            } else if (!tile.isLand() || borderingTile.isLand()) {
-                                if (borderingTileType.getIndex() < tileType.getIndex() &&
-                                        !lib.getTerrainImage(tileType, 0, 0).equals(lib.getTerrainImage(borderingTileType, 0, 0))) {
-                                    // Draw land terrain with bordering land type, or ocean/high seas limit,
-                                    // if the tiles do not share same graphics (ocean & great river)
-                                    si = new SortableImage(
-                                            lib.getBorderImage(borderingTileType, direction, x, y),
-                                            borderingTileType.getIndex());
-                                    imageBorders.add(si);
-                                }
-                            }
-                        }
+        // ATTENTION: we assume that all base tiles have the same size
+        g.drawImage(lib.getTerrainImage(tileType, x, y), 0, 0, null);
+
+        if (!tile.isExplored()) return;
+        if (!tile.isLand() && tile.getStyle() > 0) {
+            int edgeStyle = tile.getStyle() >> 4;
+            if (edgeStyle > 0) {
+                g.drawImage(lib.getBeachEdgeImage(edgeStyle, x, y),
+                            0, 0, null);
+            }
+            int cornerStyle = tile.getStyle() & 15;
+            if (cornerStyle > 0) {
+                g.drawImage(lib.getBeachCornerImage(cornerStyle, x, y),
+                            0, 0, null);
+            }
+        }
+
+        List<SortableImage> imageBorders = new ArrayList<>(8);
+        for (Direction direction : Direction.values()) {
+            Tile borderingTile = tile.getNeighbourOrNull(direction);
+            TileType borderingTileType;
+            SortableImage si;
+            if (borderingTile == null
+                || !borderingTile.isExplored()
+                || (borderingTileType = borderingTile.getType()) == tileType) continue;
+            if (!tile.isLand() && borderingTile.isLand()) {
+                // If there is a Coast image (eg. beach) defined, use
+                // it, otherwise skip Draw the grass from the
+                // neighboring tile, spilling over on the side of this tile
+                si = new SortableImage(lib.getBorderImage(borderingTileType,
+                        direction, x, y),
+                    borderingTileType.getIndex());
+                imageBorders.add(si);
+                TileImprovement river = borderingTile.getRiver();
+                if (river != null) {
+                    int magnitude = river.getRiverConnection(direction.getReverseDirection());
+                    if (magnitude > 0) {
+                        si = new SortableImage(lib.getRiverMouthImage(direction,
+                                magnitude, x, y), -1);
+                        imageBorders.add(si);
                     }
                 }
-                for (SortableImage sorted : sort(imageBorders)) {
-                    g.drawImage(sorted.image, 0, 0, null);
+            } else if (!tile.isLand() || borderingTile.isLand()) {
+                if (borderingTileType.getIndex() < tileType.getIndex()
+                    && !lib.getTerrainImage(tileType, 0, 0).equals(lib.getTerrainImage(borderingTileType, 0, 0))) {
+                    // Draw land terrain with bordering land type, or
+                    // ocean/high seas limit, if the tiles do not
+                    // share same graphics (ocean & great river)
+                    si = new SortableImage(lib.getBorderImage(borderingTileType,
+                            direction, x, y),
+                        borderingTileType.getIndex());
+                    imageBorders.add(si);
                 }
             }
         }
+        for (SortableImage si : sort(imageBorders)) {
+            g.drawImage(si.image, 0, 0, null);
+        }
     }
 
-    void displayUnknownTileBorder(Graphics2D g, Tile tile) {
-        if (tile.isExplored()) {
-            for (Direction direction : Direction.values()) {
-                Tile borderingTile = tile.getNeighbourOrNull(direction);
-                if (borderingTile != null && !borderingTile.isExplored()) {
-                    g.drawImage(lib.getBorderImage(
-                            null, direction, tile.getX(), tile.getY()),
-                        0, 0, null);
-                }
+    public void displayUnknownTileBorder(Graphics2D g, Tile tile) {
+        if (!tile.isExplored()) return;
+        
+        for (Direction direction : Direction.values()) {
+            Tile borderingTile = tile.getNeighbourOrNull(direction);
+            if (borderingTile != null && !borderingTile.isExplored()) {
+                g.drawImage(lib.getBorderImage(null, direction,
+                                               tile.getX(), tile.getY()),
+                            0, 0, null);
             }
-        }
-    }
-
-    /**
-     * Checks if Fog of war has to be drawn for this Tile.
-     *
-     * @param tile The {@code Tile} to draw.
-     * @return true if there is fog
-     */
-    boolean hasFogOfWar(Tile tile) {
-        if (getGame() != null
-            && getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
-            && getMyPlayer() != null
-            && !getMyPlayer().canSee(tile)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Displays Fog of War of the tile onto the given Graphics2D object,
-     * if necessary.
-     *
-     * @param g The {@code Graphics2D} object on which to draw
-     *     the {@code Tile}.
-     * @param tile The {@code Tile} to draw.
-     */
-    void displayFogOfWar(Graphics2D g, Tile tile) {
-        if (hasFogOfWar(tile)) {
-            g.setColor(Color.BLACK);
-            Composite oldComposite = g.getComposite();
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                                                      0.2f));
-            g.fill(fog);
-            g.setComposite(oldComposite);
         }
     }
 
@@ -565,7 +538,7 @@ public final class TileViewer extends FreeColClientHolder {
      * @param g The Graphics2D object on which the text gets drawn.
      * @param tile The Tile to draw the text on.
      */
-    void displayOptionalTileText(Graphics2D g, Tile tile) {
+    public void displayOptionalTileText(Graphics2D g, Tile tile) {
         String text = null;
         int op = getClientOptions().getInteger(ClientOptions.DISPLAY_TILE_TEXT);
         switch (op) {
@@ -640,8 +613,8 @@ public final class TileViewer extends FreeColClientHolder {
      * @param withNumber Whether to display the number of units present.
      * @param rop An optional RescaleOp for fog of war.
      */
-    void displaySettlementWithChipsOrPopulationNumber(
-            Graphics2D g, Tile tile, boolean withNumber, RescaleOp rop) {
+    public void displaySettlementWithChipsOrPopulationNumber(Graphics2D g,
+        Tile tile, boolean withNumber, RescaleOp rop) {
         //TODO: Use rop to apply Fog of War!
         final Player player = getMyPlayer();
         final Settlement settlement = tile.getSettlement();
@@ -723,8 +696,8 @@ public final class TileViewer extends FreeColClientHolder {
      * @param rop An optional RescaleOp for fog of war.
      * @param overlayImage The BufferedImage for the tile overlay.
      */
-    void displayTileItems(Graphics2D g, Tile tile, RescaleOp rop,
-                          BufferedImage overlayImage) {
+    public void displayTileItems(Graphics2D g, Tile tile, RescaleOp rop,
+                                 BufferedImage overlayImage) {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
         BufferedImage image = new BufferedImage(
