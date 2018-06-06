@@ -156,8 +156,14 @@ public class TileItemContainer extends FreeColGameObject {
      * @param item The {@code TileItem} to add.
      */
     private final void addTileItem(TileItem item) {
+        int i = 0;
+        int size = tileItems.size();
+        int zIndex = item.getZIndex();
         synchronized (tileItems) {
-            tileItems.add(item);
+            while (i < size && tileItems.get(i).getZIndex() < zIndex) {
+                i++;
+            }
+            tileItems.add(i, item);
         }
     }
 
@@ -296,7 +302,7 @@ public class TileItemContainer extends FreeColGameObject {
             return find(tileItems, pred);
         }
     }
-    
+
     /**
      * Gets any lost city rumour in this container.
      *
@@ -414,7 +420,7 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Does this container contain an item that allows the tile to 
+     * Does this container contain an item that allows the tile to
      * produce a goods type?
      *
      * @param goodsType The {@code GoodsType} to produce.
@@ -444,7 +450,7 @@ public class TileItemContainer extends FreeColGameObject {
                     && ((TileImprovement)ti).isComplete()))) {
             Direction direction = targetTile.getDirection(fromTile);
             if (direction == null) return INFINITY;
-            moveCost = Math.min(moveCost, 
+            moveCost = Math.min(moveCost,
                 ((TileImprovement)item).getMoveCost(direction, moveCost));
         }
         return moveCost;
