@@ -48,12 +48,6 @@
       <unit-type-change id="model.unitChange.experience.masterGunsmith"
                         from="model.unit.freeColonist"
                         to="model.unit.masterGunsmith" probability="3"/>
-      <unit-type-change id="model.unitChange.experience.masterBlacksmith"
-                        from="model.unit.freeColonist"
-                        to="model.unit.masterBlacksmith" probability="3"/>
-      <unit-type-change id="model.unitChange.experience.masterBlacksmith"
-                        from="model.unit.freeColonist"
-                        to="model.unit.masterBlacksmith" probability="3"/>
     </unit-change-type>
   </unit-change-types>
 </freecol-specification>
