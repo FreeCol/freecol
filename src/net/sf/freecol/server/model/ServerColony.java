@@ -280,7 +280,7 @@ public class ServerColony extends Colony implements TurnTaker {
                             .addName("%colony%", getName()));
                 }
                 return null;
-                
+
             case POPULATION_TOO_SMALL:
                 cs.addMessage(owner,
                     new ModelMessage(MessageType.WARNING,
@@ -349,7 +349,7 @@ public class ServerColony extends Colony implements TurnTaker {
 
         for (Tile t : owned) t.cacheUnseen(newOwner);//+til
         changeOwner(newOwner);//-vis(both),-til
-        
+
         String change = (newOwner.isUndead()) ? UnitChangeType.UNDEAD
             : UnitChangeType.CAPTURE;
         List<Unit> units = getAllUnitsList();
@@ -411,12 +411,12 @@ public class ServerColony extends Colony implements TurnTaker {
      */
     public void csFreeBuilding(BuildingType type, ChangeSet cs) {
         if (!canBuild(type)) return;
-        
+
         // Does this free building displace an existing one?
         Building found = getBuilding(type);
         List<Unit> present = (found == null) ? Collections.<Unit>emptyList()
             : found.getUnitList();
-        
+
         final ServerPlayer owner = (ServerPlayer)getOwner();
         Building build = new ServerBuilding(getGame(), this, type);
         buildBuilding(build);//-til
@@ -478,7 +478,7 @@ public class ServerColony extends Colony implements TurnTaker {
         if (brave == null) return;
         ServerPlayer newOwner = (ServerPlayer)getOwner();
         ServerPlayer oldOwner = (ServerPlayer)brave.getOwner();
-        if (oldOwner.csChangeOwner(brave, newOwner, UnitChangeType.CONVERSION, 
+        if (oldOwner.csChangeOwner(brave, newOwner, UnitChangeType.CONVERSION,
                                    getTile(), cs)) { //-vis(other)
             brave.changeRole(getSpecification().getDefaultRole(), 0);
             for (Goods g : brave.getCompactGoodsList()) brave.removeGoods(g);
@@ -630,7 +630,7 @@ public class ServerColony extends Colony implements TurnTaker {
                 }
             }
         }
-    
+
         // If a build queue is empty, check that we are not producing
         // any goods types useful for BuildableTypes, except if that
         // type is the input to some other form of production.  (Note:
@@ -700,9 +700,9 @@ public class ServerColony extends Colony implements TurnTaker {
                     UnitType expert = spec.getExpertForProducing(goods.getType());
                     int experience = goods.getAmount() / wl.getUnitCount();
                     for (Unit unit : transform(wl.getUnits(),
-                            u -> u.getExperienceType() == goods.getType()
-                            && u.getUnitChange(UnitChangeType.EXPERIENCE,
-                                               expert) != null)) {
+                            u -> u.getUnitChange(UnitChangeType.EXPERIENCE,
+                                                 expert) != null)) {
+                        unit.changeExperienceType(goods.getType());
                         unit.setExperience(unit.getExperience() + experience);
                         cs.addPartial(See.only(owner), unit,
                             "experience", String.valueOf(unit.getExperience()));
@@ -798,7 +798,7 @@ public class ServerColony extends Colony implements TurnTaker {
                         lb.add(" famine in ", turns,
                             " food=", stored, " production=", net);
                     }
-                }                
+                }
             }
         }
         invalidateCache();
