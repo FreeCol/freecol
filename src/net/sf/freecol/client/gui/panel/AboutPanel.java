@@ -78,10 +78,13 @@ public final class AboutPanel extends FreeColPanel {
         = "http://www.freecol.org";
     /** The FreeCol SourceForge project link */
     private static final String PROJECT_URL
-        = "http://sourceforge.net/projects/freecol/";
+        = "https://sourceforge.net/projects/freecol/";
     /** The link to the user manual for FreeCol users */
     private static final String MANUAL_URL
         = "http://www.freecol.org/documentation/freecol-user-manual.html";
+    /** The link to the GitHub mirror */
+    private static final String GITHUB_URL
+        = "https://github.com/FreeCol/freecol";
 
 
     /**
@@ -129,6 +132,15 @@ public final class AboutPanel extends FreeColPanel {
         apSFProject.setFont(fontBold);
         add(apSFProject, "newline 10");
         JButton apProjectURL = Utility.getLinkButton(PROJECT_URL, null, PROJECT_URL);
+        apProjectURL.addActionListener(this);
+        apProjectURL.setFont(fontNormal);
+        add(apProjectURL, "newline");
+
+        //GitHub Mirror
+        JLabel apGitHubButton = Utility.localizedLabel("aboutPanel.github");
+        apSFProject.setFont(fontBold);
+        add(apSFProject, "newline 10");
+        JButton apGitHubURL = Utility.getLinkButton(GITHUB_URL, null, GITHUB_URL);
         apProjectURL.addActionListener(this);
         apProjectURL.setFont(fontNormal);
         add(apProjectURL, "newline");
