@@ -138,12 +138,12 @@ public final class AboutPanel extends FreeColPanel {
 
         //GitHub Mirror
         JLabel apGitHubButton = Utility.localizedLabel("aboutPanel.github");
-        apSFProject.setFont(fontBold);
-        add(apSFProject, "newline 10");
+        apGitHubButton.setFont(fontBold);
+        add(apGitHubButton, "newline 10");
         JButton apGitHubURL = Utility.getLinkButton(GITHUB_URL, null, GITHUB_URL);
-        apProjectURL.addActionListener(this);
-        apProjectURL.setFont(fontNormal);
-        add(apProjectURL, "newline");
+        apGitHubURL.addActionListener(this);
+        apGitHubURL.setFont(fontNormal);
+        add(apGitHubURL, "newline");
 
         // Manual
         JLabel apManual = Utility.localizedLabel("aboutPanel.manual");
@@ -179,8 +179,11 @@ public final class AboutPanel extends FreeColPanel {
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String url = ae.getActionCommand();
-        if (SITE_URL.equals(url) || PROJECT_URL.equals(url)
-            || MANUAL_URL.equals(url)) {
+        if (SITE_URL.equals(url)
+                || PROJECT_URL.equals(url)
+                || MANUAL_URL.equals(url)
+                || GITHUB_URL.equals(url)
+                ) {
             OSUtils.launchBrowser(url);
         }
         else {
