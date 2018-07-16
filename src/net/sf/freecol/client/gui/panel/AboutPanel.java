@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2017   The FreeCol Team
+ *  Copyright (C) 2002-2018   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -78,10 +78,13 @@ public final class AboutPanel extends FreeColPanel {
         = "http://www.freecol.org";
     /** The FreeCol SourceForge project link */
     private static final String PROJECT_URL
-        = "http://sourceforge.net/projects/freecol/";
+        = "https://sourceforge.net/projects/freecol/";
     /** The link to the user manual for FreeCol users */
     private static final String MANUAL_URL
         = "http://www.freecol.org/documentation/freecol-user-manual.html";
+    /** The link to the GitHub mirror */
+    private static final String GITHUB_URL
+        = "https://github.com/FreeCol/freecol";
 
 
     /**
@@ -133,6 +136,15 @@ public final class AboutPanel extends FreeColPanel {
         apProjectURL.setFont(fontNormal);
         add(apProjectURL, "newline");
 
+        //GitHub Mirror
+        JLabel apGitHubButton = Utility.localizedLabel("aboutPanel.github");
+        apGitHubButton.setFont(fontBold);
+        add(apGitHubButton, "newline 10");
+        JButton apGitHubURL = Utility.getLinkButton(GITHUB_URL, null, GITHUB_URL);
+        apGitHubURL.addActionListener(this);
+        apGitHubURL.setFont(fontNormal);
+        add(apGitHubURL, "newline");
+
         // Manual
         JLabel apManual = Utility.localizedLabel("aboutPanel.manual");
         apManual.setFont(fontBold);
@@ -167,8 +179,11 @@ public final class AboutPanel extends FreeColPanel {
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String url = ae.getActionCommand();
-        if (SITE_URL.equals(url) || PROJECT_URL.equals(url)
-            || MANUAL_URL.equals(url)) {
+        if (SITE_URL.equals(url)
+                || PROJECT_URL.equals(url)
+                || MANUAL_URL.equals(url)
+                || GITHUB_URL.equals(url)
+                ) {
             OSUtils.launchBrowser(url);
         }
         else {

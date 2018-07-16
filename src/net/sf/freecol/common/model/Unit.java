@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2017   The FreeCol Team
+ *  Copyright (C) 2002-2018   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -107,7 +107,7 @@ public class Unit extends GoodsLocation
     /** Useful predicate for finding sentried land units. */
     public static final Predicate<Unit> sentryPred = u ->
         !u.isNaval() && u.getState() == UnitState.SENTRY;
-    
+
     /** A state a Unit can have. */
     public static enum UnitState {
         ACTIVE,
@@ -265,7 +265,7 @@ public class Unit extends GoodsLocation
             setEthnicity(owner.getNationId());
         }
     }
-        
+
     /**
      * Get the individual name of this unit.
      *
@@ -432,7 +432,7 @@ public class Unit extends GoodsLocation
             .addName("%chance%", (unknown) ? "??"
                 : String.valueOf((int)(combatOdds.win * 100)));
     }
-    
+
     /**
      * Get a destination label for this unit.
      *
@@ -819,7 +819,7 @@ public class Unit extends GoodsLocation
      * Get the role count.
      *
      * @return The current role count.
-     */    
+     */
     public int getRoleCount() {
         return roleCount;
     }
@@ -828,7 +828,7 @@ public class Unit extends GoodsLocation
      * Set the role count.
      *
      * @param roleCount The new role count.
-     */    
+     */
     public void setRoleCount(int roleCount) {
         this.roleCount = roleCount;
     }
@@ -1126,7 +1126,6 @@ public class Unit extends GoodsLocation
      */
     public void changeWorkType(GoodsType type) {
         setWorkType(type);
-        if (type != null) experienceType = type;
         WorkLocation wl = getWorkLocation();
         if (wl != null) wl.updateProductionType();
     }
@@ -1134,10 +1133,22 @@ public class Unit extends GoodsLocation
     /**
      * Gets the type of goods this unit has accrued experience producing.
      *
-     * @return The type of goods this unit would produce.
+     * @return The {@code GoodsType} this unit would produce.
      */
     public GoodsType getExperienceType() {
         return experienceType;
+    }
+
+    /**
+     * Sets the type of goods this unit has accrued experience producing.
+     *
+     * @param type The {@code GoodsType} this unit would produce.
+     */
+    public void changeExperienceType(GoodsType type) {
+        if (experienceType != type) {
+            experience = 0;
+            experienceType = type;
+        }
     }
 
     /**
@@ -1358,7 +1369,7 @@ public class Unit extends GoodsLocation
     public UnitTypeChange getUnitChange(String change) {
         return getUnitChange(change, null);
     }
-    
+
     /**
      * Get a unit change for this unit.
      *
@@ -2565,7 +2576,7 @@ public class Unit extends GoodsLocation
             && getState() == UnitState.ACTIVE
             && getMovesLeft() > 0;
     }
-    
+
     /**
      * Is this unit a suitable `next active unit', that is, the unit
      * needs to be currently movable by the player.
@@ -2607,7 +2618,7 @@ public class Unit extends GoodsLocation
             // Trade route code might set destination
     }
 
-    
+
     // Map support routines
 
     /**
@@ -2711,7 +2722,7 @@ public class Unit extends GoodsLocation
             Tile tile = getTile();
             if (tile != null && tile.isOnRiver()
                 && tile.isHighSeasConnected()) {
-                path = search(getLocation(), 
+                path = search(getLocation(),
                     GoalDeciders.getCornerGoalDecider(),
                     CostDeciders.avoidSettlementsAndBlockingUnits(),
                     INFINITY, null);
@@ -2855,7 +2866,7 @@ public class Unit extends GoodsLocation
     public Colony getClosestColony(List<Colony> colonies) {
         return getClosestColony(colonies.stream());
     }
-    
+
     /**
      * Get the colony that can be reached by this unit in the least number
      * of turns.
@@ -2868,7 +2879,7 @@ public class Unit extends GoodsLocation
             (col == null) ? MANY_TURNS-1 : this.getTurnsToReach(col));
         return minimize(concat(Stream.of((Colony)null), colonies), comp);
     }
-    
+
     /**
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier.
@@ -3135,7 +3146,7 @@ public class Unit extends GoodsLocation
                     }
                     final Predicate<Unit> attackerPred = u -> {
                         PathNode p;
-                        return (u.canAttack(unit) 
+                        return (u.canAttack(unit)
                             && cm.calculateCombatOdds(u, unit).win >= threat
                             && (p = u.findPath(start)) != null
                             && p.getTotalTurns() < range);
@@ -3205,7 +3216,7 @@ public class Unit extends GoodsLocation
             : new HashSet<Tile>(tile.getSurroundingTiles(0, getLineOfSight()));
     }
 
-    
+
     // Goods handling
 
     /**
@@ -3222,7 +3233,7 @@ public class Unit extends GoodsLocation
         for (Goods g : goods) g.setLocation(this);
         return goods;
     }
-        
+
     /**
      * Get the goods carried by this unit.
      *
@@ -3668,7 +3679,7 @@ public class Unit extends GoodsLocation
         result.addAll(transform(owner.getModifiers(id, fcgot, turn),
                 alwaysTrue(),
                 m -> m.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX)));
-        
+
         // Role modifiers apply
         result.addAll(transform(role.getModifiers(id, fcgot, turn),
                 alwaysTrue(),
@@ -4475,7 +4486,7 @@ public class Unit extends GoodsLocation
         final Game game = getGame();
         final WorkLocation oldWorkLocation = getWorkLocation();
         final GoodsType oldWorkType = getWorkType();
-        
+
         name = xr.getAttribute(NAME_TAG, (String)null);
 
         Player oldOwner = owner;
@@ -4541,8 +4552,7 @@ public class Unit extends GoodsLocation
 
         setWorkType(xr.getType(spec, WORK_TYPE_TAG, GoodsType.class, null));
 
-        // Fix changes to experience and production
-        if (workType != oldWorkType) experienceType = workType;
+        // Fix changes to production
         WorkLocation wl = getWorkLocation();
         if (wl != null && wl != oldWorkLocation) wl.updateProductionType();
     }

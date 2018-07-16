@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2017   The FreeCol Team
+ *  Copyright (C) 2002-2018   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -184,8 +184,7 @@ public final class QuickActionMenu extends JPopupMenu {
             if (colony != null) {
                 if (addTileItem(unitLabel)) this.addSeparator();
                 if (addWorkItems(unitLabel)) this.addSeparator();
-                if (unit.isInColony()
-                    && addEducationItems(unitLabel)) this.addSeparator();
+                if (addEducationItems(unitLabel)) this.addSeparator();
                 if (unit.isInColony() && colony.canReducePopulation()) {
                     JMenuItem menuItem = Utility.localizedMenuItem("quickActionMenu.leaveTown");
                     menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
@@ -450,7 +449,7 @@ public final class QuickActionMenu extends JPopupMenu {
             JMenuItem menuItem = Utility.localizedMenuItem(StringTemplate
                 .template("quickActionMenu.teaching")
                 .addName("%unit%", Messages.getName(student.getType())));
-            menuItem.setText(menuItem.getText() 
+            menuItem.setText(menuItem.getText()
                 + ": " + unit.getTurnsOfTraining()
                 + "/" + unit.getNeededTurnsOfTraining());
             menuItem.setEnabled(false);
@@ -481,9 +480,11 @@ public final class QuickActionMenu extends JPopupMenu {
                         .addName(String.valueOf(experience))
                         .addName(String.valueOf(maxExperience))),
                     "align right");
-                experiencePanel.add(Utility.localizedLabel("quickActionMenu.upgrade"));
-                experiencePanel.add(new JLabel(ModifierFormat.format(probability) + "%"),
-                                    "align right");
+                if (unit.isInColony() && unit.getWorkType() == goods) {
+                    experiencePanel.add(Utility.localizedLabel("quickActionMenu.upgrade"));
+                    experiencePanel.add(new JLabel(ModifierFormat.format(probability) + "%"),
+                                        "align right");
+                }
                 this.add(experiencePanel);
                 separatorNeeded = true;
             }
@@ -593,7 +594,7 @@ public final class QuickActionMenu extends JPopupMenu {
      * @return A suitable menu item.
      */
     private JMenuItem createRoleItem(final UnitLabel unitLabel,
-                                     final Role from, final int fromCount, 
+                                     final Role from, final int fromCount,
                                      final Role to, final int toCount,
                                      final int price) {
         // Get the text
@@ -731,7 +732,7 @@ public final class QuickActionMenu extends JPopupMenu {
         this.add(name);
 
         int amount = (player.getMarket() == null) ? 0
-            : player.getMarket().getSalePrice(goods.getType(), 
+            : player.getMarket().getSalePrice(goods.getType(),
                                               goods.getAmount());
         if (amount > 0) amount -= amount * player.getTax() / 100;
         if (amount > 0) {
@@ -740,7 +741,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 .addAmount("%amount%", amount));
             this.add(price);
         }
-        
+
         if (goods.getLocation() instanceof Colony) {
             Colony colony = (Colony)goods.getLocation();
             addLoadItems(goods, colony.getTile());
@@ -867,7 +868,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
     /**
      * Creates a menu for a tile.
-     * 
+     *
      * @param singleTilePanel The {@code ASingleTilePanel} to create with.
      */
     private void createTileMenu(final ASingleTilePanel singleTilePanel) {
