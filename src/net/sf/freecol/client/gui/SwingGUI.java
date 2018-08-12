@@ -850,10 +850,9 @@ public class SwingGUI extends GUI {
             igc().clearGotoOrders(unit);
         } else {
             igc().goToTile(unit, path);
-            // FIXME? Unit may have been deselected on reaching destination
-            changeActiveUnit(unit);
         }
-        updateUnitPath();
+        // Only update the path if the unit is still active
+        if (unit == getActiveUnit()) updateUnitPath();
     }
 
     /**
