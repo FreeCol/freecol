@@ -750,7 +750,9 @@ public final class FreeColClient {
     public int getAnimationSpeed(Player player) {
         String key = (getMyPlayer() == player)
             ? ClientOptions.MOVE_ANIMATION_SPEED
-            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+            : (getMyPlayer().isPotentialFriend(player)) // i.e. currently hostile
+            ? ClientOptions.ENEMY_MOVE_ANIMATION_SPEED
+            : ClientOptions.FRIENDLY_MOVE_ANIMATION_SPEED;
         return getClientOptions().getInteger(key);
     }
 

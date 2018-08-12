@@ -54,6 +54,15 @@ public class RangeOption extends SelectOption {
         super(specification);
     }
 
+    /**
+     * Creates a new {@code RangeOption}.
+     *
+     * @param id The object identifier.
+     * @param specification The {@code Specification} to refer to.
+     */
+    public RangeOption(String id, Specification specification) {
+        super(id, specification);
+    }
 
     /**
      * Gets the rank of the current selected value in the list of
