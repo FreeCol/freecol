@@ -695,9 +695,10 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = getMyPlayer();
         final Turn thisTurn = getGame().getTurn();
         final List<ModelMessage> messages = new ArrayList<>();
+        List<ModelMessage> todo = (allMessages) ? player.getModelMessages()
+            : player.getNewModelMessages();
 
-        for (ModelMessage m : ((allMessages) ? player.getModelMessages()
-                : player.getNewModelMessages())) {
+        for (ModelMessage m : todo) {
             final String key = m.getOptionName();
             try {
                 if ((key == null || co.getBoolean(key))
