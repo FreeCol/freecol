@@ -526,7 +526,7 @@
                     name="FreeCol"
                     mainclass="net.sf.freecol.freecol"
                     version="${freecol.version}"
-                    vmoptions="-Xmx512M -Dapple.awt.fakefullscreen=true"
+                    vmoptions="-Xmx1G -Dapple.awt.fakefullscreen=true"
                     jvmversion="1.8+"
                     arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
                     stubfile="${freecol.build.dir}/skeletons/universalJavaApplicationStub"
@@ -959,7 +959,7 @@
     <!-- This is a shortcut for NetBeans, and possibly other IDEs. -->
     <target name="run" depends="package" description="Runs the game">
         <java jar="FreeCol.jar" fork="true">
-            <jvmarg value="-Xmx512M" />
+            <jvmarg value="-Xmx1G" />
         </java>
     </target>
 

@@ -106,7 +106,8 @@ public final class FreeCol {
 
     /** The maximum available memory. */
     private static final long MEMORY_MAX = Runtime.getRuntime().maxMemory();
-
+    private static final long MEGA = 1000000; // Metric
+    
     public static final String  CLIENT_THREAD = "FreeColClient:";
     public static final String  SERVER_THREAD = "FreeColServer:";
     public static final String  METASERVER_THREAD = "FreeColMetaServer:";
@@ -131,7 +132,7 @@ public final class FreeCol {
     public static final float   GUI_SCALE_STEP = GUI_SCALE_STEP_PCT / 100.0f;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
     private static final String JAVA_VERSION_MIN = "1.8";
-    private static final int    MEMORY_MIN = 128; // Mbytes
+    private static final long   MEMORY_MIN = 512000000; // 512M
     private static final String META_SERVER_ADDRESS = "meta.freecol.org";
     private static final int    META_SERVER_PORT = 3540;
     private static final int    PORT_DEFAULT = 3541;
@@ -288,10 +289,11 @@ public final class FreeCol {
                 .addName("%version%", JAVA_VERSION)
                 .addName("%minVersion%", JAVA_VERSION_MIN));
         }
-        if (memoryCheck && MEMORY_MAX < MEMORY_MIN * 1000000) {
+        if (memoryCheck && MEMORY_MAX < MEMORY_MIN) {
+            // Memory message is in Mbytes, hence division by MEGA.
             fatal(StringTemplate.template("main.memory")
                 .addAmount("%memory%", MEMORY_MAX)
-                .addAmount("%minMemory%", MEMORY_MIN));
+                .addAmount("%minMemory%", MEMORY_MIN / MEGA));
         }
 
         // Having parsed the command line args, we know where the user
@@ -886,7 +888,7 @@ public final class FreeCol {
      */
     private static void printUsage(Options options, int status) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("java -Xmx 256M -jar freecol.jar [OPTIONS]",
+        formatter.printHelp("java -Xmx1G -jar freecol.jar [OPTIONS]",
                             options);
         System.exit(status);
     }
