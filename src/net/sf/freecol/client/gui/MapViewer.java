@@ -1225,7 +1225,7 @@ public final class MapViewer extends FreeColClientHolder {
             = options.getInteger(ClientOptions.COLONY_LABELS);
         final Game game = getGame();
         final Map map = game.getMap();
-        final Player player = getMyPlayer();
+        final Player player = getMyPlayer(); // Check, can be null in map editor
 
         // Remember transform
         AffineTransform originTransform = g.getTransform();
@@ -1355,7 +1355,8 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Apply fog of war to flat parts of all tiles
         RescaleOp fow = null;
-        if (getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
+        if (getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
+            && player != null) {
             // Knowing that we have FOW, prepare a rescaling for the
             // overlay step below.
             fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
@@ -1393,20 +1394,19 @@ public final class MapViewer extends FreeColClientHolder {
             final int yt = (y-y0) * halfHeight;
             g.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
-
+            
             BufferedImage overlayImage = lib.getOverlayImage(t, overlayCache);
-            RescaleOp rop = (player.canSee(t)) ? null : fow;
+            RescaleOp rop = (player == null || player.canSee(t)) ? null : fow;
             tv.displayTileItems(g, t, rop, overlayImage);
             tv.displaySettlementWithChipsOrPopulationNumber(g, t, withNumbers,
-                                                            rop);
+                rop);
             tv.displayOptionalTileText(g, t);
         }
         g.translate(-xt0, -yt0);
-
+        
+        // Paint transparent region borders
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Paint transparent region borders
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT)
             == ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
             if (extendedTiles == null) {

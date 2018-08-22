@@ -107,7 +107,14 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** Special return values for showstopper getColonyValue fail. */
     public static enum NoValueType {
-        BOGUS(-1), TERRAIN(-2), RUMOUR(-3), SETTLED(-4), FOOD(-5), INLAND(-6), POLAR(-7);
+        BOGUS(-1),       // bad value from canClaimToFoundSettlementReason
+        TERRAIN(-2),     // can not settle on tile (e.g. moutain, water)
+        RUMOUR(-3),      // LCR present
+        SETTLED(-4),     // settlement present
+        FOOD(-5),        // low food
+        INLAND(-6),      // inland and we need a port badly
+        POLAR(-7),       // polar settlement and we have too few
+        ISLAND1(-8);     // single tile island
      
         private static final int MAX = values().length;
 
@@ -3688,6 +3695,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         Set<GoodsType> highProduction = new HashSet<>();
         Set<GoodsType> goodProduction = new HashSet<>();
+        int land = 0;
         for (Tile t : transform(tile.getSurroundingTiles(1,1),
                                 isNotNull(Tile::getType))) {
             if (t.getSettlement() != null) { // Should not happen, tested above
@@ -3696,6 +3704,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 return values;
             }
 
+            if (t.isLand()) land++;
+            
             double pf = 1.0;
             if (t.getOwner() != null && !this.owns(t)) {
                 if (t.getOwner().isEuropean()) {
@@ -3740,6 +3750,11 @@ public class Player extends FreeColGameObject implements Nameable {
                     values.get(ColonyValueCategory.A_ADJACENT.ordinal())
                     * MOD_ENEMY_UNIT[1]);
             }
+        }
+        if (land <= 1) { // Never settle the 1-tile islands
+            values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
+                NoValueType.ISLAND1.getDouble());
+            return values;
         }
 
         for (GoodsType g : highProduction) {
@@ -4000,9 +4015,11 @@ public class Player extends FreeColGameObject implements Nameable {
         this.setStances(o.getStances());
         this.tradeRoutes.clear();
         for (TradeRoute tr : tradeRoutes) this.tradeRoutes.add(game.update(tr, false));
-        this.setModelMessages(o.getModelMessages());
         this.setHistory(o.getHistory());
         this.setLastSales(o.getLastSales());
+        // Do not copy in the model messages, they are always passed
+        // explicitly, never by player serialization.
+        // this.setModelMessages(o.getModelMessages());
         return true;
     }
 

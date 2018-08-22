@@ -417,9 +417,8 @@ public class ServerUnitTest extends FreeColTestCase {
         boolean isExpert = colonist.getType() == expertFarmerType;
         assertFalse("Unit should not be an expert", isExpert);
 
-        // Make upgrade
+        // Unit should upgrade
         ServerTestHelper.newTurn();
-        assertTrue(colonist.getExperience() > expectXP);
 
         // verify upgrade
         isExpert = colonist.getType() == expertFarmerType;

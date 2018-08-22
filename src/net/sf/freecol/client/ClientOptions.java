@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -50,6 +51,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.ModListOption;
@@ -267,13 +269,17 @@ public class ClientOptions extends OptionGroup {
     public static final String DEFAULT_MINIMAP_ZOOM
         = "model.option.defaultZoomLevel";
 
-    /** Animation speed for friendly units. */
+    /** Animation speed for our units. */
     public static final String MOVE_ANIMATION_SPEED
         = "model.option.moveAnimationSpeed";
 
     /** Animation speed for enemy units. */
     public static final String ENEMY_MOVE_ANIMATION_SPEED
         = "model.option.enemyMoveAnimationSpeed";
+
+    /** Animation speed for friendly units. */
+    public static final String FRIENDLY_MOVE_ANIMATION_SPEED
+        = "model.option.friendlyMoveAnimationSpeed";
 
 
     // clientOptions.messages
@@ -471,7 +477,7 @@ public class ClientOptions extends OptionGroup {
     // The special keys that are read early.
     private static final List<String> specialKeys
         = makeUnmodifiableList(LANGUAGE, USE_OPENGL, USE_PIXMAPS, USE_XRENDER);
-        
+
     // Comparators for sorting colonies.
     /** Compare by ascending age. */
     private static final Comparator<Colony> colonyAgeComparator
@@ -544,6 +550,17 @@ public class ClientOptions extends OptionGroup {
                     - m2.getMessageType().ordinal();
 
 
+    /** Friendly move animation speed option values. */
+    private static final Map<Integer, String> friendlyMoveAnimationSpeeds
+        = makeUnmodifiableMap(new Integer[] { 0, 1, 2, 3 },
+            new String[] {
+                "clientOptions.gui.friendlyMoveAnimationSpeed.off",
+                "clientOptions.gui.friendlyMoveAnimationSpeed.slow",
+                "clientOptions.gui.friendlyMoveAnimationSpeed.normal",
+                "clientOptions.gui.friendlyMoveAnimationSpeed.fast"
+            });
+        
+    
     /**
      * Creates a new {@code ClientOptions}.
      *
@@ -741,6 +758,8 @@ public class ClientOptions extends OptionGroup {
                          ClientOptions.MESSAGES, true);
         addBooleanOption(USE_OPENGL, ClientOptions.GUI, true);
         addBooleanOption(USE_XRENDER, ClientOptions.GUI, true);
+        addRangeOption(FRIENDLY_MOVE_ANIMATION_SPEED, ClientOptions.GUI, 3,
+                       friendlyMoveAnimationSpeeds);
         // end @compat 0.11.6
     }
 
@@ -767,6 +786,20 @@ public class ClientOptions extends OptionGroup {
             OptionGroup og = new OptionGroup(id);
             og.setGroup(gr);
             add(og);
+        }
+    }
+
+    private void addRangeOption(String id, String gr, int rank,
+                                Map<Integer, String> entries) {
+        if (!hasOption(id, RangeOption.class)) {
+            RangeOption op = new RangeOption(id, (Specification)null);
+            op.setGroup(gr);
+            op.clearItemValues();
+            for (Entry<Integer, String> e : entries.entrySet()) {
+                op.addItemValue(e.getKey(), e.getValue());
+            }
+            op.setValueRank(rank);
+            add(op);
         }
     }
 

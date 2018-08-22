@@ -823,6 +823,10 @@ public final class FreeColServer {
      */
     private void saveGame(File file, String owner, OptionGroup options,
                           Unit active, BufferedImage image) throws IOException {
+        // Try to GC now before launching into the save, as a failure here
+        // can lead to a corrupt saved game file (BR#3146).  Alas,
+        // System.gc() is only advisory, but it is all we have got.
+        System.gc();
         try (
             JarOutputStream fos = new JarOutputStream(new FileOutputStream(file));
         ) {

@@ -148,7 +148,7 @@
         <rangeValue label="5" value="5"/>
         <rangeValue label="6" value="6"/>
       </rangeOption>
-      <!-- Animation speed for friendly units. -->
+      <!-- Animation speed for our units. -->
       <rangeOption id="model.option.moveAnimationSpeed"
                    defaultValue="0" localizedLabels="true">
         <rangeValue label="clientOptions.gui.moveAnimationSpeed.off" value="0"/>
@@ -156,13 +156,21 @@
         <rangeValue label="clientOptions.gui.moveAnimationSpeed.normal" value="2"/>
         <rangeValue label="clientOptions.gui.moveAnimationSpeed.fast" value="3"/>
       </rangeOption>
-      <!-- Animation speed for enemy units. -->
+      <!-- Animation speed for other enemy units. -->
       <rangeOption id="model.option.enemyMoveAnimationSpeed"
                    defaultValue="3" localizedLabels="true">
         <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.off" value="0"/>
         <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.slow" value="1"/>
         <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.normal" value="2"/>
         <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.fast" value="3"/>
+      </rangeOption>
+      <!-- Animation speed for other friendly units. -->
+      <rangeOption id="model.option.friendlyMoveAnimationSpeed"
+                   defaultValue="3" localizedLabels="true">
+        <rangeValue label="clientOptions.gui.friendlyMoveAnimationSpeed.off" value="0"/>
+        <rangeValue label="clientOptions.gui.friendlyMoveAnimationSpeed.slow" value="1"/>
+        <rangeValue label="clientOptions.gui.friendlyMoveAnimationSpeed.normal" value="2"/>
+        <rangeValue label="clientOptions.gui.friendlyMoveAnimationSpeed.fast" value="3"/>
       </rangeOption>
     </optionGroup>
 

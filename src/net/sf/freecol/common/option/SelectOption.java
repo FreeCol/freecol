@@ -67,6 +67,16 @@ public class SelectOption extends IntegerOption {
         super(specification);
     }
 
+    /**
+     * Creates a new {@code SelectOption}.
+     *
+     * @param id The object identifier.
+     * @param specification The {@code Specification} to refer to.
+     */
+    public SelectOption(String id, Specification specification) {
+        super(id, specification);
+    }
+
 
     /**
      * Get the name associated with the current value.

@@ -6,7 +6,7 @@
     <target depends="package" description="Runs the game" name="debug-nb">
         <nbjpdastart addressproperty="jpda.address" name="FreeCol" transport="dt_socket"/>
         <java fork="true" jar="FreeCol.jar">
-            <jvmarg value="-Xmx512M"/>
+            <jvmarg value="-Xmx1G"/>
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
         </java>
@@ -18,7 +18,7 @@
     <!-- (more info: http://netbeans.org/kb/articles/freeform-config.html#profilej2se) -->
     <target depends="-profile-check" description="Runs the game" if="profiler.configured" name="profile-nb">
         <java fork="true" jar="FreeCol.jar">
-            <jvmarg value="-Xmx512M"/>
+            <jvmarg value="-Xmx1G"/>
             <jvmarg line="${agent.jvmargs}"/>
         </java>
     </target>

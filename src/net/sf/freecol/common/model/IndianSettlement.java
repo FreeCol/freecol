@@ -1249,7 +1249,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     @Override
     public StringTemplate getLocationLabelFor(Player player) {
-        return (hasContacted(player)) ? StringTemplate.name(getName())
+        return (player == null || hasContacted(player))
+            ? StringTemplate.name(getName())
             : StringTemplate.key("model.indianSettlement.nameUnknown");
     }
 
