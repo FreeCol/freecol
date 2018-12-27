@@ -473,12 +473,18 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final Function<Entry<Location, PathNode>, Destination> dmapper = e -> {
             Settlement s = e.getKey().getTile().getSettlement();
             PathNode p = e.getValue();
+            if (s == null) {
+                logger.warning("BR#3149 null settlement: "
+                    + Messages.message(e.getKey().getLocationLabel())
+                    + " path=" + p.fullPathToString());
+                return null;
+            }                    
             int turns = p.getTotalTurns();
             if (unit.isInEurope()) turns += unit.getSailTurns();
             if (p.getMovesLeft() < unit.getInitialMovesLeft()) turns++;
             return new Destination(s, turns, unit, goodsTypes);
         };
-        td.addAll(transform(md.getResults().entrySet(), alwaysTrue(), dmapper));
+        td.addAll(transform(md.getResults().entrySet(), isNotNull(), dmapper));
 
         // Drop inaccessible destinations and sort as specified.
         this.destinations.addAll(transform(td, d -> d.turns < Unit.MANY_TURNS,
