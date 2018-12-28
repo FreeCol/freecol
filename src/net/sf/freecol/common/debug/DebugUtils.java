@@ -598,14 +598,17 @@ public class DebugUtils {
         // Do not check goods amount, the server only sends changes to
         // the client when the *price* changes.
         boolean goodsProblemDetected = false;
-        for (GoodsType sg : sGame.getSpecification().getGoodsTypeList()) {
-            int sPrice = sPlayer.getMarket().getBidPrice(sg, 1);
-            GoodsType cg = cGame.getSpecification().getGoodsType(sg.getId());
-            int cPrice = cPlayer.getMarket().getBidPrice(cg, 1);
-            if (sPrice != cPrice) {
-                lb.add("Goods prices for ", sg, " differ: ", sPrice,
-                    "!=", cPrice, " ");
-                goodsProblemDetected = true;
+        Market sMarket = sPlayer.getMarket(), cMarket = cPlayer.getMarket();
+        if (sMarket != null && cMarket != null) {
+            for (GoodsType sg : sGame.getSpecification().getGoodsTypeList()) {
+                int sPrice = sMarket.getBidPrice(sg, 1);
+                GoodsType cg = cGame.getSpecification().getGoodsType(sg.getId());
+                int cPrice = cMarke.getBidPrice(cg, 1);
+                if (sPrice != cPrice) {
+                    lb.add("Goods prices for ", sg, " differ: ", sPrice,
+                        "!=", cPrice, " ");
+                    goodsProblemDetected = true;
+                }
             }
         }
         if (goodsProblemDetected) {
