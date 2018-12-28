@@ -576,6 +576,7 @@ public class NameCache {
      * Gets a new name for a unit.
      *
      * Currently only names naval units, not specific to type.
+     * REF ships should not be named.
      * FIXME: specific names for types.
      *
      * @param player The {@code Player} who will own the unit.
@@ -585,7 +586,7 @@ public class NameCache {
      */
     public static String getUnitName(Player player, UnitType type,
                                      Random random) {
-        if (!type.isNaval()) return null;
+        if (!type.isNaval() || player.isREF()) return null;
         String name;
 
         // Find a new name in the installed ship names if possible.
