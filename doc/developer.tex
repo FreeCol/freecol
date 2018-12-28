@@ -1069,6 +1069,34 @@ original Colonization game:
   among other things
 \end{itemize}
 
+\hypertarget{Map Format}{\chapter{Map Format}}
+
+A map file, as found in \texttt{.../data/maps}, is a cut-down version
+of a normal freecol save file.  Map files should have the
+\texttt{.fsm} (``FreeCol Saved Map'') extension, as distinct from
+\texttt{.fsg} (``FreeCol Saved Game'').  Saved maps and games are both
+actually just standard Java archives, as operated on by the
+\texttt{jar(1)} utility.
+
+Saved maps should contain the following files:
+\begin{itemize}
+  \item \texttt{savegame.properties}, a standard Java properties file
+    containing the map.height and map.width properties.
+  \item \texttt{thumbnail.jpg}, a high level picture of the map, as
+    used in the map selection dialog
+  \item \texttt{savegame.xml}, the XML representation of a FreeCol
+    game, but with the following skeleton: \begin{itemize}
+    \item \texttt{<?xml>} header
+    \item \texttt{savedGame} \begin{itemize}
+      \item \texttt{game} \begin{itemize}
+        \item \texttt{cibola} (seven entries)
+        \item \texttt{nationOptions} (native \texttt{nationOption}s only)
+        \item \texttt{player} (native players only)
+        \item \texttt{map}
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
 
 \printindex
 
