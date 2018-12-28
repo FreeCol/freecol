@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
@@ -598,14 +599,18 @@ public class DebugUtils {
         // Do not check goods amount, the server only sends changes to
         // the client when the *price* changes.
         boolean goodsProblemDetected = false;
-        for (GoodsType sg : sGame.getSpecification().getGoodsTypeList()) {
-            int sPrice = sPlayer.getMarket().getBidPrice(sg, 1);
-            GoodsType cg = cGame.getSpecification().getGoodsType(sg.getId());
-            int cPrice = cPlayer.getMarket().getBidPrice(cg, 1);
-            if (sPrice != cPrice) {
-                lb.add("Goods prices for ", sg, " differ: ", sPrice,
-                    "!=", cPrice, " ");
-                goodsProblemDetected = true;
+        final Market cMarket = cPlayer.getMarket();
+        final Market sMarket = sPlayer.getMarket();
+        if (sMarket != null && cMarket != null) {
+            for (GoodsType sg : sGame.getSpecification().getGoodsTypeList()) {
+                int sPrice = sMarket.getBidPrice(sg, 1);
+                GoodsType cg = cGame.getSpecification().getGoodsType(sg.getId());
+                int cPrice = cMarket.getBidPrice(cg, 1);
+                if (sPrice != cPrice) {
+                    lb.add("Goods prices for ", sg, " differ: ", sPrice,
+                        "!=", cPrice, " ");
+                    goodsProblemDetected = true;
+                }
             }
         }
         if (goodsProblemDetected) {
