@@ -1227,7 +1227,35 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return any(getSurroundingTiles(1, 1), t -> t.isLand() != this.isLand());
     }
 
+    /**
+     * Is this a good tile to put hills on?
+     *
+     * Used by the terrain generator.
+     *
+     * @return True if this is a good potential hill tile.
+     */
+    public boolean isGoodHillTile() {
+        return isLand() && !getType().isElevation()
+            // Not too close to the ocean/lake, as this helps with
+            // good locations for building colonies on shore.
+            && none(getSurroundingTiles(1, 1), x -> !x.isLand());
+    }
 
+    /**
+     * Is this a good tile to put mountains on?
+     *
+     * Used by the terrain generator.
+     *
+     * @param mountains The mountain tile type.
+     * @return True if this is a good potential elevated tile.
+     */
+    public boolean isGoodMountainTile(TileType mountains) {
+        return isGoodHillTile()
+            // Not too close to an existing mountain range
+            && none(getSurroundingTiles(1, 3), t -> t.getType() == mountains);
+    }
+
+    
     /**
      * Gets all the tiles surrounding a tile within the given range.
      * The center tile is not included.

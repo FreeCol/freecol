@@ -1063,6 +1063,7 @@ public class SimpleMapGenerator implements MapGenerator {
         makeNativeSettlements(map, importMap, lb);
         makeLostCityRumours(map, importMap, lb);
         createEuropeanUnits(map, game.getLiveEuropeanPlayerList(), lb);
+        lb.shrink("\n");
         return map;
     }
 }

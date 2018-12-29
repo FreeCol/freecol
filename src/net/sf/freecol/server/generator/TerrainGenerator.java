@@ -498,38 +498,48 @@ public class TerrainGenerator {
         }
 
         // Generate the mountain ranges
-        int counter = 0;
-        for (int tries = 0; tries < 100; tries++) {
-            Tile startTile = getGoodMountainTile(map);
-            if (startTile == null) break;
+        List<Tile> tiles = new ArrayList<>();
+        map.forEachTile(t -> t.isGoodMountainTile(mountains),
+                        t -> tiles.add(t));
+        randomShuffle(logger, "Randomize mountain tiles", tiles, random);
 
+        int counter = 0;
+        for (Tile startTile : tiles) {
+            // isGoodMountainTile can change when new mountains are added
+            if (!startTile.isGoodMountainTile(mountains)) continue;
+            
             ServerRegion mountainRegion
                 = new ServerRegion(game, RegionType.MOUNTAIN);
-            startTile.setType(mountains);
-            mountainRegion.addTile(startTile);
             Direction direction = Direction.getRandomDirection("getLand",
                 logger, random);
             int length = maximumLength
                 - randomInt(logger, "MLen", random, maximumLength/2);
+            Tile tile = startTile;
             for (int index = 0; index < length; index++) {
-                Tile nextTile = startTile.getNeighbourOrNull(direction);
-                if (nextTile == null || !nextTile.isLand()) continue;
-                nextTile.setType(mountains);
-                mountainRegion.addTile(nextTile);
-                counter++;
-                for (Tile neighbour : nextTile.getSurroundingTiles(1)) {
-                    if (!neighbour.isLand()
-                        || neighbour.getType() == mountains) continue;
+                // Raise current tile up as mountain
+                if (tile.getType() != mountains) {
+                    tile.setType(mountains);
+                    mountainRegion.addTile(tile);
+                    counter++;
+                }
+                // Add nothing (1/8), mountains (2/8) or hills (5/8)
+                // to surrounding tiles if suitable and not already a
+                // mountain
+                for (Tile t : tile.getSurroundingTiles(1)) {
+                    if (!t.isGoodHillTile()
+                        || t.getType() == mountains) continue;
                     int r = randomInt(logger, "MSiz", random, 8);
-                    if (r == 0) {
-                        neighbour.setType(mountains);
-                        mountainRegion.addTile(neighbour);
+                    if (r < 2) {
+                        t.setType(mountains);
+                        mountainRegion.addTile(t);
                         counter++;
-                    } else if (r > 2) {
-                        neighbour.setType(hills);
-                        mountainRegion.addTile(neighbour);
+                    } else if (r < 7) {
+                        t.setType(hills);
+                        mountainRegion.addTile(t);
                     }
                 }
+                tile = tile.getNeighbourOrNull(direction);
+                if (tile == null || !tile.isLand()) break;
             }
             int scoreValue = 2 * mountainRegion.getSize();
             mountainRegion.setScoreValue(scoreValue);
@@ -543,13 +553,14 @@ public class TerrainGenerator {
         lb.add("Added ", counter, " mountain range tiles.\n");
 
         // and sprinkle a few random hills/mountains here and there
+        tiles.clear();
+        map.forEachTile(Tile::isGoodHillTile, t -> tiles.add(t));
+        randomShuffle(logger, "Randomize hill tiles", tiles, random);
+
         number = (int) (getApproximateLandCount(game) * randomHillsRatio)
             / mapOptions.getRange(MapGeneratorOptions.MOUNTAIN_NUMBER);
         counter = 0;
-        for (int tries = 0; tries < 1000; tries++) {
-            Tile t = getGoodMountainTile(map);
-            if (t == null) break;
-
+        for (Tile t : tiles) {
             // 25% mountains, 75% hills
             boolean m = randomInt(logger, "MorH", random, 4) == 0;
             t.setType((m) ? mountains : hills);
