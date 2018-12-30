@@ -1238,7 +1238,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return isLand() && !getType().isElevation()
             // Not too close to the ocean/lake, as this helps with
             // good locations for building colonies on shore.
-            && none(getSurroundingTiles(1, 1), x -> !x.isLand());
+            && all(getSurroundingTiles(1, 1), Tile::isLand);
     }
 
     /**
@@ -1255,7 +1255,20 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             && none(getSurroundingTiles(1, 3), t -> t.getType() == mountains);
     }
 
-    
+    /**
+     * Is this a good tile to start a river on?
+     *
+     * Used by the terrain generator.
+     *
+     * @param riverType The river <code>TileImprovementType</code>.
+     * @return True if this is a good place to start a river.
+     */
+    public boolean isGoodRiverTile(TileImprovementType riverType) {
+        return riverType.isTileTypeAllowed(getType())
+            // check the river source/spring is not too close to the ocean
+            && all(getSurroundingTiles(1, 2), Tile::isLand);
+    }
+
     /**
      * Gets all the tiles surrounding a tile within the given range.
      * The center tile is not included.

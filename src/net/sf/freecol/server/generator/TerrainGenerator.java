@@ -587,36 +587,30 @@ public class TerrainGenerator {
             = spec.getTileImprovementType("model.improvement.river");
         final int number = getApproximateLandCount(game)
             / mapOptions.getRange(MapGeneratorOptions.RIVER_NUMBER);
-        int counter = 0;
         HashMap<Tile, River> riverMap = new HashMap<>();
         List<River> rivers = new ArrayList<>();
 
-        outer: for (int i = 0; i < number; i++) {
-            for (int tries = 0; tries < 100; tries++) {
-                Tile tile = map.getRandomLandTile(random);
-                if (tile == null) break outer;
+        List<Tile> tiles = new ArrayList<>();
+        map.forEachTile(t -> t.isGoodRiverTile(riverType),
+                        t -> tiles.add(t));
+        randomShuffle(logger, "Randomize river tiles", tiles, random);
+        
+        int counter = 0;
+        for (Tile tile : tiles) {
+            // Any river here yet?
+            if (riverMap.get(tile) != null)
+                continue;
 
-                if (!riverType.isTileTypeAllowed(tile.getType())) continue;
-
-                // check the river source/spring is not too close to the ocean
-                if (!all(tile.getSurroundingTiles(1, 2), Tile::isLand))
-                    continue;
-
-                if (riverMap.get(tile) == null) {
-                    // no river here yet
-                    ServerRegion riverRegion = new ServerRegion(game, RegionType.RIVER);
-                    River river = new River(map, riverMap, riverRegion, random);
-                    if (river.flowFromSource(tile)) {
-                        lb.add("Created new river with length ",
-                            river.getLength(), "\n");
-                        result.add(riverRegion);
-                        rivers.add(river);
-                        if (++counter >= number) break;
-                    } else {
-                        lb.add("Failed to generate river.\n");
-                    }
-                    break;
-                }
+            ServerRegion riverRegion = new ServerRegion(game, RegionType.RIVER);
+            River river = new River(map, riverMap, riverRegion, random);
+            if (river.flowFromSource(tile)) {
+                lb.add("Created new river with length ",
+                    river.getLength(), "\n");
+                result.add(riverRegion);
+                rivers.add(river);
+                if (++counter >= number) break;
+            } else {
+                lb.add("Failed to generate river at " + tile + ".\n");
             }
         }
         lb.add("Created ", counter, " rivers of maximum ", number, "\n");
