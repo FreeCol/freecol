@@ -2218,9 +2218,12 @@ public class Unit extends GoodsLocation
                     ? MoveType.ATTACK_UNIT
                     : MoveType.MOVE_NO_ATTACK_CIVILIAN;
             } else {
-                return (target.isDirectlyHighSeasConnected())
-                    ? MoveType.MOVE_HIGH_SEAS
-                    : MoveType.MOVE;
+                if (target.isExplored()) {
+                    return (target.isDirectlyHighSeasConnected())
+                            ? MoveType.MOVE_HIGH_SEAS
+                            : MoveType.MOVE;
+                    } else
+                        return MoveType.MOVE_ILLEGAL;
             }
         }
     }
