@@ -46,6 +46,7 @@ import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.UpdateServerMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.Utils.*;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -288,7 +289,7 @@ public class MetaServerUtils {
                     ret = new ArrayList<>(lsi);
                     break;
                 }
-                Thread.sleep(SLEEP_TIME);
+                delay(SLEEP_TIME, "Delay interrupted");
             }
             if (ret == null) logger.warning("No response from metaserver.");
         } catch (Exception ex) {
