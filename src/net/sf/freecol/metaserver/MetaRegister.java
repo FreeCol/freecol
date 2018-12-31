@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.networking.Connection;
+import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
@@ -178,7 +179,7 @@ public final class MetaRegister {
     public synchronized void removeDeadServers() {
         logger.info("Removing dead servers.");
 
-        long time = System.currentTimeMillis() - REMOVE_OLDER_THAN;
+        long time = now() - REMOVE_OLDER_THAN;
         for (int i=0; i<items.size(); i++) {
             if (items.get(i).getLastUpdated() < time) {
                 logger.info("Removing: " + items.get(i));
