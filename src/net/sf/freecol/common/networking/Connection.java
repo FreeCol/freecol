@@ -494,19 +494,12 @@ public class Connection implements Closeable {
      *
      * @param message The {@code Message} to handle.
      * @return The result of the handler.
-     * @exception FreeColException if the message is corrupt.
+     * @exception FreeColException if the message is malformed.
      */
     public Message handle(Message message) throws FreeColException {
-        Message ret = null;
-        if (message != null) {
-            final MessageHandler mh = getMessageHandler();
-            if (mh == null) { // FIXME: Temporary hack
-                throw new FreeColException(getName() + " has no handler for "
-                    + message.getType()).preserveDebug();
-            }
-            ret = mh.handle(this, message);
-        }
-        return ret;
+        if (message == null) return null;
+        final MessageHandler mh = getMessageHandler();
+        return mh.handle(this, message);
     }
 
     /**
