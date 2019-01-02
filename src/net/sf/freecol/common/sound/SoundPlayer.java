@@ -39,6 +39,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 import net.sf.freecol.common.option.PercentageOption;
+import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
@@ -218,9 +219,7 @@ public class SoundPlayer {
         }
 
         private void sleep(int t) {
-            try { Thread.sleep(t); } catch (InterruptedException e) {
-                logger.log(Level.WARNING, "Thread used for playing a sound has been interupted.", e);
-            }
+            delay(t, "Sound player interrupted.");
         }
 
         private void setVolume(SourceDataLine line, int vol) {

@@ -45,7 +45,7 @@ import net.sf.freecol.common.util.OSUtils;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.OSUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
@@ -146,8 +146,8 @@ public class FreeColDirectories {
 
     /** Predicate to filter suitable candidates to be made into mods. */
     private static final Predicate<File> modFileFilter = f ->
-        Utils.fileAnySuffix(f, MOD_FILE_SUFFIX, ZIP_FILE_SUFFIX)
-            || Utils.directoryAllPresent(f, MOD_DESCRIPTOR_FILE_NAME);
+        fileAnySuffix(f, MOD_FILE_SUFFIX, ZIP_FILE_SUFFIX)
+            || directoryAllPresent(f, MOD_DESCRIPTOR_FILE_NAME);
 
     /**
      * Predicate to select readable files that look like saved games.
@@ -166,9 +166,9 @@ public class FreeColDirectories {
 
     /** Predicate to filter suitable candidates to be made into TCs. */
     private static final Predicate<File> tcFileFilter = f ->
-        Utils.fileAnySuffix(f, TC_FILE_SUFFIX, ZIP_FILE_SUFFIX)
-            || Utils.directoryAllPresent(f, MOD_DESCRIPTOR_FILE_NAME,
-                                         SPECIFICATION_FILE_NAME);
+        fileAnySuffix(f, TC_FILE_SUFFIX, ZIP_FILE_SUFFIX)
+            || directoryAllPresent(f, MOD_DESCRIPTOR_FILE_NAME,
+                                   SPECIFICATION_FILE_NAME);
 
     /** Posix file mode 0700. */
     private static final Set<PosixFilePermission> mode0700
@@ -671,7 +671,7 @@ public class FreeColDirectories {
         List<String> excludeSuffixes, long validDays) {
         if (validDays <= 0L) return null;
         final long validMS = 1000L * 24L * 60L * 60L * validDays; // days to ms
-        final long timeNow = System.currentTimeMillis();
+        final long timeNow = now();
         final Predicate<File> outdatedPred = f -> 
             f.lastModified() + validMS < timeNow;
         final String extension = "." + FreeCol.FREECOL_SAVE_EXTENSION;
@@ -683,7 +683,7 @@ public class FreeColDirectories {
         List<File> files = getAutosaveFiles(sanitize(prefix),
                                             outdatedPred.and(suffixPred)); 
         if (files.isEmpty()) return null;
-        Utils.deleteFiles(files);
+        deleteFiles(files);
         StringBuilder sb = new StringBuilder();
         sb.append("Deleted outdated (> ").append(validDays)
             .append(" old) autosave/s: ");
@@ -700,7 +700,7 @@ public class FreeColDirectories {
     public static String removeAutosaves(String prefix) {
         List<File> files = getAutosaveFiles(sanitize(prefix), alwaysTrue());
         if (files.isEmpty()) return null;
-        Utils.deleteFiles(files);
+        deleteFiles(files);
         StringBuilder sb = new StringBuilder();
         sb.append("Deleted autosave/s: ");
         for (File f : files) sb.append(" ").append(f.getPath());
@@ -805,7 +805,7 @@ public class FreeColDirectories {
      * @return A string of the log file contents, or null on error.
      */
     public static String getLogFileContents() {
-        return Utils.getUTF8Contents(new File(getLogFilePath()));
+        return getUTF8Contents(new File(getLogFilePath()));
     }
 
     /**
@@ -946,7 +946,7 @@ public class FreeColDirectories {
             throw new FreeColException("Can not write in log file \""
                 + path + "\".");
         }
-        Writer writer = Utils.getFileUTF8Writer(file);
+        Writer writer = getFileUTF8Writer(file);
         if (writer == null) {
             throw new FreeColException("Can not create writer for log file \""
                 + path + "\".");
@@ -974,7 +974,7 @@ public class FreeColDirectories {
         } catch (IOException ioe) {
             throw new FreeColException("Comms log file could not be created: " + file.getPath(), ioe);
         }
-        Writer writer = Utils.getFileUTF8Writer(file);
+        Writer writer = getFileUTF8Writer(file);
         if (writer == null) {
             throw new FreeColException("Can not create writer for comms log file: " + file.getPath());
         }

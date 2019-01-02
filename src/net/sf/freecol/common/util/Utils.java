@@ -343,4 +343,13 @@ public class Utils {
             }
         }
     }
+
+    /**
+     * Current time since epoch in milliseconds.
+     *
+     * @return Time since epoch.
+     */
+    public static long now() {
+        return System.currentTimeMillis();
+    }
 }

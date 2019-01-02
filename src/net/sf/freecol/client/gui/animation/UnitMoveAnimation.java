@@ -32,7 +32,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
@@ -47,7 +47,7 @@ final class UnitMoveAnimation extends FreeColClientHolder
      * Display delay between one frame and another, in milliseconds.
      * 33ms == 30 fps
      */
-    private static final int ANIMATION_DELAY = 33;
+    private static final long ANIMATION_DELAY = 33L;
 
     private final Unit unit;
     private final Tile sourceTile;
@@ -132,10 +132,9 @@ final class UnitMoveAnimation extends FreeColClientHolder
         final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0
             : (srcPoint.getY() > dstPoint.getY()) ? -1 : 1;
 
-        int dropFrames = 0;
         Point point = srcPoint;
+        long time = now(), dropFrames = 0;
         while (!point.equals(dstPoint)) {
-            long time = System.currentTimeMillis();
             point.x += stepX * xratio * movementRatio;
             point.y += stepY * movementRatio;
             if ((stepX < 0 && point.x < dstPoint.x)
@@ -149,10 +148,12 @@ final class UnitMoveAnimation extends FreeColClientHolder
             if (dropFrames <= 0) {
                 unitLabel.setLocation(point);
                 gui.paintImmediately(bounds);
-                int timeTaken = (int)(System.currentTimeMillis()-time);
-                final int waitTime = ANIMATION_DELAY - timeTaken;
+                long newTime = now();
+                long timeTaken = newTime - time;
+                time = newTime;
+                final long waitTime = ANIMATION_DELAY - timeTaken;
                 if (waitTime > 0) {
-                    Utils.delay(waitTime, "Animation interrupted.");
+                    delay(waitTime, "Animation interrupted.");
                     dropFrames = 0;
                 } else {
                     dropFrames = timeTaken / ANIMATION_DELAY - 1;

@@ -79,7 +79,7 @@ import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.Utils.*;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -630,7 +630,7 @@ public final class FreeColServer {
             .setMessageHandler(this.userConnectionHandler);
         getServer().addConnection(c);
         // Short delay here improves reliability
-        Utils.delay(100, "New connection delay interrupted");
+        delay(100, "New connection delay interrupted");
         c.send(new GameStateMessage(this.serverState));
         if (this.serverState == ServerState.IN_GAME) {
             c.send(new VacantPlayersMessage().setVacantPlayers(getGame()));
@@ -701,9 +701,7 @@ public final class FreeColServer {
         int timeOut = 20000;
         ServerGame serverGame = null;
         while ((serverGame = getGame()) == null) {
-            try {
-                Thread.sleep(timeStep);
-            } catch (InterruptedException e) {}
+            delay(timeStep, "waitForGame delay interrupt");
             if ((timeOut -= timeStep) <= 0) break;
         }
         return serverGame;
@@ -876,7 +874,7 @@ public final class FreeColServer {
                                   SAVEGAME_VERSION);
 
                 xw.writeAttribute(RANDOM_STATE_TAG,
-                                  Utils.getRandomState(this.random));
+                                  getRandomState(this.random));
 
                 xw.writeAttribute(DEBUG_TAG, FreeColDebugger.getDebugModes());
 
@@ -1015,7 +1013,7 @@ public final class FreeColServer {
                                                               false));
 
                 String r = xr.getAttribute(RANDOM_STATE_TAG, (String)null);
-                freeColServer.setServerRandom(Utils.restoreRandomState(r));
+                freeColServer.setServerRandom(restoreRandomState(r));
                     
                 FreeColDebugger.setDebugModes(xr.getAttribute(DEBUG_TAG,
                                                               (String)null));

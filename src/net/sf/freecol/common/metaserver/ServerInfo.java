@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.metaserver;
 
+import static net.sf.freecol.common.util.Utils.*;
+
 
 /**
  * Container class for information about a single server as retrieved
@@ -180,7 +182,7 @@ public class ServerInfo {
         this.isGameStarted = isGameStarted;
         this.version = version;
         this.gameState = gameState;
-        this.lastUpdated = System.currentTimeMillis();
+        this.lastUpdated = now();
     }
 
     /**
