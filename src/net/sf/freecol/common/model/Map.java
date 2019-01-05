@@ -1595,11 +1595,30 @@ public class Map extends FreeColGameObject implements Location {
             this.movesLeft = movesLeft;
             this.turns = turns;
             this.onCarrier = onCarrier;
-            this.cost = decider.getCost(unit, current.getLocation(),
-                                        dst, movesLeft);
-            assert this.cost != CostDecider.ILLEGAL_MOVE;
-            this.turns += decider.getNewTurns();
-            this.movesLeft = decider.getMovesLeft();
+            CostDecider cd = (decider != null) ? decider
+                : CostDeciders.defaultCostDeciderFor(unit);
+            this.cost = cd.getCost(unit, current.getLocation(), dst,
+                                   movesLeft);
+            if (this.cost == CostDecider.ILLEGAL_MOVE) {
+                // This can happen "validly" if we try to route
+                // through unexplored tiles.  We do *not* want to
+                // disallow this completely --- there was a bug report
+                // to the effect that surely you should be able to
+                // route through short stretches of unknown to
+                // explored areas on the other side.  However BR#3153
+                // shows that we need to cost the unexplored tiles
+                // conservatively, so for now, consume all moves left
+                // add two extra turns.
+                if (dst.getTile() != null && !dst.getTile().isExplored()) {
+                    this.turns += 2;
+                    this.movesLeft = 0;
+                } else {
+                    throw new RuntimeException("Invalid move candidate:"
+                        + " for " + unit + " to " + dst);
+                }
+            }
+            this.turns += cd.getNewTurns();
+            this.movesLeft = cd.getMovesLeft();
             this.cost = PathNode.getCost(this.turns, this.movesLeft);
         }
 
@@ -1984,28 +2003,22 @@ ok:     while (!openMap.isEmpty()) {
                     switch (step) {
                     case BYLAND:
                         move = new MoveCandidate(unit, currentNode, moveTile, 
-                            currentMovesLeft, currentTurns, false,
-                            ((costDecider != null) ? costDecider
-                                : CostDeciders.defaultCostDeciderFor(unit)));
+                            currentMovesLeft, currentTurns, false, costDecider);
                         break;
                     case BYWATER:
                         move = new MoveCandidate(offMapUnit, currentNode, moveTile,
                             currentMovesLeft, currentTurns, currentOnCarrier,
-                            ((costDecider != null) ? costDecider
-                                : CostDeciders.defaultCostDeciderFor(offMapUnit)));
+                            costDecider);
                         break;
                     case EMBARK:
-                        move = new MoveCandidate(unit, currentNode, moveTile,
+                        move = new MoveCandidate(offMapUnit, currentNode, moveTile,
                             currentMovesLeft, currentTurns, true,
-                            ((costDecider != null) ? costDecider
-                                : CostDeciders.defaultCostDeciderFor(unit)));
+                            costDecider);
                         move.embarkUnit(carrier);
                         break;
                     case DISEMBARK:
                         move = new MoveCandidate(unit, currentNode, moveTile,
-                            0, currentTurns, false,
-                            ((costDecider != null) ? costDecider
-                                : CostDeciders.defaultCostDeciderFor(unit)));
+                            0, currentTurns, false, costDecider);
                         break;
                     case FAIL: default: // Loop on failure.
                         if (lb != null) lb.add("!");
@@ -2013,7 +2026,6 @@ ok:     while (!openMap.isEmpty()) {
                     }
                     stepLog = " " + step + "_";
                 }
-
                 assert move != null && move.getCost() >= 0;
                 // Tighten the bounds on a previously seen case if possible
                 if (closed != null) {
