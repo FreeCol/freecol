@@ -43,6 +43,7 @@ import javax.swing.ImageIcon;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -305,6 +306,8 @@ public class Map extends FreeColGameObject implements Location {
         setTiles(width, height);
         setLayer(Layer.RESOURCES);
         calculateLatitudePerRow();
+        // Enable full path logging by default if in PATHS debug mode
+        this.traceSearch = FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.PATHS);
     }
 
     /**
