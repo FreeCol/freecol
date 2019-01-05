@@ -860,10 +860,11 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateGoto(int x, int y, boolean start) {
+        if (start && canvas.isDrag(x, y)) {
+            canvas.startGoto();
+        }
         if (canvas.isGotoStarted()) {
             updateGotoTile(canvas.convertToMapTile(x, y));
-        } else if (start && canvas.isDrag(x, y)) {
-            canvas.startGoto();
         }
     }
 
