@@ -1060,7 +1060,6 @@ public class Unit extends GoodsLocation
      */
     public Tile getFullEntryLocation() {
         return (this.entryLocation != null) ? this.entryLocation.getTile()
-            : (owner.getEntryTile() == null) ? null
             : owner.getEntryTile();
     }
 
@@ -2044,7 +2043,7 @@ public class Unit extends GoodsLocation
      * {@code Tile} onto the given {@code Tile}. A call to
      * {@link #getMoveType(Tile, Tile, int)} will return
      * {@code MOVE_NO_MOVES}, if {@link #getMoveCost} returns a move cost
-     * larger than the {@link #getMovesLeft moves left}.
+     * larger than the {@link #getMovesLeft} moves left.
      *
      * @param from The {@code Tile} this {@code Unit} will
      *     move from.
