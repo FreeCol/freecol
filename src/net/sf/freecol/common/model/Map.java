@@ -1863,7 +1863,7 @@ ok:     while (!openMap.isEmpty()) {
                                                            moveTile);
                 boolean unitMove = umt.isProgress();
                 boolean carrierMove = carrier != null
-                    && carrier.isTileAccessible(moveTile);
+                    && carrier.getSimpleMoveType(carrier.getTile(), moveTile).isProgress();
                 if (lb != null) lb.add(" ", ((unitMove) ? "U" : ""),
                     ((carrierMove) ? "C" : ""));
                 MoveCandidate move;
@@ -1875,13 +1875,10 @@ ok:     while (!openMap.isEmpty()) {
                 boolean isGoal = goalDecider.check(unit,
                     new PathNode(moveTile, 0, INFINITY/2, false,
                                  currentNode, null));
-                if (isGoal && lb != null) lb.add(" *goal*", umt);
-
-                // Special processing for moves-to-goal.
                 if (isGoal) {
+                    if (lb != null) lb.add(" *goal*", umt);
                     if (unitMove) {
-                        if (moveTile.hasSettlement() && currentOnCarrier
-                            && carrierMove) {
+                        if (moveTile.hasSettlement() && currentOnCarrier && carrierMove) {
                             // If the goal has a settlement and the
                             // unit is travelling by carrier, dock the
                             // carrier.
@@ -1968,7 +1965,6 @@ ok:     while (!openMap.isEmpty()) {
                             continue;
                         }
                     }
-                    assert unitMove == true;
                     assert move != null;
                     stepLog = "@";
                 } else {
