@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002-${year}   The FreeCol Team
+ * Copyright (C) 2002-2019ar}   The FreeCol Team
  * <p>
  * This file is part of FreeCol.
  * <p>
