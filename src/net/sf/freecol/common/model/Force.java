@@ -108,18 +108,6 @@ public class Force extends FreeColSpecObject {
     }
 
     /**
-     * Update the space and capacity variables.
-     */
-    public final void updateSpaceAndCapacity() {
-        final Specification spec = getSpecification();
-        this.capacity = sum(this.navalUnits,
-                            nu -> nu.getType(spec).canCarryUnits(),
-                            nu -> nu.getType(spec).getSpace() * nu.getNumber());
-        this.spaceRequired = sum(this.landUnits,
-                                 lu -> lu.getType(spec).getSpaceTaken() * lu.getNumber());
-    }
-
-    /**
      * Gets all units.
      *
      * @return A copy of the list of all units.
@@ -242,23 +230,35 @@ public class Force extends FreeColSpecObject {
 
     /**
      * Defend against underprovisioned navies.
+     *
+     * @return True if the navy can carry the army.
      */
     public boolean prepareToBoard() {
-        if (this.navalUnits.isEmpty()) return false;
-        updateSpaceAndCapacity();
-        AbstractUnit ship0 = this.navalUnits.get(0);
-        int n = ship0.getNumber(),
-            sp = ship0.getType(getSpecification()).getSpace(),
-            space = getSpaceRequired(),
-            capacity = getCapacity();
-        while (space > capacity) {
-            n++;
-            ship0.setNumber(n);
-            capacity += sp;
+        final Specification spec = getSpecification();
+        AbstractUnit ship0 = find(this.navalUnits,
+            au -> au.getType(spec).getSpace() > 0);
+        if (ship0 != null) {
+            int sp = ship0.getType(spec).getSpace(),
+                more = (this.spaceRequired - this.capacity) / sp + 1;
+            if (more > 0) {
+                ship0.setNumber(ship0.getNumber() + more);
+                this.capacity += sp * more;
+            }
         }
-        return true;
+        return this.spaceRequired <= this.capacity;
     }
-        
+
+    /**
+     * Does another force match?
+     *
+     * @param other The other <code>Force</code> to test.
+     * @return True if the other force contains the same units.
+     */
+    public boolean matchAll(Force other) {
+        return AbstractUnit.matchAll(this.landUnits, other.landUnits)
+            && AbstractUnit.matchAll(this.navalUnits, other.navalUnits);
+    }
+
 
     // Override FreeColObject
 
@@ -337,4 +337,20 @@ public class Force extends FreeColSpecObject {
      * {@inheritDoc}
      */
     public String getXMLTagName() { return TAG; }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("<Force");
+        for (AbstractUnit au : this.landUnits) sb.append(" ").append(au);
+        for (AbstractUnit au : this.navalUnits) sb.append(" ").append(au);
+        sb.append('>');
+        return sb.toString();
+    }
 }

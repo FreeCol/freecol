@@ -89,7 +89,7 @@ public class AbstractUnit extends FreeColObject {
      * @return The role identifier.
      */
     public final String getRoleId() {
-        return roleId;
+        return this.roleId;
     }
 
     /**
@@ -107,7 +107,7 @@ public class AbstractUnit extends FreeColObject {
      * @return The number of units.
      */
     public final int getNumber() {
-        return number;
+        return this.number;
     }
 
     /**
@@ -245,6 +245,34 @@ public class AbstractUnit extends FreeColObject {
             template.addStringTemplate(au.getLabel());
         }
         return template;
+    }
+
+    /**
+     * Does another AbstractUnit match in all fields.
+     *
+     * @param other The other <code>AbstractUnit</code> to test.
+     * @return True if all fields match.
+     */
+    public boolean matchAll(AbstractUnit other) {
+        return getId().equals(other.getId())
+            && this.getRoleId().equals(other.getRoleId())
+            && this.getNumber() == other.getNumber();
+    }
+
+    /**
+     * Do two lists of abstract units match completely.
+     *
+     * @param l1 The first <code>AbstractUnit</code>.
+     * @param l2 The first <code>AbstractUnit</code>.
+     * @return True if the lists match.
+     */
+    public static boolean matchAll(List<AbstractUnit> l1,
+                                   List<AbstractUnit> l2) {
+        if (l1.size() != l2.size()) return false;
+        for (AbstractUnit au : l1) {
+            if (none(l2, a -> a.matchAll(au))) return false;
+        }
+        return true;
     }
 
 

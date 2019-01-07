@@ -727,9 +727,8 @@ public final class InGameController extends Controller {
                        StringTemplate.template(messageId), monarchKey));
             break;
         case ADD_TO_REF:
-            AbstractUnit refAdditions = monarch.chooseForREF(random);
+            AbstractUnit refAdditions = monarch.addToREF(random);
             if (refAdditions == null) break;
-            monarch.getExpeditionaryForce().add(refAdditions);
             template = StringTemplate.template(messageId)
                 .addAmount("%number%", refAdditions.getNumber())
                 .addNamed("%unit%", refAdditions.getType(spec));

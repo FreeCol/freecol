@@ -391,7 +391,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         case WAIVE_TAX:
             return true;
         case ADD_TO_REF:
-            return !(navalREFUnitTypes.isEmpty() || landREFUnitTypes.isEmpty());
+            return !navalREFUnitTypes.isEmpty() && !landREFUnitTypes.isEmpty();
         case DECLARE_PEACE:
             return !collectPotentialFriends().isEmpty();
         case DECLARE_WAR:
@@ -444,12 +444,12 @@ public final class Monarch extends FreeColGameObject implements Named {
         addIfValid(choices, MonarchAction.DECLARE_PEACE, 6 - dx);
         addIfValid(choices, MonarchAction.DECLARE_WAR, 5 + dx);
         if (player.checkGold(MONARCH_MINIMUM_PRICE)) {
-            addIfValid(choices, MonarchAction.MONARCH_MERCENARIES, 6-dx);
+            addIfValid(choices, MonarchAction.MONARCH_MERCENARIES, 6 - dx);
         } else if (dx < 3) {
             addIfValid(choices, MonarchAction.SUPPORT_LAND, 3 - dx);
         }
         addIfValid(choices, MonarchAction.SUPPORT_SEA, 6 - dx);
-        addIfValid(choices, MonarchAction.HESSIAN_MERCENARIES, 6-dx);
+        addIfValid(choices, MonarchAction.HESSIAN_MERCENARIES, 6 - dx);
 
         return choices;
     }
@@ -511,35 +511,39 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
-     * Gets units to be added to the Royal Expeditionary Force.
+     * Add units to the Royal Expeditionary Force.
      *
      * @param random The {@code Random} number source to use.
      * @return An addition to the Royal Expeditionary Force.
      */
-    public AbstractUnit chooseForREF(Random random) {
+    public AbstractUnit addToREF(Random random) {
         initializeCaches();
 
         final Specification spec = getSpecification();
-        // Preserve some extra naval capacity so that not all the REF
-        // navy is completely loaded
-        // FIXME: magic number 2.5 * Manowar-capacity = 15
         Force ref = getExpeditionaryForce();
-        boolean needNaval = ref.getCapacity()
-            < ref.getSpaceRequired() + 15;
-        List<UnitType> types = (needNaval) ? navalREFUnitTypes
-            : landREFUnitTypes;
-        if (types.isEmpty()) return null;
-        UnitType unitType = getRandomMember(logger, "Choose REF unit",
-                                            types, random);
-        Role role = (needNaval
-            || !unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
-            ? spec.getDefaultRole()
-            : (randomInt(logger, "Choose land role", random, 3) == 0)
-            ? refMountedRole
-            : refArmedRole;
-        int number = (needNaval) ? 1
-            : randomInt(logger, "Choose land#", random, 3) + 1;
-        AbstractUnit result = new AbstractUnit(unitType, role.getId(), number);
+        AbstractUnit result;
+        if ((double)ref.getCapacity() < ref.getSpaceRequired() * 1.1) {
+            // Expand navy to +10% of required size to transport the land units
+            // FIXME: Magic number
+            List<UnitType> types = navalREFUnitTypes;
+            if (types.isEmpty()) return null;
+            result = new AbstractUnit(getRandomMember(logger, "Naval REF unit",
+                                                      types, random),
+                                      Specification.DEFAULT_ROLE_ID, 1);
+        } else {
+            List<UnitType> types = landREFUnitTypes;
+            if (types.isEmpty()) return null;
+            UnitType unitType = getRandomMember(logger, "Land REF unit",
+                                                types, random);
+            Role role = (!unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
+                ? spec.getDefaultRole()
+                : (randomInt(logger, "Choose land role", random, 3) == 0)
+                ? refMountedRole
+                : refArmedRole;
+            int number = randomInt(logger, "Choose land#", random, 3) + 1;
+            result = new AbstractUnit(unitType, role.getId(), number);
+        }
+        ref.add(result);
         logger.info("Add to " + player.getDebugName()
             + " REF: capacity=" + ref.getCapacity()
             + " spaceRequired=" + ref.getSpaceRequired()
@@ -551,33 +555,21 @@ public final class Monarch extends FreeColGameObject implements Named {
      * Update the intervention force, adding land units depending on
      * turns passed, and naval units sufficient to transport all land
      * units.
+     *
+     * Called when the IVF is created.
      */
     public void updateInterventionForce() {
-        Specification spec = getSpecification();
-        int interventionTurns = spec.getInteger(GameOptions.INTERVENTION_TURNS);
-        if (interventionTurns > 0) {
-            Force ivf = getInterventionForce();
-            int updates = getGame().getTurn().getNumber() / interventionTurns;
-            for (AbstractUnit unit : ivf.getLandUnitsList()) {
+        final Specification spec = getSpecification();
+        final int interventionTurns = spec.getInteger(GameOptions.INTERVENTION_TURNS);
+        final int updates = getGame().getTurn().getNumber() / interventionTurns;
+        Force ivf = getInterventionForce();
+        if (interventionTurns > 0 && updates > 0) {
+            for (AbstractUnit au : ivf.getLandUnitsList()) {
                 // add units depending on current turn
-                int value = unit.getNumber() + updates;
-                unit.setNumber(value);
+                ivf.add(new AbstractUnit(au.getType(spec), au.getRoleId(),
+                                         updates));
             }
-            ivf.updateSpaceAndCapacity();
-
-            while (ivf.getCapacity() < ivf.getSpaceRequired()) {
-                boolean progress = false;
-                // Under capacity?  Add ships until all units can be
-                // transported at once.
-                for (AbstractUnit ship : transform(ivf.getNavalUnitsList(),
-                        u -> u.getType(spec).canCarryUnits()
-                            && u.getType(spec).getSpace() > 0)) {
-                    ship.setNumber(ship.getNumber() + 1);
-                    progress = true;
-                }
-                if (!progress) break;
-                ivf.updateSpaceAndCapacity();
-            }
+            ivf.prepareToBoard();
         }
     }
 

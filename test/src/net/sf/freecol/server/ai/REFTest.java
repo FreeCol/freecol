@@ -20,10 +20,15 @@
 package net.sf.freecol.server.ai;
 
 import java.util.List;
+import java.util.Random;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Force;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
@@ -49,40 +54,17 @@ public class REFTest extends FreeColTestCase {
 
     public void testCreateREFPlayer() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
+        final Specification spec = game.getSpecification();
         InGameController igc = ServerTestHelper.getInGameController();
 
         // Create player
-        ServerPlayer player1 = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
-        List<AbstractUnit> refUnitsBeforeIndependence = player1.getMonarch()
-            .getExpeditionaryForce().getUnitList();
-        int soldiersBeforeIndependence = 0;
-        int dragoonsBeforeIndependence = 0;
-        int artilleryBeforeIndependence = 0;
-        int shipsBeforeIndependence = 0;
-        for (AbstractUnit au : refUnitsBeforeIndependence) {
-            UnitType unitType = spec().getUnitType(au.getId());
-            if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                shipsBeforeIndependence += au.getNumber();
-                continue;
-            }
-            if (unitType == artilleryType) {
-                artilleryBeforeIndependence += au.getNumber();
-                continue;
-            }
-            if (unitType == soldierType) {
-                if ("model.role.infantry".equals(au.getRoleId())) {
-                    soldiersBeforeIndependence += au.getNumber();
-                } else if ("model.role.cavalry".equals(au.getRoleId())) {
-                    dragoonsBeforeIndependence += au.getNumber();
-                } else {
-                    fail("Unknown REF role for " + unitType.getId()
-                        + ": " + au.getRoleId());
-                }
-                continue;
-            }
-            fail("Unknown REF unit: " + au);
-        }
-
+        final ServerPlayer player1 = (ServerPlayer)game
+            .getPlayerByNationId("model.nation.dutch");
+        final Force exf = player1.getMonarch().getExpeditionaryForce();
+        // Update to have full naval capacity
+        exf.prepareToBoard();
+        List<AbstractUnit> refBeforeIndependence = exf.getUnitList();
+        
         ServerPlayer refPlayer = igc.createREFPlayer(player1);
 
         assertNotNull("REF player is null", refPlayer);
@@ -90,45 +72,45 @@ public class REFTest extends FreeColTestCase {
         assertEquals("REF player should be player1 ref", refPlayer,
             player1.getREFPlayer());
 
-        // Execute
         List<Unit> refUnitsAfterIndependence = refPlayer.getUnitList();
-
-        // Get results
-        int soldiersAfterIndependence = 0;
-        int dragoonsAfterIndependence = 0;
-        int artilleryAfterIndependence = 0;
-        int shipsAfterIndependence = 0;
-        for (Unit unit : refUnitsAfterIndependence) {
-            UnitType unitType = unit.getType();
-            if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                shipsAfterIndependence++;
-                continue;
-            }
-            if (unitType == artilleryType) {
-                artilleryAfterIndependence++;
-                continue;
-            }
-            if (unitType == soldierType) {
-                if (unit.isArmed() && !unit.isMounted()) {
-                    soldiersAfterIndependence++;
-                } else if (unit.isArmed() && unit.isMounted()) {
-                    dragoonsAfterIndependence++;
-                } else {
-                    fail("Unknown REF role: " + unit.getRole());
-                }
-                continue;
-            }
-            fail("Unknown REF unit: " +  unit.toString());
+        Force newf = new Force(spec);
+        for (Unit u : refUnitsAfterIndependence) {
+            newf.add(new AbstractUnit(u.getType(), u.getRole().getId(), 1));
         }
+        assertTrue("REF player force != Player monarch Expeditionary force",
+                   exf.matchAll(newf));
+    }
 
-        // Verify results
-        assertEquals("Wrong number of ships", shipsBeforeIndependence,
-                     shipsAfterIndependence);
-        assertEquals("Wrong number of artillery", artilleryBeforeIndependence,
-                     artilleryAfterIndependence);
-        assertEquals("Wrong number of soldiers", soldiersBeforeIndependence,
-                     soldiersAfterIndependence);
-        assertEquals("Wrong number of dragoons", dragoonsBeforeIndependence,
-                     dragoonsAfterIndependence);
+
+    public void testAddToREF() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        final Specification spec = game.getSpecification();
+        InGameController igc = ServerTestHelper.getInGameController();
+        Random random = ServerTestHelper.getServer().getServerRandom();
+
+        // Create player
+        final ServerPlayer player1 = (ServerPlayer)game
+            .getPlayerByNationId("model.nation.dutch");
+        final Monarch monarch = player1.getMonarch();
+        game.setTurn(new Turn(200));
+        assertTrue("REF addition",
+                   monarch.actionIsValid(Monarch.MonarchAction.ADD_TO_REF));
+
+        // If the REF has too many land units, it should add more naval,
+        // if it has enough naval it should add more land.
+        // If this does not happen, this test will fail by looping forever.
+        final Force exf = monarch.getExpeditionaryForce();
+        int done = 0;
+        while (done != 3) {
+            boolean naval = exf.getCapacity() < exf.getSpaceRequired();
+            AbstractUnit au = monarch.addToREF(random);
+            assertNotNull("REF add", au);
+            if (naval) {
+                assertTrue("Naval unit required", au.getType(spec).isNaval());
+            } else {
+                assertFalse("Land unit required", au.getType(spec).isNaval());
+            }
+            if (au.getType(spec).isNaval()) done |= 2; else done |= 1;
+        }
     }
 }
