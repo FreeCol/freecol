@@ -19,29 +19,6 @@
 
 package net.sf.freecol.server;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.BindException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Timer;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
-import javax.xml.stream.XMLStreamException;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.FreeColSeed;
@@ -52,17 +29,15 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.metaserver.MetaServerUtils;
 import net.sf.freecol.common.metaserver.ServerInfo;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
@@ -73,13 +48,10 @@ import net.sf.freecol.common.networking.LogoutMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.TrivialMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
-import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.Utils.*;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -90,13 +62,38 @@ import net.sf.freecol.server.control.ServerInputHandler;
 import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.SimpleMapGenerator;
-import net.sf.freecol.server.generator.TerrainGenerator;
 import net.sf.freecol.server.model.ServerGame;
-import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.Session;
 import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
+
+import javax.imageio.ImageIO;
+import javax.xml.stream.XMLStreamException;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Random;
+import java.util.function.Predicate;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static net.sf.freecol.common.util.CollectionUtils.count;
+import static net.sf.freecol.common.util.CollectionUtils.matchKeyEquals;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.Utils.delay;
+import static net.sf.freecol.common.util.Utils.getRandomState;
+import static net.sf.freecol.common.util.Utils.restoreRandomState;
 
 
 /**
@@ -690,7 +687,7 @@ public final class FreeColServer {
     /**
      * Wait until the game has been created.
      *
-     * 2017: This should not be needed, but just occasionally the
+     * 2019: This should not be needed, but just occasionally the
      * client and server threads conspire to race in a way that
      * causes a hang.  Check this again in due course.
      *
