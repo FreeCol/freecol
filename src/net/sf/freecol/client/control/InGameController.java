@@ -3820,16 +3820,15 @@ public final class InGameController extends FreeColClientHolder {
             : new ColonyWas(unit.getColony());
         changeState(unit, UnitState.ACTIVE);
         moveDirection(unit, direction, true);
-        boolean ret = unit.getTile() != oldTile
-            || unitWas.fireChanges();
+        boolean ret = unitWas.fireChanges();
         if (ret) {
             if (colonyWas != null) colonyWas.fireChanges();
             updateGUI(null, false);
-            if (!unit.couldMove() && unit.hasTile()) {
-                // Show colony panel if unit out of moves
-                Colony colony = unit.getTile().getColony();
-                if (colony != null) colonyPanel(colony, unit);
-            }
+        }
+        if (unit.getTile() != oldTile && !unit.couldMove() && unit.hasTile()) {
+            // Show colony panel if unit moved and is now out of moves
+            Colony colony = unit.getTile().getColony();
+            if (colony != null) colonyPanel(colony, unit);
         }
         return ret;
     }
