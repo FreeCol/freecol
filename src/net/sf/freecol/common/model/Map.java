@@ -306,8 +306,7 @@ public class Map extends FreeColGameObject implements Location {
         setTiles(width, height);
         setLayer(Layer.RESOURCES);
         calculateLatitudePerRow();
-        // Enable full path logging by default if in PATHS debug mode
-        this.traceSearch = FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.PATHS);
+        initializeTraceSearch();
     }
 
     /**
@@ -321,6 +320,7 @@ public class Map extends FreeColGameObject implements Location {
         super(game, null);
 
         readFromXML(xr);
+        initializeTraceSearch();
     }
 
     /**
@@ -333,9 +333,17 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Map(Game game, String id) {
         super(game, id);
+        initializeTraceSearch();
     }
 
 
+    /**
+     * Enable full path logging by default if in PATHS debug mode.
+     */
+    private void initializeTraceSearch() {
+        this.traceSearch = FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.PATHS);
+    }
+        
     /**
      * Gets the width of this map.
      *
@@ -1922,11 +1930,6 @@ ok:     while (!openMap.isEmpty()) {
                                 true, CostDeciders.tileCost());
                             unitMove = true;
                             break;
-                        case MOVE_NO_ATTACK_MARINE:
-                            // Ampibious attack disallowed, disembark to
-                            // reach the goal.
-                            if (lb != null) lb.add(" !amphibious");
-                            continue;
                         case MOVE_NO_ATTACK_CIVILIAN:
                             // There is a settlement in the way, this
                             // path can never succeed.
@@ -1952,16 +1955,24 @@ ok:     while (!openMap.isEmpty()) {
                                 moveTile, currentMovesLeft, currentTurns,
                                 false, CostDeciders.tileCost());
                             break;
-                        case MOVE_NO_ACCESS_WATER:
-                            // The unit can not disembark directly to
-                            // the goal along this path, but the unit
-                            // could disembark onto land and then move
-                            // to the goal.
-                            if (lb != null) lb.add(" !disembark");
-                            continue;
                         default:
+                            // Several cases here, these are understood:
+                            // MOVE_NO_ATTACK_EMBARK:
+                            //   Land unit trying to use water, which
+                            //   can not work without a ship there
+                            // MOVE_NO_ACCESS_WATER:
+                            //   The unit can not disembark directly to
+                            //   the goal along this path
+                            // MOVE_NO_ATTACK_MARINE:
+                            //   Ampibious attack disallowed, disembark to
+                            //   reach the goal
+                            // There will be more.
+                            // We used to do---
+                            //   if (!goalDecider.hasSubGoals()) break ok;
+                            // --- here, like in the transient failure case
+                            // above but we should not truncate other
+                            // surrounding tiles.
                             if (lb != null) lb.add(" !FAIL-", umt);
-                            if (!goalDecider.hasSubGoals()) break ok;
                             continue;
                         }
                     }
