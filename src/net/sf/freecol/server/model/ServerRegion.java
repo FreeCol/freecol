@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.ChangeSet.See;
 import net.sf.freecol.common.option.GameOptions;
@@ -215,25 +216,25 @@ public class ServerRegion extends Region {
      * Discover this region.
      *
      * @param player The discovering {@code Player}.
+     * @param unit The discovering {@code Unit}.
      * @param turn The discovery {@code Turn}.
      * @param newName The name of the region.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csDiscover(Player player, Turn turn, String newName,
-                           ChangeSet cs) {
+    public void csDiscover(Player player, Unit unit, Turn turn,
+                           String newName, ChangeSet cs) {
         if (!getDiscoverable()) return;
         final int score = (getSpecification().getBoolean(GameOptions.EXPLORATION_POINTS)) 
             ? this.scoreValue
             : 0;
         if (!hasName()) this.name = newName;
-        for (Region r : discover(player, turn)) cs.add(See.all(), r);
+        for (Region r : discover(player, unit, turn)) cs.add(See.all(), r);
         HistoryEvent h = new HistoryEvent(turn,
             HistoryEvent.HistoryEventType.DISCOVER_REGION, player)
                 .addStringTemplate("%nation%", player.getNationLabel())
                 .addName("%region%", newName);
         h.setScore(score);
         cs.addGlobalHistory(getGame(), h);
-        setDiscoverer(null);
     }
 
     /**

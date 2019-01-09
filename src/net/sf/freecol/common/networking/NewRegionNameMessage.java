@@ -143,7 +143,7 @@ public class NewRegionNameMessage extends AttributeMessage {
             return serverPlayer.clientError("Region mismatch, "
                 + region.getId() + " != " + regionId);
         }
-        
+
         // Do the discovery
         return igc(freeColServer)
             .setNewRegionName(serverPlayer, unit, region, getNewRegionName());

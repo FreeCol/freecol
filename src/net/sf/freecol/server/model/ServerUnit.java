@@ -880,11 +880,10 @@ public class ServerUnit extends Unit implements TurnTaker {
         // Check for region discovery
         Region region = newTile.getDiscoverableRegion();
         if (serverPlayer.isEuropean() && region != null
-            && region.getDiscoverer() == null) {
+            && region.checkDiscover(this)) {
             cs.add(See.only(serverPlayer),
                    new NewRegionNameMessage(region, newTile, this,
                        serverPlayer.getNameForRegion(region)));
-            region.setDiscoverer(getId());
         }
     }
 

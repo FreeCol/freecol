@@ -3753,7 +3753,7 @@ public final class InGameController extends Controller {
                 + unit.getId() + " provided.");
         }
         ChangeSet cs = new ChangeSet();
-        serverRegion.csDiscover(serverPlayer, game.getTurn(), name, cs);
+        serverRegion.csDiscover(serverPlayer, unit, game.getTurn(), name, cs);
 
         // Others do find out about region name changes.
         getGame().sendToOthers(serverPlayer, cs);
