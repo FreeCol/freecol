@@ -95,7 +95,7 @@ public class Connection implements Closeable {
     private ReceivingThread receivingThread;
 
     /** The message handler to process incoming messages with. */
-    private MessageHandler messageHandler;
+    private MessageHandler messageHandler = null;
 
     /** Is there an active connection. */
     private boolean connected = false;
@@ -285,7 +285,7 @@ public class Connection implements Closeable {
      *
      * @return The {@code MessageHandler} for this Connection.
      */
-    public MessageHandler getMessageHandler() {
+    public synchronized MessageHandler getMessageHandler() {
         return this.messageHandler;
     }
 
@@ -296,7 +296,7 @@ public class Connection implements Closeable {
      *     Connection.
      * @return This {@code Connection}.
      */
-    public Connection setMessageHandler(MessageHandler messageHandler) {
+    public synchronized Connection setMessageHandler(MessageHandler messageHandler) {
         this.messageHandler = messageHandler;
         return this;
     }
@@ -499,7 +499,7 @@ public class Connection implements Closeable {
     public Message handle(Message message) throws FreeColException {
         if (message == null) return null;
         final MessageHandler mh = getMessageHandler();
-        return mh.handle(this, message);
+        return (mh == null) ? null : mh.handle(this, message);
     }
 
     /**
