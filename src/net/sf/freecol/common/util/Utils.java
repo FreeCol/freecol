@@ -195,6 +195,35 @@ public class Utils {
     /**
      * Create a new file writer that uses UTF-8.
      *
+     * @param os An {@code OutputStream} to write to.
+     * @return A {@code Writer} for this file.
+     */
+    public static Writer getUTF8Writer(OutputStream os) {
+        return new OutputStreamWriter(os, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Create a new file writer that uses UTF-8.
+     *
+     * @param file A {@code File} to write to.
+     * @param append If true, append to the file.
+     * @return A {@code Writer} for this file.
+     */
+    private static Writer getF8W(File file, boolean append) {
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(file, append);
+        } catch (FileNotFoundException e) {
+            logger.log(Level.WARNING, "No FileOutputStream for "
+                + file.getName(), e);
+            return null;
+        }
+        return getUTF8Writer(fos);
+    }
+
+    /**
+     * Create a new file writer that uses UTF-8.
+     *
      * @param file A {@code File} to write to.
      * @return A {@code Writer} for this file.
      */
@@ -213,43 +242,6 @@ public class Utils {
     }
     
     /**
-     * Create a new file writer that uses UTF-8.
-     *
-     * @param file A {@code File} to write to.
-     * @param append If true, append to the file.
-     * @return A {@code Writer} for this file.
-     */
-    private static Writer getF8W(File file, boolean append) {
-        FileOutputStream fos;
-        try {
-            fos = new FileOutputStream(file, append);
-        } catch (FileNotFoundException e) {
-            logger.log(Level.WARNING, "No FileOutputStream for "
-                + file.getName(), e);
-            return null;
-        }
-        Writer wr = getUTF8Writer(fos);
-        if (wr == null) {
-            try {
-                fos.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Failed to close", ioe);
-            }
-        }
-        return wr;            
-    }
-
-    /**
-     * Create a new file writer that uses UTF-8.
-     *
-     * @param os An {@code OutputStream} to write to.
-     * @return A {@code Writer} for this file.
-     */
-    public static Writer getUTF8Writer(OutputStream os) {
-        return new OutputStreamWriter(os, StandardCharsets.UTF_8);
-    }
-
-    /**
      * Helper to make an XML Transformer.
      *
      * @param declaration If true, include the XML declaration.
@@ -261,7 +253,7 @@ public class Utils {
         Transformer tf = null;
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
-            factory.setAttribute("indent-number", new Integer(2));
+            factory.setAttribute("indent-number", Integer.valueOf(2));
             tf = factory.newTransformer();
             tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             tf.setOutputProperty(OutputKeys.METHOD, "xml");
