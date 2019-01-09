@@ -65,13 +65,39 @@ public class UserServerAPI extends ServerAPI {
         this.gui = gui;
     }
 
-
-    // Implement ServerAPI
+    /**
+     * Name accessor.
+     *
+     * @return The connection name.
+     */
+    private synchronized String getName() {
+        return this.name;
+    }
 
     /**
-     * {@inheritDoc}
+     * Host accessor.
+     *
+     * @return The connection host.
      */
-    public synchronized Connection connect(String name, String host, int port)
+    private synchronized String getHost() {
+        return this.host;
+    }
+
+    /**
+     * Port accessor.
+     *
+     * @return The connection port.
+     */
+    private synchronized int getPort() {
+        return this.port;
+    }
+
+    /**
+     * Create a new connection.
+     *
+     * @return The new <code>Connection</code>.
+     */
+    private static Connection newConnection(String name, String host, int port)
         throws IOException {
         int tries;
         if (port < 0) {
@@ -80,23 +106,39 @@ public class UserServerAPI extends ServerAPI {
         } else {
             tries = 1;
         }
+        Connection conn = null;
         for (int i = tries; i > 0; i--) {
             try {
-                this.connection = new Connection(host, port, name)
-                    .setMessageHandler(messageHandler);
-                if (this.connection != null) {
-                    // Connected, save the connection information
-                    this.name = name;
-                    this.host = host;
-                    this.port = port;
-                    this.connection.setWriteScope(FreeColXMLWriter.WriteScope.toServer());
-                    break;
-                }
+                conn = new Connection(host, port, name);
+                if (conn != null) break;
             } catch (IOException e) {
                 if (i <= 1) throw e;
             }
         }
-        return this.connection;
+        return conn;
+    }
+
+
+    // Implement ServerAPI
+
+    /**
+     * {@inheritDoc}
+     */
+    public Connection connect(String name, String host, int port)
+        throws IOException {
+        Connection c = newConnection(name, host, port);
+        synchronized (this) {
+            if (c != null) {
+                // Connection made, save the parameters
+                this.name = name;
+                this.host = host;
+                this.port = port;
+                c.setMessageHandler(this.messageHandler);
+                c.setWriteScope(FreeColXMLWriter.WriteScope.toServer());
+            }
+            this.connection = c;
+            return this.connection;
+        }
     }
 
     /**
@@ -114,7 +156,7 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     public Connection reconnect() throws IOException {
-        return connect(this.name, this.host, this.port);
+        return connect(getName(), getHost(), getPort());
     }
 
     /**
@@ -128,7 +170,7 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     @Override
-    public void setMessageHandler(MessageHandler mh) {
+    public synchronized void setMessageHandler(MessageHandler mh) {
         super.setMessageHandler(mh);
         this.messageHandler = mh;
     }
