@@ -128,6 +128,14 @@ public class Unit extends GoodsLocation
         }
     }
 
+    /** Internal state for findIntermediatePort. */
+    private static enum PortMode {
+        LAKE,
+        NO_HIGH_SEAS,
+        BLOCKED,
+        LAND
+    };
+
 
     /** The individual name of this unit, not of the unit type. */
     protected String name = null;
@@ -2998,47 +3006,49 @@ public class Unit extends GoodsLocation
                     : p.getTotalTurns() + dstTile.getDistanceTo(s.getTile());
                 });
 
-        int type;
+        PortMode type;
         if (isNaval()) {
             if (!srcTile.isHighSeasConnected()) {
                 // On a lake!  FIXME: do better
-                type = 0;
+                type = PortMode.LAKE;
             } else if (dstTile == null) {
                 // Carrier must be blocked from high seas
-                type = 1;
+                type = PortMode.NO_HIGH_SEAS;
             } else if (dstTile.isHighSeasConnected()) {
                 // Carrier is blocked or destination is blocked.
-                type = (getTile().isOnRiver()) ? 1 : 2;
+                type = (getTile().isOnRiver()) ? PortMode.NO_HIGH_SEAS
+                    : PortMode.BLOCKED;
             } else {
                 // Destination must be blocked
-                type = 2;
+                type = PortMode.BLOCKED;
             }
         } else {
             if (dstTile == null || getTile().getContiguity() != dstCont) {
                 // Ocean travel will be required
                 // If already at port try to improve its connectivity,
                 // otherwise go to a port.
-                type = (srcTile.isHighSeasConnected()) ? 1 : 2;
+                type = (srcTile.isHighSeasConnected()) ? PortMode.NO_HIGH_SEAS
+                    : PortMode.BLOCKED;
             } else {
                 // Pure land travel, just find a nearer settlement.
-                type = 3;
+                type = PortMode.LAND;
             }
         }
 
         PathNode path = null;
         Settlement sett;
         switch (type) {
-        case 0:
+        case LAKE:
             // No progress possible.
             break;
-        case 1:
+        case NO_HIGH_SEAS:
             // Starting on a river, probably blocked in there.
             // Find the settlement that most reduces the high seas count.
             path = search(getLocation(),
                           GoalDeciders.getReduceHighSeasCountGoalDecider(this),
                           null, INFINITY, null);
             break;
-        case 2:
+        case BLOCKED:
             // Ocean travel required, destination blocked.
             // Find the closest available connected port.
             final Predicate<Settlement> portPredicate = s ->
@@ -3047,7 +3057,7 @@ public class Unit extends GoodsLocation
                             settlementComparator);
             path = (sett == null) ? null : this.findPath(sett);
             break;
-        case 3:
+        case LAND:
             // Land travel.  Find nearby settlement with correct contiguity.
             final Predicate<Settlement> contiguityPred = s ->
                 s != ignoreSrc && s != ignoreDst
