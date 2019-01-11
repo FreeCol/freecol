@@ -409,6 +409,7 @@ public class Map extends FreeColGameObject implements Location {
         this.width = width;
         this.height = height;
         this.tiles = new Tile[width][height];
+        this.cachedTilesValid = false;
         return true;
     }
 
@@ -635,16 +636,6 @@ public class Map extends FreeColGameObject implements Location {
         this.cachedTilesValid = true;
     }
 
-    /**
-     * Get all the tiles in the map as a set.
-     *
-     * @return A {@code Set} of all {@code Tile}s in this {@code Map}.
-     */
-    public Set<Tile> getAllTilesSet() {
-        if (!this.cachedTilesValid) resetCachedTiles();
-        return this.cachedTiles;
-    }
-
 
     // Useful location and direction utilities
     
@@ -805,7 +796,8 @@ public class Map extends FreeColGameObject implements Location {
      * @return A {@code Stream} of all {@code Tile}s in this {@code Map}.
      */
     public Stream<Tile> getAllTiles() {
-        return toStream(getAllTilesSet());
+        resetCachedTiles();
+        return toStream(this.cachedTiles);
     }
 
     /**
@@ -814,7 +806,8 @@ public class Map extends FreeColGameObject implements Location {
      * @param consumer The {@code Consumer} action to perform.
      */
     public void forEachTile(Consumer<Tile> consumer) {
-        for (Tile t : getAllTilesSet()) consumer.accept(t);
+        resetCachedTiles();
+        for (Tile t : this.cachedTiles) consumer.accept(t);
     }
 
     /**
@@ -825,7 +818,8 @@ public class Map extends FreeColGameObject implements Location {
      */
     public void forEachTile(Predicate<Tile> predicate,
                             Consumer<Tile> consumer) {
-        for (Tile t : getAllTilesSet()) {
+        resetCachedTiles();
+        for (Tile t : this.cachedTiles) {
             if (predicate.test(t)) consumer.accept(t);
         }
     }
@@ -2254,9 +2248,8 @@ ok:     while (!openMap.isEmpty()) {
         }
 
         // Reset all highSeas tiles to the default ocean type.
-        for (Tile t : getAllTilesSet()) {
-            if (t.getType() == highSeas) t.setType(ocean);
-        }
+        forEachTile(t -> t.getType() == highSeas,
+                    t -> t.setType(ocean));
 
         final int width = getWidth(), height = getHeight();
         Tile t, seaL = null, seaR = null;
@@ -2331,7 +2324,8 @@ ok:     while (!openMap.isEmpty()) {
         List<Tile> curr = new ArrayList<>();
         List<Tile> next = new ArrayList<>();
         int hsc = 0;
-        for (Tile t : getAllTilesSet()) {
+        resetCachedTiles();
+        for (Tile t : this.cachedTiles) {
             t.setHighSeasCount(-1);
             if (!t.isLand()) {
                 if ((t.getX() == 0 || t.getX() == getWidth()-1)
@@ -2671,10 +2665,9 @@ ok:     while (!openMap.isEmpty()) {
         clearRegions();
         for (Region r : o.getRegions()) addRegion(game.update(r, true));
         this.setTiles(o.getWidth(), o.getHeight());
-        for (Tile ot : o.getAllTilesSet()) {
-            // Allow creating new tiles in first map update
-            this.setTile(game.update(ot, true), ot.getX(), ot.getY());
-        }
+        // Allow creating new tiles in first map update
+        o.forEachTile(t -> this.setTile(game.update(t, true),
+                                        t.getX(), t.getY()));
         this.layer = o.getLayer();
         this.minimumLatitude = o.getMinimumLatitude();
         this.maximumLatitude = o.getMaximumLatitude();
@@ -2765,10 +2758,10 @@ ok:     while (!openMap.isEmpty()) {
 
         // Fix up settlement tile ownership in one hit here, avoiding
         // complications with Tile-internal cached tiles.
-        for (Tile t : getAllTilesSet()) {
-            Settlement s = t.getOwningSettlement();
-            if (s != null) s.addTile(t);
-        }
+        forEachTile(t -> {
+                Settlement s = t.getOwningSettlement();
+                if (s != null) s.addTile(t);
+            });
 
         // @compat 0.11.3
         // Maps with incorrect parent/child chains were occurring.

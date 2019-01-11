@@ -2848,9 +2848,8 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         } else {
             // Otherwise it is just the explored tiles
-            for (Tile t : getGame().getMap().getAllTilesSet()) {
-                if (hasExplored(t)) tiles.add(t);
-            }
+            getGame().getMap().forEachTile(t -> this.hasExplored(t),
+                                           t -> tiles.add(t));
         }
         return tiles;
     }
