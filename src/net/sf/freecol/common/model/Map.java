@@ -784,12 +784,17 @@ public class Map extends FreeColGameObject implements Location {
     // Support for various kinds of map iteration.
 
     /**
-     * Get a stream of all the tiles in the map.
+     * Get a list of all the tiles that match a predicate.
      *
-     * @return A {@code Stream} of all {@code Tile}s in this {@code Map}.
+     * @param predicate The <code>Predicate</code> to check.
+     * @return A {@code List} of all matching {@code Tile}s.
      */
-    public Stream<Tile> getAllTiles() {
-        return toStream(this.tileList);
+    public List<Tile> getTiles(Predicate<Tile> predicate) {
+        List<Tile> ret = new ArrayList<>();
+        for (Tile t : this.tileList) {
+            if (predicate.test(t)) ret.add(t);
+        }
+        return ret;
     }
 
     /**

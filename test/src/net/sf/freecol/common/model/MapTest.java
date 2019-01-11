@@ -173,7 +173,7 @@ public class MapTest extends FreeColTestCase {
         assertEquals(Direction.SE, Direction.NW.getReverseDirection());
     }
 
-    public void testGetAllTiles() {
+    public void testGetTiles() {
         Game game = getStandardGame();
         final int xmax = 5;
         final int ymax = 6;
@@ -188,7 +188,7 @@ public class MapTest extends FreeColTestCase {
         }
         
         int i = 0;
-        for (Tile t : toList(map.getAllTiles())) {
+        for (Tile t : map.getTiles(alwaysTrue())) {
             i++;
             assertTrue(allTiles.remove(t));
         }

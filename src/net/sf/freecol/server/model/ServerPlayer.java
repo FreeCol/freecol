@@ -674,8 +674,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         }
 
         // Clean up remaining tile ownerships
-        for (Tile t : transform(game.getMap().getAllTiles(),
-                                matchKeyEquals(this, Tile::getOwner))) {
+        for (Tile t : game.getMap().getTiles(matchKeyEquals(this, Tile::getOwner))) {
             t.cacheUnseen();//+til
             t.changeOwnership(null, null);//-til
             tiles.add(t);
@@ -974,10 +973,9 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @param reveal If true, reveal the map, if false, hide it.
      * @return A list of tiles whose visibility changed.
      */
-    public Set<Tile> exploreMap(boolean reveal) {
+    public Set<Tile> exploreMap(final boolean reveal) {
         Set<Tile> result = new HashSet<>();
-        for (Tile t : transform(getGame().getMap().getAllTiles(),
-                                t -> hasExplored(t) != reveal)) {
+        for (Tile t : getGame().getMap().getTiles(t -> this.hasExplored(t) != reveal)) {
             t.setExplored(this, reveal);//-vis(this)
             result.add(t);
         }
