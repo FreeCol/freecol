@@ -250,7 +250,7 @@ public class Map extends FreeColGameObject implements Location {
     private Tile[][] tiles;
 
     /** The width and height of the map. */
-    private int width, height;
+    private int width = -1, height = -1;
 
     /** The highest map layer included. */
     private Layer layer;
@@ -402,14 +402,14 @@ public class Map extends FreeColGameObject implements Location {
      *
      * @param width The new map width.
      * @param height The new map height.
-     * @return The old tiles array.
+     * @return True if the tile array was replaced due to the shape changing.
      */
-    public synchronized Tile[][] setTiles(int width, int height) {
-        Tile[][] ret = this.tiles;
+    private synchronized boolean setTiles(int width, int height) {
+        if (this.width == width && this.height == height) return false;
         this.width = width;
         this.height = height;
         this.tiles = new Tile[width][height];
-        return ret;
+        return true;
     }
 
     /**
@@ -2439,10 +2439,11 @@ ok:     while (!openMap.isEmpty()) {
         // FIXME: tile ownership is borked again
         // FIXME: settlements?!? what settlements?
         // Note: can not use Tile.copyIn as that sets x,y
+        final Tile oldTiles[][] = this.tiles;
         final Game game = getGame();
         final int oldWidth = getWidth();
         final int oldHeight = getHeight();
-        Tile oldTiles[][] = setTiles(width, height);
+        if (!setTiles(width, height)) return;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 final int oldX = (x * oldWidth) / width;

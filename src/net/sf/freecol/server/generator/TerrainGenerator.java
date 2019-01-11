@@ -847,14 +847,8 @@ public class TerrainGenerator {
         final boolean importTerrain = (importMap != null)
             && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
 
-        Map map = game.getMap();
-        if (map == null) {
-            map = new Map(game, width, height);
-            game.setMap(map);
-        } else {
-            map.setTiles(width, height);
-        }
-        map.clearRegions();
+        Map map = new Map(game, width, height);
+        game.setMap(map);
         
         boolean mapHasLand = false;
         int minimumLatitude = mapOptions
