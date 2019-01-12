@@ -2405,8 +2405,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             result = Math.min(result, tileItemContainer.checkIntegrity(fix, lb));
         }
         if (type == null) {
+            lb.add("\n  Tile has no type: ", getId());
             result = -1; // Fundamentally unfixable
         } else if (isLand() && moveToEurope == Boolean.TRUE) {
+            lb.add("\n  Tile is land but has move-to-Europe: ", getId());
             if (fix) {
                 moveToEurope = false;
             } else {

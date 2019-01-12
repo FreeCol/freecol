@@ -543,7 +543,7 @@ public class TileItemContainer extends FreeColGameObject {
                         // exist in broken maps from before 0.10.5 which later
                         // got upgraded with 0.11.x (x<6), so better be safe.
                         if (tim.getStyle() == null) {
-                            logger.warning("Style null river: " + tim);
+                            lb.add("\n  TileImprovement null river style: ", tim);
                             integ = -1;
                         } else
                         // end @compat
@@ -553,15 +553,15 @@ public class TileItemContainer extends FreeColGameObject {
                         // to add any rivers, unless code for map saving
                         // would be changed to filter these out.
                         if ("0000".equals(tim.getStyle().toString())) {
-                            logger.warning("Style 0000 river: " + tim);
+                            lb.add("\n  TileImprovement 0000 river: ", tim);
                             integ = -1;
                         }
                     }
                 }
 
                 if (integ < 0) {
-                    logger.warning("Removing broken improvement at: " + tile
-                                   + " / " + ti.getId());
+                    logger.warning("Removing broken TileImprovement: "
+                        + ti.getId());
                     removeTileItem(ti);
                     integ = 0;
                 }

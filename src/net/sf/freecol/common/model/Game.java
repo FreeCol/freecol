@@ -270,24 +270,15 @@ public class Game extends FreeColGameObject {
      * client does not race ahead and launch into the game before the
      * update completes.
      *
+     * We used to check integrity here, but 1) the server has already
+     * done that and 2) the unexplored Tiles have no type which makes
+     * a lot of integrity failures.
+     *
      * @param game The update for this {@code Game}.
      * @return True if the update succeeds.
      */
     public synchronized boolean preGameUpdate(Game game) {
-        boolean ret = copyIn(game);
-        LogBuilder lb = new LogBuilder(64);
-        switch (game.checkIntegrity(true, lb)) {
-        case 1:
-            break;
-        case 0:
-            logger.info("New game integrity test failed, but fixed."
-                + lb.toString());
-            break;
-        default:
-            logger.warning("New game integrity test failed." + lb.toString());
-            break;
-        }
-        return ret;
+        return copyIn(game);
     }
 
     /**

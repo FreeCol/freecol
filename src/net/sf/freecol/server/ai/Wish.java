@@ -155,8 +155,11 @@ public abstract class Wish extends ValuedAIObject {
             result = Math.min(result, 
                               transportable.checkIntegrity(fix, lb));
         }
-        if (destination == null
-            || ((FreeColGameObject)destination).isDisposed()) {
+        if (destination == null) {
+            lb.add("\n  Wish destination null for: ", getId());
+            result = -1;
+        } else if (((FreeColGameObject)destination).isDisposed()) {
+            lb.add("\n  Wish destination disposed for: ", getId());
             result = -1;
         }
         return result;
