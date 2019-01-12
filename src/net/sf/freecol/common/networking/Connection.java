@@ -86,8 +86,6 @@ public class Connection implements Closeable {
     /** Main message writer. */
     private FreeColXMLWriter xw;
 
-    /** A lock for the logging routines. */
-    private final Object logLock = new Object();
     /** The FreeColXMLWriter to write logging messages to. */
     private FreeColXMLWriter lw;
 
@@ -473,8 +471,8 @@ public class Connection implements Closeable {
      * @param send True if this is a send, false if a reply.
      */
     protected final void logMessage(Message message, boolean send) {
-        synchronized (this.logLock) {
-            if (this.lw == null || message == null) return;
+        if (this.lw == null || message == null) return;
+        synchronized (this.lw) {
             try {
                 this.lw.writeComment(this.name
                     + ((send) ? SEND_SUFFIX : REPLY_SUFFIX));

@@ -251,7 +251,12 @@ public class FreeColDirectories {
      */
     private static File userModsDirectory = null;
 
+    /** Lock for the comms writer. */
+    private static Object commsWriterLock = new Object();
+    /** The comms writer. */
+    private static Writer commsWriter = null;
 
+    
     /**
      * Get the user home directory.
      *
@@ -961,6 +966,9 @@ public class FreeColDirectories {
      * @exception FreeColException on error.
      */
     public static Writer getLogCommsWriter() throws FreeColException {
+        synchronized (commsWriterLock) {
+            if (commsWriter != null) return commsWriter;
+        }
         File file = new File(getUserCacheDirectory(), LOG_COMMS_FILE_NAME);
         if (file.exists()) {
             try {
@@ -969,16 +977,14 @@ public class FreeColDirectories {
                 throw new FreeColException("Comms log file exists, delete failed: " + file.getPath(), se);
             }
         }
-        try {
-            file.createNewFile();
-        } catch (IOException ioe) {
-            throw new FreeColException("Comms log file could not be created: " + file.getPath(), ioe);
-        }
-        Writer writer = getFileUTF8Writer(file);
+        Writer writer = getFileUTF8AppendWriter(file);
         if (writer == null) {
             throw new FreeColException("Can not create writer for comms log file: " + file.getPath());
         }
-        return writer;
+        synchronized (commsWriterLock) {
+            commsWriter = writer;
+        }
+        return commsWriter;
     }        
                              
     /**
