@@ -137,7 +137,6 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
                 + "server state = " + freeColServer.getServerState());
         }
 
-        final Specification spec = freeColServer.getGame().getSpecification();
         final OptionGroup gameOptions = getGameOptions();
         if (gameOptions == null) {
             return serverPlayer.clientError("No game options to merge");

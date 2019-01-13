@@ -83,7 +83,6 @@ public class FountainOfYouthMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
         final int n = getMigrants();
 
         if (n <= 0) {

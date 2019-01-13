@@ -452,7 +452,6 @@ public class Connection implements Closeable {
     public boolean sendMessage(Message message)
         throws FreeColException, IOException, XMLStreamException {
         if (message == null) return true;
-        final String tag = message.getType();
         synchronized (this.outputLock) {
             if (this.xw == null) return false;
             message.toXML(this.xw);

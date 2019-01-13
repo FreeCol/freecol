@@ -95,8 +95,6 @@ public final class PreGameController extends Controller {
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet ready(ServerPlayer serverPlayer, boolean ready) {
-        final FreeColServer freeColServer = getFreeColServer();
-        
         serverPlayer.setReady(ready);
         getFreeColServer().sendToAll(new ReadyMessage(serverPlayer, ready),
                                      serverPlayer);

@@ -113,7 +113,6 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
     @Override
     public void clientHandler(FreeColClient freeColClient) {
         final Game game = freeColClient.getGame();
-        final Specification spec = game.getSpecification();
         final OptionGroup mapOptions = getMapGeneratorOptions();
 
         if (freeColClient.isInGame()) {

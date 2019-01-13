@@ -4484,7 +4484,6 @@ public class Unit extends GoodsLocation
         final Specification spec = getSpecification();
         final Game game = getGame();
         final WorkLocation oldWorkLocation = getWorkLocation();
-        final GoodsType oldWorkType = getWorkType();
 
         name = xr.getAttribute(NAME_TAG, (String)null);
 
@@ -4573,7 +4572,6 @@ public class Unit extends GoodsLocation
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
         final Game game = getGame();
         final String tag = xr.getLocalName();
 

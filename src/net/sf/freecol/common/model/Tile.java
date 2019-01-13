@@ -2727,7 +2727,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
         final Game game = getGame();
         final String tag = xr.getLocalName();
 

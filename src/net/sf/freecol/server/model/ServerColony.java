@@ -539,7 +539,6 @@ public class ServerColony extends Colony implements TurnTaker {
             }
         }
 
-        List<BuildQueue<? extends BuildableType>> built = new ArrayList<>();
         for (BuildQueue<?> queue : queues) {
             ProductionInfo info = getProductionInfo(queue);
             if (info == null) continue;

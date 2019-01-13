@@ -2864,15 +2864,15 @@ public class Player extends FreeColGameObject implements Nameable {
     private boolean[][] makeCanSeeTiles(Map map) {
         final Specification spec = getSpecification();
         boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
-        Set<Tile> visible = getVisibleTileSet();
+        final Set<Tile> visible = getVisibleTileSet();
         if (spec.getBoolean(GameOptions.FOG_OF_WAR)) {
-            for (Tile t : getVisibleTileSet()) {
+            for (Tile t : visible) {
                 cST[t.getX()][t.getY()] = true;
                 // Set the PET for visible tiles to the tile itself.
                 t.seeTile(this);
             }
         } else {
-            for (Tile t : getVisibleTileSet()) {
+            for (Tile t : visible) {
                 cST[t.getX()][t.getY()] = true;
             }
         }

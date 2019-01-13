@@ -137,7 +137,6 @@ public class NativeTradeMessage extends ObjectMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
         final NativeTradeAction action = getAction();
         final NativeTrade nt = getNativeTrade();
 

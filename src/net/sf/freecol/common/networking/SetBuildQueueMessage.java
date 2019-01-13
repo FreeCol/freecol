@@ -103,7 +103,6 @@ public class SetBuildQueueMessage extends AttributeMessage {
      * @return A list of {@code BuildableType}s.
      */
     private List<BuildableType> getQueue(Specification spec) {
-        List<String> aa = getArrayAttributes();
         return transform(getArrayAttributes(), alwaysTrue(),
                          id -> spec.getType(id, BuildableType.class),
                          toListNoNulls());

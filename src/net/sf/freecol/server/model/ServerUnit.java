@@ -166,7 +166,6 @@ public class ServerUnit extends Unit implements TurnTaker {
                       UnitType type, Role role) {
         super(game);
 
-        final Specification spec = getSpecification();
         this.owner = owner;
         this.type = type;
         this.state = UnitState.ACTIVE; // placeholder

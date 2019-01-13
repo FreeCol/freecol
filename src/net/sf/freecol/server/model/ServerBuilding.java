@@ -142,7 +142,6 @@ public class ServerBuilding extends Building implements TurnTaker {
     private boolean csTrainStudent(Unit teacher, Unit student, ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
         StringTemplate oldName = student.getLabel();
-        UnitType teach = teacher.getType().getSkillTaught();
         UnitType skill = student.getTeachingType(teacher);
         boolean ret = skill != null;
         if (skill == null) {

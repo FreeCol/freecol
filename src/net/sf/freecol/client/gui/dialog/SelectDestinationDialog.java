@@ -147,7 +147,6 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
          */
         private String getExtras(Location loc, Unit unit,
                                  List<GoodsType> goodsTypes) {
-            final Specification spec = unit.getSpecification();
             final String sep = ", ";
             final Player owner = unit.getOwner();
             LogBuilder lb = new LogBuilder(32);

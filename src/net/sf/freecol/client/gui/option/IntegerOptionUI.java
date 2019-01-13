@@ -55,7 +55,7 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
             max = tmp;
         }
         final int stepSize = Math.max(1, Math.min((max - min) / 10, 1000));
-        this.spinner.setModel(new SpinnerNumberModel(value, min, max, 1));
+        this.spinner.setModel(new SpinnerNumberModel(value, min, max, stepSize));
         initialize();
     }
 

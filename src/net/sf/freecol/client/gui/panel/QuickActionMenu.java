@@ -657,7 +657,6 @@ public final class QuickActionMenu extends JPopupMenu {
      * @return True if menu items were added and a separator is now needed.
      */
     private boolean addRoleItems(final UnitLabel unitLabel) {
-        final Specification spec = freeColClient.getGame().getSpecification();
         final Unit unit = unitLabel.getUnit();
         final Role role = unit.getRole();
         final int roleCount = unit.getRoleCount();

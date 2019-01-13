@@ -770,8 +770,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         initializeCaches();
         mercs.clear();
 
-        final Specification spec = getSpecification();
-        
         mercs.addAll(getMercenaryForce().getUnitList());
         List<Integer> prices = new ArrayList<>();
         for (AbstractUnit au : mercs) {

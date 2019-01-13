@@ -359,7 +359,6 @@ public class TradeRoute extends FreeColGameObject
     public <T extends FreeColObject> boolean copyIn(T other) {
         TradeRoute o = copyInCast(other, TradeRoute.class);
         if (o == null || !super.copyIn(o)) return false;
-        final Game game = getGame();
         this.name = o.getName();
         this.owner = o.getOwner();
         clearStops();

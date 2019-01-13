@@ -857,11 +857,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
         if (nt == null || !this.getPlayer().owns(nt.getIndianSettlement())) {
             return NativeTradeAction.NAK_INVALID;
         }
-        final Specification spec = getSpecification();
         final IndianSettlement is = nt.getIndianSettlement();
         final Unit unit = nt.getUnit();
         final Player other = unit.getOwner();
-        final Turn turn = getGame().getTurn();
         NativeTradeItem ours;
         int anger, haggle;
         Tension tension = is.getAlarm(other);

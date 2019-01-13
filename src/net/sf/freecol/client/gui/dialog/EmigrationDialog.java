@@ -55,8 +55,6 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
     public EmigrationDialog(FreeColClient freeColClient, JFrame frame,
             Europe europe, boolean foy) {
         super(freeColClient, frame);
-
-        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         final List<AbstractUnit> recruitables
             = new ArrayList<>(europe.getExpandedRecruitables(false));
 

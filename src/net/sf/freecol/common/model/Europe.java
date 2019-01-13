@@ -700,8 +700,6 @@ public class Europe extends UnitLocation
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        final Specification spec = getSpecification();
-
         owner = xr.findFreeColGameObject(getGame(), OWNER_TAG,
                                          Player.class, (Player)null, true);
 

@@ -2440,7 +2440,6 @@ ok:     while (!openMap.isEmpty()) {
         // FIXME: settlements?!? what settlements?
         // Note: can not use Tile.copyIn as that sets x,y
         final Tile oldTiles[][] = this.tiles;
-        final Game game = getGame();
         final int oldWidth = getWidth();
         final int oldHeight = getHeight();
         if (!setTiles(width, height)) return;

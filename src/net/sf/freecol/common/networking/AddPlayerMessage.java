@@ -140,9 +140,9 @@ public class AddPlayerMessage extends ObjectMessage {
         List<Player> players = getPlayers();
         
         if (freeColClient.isInGame()) {
-            igc(freeColClient).addPlayerHandler(getPlayers());
+            igc(freeColClient).addPlayerHandler(players);
         } else {
-            pgc(freeColClient).addPlayerHandler(getPlayers());
+            pgc(freeColClient).addPlayerHandler(players);
         }
     }
 }

@@ -607,7 +607,6 @@ public final class FreeColServer {
      */
     public void endGame() {
         changeServerState(ServerState.END_GAME);
-        ChangeSet cs = new ChangeSet();
         for (Player p : getGame().getLiveEuropeanPlayerList()) {
             ServerPlayer sp = (ServerPlayer)p;
             if (sp.isAdmin()) continue;
@@ -1087,7 +1086,6 @@ public final class FreeColServer {
             break;
         }
 
-        int savegameVersion = fis.getSavegameVersion();
         serverGame.getMap().resetContiguity();
         serverGame.establishUnknownEnemy();
 

@@ -188,7 +188,6 @@ public class MonarchActionMessage extends ObjectMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
         final MonarchAction action = getAction();
         final StringTemplate template = getTemplate();
         final String key = getMonarchKey();

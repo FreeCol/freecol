@@ -1727,6 +1727,7 @@ outer:  for (Effect effect : effects) {
         int r = (random == null) ? (lowerBound + upperBound)/2
             : randomInt(logger, "Propagate goods", random,
                         upperBound - lowerBound + 1) + lowerBound;
+        amount *= r;
         amount /= 100;
         if (amount == 0) return;
 
@@ -3166,7 +3167,6 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csDemoteUnit(Unit winner, Unit loser, ChangeSet cs) {
-        final Specification spec = getSpecification();
         final ServerPlayer loserPlayer = (ServerPlayer)loser.getOwner();
         final StringTemplate loserNation = loser.getApparentOwnerName();
         final StringTemplate loserLocation = loser.getLocation()
@@ -4247,8 +4247,6 @@ outer:  for (Effect effect : effects) {
      */
     public void csEuropeanFirstContact(Unit unit, Settlement settlement,
                                        Unit otherUnit, ChangeSet cs) {
-        final Game game = getGame();
-
         DiplomacySession ds;
         ServerPlayer other;
         if (settlement instanceof Colony) {
@@ -4298,7 +4296,6 @@ outer:  for (Effect effect : effects) {
                                  ChangeSet cs) {
         if (newOwner == this) return true; // No transfer needed
 
-        final Specification spec = getSpecification();
         final Tile oldTile = unit.getTile();
         if (change != null) {
             UnitType mainType = unit.getType();

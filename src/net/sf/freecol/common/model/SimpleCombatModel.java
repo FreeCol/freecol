@@ -693,7 +693,6 @@ public class SimpleCombatModel extends CombatModel {
      */
     private void resolveAttack(Unit winner, Unit loser, boolean great,
                                double r, List<CombatResult> crs) {
-        final Specification spec = winner.getSpecification();
         Player loserPlayer = loser.getOwner();
         Tile tile = loser.getTile();
         Player winnerPlayer = winner.getOwner();

@@ -1890,7 +1890,6 @@ public final class InGameController extends Controller {
             logger.info("Continuing diplomacy session: " + session
                         + " from " + ourUnit);
         }
-        ServerPlayer otherPlayer = (ServerPlayer)otherColony.getOwner();
         serverPlayer.csDiplomacy(session, agreement, cs);
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
@@ -1919,7 +1918,6 @@ public final class InGameController extends Controller {
             logger.info("Continuing diplomacy session: " + session
                         + " from " + ourColony);
         }
-        ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
         serverPlayer.csDiplomacy(session, agreement, cs);
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
@@ -2544,7 +2542,6 @@ public final class InGameController extends Controller {
                                   Colony colony, GoodsType type, int amount,
                                   Boolean result) {
         final Game game = getGame();
-        final Specification spec = game.getSpecification();
         final ServerPlayer victim = (ServerPlayer) colony.getOwner();
         NativeDemandSession session = Session.lookup(NativeDemandSession.class,
                                                      unit, colony);

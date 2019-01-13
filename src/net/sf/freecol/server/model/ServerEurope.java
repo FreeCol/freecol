@@ -165,7 +165,6 @@ public class ServerEurope extends Europe implements TurnTaker {
     public AbstractUnit extractRecruitable(int slot, Random random) {
         // An invalid slot is normal when the player has no control over
         // recruit type.
-        final Specification spec = getSpecification();
         final int count = MigrationType.getMigrantCount();
         int index = (MigrationType.specificMigrantSlot(slot))
             ? MigrationType.migrantSlotToIndex(slot)
