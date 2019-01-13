@@ -2426,26 +2426,26 @@ ok:     while (!openMap.isEmpty()) {
      *
      * @param width The width of the resulting map.
      * @param height The height of the resulting map.
+     * @return A scaled version of this map.
      */
-    public void scale(final int width, final int height) {
+    public Map scale(final int width, final int height) {
         // FIXME: the scaling above can omit or double tiles, which will
         // break the river and road connections.
         // FIXME: tile ownership is borked again
         // FIXME: settlements?!? what settlements?
         // Note: can not use Tile.copyIn as that sets x,y
-        final Tile oldTiles[][] = this.tiles;
+        final Game game = getGame();
+        Map ret = new Map(game, width, height);
         final int oldWidth = getWidth();
         final int oldHeight = getHeight();
-        if (!setTiles(width, height)) return;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 final int oldX = (x * oldWidth) / width;
                 final int oldY = (y * oldHeight) / height;
                 // FIXME: This tile should be based on the average as
                 // mentioned at the top of this method.
-                Tile importTile = oldTiles[oldX][oldY];
-                Tile t = getTile(x, y);
-                t.setType(importTile.getType());
+                Tile importTile = getTile(oldX, oldY);
+                Tile t = new Tile(game, importTile.getType(), x, y);
                 if (importTile.getMoveToEurope() != null) {
                     t.setMoveToEurope(importTile.getMoveToEurope());
                 }
@@ -2454,10 +2454,12 @@ ok:     while (!openMap.isEmpty()) {
                         .getTileItemContainer(), Map.Layer.ALL);
                 }
                 // FIXME: t.setRegion(importTile.getRegion());
+                ret.setTile(t, x, y);
             }
         }
-        resetContiguity();
-        resetHighSeasCount();
+        ret.resetContiguity();
+        ret.resetHighSeasCount();
+        return ret;
     }
         
     
