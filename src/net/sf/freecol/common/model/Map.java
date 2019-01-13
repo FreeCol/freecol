@@ -317,10 +317,10 @@ public class Map extends FreeColGameObject implements Location {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public Map(Game game, FreeColXMLReader xr) throws XMLStreamException {
-        super(game, null);
+        this(game, xr.getAttribute(WIDTH_TAG, -1),
+                   xr.getAttribute(HEIGHT_TAG, -1));
 
         readFromXML(xr);
-        initializeTraceSearch();
     }
 
     /**
@@ -333,6 +333,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Map(Game game, String id) {
         super(game, id);
+
         initializeTraceSearch();
     }
 
@@ -404,12 +405,14 @@ public class Map extends FreeColGameObject implements Location {
      * @param height The new map height.
      * @return True if the tile array was replaced due to the shape changing.
      */
-    private synchronized boolean setTiles(int width, int height) {
+    private boolean setTiles(int width, int height) {
         if (this.width == width && this.height == height) return false;
-        this.width = width;
-        this.height = height;
-        this.tiles = new Tile[width][height];
-        this.cachedTilesValid = false;
+        synchronized (this) {
+            this.width = width;
+            this.height = height;
+            this.tiles = new Tile[width][height];
+            this.cachedTilesValid = false;
+        }
         return true;
     }
 
@@ -444,8 +447,9 @@ public class Map extends FreeColGameObject implements Location {
      * @param y The y-coordinate of the {@code Tile}.
      * @param tile The {@code Tile} to set.
      */
-    public synchronized void setTile(Tile tile, int x, int y) {
-        if (isValid(x, y)) {
+    public void setTile(Tile tile, int x, int y) {
+        if (!isValid(x, y)) return;
+        synchronized (this) {
             this.tiles[x][y] = tile;
             this.cachedTilesValid = false;
         }
@@ -2663,10 +2667,12 @@ ok:     while (!openMap.isEmpty()) {
         Map o = copyInCast(other, Map.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
+        if (o.getWidth() != getWidth() || o.getHeight() != getHeight()) {
+            throw new RuntimeException("Map.copyIn attempted resize");
+        }
         // Allow creating new regions in first map update
         clearRegions();
         for (Region r : o.getRegions()) addRegion(game.update(r, true));
-        this.setTiles(o.getWidth(), o.getHeight());
         // Allow creating new tiles in first map update
         o.forEachTile(t -> this.setTile(game.update(t, true),
                                         t.getX(), t.getY()));
@@ -2784,7 +2790,11 @@ ok:     while (!openMap.isEmpty()) {
 
         } else if (Tile.TAG.equals(tag)) {
             Tile t = xr.readFreeColObject(game, Tile.class);
-            setTile(t);
+            if (t != null) {
+                final int x = t.getX(), y = t.getY();
+                Tile old = getTile(x, y);
+                if (old == null) setTile(t, x, y); else old.copyIn(t);
+            }
 
         } else {
             super.readChild(xr);
