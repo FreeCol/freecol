@@ -246,11 +246,22 @@ public class Map extends FreeColGameObject implements Location {
     }
 
 
-    /** The tiles that this map contains. */
-    private Tile[][] tiles;
-
     /** The width and height of the map. */
     private int width = -1, height = -1;
+
+    /**
+     * The tiles that this map contains, as a 2D array.  This starts
+     * out unassigned, but is initialized in setTiles().  Then the
+     * individual tiles are filled in with setTile(), however once a
+     * Tile is present further calls to setTile will copyIn to it.
+     */
+    private Tile[][] tileArray;
+
+    /**
+     * The tiles that this map contains, as a list.
+     * This is populated in setTile().
+     */
+    private List<Tile> tileList = new ArrayList<>();
 
     /** The highest map layer included. */
     private Layer layer;
@@ -279,18 +290,6 @@ public class Map extends FreeColGameObject implements Location {
 
     /** The search tracing status. */
     private boolean traceSearch = false;
-
-    /**
-     * A cache of all tiles as a set.  This is just a {@code Map}
-     * local cache, and is unrelated to the player-specific caching
-     * within {@code Tile} iteself.
-     */
-    private final Set<Tile> cachedTiles = new HashSet<>();
-    /**
-     * Validity flag for the cachedTiles set, invalidation occurs in
-     * {@link Map#setTile}, revalidation in {@link Map#resetCachedTiles}.
-     */
-    private volatile boolean cachedTilesValid = false;
 
 
     /**
@@ -407,12 +406,10 @@ public class Map extends FreeColGameObject implements Location {
      */
     private boolean setTiles(int width, int height) {
         if (this.width == width && this.height == height) return false;
-        synchronized (this) {
-            this.width = width;
-            this.height = height;
-            this.tiles = new Tile[width][height];
-            this.cachedTilesValid = false;
-        }
+        this.width = width;
+        this.height = height;
+        this.tileArray = new Tile[width][height];
+        this.tileList.clear();
         return true;
     }
 
@@ -426,8 +423,9 @@ public class Map extends FreeColGameObject implements Location {
      * @return The {@code Tile} at (x, y), or null if the
      *     position is invalid.
      */
-    public synchronized Tile getTile(int x, int y) {
-        return (isValid(x, y)) ? this.tiles[x][y] : null;
+    public Tile getTile(int x, int y) {
+        if (!isValid(x, y)) return null;
+        return this.tileArray[x][y];
     }
 
     /**
@@ -446,17 +444,16 @@ public class Map extends FreeColGameObject implements Location {
      * @param x The x-coordinate of the {@code Tile}.
      * @param y The y-coordinate of the {@code Tile}.
      * @param tile The {@code Tile} to set.
-     * @return True if the tile was updated.
+     * @return True if the {@code Tile} was updated.
      */
     public boolean setTile(Tile tile, int x, int y) {
         if (tile == null || !isValid(x, y)) return false;
-        synchronized (this) {
-            if (this.tiles[x][y] == null) {
-                this.tiles[x][y] = tile;
-                this.cachedTilesValid = false;
-            } else {
-                this.tiles[x][y].copyIn(tile);
-            }
+        Tile old = this.tileArray[x][y];
+        if (old != null) {
+            old.copyIn(tile);
+        } else {
+            this.tileArray[x][y] = tile;
+            this.tileList.add(tile);
         }
         return true;
     }
@@ -633,20 +630,6 @@ public class Map extends FreeColGameObject implements Location {
             : find(getRegions(), matchKeyEquals(name, Region::getName));
     }
 
-    /**
-     * Reset the tile cache.
-     */
-    private synchronized void resetCachedTiles() {
-        if (this.cachedTilesValid) return;
-        this.cachedTiles.clear();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                this.cachedTiles.add(this.tiles[x][y]);
-            }
-        }
-        this.cachedTilesValid = true;
-    }
-
 
     // Useful location and direction utilities
     
@@ -801,14 +784,12 @@ public class Map extends FreeColGameObject implements Location {
     // Support for various kinds of map iteration.
 
     /**
-     * Get a stream of all the tiles in the map using an underlying
-     * WholeMapIterator.
+     * Get a stream of all the tiles in the map.
      *
      * @return A {@code Stream} of all {@code Tile}s in this {@code Map}.
      */
     public Stream<Tile> getAllTiles() {
-        resetCachedTiles();
-        return toStream(this.cachedTiles);
+        return toStream(this.tileList);
     }
 
     /**
@@ -817,8 +798,7 @@ public class Map extends FreeColGameObject implements Location {
      * @param consumer The {@code Consumer} action to perform.
      */
     public void forEachTile(Consumer<Tile> consumer) {
-        resetCachedTiles();
-        for (Tile t : this.cachedTiles) consumer.accept(t);
+        for (Tile t : this.tileList) consumer.accept(t);
     }
 
     /**
@@ -829,8 +809,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public void forEachTile(Predicate<Tile> predicate,
                             Consumer<Tile> consumer) {
-        resetCachedTiles();
-        for (Tile t : this.cachedTiles) {
+        for (Tile t : this.tileList) {
             if (predicate.test(t)) consumer.accept(t);
         }
     }
@@ -2259,8 +2238,7 @@ ok:     while (!openMap.isEmpty()) {
         }
 
         // Reset all highSeas tiles to the default ocean type.
-        forEachTile(t -> t.getType() == highSeas,
-                    t -> t.setType(ocean));
+        forEachTile(t -> t.getType() == highSeas, t -> t.setType(ocean));
 
         final int width = getWidth(), height = getHeight();
         Tile t, seaL = null, seaR = null;
@@ -2335,8 +2313,7 @@ ok:     while (!openMap.isEmpty()) {
         List<Tile> curr = new ArrayList<>();
         List<Tile> next = new ArrayList<>();
         int hsc = 0;
-        resetCachedTiles();
-        for (Tile t : this.cachedTiles) {
+        for (Tile t : this.tileList) {
             t.setHighSeasCount(-1);
             if (!t.isLand()) {
                 if ((t.getX() == 0 || t.getX() == getWidth()-1)
@@ -2680,7 +2657,8 @@ ok:     while (!openMap.isEmpty()) {
         // Allow creating new regions in first map update
         clearRegions();
         for (Region r : o.getRegions()) addRegion(game.update(r, true));
-        // Use setTile to allow creating new tiles in first map update
+        // Use setTile rather than copyIn to allow new tiles to be populated
+        // in the first map update
         o.forEachTile(t -> this.setTile(game.update(t, true),
                                         t.getX(), t.getY()));
         this.layer = o.getLayer();
