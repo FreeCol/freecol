@@ -274,14 +274,14 @@ public class FreeColTestCase extends TestCase {
         int landWidth = (int) Math.floor(totalWidth/2);
         for (int x = 0; x < landWidth; x++) {
             for (int y = 0; y < totalHeight; y++) {
-                builder.setTile(x, y, landTileType);
+                builder.setTileType(x, y, landTileType);
             }
         }
 
         // Add high seas.
         final TileType highSeasType = spec().getTileType("model.tile.highSeas");
         for (int y = 0; y < totalHeight; y++) {
-            builder.setTile(totalWidth - 1, y, highSeasType);
+            builder.setTileType(totalWidth - 1, y, highSeasType);
         }
 
         return builder.build();
@@ -354,7 +354,7 @@ public class FreeColTestCase extends TestCase {
         // Required parameter
         private final Game game;
 
-        private TileType[][] tiles = null;
+        private TileType[][] tileTypes = null;
         private int width;
         private int height;
         private TileType baseTile;
@@ -373,12 +373,12 @@ public class FreeColTestCase extends TestCase {
             exploredByAll = false;
             initiated = false;
             // set empty grid
-            if(tiles == null){
-                tiles = new TileType[width][height];
+            if(tileTypes == null){
+                tileTypes = new TileType[width][height];
             }
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    tiles[x][y] = null;
+                    tileTypes[x][y] = null;
                 }
             }
         }
@@ -403,7 +403,7 @@ public class FreeColTestCase extends TestCase {
             }
             this.width = width;
             this.height = heigth;
-            this.tiles = new TileType[width][height];
+            this.tileTypes = new TileType[width][height];
             return this;
         }
 
@@ -412,7 +412,7 @@ public class FreeColTestCase extends TestCase {
             return this;
         }
 
-        public MapBuilder setTile(int x, int y, TileType tileType){
+        public MapBuilder setTileType(int x, int y, TileType tileType){
             if(x < 0 || y < 0){
                 throw new IllegalArgumentException("Coordenates cannot be negative");
             }
@@ -423,7 +423,7 @@ public class FreeColTestCase extends TestCase {
                 throw new NullPointerException("Tile type cannot be null");
             }
 
-            tiles[x][y]= tileType;
+            tileTypes[x][y]= tileType;
             initiated = true;
 
             return this;
@@ -435,10 +435,10 @@ public class FreeColTestCase extends TestCase {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     // Already manually set by the tester
-                    if(tiles[x][y] != null){
+                    if(tileTypes[x][y] != null){
                         continue;
                     }
-                    tiles[x][y] = baseTile;
+                    tileTypes[x][y] = baseTile;
                 }
             }
             initiated=true;
@@ -451,7 +451,7 @@ public class FreeColTestCase extends TestCase {
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    TileType tileType = tiles[x][y];
+                    TileType tileType = tileTypes[x][y];
                     Tile t = new Tile(game, tileType, x, y);
                     t.setRegion(region);
                     map.setTile(t, x, y);

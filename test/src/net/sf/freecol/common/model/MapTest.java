@@ -63,11 +63,11 @@ public class MapTest extends FreeColTestCase {
         MapBuilder builder = new MapBuilder(game);
         builder.setBaseTileType(oceanType);
         // Land Stripe
-        builder.setTile(1,11,plainsType);
-        builder.setTile(2,10,plainsType);
-        builder.setTile(2,9,plainsType);
-        builder.setTile(3,8,plainsType);
-        builder.setTile(3,7,plainsType);
+        builder.setTileType(1,11,plainsType);
+        builder.setTileType(2,10,plainsType);
+        builder.setTileType(2,9,plainsType);
+        builder.setTileType(3,8,plainsType);
+        builder.setTileType(3,7,plainsType);
 
         return builder.build();
     }
@@ -86,20 +86,20 @@ public class MapTest extends FreeColTestCase {
         MapBuilder builder = new MapBuilder(game);
         builder.setBaseTileType(oceanType);
         //Start
-        builder.setTile(1,11,plainsType);
+        builder.setTileType(1,11,plainsType);
         //Short path
-        builder.setTile(2,10,plainsType);
-        builder.setTile(2,9,plainsType);
+        builder.setTileType(2,10,plainsType);
+        builder.setTileType(2,9,plainsType);
         //Longer path
-        builder.setTile(1,9,plainsType);
-        builder.setTile(1,7,plainsType);
-        builder.setTile(1,5,plainsType);
-        builder.setTile(2,6,plainsType);
-        builder.setTile(2,7,plainsType);
+        builder.setTileType(1,9,plainsType);
+        builder.setTileType(1,7,plainsType);
+        builder.setTileType(1,5,plainsType);
+        builder.setTileType(2,6,plainsType);
+        builder.setTileType(2,7,plainsType);
         // Common
-        builder.setTile(3,8,plainsType);
+        builder.setTileType(3,8,plainsType);
         // Finish
-        builder.setTile(3,7,plainsType);
+        builder.setTileType(3,7,plainsType);
 
         return builder.build();
     }
