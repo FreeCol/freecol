@@ -446,22 +446,29 @@ public class Map extends FreeColGameObject implements Location {
      * @param x The x-coordinate of the {@code Tile}.
      * @param y The y-coordinate of the {@code Tile}.
      * @param tile The {@code Tile} to set.
+     * @return True if the tile was updated.
      */
-    public void setTile(Tile tile, int x, int y) {
-        if (!isValid(x, y)) return;
+    public boolean setTile(Tile tile, int x, int y) {
+        if (tile == null || !isValid(x, y)) return false;
         synchronized (this) {
-            this.tiles[x][y] = tile;
-            this.cachedTilesValid = false;
+            if (this.tiles[x][y] == null) {
+                this.tiles[x][y] = tile;
+                this.cachedTilesValid = false;
+            } else {
+                this.tiles[x][y].copyIn(tile);
+            }
         }
+        return true;
     }
 
     /**
      * Set a tile from its internal coordinates.
      *
      * @param tile The {@code Tile} to set.
+     * @return True if the tile was updated.
      */
-    public void setTile(Tile tile) {
-        setTile(tile, tile.getX(), tile.getY());
+    public boolean setTile(Tile tile) {
+        return (tile == null) ? false : setTile(tile, tile.getX(), tile.getY());
     }
 
     /**
@@ -2673,7 +2680,7 @@ ok:     while (!openMap.isEmpty()) {
         // Allow creating new regions in first map update
         clearRegions();
         for (Region r : o.getRegions()) addRegion(game.update(r, true));
-        // Allow creating new tiles in first map update
+        // Use setTile to allow creating new tiles in first map update
         o.forEachTile(t -> this.setTile(game.update(t, true),
                                         t.getX(), t.getY()));
         this.layer = o.getLayer();
@@ -2789,12 +2796,7 @@ ok:     while (!openMap.isEmpty()) {
             addRegion(xr.readFreeColObject(game, Region.class));
 
         } else if (Tile.TAG.equals(tag)) {
-            Tile t = xr.readFreeColObject(game, Tile.class);
-            if (t != null) {
-                final int x = t.getX(), y = t.getY();
-                Tile old = getTile(x, y);
-                if (old == null) setTile(t, x, y); else old.copyIn(t);
-            }
+            setTile(xr.readFreeColObject(game, Tile.class));
 
         } else {
             super.readChild(xr);
