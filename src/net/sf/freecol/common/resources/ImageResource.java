@@ -105,6 +105,19 @@ public class ImageResource extends Resource
     }
 
     /**
+     * Find the loaded image that satisfies a predicate.
+     *
+     * @param pred The <code>Predicate</code> to satisfy.
+     * @return The <code>BufferedImage</code> found, or if not found, the
+     *     one at the end of the loaded images list.
+     */
+    private synchronized BufferedImage findLoadedImage(Predicate<BufferedImage> pred) {
+        BufferedImage oim = find(this.loadedImages, pred);
+        return (oim != null) ? oim
+            : this.loadedImages.get(this.loadedImages.size() - 1);
+    }
+    
+    /**
      * Gets the image using the specified dimension.
      * 
      * @param d The {@code Dimension} of the requested image.
@@ -132,9 +145,7 @@ public class ImageResource extends Resource
             final int fwNew = wNew, fhNew = hNew;
             final Predicate<BufferedImage> sizePred = img ->
                 img.getWidth() >= fwNew && img.getHeight() >= fhNew;
-            BufferedImage oim = find(this.loadedImages, sizePred);
-            im = (oim != null) ? oim
-                : this.loadedImages.get(this.loadedImages.size() - 1);
+            im = findLoadedImage(sizePred);
             w = im.getWidth();
             h = im.getHeight();
             if (wNew*h > w*hNew) {
