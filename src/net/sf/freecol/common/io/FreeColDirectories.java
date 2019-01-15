@@ -358,24 +358,25 @@ public class FreeColDirectories {
         String env = System.getenv(XDG_CONFIG_HOME_ENV);
         File d = (env != null) ? new File(env)
             : new File(home, XDG_CONFIG_HOME_DEFAULT);
-        if ((d = requireDirectory(d)) == null) return badDir(d);
-        File f = new File(d, FREECOL_DIRECTORY);
+        File xd;
+        if ((xd = requireDirectory(d)) == null) return badDir(d);
+        File f = new File(xd, FREECOL_DIRECTORY);
         if ((d = requireDirectory(f)) == null) return badConfig(f);
         dirs[0] = d;
 
         env = System.getenv(XDG_DATA_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_DATA_HOME_DEFAULT);
-        if ((d = requireDirectory(d)) == null) return badDir(d);
-        f = new File(d, FREECOL_DIRECTORY);
+        if ((xd = requireDirectory(d)) == null) return badDir(d);
+        f = new File(xd, FREECOL_DIRECTORY);
         if ((d = requireDirectory(f)) == null) return badData(f);
         dirs[1] = d;
 
         env = System.getenv(XDG_CACHE_HOME_ENV);
         d = (env != null) ? new File(env)
             : new File(home, XDG_CACHE_HOME_DEFAULT);
-        if ((d = requireDirectory(d)) == null) return badDir(d);
-        f = new File(d, FREECOL_DIRECTORY);
+        if ((xd = requireDirectory(d)) == null) return badDir(d);
+        f = new File(xd, FREECOL_DIRECTORY);
         if ((d = requireDirectory(f)) == null) return badCache(f);
         dirs[2] = d;
 
