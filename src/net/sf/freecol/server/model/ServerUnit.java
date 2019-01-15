@@ -755,6 +755,12 @@ public class ServerUnit extends Unit implements TurnTaker {
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
         final Location oldLocation = getLocation();
+        if (oldLocation == null) {
+            // This "can not happen", but if it did what follows would crash.
+            // Probably best to log and return in the hope of not breaking it worse.
+            logger.warning("Unit with null location: " + this.toString());
+            return;
+        }
         Set<Tile> oldTiles = getVisibleTileSet();
         Set<Tile> newTiles
             = serverPlayer.collectNewTiles(newTile, getLineOfSight());
