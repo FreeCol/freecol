@@ -287,7 +287,7 @@ public final class TileType extends FreeColSpecObjectType
      * @return True if the {@code ResourceType} is compatible.
      */
     public boolean canHaveResourceType(ResourceType resourceType) {
-        return getResourceTypes().contains(resourceType);
+        return getResourceTypeValues().contains(resourceType);
     }
 
     /**
