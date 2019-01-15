@@ -1907,8 +1907,8 @@ ok:     while (!openMap.isEmpty()) {
                 boolean unitMove = umt.isProgress();
                 boolean carrierMove = carrier != null
                     && carrier.getSimpleMoveType(carrier.getTile(), moveTile).isProgress();
-                if (lb != null) lb.add(" ", ((unitMove) ? "U" : ""),
-                    ((carrierMove) ? "C" : ""));
+                if (lb != null) lb.add(" ", ((unitMove) ? "U"
+                        : ((carrierMove) ? "C" : "")));
                 MoveCandidate move;
                 String stepLog;
                 
@@ -1930,12 +1930,11 @@ ok:     while (!openMap.isEmpty()) {
                                 true, CostDeciders.tileCost());
                         } else {
                             // Otherwise let the unit complete the path.
-                            int left = currentMovesLeft;
-                            if (currentOnCarrier && unit != null) {
-                                left = (currentNode.embarkedThisTurn(currentTurns))
+                            int left = (currentOnCarrier)
+                                ? ((currentNode.embarkedThisTurn(currentTurns))
                                     ? 0
-                                    : unit.getInitialMovesLeft();
-                            }
+                                    : unit.getInitialMovesLeft())
+                                : currentMovesLeft;
                             move = new MoveCandidate(unit, currentNode,
                                 moveTile, left, currentTurns, false,
                                 CostDeciders.tileCost());
