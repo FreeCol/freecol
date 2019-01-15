@@ -128,10 +128,11 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
     @Override
     public ChangeSet serverHandler(FreeColServer freeColServer,
                                    ServerPlayer serverPlayer) {
-        if (serverPlayer == null || !serverPlayer.isAdmin()) {
+        if (serverPlayer == null) {
+            return ChangeSet.clientError((ChangeSet.See)null, "Missing serverPlayer");
+        } else if (!serverPlayer.isAdmin()) {
             return serverPlayer.clientError("Not an admin: " + serverPlayer);
-        }
-        if (freeColServer.getServerState() != FreeColServer.ServerState.PRE_GAME) {
+        } else if (freeColServer.getServerState() != FreeColServer.ServerState.PRE_GAME) {
             return serverPlayer.clientError("Can not change map generator options, "
                 + "server state = " + freeColServer.getServerState());
         }

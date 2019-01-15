@@ -88,12 +88,12 @@ public class LoginMessage extends ObjectMessage {
      * @param xr The {@code FreeColXMLReader} to read the message from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public LoginMessage(Game game, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public LoginMessage(@SuppressWarnings("unused") Game ignoredGame,
+                        FreeColXMLReader xr) throws XMLStreamException {
         super(TAG, xr, USER_NAME_TAG, VERSION_TAG, STATE_TAG,
               SINGLE_PLAYER_TAG, CURRENT_PLAYER_TAG);
 
-        game = null;
+        Game game = null;
         while (xr.moreTags()) {
             final String tag = xr.getLocalName();
             if (Game.TAG.equals(tag)) {
