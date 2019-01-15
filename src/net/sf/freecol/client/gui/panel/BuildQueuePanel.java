@@ -31,6 +31,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -197,7 +198,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
              */
             @Override
             public DataFlavor[] getTransferDataFlavors() {
-                return supportedFlavors;
+                // findbugs warns against returning supportedFlavors directly
+                // as it exposes internal representation
+                return Arrays.copyOf(supportedFlavors, supportedFlavors.length);
             }
 
             /**

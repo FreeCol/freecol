@@ -308,7 +308,8 @@ public class HighScore extends FreeColObject {
      * @return The date.
      */
     public final Date getDate() {
-        return date;
+        // findbugs says not to expose this.date directly
+        return new Date(date.getTime());
     }
 
     /**
