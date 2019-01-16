@@ -884,32 +884,20 @@ public class TerrainGenerator {
         }
 
         List<Tile> fixRegions = new ArrayList<>();
+        Map.Layer layer = (importRumours) ? Map.Layer.RUMOURS
+            : (importBonuses) ? Map.Layer.RESOURCES
+            : Map.Layer.RIVERS;
         for (int y = 0; y < height; y++) {
             int latitude = map.getLatitude(y);
             for (int x = 0; x < width; x++) {
                 if (landMap.isLand(x, y)) mapHasLand = true;
-                Tile t, importTile = null;
+                Tile otherTile = null;
                 if (importTerrain
                     && importMap.isValid(x, y)
-                    && (importTile = importMap.getTile(x, y)) != null
-                    && importTile.isLand() == landMap.isLand(x, y)) {
-                    String id = importTile.getType().getId();
-                    t = new Tile(game, spec.getTileType(id), x, y);
-                    if (importTile.getMoveToEurope() != null) {
-                        t.setMoveToEurope(importTile.getMoveToEurope());
-                    }
-                    if (importTile.getTileItemContainer() != null) {
-                        TileItemContainer container
-                            = new TileItemContainer(game, t);
-                        // TileItemContainer copies every natural item
-                        // including Resource if importBonuses is true.
-                        container.copyFrom(importTile.getTileItemContainer(),
-                            (importRumours) ? Map.Layer.RUMOURS
-                            : (importBonuses) ? Map.Layer.RESOURCES
-                            : Map.Layer.RIVERS);
-                        t.setTileItemContainer(container);
-                    }
-                    Region r = importTile.getRegion();
+                    && (otherTile = importMap.getTile(x, y)) != null
+                    && otherTile.isLand() == landMap.isLand(x, y)) {
+                    Tile t = map.importTile(otherTile, x, y, layer);
+                    Region r = otherTile.getRegion();
                     if (r == null) {
                         fixRegions.add(t);
                     } else {
@@ -926,9 +914,8 @@ public class TerrainGenerator {
                     TileType tt = (landMap.isLand(x, y))
                         ? getRandomLandTileType(game, latitude)
                         : getRandomOceanTileType(game, latitude);
-                    t = new Tile(game, tt, x, y);
+                    map.setTile(new Tile(game, tt, x, y), x, y);
                 }
-                map.setTile(t, x, y);
             }
         }
 

@@ -2421,6 +2421,31 @@ ok:     while (!openMap.isEmpty()) {
     }
 
     /**
+     * Import a tile, possibly from another game.
+     *
+     * @param other The <code>Tile</code> to import.
+     * @param x The x-coordinate of the new tile.
+     * @param y The y-coordinate of the new tile.
+     * @param layer The maximum layer to import.
+     * @return The new imported <code>Tile</code>.
+     */
+    public Tile importTile(Tile other, int x, int y, Layer layer) {
+        final Game game = getGame();
+        Tile t = new Tile(game, other.getType(), x, y);
+        if (other.getMoveToEurope() != null) {
+            t.setMoveToEurope(other.getMoveToEurope());
+        }
+        if (other.getTileItemContainer() != null) {
+            TileItemContainer container = new TileItemContainer(game, t);
+            container.copyFrom(other.getTileItemContainer(), layer);
+            t.setTileItemContainer(container);
+        }
+        // FIXME: handle regions
+        setTile(t, x, y);
+        return t;
+    }
+
+    /**
      * Scale the map into the specified size.
      *
      * This implementation uses a simple linear scaling, and
@@ -2451,24 +2476,14 @@ ok:     while (!openMap.isEmpty()) {
                 final int oldY = (y * oldHeight) / height;
                 // FIXME: This tile should be based on the average as
                 // mentioned at the top of this method.
-                Tile importTile = getTile(oldX, oldY);
-                Tile t = new Tile(game, importTile.getType(), x, y);
-                if (importTile.getMoveToEurope() != null) {
-                    t.setMoveToEurope(importTile.getMoveToEurope());
-                }
-                if (t.getTileItemContainer() != null) {
-                    t.getTileItemContainer().copyFrom(importTile
-                        .getTileItemContainer(), Map.Layer.ALL);
-                }
-                // FIXME: t.setRegion(importTile.getRegion());
-                ret.setTile(t, x, y);
+                ret.importTile(getTile(oldX, oldY), x, y, Map.Layer.ALL);
             }
         }
         ret.resetContiguity();
         ret.resetHighSeasCount();
         return ret;
     }
-        
+
     
     // Interface Location
     // getId() inherited.

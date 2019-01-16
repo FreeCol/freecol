@@ -1486,7 +1486,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                          t -> (!t.isLand() && t.isHighSeasConnected()
                              && !t.isDangerousToShip(unit)));
     }
-                
+
 
     //
     // Type and Ownership
