@@ -449,14 +449,12 @@ public class FreeColTestCase extends TestCase {
             Map map = new Map(game, width, height);
             Region region = new Region(game);
 
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
+            map.populateTiles((x, y) -> {
                     TileType tileType = tileTypes[x][y];
                     Tile t = new Tile(game, tileType, x, y);
                     t.setRegion(region);
-                    map.setTile(t, x, y);
-                }
-            }
+                    return t;
+                });
 
             map.resetContiguity();
             map.resetHighSeasCount();

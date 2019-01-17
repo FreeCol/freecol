@@ -34,6 +34,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -398,27 +399,34 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Initialize the tile shape.
-     *
-     * This may be done *once*.  It is an error to change the map size
-     * after the initial setting.
+     * Initialize the tile shape.  This must be called *once* per map.
      *
      * @param width The new map width.
      * @param height The new map height.
      * @return An error message if setting the tile array was invalid, null if valid.
      */
     private String setTiles(int width, int height) {
-        // Initial setting
-        if (this.width < 0 && this.height < 0) {
-            if (width <= 0 || height <= 0) {
-                return "Bad map tile array size: (" + width + "," + height + ")";
-            }
-            this.width = width;
-            this.height = height;
-            this.tileArray = new Tile[width][height];
-            this.tileList.clear();
-            return null;
+        if (width <= 0 || height <= 0) {
+            return "Bad map tile array size: (" + width + "," + height + ")";
         }
+        this.width = width;
+        this.height = height;
+        this.tileArray = new Tile[width][height];
+        this.tileList.clear();
+        return null;
+    }
+
+    /**
+     * Update the tile shape, however it is an error to change the map
+     * size after the initial setting.
+     *
+     * @param width The new map width.
+     * @param height The new map height.
+     * @return An error message if setting the tile array was invalid, null if valid.
+     */
+    private String updateTiles(int width, int height) {
+        // Initial setting
+        if (this.width < 0 && this.height < 0) return setTiles(width, height);
         // Next time, the size must *not* change.
         if (this.width != width || this.height != height) {
             return "Attempted map resize (" + this.width + "," + this.height
@@ -453,35 +461,41 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Sets the tile at the given coordinates.
+     * Set the tile at the given coordinates.
+     *
+     * This can be done *once* per tile.  Currently that is enforced
+     * by calling setTile() only from populateTiles() where the map is
+     * being built or indirectly through updateTile() where the
+     * absence of the tile is checked.
      *
      * @param x The x-coordinate of the {@code Tile}.
      * @param y The y-coordinate of the {@code Tile}.
      * @param tile The {@code Tile} to set.
      * @return True if the {@code Tile} was updated.
      */
-    public boolean setTile(Tile tile, int x, int y) {
-        if (tile == null || !isValid(x, y)) return false;
-        Tile old = this.tileArray[x][y];
-        if (old != null) {
-            old.copyIn(tile);
-        } else {
-            this.tileArray[x][y] = tile;
-            this.tileList.add(tile);
-        }
+    private boolean setTile(Tile tile, int x, int y) {
+        if (tile == null) return false;
+        this.tileArray[x][y] = tile;
+        this.tileList.add(tile);
         return true;
     }
 
     /**
-     * Set a tile from its internal coordinates.
+     * Update a tile in this map from the given tile.
      *
-     * @param tile The {@code Tile} to set.
+     * @param tile The {@code Tile} to update from.
      * @return True if the tile was updated.
      */
-    public boolean setTile(Tile tile) {
-        return (tile == null) ? false : setTile(tile, tile.getX(), tile.getY());
+    private boolean updateTile(Tile tile) {
+        if (tile == null) return false;
+        final int x = tile.getX(), y = tile.getY();
+        if (!isValid(x, y)) return false;
+        Tile old = this.tileArray[x][y];
+        if (old == null) return setTile(tile, x, y);
+        old.copyIn(tile);
+        return true;
     }
-
+        
     /**
      * Get the layer.
      *
@@ -831,6 +845,24 @@ public class Map extends FreeColGameObject implements Location {
         for (Tile t : this.tileList) {
             if (predicate.test(t)) consumer.accept(t);
         }
+    }
+
+    /**
+     * Populate the map.
+     *
+     * To be called to build a new map.
+     *
+     * @param func A <code>Function</code> that makes a new
+     *    <code>Tile</code> for the supplied x,y coordinates.
+     * @return True if the map was populated.
+     */
+    public boolean populateTiles(BiFunction<Integer, Integer, Tile> func) {
+        for (int y = 0; y < this.height; y++) {
+            for (int x = 0; x < this.width; x++) {
+                if (!this.setTile(func.apply(x, y), x, y)) return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -2441,7 +2473,6 @@ ok:     while (!openMap.isEmpty()) {
             t.setTileItemContainer(container);
         }
         // FIXME: handle regions
-        setTile(t, x, y);
         return t;
     }
 
@@ -2470,20 +2501,18 @@ ok:     while (!openMap.isEmpty()) {
         Map ret = new Map(game, width, height);
         final int oldWidth = getWidth();
         final int oldHeight = getHeight();
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        ret.populateTiles((x, y) -> {
                 final int oldX = (x * oldWidth) / width;
                 final int oldY = (y * oldHeight) / height;
                 // FIXME: This tile should be based on the average as
                 // mentioned at the top of this method.
-                ret.importTile(getTile(oldX, oldY), x, y, Map.Layer.ALL);
-            }
-        }
+                return this.importTile(getTile(oldX, oldY), x, y, Layer.ALL);
+            });
         ret.resetContiguity();
         ret.resetHighSeasCount();
         return ret;
     }
-
+        
     
     // Interface Location
     // getId() inherited.
@@ -2685,15 +2714,15 @@ ok:     while (!openMap.isEmpty()) {
         Map o = copyInCast(other, Map.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        String err = setTiles(o.getWidth(), o.getHeight());
+        String err = updateTiles(o.getWidth(), o.getHeight());
         if (err != null) throw new RuntimeException("copyIn failure, " + err);
         // Allow creating new regions in first map update
         clearRegions();
         for (Region r : o.getRegions()) addRegion(game.update(r, true));
-        // Use setTile rather than copyIn to allow new tiles to be populated
-        // in the first map update
-        o.forEachTile(t -> this.setTile(game.update(t, true),
-                                        t.getX(), t.getY()));
+        // Use updateTile rather than copyIn to allow new tiles to be
+        // populated in the first map update
+        o.forEachTile(t -> this.updateTile(game.update(t, true)));
+        
         this.layer = o.getLayer();
         this.minimumLatitude = o.getMinimumLatitude();
         this.maximumLatitude = o.getMaximumLatitude();
@@ -2753,7 +2782,7 @@ ok:     while (!openMap.isEmpty()) {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        String err = setTiles(xr.getAttribute(WIDTH_TAG, -1), xr.getAttribute(HEIGHT_TAG, -1));
+        String err = updateTiles(xr.getAttribute(WIDTH_TAG, -1), xr.getAttribute(HEIGHT_TAG, -1));
         if (err != null) throw new XMLStreamException("Map.readAttributes failure, " + err);
 
         setLayer(xr.getAttribute(LAYER_TAG, Layer.class, Layer.ALL));
@@ -2800,7 +2829,10 @@ ok:     while (!openMap.isEmpty()) {
             addRegion(xr.readFreeColObject(game, Region.class));
 
         } else if (Tile.TAG.equals(tag)) {
-            setTile(xr.readFreeColObject(game, Tile.class));
+            Tile t = xr.readFreeColObject(game, Tile.class);
+            if (!updateTile(t)) {
+                logger.warning("Tile update failure for: " + t);
+            }                    
 
         } else {
             super.readChild(xr);

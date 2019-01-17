@@ -151,6 +151,20 @@ public class LandMap {
     }
 
     /**
+     * Is there any land in this land map?
+     *
+     * @return True if any land is present.
+     */
+    public boolean hasLand() {
+        for (int y = 0; y < this.height; y++) {
+            for (int x = 0; y < this.width; x++) {
+                if (this.map[x][y]) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Set a map position to land, and increase the land tile count.
      *
      * @param x The x coordinate of the new land.

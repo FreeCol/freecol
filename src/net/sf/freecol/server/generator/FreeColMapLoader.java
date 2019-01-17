@@ -86,21 +86,16 @@ public class FreeColMapLoader implements MapLoader {
         Map map = new Map(game, width, height);
         if (highestLayer == Layer.LAND) {
             // import only the land / water distinction
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    Tile t = new Tile(game,
+            map.populateTiles((x, y) -> {
+                    return new Tile(game,
                         (importMap.getTile(x, y).getType().isWater())
                         ? TileType.WATER : TileType.LAND,
                         x, y);
-                    map.setTile(t, x, y);
-                }
-            }
+                });
         } else {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
+            map.populateTiles((x, y) -> {
                     Tile template = importMap.getTile(x, y);
                     Tile tile = new Tile(game, null, x, y);
-                    map.setTile(tile, x, y);
 
                     // import tile types
                     tile.setType(game.getSpecification().getTileType(template.getType().getId()));
@@ -141,8 +136,8 @@ public class FreeColMapLoader implements MapLoader {
                             }
                         }
                     }
-                }
-            }
+                    return tile;
+                });
         }
         for (Region region : regions.values()) {
             map.addRegion(region);

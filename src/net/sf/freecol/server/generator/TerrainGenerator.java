@@ -850,7 +850,6 @@ public class TerrainGenerator {
         Map map = new Map(game, width, height);
         game.setMap(map);
         
-        boolean mapHasLand = false;
         int minimumLatitude = mapOptions
             .getInteger(MapGeneratorOptions.MINIMUM_LATITUDE);
         int maximumLatitude = mapOptions
@@ -883,20 +882,17 @@ public class TerrainGenerator {
             lb.add("\n");
         }
 
-        List<Tile> fixRegions = new ArrayList<>();
-        Map.Layer layer = (importRumours) ? Map.Layer.RUMOURS
+        final Map.Layer layer = (importRumours) ? Map.Layer.RUMOURS
             : (importBonuses) ? Map.Layer.RESOURCES
             : Map.Layer.RIVERS;
-        for (int y = 0; y < height; y++) {
-            int latitude = map.getLatitude(y);
-            for (int x = 0; x < width; x++) {
-                if (landMap.isLand(x, y)) mapHasLand = true;
-                Tile otherTile = null;
+        List<Tile> fixRegions = new ArrayList<>();
+        map.populateTiles((x, y) -> {
+                Tile t, otherTile = null;
                 if (importTerrain
                     && importMap.isValid(x, y)
                     && (otherTile = importMap.getTile(x, y)) != null
                     && otherTile.isLand() == landMap.isLand(x, y)) {
-                    Tile t = map.importTile(otherTile, x, y, layer);
+                    t = map.importTile(otherTile, x, y, layer);
                     Region r = otherTile.getRegion();
                     if (r == null) {
                         fixRegions.add(t);
@@ -911,13 +907,14 @@ public class TerrainGenerator {
                         }
                     }
                 } else {
+                    final int latitude = map.getLatitude(y);
                     TileType tt = (landMap.isLand(x, y))
                         ? getRandomLandTileType(game, latitude)
                         : getRandomOceanTileType(game, latitude);
-                    map.setTile(new Tile(game, tt, x, y), x, y);
+                    t = new Tile(game, tt, x, y);
                 }
-            }
-        }
+                return t;
+            });
 
         // Build the regions.
         List<ServerRegion> fixed = ServerRegion.requireFixedRegions(map, lb);
@@ -931,7 +928,7 @@ public class TerrainGenerator {
             map.resetHighSeas(
                 mapOptions.getInteger(MapGeneratorOptions.DISTANCE_TO_HIGH_SEA),
                 mapOptions.getInteger(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE));
-            if (mapHasLand) {
+            if (landMap.hasLand()) {
                 newRegions.addAll(createMountains(map, lb));
                 newRegions.addAll(createRivers(map, lb));
                 newRegions.addAll(createLakeRegions(map, lb));
