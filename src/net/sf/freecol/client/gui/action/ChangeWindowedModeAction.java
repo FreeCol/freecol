@@ -40,6 +40,8 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     public ChangeWindowedModeAction(FreeColClient freeColClient) {
         super(freeColClient, id, null);
+
+        setSelected(shouldBeSelected());
     }
 
 

@@ -42,6 +42,8 @@ public class DisplayGridAction extends SelectableAction {
      */
     public DisplayGridAction(FreeColClient freeColClient) {
         super(freeColClient, id, ClientOptions.DISPLAY_GRID);
+
+        setSelected(shouldBeSelected());
     }
 
 

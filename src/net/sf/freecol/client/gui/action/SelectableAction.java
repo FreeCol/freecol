@@ -50,7 +50,6 @@ public abstract class SelectableAction extends MapboardAction {
         super(freeColClient, id);
 
         this.optionId = optionId;
-        setSelected(shouldBeSelected());
     }
 
 

@@ -42,6 +42,8 @@ public class DisplayBordersAction extends SelectableAction {
      */
     public DisplayBordersAction(FreeColClient freeColClient) {
         super(freeColClient, id, ClientOptions.DISPLAY_BORDERS);
+
+        setSelected(shouldBeSelected());
     }
 
 
