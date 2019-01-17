@@ -398,19 +398,33 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Set the tiles to a new shape.
+     * Initialize the tile shape.
+     *
+     * This may be done *once*.  It is an error to change the map size
+     * after the initial setting.
      *
      * @param width The new map width.
      * @param height The new map height.
-     * @return True if the tile array was replaced due to the shape changing.
+     * @return An error message if setting the tile array was invalid, null if valid.
      */
-    private boolean setTiles(int width, int height) {
-        if (this.width == width && this.height == height) return false;
-        this.width = width;
-        this.height = height;
-        this.tileArray = new Tile[width][height];
-        this.tileList.clear();
-        return true;
+    private String setTiles(int width, int height) {
+        // Initial setting
+        if (this.width < 0 && this.height < 0) {
+            if (width <= 0 || height <= 0) {
+                return "Bad map tile array size: (" + width + "," + height + ")";
+            }
+            this.width = width;
+            this.height = height;
+            this.tileArray = new Tile[width][height];
+            this.tileList.clear();
+            return null;
+        }
+        // Next time, the size must *not* change.
+        if (this.width != width || this.height != height) {
+            return "Attempted map resize (" + this.width + "," + this.height
+                + " -> " + width + "," + height + ")";
+        }
+        return null;
     }
 
     /**
@@ -2656,9 +2670,8 @@ ok:     while (!openMap.isEmpty()) {
         Map o = copyInCast(other, Map.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
-        if (o.getWidth() != getWidth() || o.getHeight() != getHeight()) {
-            throw new RuntimeException("Map.copyIn attempted resize");
-        }
+        String err = setTiles(o.getWidth(), o.getHeight());
+        if (err != null) throw new RuntimeException("copyIn failure, " + err);
         // Allow creating new regions in first map update
         clearRegions();
         for (Region r : o.getRegions()) addRegion(game.update(r, true));
@@ -2725,15 +2738,8 @@ ok:     while (!openMap.isEmpty()) {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        int width = xr.getAttribute(WIDTH_TAG, -1);
-        if (width < 0) {
-            throw new XMLStreamException("Bogus width: " + width);
-        }
-        int height = xr.getAttribute(HEIGHT_TAG, -1);
-        if (height < 0) {
-            throw new XMLStreamException("Bogus height: " + height);
-        }
-        setTiles(width, height);
+        String err = setTiles(xr.getAttribute(WIDTH_TAG, -1), xr.getAttribute(HEIGHT_TAG, -1));
+        if (err != null) throw new XMLStreamException("Map.readAttributes failure, " + err);
 
         setLayer(xr.getAttribute(LAYER_TAG, Layer.class, Layer.ALL));
 
