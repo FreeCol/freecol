@@ -60,6 +60,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.OSUtils;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.Controller;
 
@@ -757,8 +758,8 @@ public final class FreeCol {
                 for (String value : line.getOptionValues("log-level")) {
                     String[] s = value.split(":");
                     logLevels.add((s.length == 1)
-                        ? new LogLevel("", Level.parse(s[0].toUpperCase()))
-                        : new LogLevel(s[0], Level.parse(s[1].toUpperCase())));
+                        ? new LogLevel("", Level.parse(upCase(s[0])))
+                        : new LogLevel(s[0], Level.parse(upCase(s[1]))));
                 }
             }
 

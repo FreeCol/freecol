@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -127,7 +128,7 @@ public class Messages {
      * @return A suitable {@code Selector}.
      */
     private static Selector getSelector(String tag) {
-        return tagMap.get(tag.toLowerCase(Locale.US));
+        return tagMap.get(downCase(tag));
     }
 
     /**

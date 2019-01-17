@@ -29,6 +29,7 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -83,7 +84,7 @@ final class UnitAttackAnimation extends FreeColClientHolder {
      */
     private boolean loadAnimation(String startStr, float scale,
                                   Direction direction) {
-        String specialId = startStr + direction.toString().toLowerCase();
+        String specialId = startStr + downCase(direction.toString());
         if ((this.sza = ImageLibrary.getSZA(specialId, scale)) != null) {
             this.mirror = false;
             return true;
@@ -92,7 +93,7 @@ final class UnitAttackAnimation extends FreeColClientHolder {
         Direction mirrored = direction.getEWMirroredDirection();
         String mirroredId = "";
         if (mirrored != direction) {
-            mirroredId = startStr + mirrored.toString().toLowerCase();
+            mirroredId = startStr + downCase(mirrored.toString());
             if ((this.sza = ImageLibrary.getSZA(mirroredId, scale)) != null) {
                 this.mirror = true;
                 return true;

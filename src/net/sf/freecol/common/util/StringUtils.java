@@ -233,7 +233,7 @@ public class StringUtils {
      */
     public static String capitalize(String s, Locale locale) {
         return (s == null || s.length() == 0) ? s
-            : s.substring(0, 1).toUpperCase(locale) + s.substring(1);
+            : upCase(s.substring(0, 1), locale) + s.substring(1);
     }
 
     /**
@@ -277,6 +277,4 @@ public class StringUtils {
     public static String upCase(String s, Locale locale) {
         return (s == null || s.length() == 0) ? s : s.toUpperCase(locale);
     }
-
-   
 }
