@@ -1392,7 +1392,8 @@ public class Map extends FreeColGameObject implements Location {
                             && isSameContiguity(t, realStart)))
                 : null;
             path = (closest == null) ? null
-                : findPath(unit, realStart, closest, carrier, costDecider, lb);
+                : this.findPath(unit, realStart, closest, carrier,
+                                costDecider, lb);
             if (path != null) {
                 PathNode last = path.getLastNode();
                 last.next = new PathNode((Tile)realEnd, 0,
@@ -1551,8 +1552,8 @@ public class Map extends FreeColGameObject implements Location {
                 // will lose if the initial search fails due to a turn limit.
                 // FIXME: do something better.
             } else {
-                path = findPath(unit, realStart, p.getLastNode().getTile(),
-                                carrier, costDecider, lb);
+                path = this.findPath(unit, realStart, p.getLastNode().getTile(),
+                                     carrier, costDecider, lb);
             }
 
         } else {

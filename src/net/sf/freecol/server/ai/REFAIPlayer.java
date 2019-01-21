@@ -186,7 +186,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Unit carrier = aiCarrier.getUnit();
         final CachingFunction<Colony, PathNode> pathMapper
             = new CachingFunction<Colony, PathNode>(c ->
-                unit.findPath(carrier, c, carrier, null));
+                unit.findPath(carrier, c, carrier));
         final Predicate<Colony> pathPred = c ->
             pathMapper.apply(c) != null;
         final Function<Colony, TargetTuple> newTupleMapper = c -> {

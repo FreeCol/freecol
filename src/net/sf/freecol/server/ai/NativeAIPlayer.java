@@ -507,7 +507,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
                 if (IndianBringGiftMission.invalidReason(aiUnit) == null
-                    && u.findPath(u.getTile(), home, null, cd) != null) {
+                    && u.findPath(u.getTile(), home, null, cd, null) != null) {
                     unit = u;
                 }
             }
@@ -527,7 +527,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                     || !is.hasContacted(c.getOwner())
                     || IndianBringGiftMission.invalidReason(aiUnit, c) != null
                     || (path = unit.findPath(home, c.getTile(),
-                                             null, cd)) == null) continue;
+                                             null, cd, null)) == null) continue;
                 int alarm = Math.max(1, is.getAlarm(c.getOwner()).getValue());
                 nearbyColonies.add(new RandomChoice<>(c,
                         1000000 / alarm / (1 + path.getTotalTurns())));
@@ -603,7 +603,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
                 if (IndianDemandMission.invalidReason(aiUnit) == null
-                    && u.findPath(u.getTile(), home, null, cd) != null) {
+                    && u.findPath(u.getTile(), home, null, cd, null) != null) {
                     unit = u;
                 }
             }
@@ -622,7 +622,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                     || !is.hasContacted(c.getOwner())
                     || IndianDemandMission.invalidReason(aiUnit, c) != null
                     || (path = unit.findPath(home, c.getTile(),
-                                             null, cd)) == null) continue;
+                                             null, cd, null)) == null) continue;
                 int alarm = is.getAlarm(c.getOwner()).getValue();
                 int defence = c.getUnitCount() + ((c.getStockade() == null) ? 1
                     : (c.getStockade().getLevel() * 10));

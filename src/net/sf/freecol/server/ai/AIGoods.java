@@ -231,7 +231,7 @@ public class AIGoods extends TransportableAIObject {
 
         PathNode path = (goods.getLocation() == carrier) ? carrier.findPath(dst)
             : (goods.getLocation() instanceof Unit) ? null
-            : carrier.findPath(goods.getLocation(), dst, null, null);
+            : carrier.findPath(goods.getLocation(), dst);
         if (path != null) path.convertToGoodsDeliveryPath();
         return path;
     }

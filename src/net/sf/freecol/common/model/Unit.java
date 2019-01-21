@@ -2705,8 +2705,8 @@ public class Unit extends GoodsLocation
         return loc != null
             && !isNaval()
             && !isAtLocation(loc)
-            && ((path = findPath(getLocation(), loc,
-                                 getCarrier(), null)) == null
+            && ((path = this.findPath(getLocation(), loc,
+                                      getCarrier())) == null
                 || path.usesCarrier());
     }
 
@@ -2755,7 +2755,8 @@ public class Unit extends GoodsLocation
                                               final Unit carrier,
                                               final CostDecider costDecider) {
         return cachingIntComparator((Tile t) -> {
-                PathNode p = this.findPath(start, t, carrier, costDecider);
+                PathNode p = this.findPath(start, t, carrier,
+                                           costDecider, null);
                 return (p == null) ? INFINITY : p.getTotalTurns();
             });
     }
@@ -2770,7 +2771,36 @@ public class Unit extends GoodsLocation
      *     end location, or null if none found.
      */
     public PathNode findPath(Location end) {
-        return findPath(getLocation(), end, null, null);
+        return this.findPath(getLocation(), end);
+    }
+
+    /**
+     * Finds the fastest path from a given location to a specified
+     * one.  No carrier is provided, and the default cost decider for
+     * this unit is used.
+     *
+     * @param start The {@code Location} at which the path starts.
+     * @param end The {@code Location} in which the path ends.
+     * @return A {@code PathNode} from the current location to the
+     *     end location, or null if none found.
+     */
+    public PathNode findPath(Location start, Location end) {
+        return this.findPath(start, end, null);
+    }
+
+    /**
+     * Finds the fastest path from a given location to a specified
+     * one, with an optional carrier.  The default cost decider for
+     * the relevant unit is used.
+     *
+     * @param start The {@code Location} at which the path starts.
+     * @param end The {@code Location} in which the path ends.
+     * @param carrier An optional carrier {@code Unit} to use.
+     * @return A {@code PathNode} from the current location to the
+     *     end location, or null if none found.
+     */
+    public PathNode findPath(Location start, Location end, Unit carrier) {
+        return this.findPath(start, end, carrier, null, null);
     }
 
     /**
@@ -2783,12 +2813,19 @@ public class Unit extends GoodsLocation
      * @param costDecider An optional {@code CostDecider} for
      *     determining the movement costs (uses default cost deciders
      *     for the unit/s if not provided).
+     * @param lb An optional {@code LogBuilder} to log the path to.
      * @return A {@code PathNode}, or null if no path is found.
+     * @exception IllegalArgumentException if the destination is null,
+     *     (FIXME) this is a temporary debugging measure.
      */
     public PathNode findPath(Location start, Location end, Unit carrier,
-                             CostDecider costDecider) {
+                             CostDecider costDecider, LogBuilder lb) {
+        if (end == null) {
+            throw new IllegalArgumentException("findPath to null for " + this
+                + " from " + start + " on " + carrier);
+        }
         return getGame().getMap().findPath(this, start, end,
-                                           carrier, costDecider, null);
+                                           carrier, costDecider, lb);
     }
 
     /**
@@ -2813,7 +2850,7 @@ public class Unit extends GoodsLocation
         Tile best = minimize(end.getSurroundingTiles(1, 1), endPred,
             getPathComparator(start, carrier, costDecider));
         return (best == null) ? null
-            : this.findPath(start, best, carrier, costDecider);
+            : this.findPath(start, best, carrier, costDecider, null);
     }
 
     /**
@@ -2859,7 +2896,7 @@ public class Unit extends GoodsLocation
      */
     public int getTurnsToReach(Location start, Location end, Unit carrier,
                                CostDecider costDecider) {
-        PathNode path = findPath(start, end, carrier, costDecider);
+        PathNode path = this.findPath(start, end, carrier, costDecider, null);
         return (path == null) ? MANY_TURNS : path.getTotalTurns();
     }
 
@@ -2974,7 +3011,7 @@ public class Unit extends GoodsLocation
         int eTurns = -1;
         Europe europe = getOwner().getEurope();
         if (getType().canMoveToHighSeas()) {
-            ePath = (europe == null) ? null : findPath(europe);
+            ePath = (europe == null) ? null : this.findPath(europe);
             eTurns = (ePath == null) ? -1 : ePath.getTotalTurns();
         }
         PathNode sPath = findOurNearestSettlement(false, INFINITY, true);
@@ -3001,7 +3038,7 @@ public class Unit extends GoodsLocation
         final int dstCont = (dstTile == null) ? -1 : dstTile.getContiguity();
         final Comparator<Settlement> settlementComparator
             = cachingIntComparator(s -> {
-                    PathNode p = findPath(s);
+                    PathNode p = this.findPath(s);
                     return (p == null) ? INFINITY
                     : p.getTotalTurns() + dstTile.getDistanceTo(s.getTile());
                 });

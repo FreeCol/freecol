@@ -601,7 +601,7 @@ public class AIUnit extends TransportableAIObject {
         PathNode path;
         final Unit unit = getUnit();
         if (unit.getLocation() == carrier) {
-            path = unit.findPath(carrier.getLocation(), dst, carrier, null);
+            path = unit.findPath(carrier.getLocation(), dst, carrier);
             if (path == null && dst.getTile() != null) {
                 path = unit.findPathToNeighbour(carrier.getLocation(),
                     dst.getTile(), carrier, null);
@@ -609,7 +609,7 @@ public class AIUnit extends TransportableAIObject {
         } else if (unit.getLocation() instanceof Unit) {
             return null;
         } else {
-            path = unit.findPath(unit.getLocation(), dst, carrier, null);
+            path = unit.findPath(unit.getLocation(), dst, carrier);
             if (path == null && dst.getTile() != null) {
                 path = unit.findPathToNeighbour(unit.getLocation(),
                     dst.getTile(), carrier, null);

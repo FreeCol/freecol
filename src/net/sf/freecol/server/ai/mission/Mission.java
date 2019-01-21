@@ -720,7 +720,7 @@ public abstract class Mission extends AIObject {
                     useTransport = true;
                 } else {
                     path = unit.findPath(unit.getLocation(), target,
-                                         null, costDecider);
+                                         null, costDecider, null);
                 }
             } else if (aiCarrier != null) {
                 // Transport already allocated.
@@ -734,7 +734,7 @@ public abstract class Mission extends AIObject {
             } else {
                 // Should not need transport within the same contiguity.
                 path = unit.findPath(unit.getLocation(), target,
-                                     null, costDecider);
+                                     null, costDecider, null);
             }
         }
 
@@ -770,13 +770,13 @@ public abstract class Mission extends AIObject {
                     waiting = true;
 
                 } else if ((path = unit.findPath(unit.getLocation(), pick,
-                                                 null, costDecider)) == null) {
+                            null, costDecider, null)) == null) {
                     // No path to the collection point.
                     lbAt(lb);
                     lb.add(", no path to meet ", aiCarrier.getUnit(),
                            " at ", pick);
                     path = unit.findPath(unit.getLocation(), target,
-                                         null, costDecider);
+                        null, costDecider, null);
                     if (path == null) {
                         // Unable to fall back to going direct.
                         // Return failure in the hope that it is a
@@ -790,7 +790,7 @@ public abstract class Mission extends AIObject {
                     useTransport = false;
 
                 } else if ((ownPath = unit.findPath(unit.getLocation(), 
-                            target, null, costDecider)) == null
+                            target, null, costDecider, null)) == null
                     || (ownTurns = ownPath.getTotalTurns())
                     > (pathTurns = path.getTotalTurns())) {
                     // Either there is no direct path to the target or

@@ -308,7 +308,7 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = map.findPath(colonist, colonist.getTile(),
+        PathNode path = colonist.findPath(colonist.getTile(),
             destinationTile, null,
             CostDeciders.avoidSettlementsAndBlockingUnits(), null);
         assertNull("No path should be available", path);

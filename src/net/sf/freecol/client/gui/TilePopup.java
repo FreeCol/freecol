@@ -340,9 +340,8 @@ public final class TilePopup extends JPopupMenu {
                     if (currTile == tile) return;
                     final Map map = activeUnit.getGame().getMap();
                     LogBuilder lb = new LogBuilder(512);
-                    PathNode path = map.findPath(activeUnit,
-                        activeUnit.getTile(), tile, activeUnit.getCarrier(),
-                        null, lb);
+                    PathNode path = activeUnit.findPath(activeUnit.getTile(),
+                        tile, activeUnit.getCarrier(), null, lb);
                     gui.showInformationMessage(lb.toString());
                     gui.setUnitPath(path);
                     gui.refresh();                        

@@ -242,8 +242,8 @@ public class BaseCostDeciderTest extends FreeColTestCase {
                        cost == CostDecider.ILLEGAL_MOVE);
         }
         assertNotNull("Path should be valid from carrier to settlement",
-                      map.findPath(colonist, unitTile, settlementTile,
-                                   galleon, base, null));
+                      colonist.findPath(unitTile, settlementTile,
+                                        galleon, base, null));
 
         // Set players at war
         Player indianPlayer = settlement.getOwner();

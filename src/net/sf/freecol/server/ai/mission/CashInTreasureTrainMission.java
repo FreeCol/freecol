@@ -235,7 +235,7 @@ public class CashInTreasureTrainMission extends Mission {
             // doomed.
             return (europe == null) ? null
                 : unit.findPath(unit.getLocation(), europe, carrier,
-                                standardCd);
+                                standardCd, null);
         }
 
         // Can the unit get to a cash in site?
