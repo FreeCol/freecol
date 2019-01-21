@@ -105,18 +105,38 @@ public class ImageResource extends Resource
     }
 
     /**
+     * Get the default image.
+     *
+     * @return The default <code>BufferedImage</code>.
+     */
+    private synchronized BufferedImage getDefaultImage() {
+        return (this.loadedImages == null) ? null
+            : this.loadedImages.get(this.loadedImages.size() - 1);
+    }
+
+    /**
      * Find the loaded image that satisfies a predicate.
      *
      * @param pred The <code>Predicate</code> to satisfy.
      * @return The <code>BufferedImage</code> found, or if not found, the
      *     one at the end of the loaded images list.
      */
-    private synchronized BufferedImage findLoadedImage(Predicate<BufferedImage> pred) {
-        BufferedImage oim = find(this.loadedImages, pred);
-        return (oim != null) ? oim
-            : this.loadedImages.get(this.loadedImages.size() - 1);
+    private synchronized BufferedImage findExactImage(Predicate<BufferedImage> pred) {
+        return find(this.loadedImages, pred);
     }
-    
+
+    /**
+     * Find the loaded image that satisfies a predicate, defaulting to the last image.
+     *
+     * @param pred The <code>Predicate</code> to satisfy.
+     * @return The <code>BufferedImage</code> found, or if not found, the
+     *     one at the end of the loaded images list.
+     */
+    private BufferedImage findLoadedImage(Predicate<BufferedImage> pred) {
+        BufferedImage oim = findExactImage(pred);
+        return (oim != null) ? oim : getDefaultImage();
+    }
+
     /**
      * Gets the image using the specified dimension.
      * 
@@ -141,11 +161,11 @@ public class ImageResource extends Resource
         }
         if (wNew == w && hNew == h) return im; // Matching dimension
 
-        if (this.loadedImages != null) {
-            final int fwNew = wNew, fhNew = hNew;
-            final Predicate<BufferedImage> sizePred = img ->
-                img.getWidth() >= fwNew && img.getHeight() >= fhNew;
-            im = findLoadedImage(sizePred);
+        final int fwNew = wNew, fhNew = hNew;
+        final Predicate<BufferedImage> sizePred = img ->
+            img.getWidth() >= fwNew && img.getHeight() >= fhNew;
+        im = findExactImage(sizePred);
+        if (im != null) {
             w = im.getWidth();
             h = im.getHeight();
             if (wNew*h > w*hNew) {
