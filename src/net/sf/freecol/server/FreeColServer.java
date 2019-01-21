@@ -289,13 +289,13 @@ public final class FreeColServer {
         throws IOException {
         this(name, port);
 
-        this.publicServer = publicServer;
+        this.setPublicServer(publicServer);
         this.singlePlayer = singlePlayer;
         this.random = new Random(FreeColSeed.getFreeColSeed(true));
         this.serverGame = new ServerGame(specification, random);
         this.inGameController.setRandom(this.random);
         this.mapGenerator = new SimpleMapGenerator(this.random);
-        this.publicServer = registerWithMetaServer();
+        registerWithMetaServer();
     }
 
     /**
@@ -330,7 +330,7 @@ public final class FreeColServer {
         }
         this.inGameController.setRandom(random);
         this.mapGenerator = null;
-        this.publicServer = registerWithMetaServer();
+        registerWithMetaServer();
     }
 
 
@@ -359,7 +359,7 @@ public final class FreeColServer {
      *
      * @return The public server state.
      */
-    public boolean getPublicServer() {
+    public synchronized boolean getPublicServer() {
         return this.publicServer;
     }
 
@@ -368,7 +368,7 @@ public final class FreeColServer {
      *
      * @param publicServer The new public server state.
      */
-    public void setPublicServer(boolean publicServer) {
+    public synchronized void setPublicServer(boolean publicServer) {
         this.publicServer = publicServer;
     }
 
@@ -865,7 +865,7 @@ public final class FreeColServer {
                 xw.writeAttribute(OWNER_TAG,
                                   (owner != null) ? owner : FreeCol.getName());
 
-                xw.writeAttribute(PUBLIC_SERVER_TAG, this.publicServer);
+                xw.writeAttribute(PUBLIC_SERVER_TAG, this.getPublicServer());
 
                 xw.writeAttribute(SINGLE_PLAYER_TAG, this.singlePlayer);
 
