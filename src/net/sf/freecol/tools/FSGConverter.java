@@ -46,8 +46,9 @@ public class FSGConverter {
      * @see #getFSGConverter()
      */
     private static FSGConverter singleton;
-    
-    
+    private static Object singletonLock = new Object();
+
+
     /**
      * Creates an instance of {@code FSGConverter}
      */
@@ -62,18 +63,18 @@ public class FSGConverter {
      */
     public static FSGConverter getFSGConverter() {
         // Using lazy initialization:       
-        if (singleton == null) {
-            singleton = new FSGConverter();
+        synchronized (singletonLock) {
+            if (singleton == null) {
+                singleton = new FSGConverter();
+            }
+            return singleton;
         }
-        return singleton;
     }
 
     
     /**
      * Converts the given input file to an uncompressed and
      * indented XML-file.
-     * 
-     * <br><br>
      * 
      * Savegame compression is automatically detected, so using
      * this method on an uncompressed savegame creates an
