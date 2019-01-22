@@ -969,23 +969,21 @@ public class FreeColDirectories {
     public static Writer getLogCommsWriter() throws FreeColException {
         synchronized (commsWriterLock) {
             if (commsWriter != null) return commsWriter;
-        }
-        File file = new File(getUserCacheDirectory(), LOG_COMMS_FILE_NAME);
-        if (file.exists()) {
-            try {
-                file.delete();
-            } catch (SecurityException se) {
-                throw new FreeColException("Comms log file exists, delete failed: " + file.getPath(), se);
+            File file = new File(getUserCacheDirectory(), LOG_COMMS_FILE_NAME);
+            if (file.exists()) {
+                try {
+                    file.delete();
+                } catch (SecurityException se) {
+                    throw new FreeColException("Comms log file exists, delete failed: " + file.getPath(), se);
+                }
             }
-        }
-        Writer writer = getFileUTF8AppendWriter(file);
-        if (writer == null) {
-            throw new FreeColException("Can not create writer for comms log file: " + file.getPath());
-        }
-        synchronized (commsWriterLock) {
+            Writer writer = getFileUTF8AppendWriter(file);
+            if (writer == null) {
+                throw new FreeColException("Can not create writer for comms log file: " + file.getPath());
+            }
             commsWriter = writer;
+            return commsWriter;
         }
-        return commsWriter;
     }        
                              
     /**
