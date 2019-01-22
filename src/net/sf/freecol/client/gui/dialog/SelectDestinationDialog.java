@@ -314,7 +314,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     /** How to order the destinations. */
     private static Comparator<Destination> destinationComparator = null;
-
+    /** Lock for the destinationComparator. */
+    private static Object destinationComparatorLock = new Object();
+    
     /** The available destinations. */
     private final List<Destination> destinations = new ArrayList<>();
 
@@ -380,12 +382,13 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             });
         this.comparatorBox.addItemListener((ItemEvent event) -> {
                 updateDestinationComparator();
-                SelectDestinationDialog.this.destinations.sort(SelectDestinationDialog.this.destinationComparator);
+                SelectDestinationDialog.this.destinations
+                    .sort(getDestinationComparator());
                 updateDestinationList();
             });
-        this.comparatorBox.setSelectedIndex(
-            (this.destinationComparator instanceof NameComparator) ? 1
-            : (this.destinationComparator instanceof DistanceComparator) ? 2
+        Comparator<Destination> dc = getDestinationComparator();
+        this.comparatorBox.setSelectedIndex((dc instanceof NameComparator) ? 1
+            : (dc instanceof DistanceComparator) ? 2
             : 0);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
@@ -407,6 +410,28 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     }
 
 
+    /**
+     * Get the current destination comparator.
+     *
+     * @return The destination comparator.
+     */
+    private Comparator<Destination> getDestinationComparator() {
+        synchronized (destinationComparatorLock) {
+            return destinationComparator;
+        }
+    }
+
+    /**
+     * Set the current destination comparator.
+     *
+     * @param dc The new destination comparator.
+     */
+    private void setDestinationComparator(Comparator<Destination> dc) {
+        synchronized (destinationComparatorLock) {
+            destinationComparator = dc;
+        }
+    }
+    
     /**
      * Load destinations for a given unit and carried goods types.
      *
@@ -430,9 +455,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final Predicate<Settlement> canReach = s ->
             (unit.isNaval()) ? s.isConnectedPort()
                 : Map.isSameContiguity(unit.getLocation(), s.getTile());
-       
-        if (this.destinationComparator == null) {
-            this.destinationComparator = new DestinationComparator(player);
+
+        synchronized (destinationComparatorLock) {
+            if (this.destinationComparator == null) {
+                this.destinationComparator = new DestinationComparator(player);
+            }
         }
         List<Destination> td = new ArrayList<>();
         
@@ -488,7 +515,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         // Drop inaccessible destinations and sort as specified.
         this.destinations.addAll(transform(td, d -> d.turns < Unit.MANY_TURNS,
                                            Function.identity(),
-                                           this.destinationComparator));
+                                           getDestinationComparator()));
     }
 
     /**
@@ -538,13 +565,13 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final Player player = getMyPlayer();
         switch (this.comparatorBox.getSelectedIndex()) {
         case 1:
-            this.destinationComparator = new NameComparator(player);
+            setDestinationComparator(new NameComparator(player));
             break;
         case 2:
-            this.destinationComparator = new DistanceComparator(player);
+            setDestinationComparator(new DistanceComparator(player));
             break;
         case 0: default:
-            this.destinationComparator = new DestinationComparator(player);
+            setDestinationComparator(new DestinationComparator(player));
             break;
         }
     }
