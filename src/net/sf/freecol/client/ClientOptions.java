@@ -485,7 +485,9 @@ public class ClientOptions extends OptionGroup {
 	
     /** Compare by name, initialized at run time. */
     private static Comparator<Colony> colonyNameComparator = null;
-
+    /** Lock for the colony name comparator. */
+    private static Object colonyNameComparatorLock = new Object();
+    
     /** Compare by descending size then liberty. */
     private static final Comparator<Colony> colonySizeComparator
         = Comparator.comparingInt(Colony::getUnitCount)
@@ -674,12 +676,14 @@ public class ClientOptions extends OptionGroup {
         case COLONY_COMPARATOR_SOL:
             return colonySoLComparator;
         case COLONY_COMPARATOR_NAME:
-            if (colonyNameComparator == null) {
-                // Can not be done statically, must wait for CLI parsing
-                colonyNameComparator = Comparator.comparing(Colony::getName,
-                    Collator.getInstance(FreeCol.getLocale()));
+            synchronized (colonyNameComparatorLock) {
+                if (colonyNameComparator == null) {
+                    // Can not be done statically, must wait for CLI parsing
+                    colonyNameComparator = Comparator.comparing(Colony::getName,
+                        Collator.getInstance(FreeCol.getLocale()));
+                }
+                return colonyNameComparator;
             }
-            return colonyNameComparator;
         default:
             throw new IllegalStateException("Unknown comparator");
         }
