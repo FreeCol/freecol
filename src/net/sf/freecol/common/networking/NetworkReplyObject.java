@@ -51,7 +51,7 @@ public class NetworkReplyObject {
     public synchronized void setResponse(Object response) {
         this.response = response;
         this.responseGiven = true;
-        notify();
+        notifyAll();
     }
 
     /**
@@ -87,6 +87,6 @@ public class NetworkReplyObject {
      */
     public synchronized void interrupt() {
         responseGiven = true;
-        notify();
+        notifyAll();
     }
 }
