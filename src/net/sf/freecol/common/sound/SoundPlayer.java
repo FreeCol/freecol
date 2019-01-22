@@ -34,6 +34,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -82,10 +83,10 @@ public class SoundPlayer {
      *
      * @param file The {@code File} to test.
      * @return An {@code AudioInputStream}, or null on failure.
-     * @throws Exception if the file does not contain valid audio.
+     * @exception IOException if the file does not contain valid audio.
      */
     public static AudioInputStream getAudioInputStream(File file)
-        throws Exception {
+        throws IOException {
         AudioInputStream in;
         if (file.getName().endsWith(".ogg")) {
             // We used to use tritonus to provide ogg (strictly,
@@ -95,7 +96,12 @@ public class SoundPlayer {
             // own jorbis-based decoder.
             in = new OggVorbisDecoderFactory().getOggStream(file);
         } else {
-            in = AudioSystem.getAudioInputStream(file);
+            try {
+                in = AudioSystem.getAudioInputStream(file);
+            } catch (UnsupportedAudioFileException uafe) {
+                // Hide the UAFE, upstream only cares that failure occurred
+                throw new IOException(uafe);
+            }
         }
         return in;
     }
@@ -111,10 +117,13 @@ public class SoundPlayer {
 
     private void setMixer(MixerWrapper mw) {
         try {
-            mixer = AudioSystem.getMixer(mw.getMixerInfo());
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not set mixer", e);
-            mixer = null;
+            this.mixer = AudioSystem.getMixer(mw.getMixerInfo());
+        } catch (SecurityException se) {
+            logger.log(Level.WARNING, "Access to mixer denied: " + mw, se);
+            this.mixer = null;
+        } catch (IllegalArgumentException ie) {
+            logger.log(Level.WARNING, "Not a recognized mixer: " + mw, ie);
+            this.mixer = null;
         }
     }
 

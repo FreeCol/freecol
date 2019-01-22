@@ -20,6 +20,7 @@
 package net.sf.freecol.common.resources;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 
 import net.sf.freecol.common.sound.SoundPlayer;
@@ -43,9 +44,9 @@ public class AudioResource extends Resource {
      * Do not use directly.
      * @param resourceLocator The {@code URI} used when loading this
      *      resource.
-     * @throws Exception of assorted types from the underlying audio components
+     * @exception IOException if the URI does not point to recognizable audio.
      */
-    public AudioResource(URI resourceLocator) throws Exception {
+    public AudioResource(URI resourceLocator) throws IOException {
         super(resourceLocator);
         File f = new File(resourceLocator);
         if (SoundPlayer.getAudioInputStream(f) != null) this.file = f;
