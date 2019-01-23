@@ -116,7 +116,11 @@ public class ImageResource extends Resource
         return (oim != null) ? oim
             : this.loadedImages.get(this.loadedImages.size() - 1);
     }
-    
+
+    private synchronized boolean haveAlternatives() {
+        return this.loadedImages != null;
+    }
+
     /**
      * Gets the image using the specified dimension.
      * 
@@ -141,7 +145,7 @@ public class ImageResource extends Resource
         }
         if (wNew == w && hNew == h) return im; // Matching dimension
 
-        if (this.loadedImages != null) {
+        if (this.haveAlternatives()) {
             final int fwNew = wNew, fhNew = hNew;
             final Predicate<BufferedImage> sizePred = img ->
                 img.getWidth() >= fwNew && img.getHeight() >= fhNew;
