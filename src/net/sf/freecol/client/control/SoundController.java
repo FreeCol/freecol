@@ -99,19 +99,16 @@ public class SoundController {
      * @param sound The sound resource to play, or if null stop playing.
      */
     public void playSound(String sound) {
-        if (!canPlaySound()) {
-            return;
-        }
-        if (sound == null) {
-            soundPlayer.stop();
+        if (!canPlaySound() || sound == null) return;
+
+        File file = ResourceManager.getAudio(sound);
+        if (file == null) {
+            logger.finest("Cound not load sound: " + sound);
         } else {
-            File file = ResourceManager.getAudio(sound);
-            if (file != null) {
-                soundPlayer.playOnce(file);
-            }
-            logger.finest(((file == null)
-                ? "Could not load"
-                : "Playing") + " sound: " + sound);
+            soundPlayer.stop();
+            boolean playing = soundPlayer.playOnce(file);
+            logger.finest(((playing) ? "Queued" : "Fail on")
+                + " sound: " + sound);
         }
     }
 
@@ -131,5 +128,4 @@ public class SoundController {
                 : mixer.getMixerInfo().getName();
         return Messages.message("current") + ":  " + text;
     }
-
 }
