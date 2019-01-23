@@ -29,7 +29,7 @@ import net.sf.freecol.common.model.WorkLocation;
  * Objects of this class contains AI-information for a single
  * {@link net.sf.freecol.common.model.WorkLocation}.
  */
-public class WorkLocationPlan extends AIObject {
+public final class WorkLocationPlan extends AIObject {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkLocationPlan.class.getName());
@@ -58,8 +58,7 @@ public class WorkLocationPlan extends AIObject {
 
         this.workLocation = workLocation;
         this.goodsType = goodsType;
-
-        uninitialized = false;
+        this.initialized = getWorkLocation() != null && getGoodsType() != null;
     }
 
 

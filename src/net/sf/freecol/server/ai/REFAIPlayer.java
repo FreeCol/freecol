@@ -68,7 +68,7 @@ import net.sf.freecol.server.model.ServerPlayer;
  *
  * For now, mostly just the EuropeanAIPlayer, with a few tweaks.
  */
-public class REFAIPlayer extends EuropeanAIPlayer {
+public final class REFAIPlayer extends EuropeanAIPlayer {
 
     private static final Logger logger = Logger.getLogger(REFAIPlayer.class.getName());
 
@@ -153,7 +153,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     public REFAIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player);
 
-        uninitialized = getPlayer() == null;
+        this.initialized = getPlayer() != null;
     }
 
     /**
@@ -167,7 +167,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                        FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getPlayer() == null;
+        this.initialized = getPlayer() != null;
     }
 
 

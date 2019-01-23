@@ -60,8 +60,9 @@ public class WorkerWish extends Wish {
     public WorkerWish(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        unitType = null;
-        expertNeeded = false;
+        this.unitType = null;
+        this.expertNeeded = false;
+        this.initialized = false;
     }
 
     /**
@@ -90,7 +91,7 @@ public class WorkerWish extends Wish {
         setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
-        uninitialized = false;
+        this.initialized = getDestination() != null && getUnitType() != null;
     }
 
     /**
@@ -106,7 +107,7 @@ public class WorkerWish extends Wish {
                       FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = unitType == null;
+        this.initialized = getDestination() != null && getUnitType() != null;
     }
 
 
@@ -202,16 +203,6 @@ public class WorkerWish extends Wish {
                               UnitType.class, (UnitType)null);
         
         expertNeeded = xr.getAttribute(EXPERT_NEEDED_TAG, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (unitType != null) uninitialized = false;
     }
 
     /**

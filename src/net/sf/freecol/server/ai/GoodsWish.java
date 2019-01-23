@@ -60,8 +60,9 @@ public class GoodsWish extends Wish {
     public GoodsWish(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        goodsType = null;
-        amountRequested = -1;
+        this.goodsType = null;
+        this.amountRequested = -1;
+        this.initialized = false;
     }
 
     /**
@@ -89,7 +90,7 @@ public class GoodsWish extends Wish {
         setValue(value);
         this.goodsType = goodsType;
         this.amountRequested = amountRequested;
-        uninitialized = false;
+        this.initialized = getGoodsType() != null && getGoodsAmount() > 0;
     }
 
     /**
@@ -105,7 +106,7 @@ public class GoodsWish extends Wish {
                      FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = goodsType == null;
+        this.initialized = getGoodsType() != null && getGoodsAmount() > 0;
     }
 
 
@@ -232,16 +233,6 @@ public class GoodsWish extends Wish {
 
         amountRequested = xr.getAttribute(AMOUNT_REQUESTED_TAG,
                                           GoodsContainer.CARGO_SIZE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (goodsType != null && amountRequested > 0) uninitialized = false;
     }
 
     /**

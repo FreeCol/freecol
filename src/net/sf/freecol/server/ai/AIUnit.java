@@ -78,7 +78,7 @@ import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
  *
  * @see Mission
  */
-public class AIUnit extends TransportableAIObject {
+public final class AIUnit extends TransportableAIObject {
 
     private static final Logger logger = Logger.getLogger(AIUnit.class.getName());
 
@@ -102,6 +102,7 @@ public class AIUnit extends TransportableAIObject {
 
         this.unit = null;
         this.mission = null;
+        this.initialized = false;
     }
 
     /**
@@ -113,7 +114,9 @@ public class AIUnit extends TransportableAIObject {
     public AIUnit(AIMain aiMain, Unit unit) {
         this(aiMain, unit.getId());
 
-        setUnit(unit);
+        this.unit = unit;
+        this.mission = null;
+        this.initialized = getUnit() != null;
     }
 
     /**
@@ -129,7 +132,7 @@ public class AIUnit extends TransportableAIObject {
                   FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = unit == null;
+        this.initialized = getUnit() != null;
     }
 
 
@@ -156,7 +159,6 @@ public class AIUnit extends TransportableAIObject {
                 + "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
         }
         this.unit = unit;
-        this.uninitialized = this.unit == null;
     }
 
     /**

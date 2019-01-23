@@ -43,8 +43,8 @@ public abstract class AIObject extends FreeColObject {
     /** The AI this object exists within. */
     private final AIMain aiMain;
 
-    /** Whether the object is uninitialized. */
-    protected boolean uninitialized = false;
+    /** Whether the object is initialized. */
+    protected boolean initialized;
 
 
     /**
@@ -54,7 +54,7 @@ public abstract class AIObject extends FreeColObject {
      */
     public AIObject(AIMain aiMain) {
         this.aiMain = aiMain;
-        this.uninitialized = true;
+        this.initialized = false;
     }
 
     /**
@@ -72,7 +72,6 @@ public abstract class AIObject extends FreeColObject {
             setId(id);
             aiMain.addAIObject(id, this);
         }
-        this.uninitialized = true;
     }
 
     /**
@@ -99,19 +98,21 @@ public abstract class AIObject extends FreeColObject {
      * @return The {@code AIMain}.
      */
     public final AIMain getAIMain() {
-        return aiMain;
+        return this.aiMain;
     }
 
     /**
-     * Checks if this {@code AIObject}
-     * is uninitialized. That is: it has been referenced
-     * by another object, but has not yet been updated with
+     * Is this {@code AIObject} initialized?
+     *
+     * That is: it has been fully initialized by a detailed
+     * constructor, or built with a simple constructor due to being
+     * referenced by another object, but then updated with
      * {@link #readFromXML}.
      *
      * @return {@code true} if this object is not initialized.
      */
-    public final boolean isUninitialized() {
-        return this.uninitialized;
+    public final boolean isInitialized() {
+        return this.initialized;
     }
 
     /**
@@ -150,7 +151,7 @@ public abstract class AIObject extends FreeColObject {
      *     were fixed, +1 if no problems found at all.
      */
     public int checkIntegrity(boolean fix, LogBuilder lb) {
-        if (isUninitialized()) {
+        if (!isInitialized()) {
             lb.add("\n  Uninitialized AI Object: ", getId());
             return -1;
         }
@@ -213,7 +214,7 @@ public abstract class AIObject extends FreeColObject {
         AIObject o = copyInCast(other, AIObject.class);
         if (o == null || !super.copyIn(o)) return false;
         //this.aiMain is fixed
-        this.uninitialized = o.isUninitialized();
+        this.initialized = o.isInitialized();
         return true;
     }
 }

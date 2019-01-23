@@ -74,9 +74,10 @@ public class TileImprovementPlan extends ValuedAIObject {
         throws XMLStreamException {
         super(aiMain, id);
 
-        type = null;
-        target = null;
-        pioneer = null;
+        this.type = null;
+        this.target = null;
+        this.pioneer = null;
+        this.initialized = false;
     }
 
     /**
@@ -97,7 +98,7 @@ public class TileImprovementPlan extends ValuedAIObject {
         this.type = type;
         this.pioneer = null;
         setValue(value);
-        uninitialized = getType() == null || getTarget() == null;
+        this.initialized = getType() != null && getTarget() != null;
     }
 
     /**
@@ -113,7 +114,7 @@ public class TileImprovementPlan extends ValuedAIObject {
                                FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getType() == null || getTarget() == null;
+        this.initialized = getType() != null && getTarget() != null;
     }
 
 
@@ -339,16 +340,6 @@ public class TileImprovementPlan extends ValuedAIObject {
 
         target = xr.getAttribute(getGame(), TARGET_TAG,
                                  Tile.class, (Tile)null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (type != null && target != null) uninitialized = false;
     }
 
     /**

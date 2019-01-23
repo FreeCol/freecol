@@ -45,7 +45,7 @@ import net.sf.freecol.server.ai.mission.Mission;
 /**
  * Objects of this class contains AI-information for a single {@link Goods}.
  */
-public class AIGoods extends TransportableAIObject {
+public final class AIGoods extends TransportableAIObject {
 
     private static final Logger logger = Logger.getLogger(AIGoods.class.getName());
 
@@ -69,6 +69,7 @@ public class AIGoods extends TransportableAIObject {
 
         this.goods = null;
         this.destination = null;
+        this.initialized = false;
     }
 
     /**
@@ -87,8 +88,7 @@ public class AIGoods extends TransportableAIObject {
 
         this.goods = new Goods(aiMain.getGame(), location, type, amount);
         this.destination = destination;
-
-        uninitialized = false;
+        this.initialized = getGoods() != null;
     }
 
     /**
@@ -104,7 +104,7 @@ public class AIGoods extends TransportableAIObject {
                    FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getGoods() == null;
+        this.initialized = getGoods() != null;
     }
 
 
@@ -114,7 +114,7 @@ public class AIGoods extends TransportableAIObject {
      * @return The {@code Goods}.
      */
     public final Goods getGoods() {
-        return goods;
+        return this.goods;
     }
 
     /**
@@ -415,16 +415,6 @@ public class AIGoods extends TransportableAIObject {
         final Game game = getAIMain().getGame();
 
         destination = xr.getLocationAttribute(game, DESTINATION_TAG, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (getGoods() != null) uninitialized = false;
     }
 
     /**

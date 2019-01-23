@@ -105,7 +105,7 @@ public abstract class Mission extends AIObject {
         super(aiMain);
 
         this.aiUnit = aiUnit;
-        this.uninitialized = aiUnit == null;
+        this.initialized = this.aiUnit != null;
     }
 
     /**

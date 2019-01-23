@@ -69,7 +69,7 @@ import net.sf.freecol.common.util.LogBuilder;
 /**
  * Objects of this class contains AI-information for a single {@link Colony}.
  */
-public class AIColony extends AIObject implements PropertyChangeListener {
+public final class AIColony extends AIObject implements PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(AIColony.class.getName());
 
@@ -86,21 +86,28 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /** Do not bother trying to ship out less than this amount of goods. */
     private static final int EXPORT_MINIMUM = 10;
 
+    /** Comparator to choose the best pioneers. */
+    private static final Comparator<Unit> pioneerComparator
+        = Comparator.comparingInt(Unit::getPioneerScore).reversed();
+
+    /** Comparator to choose the best scouts. */
+    private static final Comparator<Unit> scoutComparator
+        = Comparator.comparingInt(Unit::getScoutScore).reversed();
+
     /** The colony this AIColony is managing. */
     private Colony colony;
 
     /** The current plan for the colony.  Does not need to be serialized. */
-    private ColonyPlan colonyPlan = null;
+    private ColonyPlan colonyPlan;
 
     /** Goods to export from the colony. */
-    private final List<AIGoods> exportGoods = new ArrayList<>();
+    private List<AIGoods> exportGoods;
 
     /** Useful things for the colony. */
-    private final List<Wish> wishes = new ArrayList<>();
+    private List<Wish> wishes;
 
     /** Plans to improve neighbouring tiles. */
-    private final List<TileImprovementPlan> tileImprovementPlans
-        = new ArrayList<>();
+    private List<TileImprovementPlan> tileImprovementPlans;
 
     /** When should the workers in this Colony be rearranged? */
     private Turn rearrangeTurn = new Turn(0);
@@ -112,14 +119,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private static final Set<GoodsType> fullExport = new HashSet<>();
     private static final Set<GoodsType> partExport = new HashSet<>();
 
-    /** Comparator to choose the best pioneers. */
-    private static final Comparator<Unit> pioneerComparator
-        = Comparator.comparingInt(Unit::getPioneerScore).reversed();
-
-    /** Comparator to choose the best scouts. */
-    private static final Comparator<Unit> scoutComparator
-        = Comparator.comparingInt(Unit::getScoutScore).reversed();
-
 
     /**
      * Creates a new uninitialized {@code AIColony}.
@@ -130,8 +129,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public AIColony(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        this.colony = null;
-        this.colonyPlan = null;
+        baseInitialize();
+        this.initialized = false;
     }
 
     /**
@@ -146,7 +145,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         this.colony = colony;
         colony.addPropertyChangeListener(Colony.REARRANGE_COLONY, this);
 
-        uninitialized = false;
+        this.initialized = getColony() != null;
     }
 
     /**
@@ -158,13 +157,23 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public AIColony(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
-        this(aiMain, (String)null);
+    public AIColony(AIMain aiMain, FreeColXMLReader xr)
+        throws XMLStreamException {
+        super(aiMain, xr);
 
-        readFromXML(xr);
-        addAIObjectWithId();
+        this.initialized = getColony() != null;
+    }
 
-        uninitialized = getColony() == null;
+    /**
+     * Initialize the basic fields.
+     */
+    private void baseInitialize() {
+        if (this.exportGoods != null) return;
+        this.colony = null;
+        this.colonyPlan = null;
+        this.exportGoods = new ArrayList<>();
+        this.wishes = new ArrayList<>();
+        this.tileImprovementPlans = new ArrayList<>();
     }
 
 
@@ -659,6 +668,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Sort the export goods.
      */
     private void sortExportGoods() {
+        if (this.exportGoods == null) return;
         synchronized (exportGoods) {
             exportGoods.sort(ValuedAIObject.descendingValueComparator);
         }
@@ -802,6 +812,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
     }
 
+
+    /**
+     * Clear the wishes.
+     */
+    private void clearWishes() {
+        this.wishes.clear();
+    }
 
     /**
      * Adds a {@code Wish} to the wishes list.
@@ -1174,6 +1191,22 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
+     * Clear the tile improvement plans.
+     */
+    private void clearTileImprovementPlans() {
+        this.tileImprovementPlans.clear();
+    }
+
+    /**
+     * Add a tile improvement plan.
+     *
+     * @param plan The new {@code TileImprovementPlan} to add.
+     */
+    private void addTileImprovementPlan(TileImprovementPlan plan) {
+        this.tileImprovementPlans.add(plan);
+    }
+
+    /**
      * Gets the tile improvements planned for this colony.
      *
      * @return A copy of the tile improvement plan list.
@@ -1262,7 +1295,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
             newPlans.add(plan); // Otherwise add the plan.
         }
-        tileImprovementPlans.clear();
+        clearTileImprovementPlans();
         tileImprovementPlans.addAll(newPlans);
         tileImprovementPlans.sort(ValuedAIObject.descendingValueComparator);
         if (!tileImprovementPlans.isEmpty()) {
@@ -1365,9 +1398,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         List<AIObject> objects = transform(getExportGoods(), ourGoodsPred,
                                            aig -> (AIObject)aig);
         objects.addAll(wishes);
-        wishes.clear();
+        clearWishes();
         objects.addAll(tileImprovementPlans);
-        tileImprovementPlans.clear();
+        clearTileImprovementPlans();
         for (AIObject o : objects) o.dispose();
         colonyPlan = null;
         // Do not clear this.colony, the identifier is still required.
@@ -1463,15 +1496,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        baseInitialize(); // Make sure the containers exist
         // Clear containers.
         clearExportGoods();
-        tileImprovementPlans.clear();
-        wishes.clear();
+        clearTileImprovementPlans();
+        clearWishes();
 
         super.readChildren(xr);
         sortExportGoods();
-        
-        if (getColony() != null) uninitialized = false;
     }
 
     /**
@@ -1488,8 +1520,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             xr.closeTag(AI_GOODS_LIST_TAG);
 
         } else if (GOODS_WISH_LIST_TAG.equals(tag)) {
-            wishes.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
-                                       GoodsWish.class, (GoodsWish)null, true));
+            addWish(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
+                                    GoodsWish.class, (GoodsWish)null, true));
             xr.closeTag(GOODS_WISH_LIST_TAG);
 
         } else if (TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
@@ -1497,13 +1529,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             || OLD_TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
             // end @compat 0.11.3
                    ) {
-            tileImprovementPlans.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
+            addTileImprovementPlan(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
                     TileImprovementPlan.class, (TileImprovementPlan)null, true));
             xr.closeTag(tag);// FIXME: tag -> TILE_IMPROVEMENT_PLAN_LIST_TAG
 
         } else if (WORKER_WISH_LIST_TAG.equals(tag)) {
-            wishes.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
-                                       WorkerWish.class, (WorkerWish)null, true));
+            addWish(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
+                                    WorkerWish.class, (WorkerWish)null, true));
             xr.closeTag(WORKER_WISH_LIST_TAG);
 
         } else {

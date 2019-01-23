@@ -100,8 +100,6 @@ public abstract class AIPlayer extends AIObject {
         this.player = player;
         this.aiRandom = new Random(aiMain.getRandomSeed("Seed for " + getId()));
         this.serverAPI = new AIServerAPI(this);
-
-        uninitialized = false;
     }
 
     /**
@@ -118,7 +116,6 @@ public abstract class AIPlayer extends AIObject {
         super(aiMain, xr);
         
         this.serverAPI = new AIServerAPI(this);
-        uninitialized = player == null;
     }
 
 
@@ -659,16 +656,6 @@ public abstract class AIPlayer extends AIObject {
                                                               (String)null));
         aiRandom = (rnd != null) ? rnd
             : new Random(aiMain.getRandomSeed("Seed for " + getId()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
-
-        if (getPlayer() != null) uninitialized = false;
     }
 
     /**

@@ -81,7 +81,7 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
  */
-public class NativeAIPlayer extends MissionAIPlayer {
+public final class NativeAIPlayer extends MissionAIPlayer {
 
     private static final Logger logger = Logger.getLogger(NativeAIPlayer.class.getName());
 
@@ -110,7 +110,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
     public NativeAIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player);
 
-        uninitialized = getPlayer() == null;
+        this.initialized = getPlayer() != null;
     }
 
     /**
@@ -124,7 +124,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                           FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getPlayer() == null;
+        this.initialized = getPlayer() != null;
     }
 
 
