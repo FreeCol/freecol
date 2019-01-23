@@ -208,6 +208,10 @@ public class AIMain extends FreeColObject
     /**
      * Adds a reference to the given {@code AIObject}.
      *
+     * Note: this is called only for new AI objects, thus it is an
+     * error for the object to already be present in the aiObjects
+     * map.
+     *
      * @param id The object identifier.
      * @param aiObject The {@code AIObject} to store a reference
      *        for.

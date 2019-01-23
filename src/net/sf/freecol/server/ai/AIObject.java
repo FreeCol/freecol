@@ -54,7 +54,7 @@ public abstract class AIObject extends FreeColObject {
      */
     public AIObject(AIMain aiMain) {
         this.aiMain = aiMain;
-        uninitialized = true;
+        this.uninitialized = true;
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class AIObject extends FreeColObject {
             setId(id);
             aiMain.addAIObject(id, this);
         }
-        uninitialized = true;
+        this.uninitialized = true;
     }
 
     /**
@@ -111,7 +111,7 @@ public abstract class AIObject extends FreeColObject {
      * @return {@code true} if this object is not initialized.
      */
     public final boolean isUninitialized() {
-        return uninitialized;
+        return this.uninitialized;
     }
 
     /**
