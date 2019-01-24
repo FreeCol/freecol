@@ -124,7 +124,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * This class represents a buildable, that is dragged/dropped
      * accompanied by its index in the source list where it is dragged from.
      */
-    private class IndexedBuildable {
+    private static class IndexedBuildable {
         private final BuildableType buildable;
         private final int index;
 

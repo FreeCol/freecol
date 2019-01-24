@@ -238,7 +238,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         nativeNation = newNativeNation;
     }
 
-    public final class TileTypeTransform extends MapTransform {
+    public static final class TileTypeTransform extends MapTransform {
         private final TileType tileType;
 
         private TileTypeTransform(TileType tileType) {
@@ -256,7 +256,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
     }
 
-    private final class RiverTransform extends MapTransform {
+    private static final class RiverTransform extends MapTransform {
         private final int magnitude;
 
         private RiverTransform(int magnitude) {
@@ -289,7 +289,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
     }
 
-    private final class RiverStyleTransform extends MapTransform {
+    private static final class RiverStyleTransform extends MapTransform {
 
         public static final int CHANGE_CONNECTIONS = 0;
         public static final int SET_STYLE = 1;
@@ -361,7 +361,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
     }
 
-    private class LostCityRumourTransform extends MapTransform {
+    private static class LostCityRumourTransform extends MapTransform {
         @Override
         public void transform(Tile t) {
             if (t.isLand()) {

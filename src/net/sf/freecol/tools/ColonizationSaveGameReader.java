@@ -79,7 +79,7 @@ public class ColonizationSaveGameReader {
 
     }
 
-    private class ColonyData {
+    private static class ColonyData {
 
         public static final int LENGTH = 202;
         public static final int COLONIST_OCCUPATION = 0x20;

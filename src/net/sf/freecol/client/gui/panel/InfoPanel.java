@@ -80,7 +80,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for ending the turn.
      */
-    public class EndTurnPanel extends MigPanel {
+    private class EndTurnPanel extends MigPanel {
 
         public EndTurnPanel() {
             super(new MigLayout("wrap 1, center", "[center]", ""));
