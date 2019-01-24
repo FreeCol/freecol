@@ -1064,66 +1064,6 @@ public class ChangeSet {
     }
 
     /**
-     * Encapsulate trivial element, which will only have attributes apart
-     * from its name.
-     */
-    private static class TrivialChange extends Change<AttributeMessage> {
-
-        private final int priority;
-        private final String name;
-        private final String[] attributes;
-
-
-        /**
-         * Build a new TrivialChange.
-         *
-         * @param see The visibility of this change.
-         * @param name The name of the element.
-         * @param priority The sort priority of this change.
-         * @param attributes The attributes to add to the change.
-         */
-        public TrivialChange(See see, String name, int priority,
-                             String[] attributes) {
-            super(see);
-            if ((attributes.length & 1) == 1) {
-                throw new IllegalArgumentException("Attributes must be even sized");
-            }
-            this.name = name;
-            this.priority = priority;
-            this.attributes = attributes;
-        }
-
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public AttributeMessage toMessage(ServerPlayer serverPlayer) {
-            if (!isNotifiable(serverPlayer)) return null;
-            AttributeMessage ret = new AttributeMessage(this.name);
-            ret.setStringAttributes(this.attributes);
-            return ret;
-        }
-
-
-        // Override Object
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder(64);
-            sb.append('[').append(getClass().getName())
-                .append(' ').append(see)
-                .append(' ').append(name);
-            for (String a : attributes) sb.append(' ').append(a);
-            sb.append(']');
-            return sb.toString();
-        }
-    }
-
-    /**
      * Simple constructor.
      */
     public ChangeSet() {
