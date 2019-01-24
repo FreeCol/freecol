@@ -189,7 +189,7 @@ public final class FreeColClient {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
         // Once the basic resources are in place construct other things.
-        this.serverAPI = new UserServerAPI(gui);
+        this.serverAPI = new UserServerAPI();
 
         // Control.  Controllers expect GUI to be available.
         connectController = new ConnectController(this);

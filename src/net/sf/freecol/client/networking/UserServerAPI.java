@@ -22,7 +22,6 @@ package net.sf.freecol.client.networking;
 import java.io.IOException;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
@@ -30,13 +29,10 @@ import net.sf.freecol.common.networking.ServerAPI;
 
 
 /**
- * Implementation of the ServerAPI for a player with attached GUI and
- * real connection to the server.
+ * Implementation of the ServerAPI for a player with a real connection
+ * to the server.
  */
 public class UserServerAPI extends ServerAPI {
-
-    /** The GUI to use for error and client processing. */
-    private final GUI gui;
 
     /** The connection used to communicate with the server. */
     private Connection connection = null;
@@ -56,13 +52,9 @@ public class UserServerAPI extends ServerAPI {
 
     /**
      * Create the new user wrapper for the server API.
-     *
-     * @param gui The {@code GUI} to use for user interaction.
      */
-    public UserServerAPI(GUI gui) {
+    public UserServerAPI() {
         super();
-
-        this.gui = gui;
     }
 
     /**
