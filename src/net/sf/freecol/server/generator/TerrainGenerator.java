@@ -436,35 +436,6 @@ public class TerrainGenerator {
     }
 
     /**
-     * Pick a good tile to put elevated terrain on.
-     *
-     * @param map A {@code Map} to choose from.
-     * @return A suitable {@code Tile}, or null if none found.
-     */
-    private Tile getGoodMountainTile(Map map) {
-        final Specification spec = map.getGame().getSpecification();
-        final TileType hills = spec.getTileType("model.tile.hills");
-        final TileType mountains = spec.getTileType("model.tile.mountains");
-        Tile tile = null;
-        while ((tile = map.getRandomLandTile(random)) != null) {
-            // Can not be high ground already
-            if (tile.getType() != hills && tile.getType() != mountains
-                
-                // Not too close to a mountain range as this would
-                // defeat the purpose of adding random hills
-                && none(tile.getSurroundingTiles(1, 3), t -> t.getType() == mountains)
-
-                // Do not add hills too close to the ocean/lake, as
-                // this helps with good locations for building
-                // colonies on shore.
-                && none(tile.getSurroundingTiles(1, 1), t -> !t.isLand())) {
-                return tile;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Creates mountain ranges on the given map.  The number and size
      * of mountain ranges depends on the map size.
      *

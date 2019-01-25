@@ -776,6 +776,7 @@ public class ClientOptions extends OptionGroup {
         }
     }
 
+    /** Currently unused.
     private void addIntegerOption(String id, String gr, int val) {
         if (!hasOption(id, IntegerOption.class)) {
             IntegerOption op = new IntegerOption(id, null);
@@ -783,15 +784,16 @@ public class ClientOptions extends OptionGroup {
             op.setValue(val);
             add(op);
         }
-    }
+    }*/
 
+    /** Currently unused.
     private void addOptionGroup(String id, String gr) {
         if (!hasOption(id, OptionGroup.class)) {
             OptionGroup og = new OptionGroup(id);
             og.setGroup(gr);
             add(og);
         }
-    }
+    }*/
 
     private void addRangeOption(String id, String gr, int rank,
                                 Map<Integer, String> entries) {

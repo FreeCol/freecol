@@ -100,7 +100,7 @@ public class GenerateDocumentation {
         }
     }
 
-
+    /* Currently unused
     private static void generateTMX() {
 
         Map<String, Map<String, String>> translations = new HashMap<>();
@@ -169,7 +169,8 @@ public class GenerateDocumentation {
             e.printStackTrace();
         }
     }
-
+    */
+    
     public static void generateDocumentation(String[] languages) {
         for (String name : sourceFiles) {
 

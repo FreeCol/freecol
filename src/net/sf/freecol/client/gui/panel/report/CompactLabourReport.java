@@ -183,10 +183,6 @@ public final class CompactLabourReport extends ReportPanel {
         }
     }
 
-    private Border createBorder() {
-        return new EmptyBorder(0, 20, 20, 20);
-    }
-
     /**
      * adds the header rows
      */

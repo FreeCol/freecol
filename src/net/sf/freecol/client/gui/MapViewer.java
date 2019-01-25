@@ -234,14 +234,14 @@ public final class MapViewer extends FreeColClientHolder {
         this.lib = lib;
     }
 
-    /**
+    /** Currently unused
      * Get the map size.
      *
      * @return The size.
-     */
     private Dimension getSize() {
         return this.size;
     }
+     */
     
     /**
      * Get the displayed map width.

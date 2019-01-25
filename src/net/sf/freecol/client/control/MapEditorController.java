@@ -93,18 +93,6 @@ public final class MapEditorController extends FreeColClientHolder {
     }
 
     /**
-     * Reload the main panel when done with the map editor.
-     */
-    private void reloadMainPanel () {
-        SwingUtilities.invokeLater(() -> {
-                getGUI().closeMainPanel();
-                getGUI().showMainPanel(null);
-                getSoundController().playSound("sound.intro.general");
-            });
-    }
-
-
-    /**
      * Enters map editor mode.
      *
      * FIXME: The TC and difficulty level can now be set at the

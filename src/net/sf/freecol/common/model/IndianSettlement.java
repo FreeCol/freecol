@@ -510,17 +510,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Get the contact levels.
-     *
-     * @return The contact level map.
-     */
-    private java.util.Map<Player, ContactLevel> getContactLevels() {
-        synchronized (this.contactLevels) {
-            return this.contactLevels;
-        }
-    }
-
-    /**
      * Set the contact levels.
      *
      * @param contactLevels The new contact level map.

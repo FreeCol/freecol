@@ -318,14 +318,15 @@ public class ForestMaker {
         }
     }
 
+    /* Currently unused
     private static int getY(int x, int y, double slope, int newX) {
         return (int) (y + slope * (newX - x));
-    }
+    }*/
 
+    /* Currently unused
     private static int getRandomY(Random random, int x) {
         int height = HALF_HEIGHT - Math.abs(x) / 2;
         return (height == 0) ? 0 : random.nextInt(2 * height) - height;
-    }
-
+    }*/
 }
 

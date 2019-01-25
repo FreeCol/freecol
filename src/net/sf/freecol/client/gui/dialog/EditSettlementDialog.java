@@ -160,11 +160,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         return getOwnerNationType().getSettlementType(this.capital.isSelected());
     }
         
-    private int getAverageSize() {
-        SettlementType t = getSettlementType();
-        return (t.getMinimumSize() + t.getMaximumSize()) / 2;
-    }
-
     private DefaultComboBoxModel<UnitType> getSkillModel() {
         IndianNationType ownerType = getOwnerNationType();
         DefaultComboBoxModel<UnitType> skillModel

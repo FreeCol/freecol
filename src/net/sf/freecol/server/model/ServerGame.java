@@ -216,7 +216,7 @@ public class ServerGame extends Game implements TurnTaker {
         return false;
     }
 
-    /**
+    /** Currently unused
      * Makes a trivial server object in this game given a server object tag
      * and an identifier.
      *
@@ -229,7 +229,6 @@ public class ServerGame extends Game implements TurnTaker {
      * @exception InvocationTargetException if the target in not available.
      * @exception NoSuchMethodException if the tag does not refer to a
      *      server type.
-     */
     private Object makeServerObject(String type, String id)
         throws ClassNotFoundException, IllegalAccessException,
                InstantiationException, InvocationTargetException,
@@ -239,6 +238,7 @@ public class ServerGame extends Game implements TurnTaker {
         return c.getConstructor(Game.class, String.class)
             .newInstance(this, id);
     }
+     */
 
     /**
      * Establish the unknown enemy player.
