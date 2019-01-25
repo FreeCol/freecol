@@ -201,17 +201,19 @@ public class ForestMaker {
                 g.translate(HALF_WIDTH, BASE_HEIGHT + MARGIN);
 
                 g.setPaint(texture);
-                String counter = "";
                 boolean[] branches = new boolean[4];
+                String counter = "";
                 if (index > 0) {
+                    StringBuilder sb = new StringBuilder(POWERS_OF_TWO.length);
                     for (int i = 0; i < POWERS_OF_TWO.length; i++) {
                         if ((index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]) {
                             branches[i] = true;
-                            counter += "1";
+                            sb.append("1");
                         } else {
-                            counter += "0";
+                            sb.append("0");
                         }
                     }
+                    counter = sb.toString();
                 }
 
                 // the two vectors that describe the diamond

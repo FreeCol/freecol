@@ -173,10 +173,10 @@ public class RiverMaker {
     }
 
     private static String getName(int[] branches) {
-        String name = "";
+        StringBuilder sb = new StringBuilder(32);
         for (int branche : branches) {
-            name += Integer.toString(branche);
+            sb.append(branche);
         }
-        return name;
+        return sb.toString();
     }
 }
