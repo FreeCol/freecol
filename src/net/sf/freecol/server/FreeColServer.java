@@ -629,7 +629,8 @@ public final class FreeColServer {
             .setMessageHandler(this.userConnectionHandler);
         getServer().addConnection(c);
         // Short delay here improves reliability
-        delay(100, "New connection delay interrupted");
+        c.startReceiving();
+        //delay(100, "New connection delay interrupted");
         c.send(new GameStateMessage(this.serverState));
         if (this.serverState == ServerState.IN_GAME) {
             c.send(new VacantPlayersMessage().setVacantPlayers(getGame()));

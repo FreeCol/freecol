@@ -153,6 +153,7 @@ public final class MetaServer extends Thread {
                     FreeCol.METASERVER_THREAD)
                     .setMessageHandler(getMetaServerHandler());
                 this.connections.put(clientSocket, connection);
+                connection.startReceiving();
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Meta-run", e);
             }

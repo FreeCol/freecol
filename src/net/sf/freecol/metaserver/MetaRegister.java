@@ -155,6 +155,7 @@ public final class MetaRegister {
                 } else {
                     items.add(newSi);
                     logger.info("Server added:" + identity);
+                    mc.startReceiving();
                 }
             } catch (IOException ioe) {
                 logger.log(Level.WARNING, "Server fail: " + identity, ioe);

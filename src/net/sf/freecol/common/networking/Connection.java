@@ -137,7 +137,6 @@ public class Connection implements Closeable {
         this.xw = new FreeColXMLWriter(socket.getOutputStream(),
             FreeColXMLWriter.WriteScope.toSave(), false);
         this.connected = true;
-        this.receivingThread.start();
     }
 
     /**
@@ -170,6 +169,13 @@ public class Connection implements Closeable {
         return socket;
     }
 
+    /**
+     * Start the recieving thread.
+     */
+    public void startReceiving() {
+        if (this.receivingThread != null) this.receivingThread.start();
+    }
+        
     /**
      * Get the socket.
      *
