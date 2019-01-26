@@ -488,18 +488,6 @@ public abstract class AIPlayer extends AIObject {
     }    
 
     /**
-     * Handle a multiple message.
-     */
-    public void multipleHandler() {
-        // We want to let the handlers for the parts of this message
-        // get a chance to run.  Perhaps we should even insist they
-        // all run to completion but let us try not being that severe.
-        // So invoke a null thread and yield.
-        invoke(nullRunnable);
-        Thread.yield();
-    }
-
-    /**
      * Handle reconnect.
      */
     public void reconnectHandler() {

@@ -114,8 +114,6 @@ public class MultipleMessage extends AttributeMessage {
                 assert ret == null;
             }
         }
-
-        aiPlayer.multipleHandler();
     }
  
     /**
