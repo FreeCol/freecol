@@ -514,7 +514,12 @@ public class UnitSeekAndDestroyMission extends Mission {
                               settlement);
             }
             Direction d = unitTile.getDirection(currentTarget.getTile());
-            assert d != null;
+            if (d == null) {
+                logger.warning("SDDM bogus " + mt + " with " + unit
+                    + " from " + unitTile + " to " + currentTarget
+                    + " at " + currentTarget.getTile());
+                return lbWait(lb);
+            }
             AIMessage.askAttack(aiUnit, d);
             return lbAttack(lb, currentTarget);
 
