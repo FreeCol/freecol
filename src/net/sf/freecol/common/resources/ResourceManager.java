@@ -201,7 +201,6 @@ public class ResourceManager {
                         + " resources.");
                 }
             };
-        preloadThread.setPriority(2);
         preloadThread.start();
     }
 
