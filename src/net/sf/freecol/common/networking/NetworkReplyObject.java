@@ -27,9 +27,19 @@ package net.sf.freecol.common.networking;
  */
 public class NetworkReplyObject {
 
-    private Object response = null;
-    private boolean responseGiven = false;
+    private static int ONE_SECOND = 1000; // 1000ms
+
+    /** A unique identifier for the message to wait for. */
     private final int networkReplyId;
+
+    /** The response from the network. */
+    private Object response;
+
+    /**
+     * A gating flag that shows when the response is valid.  Starts false,
+     * becomes true in {@link #setResponse}.
+     */
+    private volatile boolean responseGiven;
 
 
     /**
@@ -40,36 +50,8 @@ public class NetworkReplyObject {
      */
     public NetworkReplyObject(int networkReplyId) {
         this.networkReplyId = networkReplyId;
-    }
-
-    /**
-     * Sets the response and continues {@code getResponse()}.
-     *
-     * @param response The response.
-     * @see #getResponse
-     */
-    public synchronized void setResponse(Object response) {
-        this.response = response;
-        this.responseGiven = true;
-        notifyAll();
-    }
-
-    /**
-     * Gets the response. If the response has not been set, this method
-     * will block until {@link #setResponse} has been called.
-     *
-     * @return the response.
-     */
-    public synchronized Object getResponse() {
-        if (response == null) {
-            try {
-                while (!responseGiven) {
-                    wait();
-                }
-            } catch (InterruptedException ie) {}
-        }
-
-        return response;
+        this.response = null;
+        this.responseGiven = false;
     }
 
     /**
@@ -79,14 +61,46 @@ public class NetworkReplyObject {
      * @return the unique identifier.
      */
     public int getNetworkReplyId() {
-        return networkReplyId;
+        return this.networkReplyId;
     }
 
     /**
-     * Interrupts any thread waiting for a response.
+     * Gets the response. If the response has not been set, this method
+     * will block until {@link #setResponse} has been called.
+     *
+     * @return the response.
      */
-    public synchronized void interrupt() {
-        responseGiven = true;
-        notifyAll();
+    public Object getResponse() {
+        while (!this.responseGiven) {
+            synchronized (this) {
+                try {
+                    wait(ONE_SECOND);
+                } catch (InterruptedException ie) {}
+            }
+        }
+        return this.response;
+    }
+
+    /**
+     * Sets the response and continues {@code getResponse()}.
+     *
+     * @param response The response.
+     * @see #getResponse
+     */
+    public void setResponse(Object response) {
+        if (!this.responseGiven) {
+            synchronized (this) {
+                this.response = response;
+                this.responseGiven = true;
+                notifyAll();
+            }
+        }
+    }
+
+    /**
+     * Interrupt the wait for response.
+     */
+    public void interrupt() {
+        setResponse(null);
     }
 }
