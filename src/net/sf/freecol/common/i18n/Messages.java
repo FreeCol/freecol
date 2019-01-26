@@ -151,10 +151,6 @@ public class Messages {
     public static void loadMessageBundle(Locale locale) {
         messageBundle.clear(); // Reset the message bundle.
 
-        if (!Locale.getDefault().equals(locale)) {
-            Locale.setDefault(locale);
-        }
-
         if (!NumberRules.isInitialized()) {
             // attempt to read grammatical rules
             File cldr = FreeColDirectories.getI18nPluralsFile();

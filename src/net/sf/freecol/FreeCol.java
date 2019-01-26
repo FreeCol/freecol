@@ -1224,6 +1224,7 @@ public final class FreeCol {
         }
         if (newLocale != FreeCol.locale) {
             FreeCol.locale = newLocale;
+            Locale.setDefault(newLocale);
             return true;
         }
         return false;
