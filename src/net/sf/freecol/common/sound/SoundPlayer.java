@@ -158,20 +158,14 @@ public final class SoundPlayer {
         public void run() {
             for (;;) {
                 File sound = remove();
-                synchronized (this) {
+                if (sound == null) {
+                    delay(WAIT_TIMEOUT, null);
+                } else {
                     try {
-                        if (sound == null) {
-                            wait(WAIT_TIMEOUT);
-                            continue;
-                        }
-                    } catch (IllegalMonitorStateException|InterruptedException e) {
-                        continue; // IMSE can not happen, IE is expected
+                        playSound(sound);
+                    } catch (IOException e) {
+                        logger.log(Level.WARNING, "Failure playing audio.", e);
                     }
-                }
-                try {
-                    playSound(sound);
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Failure playing audio.", e);
                 }
             }
         }
@@ -264,11 +258,6 @@ public final class SoundPlayer {
     public boolean playOnce(File file) {
         if (getMixer() == null) return false; // Fail faster.
         this.soundPlayerThread.add(file);
-        try {
-            this.soundPlayerThread.notifyAll();
-        } catch (IllegalMonitorStateException imse) {
-            ; // Sound player is not waiting, so notify is unnecessary
-        }
         return true;
     }
 
