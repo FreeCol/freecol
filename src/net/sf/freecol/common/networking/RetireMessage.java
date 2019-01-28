@@ -51,10 +51,9 @@ public class RetireMessage extends TrivialMessage {
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
-     * @exception FreeColException if the internal message can not be read.
      */
     public RetireMessage(Game game, FreeColXMLReader xr)
-        throws FreeColException, XMLStreamException {
+        throws XMLStreamException {
         super(TAG, game, xr);
     }
 

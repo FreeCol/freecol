@@ -51,7 +51,7 @@ public class DesktopEntry {
      * @exception IOException when various IO fails.
      */
     public static void main(String[] args)
-        throws FileNotFoundException, IOException {
+        throws IOException {
 
         try (Writer result = Utils.getFileUTF8Writer(new File(args[0]))) {
             result.append("[Desktop Entry]\n");

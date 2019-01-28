@@ -86,7 +86,7 @@ public class FSGConverter {
      * @throws FileNotFoundException if the given input file could not be found.
      * @throws IOException if thrown while reading or writing the files. 
      */
-    public void convertToXML(File in, File out) throws FileNotFoundException, IOException {
+    public void convertToXML(File in, File out) throws IOException {
         try (
             FileInputStream fis = new FileInputStream(in);
             FileOutputStream fos = new FileOutputStream(out);

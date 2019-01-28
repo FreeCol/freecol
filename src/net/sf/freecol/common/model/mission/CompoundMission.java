@@ -63,10 +63,8 @@ public class CompoundMission extends AbstractMission {
      *
      * @param game a {@code Game} value
      * @param xr a {@code FreeColXMLReader} value
-     * @exception XMLStreamException if an error occurs
      */
-    public CompoundMission(Game game,
-                           FreeColXMLReader xr) throws XMLStreamException {
+    public CompoundMission(Game game, FreeColXMLReader xr) {
         super(game, xr);
     }
 

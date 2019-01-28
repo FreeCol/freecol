@@ -180,10 +180,8 @@ public class RearrangeColonyMessage extends AttributeMessage {
      *
      * @param game The {@code Game} to read within.
      * @param xr The {@code FreeColXMLReader} to read from.
-     * @exception XMLStreamException if the stream is corrupt.
      */
-    public RearrangeColonyMessage(Game game, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public RearrangeColonyMessage(Game game, FreeColXMLReader xr) {
         super(TAG, getAttributeMap(xr));
     }
 

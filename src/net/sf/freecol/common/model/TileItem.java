@@ -61,10 +61,8 @@ public abstract class TileItem extends FreeColGameObject
      *
      * @param game The enclosing {@code Game}.
      * @param xr The input stream containing the XML.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
      */
-    public TileItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
+    public TileItem(Game game, FreeColXMLReader xr) {
         super(game, null);
     }
 

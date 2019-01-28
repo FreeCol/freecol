@@ -60,10 +60,8 @@ public class GoToMission extends AbstractMission {
      *
      * @param game a {@code Game} value
      * @param xr a {@code FreeColXMLReader} value
-     * @exception XMLStreamException if an error occurs
      */
-    public GoToMission(Game game,
-                       FreeColXMLReader xr) throws XMLStreamException {
+    public GoToMission(Game game, FreeColXMLReader xr) {
         super(game, xr);
     }
 

@@ -59,11 +59,8 @@ public class FreeColMapLoader implements MapLoader {
      * Constructor for the FreeColMapLoader class.
      *
      * @param file The File to load.
-     * @throws IOException If the game-loading Stream could not be created.
-     * @throws FreeColException If the file could not be read properly.
-     * @throws XMLStreamException If there was a problem loading the XML Stream.
      */
-    public FreeColMapLoader(File file) throws IOException, FreeColException, XMLStreamException {
+    public FreeColMapLoader(File file) {
 
         this.importMap = FreeColServer.readMap(file, null);
         if (this.importMap == null) {

@@ -128,9 +128,8 @@ public final class MapEditorController extends FreeColClientHolder {
      * Get the default specification from the default TC.
      *
      * @return A {@code Specification} to use in the map editor.
-     * @throws IOException on failure to find the spec.
      */
-    public Specification getDefaultSpecification() throws IOException {
+    public Specification getDefaultSpecification() {
         return FreeCol.loadSpecification(FreeCol.getTCFile(), 
             FreeCol.getAdvantages(), FreeCol.getDifficulty());
     }

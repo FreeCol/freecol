@@ -77,10 +77,8 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      *
      * @param game a {@code Game} value
      * @param xr a {@code FreeColXMLReader} value
-     * @exception XMLStreamException if an error occurs
      */
-    public AbstractMission(Game game,
-                           FreeColXMLReader xr) throws XMLStreamException {
+    public AbstractMission(Game game, FreeColXMLReader xr) {
         super(game, null);
     }
 

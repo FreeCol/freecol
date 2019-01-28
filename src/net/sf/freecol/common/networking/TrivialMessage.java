@@ -91,8 +91,7 @@ public abstract class TrivialMessage extends Message {
      * @exception FreeColException if the internal message can not be read.
      */
     protected TrivialMessage(String tag, @SuppressWarnings("unused") Game game,
-                             FreeColXMLReader xr)
-        throws FreeColException, XMLStreamException {
+                             FreeColXMLReader xr) throws XMLStreamException {
         this(tag);
 
         xr.closeTag(tag);

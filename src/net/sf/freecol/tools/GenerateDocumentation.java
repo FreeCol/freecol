@@ -68,7 +68,7 @@ public class GenerateDocumentation {
 
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         System.setProperty("jaxp.debug", "1");
         if (args.length > 0) {
             Arrays.sort(args);

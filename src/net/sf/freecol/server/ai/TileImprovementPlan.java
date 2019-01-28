@@ -67,11 +67,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      *
      * @param aiMain The main AI-object.
      * @param id The object identifier.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
      */
-    public TileImprovementPlan(AIMain aiMain, String id)
-        throws XMLStreamException {
+    public TileImprovementPlan(AIMain aiMain, String id) {
         super(aiMain, id);
 
         this.type = null;
