@@ -113,7 +113,7 @@ import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.Utils.*;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -563,19 +563,15 @@ public final class InGameController extends FreeColClientHolder {
         // if "last-turn" file exists, shift it to "before-last-turn" file
         if (lastTurnFile != null) {
             if (lastTurnFile.exists()) {
+                if (beforeLastTurnFile.exists()) deleteFile(beforeLastTurnFile);
                 try {
-                    if (beforeLastTurnFile.exists()) {
-                        beforeLastTurnFile.delete();
+                    if (!lastTurnFile.renameTo(beforeLastTurnFile)) {
+                        logger.warning("Could not rename: "
+                            + lastTurnFile.getPath());
                     }
-                    try {
-                        lastTurnFile.renameTo(beforeLastTurnFile);
-                    } catch (SecurityException se) {
-                        logger.log(Level.WARNING, "Could not rename: "
-                            + lastTurnFile.getPath(), se);
-                    }
-                } catch (SecurityException se) {
-                    logger.log(Level.WARNING, "Could not delete: "
-                        + beforeLastTurnFile.getPath(), se);
+                } catch (NullPointerException|SecurityException ex) {
+                    logger.log(Level.WARNING, "Could not rename: "
+                        + lastTurnFile.getPath(), ex);
                 }
             }
             saveGame(lastTurnFile);
@@ -1601,7 +1597,7 @@ public final class InGameController extends FreeColClientHolder {
         if (unit.getMovesLeft() <= 0
             && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
             getGUI().paintImmediately();
-            Utils.delay(UNIT_LAST_MOVE_DELAY, "Last move delay interrupted.");
+            delay(UNIT_LAST_MOVE_DELAY, "Last move delay interrupted.");
         }
 
         // Update the active unit and GUI.

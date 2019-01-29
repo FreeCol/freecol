@@ -937,14 +937,15 @@ public class FreeColDirectories {
                 throw new FreeColException("Log file \"" + path
                     + "\" could not be created.");
             } else if (file.isFile()) {
-                try {
-                    file.delete();
-                } catch (SecurityException ex) {} // Do what?
+                deleteFile(file);
             }
         }
         try {
-            file.createNewFile();
-        } catch (IOException e) {
+            if (!file.createNewFile()) {
+                throw new FreeColException("Log file \"" + path
+                    + "\" creation failed.");
+            }
+        } catch (IOException|SecurityException e) {
             throw new FreeColException("Log file \"" + path
                 + "\" could not be created.", e);
         }
@@ -970,13 +971,7 @@ public class FreeColDirectories {
         synchronized (commsWriterLock) {
             if (commsWriter != null) return commsWriter;
             File file = new File(getUserCacheDirectory(), LOG_COMMS_FILE_NAME);
-            if (file.exists()) {
-                try {
-                    file.delete();
-                } catch (SecurityException se) {
-                    throw new FreeColException("Comms log file exists, delete failed: " + file.getPath(), se);
-                }
-            }
+            if (file.exists()) deleteFile(file);
             Writer writer = getFileUTF8AppendWriter(file);
             if (writer == null) {
                 throw new FreeColException("Can not create writer for comms log file: " + file.getPath());

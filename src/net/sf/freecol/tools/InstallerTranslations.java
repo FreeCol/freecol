@@ -109,12 +109,22 @@ public class InstallerTranslations {
         */
 
         if (!MAIN_FILE.exists()) {
-            System.out.println("Main input file not found.");
+            System.err.println("Main input file not found.");
             System.exit(1);
         }
 
         if (!DESTINATION_DIRECTORY.exists()) {
-            DESTINATION_DIRECTORY.mkdirs();
+            try {
+                if (!DESTINATION_DIRECTORY.mkdirs()) {
+                    System.err.println("Could not create "
+                        + DESTINATION_DIRECTORY);
+                    System.exit(1);
+                }
+            } catch (SecurityException se) {
+                System.err.println("Could not create "
+                    + DESTINATION_DIRECTORY + ": " + se.toString());
+                System.exit(1);
+            }
         }
 
         //Map<String, String> languageMappings = readLanguageMappings(LANGUAGE_CODES);

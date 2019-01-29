@@ -271,21 +271,28 @@ public class Utils {
     }
 
     /**
+     * Delete a file.
+     *
+     * @param file The {@code File} to delete.
+     */
+    public static void deleteFile(File file) {
+        try {
+            if (!file.delete()) {
+                logger.warning("Failed to delete: " + file.getPath());
+            }
+        } catch (SecurityException ex) {
+            logger.log(Level.WARNING, "Exception deleting: "
+                + file.getPath(), ex);
+        }
+    }
+        
+    /**
      * Delete a list of files.
      *
      * @param files The list of {@code File}s to delete.
      */
     public static void deleteFiles(List<File> files) {
-        for (File f : files) {
-            try {
-                if (!f.delete()) {
-                    logger.warning("Failed to delete: " + f.getPath());
-                }
-            } catch (SecurityException ex) {
-                logger.log(Level.WARNING, "Exception deleting: "
-                    + f.getPath(), ex);
-            }
-        }
+        for (File f : files) deleteFile(f);
     }
 
     /**

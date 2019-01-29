@@ -954,16 +954,7 @@ public final class FreeColServer {
         // consume the file.
         File startGame = FreeColDirectories.getStartMapFile();
         if (startGame != null
-            && startGame.getPath().equals(file.getPath())) {
-            try {
-                if (!file.delete()) {
-                    logger.warning("Failed to consume map: " + file.getPath());
-                }
-            } catch (SecurityException se) {
-                logger.log(Level.WARNING, "Failed to delete map: "
-                    + file.getPath(), se);
-            }
-        }
+            && startGame.getPath().equals(file.getPath())) deleteFile(file);
         return serverGame;
     }
 
