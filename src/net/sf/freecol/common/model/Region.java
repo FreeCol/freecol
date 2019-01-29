@@ -436,7 +436,7 @@ public class Region extends FreeColGameObject implements Nameable {
     public List<Region> discover(Player player, Unit unit, Turn turn) {
         List<Region> result = new ArrayList<>();
         this.discoveredBy = player;
-        assert this.discoverer == unit.getId(); // Require prediscover
+        assert this.discoverer.equals(unit.getId()); // Require prediscover
         this.discoveredIn = turn;
         this.discoverable = false;
         result.add(this);

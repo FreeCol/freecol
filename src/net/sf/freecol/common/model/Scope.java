@@ -352,7 +352,7 @@ public class Scope extends FreeColObject {
                 return false;
             }
             if (type == null) {
-                if (otherScope.getType() != type) {
+                if (otherScope.getType() != null) {
                     return false;
                 }
             } else if (!type.equals(otherScope.getType())) {
