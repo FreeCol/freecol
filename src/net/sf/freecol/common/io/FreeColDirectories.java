@@ -304,7 +304,10 @@ public class FreeColDirectories {
             if (dir.mkdir()) {
                 try {
                     Files.setPosixFilePermissions(dir.toPath(), mode0700);
-                } catch (IOException ioe) { /* ignore */ }
+                } catch (IOException ioe) { // Just log, error is not fatal
+                    System.err.println("Failed to change permissions of "
+                        + dir.getPath());
+                }
                 return dir;
             }
         }
