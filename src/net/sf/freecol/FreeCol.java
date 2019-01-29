@@ -481,7 +481,16 @@ public final class FreeCol {
         ZipEntry ze = jf.getEntry(SPLASH_DEFAULT);
         return jf.getInputStream(ze);
     }
-            
+
+    /**
+     * Quit FreeCol.  Route all exits through here.
+     *
+     * @param status Exit status.
+     */
+    public static void quit(int status) {
+        System.exit(status);
+    }
+
     /**
      * Exit printing fatal error message.
      *
@@ -502,7 +511,7 @@ public final class FreeCol {
             Thread.dumpStack();
         }
         System.err.println(err);
-        System.exit(1);
+        quit(1);
     }
 
     /**
@@ -866,7 +875,7 @@ public final class FreeCol {
 
             if (line.hasOption("version")) {
                 System.out.println("FreeCol " + getVersion());
-                System.exit(0);
+                quit(0);
             }
 
             if (line.hasOption("windowed")) {
@@ -891,7 +900,7 @@ public final class FreeCol {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("java -Xmx1G -jar freecol.jar [OPTIONS]",
                             options);
-        System.exit(status);
+        quit(status);
     }
 
     /**
@@ -1501,6 +1510,39 @@ public final class FreeCol {
     }
 
     /**
+     * Check the integrity of a FreeCol server.
+     *
+     * @param freeColServer The server to check.
+     */
+    private static void checkServerIntegrity(FreeColServer freeColServer) {
+        String key;
+        int ret, check;
+        if (freeColServer == null) {
+            logger.warning("Integrity test blocked");
+            check = -1;
+        } else {
+            check = freeColServer.getIntegrity();
+        }
+        switch (check) {
+        case 1:
+            key = "cli.check-savegame.success";
+            ret = 0;
+            break;
+        case 0:
+            key = "cli.check-savegame.fixed";
+            ret = 2;
+            break;
+        case -1: default:
+            key = "cli.check-savegame.failed";
+            ret = 3;
+            break;
+        }
+        gripe(StringTemplate.template(key)
+            .add("%log%", FreeColDirectories.getLogFilePath()));
+        quit(ret);
+    }
+
+    /**
      * Start the server.
      */
     private static void startServer() {
@@ -1519,33 +1561,7 @@ public final class FreeCol {
                     + ": " + e);
                 freeColServer = null;
             }
-            
-            if (checkIntegrity) {
-                String k;
-                int ret, check = (freeColServer == null) ? -1
-                    : freeColServer.getIntegrity();
-                switch (check) {
-                case 1:
-                    k = "cli.check-savegame.success";
-                    ret = 0;
-                    break;
-                case 0:
-                    k = "cli.check-savegame.fixed";
-                    ret = 2;
-                    break;
-                case -1: default:
-                    k = "cli.check-savegame.failed";
-                    ret = 3;
-                    break;
-                }
-                if (freeColServer == null) {
-                    logger.warning("Integrity test blocked");
-                }
-                gripe(StringTemplate.template(k)
-                    .add("%log%", FreeColDirectories.getLogFilePath()));
-                System.exit(ret);
-            }
-
+            if (checkIntegrity) checkServerIntegrity(freeColServer);
             if (freeColServer == null) return;
         } else {
             Specification spec = FreeCol.getTCSpecification();

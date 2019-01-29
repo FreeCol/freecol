@@ -1004,12 +1004,11 @@ public final class FreeColClient {
         if (logMe != null) logger.info(logMe);
 
         // Exit
-        int ret = 0;
         try {
             gui.quit();
         } catch (Exception e) {
-            ret = 1;
+            FreeCol.fatal("Failed to shutdown gui: " + e.toString());
         }
-        System.exit(ret);
+        FreeCol.quit(0);
     }
 }
