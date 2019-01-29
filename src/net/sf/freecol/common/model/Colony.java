@@ -2813,7 +2813,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
-        final int present = ReturnPresent(goodsType, turns);
+        final int present = returnPresent(goodsType, turns);
         final ExportData ed = getExportData(goodsType);
         return Math.max(0, present - ed.getExportLevel());
     }
@@ -2825,7 +2825,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public int getImportAmount(GoodsType goodsType, int turns) {
         if (goodsType.limitIgnored()) return GoodsContainer.HUGE_CARGO_SIZE;
 
-        final int present = ReturnPresent(goodsType, turns);
+        final int present = returnPresent(goodsType, turns);
         final ExportData ed = getExportData(goodsType);
         int capacity = ed.getEffectiveImportLevel(getWarehouseCapacity());
         return Math.max(0, capacity - present);
@@ -2843,16 +2843,15 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     *  Used to calculated the present field.
+     * Calculate the present field.
      *
      * @param goodsType The {@link GoodsType} to check for got import/export.
      * @param turns The number of turns before the goods is required.
-     * @return  The amount of goods to export.
+     * @return The amount of goods to export.
      */
-    private int ReturnPresent(GoodsType goodsType, int turns) {
-        final int present = Math.max(0, getGoodsCount(goodsType)
-                + turns * getNetProductionOf(goodsType));
-        return present;
+    private int returnPresent(GoodsType goodsType, int turns) {
+        return Math.max(0, getGoodsCount(goodsType)
+            + turns * getNetProductionOf(goodsType));
     }
 
     //
