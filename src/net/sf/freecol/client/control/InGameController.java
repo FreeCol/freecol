@@ -1322,13 +1322,9 @@ public final class InGameController extends FreeColClientHolder {
         boolean update = false;
         for (Unit u : embark) {
             if (!carrier.couldCarry(u)) continue;
-            try {
-                update |= askEmbark(u, carrier);
-            } finally {
-                if (u.getLocation() != carrier) {
-                    changeState(u, UnitState.SKIPPED);
-                }
-                continue;
+            update |= askEmbark(u, carrier);
+            if (u.getLocation() != carrier) {
+                changeState(u, UnitState.SKIPPED);
             }
         }
         if (update) updateGUI(null, false);
@@ -1406,13 +1402,7 @@ public final class InGameController extends FreeColClientHolder {
             } else if (u == unit) {
                 // Disembark all.
                 for (Unit dUnit : disembarkable) {
-                    // Guard against loss of control when asking the
-                    // server to move the unit.
-                    try {
-                        moveDirection(dUnit, direction, false);
-                    } finally {
-                        continue;
-                    }
+                    moveDirection(dUnit, direction, false);
                 }
             } else {
                 moveDirection(u, direction, false);

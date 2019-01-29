@@ -106,23 +106,22 @@ public class FSGConverter {
      * this method on an uncompressed savegame creates an
      * indented version of that savegame.
      * 
-     * @param in The input stream.
-     * @param out The output stream.
-     * 
-     * @throws IOException if thrown while reading or writing the streams. 
+     * @param ins The input stream.
+     * @param outs The output stream.
+     * @exception IOException if thrown while reading or writing the streams. 
      */
-    public void convertToXML(InputStream in, OutputStream out) throws IOException {
-        try {
-            in = new BufferedInputStream(in);
-            out = new BufferedOutputStream(out);
-            
+    public void convertToXML(InputStream ins, OutputStream outs)
+        throws IOException {
+        BufferedInputStream in = new BufferedInputStream(ins);
+        if (in == null) return;
+        try (BufferedOutputStream out = new BufferedOutputStream(outs)) {
             // Automatically detect savegame compression:
             in.mark(10);
             byte[] buf = new byte[5];
             in.read(buf, 0, 5);
             in.reset();
             if (!"<?xml".equals(new String(buf, "UTF-8"))) {
-                in =  new BufferedInputStream(new GZIPInputStream(in));
+                in = new BufferedInputStream(new GZIPInputStream(ins));
             }
 
             // Support for XML comments has not been added:
@@ -162,11 +161,8 @@ public class FSGConverter {
                     out.write(c);
                 }           
             }
-
-        } finally {
-            in.close();
-            out.close();
         }
+        in.close();
     }
     
     

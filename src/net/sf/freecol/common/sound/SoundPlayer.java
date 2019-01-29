@@ -118,9 +118,7 @@ public final class SoundPlayer {
          */
         private boolean playSound(File sound) throws IOException {
             boolean ret = false;
-            AudioInputStream in = null;
-            try {
-                in = getAudioInputStream(sound);
+            try (AudioInputStream in = getAudioInputStream(sound)) {
                 SourceDataLine line = openLine(in.getFormat(), getMixer(),
                                                data.length);
                 if (line == null) return false;
@@ -143,8 +141,6 @@ public final class SoundPlayer {
                 logger.log(Level.WARNING, "Can not open "
                     + sound + " as audio stream", ioe);
                 return false;
-            } finally {
-                if (in != null) in.close();
             }
             return ret;
         }

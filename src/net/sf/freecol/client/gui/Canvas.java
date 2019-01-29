@@ -1762,12 +1762,9 @@ public final class Canvas extends JDesktopPane {
             try {
                 panel = new ColonyPanel(freeColClient, colony);
             } catch (Exception e) {
-                try {
-                    logger.log(Level.WARNING, "Exception in ColonyPanel for "
-                        + colony.getId(), e);
-                } finally {
-                    return null;
-                }
+                logger.log(Level.WARNING, "Exception in ColonyPanel for "
+                    + colony.getId(), e);
+                return null;
             }
             showFreeColPanel(panel, colony.getTile(), true);
         } else {
