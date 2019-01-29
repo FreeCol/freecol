@@ -19,6 +19,7 @@
 
 package net.sf.freecol.tools;
 
+import java.io.EOFException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 
@@ -134,14 +135,25 @@ public class ColonizationMapReader {
             writer.write(layer1);
         } else {
             RandomAccessFile reader = new RandomAccessFile(args[0], "r");
-            reader.read(header);
-
+            try {
+                reader.readFully(header);
+            } catch (EOFException ee) {
+                System.err.println("Unable to read header of " + args[0]
+                    + ": " + ee.toString());
+                System.exit(1);
+            }
             System.out.println(String.format("Map width:  %02d", (int) header[WIDTH]));
             System.out.println(String.format("Map height: %02d", (int) header[HEIGHT]));
 
             int size = header[WIDTH] * header[HEIGHT];
             layer1 = new byte[size];
-            reader.read(layer1);
+            try {
+                reader.readFully(layer1);
+            } catch (EOFException ee) {
+                System.err.println("Unable to read data of " + args[0]
+                    + ": " + ee.toString());
+                System.exit(1);
+            }
 
             int index = 0;
             for (int y = 0; y < header[HEIGHT]; y++) {

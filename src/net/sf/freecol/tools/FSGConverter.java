@@ -118,7 +118,10 @@ public class FSGConverter {
             // Automatically detect savegame compression:
             in.mark(10);
             byte[] buf = new byte[5];
-            in.read(buf, 0, 5);
+            if (in.read(buf, 0, buf.length) < buf.length) {
+                System.err.println("Unable to read header");
+                return;
+            }
             in.reset();
             if (!"<?xml".equals(new String(buf, "UTF-8"))) {
                 in = new BufferedInputStream(new GZIPInputStream(ins));

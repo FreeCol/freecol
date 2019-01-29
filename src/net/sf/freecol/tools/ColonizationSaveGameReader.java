@@ -19,6 +19,7 @@
 
 package net.sf.freecol.tools;
 
+import java.io.EOFException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -194,9 +195,13 @@ public class ColonizationSaveGameReader {
         byte[] data;
         try (RandomAccessFile reader = new RandomAccessFile(args[0], "r")) {
             data = new byte[(int) reader.length()];
-            reader.read(data);
+            reader.readFully(data);
+            new ColonizationSaveGameReader(data).run();
+        } catch (EOFException ee) {
+            System.err.println("Could not read from " + args[0]
+                + ": " + ee.toString());
+            System.exit(1);
         }
-        new ColonizationSaveGameReader(data).run();
     }
 
 
