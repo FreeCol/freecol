@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -236,6 +237,9 @@ public class CollectionUtils {
                     // FIXME: see if we can do it with one array:-)
                     @Override
                     public List<T> next() {
+                        if (!hasNext()) {
+                            throw new NoSuchElementException("Permutations exhausted");
+                        }
                         List<T> pick = new ArrayList<>(original);
                         List<T> result = new ArrayList<>();
                         int current = index++;
