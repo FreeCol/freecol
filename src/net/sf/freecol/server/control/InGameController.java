@@ -3384,8 +3384,7 @@ public final class InGameController extends Controller {
         // Collect roles that cause a change, ordered by simplest change
         for (Arrangement a : transform(arrangements,
                 a -> a.role != a.unit.getRole() && a.role != defaultRole,
-                Function.identity(),
-                Comparator.<Arrangement>reverseOrder())) {
+                Function.identity(), Arrangement::roleComparison)) {
             if (!colony.equipForRole(a.unit, a.role, a.roleCount)) {
                 return serverPlayer.clientError("Failed to equip "
                     + a.unit.getId() + " for role " + a.role

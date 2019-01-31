@@ -48,7 +48,7 @@ public class RearrangeColonyMessage extends AttributeMessage {
     private static final String COLONY_TAG = "colony";
 
     /** Container for the unit change information. */
-    public static class Arrangement implements Comparable<Arrangement> {
+    public static class Arrangement {
 
         public Unit unit;
         public Location loc;
@@ -134,13 +134,12 @@ public class RearrangeColonyMessage extends AttributeMessage {
             return ret;
         }
 
-            
-        // Interface Comparable<Arrangement>
-
         /**
-         * {@inheritDoc}
+         * Role comparison for use in rearrangeColony.
+         *
+         * @return A comparison value.
          */
-        public int compareTo(Arrangement other) {
+        public int roleComparison(Arrangement other) {
             int cmp = this.role.compareTo(other.role);
             if (cmp == 0) cmp = this.roleCount - other.roleCount;
             return cmp;
