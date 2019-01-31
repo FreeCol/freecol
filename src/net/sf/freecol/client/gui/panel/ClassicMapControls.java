@@ -61,8 +61,7 @@ public final class ClassicMapControls extends MapControls {
         arrowFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
             FontLibrary.FontSize.SMALL, Font.BOLD);
 
-        panel = new MigPanel();
-        panel.setLayout(new MigLayout("wrap 3"));
+        panel = new MigPanel(new MigLayout("wrap 3"));
         panel.add(miniMap, "span, width " + MAP_WIDTH
                            + ", height " + MAP_HEIGHT);
 

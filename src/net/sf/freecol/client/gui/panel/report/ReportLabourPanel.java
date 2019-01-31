@@ -62,16 +62,17 @@ import net.sf.freecol.common.model.UnitType;
 public final class ReportLabourPanel extends ReportPanel {
 
     /** An individual unit type panel. */
-    private class LabourUnitPanel extends JPanel {
+    private class LabourUnitPanel extends MigPanel {
 
         public boolean selected;
         public final UnitType unitType;
 
 
         public LabourUnitPanel(UnitType unitType, int count) {
+            super(new MigLayout("wrap 2", "[60, right][left]"));
+
             this.unitType = unitType;
             setOpaque(false);
-            setLayout(new MigLayout("wrap 2", "[60, right][left]"));
             add(new JLabel(new ImageIcon(getImageLibrary()
                         .getSmallUnitTypeImage(unitType, (count == 0)))),
                 "spany 2");

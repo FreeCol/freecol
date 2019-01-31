@@ -90,7 +90,7 @@ public final class TradeRoutePanel extends FreeColPanel {
      * @param unit The optional {@code Unit} to operate on.
      */
     public TradeRoutePanel(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient, new MigLayout("wrap 2", "[fill][fill]"));
+        super(freeColClient, null, new MigLayout("wrap 2", "[fill][fill]"));
 
         final Player player = getMyPlayer();
 

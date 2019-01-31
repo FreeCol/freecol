@@ -70,7 +70,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
          * size, new size etc).
          */
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
         JPanel widthPanel = new JPanel(new FlowLayout());
         JPanel heightPanel = new JPanel(new FlowLayout());
         String str;

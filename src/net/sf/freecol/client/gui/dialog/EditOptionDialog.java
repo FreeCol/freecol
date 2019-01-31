@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.dialog;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -48,7 +49,7 @@ public class EditOptionDialog extends FreeColConfirmDialog {
         super(freeColClient, frame);
 
         this.ui = OptionUI.getOptionUI(getGUI(), option, true);
-        MigPanel panel = new MigPanel(new MigLayout());
+        JPanel panel = new MigPanel(new MigLayout());
         if (this.ui.getJLabel() == null) {
             panel.add(this.ui.getJLabel(), "split 2");
         }

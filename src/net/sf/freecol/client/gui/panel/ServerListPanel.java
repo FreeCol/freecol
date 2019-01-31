@@ -65,7 +65,7 @@ public final class ServerListPanel extends FreeColPanel {
      */
     public ServerListPanel(FreeColClient freeColClient,
                            ConnectController connectController) {
-        super(freeColClient, new MigLayout("", "", ""));
+        super(freeColClient, null, new MigLayout("", "", ""));
 
         this.connectController = connectController;
 

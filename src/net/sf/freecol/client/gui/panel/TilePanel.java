@@ -72,8 +72,9 @@ public final class TilePanel extends FreeColPanel {
      * @param tile The {@code Tile} to describe.
      */
     public TilePanel(FreeColClient freeColClient, Tile tile) {
-        super(freeColClient, new MigLayout("wrap 2, insets 20 30 10 30",
-                                           "[right, sg][left, sg]"));
+        super(freeColClient, "TilePanelUI",
+              new MigLayout("wrap 2, insets 20 30 10 30",
+                            "[right, sg][left, sg]"));
 
         final Player player = freeColClient.getMyPlayer();
         final TileType tileType = tile.getType();
@@ -232,21 +233,5 @@ public final class TilePanel extends FreeColPanel {
         } else {
             getGUI().showColopediaPanel(command);
         }
-    }
-
-
-    // Override JPanel
-
-    /**
-     * {@inheritDoc}
-     *
-     * Specifies that this Panel uses the TilePanelUI, which
-     * directs the Program Look and Feel (PLAF) by specifying the
-     * {@code FreeColBrightPanelUI} class, which is called from
-     * {@link FreeColLookAndFeel#getDefaults()} method.
-     */
-    @Override
-    public String getUIClassID() {
-        return "TilePanelUI";
     }
 }

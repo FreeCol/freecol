@@ -153,7 +153,7 @@ public final class ColonyPanel extends PortPanel
     private JButton traceWorkButton = null;
 
     /** The {@code Colony} this panel is displaying. */
-    private Colony colony = null;
+    private Colony colony;
 
     // inherit PortPanel.pressListener
     // inherit PortPanel.defaultTransferHandler
@@ -1152,7 +1152,7 @@ public final class ColonyPanel extends PortPanel
     /**
      * The panel to display the population breakdown for this colony.
      */
-    public final class PopulationPanel extends JPanel {
+    public final class PopulationPanel extends MigPanel {
 
         // Predefine all the required labels.
         private final JLabel rebelShield = new JLabel();
@@ -1169,8 +1169,10 @@ public final class ColonyPanel extends PortPanel
          * Create a new population panel.
          */
         public PopulationPanel() {
-            super(new MigLayout("wrap 5, fill, insets 0",
+            super("PopulationPanelUI",
+                  new MigLayout("wrap 5, fill, insets 0",
                                 "[][]:push[center]:push[right][]"));
+
             setOpaque(false);
             setToolTipText(" ");
         }
@@ -1278,17 +1280,6 @@ public final class ColonyPanel extends PortPanel
         }
 
 
-        // Override JLabel
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getUIClassID() {
-            return "PopulationPanelUI";
-        }
-
-
         // Override Component
 
         /**
@@ -1314,9 +1305,10 @@ public final class ColonyPanel extends PortPanel
          * Create this OutsideColonyPanel.
          */
         public OutsideColonyPanel() {
-            super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
+            super("OutsideColonyPanelUI",
+                  new MigLayout("wrap 3, fill, insets 0"), ColonyPanel.this,
+                  null, ColonyPanel.this.isEditable());
 
-            setLayout(new MigLayout("wrap 3, fill, insets 0"));
             setBorder(Utility.localizedBorder("colonyPanel.outsideColony"));
         }
 
@@ -1430,22 +1422,6 @@ public final class ColonyPanel extends PortPanel
          */
         @Override
         public int suggested(GoodsType type) { return -1; } // N/A
-
-
-        // Override JPanel
-
-        /**
-         * {@inheritDoc}
-         *
-         * Specifies that this Panel uses the OutsideColonyPanelUI,
-         * which directs the Program Look and Feel (PLAF) by specifying
-         * the {@code FreeColBrightPanelUI} class, which is called from
-         * {@link FreeColLookAndFeel#getDefaults()} method.
-         */
-        @Override
-        public String getUIClassID() {
-            return "OutsideColonyPanelUI";
-        }
     }
 
     /**
@@ -1458,10 +1434,10 @@ public final class ColonyPanel extends PortPanel
          * Creates this ColonyInPortPanel.
          */
         public ColonyInPortPanel() {
-            super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
+            super(new MigLayout("wrap 3, fill, insets 0"), ColonyPanel.this,
+                  null, ColonyPanel.this.isEditable());
 
             setBorder(Utility.localizedBorder("colonyPanel.inPort"));
-            setLayout(new MigLayout("wrap 3, fill, insets 0"));
         }
 
 
@@ -1526,14 +1502,15 @@ public final class ColonyPanel extends PortPanel
      * A panel that holds goods that represent cargo that is inside
      * the Colony.
      */
-    public final class WarehousePanel extends JPanel
+    public final class WarehousePanel extends MigPanel
         implements DropTarget, PropertyChangeListener {
 
         /**
          * Creates a WarehousePanel.
          */
         public WarehousePanel() {
-            setLayout(new MigLayout("fill, gap push, insets 0"));
+            super("WarehousePanelUI",
+                  new MigLayout("fill, gap push, insets 0"));
         }
 
 
@@ -1669,17 +1646,6 @@ public final class ColonyPanel extends PortPanel
         }
 
 
-        // Override JPanel
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getUIClassID() {
-            return "WarehousePanelUI";
-        }
-
-
         // Override Component
 
         /**
@@ -1698,13 +1664,24 @@ public final class ColonyPanel extends PortPanel
     /**
      * This panel is a list of the colony's buildings.
      */
-    public final class BuildingsPanel extends JPanel {
+    public final class BuildingsPanel extends MigPanel {
+
+        /** Always pop up the build queue when clicking on a building. */
+        private final MouseAdapter buildQueueListener
+            = new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        getGUI().showBuildQueuePanel(getColony());
+                    }
+                };
+
 
         /**
          * Creates this BuildingsPanel.
          */
         public BuildingsPanel() {
-            setLayout(new MigLayout("fill, wrap 4, insets 0, gap 0:10:10:push"));
+            super("BuildingsPanelUI",
+                  new MigLayout("fill, wrap 4, insets 0, gap 0:10:10:push"));
         }
 
 
@@ -1751,17 +1728,6 @@ public final class ColonyPanel extends PortPanel
         }
 
 
-        // Override JPanel
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getUIClassID() {
-            return "BuildingsPanelUI";
-        }
-
-
         // Override Component
 
         /**
@@ -1782,15 +1748,6 @@ public final class ColonyPanel extends PortPanel
          */
         public final class ASingleBuildingPanel extends BuildingPanel
             implements DropTarget  {
-
-            private final transient MouseAdapter buildQueueListener
-                = new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        getGUI().showBuildQueuePanel(getColony());
-                    }
-                };
-
 
             /**
              * Creates this ASingleBuildingPanel.

@@ -102,8 +102,8 @@ public final class FindSettlementPanel extends FreeColPanel
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public FindSettlementPanel(FreeColClient freeColClient) {
-        super(freeColClient, new MigLayout("wrap 1", "[align center]",
-                                           "[]30[]30[]"));
+        super(freeColClient, null,
+              new MigLayout("wrap 1", "[align center]", "[]30[]30[]"));
         this.settlementList = new JList<>();
         this.settlementList.setCellRenderer(new SettlementRenderer());
         this.settlementList.setFixedCellHeight(48);

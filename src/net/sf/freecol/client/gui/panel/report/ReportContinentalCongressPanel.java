@@ -69,8 +69,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         final Player player = getMyPlayer();
         final FoundingFather currentFather = player.getCurrentFather();
 
-        JPanel recruitingPanel = new MigPanel();
-        recruitingPanel.setLayout(new MigLayout("center, wrap 1", "center"));
+        JPanel recruitingPanel = new MigPanel(new MigLayout("center, wrap 1", "center"));
         if (currentFather == null) {
             recruitingPanel.add(new JLabel(none), "wrap 20");
         } else {
@@ -99,8 +98,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         Map<FoundingFatherType, JPanel> panels
             = new EnumMap<>(FoundingFatherType.class);
         for (FoundingFatherType type : FoundingFatherType.values()) {
-            JPanel panel = new MigPanel();
-            panel.setLayout(new MigLayout("flowy", "[center]"));
+            JPanel panel = new MigPanel(new MigLayout("flowy", "[center]"));
             panels.put(type, panel);
             JScrollPane imageScrollPane = new JScrollPane(panel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,

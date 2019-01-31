@@ -24,6 +24,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -48,7 +49,7 @@ public final class VictoryDialog extends FreeColConfirmDialog {
     public VictoryDialog(FreeColClient freeColClient, JFrame frame) {
         super(freeColClient, frame);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
         panel.add(Utility.localizedHeader(Messages.message("victory.text"),
                                           false),
                   "align center, wrap 20");

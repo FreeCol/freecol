@@ -80,17 +80,19 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     protected FreeColPanel(FreeColClient freeColClient) {
-        this(freeColClient, new FlowLayout());
+        this(freeColClient, null, new FlowLayout());
     }
 
     /**
      * Default constructor.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
+     * @param uiClassId An optional L+F class to render this component.
      * @param layout The {@code LayoutManager} to be used.
      */
-    protected FreeColPanel(FreeColClient freeColClient, LayoutManager layout) {
-        super(layout);
+    protected FreeColPanel(FreeColClient freeColClient, String uiClassId,
+                           LayoutManager layout) {
+        super(uiClassId, layout);
 
         this.freeColClient = freeColClient;
 

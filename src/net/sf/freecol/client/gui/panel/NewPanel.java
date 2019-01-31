@@ -170,7 +170,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
      *     the new game.
      */
     public NewPanel(FreeColClient freeColClient, Specification specification) {
-        super(freeColClient, new MigLayout("wrap 6", "[15]", ""));
+        super(freeColClient, null, new MigLayout("wrap 6", "[15]", ""));
 
         this.fixedSpecification = specification;
 

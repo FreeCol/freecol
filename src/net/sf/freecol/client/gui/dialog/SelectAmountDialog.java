@@ -28,6 +28,7 @@ import javax.swing.InputVerifier;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
@@ -115,7 +116,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
                     return verifyWholeBox((JComboBox<Integer>)input);
                 }
             });
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
         panel.add(question);
         panel.add(this.comboBox, "wrap 20, growx");
         panel.setSize(panel.getPreferredSize());

@@ -90,7 +90,6 @@ public final class ReportClassicColonyPanel extends ReportPanel
         final ImageLibrary lib = getImageLibrary();
         
         reportPanel.removeAll();
-        
         reportPanel.setLayout(new MigLayout("fill")); // Set the layout
         
         for (Colony colony : this.colonies) {

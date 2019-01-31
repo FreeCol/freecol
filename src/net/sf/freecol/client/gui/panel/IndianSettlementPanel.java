@@ -57,7 +57,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
      */
     public IndianSettlementPanel(FreeColClient freeColClient,
                                  IndianSettlement is) {
-        super(freeColClient, new MigLayout("wrap 2, gapx 20", "", ""));
+        super(freeColClient, null,
+              new MigLayout("wrap 2, gapx 20", "", ""));
 
         ImageLibrary lib = getImageLibrary();
         JLabel settlementLabel = new JLabel(new ImageIcon(lib

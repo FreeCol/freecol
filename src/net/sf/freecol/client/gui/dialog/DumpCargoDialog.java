@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -75,7 +76,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
             checkBoxes.add(checkBox);
         }
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
         panel.add(Utility.localizedHeader("dumpCargo", true));
         for (JCheckBox c : checkBoxes) panel.add(c);
         panel.setSize(panel.getPreferredSize());

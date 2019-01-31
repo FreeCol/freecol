@@ -102,14 +102,13 @@ public class InformationPanel extends FreeColPanel {
      */
     public InformationPanel(FreeColClient freeColClient, String[] texts,
                             FreeColObject[] fcos, ImageIcon[] images) {
-        super(freeColClient, createLayout(freeColClient));
+        super(freeColClient, null, createLayout(freeColClient));
 
         this.skin = ImageLibrary.getInformationPanelSkin(freeColClient
             .getMyPlayer());
         final SwingGUI gui = getGUI();
-        JPanel textPanel = new MigPanel();
+        JPanel textPanel = new MigPanel(new MigLayout("wrap 2", "", "top"));
         textPanel.setOpaque(false);
-        textPanel.setLayout(new MigLayout("wrap 2", "", "top"));
         for (int i = 0; i < texts.length; i++) {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));

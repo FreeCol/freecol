@@ -82,7 +82,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(null);
 
-        MigPanel panel = new MigPanel(new MigLayout("fill, wrap 1", "", ""));
+        JPanel panel = new MigPanel(new MigLayout("fill, wrap 1", "", ""));
         panel.add(Utility.localizedHeader(Messages.nameKey("warehouseDialog"), false),
                   "align center");
         panel.add(scrollPane, "grow");
@@ -131,7 +131,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
 
         public WarehouseGoodsPanel(FreeColClient freeColClient, Colony colony,
                                    GoodsType goodsType) {
-            super("WarehouseGoodsPanelUI");
+            super("WarehouseGoodsPanelUI", new MigLayout("wrap 2", "", ""));
 
             final boolean enhancedTradeRoutes = colony.getSpecification()
                 .getBoolean(GameOptions.ENHANCED_TRADE_ROUTES);
@@ -140,7 +140,6 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             final int capacity = colony.getWarehouseCapacity();
             final int maxCapacity = 300; // TODO: magic number
             
-            setLayout(new MigLayout("wrap 2", "", ""));
             setOpaque(false);
             setBorder(Utility.localizedBorder(goodsType, new Color(0)));
             Utility.padBorder(this, 6,6,6,6);

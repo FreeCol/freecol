@@ -23,6 +23,7 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
@@ -60,8 +61,7 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
         JLabel heightLabel = Utility.localizedLabel("height");
         heightLabel.setLabelFor(inputHeight);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 2"));
-        
+        JPanel panel = new MigPanel(new MigLayout("wrap 2"));
         panel.add(Utility.localizedHeader("mapSizeDialog.mapSize", true),
                   "span, align center");
         panel.add(widthLabel, "newline 20");

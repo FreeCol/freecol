@@ -137,7 +137,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         }
     }
 
-    private class ColonyTradeItemPanel extends JPanel
+    private class ColonyTradeItemPanel extends MigPanel
             implements ActionListener {
 
         private final Player source;
@@ -154,6 +154,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * @param source The {@code Player} source.
          */
         public ColonyTradeItemPanel(Player source) {
+            super(new MigLayout("wrap 1", "", ""));
+
             this.source = source;
             this.colonyBox = new JComboBox<>();
             this.clearButton = Utility.localizedButton("negotiationDialog.clear");
@@ -165,7 +167,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.getName("model.tradeItem.colony"));
             this.allColonies = source.getColonyList();
 
-            setLayout(new MigLayout("wrap 1", "", ""));
             setBorder(Utility.SIMPLE_LINE_BORDER);
 
             add(this.label);
@@ -240,7 +241,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         }
     }
 
-    private class GoldTradeItemPanel extends JPanel
+    private class GoldTradeItemPanel extends MigPanel
             implements ActionListener {
 
         private final Player source;
@@ -254,6 +255,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * @param gold The maximum amount of gold to trade.
          */
         public GoldTradeItemPanel(Player source, int gold) {
+            super(new MigLayout("wrap 1", "", ""));
+
             this.source = source;
             this.spinner = new JSpinner(new SpinnerNumberModel(0, 0, gold, 1));
             JButton clearButton = Utility.localizedButton("negotiationDialog.clear");
@@ -268,7 +271,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                                                  .setColumns(5);
 
             setBorder(Utility.SIMPLE_LINE_BORDER);
-            setLayout(new MigLayout("wrap 1", "", ""));
 
             add(Utility.localizedLabel(Messages.getName("model.tradeItem.gold")));
             add(Utility.localizedLabel(StringTemplate
@@ -320,8 +322,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         }
     }
 
-    private class GoodsTradeItemPanel extends JPanel
-            implements ActionListener {
+    private class GoodsTradeItemPanel extends MigPanel
+        implements ActionListener {
 
         private class GoodsBoxRenderer extends JLabel
                 implements ListCellRenderer<Goods> {
@@ -355,6 +357,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * @param allGoods The {@code Goods} to trade.
          */
         public GoodsTradeItemPanel(Player source, List<Goods> allGoods) {
+            super(new MigLayout("wrap 1", "", ""));
+
             this.source = source;
             this.goodsBox = new JComboBox<>(new DefaultComboBoxModel<Goods>());
             this.goodsBox.setRenderer(new GoodsBoxRenderer());
@@ -367,7 +371,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.goods"));
             this.allGoods = allGoods;
 
-            setLayout(new MigLayout("wrap 1", "", ""));
             setBorder(Utility.SIMPLE_LINE_BORDER);
 
             add(this.label);
@@ -447,8 +450,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         }
     }
 
-    private class InciteTradeItemPanel extends JPanel
-            implements ActionListener {
+    private class InciteTradeItemPanel extends MigPanel
+        implements ActionListener {
 
         private class InciteBoxRenderer extends JLabel
                 implements ListCellRenderer<Player> {
@@ -482,6 +485,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * @param other The {@code Player} negotiated with.
          */
         public InciteTradeItemPanel(Player source, Player other) {
+            super(new MigLayout("wrap 1", "", ""));
+
             this.source = source;
             this.other = other;
             this.victimBox = new JComboBox<>(new DefaultComboBoxModel<Player>());
@@ -495,7 +500,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.incite"));
 
             setBorder(Utility.SIMPLE_LINE_BORDER);
-            setLayout(new MigLayout("wrap 1", "", ""));
 
             available.clear();
             final Predicate<Player> incitablePred = p ->
@@ -570,8 +574,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      * Class for the stance trade panel.  Access needs to be public so
      * that comboBoxLabel() is externally visible.
      */
-    public class StanceTradeItemPanel extends JPanel
-            implements ActionListener {
+    public class StanceTradeItemPanel extends MigPanel
+        implements ActionListener {
 
         private class StanceBoxRenderer extends JLabel
                 implements ListCellRenderer<Stance> {
@@ -602,6 +606,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * @param target The {@code Player} to consider the stance change.
          */
         public StanceTradeItemPanel(Player source, Player target) {
+            super(new MigLayout("wrap 1", "", ""));
+
             this.source = source;
             this.target = target;
             this.stanceBox = new JComboBox<>(new DefaultComboBoxModel<Stance>());
@@ -614,7 +620,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.addButton.setActionCommand(ADD);
 
             setBorder(Utility.SIMPLE_LINE_BORDER);
-            setLayout(new MigLayout("wrap 1", "", ""));
 
             add(Utility.localizedLabel(Messages.nameKey("model.tradeItem.stance")));
             add(this.stanceBox);
@@ -686,8 +691,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         }
     }
 
-    private class UnitTradeItemPanel extends JPanel
-            implements ActionListener {
+    private class UnitTradeItemPanel extends MigPanel
+        implements ActionListener {
 
         private class UnitBoxRenderer extends JLabel
                 implements ListCellRenderer<Unit> {
@@ -720,6 +725,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * @param allUnits The {@code Unit}s to trade.
          */
         public UnitTradeItemPanel(Player source, List<Unit> allUnits) {
+            super(new MigLayout("wrap 1", "", ""));
+
             this.source = source;
             this.unitBox = new JComboBox<>(new DefaultComboBoxModel<Unit>());
             this.unitBox.setRenderer(new UnitBoxRenderer());
@@ -732,7 +739,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.unit"));
             this.allUnits = allUnits;
 
-            setLayout(new MigLayout("wrap 1", "", ""));
             setBorder(Utility.SIMPLE_LINE_BORDER);
 
             add(this.label);
@@ -944,8 +950,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         /**
          * Build Layout of Diplomatic Trade Dialog
          */
-        MigPanel panel = new MigPanel(new MigLayout("wrap 3",
-                "[30%|40%|30%]", ""));
+        JPanel panel = new MigPanel(new MigLayout("wrap 3",
+                                                  "[30%|40%|30%]", ""));
         // Main Panel Header
         panel.add(Utility.localizedHeader("negotiationDialog.title."
                         + agreement.getContext().getKey(), false),
@@ -968,8 +974,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         // Panel contents
         // TODO: Expand center panel so that contents fill cell horizontally. 
         panel.add(this.goldDemandPanel); // Left pane
-        JPanel centerPanel = new MigPanel();
-        centerPanel.setLayout(new MigLayout("wrap 1"));
+        JPanel centerPanel = new MigPanel(new MigLayout("wrap 1"));
         if (tutorial != null) {
             // Display only if tutorial variable contents overriden
             //      Can only occur if: First Contact with a forgeign Nation

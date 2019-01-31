@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.dialog;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
@@ -63,8 +64,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             Player player, Player other, Tile tile, int settlementCount) {
         super(freeColClient, frame);
 
-        MigPanel panel
-            = new MigPanel(new MigLayout("wrap 1", "[center]", "[]20"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "[center]", "[]20"));
         panel.setOpaque(false);
 
         String headerKey = BASE_KEY + other.getNation().getSuffix();

@@ -32,6 +32,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
@@ -222,8 +223,8 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
                 }
             });
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "[center]",
-                                                    "[]20[]20[]"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "[center]",
+                                                  "[]20[]20[]"));
         panel.add(Utility.localizedHeader("captureGoodsDialog.title", true));
         panel.add(this.allButton, "split 2");
         panel.add(this.noneButton);

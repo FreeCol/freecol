@@ -59,7 +59,7 @@ public final class ErrorPanel extends FreeColPanel {
      * @param message The error message to display in this error panel.
      */
     public ErrorPanel(FreeColClient freeColClient, String message) {
-        super(freeColClient, new MigLayout());
+        super(freeColClient, null, new MigLayout());
 
         JButton showButton = Utility.localizedButton(StringTemplate
             .template("errorPanel.showLogFile")
@@ -78,7 +78,7 @@ public final class ErrorPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ErrorPanel(FreeColClient freeColClient) {
-        super(freeColClient, new MigLayout());
+        super(freeColClient, null, new MigLayout());
 
         String message = FreeColDirectories.getLogFileContents();
         if (message == null) message = Messages.message("errorPanel.loadError");

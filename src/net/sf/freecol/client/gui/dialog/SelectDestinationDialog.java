@@ -39,6 +39,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
@@ -391,8 +392,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             : (dc instanceof DistanceComparator) ? 2
             : 0);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
-                                                    "[align center]", ""));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
+                                                  "[align center]", ""));
         panel.add(Utility.localizedHeader("selectDestinationDialog.text", true));
 
         panel.add(listScroller, "newline 30, growx, growy");

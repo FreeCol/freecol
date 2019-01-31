@@ -94,8 +94,10 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
     private class UnitCellRenderer implements ListCellRenderer<UnitWrapper> {
 
-        private final JPanel itemPanel = new MigPanel();
-        private final JPanel selectedPanel = new MigPanel();
+        private final JPanel itemPanel
+            = new MigPanel(new MigLayout("", "[60]"));
+        private final JPanel selectedPanel
+            = new MigPanel(new MigLayout("", "[60]"));
         private final JLabel imageLabel = new JLabel();
         private final JLabel nameLabel = new JLabel();
         private final JLabel locationLabel = new JLabel();
@@ -103,9 +105,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
         public UnitCellRenderer() {
             itemPanel.setOpaque(false);
-            itemPanel.setLayout(new MigLayout("", "[60]"));
             selectedPanel.setOpaque(false);
-            selectedPanel.setLayout(new MigLayout("", "[60]"));
             selectedPanel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(selectedPanel));
             locationLabel.setFont(locationLabel.getFont()
                 .deriveFont(Font.ITALIC));
@@ -190,8 +190,8 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
             });
         JScrollPane listScroller = new JScrollPane(this.unitList);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
-                                                    "[400, align center]"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
+                                                  "[400, align center]"));
         panel.add(header);
         panel.add(text, "newline 20");
         panel.add(listScroller, "newline 10");

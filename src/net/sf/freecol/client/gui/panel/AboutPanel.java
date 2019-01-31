@@ -93,7 +93,7 @@ public final class AboutPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public AboutPanel(FreeColClient freeColClient) {
-        super(freeColClient, new MigLayout("wrap"));
+        super(freeColClient, null, new MigLayout("wrap"));
 
         // Header with image
         JLabel apLogoLabel = new JLabel(new ImageIcon(ImageLibrary

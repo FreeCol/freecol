@@ -69,7 +69,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
          *        the scaling (old size, new size etc).
          */        
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1, center"));
         JPanel widthPanel = new JPanel(new FlowLayout());
         JPanel heightPanel = new JPanel(new FlowLayout());
         String str;

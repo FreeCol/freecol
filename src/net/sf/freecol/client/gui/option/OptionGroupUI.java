@@ -76,14 +76,13 @@ public final class OptionGroupUI extends MigPanel
      * @param editable Is the group editable.
      */
     public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
-        super("ReportPanelUI");
+        super("ReportPanelUI",
+            new MigLayout("fill", "[200:]unrelated[550:, grow, fill]",
+                          "[top]"));
 
         this.gui = gui;
         this.group = group;
         this.editable = editable;
-
-        setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]",
-                                "[top]"));
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(group);
         buildTree(group, root);
@@ -112,8 +111,7 @@ public final class OptionGroupUI extends MigPanel
         renderer.setBackgroundNonSelectionColor(new Color(0, 0, 0, 1));
 
         add(tree);
-        detailPanel = new MigPanel();
-        detailPanel.setLayout(new MigLayout("wrap 2", "[fill]related[fill]"));
+        detailPanel = new MigPanel(new MigLayout("wrap 2", "[fill]related[fill]"));
         detailPanel.setOpaque(false);
         add(detailPanel, "grow");
     }

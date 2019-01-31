@@ -144,13 +144,9 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         Object[] buttons = getButtons();
         prepareButtons(buttons);
 
-        JPanel bottom;
-        if (this.okIndex >= 0) { // Confirm dialog
-            bottom = new MigPanel(new MigLayout("insets dialog"));
-        } else { // Multi-line choice dialog
-            bottom = new MigPanel(new MigLayout("wrap "
-                    + getColumns(buttons.length)));
-        }
+        JPanel bottom = new MigPanel(new MigLayout((this.okIndex < 0)
+                ? "wrap " + getColumns(buttons.length) // Multi-line choice dialog
+                : "insets dialog")); // Confirm dialog
         bottom.setOpaque(false);
         bottom.setName("OptionPane.buttonArea");
         addButtonComponents(bottom, buttons, getInitialValueIndex());

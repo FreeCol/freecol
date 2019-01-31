@@ -30,10 +30,8 @@ import javax.swing.JPanel;
  */
 public class MigPanel extends JPanel {
 
-    private String uiClassId = null;
+    private String uiClassId;
 
-
-    public MigPanel() {}
 
     public MigPanel(String uiClassId) {
         this.uiClassId = uiClassId;
@@ -41,6 +39,14 @@ public class MigPanel extends JPanel {
 
     public MigPanel(LayoutManager layout) {
         super(layout);
+
+        this.uiClassId = null;
+    }
+
+    public MigPanel(String uiClassId, LayoutManager layout) {
+        super(layout);
+        
+        this.uiClassId = uiClassId;
     }
 
 

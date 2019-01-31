@@ -62,8 +62,9 @@ public class WorkProductionPanel extends FreeColPanel {
      * @param unit The {@code Unit} that is producing.
      */
     public WorkProductionPanel(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient, new MigLayout("wrap 3, insets 10 10 10 10",
-                                           "[]30:push[right][]", ""));
+        super(freeColClient, null,
+              new MigLayout("wrap 3, insets 10 10 10 10",
+                            "[]30:push[right][]", ""));
 
         final ImageLibrary lib = getGUI().getImageLibrary();
         final Colony colony = unit.getColony();

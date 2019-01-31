@@ -71,7 +71,7 @@ public class NewUnitPanel extends FreeColPanel {
      */
     public NewUnitPanel(FreeColClient freeColClient, LayoutManager layout,
                         String label, List<UnitType> units) {
-        super(freeColClient, layout);
+        super(freeColClient, null, layout);
 
         this.question = new JLabel(label);
         this.units.addAll(units);

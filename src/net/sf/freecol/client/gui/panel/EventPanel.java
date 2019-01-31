@@ -49,7 +49,8 @@ public final class EventPanel extends FreeColPanel {
      */
     public EventPanel(FreeColClient freeColClient, String header, String key,
                       String footer) {
-        super(freeColClient, new MigLayout("wrap 1", "[center]", "[]20"));
+        super(freeColClient, null,
+              new MigLayout("wrap 1", "[center]", "[]20"));
 
         JLabel headerLabel = new JLabel(header);
         headerLabel.setFont(FontLibrary.createCompatibleFont(header,

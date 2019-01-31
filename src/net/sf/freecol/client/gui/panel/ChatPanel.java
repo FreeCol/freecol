@@ -49,7 +49,7 @@ public final class ChatPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ChatPanel(FreeColClient freeColClient) {
-        super(freeColClient, new BorderLayout(10, 10));
+        super(freeColClient, null, new BorderLayout(10, 10));
 
         JLabel label = Utility.localizedLabel("chatPanel.message");
 

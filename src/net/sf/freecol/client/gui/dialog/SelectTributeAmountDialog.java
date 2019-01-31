@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.dialog;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
@@ -65,7 +66,7 @@ public final class SelectTributeAmountDialog
         this.maximum = maximum;
         this.input = new JTextField(Integer.toString(maximum), COLUMNS);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1"));
         panel.add(Utility.localizedTextArea(question));
         panel.add(this.input);
         

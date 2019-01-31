@@ -159,7 +159,7 @@ public final class StatisticsPanel extends FreeColPanel {
     public StatisticsPanel(FreeColClient freeColClient,
                            Map<String, String> serverStatistics,
                            Map<String, String> clientStatistics) {
-        super(freeColClient, new BorderLayout());
+        super(freeColClient, null, new BorderLayout());
 
         // Title
         JPanel header = new JPanel();

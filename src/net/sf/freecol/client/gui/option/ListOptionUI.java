@@ -38,6 +38,7 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
@@ -78,10 +79,10 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                         boolean editable) {
         super(option, editable);
 
-        this.panel = new JPanel();
+        this.panel = new MigPanel(new MigLayout("wrap 2, fill",
+                                                "[fill, grow]20[fill]"));
         this.panel.setBorder(Utility.localizedBorder(super.getJLabel().getText(),
                                                  Utility.BORDER_COLOR));
-        this.panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
         this.model = new DefaultListModel<>();
         for (AbstractOption<T> o : option.getValue()) {

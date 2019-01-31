@@ -157,6 +157,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             logger.log(Level.WARNING, "Could not load " + brightPanelUI, cnfe);
         }
 
+        // FIXME: These do not appear to be in use in 201901
         // Sharing FreeColTransparentPanelUI:
         try {
             u.put(transparentPanelUI, Class.forName(transparentPanelUI));

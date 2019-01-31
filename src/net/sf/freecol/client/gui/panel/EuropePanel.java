@@ -232,9 +232,8 @@ public final class EuropePanel extends PortPanel {
     public final class DocksPanel extends UnitPanel implements DropTarget {
 
         public DocksPanel() {
-            super(EuropePanel.this, "Europe - docks", true);
-
-            setLayout(new MigLayout("wrap 6"));
+            super(null, new MigLayout("wrap 6"), EuropePanel.this,
+                  "Europe - docks", true);
         }
 
 
@@ -321,7 +320,7 @@ public final class EuropePanel extends PortPanel {
     private final class EuropeInPortPanel extends InPortPanel {
 
         public EuropeInPortPanel() {
-            super(EuropePanel.this, "Europe - port", true);
+            super(new MigLayout(), EuropePanel.this, "Europe - port", true);
         }
 
 

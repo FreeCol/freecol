@@ -54,7 +54,7 @@ public abstract class PortPanel extends FreeColPanel {
      * @param layout The {@code LayoutManager} to be used.
      */
     protected PortPanel(FreeColClient freeColClient, LayoutManager layout) {
-        super(freeColClient, layout);
+        super(freeColClient, null, layout);
 
         this.selectedUnitLabel = null;
     }

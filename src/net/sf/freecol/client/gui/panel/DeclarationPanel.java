@@ -69,7 +69,7 @@ public final class DeclarationPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public DeclarationPanel(FreeColClient freeColClient) {
-        super(freeColClient, null);
+        super(freeColClient);
 
         Image image = ImageLibrary.getUnscaledImage("image.flavor.Declaration");
         setSize(image.getWidth(null), image.getHeight(null));

@@ -219,7 +219,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for displaying {@code Unit}-information.
      */
-    public class UnitInfoPanel extends JPanel
+    public class UnitInfoPanel extends MigPanel
         implements PropertyChangeListener {
 
         /** The unit to display. */

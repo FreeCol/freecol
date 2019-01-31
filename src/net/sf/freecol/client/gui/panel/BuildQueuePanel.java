@@ -456,8 +456,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private class DefaultBuildQueueCellRenderer
         implements ListCellRenderer<BuildableType> {
 
-        private final JPanel itemPanel = new JPanel();
-        private final JPanel selectedPanel = new JPanel();
+        private final JPanel itemPanel = new MigPanel(new MigLayout());
+        private final JPanel selectedPanel = new MigPanel(new MigLayout());
         private final JLabel imageLabel = new JLabel(new ImageIcon());
         private final JLabel nameLabel = new JLabel();
 
@@ -470,9 +470,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         public DefaultBuildQueueCellRenderer() {
             itemPanel.setOpaque(false);
-            itemPanel.setLayout(new MigLayout());
             selectedPanel.setOpaque(false);
-            selectedPanel.setLayout(new MigLayout());
             selectedPanel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(selectedPanel));
         }
 
@@ -570,8 +568,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * @param colony The enclosing {@code Colony}.
      */
     public BuildQueuePanel(FreeColClient freeColClient, Colony colony) {
-        super(freeColClient, new MigLayout("wrap 3",
-                "[260:][390:, fill][260:]", "[][][300:400:][]"));
+        super(freeColClient, null,
+              new MigLayout("wrap 3", "[260:][390:, fill][260:]",
+                            "[][][300:400:][]"));
 
         this.colony = colony;
         this.featureContainer = new FeatureContainer();

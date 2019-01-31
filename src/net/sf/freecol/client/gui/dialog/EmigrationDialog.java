@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
@@ -65,7 +66,7 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
                           + "\n\n", 0);
         }
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 1", "[fill]", ""));
+        JPanel panel = new MigPanel(new MigLayout("wrap 1", "[fill]", ""));
         panel.add(header, "wrap 20");
         panel.setSize(panel.getPreferredSize());
 

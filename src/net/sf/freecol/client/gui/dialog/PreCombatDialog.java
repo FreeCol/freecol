@@ -78,7 +78,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         final List<Modifier> defence
             = sort(defenceModifiers, Modifier.ascendingModifierIndexComparator);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 6",
+        JPanel panel = new MigPanel(new MigLayout("wrap 6",
                 "[sg label]20[sg value, right]1px[sg percent]40"
                 + "[sg label]20[sg value, right]1px[sg percent]", ""));
         // left hand side: attacker

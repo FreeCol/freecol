@@ -84,6 +84,8 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         }
 
 
+        // Override JButton
+
         /**
          * {@inheritDoc}
          */
@@ -279,8 +281,8 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         this.label.setIcon(new ImageIcon(this.flag.getImage()));
 
         // Create the main panel
-        MigPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
-                                                    "[fill]"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
+                                                  "[fill]"));
         panel.add(Utility.localizedTextArea(sure), "span");
         panel.add(Utility.localizedTextArea("confirmDeclarationDialog.enterCountry"), "span");
         panel.add(this.countryField, "span");

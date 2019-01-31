@@ -76,9 +76,7 @@ public final class ReportLabourDetailPanel extends ReportPanel
 
     @Override
     public void initialize() {
-        JPanel detailPanel = new MigPanel();
-        detailPanel.setLayout(new MigLayout("wrap 7", "[]30[][]30[][]30[][]",
-                                            ""));
+        JPanel detailPanel = new MigPanel(new MigLayout("wrap 7", "[]30[][]30[][]30[][]", ""));
         detailPanel.setOpaque(false);
 
 

@@ -421,13 +421,13 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
     private class StopRenderer implements ListCellRenderer<TradeRouteStop> {
 
-        private final JPanel SELECTED_COMPONENT = new JPanel();
-        private final JPanel NORMAL_COMPONENT = new JPanel();
+        private final JPanel SELECTED_COMPONENT
+            = new MigPanel(new MigLayout("", "[80, center][]"));
+        private final JPanel NORMAL_COMPONENT
+            = new MigPanel(new MigLayout("", "[80, center][]"));
 
         public StopRenderer() {
-            NORMAL_COMPONENT.setLayout(new MigLayout("", "[80, center][]"));
             NORMAL_COMPONENT.setOpaque(false);
-            SELECTED_COMPONENT.setLayout(new MigLayout("", "[80, center][]"));
             SELECTED_COMPONENT.setOpaque(false);
             SELECTED_COMPONENT.setUI((PanelUI)FreeColSelectedPanelUI
                 .createUI(SELECTED_COMPONENT));
@@ -535,7 +535,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     public TradeRouteInputPanel(FreeColClient freeColClient,
                                 TradeRoute newRoute) {
-        super(freeColClient, new MigLayout("wrap 4, fill", "[]20[fill]rel"));
+        super(freeColClient, null,
+              new MigLayout("wrap 4, fill", "[]20[fill]rel"));
 
         final Game game = freeColClient.getGame();
         final Player player = getMyPlayer();

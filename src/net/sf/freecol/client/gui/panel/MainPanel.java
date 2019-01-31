@@ -58,8 +58,8 @@ public final class MainPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MainPanel(FreeColClient freeColClient) {
-        super(freeColClient, new MigLayout("wrap 1, insets n n 20 n",
-                                           "[center]"));
+        super(freeColClient, null,
+              new MigLayout("wrap 1, insets n n 20 n", "[center]"));
 
         boolean canContinue = FreeColDirectories
             .getLastSaveGameFile() != null;

@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import java.awt.LayoutManager;
 
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
@@ -36,12 +37,14 @@ public abstract class InPortPanel extends UnitPanel {
     /**
      * Create an InPortPanel.
      *
+     * @param layout The {@code LayoutManager} to use.
      * @param portPanel The {@code PortPanel} to enclose.
      * @param name An optional name for the panel.
      * @param editable Is this panel editable?
      */
-    protected InPortPanel(PortPanel portPanel, String name, boolean editable) {
-        super(portPanel, name, editable);
+    protected InPortPanel(LayoutManager layout, PortPanel portPanel,
+                          String name, boolean editable) {
+        super("InPortPanelUI", layout, portPanel, name, editable);
     }
 
 
@@ -73,21 +76,5 @@ public abstract class InPortPanel extends UnitPanel {
             portPanel.setSelectedUnitLabel(lastCarrier);
         }
         // No revalidate+repaint as this is done in setSelectedUnitLabel
-    }
-
-
-    // Override JLabel
-
-    /**
-     * {@inheritDoc}
-     *
-     * Specifies that this Panel uses the InPortPanelUI, which
-     * directs the Program Look and Feel (PLAF) by specifying the
-     * {@code FreeColBrightPanelUI} class, which is called from
-     * {@link FreeColLookAndFeel#getDefaults()} method.
-     */
-    @Override
-    public String getUIClassID() {
-        return "InPortPanelUI";
     }
 }

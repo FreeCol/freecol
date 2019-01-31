@@ -30,6 +30,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -121,7 +122,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         this.units = new JSpinner(spinnerModel);
         spinnerModel.setValue(unitCount);
 
-        MigPanel panel = new MigPanel(new MigLayout("wrap 2, gapx 20"));
+        JPanel panel = new MigPanel(new MigLayout("wrap 2, gapx 20"));
         panel.add(Utility.localizedLabel("name"));
         panel.add(this.name);
         panel.add(Utility.localizedLabel("nation"));

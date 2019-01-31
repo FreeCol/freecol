@@ -95,7 +95,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MapEditorTransformPanel(FreeColClient freeColClient) {
-        super(freeColClient, new BorderLayout());
+        super(freeColClient, null, new BorderLayout());
 
         nativeNation = first(getSpecification().getIndianNations());
 

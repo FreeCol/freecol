@@ -467,8 +467,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 double probability = uc.probability * experience
                     / (double)maxExperience;
                 String jobName = Messages.message(goods.getWorkingAsKey());
-                JPanel experiencePanel = new MigPanel();
-                experiencePanel.setLayout(new MigLayout("wrap 3"));
+                JPanel experiencePanel = new MigPanel(new MigLayout("wrap 3"));
                 experiencePanel.add(new JLabel(new ImageIcon(
                         lib.getSmallerUnitTypeImage(expertType))),
                     "spany 2");

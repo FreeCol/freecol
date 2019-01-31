@@ -58,7 +58,7 @@ public final class RecruitPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      */
     public RecruitPanel(FreeColClient freeColClient) {
-        super(freeColClient, new MigLayout("wrap 1", "", ""));
+        super(freeColClient, null, new MigLayout("wrap 1", "", ""));
 
         List<AbstractUnit> recruitables = getMyPlayer().getEurope()
             .getExpandedRecruitables(false);
