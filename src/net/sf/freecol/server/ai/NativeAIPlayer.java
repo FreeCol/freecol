@@ -716,7 +716,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
             }
         }
             
-        return null;
+        return (Boolean)null;
     }
 
     /**
