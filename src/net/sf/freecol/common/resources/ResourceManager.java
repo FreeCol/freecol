@@ -129,7 +129,6 @@ public class ResourceManager {
      */
     public static synchronized void clean() {
         imageCache.clear();
-        System.gc();
     }
 
     /**

@@ -45,7 +45,6 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -523,7 +522,6 @@ public class Game extends FreeColGameObject {
                 while (iter.hasNext()) iter.next();
             }
             removeCount = 0;
-            System.gc(); // Probably a good opportunity.
         }
     }
 
@@ -1454,7 +1452,7 @@ public class Game extends FreeColGameObject {
         java.util.Map<String, String> stats = new HashMap<>();
 
         // Memory
-        System.gc();
+        Utils.garbageCollect();
         long free = Runtime.getRuntime().freeMemory()/(1024*1024);
         long total = Runtime.getRuntime().totalMemory()/(1024*1024);
         long max = Runtime.getRuntime().maxMemory()/(1024*1024);

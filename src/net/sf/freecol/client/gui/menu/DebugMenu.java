@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.Utils.*;
 
 
 /**
@@ -351,7 +352,7 @@ public class DebugMenu extends JMenu {
         //gc.setMnemonic(KeyEvent.VK_G);
         this.add(gc);
         gc.addActionListener((ActionEvent ae) -> {
-                System.gc();
+                garbageCollect();
             });
         gc.setEnabled(true);
 

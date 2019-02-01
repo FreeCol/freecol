@@ -351,4 +351,14 @@ public class Utils {
     public static long now() {
         return System.currentTimeMillis();
     }
+
+
+    /**
+     * Run the garbage collector.
+     *
+     * Route all gc calls here, so we can disable the findbugs warning.
+     */
+    public static void garbageCollect() {
+        System.gc();
+    }
 }

@@ -4875,7 +4875,7 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Trains a unit of a specified type in Europe.
      *
-     * Called from NewUnitPanel
+     * Called from NewUnitPanel.
      *
      * @param unitType The type of unit to be trained.
      * @return True if a new unit was trained.
