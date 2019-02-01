@@ -62,14 +62,16 @@ import net.sf.freecol.common.model.UnitType;
 public final class ReportLabourPanel extends ReportPanel {
 
     /** An individual unit type panel. */
-    private class LabourUnitPanel extends MigPanel {
+    private static class LabourUnitPanel extends FreeColPanel {
 
         public boolean selected;
         public final UnitType unitType;
 
 
-        public LabourUnitPanel(UnitType unitType, int count) {
-            super(new MigLayout("wrap 2", "[60, right][left]"));
+        public LabourUnitPanel(FreeColClient freeColClient, UnitType unitType,
+                               int count) {
+            super(freeColClient, null,
+                  new MigLayout("wrap 2", "[60, right][left]"));
 
             this.unitType = unitType;
             setOpaque(false);
@@ -174,7 +176,7 @@ public final class ReportLabourPanel extends ReportPanel {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isPerson() && unitType.isAvailableTo(player)) {
                 int count = this.unitCount.getCount(unitType);
-                model.addElement(new LabourUnitPanel(unitType, count));
+                model.addElement(new LabourUnitPanel(freeColClient, unitType, count));
             }
         }
         Action selectAction = new AbstractAction() {

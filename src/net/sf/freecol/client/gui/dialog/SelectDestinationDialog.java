@@ -96,15 +96,14 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * A container for a destination location, with associated
      * distance and extra characteristics.
      */
-    private class Destination {
+    private static class Destination {
 
         public final Unit unit;
         public final Location location;
         public final int turns;
         public final String extras;
-        public final String text;
         public final int score;
-        public ImageIcon icon;
+        public final String text;
 
 
         /**
@@ -122,12 +121,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             this.turns = turns;
             this.extras = getExtras(location, unit, goodsTypes);
             this.score = calculateScore();
-            this.icon = null;
 
-            final Player player = getMyPlayer();
-            final ImageLibrary lib = getImageLibrary();
+            final Player player = unit.getOwner();
             final String name = location.getNameForLabel(player);
-            this.icon = location.getLocationImage(CELL_HEIGHT, lib);
             StringTemplate template = StringTemplate
                 .template("selectDestinationDialog.destinationTurns")
                 .addName("%location%", name)
@@ -297,12 +293,21 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     private static class LocationRenderer
         extends FreeColComboBoxRenderer<Destination> {
 
+        private ImageLibrary lib;
+
+        public LocationRenderer(ImageLibrary lib) {
+            this.lib = lib;
+        }
+
         /**
          * {@inheritDoc}
          */
         @Override
         public void setLabelValues(JLabel label, Destination value) {
-            if (value.icon != null) label.setIcon(value.icon);
+            if (value == null) return;
+            if (value.location != null) {
+                label.setIcon(value.location.getLocationImage(CELL_HEIGHT, this.lib));
+            }
             label.setText(value.text);
         }
     }
@@ -342,6 +347,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                                    Unit unit) {
         super(freeColClient, frame);
 
+        final ImageLibrary lib = getImageLibrary();
         // Collect the goods the unit is carrying and set this.destinations.
         final List<GoodsType> goodsTypes = new ArrayList<>();
         for (Goods goods : unit.getCompactGoodsList()) {
@@ -352,7 +358,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         DefaultListModel<Destination> model
             = new DefaultListModel<>();
         this.destinationList = new JList<>(model);
-        this.destinationList.setCellRenderer(new LocationRenderer());
+        this.destinationList.setCellRenderer(new LocationRenderer(lib));
         this.destinationList.setFixedCellHeight(CELL_HEIGHT);
         this.destinationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.destinationList.addListSelectionListener(this);
@@ -406,8 +412,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 (Location)null).okOption());
         c.add(new ChoiceItem<>(Messages.message("selectDestinationDialog.cancel"),
                 (Location)null).cancelOption().defaultOption());
-        initializeDialog(frame, DialogType.QUESTION, true, panel, new ImageIcon(
-            getImageLibrary().getSmallUnitImage(unit)), c);
+        initializeDialog(frame, DialogType.QUESTION, true, panel,
+                         new ImageIcon(lib.getSmallUnitImage(unit)), c);
     }
 
 

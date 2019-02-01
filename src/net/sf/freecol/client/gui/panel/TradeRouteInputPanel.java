@@ -90,25 +90,35 @@ public final class TradeRouteInputPanel extends FreeColPanel
      *
      * Public for DragListener.
      */
-    public class TradeRouteCargoLabel extends FreeColLabel {
+    public static class TradeRouteCargoLabel extends FreeColLabel {
 
         /** The type of goods to load at a stop. */
         private final GoodsType goodsType;
 
 
-        public TradeRouteCargoLabel(GoodsType type) {
-            super(new ImageIcon(getImageLibrary().getScaledGoodsTypeImage(type)));
+        /**
+         * Build a new cargo label for a given goods type.
+         *
+         * @param icon The label icon.
+         * @param type The {@code GoodsType}.
+         */         
+        public TradeRouteCargoLabel(ImageIcon icon, GoodsType type) {
+            super(icon);
 
             this.goodsType = type;
             setDisabledIcon(getDisabledIcon());
-            setTransferHandler(TradeRouteInputPanel.this.cargoHandler);
-            addMouseListener(TradeRouteInputPanel.this.dragListener);
         }
 
+        /**
+         * Get the goods type of this label.
+         *
+         * @return The {@code GoodsType}.
+         */
         public GoodsType getType() {
             return this.goodsType;
         }
     }
+
 
     /**
      * Panel for the cargo the carrier is supposed to take on board at
@@ -117,26 +127,60 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * FIXME: create a single cargo panel for this purpose and the use
      * in the ColonyPanel, the EuropePanel and the CaptureGoodsDialog?
      */
-    private class TradeRouteCargoPanel extends JPanel {
+    private static class TradeRouteCargoPanel extends MigPanel {
 
+        /**
+         * Build a new cargo panel.
+         */
         public TradeRouteCargoPanel() {
-            super();
+            super(new MigLayout());
 
             setOpaque(false);
             setBorder(Utility.localizedBorder("cargoOnCarrier"));
-            addMouseListener(TradeRouteInputPanel.this.dropListener);
         }
 
-        public void initialize(TradeRouteStop newStop) {
+        /**
+         * Set the labels to display on this panel.
+         *
+         * @param labels The {@code TradeRouteCargoLabel}s to display.
+         */
+        public void setLabels(List<TradeRouteCargoLabel> labels) {
             removeAll();
-            if (newStop != null) {
-                // stop = newStop;
-                for (GoodsType goodsType : newStop.getCargo()) {
-                    add(new TradeRouteCargoLabel(goodsType));
-                }
+            if (labels != null) {
+                for (TradeRouteCargoLabel label : labels) add(label);
             }
             revalidate();
             repaint();
+        }
+
+        /**
+         * Add a single label.
+         *
+         * Do not repaint, that will be done top down.
+         *
+         * @param label The {@code TradeRouteCargoLabel} to add.
+         */
+        public void addLabel(TradeRouteCargoLabel label) {
+            if (label != null) {
+                add(label);
+                revalidate();
+            }
+        }
+
+        /**
+         * Remove labels that correspond to a given goods type.
+         *
+         * @param gt The {@code GoodsType} to remove.
+         */
+        public void removeType(GoodsType gt) {
+            for (Component child : getComponents()) {
+                if (child instanceof TradeRouteCargoLabel) {
+                    if (((TradeRouteCargoLabel)child).getType() == gt) {
+                        remove(child);
+                    }
+                }
+                revalidate();
+            }
         }
     }
 
@@ -148,6 +192,33 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     private class CargoHandler extends TransferHandler {
 
+        /** The enclosing panel. */
+        private TradeRouteInputPanel tradeRouteInputPanel;
+
+        /**
+         * Build a new cargo handler for the given panel.
+         *
+         * @param trip The {@code TradeRouteInputPanel} to notify of changes.
+         */
+        public CargoHandler(TradeRouteInputPanel trip) {
+            this.tradeRouteInputPanel = trip;
+        }
+
+
+        /**
+         * Convenience function to try to get a {@code TradeRouteCargoLabel}
+         * from a {@code Transferable}.
+         *
+         * @param data The {@code Transferable} to query.
+         * @return The label found if any.
+         * @exception IOException if the data is not available.
+         * @exception UnsupportedFlavorException on flavor mismatch.
+         */
+        private TradeRouteCargoLabel tryTransfer(Transferable data)
+            throws IOException, UnsupportedFlavorException {
+            return (TradeRouteCargoLabel)data.getTransferData(DefaultTransferHandler.flavor);
+        }
+        
         /**
          * {@inheritDoc}
          */
@@ -171,25 +242,16 @@ public final class TradeRouteInputPanel extends FreeColPanel
         public boolean importData(JComponent target, Transferable data) {
             if (!canImport(target, data.getTransferDataFlavors()))
                 return false;
+            TradeRouteCargoLabel label;
             try {
-                TradeRouteCargoLabel label = (TradeRouteCargoLabel)data.getTransferData(DefaultTransferHandler.flavor);
-                if (target instanceof TradeRouteCargoPanel) {
-                    TradeRouteCargoLabel newLabel = new TradeRouteCargoLabel(label.getType());
-                    TradeRouteInputPanel.this.cargoPanel.add(newLabel);
-                    TradeRouteInputPanel.this.cargoPanel.revalidate();
-                    int[] indices = TradeRouteInputPanel.this.stopList
-                        .getSelectedIndices();
-                    for (int index : indices) {
-                        TradeRouteStop stop = TradeRouteInputPanel.this
-                            .stopListModel.get(index);
-                        stop.addCargo(label.getType());
-                    }
-                    TradeRouteInputPanel.this.stopList.revalidate();
-                    TradeRouteInputPanel.this.stopList.repaint();
-                }
-                return true;
+                label = tryTransfer(data);
             } catch (IOException|UnsupportedFlavorException ex) {
                 logger.log(Level.WARNING, "CargoHandler import", ex);
+                return false;
+            }
+            if (target instanceof TradeRouteCargoPanel) {
+                this.tradeRouteInputPanel.enableImport(label.getType());
+                return true;
             }
             return false;
         }
@@ -200,34 +262,21 @@ public final class TradeRouteInputPanel extends FreeColPanel
         @Override
         protected void exportDone(JComponent source, Transferable data,
                                   int action) {
+            TradeRouteCargoLabel label;
             try {
-                TradeRouteCargoLabel label = (TradeRouteCargoLabel)data.getTransferData(DefaultTransferHandler.flavor);
-                if (source.getParent() instanceof TradeRouteCargoPanel) {
-                    TradeRouteInputPanel.this.cargoPanel.remove(label);
-                    int[] indices = TradeRouteInputPanel.this.stopList
-                        .getSelectedIndices();
-                    for (int stopIndex : indices) {
-                        TradeRouteStop stop = TradeRouteInputPanel.this
-                            .stopListModel.get(stopIndex);
-                        List<GoodsType> cargo = new ArrayList<>(stop.getCargo());
-                        for (int index = 0; index < cargo.size(); index++) {
-                            if (cargo.get(index) == label.getType()) {
-                                cargo.remove(index);
-                                break;
-                            }
-                        }
-                        stop.setCargo(cargo);
-                    }
-                    TradeRouteInputPanel.this.stopList.revalidate();
-                    TradeRouteInputPanel.this.stopList.repaint();
-                    TradeRouteInputPanel.this.cargoPanel.revalidate();
-                    TradeRouteInputPanel.this.cargoPanel.repaint();
-                }
+                label = tryTransfer(data);
             } catch (IOException|UnsupportedFlavorException ex) {
                 logger.log(Level.WARNING, "CargoHandler export", ex);
+                return;
+            }
+            if (source.getParent() instanceof TradeRouteCargoPanel) {
+                this.tradeRouteInputPanel.cancelImport(label.getType());
             }
         }
-
+        
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
             return any(flavors, matchKeyEquals(DefaultTransferHandler.flavor));
@@ -267,20 +316,14 @@ public final class TradeRouteInputPanel extends FreeColPanel
     /**
      * Panel for all types of goods that can be loaded onto a carrier.
      */
-    private class GoodsPanel extends JPanel {
+    private static class TradeRouteGoodsPanel extends MigPanel {
 
-        public GoodsPanel() {
+        public TradeRouteGoodsPanel(List<TradeRouteCargoLabel> labels) {
             super(new GridLayout(0, 4, MARGIN, MARGIN));
 
-            for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-                if (goodsType.isStorable()) {
-                    TradeRouteCargoLabel label = new TradeRouteCargoLabel(goodsType);
-                    add(label);
-                }
-            }
+            for (TradeRouteCargoLabel label : labels) add(label);
             setOpaque(false);
             setBorder(Utility.localizedBorder("goods"));
-            addMouseListener(TradeRouteInputPanel.this.dropListener);
         }
 
         /**
@@ -436,9 +479,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         /**
          * {@inheritDoc}
-         *
-         *
-         * @throws IllegalStateException if the method is run for an illegal location
          */
         @Override
         public Component getListCellRendererComponent(JList<? extends TradeRouteStop> list,
@@ -521,7 +561,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
     private JButton removeStopButton;
 
     /** The panel displaying the goods that could be transported. */
-    private final GoodsPanel goodsPanel;
+    private final TradeRouteGoodsPanel goodsPanel;
 
     /** The panel displaying the cargo at the selected stop. */
     private TradeRouteCargoPanel cargoPanel;
@@ -543,7 +583,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         final TradeRoute tradeRoute = newRoute.copy(game);
 
         this.newRoute = newRoute;
-        this.cargoHandler = new CargoHandler();
+        this.cargoHandler = new CargoHandler(this);
         this.dragListener = new DragListener(freeColClient, this);
         this.dropListener = new DropListener();
 
@@ -608,11 +648,16 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 deleteCurrentlySelectedStops();
             });
 
-        this.goodsPanel = new GoodsPanel();
+        final List<GoodsType> gtl = getSpecification().getGoodsTypeList();
+        this.goodsPanel = new TradeRouteGoodsPanel(transform(gtl,
+                gt -> gt.isStorable(), gt -> buildCargoLabel(gt)));
         this.goodsPanel.setTransferHandler(this.cargoHandler);
         this.goodsPanel.setEnabled(false);
+        this.goodsPanel.addMouseListener(this.dropListener);
+
         this.cargoPanel = new TradeRouteCargoPanel();
         this.cargoPanel.setTransferHandler(this.cargoHandler);
+        this.cargoPanel.addMouseListener(this.dropListener);
 
         JButton cancelButton = Utility.localizedButton("cancel");
         cancelButton.setActionCommand(CANCEL);
@@ -637,14 +682,59 @@ public final class TradeRouteInputPanel extends FreeColPanel
         // update cargo panel if stop is selected
         if (this.stopListModel.getSize() > 0) {
             this.stopList.setSelectedIndex(0);
-            TradeRouteStop selectedStop = this.stopListModel.firstElement();
-            this.cargoPanel.initialize(selectedStop);
+            updateCargoPanel(this.stopListModel.firstElement());
         }
-
         // update buttons according to selection
         updateButtons();
 
         getGUI().restoreSavedSize(this, getPreferredSize());
+    }
+
+    /**
+     * Update the cargo panel to show a given stop.
+     *
+     * @param stop The {@code TradeRouteStop} to select.
+     */
+    private void updateCargoPanel(TradeRouteStop stop) {
+        this.cargoPanel.setLabels((stop == null) ? null
+            : transform(stop.getCargo(), gt -> gt.isStorable(),
+                        gt -> buildCargoLabel(gt)));
+    }
+
+    /**
+     * Import new goods at the selected stops.
+     *
+     * @param gt The {@code GoodsType} to import.
+     */
+    private void enableImport(GoodsType gt) {
+        if (gt == null) return;
+        this.cargoPanel.addLabel(buildCargoLabel(gt));
+        for (int stopIndex : this.stopList.getSelectedIndices()) {
+            TradeRouteStop stop = this.stopListModel.get(stopIndex);
+            stop.addCargo(gt);
+        }
+        this.stopList.revalidate();
+        this.stopList.repaint();
+    }
+
+    /**
+     * Cancel import of goods at the selected stops.
+     *
+     * @param gt The {@code GoodsType} to stop importing.
+     */
+    private void cancelImport(GoodsType gt) {
+        this.cargoPanel.removeType(gt);
+        for (int stopIndex : this.stopList.getSelectedIndices()) {
+            TradeRouteStop stop = this.stopListModel.get(stopIndex);
+            List<GoodsType> cargo = new ArrayList<>(stop.getCargo());
+            if (removeInPlace(cargo, matchKey(gt))) {
+                stop.setCargo(cargo);
+            }
+        }
+        this.stopList.revalidate();
+        this.stopList.repaint();
+        this.cargoPanel.revalidate();
+        this.cargoPanel.repaint();
     }
 
     /**
@@ -680,6 +770,20 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 }
             }
         }
+    }
+
+    /**
+     * Convenience function to build a new {@code TradeRouteCargoLabel}.
+     *
+     * @param gt The {@code GoodsType} for the label.
+     */
+    private TradeRouteCargoLabel buildCargoLabel(GoodsType gt) {
+        final ImageLibrary lib = getImageLibrary();
+        ImageIcon icon = new ImageIcon(lib.getScaledGoodsTypeImage(gt));
+        TradeRouteCargoLabel label = new TradeRouteCargoLabel(icon, gt);
+        label.setTransferHandler(this.cargoHandler);
+        label.addMouseListener(this.dragListener);
+        return label;
     }
 
     /**
@@ -788,8 +892,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         if (e.getValueIsAdjusting()) return;
         int[] idx = this.stopList.getSelectedIndices();
         if (idx.length > 0) {
-            TradeRouteStop stop = this.stopListModel.get(idx[0]);
-            this.cargoPanel.initialize(stop);
+            updateCargoPanel(this.stopListModel.get(idx[0]));
             this.goodsPanel.setEnabled(true);
         } else {
             this.goodsPanel.setEnabled(false);

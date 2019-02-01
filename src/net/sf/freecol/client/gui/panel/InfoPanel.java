@@ -80,10 +80,11 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for ending the turn.
      */
-    private class EndTurnPanel extends MigPanel {
+    private static class EndTurnPanel extends FreeColPanel {
 
-        public EndTurnPanel() {
-            super(new MigLayout("wrap 1, center", "[center]", ""));
+        public EndTurnPanel(FreeColClient freeColClient) {
+            super(freeColClient, null,
+                  new MigLayout("wrap 1, center", "[center]", ""));
 
             final ImageLibrary lib = getGUI().getTileImageLibrary();
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
@@ -392,7 +393,7 @@ public final class InfoPanel extends FreeColPanel {
     public InfoPanel(final FreeColClient freeColClient, boolean useSkin) {
         super(freeColClient);
 
-        this.endTurnPanel = new EndTurnPanel();
+        this.endTurnPanel = new EndTurnPanel(freeColClient);
         this.mapEditorPanel = new JPanel(null);
         this.mapEditorPanel.setSize(130, 100);
         this.mapEditorPanel.setOpaque(false);
