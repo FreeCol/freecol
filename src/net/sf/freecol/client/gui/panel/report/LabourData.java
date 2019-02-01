@@ -44,26 +44,54 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class LabourData {
 
-    private static final LocationData.Getter UNITS_IN_EUROPE_GETTER = new LocationData.Getter() {
+    private static class ColonyLocationDataGetter
+        implements LocationData.Getter {
+
+        /** The colony to get data for. */
+        private Colony colony;
+
+
+        /**
+         * Build a new location data getter for a given colony.
+         *
+         * @param colony The {@code Colony} to get data for.
+         */
+        public ColonyLocationDataGetter(Colony colony) {
+            this.colony = colony;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public LocationData getLocationData(UnitData unitData) {
-            return unitData.unitsInEurope;
+        public LocationData getLocationData(UnitData data) {
+            return data.getLocationData(this.colony);
         }
     };
 
-    private static final LocationData.Getter UNITS_AT_SEA_GETTER = new LocationData.Getter() {
-        @Override
-        public LocationData getLocationData(UnitData unitData) {
-            return unitData.unitsAtSea;
-        }
-    };
+    private static final LocationData.Getter UNITS_IN_EUROPE_GETTER
+        = new LocationData.Getter() {
+                @Override
+                public LocationData getLocationData(UnitData unitData) {
+                    return unitData.unitsInEurope;
+                }
+            };
 
-    private static final LocationData.Getter UNITS_ON_LAND_GETTER = new LocationData.Getter() {
-        @Override
-        public LocationData getLocationData(UnitData unitData) {
-            return unitData.unitsOnLand;
-        }
-    };
+    private static final LocationData.Getter UNITS_AT_SEA_GETTER
+        = new LocationData.Getter() {
+                @Override
+                public LocationData getLocationData(UnitData unitData) {
+                    return unitData.unitsAtSea;
+                }
+            };
+
+    private static final LocationData.Getter UNITS_ON_LAND_GETTER
+        = new LocationData.Getter() {
+                @Override
+                public LocationData getLocationData(UnitData unitData) {
+                    return unitData.unitsOnLand;
+                }
+            };
 
     public static class ProductionData {
         /**
@@ -453,12 +481,7 @@ public class LabourData {
             summarize(unitData, UNITS_ON_LAND_GETTER);
 
             for (final Colony colony : unitData.details.keySet()) {
-                summarize(unitData, new LocationData.Getter() {
-                    @Override
-                    public LocationData getLocationData(UnitData data) {
-                        return data.getLocationData(colony);
-                    }
-                });
+                summarize(unitData, new ColonyLocationDataGetter(colony));
             }
         }
     }
@@ -503,12 +526,8 @@ public class LabourData {
 
     private void incrementColonyCount(final Colony colony, Unit unit, UnitData unitData) {
         if (!unit.isInColony()) {
-            incrementOutsideWorker(unitData, unit, new LocationData.Getter() {
-                    @Override
-                    public LocationData getLocationData(UnitData data) {
-                        return data.getLocationData(colony);
-                    }
-                });
+            incrementOutsideWorker(unitData, unit,
+                new ColonyLocationDataGetter(colony));
             return;
         }
         WorkLocation wl = unit.getWorkLocation();

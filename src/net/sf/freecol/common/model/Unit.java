@@ -61,6 +61,71 @@ public class Unit extends GoodsLocation
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
+    private static class ClosestSettlementGoalDecider implements GoalDecider {
+
+        /** A tile to exclude. */
+        private Tile exclude;
+
+        /** Require a connected port. */
+        private boolean coastal;
+
+        /** Best value so far. */
+        private int bestValue;
+
+        /** Best path so far. */
+        private PathNode best;
+
+
+        /**
+         * Build a new goal decider to find the closest path to a settlement
+         * owned by the player controlling the searching unit.
+         *
+         * @param exclude An optional tile to exclude.
+         * @param coastal If true, a connected port is required.
+         */
+        public ClosestSettlementGoalDecider(Tile exclude, boolean coastal) {
+            this.exclude = exclude;
+            this.coastal = coastal;
+            this.bestValue = Integer.MAX_VALUE;
+            this.best = null;
+        }
+
+        // Implement GoalDecider
+
+        /**
+         * {@inheritDoc}
+         */
+        public PathNode getGoal() {
+            return this.best;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean hasSubGoals() {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean check(Unit u, PathNode path) {
+            Tile t = path.getTile();
+            if (t == null || t == this.exclude) return false;
+            Settlement settlement = t.getSettlement();
+            int value;
+            if (settlement != null
+                && u.getOwner().owns(settlement)
+                && (!this.coastal || settlement.isConnectedPort())
+                && (value = path.getTotalTurns()) < bestValue) {
+                bestValue = value;
+                best = path;
+                return true;
+            }
+            return false;
+        }
+    };
+
     /** Class index for units. */
     private static final int UNIT_CLASS_INDEX = 40;
 
@@ -2958,33 +3023,8 @@ public class Unit extends GoodsLocation
                                              int range, final boolean coastal) {
         final Player player = getOwner();
         if (startTile == null || !player.hasSettlements()) return null;
-        final GoalDecider gd = new GoalDecider() {
 
-                private int bestValue = Integer.MAX_VALUE;
-                private PathNode best = null;
-
-                @Override
-                public PathNode getGoal() { return best; }
-                @Override
-                public boolean hasSubGoals() { return true; }
-                @Override
-                public boolean check(Unit u, PathNode path) {
-                    Tile t = path.getTile();
-                    if (t == null
-                        || (t == startTile && excludeStart)) return false;
-                    Settlement settlement = t.getSettlement();
-                    int value;
-                    if (settlement != null
-                        && player.owns(settlement)
-                        && (!coastal || settlement.isConnectedPort())
-                        && (value = path.getTotalTurns()) < bestValue) {
-                        bestValue = value;
-                        best = path;
-                        return true;
-                    }
-                    return false;
-                }
-            };
+        GoalDecider gd = new ClosestSettlementGoalDecider((excludeStart) ? startTile : null, coastal);
         return search(startTile, gd, CostDeciders.avoidIllegal(), range, null);
     }
 

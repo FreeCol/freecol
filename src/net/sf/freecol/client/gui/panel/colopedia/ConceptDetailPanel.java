@@ -49,6 +49,40 @@ import net.sf.freecol.common.i18n.Messages;
 public class ConceptDetailPanel extends FreeColPanel
     implements ColopediaDetailPanel<String> {
 
+    private static class ConceptEditorPane extends JEditorPane {
+
+        /**
+         * Build a new concept editor pane containing the given text.
+         *
+         * @param text The text to display.
+         */
+        public ConceptEditorPane(String text) {
+            super("text/html", text);
+
+            putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
+                              Boolean.TRUE);
+            setOpaque(false);
+            setEditable(false);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void paintComponent(Graphics g) {
+            Graphics2D graphics2d = (Graphics2D) g;
+            graphics2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            /*
+            graphics2d.setRenderingHint(RenderingHints.KEY_RENDERING,
+              RenderingHints.VALUE_RENDER_QUALITY);
+            graphics2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+              RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+            */
+            super.paintComponent(graphics2d);
+        }
+    };
+
     private static final String id = "colopediaAction."
         + PanelType.CONCEPTS.getKey();
 
@@ -128,30 +162,10 @@ public class ConceptDetailPanel extends FreeColPanel
             SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
         panel.add(header, "align center, wrap 20");
 
-        JEditorPane editorPane = new JEditorPane("text/html",
-            Messages.getDescription(id)) {
-
-            @Override
-            public void paintComponent(Graphics g) {
-                Graphics2D graphics2d = (Graphics2D) g;
-                graphics2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                                            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                /*
-                graphics2d.setRenderingHint(RenderingHints.KEY_RENDERING,
-                                            RenderingHints.VALUE_RENDER_QUALITY);
-                graphics2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                                            RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-                */
-                super.paintComponent(graphics2d);
-            }
-        };
-        editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
-                                     Boolean.TRUE);
+        JEditorPane editorPane
+            = new ConceptEditorPane(Messages.getDescription(id));
         editorPane.setFont(panel.getFont());
-        editorPane.setOpaque(false);
-        editorPane.setEditable(false);
         editorPane.addHyperlinkListener(colopediaPanel);
-
         panel.add(editorPane, "width 95%");
     }
 }

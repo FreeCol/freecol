@@ -43,6 +43,107 @@ final class ReceivingThread extends Thread {
 
     private static final Logger logger = Logger.getLogger(ReceivingThread.class.getName());
 
+    /** A class to handle questions. */
+    private static class QuestionThread extends Thread {
+
+        /** The connection to communicate with. */
+        private final Connection conn;
+
+        /** The message to handle. */
+        private final Message query;
+
+        /** The reply identifier to use when sending a reply. */
+        private final int replyId;
+
+
+        /**
+         * Build a new thread to respond to a question message.
+         *
+         * @param name The thread name.
+         * @param conn The {@code Connection} to use for I/O.
+         * @param query The {@code Message} to handle.
+         * @param replyId The network reply identifier 
+         */
+        public QuestionThread(String name, Connection conn, Message query,
+            int replyId) {
+            super(name);
+
+            this.conn = conn;
+            this.query = query;
+            this.replyId = replyId;
+        }
+            
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void run() {
+            Message reply;
+            try {
+                reply = this.conn.handle(this.query);
+            } catch (FreeColException fce) {
+                logger.log(Level.WARNING, getName() + ": handler fail", fce);
+                return;
+            }
+
+            final String replyTag = (reply == null) ? "null"
+                : reply.getType();
+            try {
+                this.conn.sendMessage(new ReplyMessage(this.replyId, reply));
+                logger.log(Level.FINEST, getName() + " -> " + replyTag);
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, getName() + ": response " + replyTag
+                    + "fail", ex);
+            }
+        }
+    };
+
+    private static class UpdateThread extends Thread {
+
+        /** The connection to use for I/O. */
+        private final Connection conn;
+
+        /** The message to handle. */
+        private final Message message;
+
+
+        /**
+         * Build a new thread to handle an update.
+         *
+         * @param name The thread name.
+         * @param conn The {@code Connection} to use to send messsages.
+         * @param message The {@code Message} to handle.
+         */
+        public UpdateThread(String name, Connection conn, Message message) {
+            super(name);
+
+            this.conn = conn;
+            this.message = message;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void run() {
+            Message reply;
+            try {
+                reply = this.conn.handle(this.message);
+            } catch (FreeColException fce) {
+                logger.log(Level.WARNING, getName() + ": handler fail", fce);
+                return;
+            }
+
+            final String outTag = (reply == null) ? "null" : reply.getType();
+            try {
+                this.conn.sendMessage(reply);
+                logger.log(Level.FINEST, getName() + " -> " + outTag);
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, getName() + ": send exception", ex);
+            }
+        }
+    };
+
     /** Maximum number of retries before closing the connection. */
     private static final int MAXIMUM_RETRIES = 5;
 
@@ -153,34 +254,11 @@ final class ReceivingThread extends Thread {
      */
     private Thread messageQuestion(final QuestionMessage qm,
                                    final int replyId) {
-        final Connection conn = this.connection;
         final Message query = qm.getMessage();
-        if (query == null) return null;
-        final String tag = query.getType();
-        final String name = getName() + "-question-" + replyId + "-" + tag;
-
-        return new Thread(name) {
-            @Override
-            public void run() {
-                Message reply;
-                try {
-                    reply = conn.handle(query);
-                } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, name + ": handler fail", fce);
-                    return;
-                }
-
-                final String replyTag = (reply == null) ? "null"
-                    : reply.getType();
-                try {
-                    conn.sendMessage(new ReplyMessage(replyId, reply));
-                    logger.log(Level.FINEST, name + " -> " + replyTag);
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, name + ": response " + replyTag
-                        + "fail", ex);
-                }
-            }
-        };
+        return (query == null) ? null
+            : new QuestionThread(getName() + "-question-" + replyId + "-"
+                                     + query.getType(),
+                                 this.connection, query, replyId);
     }
 
     /**
@@ -193,29 +271,9 @@ final class ReceivingThread extends Thread {
         if (message == null) return null;
         final String inTag = message.getType();
         final Connection conn = this.connection;
-        final String name = getName() + "-update-" + inTag;
-        
-        return new Thread(name) {
-            @Override
-            public void run() {
-                Message reply;
-                try {
-                    reply = conn.handle(message);
-                } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, name + ": handler fail", fce);
-                    return;
-                }
 
-                final String outTag = (reply == null) ? "null"
-                    : reply.getType();
-                try {
-                    conn.sendMessage(reply);
-                    logger.log(Level.FINEST, name + " -> " + outTag);
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, name + ": send exception", ex);
-                }
-            }
-        };
+        return new UpdateThread(getName() + "-update-" + message.getType(),
+                                this.connection, message);
     }
 
     /**

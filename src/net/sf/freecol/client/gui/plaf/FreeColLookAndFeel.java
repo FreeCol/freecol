@@ -43,6 +43,69 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
     private static final Logger logger = Logger.getLogger(FreeColLookAndFeel.class.getName());
 
+    private static class FreeColMetalTheme extends DefaultMetalTheme {
+
+        private static ColorUIResource getColor(String resourceName) {
+            return new ColorUIResource(ImageLibrary.getColor(resourceName));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ColorUIResource getPrimary1() {
+            return getColor("color.primary1.LookAndFeel");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ColorUIResource getPrimary2() {
+            return getColor("color.backgroundSelect.LookAndFeel");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ColorUIResource getPrimary3() {
+            return getColor("color.primary3.LookAndFeel");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ColorUIResource getSecondary1() {
+            return getColor("color.secondary1.LookAndFeel");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ColorUIResource getSecondary2() {
+            return getColor("color.disabled.LookAndFeel");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ColorUIResource getSecondary3() {
+            return getColor("color.background.LookAndFeel");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ColorUIResource getMenuDisabledForeground() {
+            return getColor("color.disabledMenu.LookAndFeel");
+        }
+    };
+        
     private static final String brightPanelUI
         = "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI";
     private static final String transparentPanelUI
@@ -79,42 +142,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     public FreeColLookAndFeel() throws FreeColException {
         super();
 
-        setCurrentTheme(new DefaultMetalTheme() {
-                @Override
-                protected ColorUIResource getPrimary1() {
-                    return new ColorUIResource(ImageLibrary.getColor("color.primary1.LookAndFeel"));
-                }
-
-                @Override
-                protected ColorUIResource getPrimary2() {
-                    return new ColorUIResource(ImageLibrary.getColor("color.backgroundSelect.LookAndFeel"));
-                }
-
-                @Override
-                protected ColorUIResource getPrimary3() {
-                    return new ColorUIResource(ImageLibrary.getColor("color.primary3.LookAndFeel"));
-                }
-
-                @Override
-                protected ColorUIResource getSecondary1() {
-                    return new ColorUIResource(ImageLibrary.getColor("color.secondary1.LookAndFeel"));
-                }
-
-                @Override
-                protected ColorUIResource getSecondary2() {
-                    return new ColorUIResource(ImageLibrary.getColor("color.disabled.LookAndFeel"));
-                }
-
-                @Override
-                protected ColorUIResource getSecondary3() {
-                    return new ColorUIResource(ImageLibrary.getColor("color.background.LookAndFeel"));
-                }
-
-                @Override
-                public ColorUIResource getMenuDisabledForeground() {
-                    return new ColorUIResource(ImageLibrary.getColor("color.disabledMenu.LookAndFeel"));
-                }
-            });
+        setCurrentTheme(new FreeColMetalTheme());
     }
 
     /**

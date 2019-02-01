@@ -75,6 +75,59 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
     /** Limit on the number of REF units chasing a single hostile unit. */
     private static final int UNIT_USAD_THRESHOLD = 5;
 
+    /** Goal decider class for the REF Navy */
+    private static class REFNavyGoalDecider implements GoalDecider {
+
+        /** The rebel player to attack. */
+        private Player rebel;
+
+        /** A container to fill with target units. */
+        private List<Unit> rebelNavy;
+
+
+        /**
+         * Build a new goal decider for the REF to find rebel naval units.
+         *
+         * @param rebel The {@code Player} to attack.
+         * @param rebelNavy A container to fill with the naval units found.
+         */
+        public REFNavyGoalDecider(Player rebel, List<Unit> rebelNavy) {
+            this.rebel = rebel;
+            this.rebelNavy = rebelNavy;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public PathNode getGoal() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean hasSubGoals() {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean check(Unit unit, PathNode pathNode) {
+            final Predicate<Unit> pred
+                = (u -> u.isOffensiveUnit() && u.isNaval()
+                    && !this.rebelNavy.contains(u));
+            Tile tile = pathNode.getTile();
+            if (tile != null && !tile.isEmpty()
+                && !tile.isLand()
+                && this.rebel.owns(tile.getFirstUnit())) {
+                this.rebelNavy.addAll(transform(tile.getUnits(), pred));
+                return true;
+            }
+            return false;
+        }
+    };
+
     /** Container class for REF target colony information. */
     private static class TargetTuple implements Comparable<TargetTuple> {
 
@@ -425,24 +478,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         // Try to find some rebel naval units near the entry locations
         // for the targets.
         final List<Unit> rebelNavy = new ArrayList<>();
-        final GoalDecider navyGD = new GoalDecider() {
-                @Override
-                public PathNode getGoal() { return null; }
-                @Override
-                public boolean hasSubGoals() { return true; }
-                @Override
-                public boolean check(Unit unit, PathNode pathNode) {
-                    Tile tile = pathNode.getTile();
-                    if (tile != null && !tile.isEmpty()
-                        && !tile.isLand()
-                        && rebel.owns(tile.getFirstUnit())) {
-                        rebelNavy.addAll(transform(tile.getUnits(), u ->
-                                (u.isOffensiveUnit() && u.isNaval()
-                                    && !rebelNavy.contains(u))));
-                    }
-                    return false;
-                }
-            };
+        final GoalDecider navyGD = new REFNavyGoalDecider(rebel, rebelNavy);
         for (int i = 0; i < n; i++) {
             carrier.search(targets.get(i).entry, navyGD, null,
                            carrier.getInitialMovesLeft() * 2, null);
