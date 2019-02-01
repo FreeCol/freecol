@@ -70,13 +70,11 @@ public class NetworkReplyObject {
      *
      * @return the response.
      */
-    public Object getResponse() {
+    public synchronized Object getResponse() {
         while (!this.responseGiven) {
-            synchronized (this) {
-                try {
-                    wait(ONE_SECOND);
-                } catch (InterruptedException ie) {}
-            }
+            try {
+                wait(ONE_SECOND);
+            } catch (InterruptedException ie) {}
         }
         return this.response;
     }
@@ -87,13 +85,11 @@ public class NetworkReplyObject {
      * @param response The response.
      * @see #getResponse
      */
-    public void setResponse(Object response) {
+    public synchronized void setResponse(Object response) {
         if (!this.responseGiven) {
-            synchronized (this) {
-                this.response = response;
-                this.responseGiven = true;
-                notifyAll();
-            }
+            this.response = response;
+            this.responseGiven = true;
+            notifyAll();
         }
     }
 
