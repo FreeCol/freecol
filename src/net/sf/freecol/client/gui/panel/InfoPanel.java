@@ -79,6 +79,8 @@ public final class InfoPanel extends FreeColPanel {
 
     /**
      * Panel for ending the turn.
+     *
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     private static class EndTurnPanel extends FreeColPanel {
 
@@ -110,7 +112,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for displaying {@code Tile}-information.
      */
-    public class TileInfoPanel extends MigPanel {
+    public static class TileInfoPanel extends FreeColPanel {
 
         private static final int PRODUCTION = 4;
         
@@ -119,12 +121,14 @@ public final class InfoPanel extends FreeColPanel {
         // TODO: Find a way of removing the need for an extremely tiny font.
         //private final Font font = new JLabel().getFont().deriveFont(8f);
 
-
         /**
          * Create a {@code TileInfoPanel}.
+         *
+         * @param freeColClient The {@code FreeColClient} for the game.
          */
-        public TileInfoPanel() {
-            super(new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1"));
+        public TileInfoPanel(FreeColClient freeColClient) {
+            super(freeColClient, null,
+                  new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1"));
 
             setSize(260, 130);
             setOpaque(false);
@@ -220,7 +224,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for displaying {@code Unit}-information.
      */
-    public class UnitInfoPanel extends MigPanel
+    public static class UnitInfoPanel extends FreeColPanel
         implements PropertyChangeListener {
 
         /** The unit to display. */
@@ -229,9 +233,12 @@ public final class InfoPanel extends FreeColPanel {
 
         /**
          * Create a new unit information panel.
+         *
+         * @param freeColClient The {@code FreeColClient} for the game.
          */
-        public UnitInfoPanel() {
-            super(new MigLayout("wrap 5, fill, gap 0 0", "", ""));
+        public UnitInfoPanel(FreeColClient freeColClient) {
+            super(freeColClient, null,
+                  new MigLayout("wrap 5, fill, gap 0 0", "", ""));
 
             setSize(260, 130);
             setOpaque(false);
@@ -397,8 +404,8 @@ public final class InfoPanel extends FreeColPanel {
         this.mapEditorPanel = new JPanel(null);
         this.mapEditorPanel.setSize(130, 100);
         this.mapEditorPanel.setOpaque(false);
-        this.tileInfoPanel = new TileInfoPanel();
-        this.unitInfoPanel = new UnitInfoPanel();
+        this.tileInfoPanel = new TileInfoPanel(freeColClient);
+        this.unitInfoPanel = new UnitInfoPanel(freeColClient);
         this.skin = (!useSkin) ? null
             : ImageLibrary.getUnscaledImage("image.skin.InfoPanel");
 
