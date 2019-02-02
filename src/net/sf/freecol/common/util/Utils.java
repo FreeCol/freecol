@@ -39,6 +39,7 @@ import java.nio.charset.StandardCharsets;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -333,7 +334,7 @@ public class Utils {
      */
     public static void delay(long ms, String warning) {
         try {
-            Thread.sleep(ms);
+            TimeUnit.MILLISECONDS.sleep(ms);
         } catch (InterruptedException ie) {
             if (warning == null) {
                 Thread.currentThread().interrupt();
