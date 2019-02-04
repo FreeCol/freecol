@@ -69,6 +69,10 @@ public abstract class Message {
         = Collections.synchronizedMap(new HashMap<String,
             Constructor<? extends Message>>());
 
+    /** Classes used by Message.read() */
+    private static final Class[] readClasses = {
+        Game.class, FreeColXMLReader.class };
+
     // Convenient way to specify the relative priorities of the messages
     // types in one place.
     public static enum MessagePriority {
@@ -642,8 +646,7 @@ public abstract class Message {
                     .preserveDebug();
             }
 
-            final Class[] types = { Game.class, FreeColXMLReader.class };
-            mb = Introspector.getConstructor(cl, types);
+            mb = Introspector.getConstructor(cl, readClasses);
             if (mb == null) {
                 throw new FreeColException("No constructor for: " + tag)
                     .preserveDebug();
