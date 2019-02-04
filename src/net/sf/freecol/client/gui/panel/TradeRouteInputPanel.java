@@ -190,10 +190,11 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * FIXME: check whether this could/should be folded into the
      * DefaultTransferHandler.
      */
-    private class CargoHandler extends TransferHandler {
+    private static class CargoHandler extends TransferHandler {
 
         /** The enclosing panel. */
         private TradeRouteInputPanel tradeRouteInputPanel;
+
 
         /**
          * Build a new cargo handler for the given panel.
