@@ -22,13 +22,12 @@ package net.sf.freecol.common.io;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -127,12 +126,11 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * Creates a new {@code FreeColXMLReader}.
      *
      * @param file The {@code File} to create an {@code FreeColXMLReader} for.
+     * @exception IOException if the file is missing.
      * @exception XMLStreamException can be thrown while creating the reader.
-     * @exception FileNotFoundException if the file is missing.
      */
-    public FreeColXMLReader(File file)
-        throws FileNotFoundException, XMLStreamException {
-        this(new FileInputStream(file));
+    public FreeColXMLReader(File file) throws IOException, XMLStreamException {
+        this(Files.newInputStream(file.toPath()));
     }
     
     /**

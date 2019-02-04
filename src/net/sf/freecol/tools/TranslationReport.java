@@ -20,8 +20,9 @@
 package net.sf.freecol.tools;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.FilenameFilter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -66,7 +67,7 @@ public class TranslationReport {
 
         File masterFile = new File(directory, "FreeColMessages.properties");
         Properties master = new Properties();
-        master.load(new FileInputStream(masterFile));
+        master.load(Files.newInputStream(masterFile.toPath()));
         //System.out.println("*** Found master property file with " + master.size() + " properties.\n");
 
         for (String name : languageFiles) {
@@ -74,7 +75,7 @@ public class TranslationReport {
             lstat.localFile = name;
             File propertyFile = new File(directory, name);
             Properties properties = new Properties();
-            properties.load(new FileInputStream(propertyFile));
+            properties.load(Files.newInputStream(propertyFile.toPath()));
             System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
             System.out.println("*** " + name + " ***");
             System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);

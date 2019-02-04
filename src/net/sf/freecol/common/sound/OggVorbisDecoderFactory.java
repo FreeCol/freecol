@@ -20,9 +20,9 @@
 package net.sf.freecol.common.sound;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -456,7 +456,7 @@ public class OggVorbisDecoderFactory {
      * @exception IOException if unable to open the stream.
      */
     public AudioInputStream getOggStream(File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
+        InputStream fis = Files.newInputStream(file.toPath());
         return new OggVorbisAudioInputStream(new OggStream(fis));
     }
 }

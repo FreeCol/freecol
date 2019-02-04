@@ -23,12 +23,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -885,14 +884,10 @@ public abstract class FreeColObject
      * @return True if the save proceeded without error.
      */
     public boolean save(File file, WriteScope scope, boolean pretty) {
-        try (
-            FileOutputStream fos = new FileOutputStream(file);
-        ) {
+        try (OutputStream fos = Files.newOutputStream(file.toPath())) {
             return save(fos, scope, pretty);
-        } catch (FileNotFoundException fnfe) {
-            logger.log(Level.WARNING, "No file: " + file.getPath(), fnfe);
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error creating FileOutputStream", ioe);
+            logger.log(Level.WARNING, "Error creating output stream", ioe);
         }
         return false;
     }

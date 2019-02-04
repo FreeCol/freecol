@@ -21,21 +21,22 @@ package net.sf.freecol.server;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Timer;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -825,9 +826,8 @@ public final class FreeColServer {
         // here can lead to a corrupt saved game file (BR#3146).
         // Alas, gc is only advisory, but it is all we have got.
         garbageCollect();
-        try (
-            JarOutputStream fos = new JarOutputStream(new FileOutputStream(file));
-        ) {
+        try (JarOutputStream fos = new JarOutputStream(Files
+                .newOutputStream(file.toPath()))) {
             if (image != null) {
                 fos.putNextEntry(new JarEntry(FreeColSavegameFile.THUMBNAIL_FILE));
                 ImageIO.write(image, "png", fos);

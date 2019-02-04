@@ -21,12 +21,13 @@ package net.sf.freecol.common.i18n;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -155,10 +156,8 @@ public class Messages {
             // attempt to read grammatical rules
             File cldr = FreeColDirectories.getI18nPluralsFile();
             if (cldr.exists()) {
-                try {
-                    try (FileInputStream in = new FileInputStream(cldr)) {
-                        NumberRules.load(in);
-                    }
+                try (InputStream in = Files.newInputStream(cldr.toPath())) {
+                    NumberRules.load(in);
                 } catch (IOException e) {
                     System.err.println("Failed to read CLDR rules: "
                         + e.getMessage());
@@ -175,8 +174,8 @@ public class Messages {
 
         for (File f : FreeColDirectories.getI18nMessageFileList(locale)) {
             if (!f.canRead()) continue;
-            try {
-                loadMessages(new FileInputStream(f));
+            try (InputStream in = Files.newInputStream(f.toPath())) {
+                loadMessages(in);
             } catch (IOException ioe) {
                 System.err.println("Failed to load messages from "
                     + f.getPath() + ": " + ioe.getMessage());

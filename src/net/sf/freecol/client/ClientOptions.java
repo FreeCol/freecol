@@ -870,7 +870,7 @@ public class ClientOptions extends OptionGroup {
         final File optionsFile = FreeColDirectories.getClientOptionsFile();
         try (FreeColXMLReader xr = new FreeColXMLReader(optionsFile)) {
             xr.readAttributeValues(ret, "value");
-        } catch (FileNotFoundException|XMLStreamException xe) {
+        } catch (IOException|XMLStreamException xe) {
             throw new FreeColException(xe);
         }
         return ret;

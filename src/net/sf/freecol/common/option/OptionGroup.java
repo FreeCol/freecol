@@ -348,7 +348,7 @@ public class OptionGroup extends AbstractOption<OptionGroup>
             FreeColXMLReader xr = new FreeColXMLReader(file);
         ) {
             ret = load(xr);
-        } catch (FileNotFoundException|XMLStreamException xse) {
+        } catch (IOException|XMLStreamException xse) {
             logger.log(Level.WARNING, "Load OptionGroup(" + getId()
                 + ") from file " + file.getPath() + " crashed", xse);
             return false;

@@ -21,14 +21,14 @@ package net.sf.freecol;
 
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -825,9 +825,9 @@ public final class FreeCol {
             if (line.hasOption("splash")) {
                 String splash = line.getOptionValue("splash");
                 try {
-                    FileInputStream fis = new FileInputStream(splash);
+                    InputStream fis = Files.newInputStream(Paths.get(splash));
                     splashStream = fis;
-                } catch (FileNotFoundException fnfe) {
+                } catch (IOException ioe) {
                     gripe(StringTemplate.template("cli.error.splash")
                         .addName("%name%", splash));
                 }

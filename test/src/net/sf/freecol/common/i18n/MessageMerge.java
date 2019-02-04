@@ -24,9 +24,11 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,9 +131,8 @@ public final class MessageMerge {
 
 
     private static List<String> loadLinesFromFile(String pathToFile) {
-        try {
-            List<String> lineList = new ArrayList<>();
-            FileInputStream in = new FileInputStream( pathToFile );
+        List<String> lineList = new ArrayList<>();
+        try (InputStream in = Files.newInputStream(Paths.get(pathToFile))) {
             StringBuilder line = new StringBuilder();
             while ( true )
             {
@@ -165,8 +166,7 @@ public final class MessageMerge {
 
     private static void saveLinesToFile( List<String> lineList, String pathToFile )
     {
-        try {
-            FileOutputStream  out = new FileOutputStream( pathToFile );
+        try (OutputStream out = Files.newOutputStream(Paths.get(pathToFile))) {
             for ( int lineNumber = 0, lines = lineList.size();  lineNumber < lines;  lineNumber ++ )
             {
                 String  line = (String) lineList.get( lineNumber );
@@ -176,7 +176,6 @@ public final class MessageMerge {
                 }
                 out.write( '\n' );
             }
-            out.close();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

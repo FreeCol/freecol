@@ -22,12 +22,10 @@ package net.sf.freecol.tools;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.zip.GZIPInputStream;
 
 import net.sf.freecol.FreeCol;
@@ -83,14 +81,11 @@ public class FSGConverter {
      * @param in The input file.
      * @param out The output file. This file will be overwritten
      *      if it already exists.
-     * @throws FileNotFoundException if the given input file could not be found.
      * @throws IOException if thrown while reading or writing the files. 
      */
     public void convertToXML(File in, File out) throws IOException {
-        try (
-            FileInputStream fis = new FileInputStream(in);
-            FileOutputStream fos = new FileOutputStream(out);
-        ) {
+        try (InputStream fis = Files.newInputStream(in.toPath());
+            OutputStream fos = Files.newOutputStream(out.toPath())) {
             convertToXML(fis, fos);
         }
     }

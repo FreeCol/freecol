@@ -20,12 +20,13 @@
 package net.sf.freecol.common.debug;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import static java.nio.file.StandardOpenOption.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -357,21 +358,13 @@ public class FreeColDebugger {
      * @param msg The message to log.
      */
     public static void debugLog(String msg) {
-        FileOutputStream fos = null;
-        PrintStream prs = null;
-        try {
-            fos = new FileOutputStream("/tmp/freecol.debug", true);
-            prs = new PrintStream(fos, true, "UTF-8");
-            prs.println(msg);
-        } catch (FileNotFoundException|UnsupportedEncodingException ex) {
-            ; // Ignore failure
-        } finally {
-            try {
-                if (prs != null) prs.close();
-                if (fos != null) fos.close();
-            } catch (IOException ioe) {
-                ; // Ignore failure
+        final Path path = Paths.get("/tmp", "freecol.debug");
+        try (OutputStream fos = Files.newOutputStream(path, APPEND)) {
+            try (PrintStream prs = new PrintStream(fos, true, "UTF-8")) {
+                prs.println(msg);
             }
+        } catch (IOException ex) {
+            ; // Ignored
         }
     }
 

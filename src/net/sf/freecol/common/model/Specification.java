@@ -21,10 +21,10 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -2048,11 +2048,9 @@ public final class Specification implements OptionContainer {
         if (compareVersion("0.85") > 0) return;
 
         File rolf = FreeColDirectories.getCompatibilityFile(ROLES_COMPAT_FILE_NAME);
-        try (
-            FileInputStream fis = new FileInputStream(rolf);
-        ) {
+        try (InputStream fis = Files.newInputStream(rolf.toPath())) {
             load(fis);
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.log(Level.WARNING, "Failed to load remedial roles.", e);
             return;
         }
@@ -2074,11 +2072,9 @@ public final class Specification implements OptionContainer {
         UnitChangeType enter = find(unitChangeTypeList,
             matchKeyEquals(UnitChangeType.ENTER_COLONY, UnitChangeType::getId));
         File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME);
-        try (
-             FileInputStream fis = new FileInputStream(uctf);
-             ) {
+        try (InputStream fis = Files.newInputStream(uctf.toPath())) {
             load(fis);
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.log(Level.WARNING, "Failed to load unit changes.", e);
             return;
         }
