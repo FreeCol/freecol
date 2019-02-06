@@ -22,9 +22,7 @@ package net.sf.freecol.common.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -36,7 +34,8 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-
+import java.nio.file.Files;
+import static java.nio.file.StandardOpenOption.*;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -154,15 +153,14 @@ public class Utils {
      * @return A {@code Reader} for this file.
      */
     public static Reader getFileUTF8Reader(File file) {
-        FileInputStream fis;
         try {
-            fis = new FileInputStream(file);
-        } catch (FileNotFoundException fnfe) {
-            logger.log(Level.WARNING, "No FileInputStream for "
-                + file.getPath(), fnfe);
-            return null;
+            InputStream fis = Files.newInputStream(file.toPath());
+            return new InputStreamReader(fis, StandardCharsets.UTF_8);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "No input stream for " + file.getPath(),
+                       ioe);
         }
-        return new InputStreamReader(fis, StandardCharsets.UTF_8);
+        return null;
     }
 
     /**
@@ -211,15 +209,16 @@ public class Utils {
      * @return A {@code Writer} for this file.
      */
     private static Writer getF8W(File file, boolean append) {
-        FileOutputStream fos;
         try {
-            fos = new FileOutputStream(file, append);
-        } catch (FileNotFoundException e) {
-            logger.log(Level.WARNING, "No FileOutputStream for "
-                + file.getName(), e);
-            return null;
+            OutputStream fos = (append)
+                ? Files.newOutputStream(file.toPath(), CREATE, APPEND)
+                : Files.newOutputStream(file.toPath());
+            return getUTF8Writer(fos);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "No output stream for " + file.getName(),
+                       ioe);
         }
-        return getUTF8Writer(fos);
+        return null;
     }
 
     /**
