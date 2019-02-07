@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.zip.GZIPInputStream;
 
@@ -118,7 +119,7 @@ public class FSGConverter {
                 return;
             }
             in.reset();
-            if (!"<?xml".equals(new String(buf, "UTF-8"))) {
+            if (!"<?xml".equals(new String(buf, StandardCharsets.UTF_8))) {
                 in = new BufferedInputStream(new GZIPInputStream(ins));
             }
 
