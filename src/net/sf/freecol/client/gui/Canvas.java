@@ -1159,7 +1159,7 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else if (panel.endsWith("Dialog")) {
-            for (FreeColDialog<?> fcd : dialogs) {
+            for (FreeColDialog<?> fcd : new ArrayList<>(dialogs)) {
                 if (panel.equals(fcd.getClass().getName())) {
                     dialogs.remove(fcd);
                     fcd.dispose();

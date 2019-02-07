@@ -4011,7 +4011,9 @@ public class Player extends FreeColGameObject implements Nameable {
         this.setBannedMissions(game.updateRef(o.getBannedMissions()));
         this.setStances(o.getStances());
         this.tradeRoutes.clear();
-        for (TradeRoute tr : tradeRoutes) this.tradeRoutes.add(game.update(tr, false));
+        for (TradeRoute tr : o.getTradeRoutes()) {
+            this.tradeRoutes.add(game.update(tr, false));
+        }
         this.setHistory(o.getHistory());
         this.setLastSales(o.getLastSales());
         // Do not copy in the model messages, they are always passed
