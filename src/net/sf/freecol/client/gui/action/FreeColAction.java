@@ -21,6 +21,8 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -235,21 +237,22 @@ public abstract class FreeColAction extends AbstractAction
      */
     protected void addImageIcons(String key) {
         orderButtonImageCount = 0;
-        Image[] images = ImageLibrary.getButtonImages(key);
-        if (images[0] != null) {
-            putValue(BUTTON_IMAGE, new ImageIcon(images[0]));
+        List<BufferedImage> images = ImageLibrary.getButtonImages(key);
+        BufferedImage im;
+        if ((im = images.remove(0)) != null) {
+            putValue(BUTTON_IMAGE, new ImageIcon(im));
             orderButtonImageCount++;
         }
-        if (images[1] != null) {
-            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(images[1]));
+        if ((im = images.remove(0)) != null) {
+            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(im));
             orderButtonImageCount++;
         }
-        if (images[2] != null) {
-            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images[2]));
+        if ((im = images.remove(0)) != null) {
+            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(im));
             orderButtonImageCount++;
         }
-        if (images[3] != null) {
-            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images[3]));
+        if ((im = images.remove(0)) != null) {
+            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(im));
             orderButtonImageCount++;
         }
 

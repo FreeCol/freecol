@@ -35,6 +35,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
 import java.awt.Toolkit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -569,20 +570,26 @@ public final class ImageLibrary {
 
     // Miscellaneous image handling
 
-    public static BufferedImage[] getButtonImages(String key) {
-        BufferedImage[] ret = new BufferedImage[4];
+    /**
+     * Get the button images for a given key.
+     *
+     * @param key The key to look up.
+     * @return The list of button images found.
+     */
+    public static List<BufferedImage> getButtonImages(String key) {
+        List<BufferedImage> ret = new ArrayList<>();
         final String normalKey = "image.miscicon.button.normal." + key;
-        ret[0] = (!ResourceManager.hasImageResource(normalKey)) ? null
-            : getUnscaledImage(normalKey);
+        ret.add((!ResourceManager.hasImageResource(normalKey)) ? null
+            : getUnscaledImage(normalKey));
         final String highlightedKey = "image.miscicon.button.highlighted." + key;
-        ret[1] = (!ResourceManager.hasImageResource(highlightedKey)) ? null
-            : getUnscaledImage(highlightedKey);
+        ret.add((!ResourceManager.hasImageResource(highlightedKey)) ? null
+            : getUnscaledImage(highlightedKey));
         final String pressedKey = "image.miscicon.button.pressed." + key;
-        ret[2] = (!ResourceManager.hasImageResource(pressedKey)) ? null
-            : getUnscaledImage(pressedKey);
+        ret.add((!ResourceManager.hasImageResource(pressedKey)) ? null
+            : getUnscaledImage(pressedKey));
         final String disabledKey = "image.miscicon.button.disabled." + key;
-        ret[3] = (!ResourceManager.hasImageResource(disabledKey)) ? null
-            : getUnscaledImage(disabledKey);
+        ret.add((!ResourceManager.hasImageResource(disabledKey)) ? null
+            : getUnscaledImage(disabledKey));
         return ret;
     }
         
