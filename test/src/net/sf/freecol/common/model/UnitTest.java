@@ -431,18 +431,18 @@ public class UnitTest extends FreeColTestCase {
         assertEquals("Colonist should be dutch", dutch,
                      colonist.getOwner());
         assertEquals("Dutch player should have 1 unit", 1,
-                     dutch.getUnitList().size());
+                     dutch.getUnitCount());
         assertEquals("French player should have no units", 0,
-                     french.getUnitList().size());
+                     french.getUnitCount());
 
         // change owner
         colonist.changeOwner(french);
         assertEquals("Colonist should be french", french,
                      colonist.getOwner());
         assertEquals("Dutch player should have no units", 0,
-                     dutch.getUnitList().size());
+                     dutch.getUnitCount());
         assertEquals("French player should have 1 unit", 1,
-                     french.getUnitList().size());
+                     french.getUnitCount());
     }
 
     public void testCarrierOwnerChange(){
@@ -471,9 +471,9 @@ public class UnitTest extends FreeColTestCase {
         assertEquals("Colonist should be dutch", dutch,
                      colonist.getOwner());
         assertEquals("Dutch player should have 2 units", 2,
-                     dutch.getUnitList().size());
+                     dutch.getUnitCount());
         assertEquals("French player should have no units", 0,
-                     french.getUnitList().size());
+                     french.getUnitCount());
 
         // change carrier owner
         galleon.changeOwner(french);
@@ -482,9 +482,9 @@ public class UnitTest extends FreeColTestCase {
         assertEquals("Colonist should be french", french,
                      colonist.getOwner());
         assertEquals("Dutch player should have no units", 0,
-                     dutch.getUnitList().size());
+                     dutch.getUnitCount());
         assertEquals("French player should have 2 units", 2,
-                     french.getUnitList().size());
+                     french.getUnitCount());
     }
 
 

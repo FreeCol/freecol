@@ -279,7 +279,7 @@ public final class TradeRoutePanel extends FreeColPanel {
 
         // Update the counts
         this.counts.clear();
-        for (Unit u : player.getUnitList()) {
+        for (Unit u : player.getUnitSet()) {
             TradeRoute tradeRoute = u.getTradeRoute();
             if (tradeRoute != null && routes.contains(tradeRoute)) {
                 Integer i = counts.get(tradeRoute);

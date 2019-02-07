@@ -462,7 +462,7 @@ public class PioneeringMission extends Mission {
             : (loc instanceof Tile)
             ? invalidTileReason(aiUnit, (Tile)loc)
             : (loc instanceof Colony)
-            ? ((aiUnit.getUnit().getLocation() instanceof Tile)
+            ? ((aiUnit.getUnit().isOnTile())
                 ? invalidColonyReason(aiUnit, (Colony)loc)
                 : invalidTargetReason(loc, aiUnit.getUnit().getOwner()))
             : Mission.TARGETINVALID;

@@ -713,8 +713,7 @@ public class Unit extends GoodsLocation
         case FORTIFYING:
             return getMovesLeft() > 0;
         case IMPROVING:
-            return getMovesLeft() > 0
-                && getLocation() instanceof Tile
+            return getMovesLeft() > 0 && isOnTile()
                 && getOwner().canAcquireForImprovement(getLocation().getTile());
         case IN_COLONY:
             return !isNaval();
@@ -1030,6 +1029,15 @@ public class Unit extends GoodsLocation
      */
     public boolean isOnCarrier() {
         return getLocation() instanceof Unit;
+    }
+
+    /**
+     * Is this unit on a tile?
+     *
+     * @return True if the unit is on a tile.
+     */
+    public boolean isOnTile() {
+        return getLocation() instanceof Tile;
     }
 
     /**

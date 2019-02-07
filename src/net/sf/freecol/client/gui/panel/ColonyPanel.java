@@ -973,8 +973,7 @@ public final class ColonyPanel extends PortPanel
             igc().nextModelMessage();
             Unit activeUnit = getGUI().getActiveUnit();
             if (activeUnit == null || !activeUnit.hasTile()
-                || (!(activeUnit.getLocation() instanceof Tile)
-                    && !activeUnit.isOnCarrier())) {
+                || (!activeUnit.isOnTile() && !activeUnit.isOnCarrier())) {
                 igc().nextActiveUnit();
             }
         }
@@ -1399,8 +1398,7 @@ public final class ColonyPanel extends PortPanel
                     if (unit.getColony() == null) {
                         closeColonyPanel();
                         return null;
-                    } else if (!(unit.getLocation() instanceof Tile)
-                        && !unit.isOnCarrier()) {
+                    } else if (!unit.isOnTile() && !unit.isOnCarrier()) {
                         return null;
                     }
 

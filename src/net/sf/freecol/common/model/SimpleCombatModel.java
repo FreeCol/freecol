@@ -397,7 +397,7 @@ public class SimpleCombatModel extends CombatModel {
             // Artillery in the open penalty, attacker must be on a
             // tile and neither unit can be in a settlement.
             if (attacker.hasAbility(Ability.BOMBARD)
-                && attacker.getLocation() instanceof Tile
+                && attacker.isOnTile()
                 && attacker.getSettlement() == null
                 && attacker.getState() != Unit.UnitState.FORTIFIED
                 && defenderUnit.getSettlement() == null) {

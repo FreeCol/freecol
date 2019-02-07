@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -835,7 +836,7 @@ public class DebugUtils {
      */
     public static void displayUnits(final FreeColClient freeColClient) {
         final Player player = freeColClient.getMyPlayer();
-        List<Unit> all = player.getUnitList();
+        Set<Unit> all = player.getUnitSet();
         LogBuilder lb = new LogBuilder(256);
         lb.add("\nActive units:\n");
 
@@ -861,9 +862,8 @@ public class DebugUtils {
             }
         }
         lb.add("Remaining units:\n");
-        while (!all.isEmpty()) {
-            u = all.remove(0);
-            lb.add(u, "\nat ", u.getLocation(), "\n");
+        for (Unit x : all) {
+            lb.add(x, "\nat ", x.getLocation(), "\n");
         }
 
         freeColClient.getGUI().showInformationMessage(lb.toString());

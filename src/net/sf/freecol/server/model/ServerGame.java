@@ -426,7 +426,7 @@ public class ServerGame extends Game implements TurnTaker {
             lb.add(" ", c.getName());
             contacts.add(c.getFirstUnit());
         }
-        for (Unit unit : weakest.getUnitList()) {
+        for (Unit unit : weakest.getUnitSet()) {
             lb.add(" ", unit.getId());
             if (unit.isOnCarrier()) {
                 ; // Allow carrier to handle
@@ -442,7 +442,7 @@ public class ServerGame extends Game implements TurnTaker {
                 } else if (unit.getLocation() instanceof HighSeas) {
                     unit.setLocation(strongAI.getHighSeas());//-vis
                     cs.add(See.only(strongest), unit);
-                } else if (unit.getLocation() instanceof Tile) {
+                } else if (unit.isOnTile()) {
                     Tile tile = unit.getTile();
                     if (!tiles.contains(tile)) tiles.add(tile);
                 }

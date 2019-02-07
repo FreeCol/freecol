@@ -72,9 +72,8 @@ public class REFTest extends FreeColTestCase {
         assertEquals("REF player should be player1 ref", refPlayer,
             player1.getREFPlayer());
 
-        List<Unit> refUnitsAfterIndependence = refPlayer.getUnitList();
         Force newf = new Force(spec);
-        for (Unit u : refUnitsAfterIndependence) {
+        for (Unit u : refPlayer.getUnitSet()) {
             newf.add(new AbstractUnit(u.getType(), u.getRole().getId(), 1));
         }
         assertTrue("REF player force != Player monarch Expeditionary force",

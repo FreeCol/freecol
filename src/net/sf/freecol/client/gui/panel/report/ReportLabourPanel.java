@@ -142,7 +142,7 @@ public final class ReportLabourPanel extends ReportPanel {
         final Player player = getMyPlayer();
         this.data = new HashMap<>();
         this.unitCount = new TypeCountMap<>();
-        for (Unit unit : player.getUnitList()) {
+        for (Unit unit : player.getUnitSet()) {
             UnitType type = unit.getType();
             this.unitCount.incrementCount(type, 1);
             Map<Location, Integer> unitMap = this.data.get(type);

@@ -502,7 +502,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         // carriers with units, carriers with goods.
         boolean hasCarrier = false, hasColonist = false, hasEmbarked = false,
             hasGoods = false;
-        for (Unit unit : getUnitList()) {
+        for (Unit unit : getUnitSet()) {
             if (unit.isCarrier()) {
                 if (unit.hasGoodsCargo()) hasGoods = true;
                 hasCarrier = true;
@@ -611,7 +611,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         final int landREFUnitsRequired = 7; // FIXME: magic number
         boolean naval = false;
         int land = 0;
-        for (Unit u : getUnitList()) {
+        for (Unit u : getUnitSet()) {
             if (u.isNaval()) naval = true; else {
                 if (u.hasAbility(Ability.REF_UNIT)) land++;
             }
@@ -681,9 +681,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         }
 
         // Remove units
-        List<Unit> units = getUnitList();
-        while (!units.isEmpty()) {
-            Unit u = units.remove(0);
+        for (Unit u : getUnitSet()) {
             if (u.hasTile()) tiles.add(u.getTile());
             ((ServerUnit)u).csRemove(See.perhaps().always(this),
                                      u.getLocation(), cs);//-vis(this)
@@ -961,8 +959,8 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @see #hasExplored
      */
     public Set<Tile> exploreForUnit(Unit unit) {
-        return (getGame() == null || getGame().getMap() == null || unit == null
-            || !(unit.getLocation() instanceof Tile)) 
+        return (getGame() == null || getGame().getMap() == null
+                || unit == null || !unit.isOnTile())
             ? Collections.<Tile>emptySet()
             : exploreTiles(unit.getVisibleTileSet());
     }
@@ -982,7 +980,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         invalidateCanSeeTiles();//+vis(this)
         if (!reveal) {
             for (Settlement s : getSettlementList()) exploreForSettlement(s);
-            for (Unit u : getUnitList()) exploreForUnit(u);
+            for (Unit u : getUnitSet()) exploreForUnit(u);
         }
         return result;
     }
@@ -1982,7 +1980,7 @@ outer:  for (Effect effect : effects) {
         UnitChangeType uct
             = spec.getUnitChangeType(UnitChangeType.FOUNDING_FATHER);
         if (uct != null && uct.appliesTo(this)) {
-            for (Unit u : getUnitList()) {
+            for (Unit u : getUnitSet()) {
                 for (UnitTypeChange uc : uct.getUnitChanges(u.getType())) {
                     if (!uc.appliesTo(u)) continue;
                     u.changeType(uc.to);//-vis(this)
@@ -4461,7 +4459,7 @@ outer:  for (Effect effect : effects) {
         newLiberty = getLiberty() - oldLiberty;
         
         // Units.
-        for (Unit unit : getUnitList()) {
+        for (Unit unit : getUnitSet()) {
             try {
                 ((TurnTaker)unit).csNewTurn(random, lb, cs);
             } catch (ClassCastException cce) {

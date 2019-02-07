@@ -286,7 +286,7 @@ public class Player extends FreeColGameObject implements Nameable {
     // Temporary/transient variables, do not serialize.
 
     /** The units this player owns. */
-    private final List<Unit> units = new ArrayList<>();
+    private final Set<Unit> units = new HashSet<>();
 
     /** The settlements this player owns. */
     protected final List<Settlement> settlements = new ArrayList<>();
@@ -1933,18 +1933,18 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A stream of the player {@code Unit}s.
      */
     public Stream<Unit> getUnits() {
-        return getUnitList().stream();
+        return this.getUnitSet().stream();
     }
 
     /**
      * Get a copy of the players units.
      *
-     * @return A list of the player {@code Unit}s.
+     * @return A set of the player {@code Unit}s.
      */
-    public List<Unit> getUnitList() {
+    public Set<Unit> getUnitSet() {
         synchronized (this.units) {
-            return (this.units.isEmpty()) ? Collections.<Unit>emptyList()
-                : new ArrayList<>(this.units);
+            return (this.units.isEmpty()) ? Collections.<Unit>emptySet()
+                : new HashSet<Unit>(this.units);
         }
     }
 
@@ -1955,7 +1955,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getUnitCount() {
         synchronized (this.units) {
-            return count(this.units);
+            return this.units.size();
         }
     }
 
@@ -2833,10 +2833,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 ? getGame().getAllColoniesList(null)
                 : getSettlementList();
             for (Settlement s : settlements) tiles.addAll(s.getVisibleTileSet());
-            for (Unit u : getUnitList()) {
-                if (u.getLocation() instanceof Tile) {
-                    tiles.addAll(u.getVisibleTileSet());
-                }
+            for (Unit u : transform(getUnitSet(), Unit::isOnTile)) {
+                tiles.addAll(u.getVisibleTileSet());
             }
             if (isEuropean()
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
@@ -3933,7 +3931,7 @@ public class Player extends FreeColGameObject implements Nameable {
     @Override
     public int checkIntegrity(boolean fix, LogBuilder lb) {
         int result = super.checkIntegrity(fix, lb);
-        for (Unit unit : getUnitList()) {
+        for (Unit unit : getUnitSet()) {
             if (unit.getOwner() == null) {
                 if (fix) {
                     unit.setOwner(this);
