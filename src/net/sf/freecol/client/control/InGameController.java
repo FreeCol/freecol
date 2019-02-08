@@ -151,7 +151,7 @@ public final class InGameController extends FreeColClientHolder {
     /** A comparator for ordering trade route units. */
     private static final Comparator<Unit> tradeRouteUnitComparator
         = Comparator.comparing((Unit u) -> u.getTradeRoute().getName())
-            .thenComparing(u -> (FreeColObject)u);
+        .thenComparing(Function.<Unit>identity());
 
     /** Current mode for moving units. */
     private MoveMode moveMode = MoveMode.NEXT_ACTIVE_UNIT;
@@ -739,7 +739,7 @@ public final class InGameController extends FreeColClientHolder {
         final Predicate<Unit> tradePred = u ->
             u.isReadyToTrade() && player.owns(u);
         for (Unit unit : transform(player.getUnits(), tradePred,
-                                   Function.identity(),
+                                   Function.<Unit>identity(),
                                    tradeRouteUnitComparator)) {
             getGUI().changeView(unit);
             if (!moveToDestination(unit, messages)) {

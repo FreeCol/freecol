@@ -1641,7 +1641,8 @@ public final class Specification implements OptionContainer {
     public List<Role> getMilitaryRolesList() {
         if (this.militaryRoles == null) {
             this.militaryRoles = Collections.<Role>unmodifiableList(
-                transform(this.roles, Role::isOffensive, Function.identity(),
+                transform(this.roles, Role::isOffensive,
+                          Function.<Role>identity(),
                           Role.militaryComparator));
         }
         return this.militaryRoles;

@@ -31,8 +31,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.util.*;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -81,9 +79,10 @@ public final class ReportExplorationPanel extends ReportPanel {
         
         // Content Rows
         // TODO: Display "None" if no contents, though this would be rare.
-        for (Region region : CollectionUtils.transform(getGame().getMap().getRegions(),
+        for (Region region : transform(getGame().getMap().getRegions(),
                                        isNotNull(Region::getDiscoveredIn),
-                                       Function.identity(), regionComparator)) {
+                                       Function.<Region>identity(),
+                                       regionComparator)) {
             reportPanel.add(new JLabel(region.getName()));
             reportPanel.add(Utility.localizedLabel(region.getType().getNameKey()));
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredIn()

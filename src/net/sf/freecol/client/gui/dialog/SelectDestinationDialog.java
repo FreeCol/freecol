@@ -503,7 +503,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         // Drop inaccessible destinations and sort as specified.
         this.destinations.addAll(transform(td, d -> d.turns < Unit.MANY_TURNS,
-                                           Function.identity(),
+                                           Function.<Destination>identity(),
                                            getDestinationComparator()));
     }
 

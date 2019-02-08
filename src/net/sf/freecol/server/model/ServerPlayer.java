@@ -930,7 +930,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @see #hasExplored
      */
     public Set<Tile> exploreTiles(Collection<? extends Tile> tiles) {
-        return transform(tiles, t -> exploreTile(t), (Tile t) -> t,
+        return transform(tiles, t -> exploreTile(t), Function.<Tile>identity(),
                          Collectors.toSet());
     }
 
@@ -1035,7 +1035,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      */
     public Set<Tile> collectNewTiles(Stream<Tile> tiles) {
         return transform(tiles, t -> exploreTile(t) || !canSee(t),
-                         Function.identity(), Collectors.toSet());
+                         Function.<Tile>identity(), Collectors.toSet());
     }
         
     /**

@@ -644,7 +644,8 @@ public class SimpleMapGenerator implements MapGenerator {
             = Comparator.comparingInt(t -> t.getDistanceTo(center));
         // Choose a tile that is free and half the expected tile claims
         // can succeed, preventing capitals on small islands.
-        Tile t = first(transform(tiles, terrPred, Function.identity(), comp));
+        Tile t = first(transform(tiles, terrPred, Function.<Tile>identity(),
+                                 comp));
         if (t == null) return null;
 
         String name = (territory.region == null) ? "default region"
@@ -703,9 +704,10 @@ public class SimpleMapGenerator implements MapGenerator {
         List<RandomChoice<UnitType>> skills
             = ((IndianNationType)nationType).getSkills();
         java.util.Map<GoodsType, Integer> scale
-            = transform(skills, alwaysTrue(), Function.identity(),
-                Collectors.toMap(rc -> rc.getObject().getExpertProduction(),
-                                 rc -> 1));
+            = transform(skills, alwaysTrue(),
+                        Function.<RandomChoice<UnitType>>identity(),
+                        Collectors.toMap(rc ->
+                            rc.getObject().getExpertProduction(), rc -> 1));
 
         for (Tile t: tile.getSurroundingTiles(1)) {
             forEachMapEntry(scale, e -> {

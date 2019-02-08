@@ -451,7 +451,8 @@ public class NativeTrade extends FreeColGameObject {
      */
     public void limitSettlementToUnit(int n) {
         List<NativeTradeItem> best = transform(this.settlementToUnit,
-            NativeTradeItem::priceIsValid, Function.identity(),
+            NativeTradeItem::priceIsValid,
+            Function.<NativeTradeItem>identity(),
             NativeTradeItem.descendingPriceComparator);
         if (best.size() <= n) return;
         for (NativeTradeItem nti : best.subList(n, best.size())) {

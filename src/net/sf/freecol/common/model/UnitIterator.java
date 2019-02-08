@@ -69,7 +69,7 @@ public class UnitIterator implements Iterator<Unit> {
     private final void update() {
         this.units.clear();
         this.units.addAll(transform(owner.getUnits(), u -> predicate.test(u),
-                          Function.identity(), Unit.locComparator));
+                          Function.<Unit>identity(), Unit.locComparator));
     }
 
     /**

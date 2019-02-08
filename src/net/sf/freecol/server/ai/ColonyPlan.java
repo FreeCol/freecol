@@ -891,7 +891,7 @@ public class ColonyPlan {
         if (colony.getSoL() < 100) {
             produce.addAll(0, transform(libertyGoodsTypes,
                     gt -> production.containsKey(gt),
-                    Function.identity(), productionComparator));
+                    Function.<GoodsType>identity(), productionComparator));
         }
 
         // Always add raw/building materials first.
@@ -904,7 +904,7 @@ public class ColonyPlan {
                     && (colony.getGoodsCount(gt.getInputType())
                         >= GoodsContainer.CARGO_SIZE/2
                         || production.containsKey(gt.getInputType())),
-                Function.identity(),
+                Function.<GoodsType>identity(),
                 Comparator.comparingInt(indexer).reversed()));
 
         for (int i = toAdd.size()-1; i >= 0; i--) {
@@ -926,13 +926,15 @@ public class ColonyPlan {
         // Military goods after lucrative production.
         produce.addAll(transform(militaryGoodsTypes,
                                  gt -> production.containsKey(gt),
-                                 Function.identity(), productionComparator));
+                                 Function.<GoodsType>identity(),
+                                 productionComparator));
 
         // Immigration last.
         if (colony.getOwner().getEurope() != null) {
             produce.addAll(transform(immigrationGoodsTypes,
                                      gt -> production.containsKey(gt),
-                                     Function.identity(), productionComparator));
+                                     Function.<GoodsType>identity(),
+                                     productionComparator));
         }
     }
 

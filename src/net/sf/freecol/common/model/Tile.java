@@ -613,7 +613,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Set<Tile> getContiguityAdjacent(final int contiguity) {
         return transform(getSurroundingTiles(1, 1),
                          matchKey(contiguity, Tile::getContiguity),
-                         Function.identity(), Collectors.toSet());
+                         Function.<Tile>identity(), Collectors.toSet());
     }
 
     /**
@@ -1437,7 +1437,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         final Comparator<Tile> defenceComp
             = cachingDoubleComparator(Tile::getDefenceValue).reversed();
         return transform(getSurroundingTiles(0, 1), safeTilePred,
-                         Function.identity(), defenceComp);
+                         Function.<Tile>identity(), defenceComp);
     }
                     
     /**

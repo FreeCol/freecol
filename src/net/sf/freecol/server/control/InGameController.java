@@ -1521,7 +1521,8 @@ public final class InGameController extends Controller {
         final Comparator<Player> comp = Comparator.comparingInt(p ->
             p.getTension(serverPlayer).getValue());
         List<Player> natives = transform(game.getLiveNativePlayers(),
-            p -> p.hasContacted(serverPlayer), Function.identity(), comp);
+                                         p -> p.hasContacted(serverPlayer),
+                                         Function.<Player>identity(), comp);
         if (!natives.isEmpty()) {
             ServerPlayer good = (ServerPlayer)first(natives);
             logger.info("Native ally following independence: " + good);
@@ -3384,7 +3385,8 @@ public final class InGameController extends Controller {
         // Collect roles that cause a change, ordered by simplest change
         for (Arrangement a : transform(arrangements,
                 a -> a.role != a.unit.getRole() && a.role != defaultRole,
-                Function.identity(), Arrangement::roleComparison)) {
+                Function.<Arrangement>identity(),
+                Arrangement::roleComparison)) {
             if (!colony.equipForRole(a.unit, a.role, a.roleCount)) {
                 return serverPlayer.clientError("Failed to equip "
                     + a.unit.getId() + " for role " + a.role
@@ -3537,7 +3539,7 @@ public final class InGameController extends Controller {
             // newly visible tiles, possibly with enhanced radius.
             Set<Tile> tiles = transform(tile.getSurroundingTiles(1, radius),
                 t -> !serverPlayer.canSee(t) && (t.isLand() || t.isShore()),
-                Function.identity(), Collectors.toSet());
+                Function.<Tile>identity(), Collectors.toSet());
             cs.add(See.only(serverPlayer), serverPlayer.exploreTiles(tiles));
 
             // If the unit was promoted, update it completely, otherwise just

@@ -385,7 +385,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         if (tipSize > 0) {
             List<Unit> pioneers
                 = transform(tile.getUnits(), u -> u.getPioneerScore() >= 0,
-                            Function.identity(), pioneerComparator);
+                            Function.<Unit>identity(), pioneerComparator);
             for (Unit u : pioneers) {
                 final AIUnit aiu = getAIUnit(u);
                 if (aiu.tryPioneeringMission(lb)) {
@@ -488,7 +488,8 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
             && (u.getType().getSkill() <= 0
                 || u.hasAbility(Ability.EXPERT_SCOUT));
         List<Unit> scouts = transform(tile.getUnits(), explorerPred,
-                                      Function.identity(), scoutComparator);
+                                      Function.<Unit>identity(),
+                                      scoutComparator);
         for (Tile t : transform(tile.getSurroundingTiles(1,1),
                                 Tile::hasLostCityRumour)) {
             Direction direction = tile.getDirection(t);

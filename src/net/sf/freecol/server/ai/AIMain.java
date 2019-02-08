@@ -323,8 +323,10 @@ public class AIMain extends FreeColObject
                 stats.put(className, count);
             }
         }
-        return transform(stats.entrySet(), alwaysTrue(), Function.identity(),
-            Collectors.toMap(Entry::getKey, e -> Long.toString(e.getValue())));
+        return transform(stats.entrySet(), alwaysTrue(),
+                         Function.<Entry<String,Long>>identity(),
+                         Collectors.toMap(Entry::getKey,
+                                          e -> Long.toString(e.getValue())));
     }
 
     /**

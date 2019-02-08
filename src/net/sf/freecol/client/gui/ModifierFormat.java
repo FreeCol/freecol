@@ -123,6 +123,6 @@ public class ModifierFormat {
 
     public static String getModifierAsString(Modifier modifier) {
         return transform(getModifierStrings(modifier), isNotNull(),
-                         Function.identity(), Collectors.joining());
+                         Function.<String>identity(), Collectors.joining());
     }
 }

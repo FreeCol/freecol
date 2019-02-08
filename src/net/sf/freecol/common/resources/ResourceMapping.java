@@ -280,7 +280,7 @@ public final class ResourceMapping {
      */
     public Set<String> getImageKeySet(String prefix) {
         return transform(imageResources.keySet(), k -> k.startsWith(prefix),
-                         Function.identity(), Collectors.toSet());
+                         Function.<String>identity(), Collectors.toSet());
     }
 
     public Map<String, ImageResource> getImageResources() {

@@ -390,7 +390,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         this.colonies.addAll(sort(continents.values(), firstColonyComparator));
 
         this.goodsTypes.addAll(transform(spec.getGoodsTypeList(),
-                                         reportGoodsPred, Function.identity(),
+                                         reportGoodsPred,
+                                         Function.<GoodsType>identity(),
                                          GoodsType.goodsTypeComparator));
 
         loadResources();

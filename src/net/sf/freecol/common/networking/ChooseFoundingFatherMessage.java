@@ -91,7 +91,7 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      */
     private void setFatherAttributes(List<FoundingFather> fathers) {
         setStringAttributeMap(transform(fathers, alwaysTrue(),
-                Function.identity(),
+                Function.<FoundingFather>identity(),
                 Collectors.toMap(ff -> ff.getType().getKey(),
                                  FoundingFather::getId)));
     }

@@ -1465,7 +1465,7 @@ public class Player extends FreeColGameObject implements Nameable {
         return transform(getHistory(),
                          matchKey(HistoryEvent.HistoryEventType.FOUNDING_FATHER,
                                   HistoryEvent::getEventType),
-                         Function.identity(),
+                         Function.<HistoryEvent>identity(),
                          Collectors.toMap(he -> he.getReplacement("%father%").getId(),
                                           HistoryEvent::getTurn));
     }

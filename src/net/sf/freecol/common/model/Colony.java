@@ -638,10 +638,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public Stream<WorkLocation> getAllWorkLocations() {
         Stream<WorkLocation> ret = Stream.<WorkLocation>empty();
         synchronized (this.colonyTiles) {
-            ret = concat(ret, map(this.colonyTiles, ct -> (WorkLocation)ct));
+            ret = concat(ret, map(this.colonyTiles,
+                                  Function.<WorkLocation>identity()));
         }
         synchronized (this.buildingMap) {
-            ret = concat(ret, map(this.buildingMap.values(), b -> (WorkLocation)b));
+            ret = concat(ret, map(this.buildingMap.values(),
+                                  Function.<WorkLocation>identity()));
         }
         return ret;
     }

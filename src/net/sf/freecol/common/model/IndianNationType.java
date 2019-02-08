@@ -141,9 +141,10 @@ public class IndianNationType extends NationType {
     public List<RandomChoice<UnitType>> generateSkillsForTile(Tile tile) {
         final List<RandomChoice<UnitType>> skills = getSkills();
         final Map<GoodsType, Integer> scale
-            = transform(skills, alwaysTrue(), Function.identity(),
-                Collectors.toMap(rc -> rc.getObject().getExpertProduction(),
-                                 rc -> 1));
+            = transform(skills, alwaysTrue(),
+                        Function.<RandomChoice<UnitType>>identity(),
+                        Collectors.toMap(rc ->
+                            rc.getObject().getExpertProduction(), rc -> 1));
 
         for (Tile t: tile.getSurroundingTiles(1)) {
             forEachMapEntry(scale, e -> {

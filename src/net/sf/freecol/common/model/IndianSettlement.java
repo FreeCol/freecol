@@ -1102,7 +1102,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public void updateWantedGoods() {
         final Specification spec = getSpecification();
-        final Function<GoodsType, GoodsType> identity = Function.identity();
+        final Function<GoodsType, GoodsType> identity
+            = Function.<GoodsType>identity();
         final java.util.Map<GoodsType, Integer> prices
             = transform(spec.getGoodsTypeList(),
                         gt -> !gt.getMilitary() && gt.isStorable(),
