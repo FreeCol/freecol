@@ -56,26 +56,11 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     /** Whether to display positive integers with a "+" sign. */
     private boolean drawPlus;
 
-    /** Whether the ProductionLabel should be centered. */
-    private final boolean centered = true;
-
     /** The compressed width of the ProductionLabel. */
     private int compressedWidth = -1;
 
     /** The goodsIcon for this type of production. */
     private final ImageIcon goodsIcon;
-
-    /** The amount of goods that could be produced. */
-    private int maximumProduction = -1;
-
-    /** The smallest number to display above the goodsIcons. */
-    private final int displayNumber;
-
-    /**
-     * The smallest number to display above the goodsIcons.
-     * used to show stored items in ReportColonyPanel
-     */
-    private int stockNumber = -1;
 
     /** The image to display. */
     private transient Image stringImage;
@@ -150,8 +135,6 @@ public final class ProductionLabel extends AbstractGoodsLabel {
                 + " stock=" + stockNumber);
         }
 
-        this.maximumProduction = maximumProduction;
-        this.stockNumber = stockNumber;
         final ClientOptions options = freeColClient.getClientOptions();
         // Horses stack poorly, only show one icon
         // TODO: make this highly specific hack more generic
@@ -159,8 +142,6 @@ public final class ProductionLabel extends AbstractGoodsLabel {
                                               .getGoodsType("model.goods.horses");
         this.maxIcons = (ag.getType() == horses) ? 1
             : options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
-        this.displayNumber = options
-            .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
         this.goodsIcon = (ag.getType() == null) ? null
             : new ImageIcon(lib.getScaledGoodsTypeImage(ag.getType()));
         this.compressedWidth = (this.goodsIcon == null) ? 0
@@ -173,6 +154,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             : Messages.message(getAbstractGoods().getLabel()));
 
         final int amount = getAmount();
+        final int displayNumber = options
+            .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
         boolean showMax = amount > 0 && maximumProduction > amount;
         if (amount < 0 || amount >= displayNumber || amount > maxIcons
                 || stockNumber > 0 || showMax) {
@@ -224,7 +207,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         int coverage = pixelsPerIcon * (drawImageCount - 1) + iconWidth;
         int leftOffset = 0;
         int width = Math.max(getWidth(), Math.max(stringWidth, coverage));
-        if (centered && coverage < width) leftOffset = (width - coverage)/2;
+        if (coverage < width) leftOffset = (width - coverage)/2;
         int height = Math.max(getHeight(),
                               this.goodsIcon.getImage().getHeight(null));
         setSize(new Dimension(width, height));
