@@ -211,12 +211,11 @@ public final class PlayersTable extends JTable {
             = new JComboBox<>(NationState.values());
         private JComboBox activeBox;
 
-        private final ActionListener listener = (ActionEvent ae) -> {
-            stopCellEditing();
-        };
-
 
         public AvailableCellEditor() {
+            ActionListener listener = (ActionEvent ae) -> {
+                stopCellEditing();
+            };
             aiStateBox.setRenderer(new NationStateRenderer());
             aiStateBox.addActionListener(listener);
             allStateBox.setRenderer(new NationStateRenderer());
