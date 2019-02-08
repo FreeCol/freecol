@@ -59,7 +59,7 @@ public class DefaultNumberRule extends Number {
      * @return an {@code int} value
      */
     public int countRules() {
-        return rules.values().size();
+        return rules.size();
     }
 
     /**
