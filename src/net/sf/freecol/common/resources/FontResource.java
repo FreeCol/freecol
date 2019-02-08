@@ -78,7 +78,8 @@ public class FontResource extends Resource {
         } catch (FontFormatException|IOException ex) {
             logger.log(Level.WARNING,
                 "Failed loading font from: " + resourceLocator, ex);
-            throw new IOException(ex.getMessage());
+            throw new IOException("Font load failed from: " + resourceLocator,
+                ex);
         }
     }
 

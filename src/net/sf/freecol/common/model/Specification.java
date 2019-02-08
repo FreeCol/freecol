@@ -1096,7 +1096,7 @@ public final class Specification implements OptionContainer {
                 return returnClass.cast(op);
             } catch (ClassCastException cce) {
                 throw new RuntimeException("Not a " + returnClass.getName()
-                    + ": " + id);
+                    + ": " + id, cce);
             }
         }
     }

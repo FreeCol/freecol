@@ -567,10 +567,10 @@ public class Game extends FreeColGameObject {
         T t;
         try {
             t = returnClass.cast(fcgo);
-        } catch (ClassCastException e) {
+        } catch (ClassCastException cce) {
             // "Can not happen"
             throw new RuntimeException("Update class clash: " + fcgo.getClass()
-                + " / " + returnClass);
+                + " / " + returnClass, cce);
         }
         if (!t.copyIn(other)) {
             // "Can not happen"

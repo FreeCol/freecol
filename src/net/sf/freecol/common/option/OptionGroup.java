@@ -407,7 +407,7 @@ public class OptionGroup extends AbstractOption<OptionGroup>
                 return returnClass.cast(optionMap.get(id));
             } catch (ClassCastException cce) {
                 throw new RuntimeException("Not a " + returnClass.getName()
-                    + ": " + id);
+                    + ": " + id, cce);
             }
         }
     }
