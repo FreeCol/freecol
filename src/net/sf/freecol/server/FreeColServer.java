@@ -841,9 +841,9 @@ public final class FreeColServer {
             }
 
             Properties properties = new Properties();
-            properties.put("map.width",
+            properties.setProperty("map.width",
                 Integer.toString(this.serverGame.getMap().getWidth()));
-            properties.put("map.height",
+            properties.setProperty("map.height",
                 Integer.toString(this.serverGame.getMap().getHeight()));
             fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_PROPERTIES));
             properties.store(fos, null);
