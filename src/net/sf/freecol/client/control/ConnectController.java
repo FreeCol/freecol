@@ -134,7 +134,7 @@ public final class ConnectController extends FreeColClientHolder {
         }
             
         logger.info("Logout begin for client " + player.getName()
-            + ": " + reason.toString());
+            + ": " + reason);
         return askServer().logout(player, reason);
     }
 
@@ -148,7 +148,7 @@ public final class ConnectController extends FreeColClientHolder {
         final FreeColClient fcc = getFreeColClient();
         final Player player = fcc.getMyPlayer();
         logger.info("Logout end for client " + player.getName()
-            + ": " + reason.toString());
+            + ": " + reason);
 
         askServer().disconnect();
 

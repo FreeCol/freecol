@@ -105,7 +105,7 @@ public class ChangeStateMessage extends AttributeMessage {
         }
         if (!unit.checkSetState(state)) {
             return serverPlayer.clientError("Unit " + unitId
-                + " can not change state: " + unit.getState().toString()
+                + " can not change state: " + unit.getState()
                 + " -> " + stateString);
         }
 

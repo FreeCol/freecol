@@ -111,7 +111,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
          */
         @Override
         public void setLabelValues(JLabel c, T value) {
-            c.setText(Messages.message(prefix + value.toString()));
+            c.setText(Messages.message(prefix + value));
         }
     }
 

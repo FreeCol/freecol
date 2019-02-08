@@ -667,11 +667,11 @@ public class NativeTrade extends FreeColGameObject {
             .append(" item=").append((item == null) ? "null" : item.toString())
             .append(" unitToSettlement[");
         for (NativeTradeItem nti : this.unitToSettlement) {
-            sb.append(' ').append(nti.toString());
+            sb.append(' ').append(nti);
         }
         sb.append("] settlementToUnit[");
         for (NativeTradeItem nti : this.settlementToUnit) {
-            sb.append(' ').append(nti.toString());
+            sb.append(' ').append(nti);
         }
         return sb.append(" ]]").toString();
     }

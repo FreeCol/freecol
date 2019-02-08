@@ -121,8 +121,8 @@ public class InstallerTranslations {
                     System.exit(1);
                 }
             } catch (SecurityException se) {
-                System.err.println("Could not create "
-                    + DESTINATION_DIRECTORY + ": " + se.toString());
+                System.err.println("Could not create " + DESTINATION_DIRECTORY
+                    + ": " + se);
                 System.exit(1);
             }
         }

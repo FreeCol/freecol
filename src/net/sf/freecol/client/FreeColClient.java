@@ -1007,7 +1007,7 @@ public final class FreeColClient {
         try {
             gui.quit();
         } catch (Exception e) {
-            FreeCol.fatal("Failed to shutdown gui: " + e.toString());
+            FreeCol.fatal("Failed to shutdown gui: " + e);
         }
         FreeCol.quit(0);
     }

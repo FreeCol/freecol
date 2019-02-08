@@ -3019,7 +3019,7 @@ public final class InGameController extends Controller {
         cs.addMessage(otherPlayer, m);
         cs.add(See.only(otherPlayer), colony);
         logger.info("Gift delivered by unit: " + unit.getId()
-            + " to colony " + colony.getName() + ": " + goods.toString());
+            + " to colony " + colony.getName() + ": " + goods);
 
         // Others might see unit capacity?
         getGame().sendToOthers(serverPlayer, cs);

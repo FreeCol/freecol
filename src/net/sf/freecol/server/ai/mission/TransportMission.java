@@ -851,7 +851,7 @@ public class TransportMission extends Mission {
             if ((d = cargo.getJoinDirection()) == null) {
                 logger.warning("Null pickup direction"
                     + " for " + cargo.toShortString()
-                    + " at " + t.getLocation().toString()
+                    + " at " + t.getLocation()
                     + " to " + carrier);
                 return CargoResult.TFAIL;
             }                    

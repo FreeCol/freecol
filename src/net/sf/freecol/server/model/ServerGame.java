@@ -211,7 +211,7 @@ public class ServerGame extends Game implements TurnTaker {
             // side of serialization is potentially exercised here, so it is
             // a good place to find new fails.
             logger.log(Level.WARNING, "sendTo(" + serverPlayer.getId()
-                + "," + cs.toString() + ") failed", e);
+                + "," + cs + ") failed", e);
         }
         return false;
     }

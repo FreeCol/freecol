@@ -274,7 +274,7 @@ public abstract class AIPlayer extends AIObject {
         Thread thread = new Thread(runnable,
             FreeCol.SERVER_THREAD + "AIPlayer(" + getPlayer().getName() + ")");
         thread.start();
-        logger.finest("Started " + thread.getName() + " " + thread.toString());
+        logger.finest("Started " + thread);
     }
 
     // Message.aiHandler support

@@ -199,8 +199,7 @@ public class ColonizationSaveGameReader {
             reader.readFully(data);
             new ColonizationSaveGameReader(data).run();
         } catch (EOFException ee) {
-            System.err.println("Could not read from " + args[0]
-                + ": " + ee.toString());
+            System.err.println("Could not read from " + args[0] + ": " + ee);
             System.exit(1);
         }
     }

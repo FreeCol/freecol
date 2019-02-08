@@ -1070,11 +1070,10 @@ public final class FreeColServer {
             logger.info("Game integrity test succeeded.");
             break;
         case 0:
-            logger.info("Game integrity test failed, but fixed."
-                + lb.toString());
+            logger.info("Game integrity test failed, but fixed." + lb);
             break;
         default:
-            logger.warning("Game integrity test failed." + lb.toString());
+            logger.warning("Game integrity test failed." + lb);
             break;
         }
 
@@ -1100,15 +1099,13 @@ public final class FreeColServer {
             logger.info("AI integrity test succeeded.");
             break;
         case 0:
-            logger.info("AI integrity test failed, but fixed."
-                + lb.toString());
+            logger.info("AI integrity test failed, but fixed." + lb);
             break;
         default:
             aiMain = new AIMain(this);
             aiMain.findNewObjects(true);
             setAIMain(aiMain);
-            logger.warning("AI integrity test failed, replaced AIMain."
-                + lb.toString());
+            logger.warning("AI integrity test failed, replaced AIMain." + lb);
             break;
         }
         serverGame.setFreeColGameObjectListener(aiMain);

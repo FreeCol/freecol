@@ -139,7 +139,7 @@ public class ColonizationMapReader {
                 reader.readFully(header);
             } catch (EOFException ee) {
                 System.err.println("Unable to read header of " + args[0]
-                    + ": " + ee.toString());
+                    + ": " + ee);
                 System.exit(1);
             }
             System.out.println(String.format("Map width:  %02d", (int) header[WIDTH]));
@@ -151,7 +151,7 @@ public class ColonizationMapReader {
                 reader.readFully(layer1);
             } catch (EOFException ee) {
                 System.err.println("Unable to read data of " + args[0]
-                    + ": " + ee.toString());
+                    + ": " + ee);
                 System.exit(1);
             }
 

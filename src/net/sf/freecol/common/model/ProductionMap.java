@@ -133,7 +133,7 @@ public class ProductionMap {
             StringBuilder sb = new StringBuilder(32);
             sb.append('[').append(root.getSuffix()).append(':');
             for (AbstractGoods ag : leafs) {
-                sb.append(' ').append(ag.toString());
+                sb.append(' ').append(ag);
             }
             sb.append(" ]");
             return sb.toString();
@@ -219,7 +219,7 @@ public class ProductionMap {
         sb.append('[');
         forEachMapEntry(cache, e ->
             sb.append(' ').append(e.getKey().getSuffix())
-              .append(':').append(e.getValue().toString()));
+              .append(':').append(e.getValue()));
         sb.append(" ]");
         return sb.toString();
     }

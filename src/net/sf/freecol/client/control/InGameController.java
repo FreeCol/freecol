@@ -694,7 +694,7 @@ public final class InGameController extends FreeColClientHolder {
                 }
             } catch (RuntimeException rte) {
                 logger.warning("Bogus ModelMessage with key<" + key
-                    + ">: " + m.toString());
+                    + ">: " + m);
             }
             m.setDisplayed(true);
         }
@@ -3918,7 +3918,7 @@ public final class InGameController extends FreeColClientHolder {
             return;
         case NAK_INVALID: // Should not happen, log and fail quietly.
         default:
-            logger.warning("Bogus native trade: " + nt.toString());
+            logger.warning("Bogus native trade: " + nt);
             return;
         }
 
