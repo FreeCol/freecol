@@ -869,8 +869,8 @@ public class ColonyPlan {
                 })
             .thenComparingInt((WorkLocationPlan wp) ->
                 wp.getWorkLocation().getGenericPotential(wp.getGoodsType()))
-            .thenComparing((WorkLocationPlan wp) ->
-                wp.getGoodsType(), GoodsType.goodsTypeComparator);
+            .thenComparing(WorkLocationPlan::getGoodsType,
+                           GoodsType.goodsTypeComparator);
         workPlans.sort(comp);
     }
 

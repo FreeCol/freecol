@@ -1012,7 +1012,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Stream<RandomChoice<Disaster>> getDisasterChoices() {
         return concat(type.getDisasterChoices(),
                       flatten(getCompleteTileImprovements(),
-                              ti -> ti.getDisasterChoices()));
+                              TileImprovement::getDisasterChoices));
     }
 
 
@@ -1837,7 +1837,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             = Comparator.comparingInt(ag ->
                 getPotentialProduction(ag.getType(), null));
         return maximize(flatten(getType().getAvailableProductionTypes(true),
-                                pt -> pt.getOutputs()),
+                                ProductionType::getOutputs),
                         AbstractGoods::isFoodType, goodsComp);
     }
 

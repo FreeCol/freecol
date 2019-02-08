@@ -72,10 +72,10 @@ public class IndianDemandMission extends Mission {
     private static final List<Predicate<GoodsType>> selectPredicates
         = new ArrayList<>();
     static {
-        selectPredicates.add(gt -> gt.getMilitary());
-        selectPredicates.add(gt -> gt.isBuildingMaterial());
-        selectPredicates.add(gt -> gt.isTradeGoods());
-        selectPredicates.add(gt -> gt.isRefined());
+        selectPredicates.add(GoodsType::getMilitary);
+        selectPredicates.add(GoodsType::isBuildingMaterial);
+        selectPredicates.add(GoodsType::isTradeGoods);
+        selectPredicates.add(GoodsType::isRefined);
     };
     
     /** The colony to demand from. */

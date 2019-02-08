@@ -651,7 +651,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         final List<GoodsType> gtl = getSpecification().getGoodsTypeList();
         this.goodsPanel = new TradeRouteGoodsPanel(transform(gtl,
-                gt -> gt.isStorable(), gt -> buildCargoLabel(gt)));
+                GoodsType::isStorable, gt -> buildCargoLabel(gt)));
         this.goodsPanel.setTransferHandler(this.cargoHandler);
         this.goodsPanel.setEnabled(false);
         this.goodsPanel.addMouseListener(this.dropListener);
@@ -698,7 +698,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     private void updateCargoPanel(TradeRouteStop stop) {
         this.cargoPanel.setLabels((stop == null) ? null
-            : transform(stop.getCargo(), gt -> gt.isStorable(),
+            : transform(stop.getCargo(), GoodsType::isStorable,
                         gt -> buildCargoLabel(gt)));
     }
 

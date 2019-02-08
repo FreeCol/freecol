@@ -118,7 +118,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      * @return A list of option values.
      */
     public List<T> getOptionValues() {
-        return transform(this.value, isNotNull(), o -> o.getValue());
+        return transform(this.value, isNotNull(), AbstractOption::getValue);
     }
 
     /**

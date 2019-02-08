@@ -437,7 +437,7 @@ public final class TileType extends FreeColSpecObjectType
      */
     public Stream<AbstractGoods> getPossibleProduction(boolean unattended) {
         return flatten(getAvailableProductionTypes(unattended),
-                       pt -> pt.getOutputs());
+                       ProductionType::getOutputs);
     }
 
     /**

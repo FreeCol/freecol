@@ -851,7 +851,7 @@ public class FreeColDirectories {
     public static List<String> getLanguageIdList() {
         File[] files = getI18nDirectory().listFiles();
         return (files == null) ? Collections.<String>emptyList()
-            : transform(files, f -> f.canRead(), f -> getLanguageId(f));
+            : transform(files, File::canRead, f -> getLanguageId(f));
     }
     
     /**

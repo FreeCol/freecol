@@ -70,15 +70,15 @@ public class CollectionUtils {
 
     /** Useful comparators for mapEntriesBy* */
     public static final Comparator<Integer> ascendingIntegerComparator
-        = Comparator.comparingInt(i -> i);
+        = Comparator.comparingInt(Integer::intValue);
     public static final Comparator<Integer> descendingIntegerComparator
         = ascendingIntegerComparator.reversed();
     public static final Comparator<Double> ascendingDoubleComparator
-        = Comparator.comparingDouble(d -> d);
+        = Comparator.comparingDouble(Double::doubleValue);
     public static final Comparator<Double> descendingDoubleComparator
         = ascendingDoubleComparator.reversed();
     public static final Comparator<List<?>> ascendingListLengthComparator
-        = Comparator.comparingInt(l -> l.size());
+        = Comparator.comparingInt(List::size);
     public static final Comparator<List<?>> descendingListLengthComparator
         = ascendingListLengthComparator.reversed();
 
