@@ -104,6 +104,7 @@ public final class InfoPanel extends FreeColPanel {
                 .getFreeColAction(EndTurnAction.id));
             button.setFont(font);
             add(button);
+            setBorder(null);
             setOpaque(false);
             setSize(getPreferredSize());
         }
@@ -131,6 +132,7 @@ public final class InfoPanel extends FreeColPanel {
                   new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1"));
 
             setSize(260, 130);
+            setBorder(null);
             setOpaque(false);
         }
 
@@ -241,6 +243,7 @@ public final class InfoPanel extends FreeColPanel {
                   new MigLayout("wrap 5, fill, gap 0 0", "", ""));
 
             setSize(260, 130);
+            setBorder(null);
             setOpaque(false);
         }
 
