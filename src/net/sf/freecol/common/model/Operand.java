@@ -388,7 +388,7 @@ public class Operand extends Scope {
     @Override
     public String toString() {
         if (this.value != null) return Integer.toString(value);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("[Operand type=").append(this.operandType)
             .append(" scopeLevel=").append(this.scopeLevel);
         return super.toString().replaceFirst("^[^ ]*", sb.toString());
