@@ -126,11 +126,8 @@ public class RiverSection {
      * @return The branch size.
      */
     public final int getBranch(Direction direction) {
-        if (branches.containsKey(direction)) {
-            return branches.get(direction);
-        } else {
-            return TileImprovement.NO_RIVER;
-        }
+        Integer val = branches.get(direction);
+        return (val == null) ? TileImprovement.NO_RIVER : val;
     }
 
     /**

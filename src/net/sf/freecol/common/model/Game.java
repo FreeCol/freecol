@@ -1465,13 +1465,12 @@ public class Game extends FreeColGameObject {
         long disposed = 0;
         for (FreeColGameObject fcgo : getFreeColGameObjectList()) {
             String className = fcgo.getClass().getSimpleName();
-            if (objStats.containsKey(className)) {
-                Long count = objStats.get(className);
+            Long count = objStats.get(className);
+            if (count != null) {
                 count++;
                 objStats.put(className, count);
             } else {
-                Long count = (long) 1;
-                objStats.put(className, count);
+                objStats.put(className, 1L);
             }
             if (fcgo.isDisposed()) disposed++;
         }

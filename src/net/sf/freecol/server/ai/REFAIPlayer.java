@@ -673,8 +673,8 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
             Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
                 seekAndDestroyRange, false);
             if (target != null) {
-                int count = (targetMap.containsKey(target))
-                    ? targetMap.get(target) : 0;
+                Integer count = targetMap.get(target);
+                if (count == null) count = 0;
                 if (target instanceof Unit
                     && count < UNIT_USAD_THRESHOLD
                     && (m = getSeekAndDestroyMission(aiu, target)) != null) {

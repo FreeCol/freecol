@@ -344,9 +344,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 System.err.println(getLocalName() + "]");
                 break;
             default:
-                System.err.println((tagStrings.containsKey(tag))
-                    ? tagStrings.get(tag)
-                    : "Weird tag: " + tag);
+                String val = tagStrings.get(tag);
+                System.err.println((val == null) ? "Weird tag: " + tag : val);
                 break;
             }
         }

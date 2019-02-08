@@ -1076,8 +1076,10 @@ public final class Specification implements OptionContainer {
      */
     public <R,T extends Option<R>> boolean hasOption(String id,
                                                      Class<T> returnClass) {
-        return id != null && allOptions.containsKey(id)
-            && returnClass.isAssignableFrom(allOptions.get(id).getClass());
+        if (id == null) return false;
+        AbstractOption val = allOptions.get(id);
+        return (val == null) ? false
+            : returnClass.isAssignableFrom(val.getClass());
     }
 
     /**
@@ -1910,15 +1912,8 @@ public final class Specification implements OptionContainer {
      * @return The {@code FreeColSpecObjectType} found if any.
      */
     public FreeColSpecObjectType findType(String id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Null id");
-
-        } else if (allTypes.containsKey(id)) {
-            return allTypes.get(id);
-
-        } else {
-            return null;
-        }
+        if (id == null) throw new IllegalArgumentException("Null id");
+        return allTypes.get(id);
     }
 
     /**

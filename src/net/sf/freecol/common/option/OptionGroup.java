@@ -103,7 +103,7 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public OptionGroup(FreeColXMLReader xr,
-                       Specification specification) throws XMLStreamException {
+        Specification specification) throws XMLStreamException {
         super(specification);
 
         readFromXML(xr);
@@ -345,8 +345,8 @@ public class OptionGroup extends AbstractOption<OptionGroup>
         if (file == null) return false;
         boolean ret = false;
         try (
-            FreeColXMLReader xr = new FreeColXMLReader(file);
-        ) {
+             FreeColXMLReader xr = new FreeColXMLReader(file);
+             ) {
             ret = load(xr);
         } catch (IOException|XMLStreamException xse) {
             logger.log(Level.WARNING, "Load OptionGroup(" + getId()
@@ -368,7 +368,7 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      *     not found.
      */
     public static OptionGroup load(File file, String optionId,
-                                   Specification spec) {
+        Specification spec) {
         OptionGroup ret = new OptionGroup(spec);
         if (ret.load(file)) {
             if (!optionId.equals(ret.getId())) {
@@ -388,9 +388,11 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      * {@inheritDoc}
      */    
     public <R,T extends Option<R>> boolean hasOption(String id,
-                                                     Class<T> returnClass) {
-        return id != null && this.optionMap.containsKey(id)
-            && returnClass.isAssignableFrom(this.optionMap.get(id).getClass());
+        Class<T> returnClass) {
+        if (id == null) return false;
+        Option val = this.optionMap.get(id);
+        return (val == null) ? false
+            : returnClass.isAssignableFrom(val.getClass());
     }
 
     /**

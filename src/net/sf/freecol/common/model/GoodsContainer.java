@@ -185,9 +185,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public int getGoodsCount(GoodsType type) {
         synchronized (this.storedGoods) {
-            return (this.storedGoods.containsKey(type)) 
-                ? this.storedGoods.get(type)
-                : 0;
+            Integer val = this.storedGoods.get(type);
+            return (val == null) ? 0 : val;
         }
     }
 
@@ -200,9 +199,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public int getOldGoodsCount(GoodsType type) {
         synchronized (this.oldStoredGoods) {
-            return (this.oldStoredGoods.containsKey(type))
-                ? this.oldStoredGoods.get(type)
-                : 0;
+            Integer val = this.oldStoredGoods.get(type);
+            return (val == null) ? 0 : val;
         }
     }
 

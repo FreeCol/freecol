@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.i18n;
 
+import java.util.function.Predicate;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -77,8 +78,10 @@ public class DefaultNumberRule extends Number {
      */
     @Override
     public Category getCategory(double input) {
-        return find(Category.values(),
-            category -> rules.containsKey(category)
-                && rules.get(category).matches(input), Category.other);
+        final Predicate<Category> pred = (category) -> {
+            Rule val = rules.get(category);
+            return val != null && val.matches(input);
+        };
+        return find(Category.values(), pred, Category.other);
     }
 }

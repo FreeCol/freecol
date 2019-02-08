@@ -174,10 +174,11 @@ public class CollectionUtils {
 
     public static <K,V> void accumulateToMap(Map<K,V> map, K key, V value,
                                              BinaryOperator<V> accumulator) {
-        if (map.containsKey(key)) {
-            map.put(key, accumulator.apply(map.get(key), value));
-        } else {
+        V val = map.get(key);
+        if (val == null) {
             map.put(key, value);
+        } else {
+            map.put(key, accumulator.apply(val, value));
         }
     }
 
@@ -196,9 +197,10 @@ public class CollectionUtils {
      * @return The new count associated with the key.
      */
     public static <K> int incrementMapCount(Map<K, Integer> map, K key) {
-        int count = map.containsKey(key) ? map.get(key) : 0;
-        map.put(key, count+1);
-        return count+1;
+        Integer val = map.get(key);
+        if (val == null) val = 1; else val += 1;
+        map.put(key, val);
+        return val;
     }
 
     /**

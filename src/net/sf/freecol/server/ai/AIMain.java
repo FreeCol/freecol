@@ -314,13 +314,11 @@ public class AIMain extends FreeColObject
         Map<String, Long> stats = new HashMap<>();
         for (AIObject aio : getAIObjects()) {
             String className = aio.getClass().getSimpleName();
-            if (stats.containsKey(className)) {
-                Long count = stats.get(className);
-                count++;
-                stats.put(className, count);
+            Long count = stats.get(className);
+            if (count == null) {
+                stats.put(className, 1L);
             } else {
-                Long count = (long) 1;
-                stats.put(className, count);
+                stats.put(className, count + 1L);
             }
         }
         return transform(stats.entrySet(), alwaysTrue(),
