@@ -361,4 +361,13 @@ public class Utils {
     public static void garbageCollect() {
         System.gc();
     }
+
+    /**
+     * Are we in headless mode?
+     *
+     * @return True if in headless mode.
+     */
+    public static boolean isHeadless() {
+        return System.getProperty("java.awt.headless", "false").equals("true");
+    }
 }

@@ -33,8 +33,9 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -172,9 +173,7 @@ public class ResourceManager {
      * Create and start a new background preload thread.
      */
     private static void startBackgroundPreloading() {
-        if ("true".equals(System.getProperty("java.awt.headless", "false"))) {
-            return; // Do not preload in headless mode
-        }
+        if (Utils.isHeadless()) return; // Do not preload in headless mode
 
         preloadThread = new Thread(FreeCol.CLIENT_THREAD + "-Resource loader") {
                 @Override

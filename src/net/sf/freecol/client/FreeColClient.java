@@ -64,6 +64,7 @@ import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.ServerState;
 
@@ -156,8 +157,7 @@ public final class FreeColClient {
     public FreeColClient(final InputStream splashStream, final String fontName,
                          final float scale, boolean headless) {
         mapEditor = false;
-        this.headless = headless
-            || System.getProperty("java.awt.headless", "false").equals("true");
+        this.headless = Utils.isHeadless();
         if (this.headless) {
             if (!FreeColDebugger.isInDebugMode()
                 || FreeColDebugger.getDebugRunTurns() <= 0) {
