@@ -601,16 +601,6 @@ public abstract class Settlement extends GoodsLocation
         return Location.getRank(getTile());
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNameForLabel(Player player) {
-        return Messages.message(this.getLocationLabelFor(player));
-    }
-
-
     /**
      * {@inheritDoc}
      */

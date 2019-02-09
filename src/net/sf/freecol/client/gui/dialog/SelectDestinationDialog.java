@@ -132,7 +132,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                            List<GoodsType> goodsTypes) {
             this.unit = unit;
             this.location = location;
-            this.name = location.getNameForLabel(unit.getOwner());
+            this.name = Messages.message(location.getLocationLabelFor(unit.getOwner()));
             this.turns = turns;
             this.extras = getExtras(location, unit, goodsTypes);
             this.score = calculateScore();

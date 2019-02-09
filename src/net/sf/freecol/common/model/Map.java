@@ -2672,14 +2672,6 @@ ok:     while (!openMap.isEmpty()) {
      * {@inheritDoc}
      */
     @Override
-    public String getNameForLabel(Player player) {
-        return Messages.message(this.getLocationLabelFor(player));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ImageIcon getLocationImage(int cellHeight, ImageLibrary library) {
         return new ImageIcon(library.getScaledImage(ImageLibrary.LOST_CITY_RUMOUR));
     }

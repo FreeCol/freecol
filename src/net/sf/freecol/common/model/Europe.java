@@ -415,15 +415,6 @@ public class Europe extends UnitLocation
         return "Europe";
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNameForLabel(Player player) {
-        return Messages.getName(this);
-    }
-
     /**
      * {@inheritDoc}
      */
