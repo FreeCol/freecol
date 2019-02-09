@@ -115,7 +115,7 @@ public class LandMap {
      *
      * @return The map width.
      */
-    public int getWidth() {
+    public final int getWidth() {
         return this.width;
     }
 
@@ -124,7 +124,7 @@ public class LandMap {
      *
      * @return The map height.
      */
-    public int getHeight() {
+    public final int getHeight() {
         return this.height;
     }
 

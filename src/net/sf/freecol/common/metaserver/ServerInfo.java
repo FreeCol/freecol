@@ -171,9 +171,9 @@ public class ServerInfo {
      * @param version The version of the server.
      * @param gameState The current state of the game.
      */
-    public void update(String name, String address, int port,
-                       int slotsAvailable, int currentlyPlaying,
-                       boolean isGameStarted, String version, int gameState) {
+    public final void update(String name, String address, int port,
+                             int slotsAvailable, int currentlyPlaying,
+                             boolean isGameStarted, String version, int gameState) {
         this.name = name;
         this.address = address;
         this.port = port;
@@ -190,7 +190,7 @@ public class ServerInfo {
      *
      * @param si The new {@code ServerInfo} to update with.
      */
-    public void update(ServerInfo si) {
+    public final void update(ServerInfo si) {
         update(si.getName(), si.getAddress(), si.getPort(),
                si.getSlotsAvailable(), si.getCurrentlyPlaying(),
                si.getIsGameStarted(), si.getVersion(), si.getGameState());

@@ -90,7 +90,7 @@ public class GoodsWish extends Wish {
         setValue(value);
         this.goodsType = goodsType;
         this.amountRequested = amountRequested;
-        this.initialized = getGoodsType() != null && getGoodsAmount() > 0;
+        this.initialized = this.goodsType != null && this.amountRequested > 0;
     }
 
     /**
@@ -106,7 +106,7 @@ public class GoodsWish extends Wish {
                      FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        this.initialized = getGoodsType() != null && getGoodsAmount() > 0;
+        this.initialized = this.goodsType != null && this.amountRequested > 0;
     }
 
 

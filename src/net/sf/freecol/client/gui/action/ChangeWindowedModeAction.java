@@ -28,7 +28,7 @@ import net.sf.freecol.client.gui.GUI;
 /**
  * An action for toggling between full-screen and windowed mode.
  */
-public class ChangeWindowedModeAction extends SelectableAction {
+public final class ChangeWindowedModeAction extends SelectableAction {
 
     public static final String id = "changeWindowedModeAction";
 

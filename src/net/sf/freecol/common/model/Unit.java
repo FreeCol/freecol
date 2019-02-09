@@ -331,7 +331,7 @@ public class Unit extends GoodsLocation
     /**
      * Initialize the nationality and ethnicity.
      */
-    private void initialize() {
+    private final void initialize() {
         Player owner = getOwner();
         if (owner != null && isPerson()) {
             setNationality(owner.getNationId());
@@ -1540,7 +1540,7 @@ public class Unit extends GoodsLocation
      *
      * @return The nationality of this Unit.
      */
-    public String getNationality() {
+    public final String getNationality() {
         return this.nationality;
     }
 
@@ -1552,7 +1552,7 @@ public class Unit extends GoodsLocation
      *
      * @param newNationality The new nationality of this Unit.
      */
-    public void setNationality(String newNationality) {
+    public final void setNationality(String newNationality) {
         this.nationality = newNationality;
     }
 
@@ -1565,7 +1565,7 @@ public class Unit extends GoodsLocation
      *
      * @return The ethnicity of this Unit.
      */
-    public String getEthnicity() {
+    public final String getEthnicity() {
         return this.ethnicity;
     }
 
@@ -1574,7 +1574,7 @@ public class Unit extends GoodsLocation
      *
      * @param newEthnicity The new ethnicity of this Unit.
      */
-    public void setEthnicity(String newEthnicity) {
+    public final void setEthnicity(String newEthnicity) {
         this.ethnicity = newEthnicity;
     }
 

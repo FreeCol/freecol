@@ -91,7 +91,7 @@ public class WorkerWish extends Wish {
         setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
-        this.initialized = getDestination() != null && getUnitType() != null;
+        this.initialized = this.destination != null && this.unitType != null;
     }
 
     /**
@@ -107,7 +107,7 @@ public class WorkerWish extends Wish {
                       FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        this.initialized = getDestination() != null && getUnitType() != null;
+        this.initialized = this.destination != null && this.unitType != null;
     }
 
 

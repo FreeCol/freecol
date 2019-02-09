@@ -90,7 +90,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      *
      * @param game The {@code Game} to attach this object to.
      */
-    public void initialize(Game game) {
+    public final void initialize(Game game) {
         if (game != null) {
             setGame(game); // Set game before calling internId
             internId(getXMLTagName() + ":" + game.getNextId());

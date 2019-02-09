@@ -187,7 +187,7 @@ public class Force extends FreeColSpecObject {
      *
      * @param au The addition to this {@code Force}.
      */
-    public void add(AbstractUnit au) {
+    public final void add(AbstractUnit au) {
         final Specification spec = getSpecification();
         final UnitType unitType = au.getType(spec);
         final int n = au.getNumber();
