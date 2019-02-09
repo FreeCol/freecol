@@ -16,19 +16,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.freecol.client.gui.panel.report;
-
-import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.util.*;
 
 
 /**
@@ -46,31 +43,26 @@ public final class ReportCargoPanel extends ReportUnitPanel {
     }
 
 
-    @Override
-    protected void addREFUnits() {}
-
-    @Override
-    protected void addOwnUnits() {
-        final Player player = getMyPlayer();
-        reportPanel.add(Utility.localizedLabel(player.getForcesLabel()), NL_SPAN_SPLIT_2);
-        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
-
-        for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (unitType.isAvailableTo(player)
-                    && (unitType.canCarryUnits() || unitType.canCarryGoods())) {
-                AbstractUnit unit = new AbstractUnit(unitType,
-                                                     Specification.DEFAULT_ROLE_ID,
-                                                     getCount("carriers", unitType));
-                reportPanel.add(createUnitTypeLabel(unit), "sg");
-            }
-        }
+    /**
+     * {@inheritDoc}
+     */
+    protected boolean isReportable(Unit unit) {
+        return unit.isCarrier();
     }
 
-    @Override
-    protected void gatherData() {
-        for (Unit u : CollectionUtils.transform(getMyPlayer().getUnits(), Unit::isCarrier)) {
-            addUnit(u, "carriers");
-        }
+    /**
+     * {@inheritDoc}
+     */
+    protected boolean isReportable(UnitType unitType, Role role) {
+        return unitType.isAvailableTo(getMyPlayer())
+            && (unitType.canCarryUnits() || unitType.canCarryGoods())
+            && Specification.DEFAULT_ROLE_ID.equals(role.getId());
     }
-
+        
+    /**
+     * {@inheritDoc}
+     */
+    protected boolean isReportableREF(AbstractUnit au) {
+        return false;
+    }
 }

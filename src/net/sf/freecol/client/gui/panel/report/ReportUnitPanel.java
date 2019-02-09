@@ -20,9 +20,12 @@
 package net.sf.freecol.client.gui.panel.report;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,11 +40,16 @@ import net.sf.freecol.client.gui.label.GoodsLabel;
 import net.sf.freecol.client.gui.label.UnitLabel;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
@@ -54,29 +62,34 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public abstract class ReportUnitPanel extends ReportPanel {
 
-    /**
-     * Units in Europe.
-     */
-    private final List<Unit> inEurope = new ArrayList<>();
+    /** Simple comparator to order miscellaneous locations. */
+    private static final Comparator<Location> locationComparator
+        = new Comparator<Location>() {
+                public int compare(Location l1, Location l2) {
+                    return l1.getId().compareTo(l2.getId());
+                }
+            };
 
     /**
-     * Units in colonies.
+     * Comparator to order abstract unit lists with most common
+     * type+role first.
      */
-    private final Map<Colony, List<Unit>> inColonies = new HashMap<>();
+    private static final Comparator<AbstractUnit> auComparator
+        = Comparator.comparingInt(AbstractUnit::getNumber).reversed();
 
-    /**
-     * Units in other locations.
-     */
-    private final Map<String, List<Unit>> inLocations = new HashMap<>();
+    /** Where are the players reportable units? */
+    private final Map<Location, List<Unit>> where = new HashMap<>();
+    
+    /** Count the number of units of each type+role. */
+    private final List<AbstractUnit> reportables = new ArrayList<>();
 
-    /**
-     * Records the number of units of each type.
-     */
-    private final Map<String, TypeCountMap<UnitType>> units = new HashMap<>();
-
-    /**
-     * Whether to show colonies even if no selected units are present.
-     */
+    /** Count the relevant REF units. */
+    private final List<AbstractUnit> reportableREF = new ArrayList<>();
+    
+    /** Locations in the order to display them. */
+    private final List<Location> orderedLocations = new ArrayList<>();
+    
+    /** Whether to show colonies even if no selected units are present. */
     private boolean showColonies = false;
 
 
@@ -84,129 +97,135 @@ public abstract class ReportUnitPanel extends ReportPanel {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The {@code FreeColClient} for the game.
-     * @param key the report name key
+     * @param key The report name key.
      * @param showColonies Whether to show colonies with no selected units.
      */
     protected ReportUnitPanel(FreeColClient freeColClient, String key,
                               boolean showColonies) {
         super(freeColClient, key);
 
+        // Override default layout
+        this.reportPanel.setLayout(new MigLayout("fillx, wrap 12", "", ""));
+
         this.showColonies = showColonies;
-        reportPanel.setLayout(new MigLayout("fillx, wrap 12", "", ""));
 
         gatherData();
-        addREFUnits();
-        addOwnUnits();
+        display();
+    }
 
-        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
-                        "newline, span, growx, wrap 40");
-
-        // Colonies first, sorted according to user preferences
+    private void gatherData() {
+        // Add entries to where and reportables for the players units
         final Player player = getMyPlayer();
-        for (Colony colony : player.getColonyList()) {
-            handleLocation(colony, colony.getName(), inColonies.get(colony));
+        final Specification spec = getSpecification();
+        for (Unit u : transform(player.getUnits(), u -> isReportable(u))) {
+            appendToMapList(this.where, u.getLocation().up(), u);
+            AbstractUnit au = find(this.reportables, AbstractUnit.matcher(u));
+            if (au == null) {
+                this.reportables.add(new AbstractUnit(u.getType(),
+                        u.getRole().getId(), 1));
+            } else {
+                au.addToNumber(1);
+            }
         }
+        this.reportables.sort(auComparator);
 
-        // Europe next
+        // Create the list of reportable REF abstract units
+        List<AbstractUnit> refUnits = player.getREFUnits();
+        if (refUnits != null) {
+            for (AbstractUnit au : refUnits) {
+                if (isReportableREF(au)) {
+                    this.reportableREF.add(au);
+                }
+            }
+        }
+        this.reportableREF.sort(auComparator);
+
+        // Build a list of locations, colonies first, then Europe, then other
+        this.orderedLocations.addAll(transform(this.where.keySet(),
+                l -> !(l instanceof Colony || l instanceof Europe),
+                Function.<Location>identity(), locationComparator));
         Europe europe = player.getEurope();
-        if (europe != null) {
-            handleLocation(europe, Messages.getName(europe), inEurope);
+        if (europe != null) this.orderedLocations.add(0, europe);
+        List<Colony> colonies = player.getSortedColonies(getClientOptions()
+            .getColonyComparator());
+        this.orderedLocations.addAll(0, colonies);
+    }
+
+    private void display() {
+        final Player player = getMyPlayer();
+        // Display REF
+        if (!this.reportableREF.isEmpty()) {
+            final Nation refNation = player.getNation().getREFNation();
+            this.reportPanel.add(new JLabel(Messages.getName(refNation)),
+                                SPAN_SPLIT_2);
+            this.reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
+                                 "growx");
+            for (AbstractUnit au : this.reportableREF) {
+                this.reportPanel.add(createUnitTypeLabel(au), "sg");
+            }
         }
 
-        // Finally all other locations, sorted alphabetically.
-        forEach(mapEntriesByKey(inLocations),
-                e -> handleLocation(null, e.getKey(), e.getValue()));
+        // Display our units
+        reportPanel.add(Utility.localizedLabel(player.getForcesLabel()),
+                        NL_SPAN_SPLIT_2);
+        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
+        for (AbstractUnit au : this.reportables) {
+            if (au.getNumber() <= 0) continue;
+            reportPanel.add(createUnitTypeLabel(au), "sg");
+        }
+
+        // Display again by location
+        for (Location loc : orderedLocations) {
+            List<Unit> present = this.where.get(loc);
+            if (present == null) {
+                present = Collections.<Unit>emptyList();
+            } else {
+                present = sort(present, Unit.typeRoleComparator);
+            }
+            if (!this.showColonies && present.isEmpty()) continue;
+            String locName = Messages.message(loc.getLocationLabelFor(player));
+            JButton button = Utility.getLinkButton(locName, null, loc.getId());
+            button.addActionListener(this);
+            this.reportPanel.add(button, NL_SPAN_SPLIT_2);
+            this.reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
+                                 "growx");
+            if (present.isEmpty()) {
+                this.reportPanel.add(Utility.localizedLabel("none"), "sg");
+            } else {
+                for (Unit u : sort(present, Unit.typeRoleComparator)) {
+                    JButton unitButton = getUnitButton(u);
+                    if (u.isCarrier()) {
+                        this.reportPanel.add(unitButton, "newline, sg");
+                        for (Goods goods : u.getGoodsList()) {
+                            GoodsLabel goodsLabel = new GoodsLabel(getGUI(), goods);
+                            this.reportPanel.add(goodsLabel);
+                        }
+                        for (Unit unitLoaded : u.getUnitList()) {
+                            UnitLabel unitLoadedLabel
+                                = new UnitLabel(getFreeColClient(), unitLoaded, true);
+                            this.reportPanel.add(unitLoadedLabel);
+                        }
+                    } else {
+                        this.reportPanel.add(unitButton, "sg");
+                    }
+                }
+            }
+        }
 
         revalidate();
         repaint();
     }
 
-
-    protected int getCount(String key, UnitType type) {
-        TypeCountMap<UnitType> map = units.get(key);
-        return (map == null) ? 0 : map.getCount(type);
-    }
-
-    protected void incrementCount(String key, UnitType type, int number) {
-        TypeCountMap<UnitType> map = units.get(key);
-        if (map == null) {
-            map = new TypeCountMap<>();
-            units.put(key, map);
-        }
-        map.incrementCount(type, number);
-    }
-
-    protected void addUnit(Unit unit, String key) {
-        if (unit.getLocation() == null) {
-            return; // Can not happen.
-        } else if (unit.isInEurope()) {
-            inEurope.add(unit);
-        } else {
-            Colony colony = unit.getLocation().getColony();
-            if (colony == null) {
-                String locationName = getLocationLabelFor(unit);
-                List<Unit> unitList = inLocations.get(locationName);
-                if (unitList == null) {
-                    unitList = new ArrayList<>();
-                    inLocations.put(locationName, unitList);
-                }
-                unitList.add(unit);
-            } else {
-                List<Unit> unitList = inColonies.get(colony);
-                if (unitList == null) {
-                    unitList = new ArrayList<>();
-                    inColonies.put(colony, unitList);
-                }
-                unitList.add(unit);
-            }
-        }
-        incrementCount(key, unit.getType(), 1);
-    }
-
-    protected void handleLocation(Location location, String locationName,
-                                  List<Unit> unitList) {
-        if ((unitList == null || unitList.isEmpty()) && !showColonies) {
-            return;
-        }
-
-        JComponent component;
-        if (location == null) {
-            component = new JLabel(locationName);
-        } else {
-            JButton button = Utility.getLinkButton(locationName, null, location.getId());
-            button.addActionListener(this);
-            component = button;
-        }
-        reportPanel.add(component, NL_SPAN_SPLIT_2);
-
-        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
-
-        if (unitList == null || unitList.isEmpty()) {
-            reportPanel.add(Utility.localizedLabel("none"), "sg");
-        } else {
-            for (Unit u : sort(unitList, Unit.typeRoleComparator)) {
-                JButton unitButton = getUnitButton(u);
-                if (u.isCarrier()) {
-                    reportPanel.add(unitButton, "newline, sg");
-                    for (Goods goods : u.getGoodsList()) {
-                        GoodsLabel goodsLabel = new GoodsLabel(getGUI(), goods);
-                        reportPanel.add(goodsLabel);
-                    }
-                    for (Unit unitLoaded : u.getUnitList()) {
-                        UnitLabel unitLoadedLabel
-                                = new UnitLabel(getFreeColClient(), unitLoaded, true);
-                        reportPanel.add(unitLoadedLabel);
-                    }
-                } else {
-                    reportPanel.add(unitButton, "sg");
-                }
-            }
-        }
-    }
-
-    protected JButton getUnitButton(Unit unit) {
+    /**
+     * Get a button for a unit.
+     *
+     * @param unit The {@code Unit} that needs a button.
+     * @return A suitable {@code JButton}.
+     */
+    private JButton getUnitButton(Unit unit) {
         ImageIcon icon = new ImageIcon(getImageLibrary().getScaledUnitImage(unit));
-        JButton button = Utility.getLinkButton("", icon, unit.getLocation().getId());
+        JButton button = Utility.getLinkButton("", icon,
+                                               unit.getLocation().up().getId());
         button.addActionListener(this);
         StringTemplate tip = StringTemplate.label("\n")
                                            .addStringTemplate(unit.getLabel());
@@ -221,34 +240,28 @@ public abstract class ReportUnitPanel extends ReportPanel {
     // To be implemented by specific unit panels.
 
     /**
-     * Gather the overall unit data, mostly by calling addUnit() above.
-     */
-    protected abstract void gatherData();
-
-    /**
-     * Add a section for the REF.
-     */
-    protected abstract void addREFUnits();
-
-    /**
-     * Add a section for specific unit types owned by the player.
-     */
-    protected abstract void addOwnUnits();
-
-    /**
-     * Checks whether a UnitType is reportable
+     * Is this unit from the player's units reportable?
      *
-     * @param unitType The UnitType to check
-     * @return Defaults to false unless specific conditions are met
+     * @param unit The {@code Unit} to check.
+     * @return True if the unit should appear in this panel.
      */
-    protected boolean isReportable(UnitType unitType) { return false; };
+    protected abstract boolean isReportable(Unit unit);
 
     /**
-     * Checks whether a Unit is reportable
+     * Is a unit type and role reportable as a combination usable by
+     * the player?
      *
-     * @param unit The Unit to check
-     * @return Defaults to false unless specific conditions are met
+     * @param unitType The {@code UnitType} to check.
+     * @param role The {@code Role} to check.
+     * @return True if the unit type and role should appear in this panel.
      */
-    protected boolean isReportable(Unit unit) { return false; };
-
+    protected abstract boolean isReportable(UnitType unitType, Role role);
+    
+    /**
+     * Is a REF unit reportable?
+     *
+     * @param au The {@code AbstractUnit} to check.
+     * @return True if REF unit should appear in this panel.
+     */
+    protected abstract boolean isReportableREF(AbstractUnit au);
 }
