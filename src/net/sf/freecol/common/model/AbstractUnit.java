@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -117,6 +118,15 @@ public class AbstractUnit extends FreeColObject {
      */
     public final void setNumber(final int newNumber) {
         this.number = newNumber;
+    }
+
+    /**
+     * Add to the number.
+     *
+     * @param add The amount to add.
+     */
+    public final void addToNumber(int diff) {
+        this.number += diff;
     }
 
     /**
@@ -257,6 +267,40 @@ public class AbstractUnit extends FreeColObject {
         return getId().equals(other.getId())
             && this.getRoleId().equals(other.getRoleId())
             && this.getNumber() == other.getNumber();
+    }
+
+    /**
+     * Create a predicate to match the type+role of an abstract unit.
+     *
+     * @param ut The {@code UnitType} to match.
+     * @param ro The role identifier to match.
+     * @return A suitable {@code Predicate}.
+     */
+    public static Predicate<AbstractUnit> matcher(UnitType ut, String roleId) {
+        return (AbstractUnit a) ->
+            a.getId().equals(ut.getId()) && a.roleId.equals(roleId);
+    }
+
+    /**
+     * Create a predicate to match the type+role of an abstract unit.
+     *
+     * @param au The {@code AbstractUnit} to match.
+     * @return A suitable {@code Predicate}.
+     */
+    public static Predicate<AbstractUnit> matcher(AbstractUnit au) {
+        return (AbstractUnit a) ->
+            a.getId().equals(au.getId())
+                && a.getRoleId().equals(au.getRoleId());
+    }
+
+    /**
+     * Create a predicate to match the type+role of a unit.
+     *
+     * @param unit The {@code Unit} to match.
+     * @return A suitable {@code Predicate}.
+     */
+    public static Predicate<AbstractUnit> matcher(Unit unit) {
+        return matcher(unit.getType(), unit.getRole().getId());
     }
 
     /**

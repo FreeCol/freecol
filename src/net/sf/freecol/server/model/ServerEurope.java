@@ -177,7 +177,7 @@ public class ServerEurope extends Europe implements TurnTaker {
         for (AbstractUnit au : expanded) {
             if (au.getId().equals(top.getId())
                 && au.getRoleId().equals(top.getRoleId())) {
-                top.setNumber(top.getNumber() + au.getNumber());
+                top.addToNumber(au.getNumber());
             } else {
                 this.recruitables.add(au);
                 top = au;

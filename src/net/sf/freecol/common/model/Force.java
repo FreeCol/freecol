@@ -191,14 +191,12 @@ public class Force extends FreeColSpecObject {
         final Specification spec = getSpecification();
         final UnitType unitType = au.getType(spec);
         final int n = au.getNumber();
-        final Predicate<AbstractUnit> matchPred = a ->
-            spec.getUnitType(a.getId()) == unitType
-                && a.getRoleId().equals(au.getRoleId());
+        final Predicate<AbstractUnit> matchPred = AbstractUnit.matcher(au);
 
         if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
             AbstractUnit refUnit = find(this.navalUnits, matchPred);
             if (refUnit != null) {
-                refUnit.setNumber(refUnit.getNumber() + n);
+                refUnit.addToNumber(n);
                 if (unitType.canCarryUnits()) {
                     this.capacity += unitType.getSpace() * n;
                 }
@@ -208,7 +206,7 @@ public class Force extends FreeColSpecObject {
         } else {
             AbstractUnit refUnit = find(this.landUnits, matchPred);
             if (refUnit != null) {
-                refUnit.setNumber(refUnit.getNumber() + n);
+                refUnit.addToNumber(n);
                 this.spaceRequired += unitType.getSpaceTaken() * n;
             } else {
                 this.landUnits.add(au);

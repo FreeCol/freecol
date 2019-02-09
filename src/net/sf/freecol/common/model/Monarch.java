@@ -680,10 +680,8 @@ public final class Monarch extends FreeColGameObject implements Named {
                                              enemyStrength);
             if (fullRatio < NOSUPPORT) { // Full support, some randomization
                 for (AbstractUnit au : result) {
-                    int amount = au.getNumber();
-                    amount += randomInt(logger, "Vary war force " + au.getId(),
-                                        random, 3) - 1;
-                    au.setNumber(amount);
+                    au.addToNumber(randomInt(logger, "Vary war force " + au.getId(),
+                                             random, 3) - 1);
                 }
             } else if (enemyStrength <= 0.0) { // Enemy is defenceless: 1 unit
                 while (result.size() > 1) result.remove(0);
@@ -793,7 +791,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             mercPrice -= prices.get(r);
             AbstractUnit au = mercs.get(r);
             if (au.getNumber() > 1) {
-                au.setNumber(au.getNumber() - 1);
+                au.addToNumber(-1);
             } else {
                 prices.remove(r);
                 mercs.remove(r);
