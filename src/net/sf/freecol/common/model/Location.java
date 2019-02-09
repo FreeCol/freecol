@@ -26,7 +26,6 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.ObjectWithId;
-import net.sf.freecol.common.i18n.Messages;
 
 
 /**

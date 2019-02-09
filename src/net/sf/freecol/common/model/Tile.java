@@ -1055,7 +1055,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @return A suitable {@code StringTemplate}.
      */
-    public StringTemplate getDetailedLocationLabel() {
+    private StringTemplate getDetailedLocationLabel() {
         Settlement nearSettlement = null;
         for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
             nearSettlement = tile.getSettlement();
@@ -1090,7 +1090,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param player The {@code Player} to produce a label for.
      * @return A suitable {@code StringTemplate}.
      */
-    public StringTemplate getDetailedLocationLabelFor(Player player) {
+    private StringTemplate getDetailedLocationLabelFor(Player player) {
         Settlement nearSettlement = null;
         for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
             nearSettlement = tile.getSettlement();
