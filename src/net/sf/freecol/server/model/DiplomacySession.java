@@ -257,16 +257,14 @@ public class DiplomacySession extends TimedSession {
      * @return Any {@code DiplomacySession} found.
      */
     private static DiplomacySession findContactSession(Player p1, Player p2) {
-        final ServerPlayer s1 = (ServerPlayer)p1;
-        final ServerPlayer s2 = (ServerPlayer)p2;
         final Predicate<Session> pred = s -> (s instanceof DiplomacySession)
             && ((DiplomacySession)s).getAgreement() != null
             && (((DiplomacySession)s).getAgreement().getContext()
                 == DiplomaticTrade.TradeContext.CONTACT)
-            && ((((DiplomacySession)s).getOwner() == s1
-                    && ((DiplomacySession)s).getOtherPlayer() == s2)
-                || (((DiplomacySession)s).getOwner() == s2
-                    && ((DiplomacySession)s).getOtherPlayer() == s1));
+            && ((((DiplomacySession)s).getOwner() == p1
+                    && ((DiplomacySession)s).getOtherPlayer() == p2)
+                || (((DiplomacySession)s).getOwner() == p2
+                    && ((DiplomacySession)s).getOtherPlayer() == p1));
         return (DiplomacySession)findSession(pred);
     }
 
