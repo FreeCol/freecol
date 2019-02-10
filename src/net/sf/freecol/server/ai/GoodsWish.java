@@ -37,7 +37,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Represents the need for goods within a {@code Colony}.
  */
-public class GoodsWish extends Wish {
+public final class GoodsWish extends Wish {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(GoodsWish.class.getName());

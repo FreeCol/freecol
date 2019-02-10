@@ -36,7 +36,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Represents the need for a worker within a {@code Colony}.
  */
-public class WorkerWish extends Wish {
+public final class WorkerWish extends Wish {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkerWish.class.getName());

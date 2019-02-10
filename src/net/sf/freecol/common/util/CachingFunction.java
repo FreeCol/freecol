@@ -51,6 +51,9 @@ public class CachingFunction<T, R> implements Function<T, R> {
      */
     public R apply(T t) {
         R result;
+        // Normally we would just use get(), but this is a general routine
+        // so we want to distinguish the case where the failure return from
+        // get (which is null) is being used as valid data.
         if (this.cache.containsKey(t)) {
             result = this.cache.get(t);
         } else {
