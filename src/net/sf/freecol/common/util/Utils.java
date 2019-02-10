@@ -368,6 +368,6 @@ public class Utils {
      * @return True if in headless mode.
      */
     public static boolean isHeadless() {
-        return System.getProperty("java.awt.headless", "false").equals("true");
+        return "true".equals(System.getProperty("java.awt.headless", "false"));
     }
 }
