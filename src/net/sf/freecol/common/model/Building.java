@@ -156,7 +156,7 @@ public class Building extends WorkLocation
             : map(unitType.getModifiers(id, getType(), turn),
                 m -> {
                     return (m.getType() == Modifier.ModifierType.ADDITIVE)
-                        ? new Modifier(m).setValue(m.getValue() * competence)
+                        ? Modifier.makeModifier(m).setValue(m.getValue() * competence)
                         : m;
                 });
     }

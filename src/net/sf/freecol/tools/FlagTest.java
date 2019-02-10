@@ -166,7 +166,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
     }
 
     @Override
-    public void itemStateChanged(ItemEvent e) {
+    public final void itemStateChanged(ItemEvent e) {
         Background newBackground = (Background) background.getSelectedItem();
         Decoration newDecoration = (Decoration) decoration.getSelectedItem();
         UnionPosition newPosition = (UnionPosition) union.getSelectedItem();

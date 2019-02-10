@@ -60,7 +60,7 @@ import net.sf.freecol.server.ai.TransportableAIObject;
  *
  * @see net.sf.freecol.common.model.Unit Unit
  */
-public class TransportMission extends Mission {
+public final class TransportMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(TransportMission.class.getName());
 
@@ -98,7 +98,9 @@ public class TransportMission extends Mission {
      * @param aiUnit The {@code AIUnit} this mission is created for.
      */
     public TransportMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit, aiUnit.getTrivialTarget());
+        super(aiMain, aiUnit);
+
+        setTarget(aiUnit.getTrivialTarget());
     }
 
     /**

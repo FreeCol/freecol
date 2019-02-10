@@ -106,22 +106,7 @@ public abstract class Mission extends AIObject {
 
         this.aiUnit = aiUnit;
         this.initialized = this.aiUnit != null;
-    }
 
-    /**
-     * Creates a mission for the given {@code AIUnit} and target.
-     *
-     * Note that missions are attached to their units, and thus do
-     * not need AI ids, hence the plain superclass constructor.
-     *
-     * @param aiMain The main AI-object.
-     * @param aiUnit The {@code AIUnit} this mission is created for.
-     * @param target The initial target {@code Location}.
-     */
-    protected Mission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        this(aiMain, aiUnit);
-
-        setTarget(target);
         if (aiUnit != null && aiUnit.getMission() != this) {
             aiUnit.changeMission(this);
         }
@@ -971,6 +956,9 @@ public abstract class Mission extends AIObject {
 
     /**
      * Sets the target of this mission, if any.
+     *
+     * The actual target is handled in the missions that really have
+     * them, this is a helper to make sure the unit is updated.
      *
      * @param target The new target of this mission, or null if none.
      */

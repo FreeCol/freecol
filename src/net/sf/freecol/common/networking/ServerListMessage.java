@@ -35,7 +35,7 @@ import net.sf.freecol.server.FreeColServer;
 /**
  * The message sent to query and list the available servers.
  */
-public class ServerListMessage extends ObjectMessage {
+public final class ServerListMessage extends ObjectMessage {
 
     public static final String TAG = "serverList";
 

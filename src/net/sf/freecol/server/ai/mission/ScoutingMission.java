@@ -49,7 +49,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * Mission for controlling a scout.
  */
-public class ScoutingMission extends Mission {
+public final class ScoutingMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(ScoutingMission.class.getName());
 
@@ -76,7 +76,9 @@ public class ScoutingMission extends Mission {
      * @param target The target {@code Location}.
      */
     public ScoutingMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**

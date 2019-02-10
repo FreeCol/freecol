@@ -213,8 +213,8 @@ public class LandMap {
      * @param distanceToEdge The preferred distance to the map edge.
      * @param random A pseudo random number source.
      */
-    private void generate(int type, int distanceToEdge,
-                          int minNumberOfTiles, Random random) {
+    private final void generate(int type, int distanceToEdge,
+                                int minNumberOfTiles, Random random) {
         switch (type) {
         case MapGeneratorOptions.LAND_GENERATOR_CLASSIC:
             createClassicLandMap(distanceToEdge, minNumberOfTiles, random);

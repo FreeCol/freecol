@@ -517,9 +517,9 @@ public final class FeatureContainer {
         for (Modifier modifier : transform(getModifiers(null, null, null),
                 m -> oldSource == null || m.getSource() == oldSource)) {
             removeModifier(modifier);
-            Modifier newModifier = new Modifier(modifier);
-            newModifier.setSource(newSource);
-            addModifier(newModifier);
+            Modifier mod = Modifier.makeModifier(modifier);
+            mod.setSource(newSource);
+            addModifier(mod);
         }
     }
 

@@ -47,7 +47,7 @@ import net.sf.freecol.server.ai.MissionAIPlayer;
 /**
  * Mission for attacking a specific target, be it a Unit or a Settlement.
  */
-public class UnitSeekAndDestroyMission extends Mission {
+public final class UnitSeekAndDestroyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(UnitSeekAndDestroyMission.class.getName());
 
@@ -73,7 +73,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit,
                                      Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**

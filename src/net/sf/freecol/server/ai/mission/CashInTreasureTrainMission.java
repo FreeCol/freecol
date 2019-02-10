@@ -49,7 +49,7 @@ import net.sf.freecol.server.ai.AIUnit;
  * FIXME: acquire protection
  * FIXME: Better avoidance of enemy units
  */
-public class CashInTreasureTrainMission extends Mission {
+public final class CashInTreasureTrainMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(CashInTreasureTrainMission.class.getName());
 
@@ -74,7 +74,9 @@ public class CashInTreasureTrainMission extends Mission {
      */
     public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit,
                                       Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**

@@ -48,7 +48,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * Mission for sending a missionary to a native settlement.
  */
-public class MissionaryMission extends Mission {
+public final class MissionaryMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(MissionaryMission.class.getName());
 
@@ -73,7 +73,9 @@ public class MissionaryMission extends Mission {
      * @param target The target {@code Location} for this mission.
      */
     public MissionaryMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**

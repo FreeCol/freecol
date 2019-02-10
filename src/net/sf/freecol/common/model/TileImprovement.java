@@ -108,19 +108,6 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Create an new TileImprovement from an existing one.
-     *
-     * @param game The enclosing {@code Game}.
-     * @param tile The {@code Tile} where the improvement resides.
-     * @param template The {@code TileImprovement} to copy.
-     */
-    public TileImprovement(Game game, Tile tile, TileImprovement template) {
-        super(game, tile);
-
-        copy(template);
-    }
-
-    /**
      * Create a new {@code TileImprovement} with the given identifier.
      *
      * The object should be initialized later.
@@ -132,21 +119,6 @@ public class TileImprovement extends TileItem implements Named {
         super(game, id);
     }
 
-
-    /**
-     * Copy another tile improvement into this one.
-     *
-     * @param template The other {@code TileImprovement} to copy.
-     * @return This tile improvement.
-     */
-    public TileImprovement copy(TileImprovement template) {
-        this.type = template.type;
-        this.turnsToComplete = template.turnsToComplete;
-        this.magnitude = template.magnitude;
-        this.style = template.style;
-        this.virtual = template.virtual;
-        return this;
-    }
 
     /**
      * Gets the type of this tile improvement.
@@ -237,11 +209,20 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
+     * Set the style of this improvement.
+     *
+     * @param style The new {@code TileImprovementStyle}.
+     */
+    public void setStyle(TileImprovementStyle style) {
+        this.style = style;
+    }
+
+    /**
      * Is this a virtual improvement?
      *
      * @return True if this is a virtual improvement.
      */
-    public final boolean isVirtual() {
+    public final boolean getVirtual() {
         return virtual;
     }
 
@@ -711,7 +692,7 @@ public class TileImprovement extends TileItem implements Named {
         this.turnsToComplete = o.getTurnsToComplete();
         this.magnitude = o.getMagnitude();
         this.style = o.getStyle();
-        this.virtual = o.isVirtual();
+        this.virtual = o.getVirtual();
         return true;
     }
 
@@ -775,7 +756,7 @@ public class TileImprovement extends TileItem implements Named {
                 logger.warning("At " + tile + " ignored nonempty style for "
                     + type + ": " + str);
         } else if (str == null) {
-            if (!isComplete() || isVirtual()) {
+            if (!isComplete() || getVirtual()) {
                 ; // Null style OK for incomplete or virtual roads
             } else {
                 logger.warning("At " + tile + " unexpected null style for "

@@ -46,7 +46,7 @@ import net.sf.freecol.server.ai.MissionAIPlayer;
 /**
  * Mission for defending a {@code Settlement}.
  */
-public class DefendSettlementMission extends Mission {
+public final class DefendSettlementMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
 
@@ -73,7 +73,9 @@ public class DefendSettlementMission extends Mission {
      */
     public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit,
                                    Settlement settlement) {
-        super(aiMain, aiUnit, settlement);
+        super(aiMain, aiUnit);
+
+        setTarget(settlement);
     }
 
     /**

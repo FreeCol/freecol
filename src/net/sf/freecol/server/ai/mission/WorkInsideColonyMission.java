@@ -38,7 +38,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * Mission for working inside an AI colony.
  */
-public class WorkInsideColonyMission extends Mission {
+public final class WorkInsideColonyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WorkInsideColonyMission.class.getName());
 
@@ -61,7 +61,9 @@ public class WorkInsideColonyMission extends Mission {
      */
     public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit,
                                    AIColony aiColony) {
-        super(aiMain, aiUnit, aiColony.getColony());
+        super(aiMain, aiUnit);
+
+        setTarget(aiColony.getColony());
     }
 
     /**

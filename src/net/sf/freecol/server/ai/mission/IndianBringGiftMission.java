@@ -50,7 +50,7 @@ import net.sf.freecol.server.ai.AIUnit;
  * <li>Complete the mission by delivering the gift.
  * </ol>
  */
-public class IndianBringGiftMission extends Mission {
+public final class IndianBringGiftMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianBringGiftMission.class.getName());
 
@@ -74,8 +74,9 @@ public class IndianBringGiftMission extends Mission {
      * @param target The {@code Colony} receiving the gift.
      */
     public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
 
+        setTarget(target);
         this.collected = hasGift();
     }
 

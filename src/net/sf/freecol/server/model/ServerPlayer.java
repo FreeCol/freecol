@@ -209,7 +209,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @param admin Whether the player is the game administrator or not.
      * @param nation The nation for this player.
      */
-    public void initialize(Game game, boolean admin, Nation nation) {
+    public final void initialize(Game game, boolean admin, Nation nation) {
         if (nation == null) throw new RuntimeException("Null nation");
 
         this.initialize(game); // Attach to game
@@ -274,7 +274,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @return True if this player is currently connected to the server.
      */
-    public boolean isConnected() {
+    public final boolean isConnected() {
         return this.connection != null;
     }
 
@@ -283,7 +283,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @return The {@code Connection}.
      */
-    public Connection getConnection() {
+    public final Connection getConnection() {
         return this.connection;
     }
 
@@ -292,7 +292,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @param connection The {@code Connection}.
      */
-    public void setConnection(Connection connection) {
+    public final void setConnection(Connection connection) {
         this.connection = connection;
     }
 

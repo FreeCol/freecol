@@ -56,7 +56,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * Mission for demanding goods from a specified player.
  */
-public class IndianDemandMission extends Mission {
+public final class IndianDemandMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianDemandMission.class.getName());
 
@@ -96,8 +96,9 @@ public class IndianDemandMission extends Mission {
      * @param target The {@code Colony} receiving the gift.
      */
     public IndianDemandMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
 
+        setTarget(target);
         this.demanded = this.succeeded = false;
     }
 

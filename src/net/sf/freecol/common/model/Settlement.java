@@ -306,7 +306,7 @@ public abstract class Settlement extends GoodsLocation
         settlementTile.setSettlement(null);//-vis(owner),-til
         settlementTile.changeOwnership(null, null);//-til
         TileImprovement road = settlementTile.getRoad();
-        if (road != null && road.isVirtual()) {
+        if (road != null && road.getVirtual()) {
             settlementTile.removeRoad();//-til
         }
     }

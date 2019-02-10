@@ -113,7 +113,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         display();
     }
 
-    private void gatherData() {
+    private final void gatherData() {
         // Add entries to where and reportables for the players units
         final Player player = getMyPlayer();
         final Specification spec = getSpecification();
@@ -151,7 +151,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         this.orderedLocations.addAll(0, colonies);
     }
 
-    private void display() {
+    private final void display() {
         final Player player = getMyPlayer();
         // Display REF
         if (!this.reportableREF.isEmpty()) {

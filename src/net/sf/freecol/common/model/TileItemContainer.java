@@ -69,22 +69,6 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Create a new {@code TileItemContainer} from an existing template.
-     *
-     * @param game The enclosing {@code Game}.
-     * @param tile The {@code Tile} this {@code TileItemContainer}
-     *     contains {@code TileItems} for.
-     * @param template A {@code TileItemContainer} to copy.
-     * @param layer A maximum allowed {@code Layer}.
-     */
-    public TileItemContainer(Game game, Tile tile, TileItemContainer template,
-                             Layer layer) {
-        this(game, tile);
-
-        copyFrom(template, layer);
-    }
-
-    /**
      * Create a new {@code TileItemContainer}.
      *
      * @param game The enclosing {@code Game}.
@@ -177,14 +161,16 @@ public class TileItemContainer extends FreeColGameObject {
     public final TileItem tryAddTileItem(TileItem item) {
         if (item == null) return null;
         if (item instanceof TileImprovement) {
-            // Consider merging with improvements of the same type
+            // Disallow improvements of the same type
             TileImprovement newTip = (TileImprovement)item;
             for (TileItem oldItem : getTileItems()) {
                 if (!(oldItem instanceof TileImprovement)) continue;
                 TileImprovement oldTip = (TileImprovement)oldItem;
                 if (oldTip.getType().getId().equals(newTip.getType().getId())) {
                     if (oldTip.getMagnitude() < newTip.getMagnitude()) {
-                        oldTip.copy(newTip); // Override with larger version
+                        oldTip.setMagnitude(newTip.getMagnitude());
+                        oldTip.setStyle(newTip.getStyle());
+                        oldTip.setVirtual(newTip.getVirtual());
                         invalidateCache();
                     }
                     return oldItem;

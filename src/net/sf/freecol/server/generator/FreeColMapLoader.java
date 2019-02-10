@@ -111,8 +111,9 @@ public class FreeColMapLoader implements MapLoader {
                         }
                         if (highestLayer.compareTo(Layer.RIVERS) >= 0) {
                             // import tile improvements
-                            tile.setTileItemContainer(new TileItemContainer(game, tile, template
-                                                                            .getTileItemContainer(), layer));
+                            TileItemContainer newTic = new TileItemContainer(game, tile);
+                            newTic.copyFrom(template.getTileItemContainer(), layer);
+                            tile.setTileItemContainer(newTic);
                             if (layer.compareTo(Layer.NATIVES) >= 0) {
                                 // import native settlements
                                 if (template.getOwner() != null) {

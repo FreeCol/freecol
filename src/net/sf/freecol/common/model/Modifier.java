@@ -239,30 +239,6 @@ public class Modifier extends Feature {
     }
 
     /**
-     * Creates a new {@code Modifier} instance from another.
-     *
-     * @param template A {@code Modifier} to copy.
-     */
-    public Modifier(Modifier template) {
-        this(template.getSpecification());
-
-        setId(template.getId());
-        copyIn(template);
-    }
-
-    /**
-     * Creates a new {@code Modifier} instance from another with
-     * an identifier override.
-     *
-     * @param id The object identifier.
-     * @param template A {@code Modifier} to copy.
-     */
-    public Modifier(String id, Modifier template) {
-        this(template);
-        setId(id);
-    }
-
-    /**
      * Creates a new {@code Modifier} instance.
      *
      * @param xr The {@code FreeColXMLReader} to read from.
@@ -276,6 +252,19 @@ public class Modifier extends Feature {
         readFromXML(xr);
     }
 
+
+    /**
+     * Make a copy of a modifier.
+     *
+     * @param modifier The {@code Modifier} to copy.
+     * @return A copy of the modifier.
+     */
+    public static Modifier makeModifier(Modifier modifier) {
+        Modifier ret = new Modifier(modifier.getSpecification());
+        ret.setId(modifier.getId());
+        ret.copyIn(modifier);
+        return ret;
+    }
 
     /**
      * Makes a timed modifier (one with start/end turn and increment)
@@ -292,7 +281,8 @@ public class Modifier extends Feature {
      */
     public static Modifier makeTimedModifier(String id, Modifier template,
                                              Turn start) {
-        Modifier modifier = new Modifier(id, template);
+        Modifier modifier = makeModifier(template);
+        modifier.setId(id);
         float inc = template.getIncrement();
         int duration = template.getDuration();
         modifier.setTemporary(template.isTemporary());

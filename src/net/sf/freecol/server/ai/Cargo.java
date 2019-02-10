@@ -48,7 +48,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * An class describing the action needed to make progress in a
  * transportation action for a specific transportable.
  */
-public class Cargo {
+public final class Cargo {
 
     private static final Logger logger = Logger.getLogger(Cargo.class.getName());
 

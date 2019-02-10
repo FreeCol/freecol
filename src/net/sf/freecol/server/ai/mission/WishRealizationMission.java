@@ -42,7 +42,7 @@ import net.sf.freecol.server.ai.WorkerWish;
 /**
  * Mission for realizing a {@code Wish}.
  */
-public class WishRealizationMission extends Mission {
+public final class WishRealizationMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
@@ -64,8 +64,9 @@ public class WishRealizationMission extends Mission {
      *     the unit and this mission.
      */
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
-        super(aiMain, aiUnit, wish.getDestination());
+        super(aiMain, aiUnit);
 
+        setTarget(wish.getDestination());
         this.wish = wish;
         wish.setTransportable(aiUnit);
     }
@@ -148,9 +149,7 @@ public class WishRealizationMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void setTarget(Location target) {
-        // Ignored, target is set by wish
-    }
+    public void setTarget(Location target) {} // ignore
 
     /**
      * {@inheritDoc}

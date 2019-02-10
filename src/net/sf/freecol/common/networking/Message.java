@@ -112,15 +112,6 @@ public abstract class Message {
         // empty constructor
     }
 
-    /**
-     * Build a new message with the given type.
-     * 
-     * @param type The main message type.
-     */
-    protected Message(String type) {
-        setType(type);
-    }
-    
 
     /**
      * Get the message tag.

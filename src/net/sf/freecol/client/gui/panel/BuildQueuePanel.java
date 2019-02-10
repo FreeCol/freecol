@@ -905,7 +905,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      *      {@link #updateBuildingList()} and
      *      {@link #updateUnitList()}
      */
-    private void updateAllLists() {
+    private final void updateAllLists() {
         final DefaultListModel<BuildableType> current
             = (DefaultListModel<BuildableType>)this.buildQueueList.getModel();
 

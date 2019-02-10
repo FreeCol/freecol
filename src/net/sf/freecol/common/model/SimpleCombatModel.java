@@ -300,7 +300,7 @@ public class SimpleCombatModel extends CombatModel {
         if (goodsCount > 0) {
             result.addAll(transform(spec.getModifiers(Modifier.CARGO_PENALTY),
                     alwaysTrue(),
-                    m -> new Modifier(m).setValue(m.getValue() * goodsCount)));
+                    m -> Modifier.makeModifier(m).setValue(m.getValue() * goodsCount)));
         }
     }
 
@@ -386,7 +386,8 @@ public class SimpleCombatModel extends CombatModel {
                     // bonus, if defender is REF, or attacker is indian.
                     if (isAmbush(attacker, defender)) {
                         for (Modifier m : tile.getDefenceModifiers()) {
-                            Modifier mod = new Modifier(Modifier.OFFENCE, m);
+                            Modifier mod = Modifier.makeModifier(m);
+                            mod.setId(Modifier.OFFENCE);
                             mod.setSource(Specification.AMBUSH_BONUS_SOURCE);
                             result.add(mod);
                         }
@@ -491,7 +492,7 @@ public class SimpleCombatModel extends CombatModel {
         if (goodsCount > 0) {
             result.addAll(transform(spec.getModifiers(Modifier.CARGO_PENALTY),
                     alwaysTrue(),
-                    m -> new Modifier(m).setValue(m.getValue() * goodsCount)));
+                    m -> Modifier.makeModifier(m).setValue(m.getValue() * goodsCount)));
         }
     }
 

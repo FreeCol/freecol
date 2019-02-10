@@ -245,7 +245,7 @@ public class ServerGame extends Game implements TurnTaker {
      *
      * @return The new unknown enemy {@code Player}.
      */
-    public Player establishUnknownEnemy() {
+    public final Player establishUnknownEnemy() {
         Player ret = getUnknownEnemy();
         if (ret != null) return ret;
         ServerPlayer enemy = new ServerPlayer(this, false,
@@ -281,7 +281,7 @@ public class ServerGame extends Game implements TurnTaker {
      *
      * @param random A pseudo-random number source.
      */
-    public void randomize(Random random) {
+    public final void randomize(Random random) {
         if (random != null) NameCache.requireCitiesOfCibola(random);
     }
 

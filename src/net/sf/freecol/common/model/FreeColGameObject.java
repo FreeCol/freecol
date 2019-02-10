@@ -60,12 +60,26 @@ public abstract class FreeColGameObject extends FreeColObject {
 
 
     /**
+     * Special constructor solely for initializing a Game.
+     *
+     * Do *not* call internId as the Game is not ready to register objects.
+     */
+    protected FreeColGameObject() {
+        this.game = (Game)this;
+        this.disposed = false;
+        this.initialized = false;
+    }
+    
+    /**
      * Create and initialize a new {@code FreeColGameObject}.
      *
      * @param game The enclosing {@code Game}.
      */
     public FreeColGameObject(Game game) {
-        initialize(game);
+        this.game = game; // Set game before calling internId
+        internId(getXMLTagName() + ":" + game.getNextId());
+        this.disposed = false;
+        this.initialized = getId() != null;
     }        
 
     /**
@@ -79,8 +93,8 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @param id The object identifier.
      */
     public FreeColGameObject(Game game, String id) {
-        setGame(game); // Set game before calling internId
-        if (id != null) internId(id);
+        this.game = game;
+        internId(id);
         this.initialized = false;
         this.disposed = false;
     }
@@ -91,12 +105,6 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @param game The {@code Game} to attach this object to.
      */
     public final void initialize(Game game) {
-        if (game != null) {
-            setGame(game); // Set game before calling internId
-            internId(getXMLTagName() + ":" + game.getNextId());
-        }
-        this.initialized = getId() != null;
-        this.disposed = false;
     }
         
     /**
@@ -107,17 +115,17 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     public final void internId(final String newId) {
         final Game game = getGame();
-        if (game != null && newId != null && isInternable()) {
+        if (this.game != null && newId != null && isInternable()) {
             final String oldId = getId();
             if (newId.equals(oldId)) {
                 // This happens when the client receives an update.
-                game.setFreeColGameObject(newId, this);
+                this.game.setFreeColGameObject(newId, this);
             } else {
                 if (oldId != null) {
-                    game.removeFreeColGameObject(oldId, "override");
+                    this.game.removeFreeColGameObject(oldId, "override");
                 }
                 setId(newId);
-                game.addFreeColGameObject(newId, this);
+                this.game.addFreeColGameObject(newId, this);
             }
         } else {
             setId(newId);
@@ -276,7 +284,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public Game getGame() {
+    public final Game getGame() {
         return this.game;
     }
 
@@ -284,7 +292,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public void setGame(Game game) {
+    public final void setGame(Game game) {
         if (game == null) throw new RuntimeException("Null game");
         this.game = game;
     }

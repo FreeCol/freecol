@@ -331,7 +331,7 @@ public class Connection implements Closeable {
      * @param log If true, enable logging.
      * @return This {@code Connection}.
      */
-    public Connection setLogging(boolean log) {
+    public final Connection setLogging(boolean log) {
         FreeColXMLWriter lw = null;
         if (log) {
             try {

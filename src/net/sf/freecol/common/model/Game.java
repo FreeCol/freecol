@@ -180,7 +180,7 @@ public class Game extends FreeColGameObject {
      * within { players, unknownEnemy, map } which are directly serialized.
      */
     protected final HashMap<String, WeakReference<FreeColGameObject>>
-        freeColGameObjects = new HashMap<>(10000);
+        freeColGameObjects;
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -212,10 +212,12 @@ public class Game extends FreeColGameObject {
      * Game.newInstance uses this so it must be public.
      */
     public Game() {
-        super((Game)null);
+        super(); // Use the special FCGO Game-specific constructor
 
-        // Games always have a zero identifier.
-        setId("0");
+        // freeColGameObjects has to be in place before we can
+        // call internId()
+        this.freeColGameObjects = new HashMap<>(10000);
+        internId("0"); // Games are always id 0
 
         this.clientUserName = null;
         this.players.clear();
@@ -228,10 +230,8 @@ public class Game extends FreeColGameObject {
         this.specification = null;
         this.combatModel = new SimpleCombatModel();
         this.removeCount = 0;
-        this.setGame(this);
 
-        // Explicitly set initialized as FCGO.initialize() has not happened
-        this.initialized = true;
+        this.initialized = true; // Explicit initialization needed for Games
     }
 
     /**
@@ -1576,26 +1576,8 @@ public class Game extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public void setSpecification(Specification specification) {
+    public final void setSpecification(Specification specification) {
         this.specification = specification;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Game getGame() {
-        return this; // The game must be itself!
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setGame(Game game) {
-        // Do nothing, however do not complain at attempts to set as
-        // the constructor will try to initialize to null, because we
-        // can not yet pass "this" to the FreeColGameObject constructor.
     }
     
     // Override FreeColObject

@@ -55,7 +55,7 @@ import net.sf.freecol.server.ai.TileImprovementPlan;
 /**
  * Mission for controlling a pioneer.
  */
-public class PioneeringMission extends Mission {
+public final class PioneeringMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
@@ -94,7 +94,9 @@ public class PioneeringMission extends Mission {
      * @param target The target {@code Location}.
      */
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**

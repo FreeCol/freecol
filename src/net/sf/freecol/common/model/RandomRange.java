@@ -33,7 +33,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 /**
  * A range of numbers, and support routines to make a random choice therefrom.
  */
-public class RandomRange {
+public final class RandomRange {
 
     private static final Logger logger = Logger.getLogger(RandomRange.class.getName());
 

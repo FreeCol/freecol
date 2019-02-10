@@ -54,7 +54,7 @@ import net.sf.freecol.server.ai.EuropeanAIPlayer;
  *
  * @see net.sf.freecol.common.model.Colony Colony
  */
-public class BuildColonyMission extends Mission {
+public final class BuildColonyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(BuildColonyMission.class.getName());
 
@@ -82,7 +82,9 @@ public class BuildColonyMission extends Mission {
      * @param target The target {@code Location} for this mission.
      */
     public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**

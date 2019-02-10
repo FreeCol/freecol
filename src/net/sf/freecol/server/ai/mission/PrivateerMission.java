@@ -46,7 +46,7 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * A mission for a Privateer unit.
  */
-public class PrivateerMission extends Mission {
+public final class PrivateerMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PrivateerMission.class.getName());
 
@@ -72,7 +72,9 @@ public class PrivateerMission extends Mission {
      * @param target The target {@code Location} for this mission.
      */
     public PrivateerMission(AIMain aiMain, AIUnit aiUnit, Location target) {
-        super(aiMain, aiUnit, target);
+        super(aiMain, aiUnit);
+
+        setTarget(target);
     }
 
     /**

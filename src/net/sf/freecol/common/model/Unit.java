@@ -3656,7 +3656,7 @@ public class Unit extends GoodsLocation
      */
     public Set<Modifier> getMissionaryTradeModifiers(boolean sense) {
         final Function<Modifier, Modifier> mapper = m -> {
-            Modifier mod = new Modifier(m);
+            Modifier mod = Modifier.makeModifier(m);
             if (!sense) mod.setValue(-m.getValue());
             return mod;
         };

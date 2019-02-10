@@ -54,7 +54,7 @@ public class UnitWanderHostileMission extends Mission {
      * @param aiUnit The {@code AIUnit} this mission is created for.
      */
     public UnitWanderHostileMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit, null);
+        super(aiMain, aiUnit);
     }
 
     /**
@@ -133,7 +133,7 @@ public class UnitWanderHostileMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void setTarget(Location target) {}
+    public void setTarget(Location target) {} // ignore
 
     /**
      * {@inheritDoc}

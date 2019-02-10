@@ -75,7 +75,9 @@ public abstract class TrivialMessage extends Message {
      * @param type The message type.
      */
     protected TrivialMessage(String type) {
-        super(type);
+        super();
+
+        this.type = type;
     }
 
     /**
