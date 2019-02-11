@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -215,13 +217,15 @@ final class ReceivingThread extends Thread {
      *
      * @return True if the thread was previously running and is now stopped.
      */
-    private synchronized boolean stopThread() {
+    private boolean stopThread() {
         boolean ret = this.shouldRun;
         if (this.shouldRun) {
             this.shouldRun = false;
-            for (NetworkReplyObject o : this.waitingThreads.values()) {
-                o.interrupt();
+            Set<NetworkReplyObject> values;
+            synchronized (this) {
+                values = new HashSet<>(this.waitingThreads.values());
             }
+            for (NetworkReplyObject o : values) o.interrupt();
         }
         return ret;
     }
