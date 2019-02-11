@@ -181,10 +181,8 @@ public final class RandomRange {
      * Initializes this object from an XML-representation of this object.
      *
      * @param xr The input stream with the XML.
-     * @exception XMLStreamException if there are any problems reading
-     *     from the stream.
      */
-    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+    public void readAttributes(FreeColXMLReader xr) {
         probability = xr.getAttribute(PROBABILITY_TAG, 0);
 
         minimum = xr.getAttribute(MINIMUM_TAG, 0);
