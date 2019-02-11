@@ -106,7 +106,7 @@ public class GoodsWish extends Wish {
                      FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        this.initialized = this.goodsType != null && this.amountRequested > 0;
+        this.initialized = getGoodsType() != null && getGoodsAmount() > 0;
     }
 
 

@@ -107,7 +107,7 @@ public class WorkerWish extends Wish {
                       FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        this.initialized = this.destination != null && this.unitType != null;
+        this.initialized = getDestination() != null && getUnitType() != null;
     }
 
 
