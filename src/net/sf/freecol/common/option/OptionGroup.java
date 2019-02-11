@@ -387,8 +387,8 @@ public class OptionGroup extends AbstractOption<OptionGroup>
     /**
      * {@inheritDoc}
      */    
-    public <R,T extends Option<R>> boolean hasOption(String id,
-        Class<T> returnClass) {
+    public <T extends Option> boolean hasOption(String id,
+                                                Class<T> returnClass) {
         if (id == null) return false;
         Option val = this.optionMap.get(id);
         return (val == null) ? false
@@ -398,8 +398,8 @@ public class OptionGroup extends AbstractOption<OptionGroup>
     /**
      * {@inheritDoc}
      */
-    public <R,T extends Option<R>> T getOption(String id,
-                                               Class<T> returnClass) {
+    public <T extends Option> T getOption(String id,
+                                          Class<T> returnClass) {
         if (id == null) {
             throw new RuntimeException("Null id");
         } else if (!this.optionMap.containsKey(id)) {

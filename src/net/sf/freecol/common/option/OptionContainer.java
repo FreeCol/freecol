@@ -40,7 +40,7 @@ public interface OptionContainer {
      * @param id The object identifier.
      * @return True if the option is present.
      */
-    <R,T extends Option<R>> boolean hasOption(String id, Class<T> returnClass);
+    <T extends Option> boolean hasOption(String id, Class<T> returnClass);
     
     /**
      * Get an option in this group (or descendents) by object identifier.
@@ -51,7 +51,7 @@ public interface OptionContainer {
      * @return The option, or a run time exception if the option does not
      *     exist or is of the wrong class.
      */
-    <R,T extends Option<R>> T getOption(String id, Class<T> returnClass);
+    <T extends Option> T getOption(String id, Class<T> returnClass);
 
     /**
      * Gets the value of a {@code BooleanOption}.

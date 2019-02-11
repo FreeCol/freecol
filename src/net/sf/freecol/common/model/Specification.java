@@ -1074,10 +1074,10 @@ public final class Specification implements OptionContainer {
     /**
      * {@inheritDoc}
      */
-    public <R,T extends Option<R>> boolean hasOption(String id,
-                                                     Class<T> returnClass) {
+    public <T extends Option> boolean hasOption(String id,
+                                                Class<T> returnClass) {
         if (id == null) return false;
-        AbstractOption val = allOptions.get(id);
+        AbstractOption val = this.allOptions.get(id);
         return (val == null) ? false
             : returnClass.isAssignableFrom(val.getClass());
     }
@@ -1085,8 +1085,8 @@ public final class Specification implements OptionContainer {
     /**
      * {@inheritDoc}
      */
-    public <R,T extends Option<R>> T getOption(String id,
-                                               Class<T> returnClass) {
+    public <T extends Option> T getOption(String id,
+                                          Class<T> returnClass) {
         if (id == null) {
             throw new RuntimeException("Null identifier for "
                 + returnClass.getName());
