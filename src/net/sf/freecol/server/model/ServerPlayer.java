@@ -4530,7 +4530,7 @@ outer:  for (Effect effect : effects) {
                     unit.dispose();//-vis: safe, never sighted
                 }
                 Set<Tile> tiles = exploreForUnit(naval.get(0));
-                if (!tiles.contains(entry)) tiles.add(entry);
+                tiles.add(entry);
                 invalidateCanSeeTiles();//+vis(this)
                 cs.add(See.perhaps(), tiles);
                 cs.addMessage(this,

@@ -205,7 +205,7 @@ public abstract class Settlement extends GoodsLocation
      * @param tile The {@code Tile} to add.
      */
     public void addTile(Tile tile) {
-        if (!ownedTiles.contains(tile)) ownedTiles.add(tile);
+        ownedTiles.add(tile);
     }
 
     /**

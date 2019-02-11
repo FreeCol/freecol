@@ -155,9 +155,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 GoodsType workType = unit.getWorkType();
                 UnitType expert = spec.getExpertForProducing(workType);
                 if (unitCount.get(colony).getCount(expert) == 0
-                    && !missingExpertWarning.contains(expert)) {
+                    && missingExpertWarning.add(expert)) {
                     addExpertWarning(doc, colony, workType, expert);
-                    missingExpertWarning.add(expert);
                 }
             }
         }
@@ -182,10 +181,9 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 if (goodsType != null
                     && info != null
                     && !info.hasMaximumProduction()
-                    && !productionWarning.contains(goodsType)) {
+                    && productionWarning.add(goodsType)) {
                     forEach(map(building.getInputs(), AbstractGoods::getType),
                         gt -> addProductionWarning(doc, colony, goodsType, gt));
-                    productionWarning.add(goodsType);
                 }
             }
         }

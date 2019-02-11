@@ -538,8 +538,7 @@ public final class InGameController extends Controller {
                 u.setLocation(entry);//-vis(serverPlayer)
                 u.setWorkLeft(-1);
                 u.setState(Unit.UnitState.ACTIVE);
-                if (!seen.contains(entry)) {
-                    seen.add(entry);
+                if (seen.add(entry)) {
                     cs.add(See.only(serverPlayer),
                            serverPlayer.exploreForUnit(u));
                     cs.add(See.perhaps().except(serverPlayer), entry);
