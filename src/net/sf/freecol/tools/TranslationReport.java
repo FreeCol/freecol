@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.FilenameFilter;
 import java.nio.file.Files;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -65,17 +67,18 @@ public class TranslationReport {
                 }
             });
 
-        File masterFile = new File(directory, "FreeColMessages.properties");
+        Path filePath = FileSystems.getDefault().getPath(args[0],
+            "FreeColMessages.properties");
         Properties master = new Properties();
-        master.load(Files.newInputStream(masterFile.toPath()));
+        master.load(Files.newInputStream(filePath));
         //System.out.println("*** Found master property file with " + master.size() + " properties.\n");
 
         for (String name : languageFiles) {
             LanguageStatsRecord lstat = new LanguageStatsRecord();
             lstat.localFile = name;
-            File propertyFile = new File(directory, name);
+            Path propPath = FileSystems.getDefault().getPath(args[0], name);
             Properties properties = new Properties();
-            properties.load(Files.newInputStream(propertyFile.toPath()));
+            properties.load(Files.newInputStream(propPath));
             System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
             System.out.println("*** " + name + " ***");
             System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
