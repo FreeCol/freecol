@@ -433,8 +433,7 @@ public class TradeRoute extends FreeColGameObject
         final String tag = xr.getLocalName();
 
         if (TradeRouteStop.TAG.equals(tag)) {
-            TradeRouteStop trs = new TradeRouteStop(getGame(), xr);
-            if (trs != null) addStop(trs);
+            addStop(new TradeRouteStop(getGame(), xr));
             
         } else {
             super.readChild(xr);

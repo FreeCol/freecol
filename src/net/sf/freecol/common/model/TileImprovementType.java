@@ -643,8 +643,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
             || OLD_CHANGE_TAG.equals(tag)
             // end @compat 0.11.6
             ) {
-            TileTypeChange change = new TileTypeChange(xr, spec);
-            if (change != null) addChange(change);
+            addChange(new TileTypeChange(xr, spec));
 
         } else if (DISASTER_TAG.equals(tag)) {
             Disaster disaster = xr.getType(spec, ID_ATTRIBUTE_TAG,

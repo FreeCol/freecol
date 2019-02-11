@@ -411,8 +411,7 @@ public abstract class Feature extends FreeColSpecObject
         final String tag = xr.getLocalName();
 
         if (Scope.TAG.equals(tag)) {
-            Scope scope = new Scope(xr);
-            if (scope != null) addScope(scope);
+            addScope(new Scope(xr));
 
         } else {
             super.readChild(xr);

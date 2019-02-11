@@ -109,7 +109,6 @@ public class FSGConverter {
     public void convertToXML(InputStream ins, OutputStream outs)
         throws IOException {
         BufferedInputStream in = new BufferedInputStream(ins);
-        if (in == null) return;
         try (BufferedOutputStream out = new BufferedOutputStream(outs)) {
             // Automatically detect savegame compression:
             in.mark(10);

@@ -70,8 +70,7 @@ public class HighScoresMessage extends ObjectMessage {
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (HighScore.TAG.equals(tag)) {
-                HighScore hs = new HighScore(xr);
-                if (hs != null) scores.add(hs);
+                scores.add(new HighScore(xr));
             } else {
                 expected(HighScore.TAG, tag);
             }

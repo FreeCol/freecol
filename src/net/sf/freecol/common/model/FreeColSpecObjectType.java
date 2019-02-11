@@ -334,8 +334,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
             }
 
         } else if (Scope.TAG.equals(tag)) {
-            Scope scope = new Scope(xr);
-            if (scope != null) addScope(scope);
+            addScope(new Scope(xr));
 
         } else {
             super.readChild(xr);

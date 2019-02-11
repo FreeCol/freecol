@@ -262,8 +262,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
         final String tag = xr.getLocalName();
 
         if (UnitTypeChange.TAG.equals(tag)) {
-            UnitTypeChange utc = new UnitTypeChange(xr, spec);
-            if (utc != null) addUnitTypeChange(utc);
+            addUnitTypeChange(new UnitTypeChange(xr, spec));
 
         } else {
             super.readChild(xr);

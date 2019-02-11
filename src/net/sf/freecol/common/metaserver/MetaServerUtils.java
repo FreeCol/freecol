@@ -154,7 +154,6 @@ public class MetaServerUtils {
         // since an additional update should be sent when a new
         // player is added to/removed from this server etc.
         Timer t = new Timer(true);
-        if (t == null) return false;
         updaters.put(t, si);
         t.scheduleAtFixedRate(new TimerTask() {
                 @Override

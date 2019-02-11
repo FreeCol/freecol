@@ -317,13 +317,11 @@ public class Force extends FreeColSpecObject {
 
             if (LAND_UNITS_TAG.equals(tag)) {
                 while (xr.moreTags()) {
-                    AbstractUnit au = new AbstractUnit(xr);
-                    if (au != null) add(au);
+                    add(new AbstractUnit(xr));
                 }
             } else if (NAVAL_UNITS_TAG.equals(tag)) {
                 while (xr.moreTags()) {
-                    AbstractUnit au = new AbstractUnit(xr);
-                    if (au != null) add(au);
+                    add(new AbstractUnit(xr));
                 }
             } else {
                 logger.warning("Bogus Force tag: " + tag);

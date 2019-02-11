@@ -248,8 +248,7 @@ public class Event extends FreeColSpecObjectType {
         final String tag = xr.getLocalName();
 
         if (Limit.TAG.equals(tag)) {
-            Limit limit = new Limit(xr, spec);
-            if (limit != null) addLimit(limit);
+            addLimit(new Limit(xr, spec));
 
         } else {
             super.readChild(xr);

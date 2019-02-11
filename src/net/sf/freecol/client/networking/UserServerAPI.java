@@ -102,10 +102,8 @@ public class UserServerAPI extends ServerAPI {
         for (int i = tries; i > 0; i--) {
             try {
                 conn = new Connection(host, port, name);
-                if (conn != null) {
-                    conn.startReceiving();
-                    break;
-                }
+                conn.startReceiving();
+                break;
             } catch (IOException e) {
                 if (i <= 1) throw e;
             }

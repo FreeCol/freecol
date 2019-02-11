@@ -2179,8 +2179,8 @@ ok:     while (!openMap.isEmpty()) {
         Queue<Position> q = new LinkedList<>();
 
         visited[x][y] = true;
-        for (Position p = new Position(x, y); p != null && --limit > 0;
-             p = q.poll()) {
+        Position p = new Position(x, y);
+        for (; p != null && --limit > 0; p = q.poll()) {
             for (Direction d : Direction.values()) {
                 final Position np = new Position(p, d);
                 if (np.isValid(xmax, ymax)
@@ -2190,6 +2190,7 @@ ok:     while (!openMap.isEmpty()) {
                     q.add(np);
                 }
             }
+
         }
         return visited;
     }

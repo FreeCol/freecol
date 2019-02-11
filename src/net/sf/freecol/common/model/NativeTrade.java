@@ -616,8 +616,7 @@ public class NativeTrade extends FreeColGameObject {
             while (xr.moreTags()) {
                 tag = xr.getLocalName();
                 if (NativeTradeItem.TAG.equals(tag)) {
-                    NativeTradeItem nti = new NativeTradeItem(game, xr);
-                    if (nti != null) this.settlementToUnit.add(nti);
+                    this.settlementToUnit.add(new NativeTradeItem(game, xr));
                 } else {
                     logger.warning("SettlementToUnit-item expected, not: " + tag);
                 }
@@ -627,8 +626,7 @@ public class NativeTrade extends FreeColGameObject {
             while (xr.moreTags()) {
                 tag = xr.getLocalName();
                 if (NativeTradeItem.TAG.equals(tag)) {
-                    NativeTradeItem nti = new NativeTradeItem(game, xr);
-                    if (nti != null) this.unitToSettlement.add(nti);
+                    this.unitToSettlement.add(new NativeTradeItem(game, xr));
                 } else {
                     logger.warning("UnitToSettlement-item expected, not: " + tag);
                 }
