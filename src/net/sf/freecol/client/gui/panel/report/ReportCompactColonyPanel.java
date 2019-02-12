@@ -883,8 +883,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         Map<GoodsType, ColonySummary.GoodsProduction> rProduction
             = new HashMap<>();
         Map<UnitType, Integer> rTeachers = new HashMap<>();
-        List<Unit> rNotWorking = new ArrayList<>();
-        List<UnitType> rCouldWork = new ArrayList<>();
+        //List<Unit> rNotWorking = new ArrayList<>();
+        //List<UnitType> rCouldWork = new ArrayList<>();
         Map<UnitType, Integer> rImprove = new HashMap<>();
         Map<GoodsType, Double> rNeeded = new HashMap<>();
         for (ColonySummary s : summaries) {
@@ -901,8 +901,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
             for (Unit u : s.teachers.keySet()) {
                 accumulateToMap(rTeachers, u.getType(), 1, integerAccumulator);
             }
-            rNotWorking.addAll(s.notWorking);
-            rCouldWork.addAll(s.couldWork);
+            //rNotWorking.addAll(s.notWorking);
+            //rCouldWork.addAll(s.couldWork);
             improveLen = Math.max(improveLen, s.improve.size() + s.want.size());
             for (UnitType ut : s.improve.keySet()) {
                 accumulateToMap(rImprove, ut, 1, integerAccumulator);

@@ -226,14 +226,15 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
      * FIXME: Detect military threats and boost defence.
      *
      * @param lb A {@code LogBuilder} to log to.
+     * @return A set of {@code AIUnit}s that changed their work state.
      */
-    public void rearrangeColony(LogBuilder lb) {
+    public Set<AIUnit> rearrangeColony(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         Set<AIUnit> result = new HashSet<>();
 
         // First check if it is collapsing.
         if (colony.getUnitCount() <= 0) {
-            if (!avertAutoDestruction()) return;
+            if (!avertAutoDestruction()) return result;
         }
 
         // Skip this colony if it does not yet need rearranging.
@@ -246,7 +247,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
                     + " is asleep until turn: " + rearrangeTurn.getNumber()
                     + "( > " + turn + ")");
             } else {
-                return;
+                return result;
             }
         }
 
@@ -321,7 +322,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         if (scratch == null) {
             lb.add(", failed to assign workers.");
             rearrangeTurn = new Turn(turn + 1);
-            return;
+            return result;
         }
         lb.add(", assigned ", workers.size(), " workers");
 
@@ -336,7 +337,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
                 .append(" in ").append(turn).append(':');
             for (UnitWas uw : was) sb.append('\n').append(uw);
             logger.warning(sb.toString());
-            if (!avertAutoDestruction()) return;
+            if (!avertAutoDestruction()) return result;
         }
 
         // Argh.  We may have chosen to build something we can no
@@ -413,6 +414,8 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
 
         // Set the next rearrangement turn.
         rearrangeTurn = new Turn(turn + nextRearrange);
+
+        return result;
     }
 
     /**

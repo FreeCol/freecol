@@ -166,15 +166,17 @@ public class ColonyPlan {
     /**
      * Lists of goods types to be produced in this colony.
      * Temporary variables that do not need to be serialized.
+     * Note: food and luxury groups disabled as not currently used, but
+     * will probably be needed in due course.
      */
-    private final List<GoodsType> foodGoodsTypes = new ArrayList<>();
+    //private final List<GoodsType> foodGoodsTypes = new ArrayList<>();
     private final List<GoodsType> libertyGoodsTypes = new ArrayList<>();
     private final List<GoodsType> immigrationGoodsTypes = new ArrayList<>();
     private final List<GoodsType> militaryGoodsTypes = new ArrayList<>();
     private final List<GoodsType> rawBuildingGoodsTypes = new ArrayList<>();
     private final List<GoodsType> buildingGoodsTypes = new ArrayList<>();
     private final List<GoodsType> rawLuxuryGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> luxuryGoodsTypes = new ArrayList<>();
+    //private final List<GoodsType> luxuryGoodsTypes = new ArrayList<>();
     private final List<GoodsType> otherRawGoodsTypes = new ArrayList<>();
 
 
@@ -431,18 +433,18 @@ public class ColonyPlan {
      * @param production The production map.
      */
     private void updateGoodsTypeLists(Map<GoodsType, Map<WorkLocation, Integer>> production) {
-        foodGoodsTypes.clear();
+        //foodGoodsTypes.clear();
         libertyGoodsTypes.clear();
         immigrationGoodsTypes.clear();
         militaryGoodsTypes.clear();
         rawBuildingGoodsTypes.clear();
         buildingGoodsTypes.clear();
         rawLuxuryGoodsTypes.clear();
-        luxuryGoodsTypes.clear();
+        //luxuryGoodsTypes.clear();
         otherRawGoodsTypes.clear();
         for (GoodsType g : new ArrayList<>(production.keySet())) {
             if (g.isFoodType()) {
-                foodGoodsTypes.add(g);
+                ;//foodGoodsTypes.add(g);
             } else if (g.isLibertyType()) {
                 libertyGoodsTypes.add(g);
             } else if (g.isImmigrationType()) {
@@ -458,7 +460,7 @@ public class ColonyPlan {
                 rawLuxuryGoodsTypes.add(g);
             } else if (g.isRefined()
                 && g.getInputType().isNewWorldGoodsType()) {
-                luxuryGoodsTypes.add(g);
+                ;//luxuryGoodsTypes.add(g);
             } else if (g.isFarmed()) {
                 otherRawGoodsTypes.add(g);
             } else { // Not interested in this goods type.  Should not happen.
@@ -515,7 +517,7 @@ public class ColonyPlan {
                 production.remove(secondaryRawMaterial.getOutputType());
                 if (rawLuxuryGoodsTypes.contains(secondaryRawMaterial)) {
                     rawLuxuryGoodsTypes.remove(secondaryRawMaterial);
-                    luxuryGoodsTypes.remove(secondaryRawMaterial.getOutputType());
+                    ;//luxuryGoodsTypes.remove(secondaryRawMaterial.getOutputType());
                 } else if (otherRawGoodsTypes.contains(secondaryRawMaterial)) {
                     otherRawGoodsTypes.remove(secondaryRawMaterial);
                 }
