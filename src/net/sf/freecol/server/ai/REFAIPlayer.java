@@ -22,11 +22,13 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -82,7 +84,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         private Player rebel;
 
         /** A container to fill with target units. */
-        private List<Unit> rebelNavy;
+        private Set<Unit> rebelNavy;
 
 
         /**
@@ -91,7 +93,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
          * @param rebel The {@code Player} to attack.
          * @param rebelNavy A container to fill with the naval units found.
          */
-        public REFNavyGoalDecider(Player rebel, List<Unit> rebelNavy) {
+        public REFNavyGoalDecider(Player rebel, Set<Unit> rebelNavy) {
             this.rebel = rebel;
             this.rebelNavy = rebelNavy;
         }
@@ -477,7 +479,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
 
         // Try to find some rebel naval units near the entry locations
         // for the targets.
-        final List<Unit> rebelNavy = new ArrayList<>();
+        final Set<Unit> rebelNavy = new HashSet<>();
         final GoalDecider navyGD = new REFNavyGoalDecider(rebel, rebelNavy);
         for (int i = 0; i < n; i++) {
             carrier.search(targets.get(i).entry, navyGD, null,
@@ -487,8 +489,9 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         // Attack naval targets.
         final Comparator<Unit> militaryStrengthComparator
             = getGame().getCombatModel().getMilitaryStrengthComparator();
-        rebelNavy.sort(militaryStrengthComparator);
-        Iterator<Unit> ui = rebelNavy.iterator();
+        List<Unit> rebelTargets = new ArrayList<>(rebelNavy);
+        rebelTargets.sort(militaryStrengthComparator);
+        Iterator<Unit> ui = rebelTargets.iterator();
         List<Tile> entries = new ArrayList<>();
         entries.add(rebel.getEntryTile());
         while (!navy.isEmpty()) {

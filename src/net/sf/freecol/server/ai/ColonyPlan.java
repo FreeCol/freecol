@@ -22,9 +22,11 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -164,20 +166,21 @@ public class ColonyPlan {
     private final List<GoodsType> produce = new ArrayList<>();
 
     /**
-     * Lists of goods types to be produced in this colony.
+     * Sets of goods types to be produced in this colony.
      * Temporary variables that do not need to be serialized.
      * Note: food and luxury groups disabled as not currently used, but
-     * will probably be needed in due course.
+     * will probably be needed in due course.  Raw building goods types
+     * need to be sorted so they are a list.
      */
-    //private final List<GoodsType> foodGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> libertyGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> immigrationGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> militaryGoodsTypes = new ArrayList<>();
+    //private final Set<GoodsType> foodGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> libertyGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> immigrationGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> militaryGoodsTypes = new HashSet<>();
     private final List<GoodsType> rawBuildingGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> buildingGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> rawLuxuryGoodsTypes = new ArrayList<>();
-    //private final List<GoodsType> luxuryGoodsTypes = new ArrayList<>();
-    private final List<GoodsType> otherRawGoodsTypes = new ArrayList<>();
+    private final Set<GoodsType> buildingGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> rawLuxuryGoodsTypes = new HashSet<>();
+    //private final Set<GoodsType> luxuryGoodsTypes = new HashSet<>();
+    private final Set<GoodsType> otherRawGoodsTypes = new HashSet<>();
 
 
     /**
