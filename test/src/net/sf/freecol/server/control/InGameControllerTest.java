@@ -1943,7 +1943,7 @@ public class InGameControllerTest extends FreeColTestCase {
         pressScope.setType("model.building.printingPress");
         List<Scope> scopeList = new ArrayList<>();
         scopeList.add(pressScope);
-        priceBonus.setScopes(scopeList);
+        priceBonus.copyScopes(scopeList);
         father.addModifier(priceBonus);
         igc.addFoundingFather(dutch, father);
 

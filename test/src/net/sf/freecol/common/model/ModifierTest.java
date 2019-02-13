@@ -150,7 +150,7 @@ public class ModifierTest extends FreeColTestCase {
 
         List<Scope> scopes = new ArrayList<>();
         scopes.add(scope1);
-        modifier1.setScopes(scopes);
+        modifier1.copyScopes(scopes);
         assertTrue(modifier1.appliesTo(frigate));
         assertFalse(modifier1.appliesTo(carpenter));
 
@@ -168,7 +168,7 @@ public class ModifierTest extends FreeColTestCase {
         List<Scope> scopes2 = new ArrayList<>();
         scopes2.add(scope2);
         scopes2.add(scope3);
-        modifier2.setScopes(scopes2);
+        modifier2.copyScopes(scopes2);
         assertTrue(modifier2.appliesTo(frigate));
         assertTrue(modifier2.appliesTo(carpenter));
 
@@ -295,8 +295,8 @@ public class ModifierTest extends FreeColTestCase {
         scopeList3.add(scope1);
         scopeList3.add(scope2);
 
-        modifier1.setScopes(scopeList1);
-        modifier2.setScopes(scopeList1);
+        modifier1.copyScopes(scopeList1);
+        modifier2.copyScopes(scopeList1);
 
         assertEquals(modifier1, modifier1);
         assertEquals(modifier1.hashCode(), modifier1.hashCode());
@@ -305,8 +305,7 @@ public class ModifierTest extends FreeColTestCase {
         assertFalse(modifier1.equals(modifier3));
         assertFalse(modifier1.hashCode() == modifier3.hashCode());
 
-        modifier2.setScopes(scopeList2);
-
+        modifier2.copyScopes(scopeList2);
         assertEquals(modifier2, modifier2);
         assertEquals(modifier2.hashCode(), modifier2.hashCode());
         assertEquals(modifier1, modifier2);
@@ -314,7 +313,7 @@ public class ModifierTest extends FreeColTestCase {
         assertFalse(modifier2.equals(modifier3));
         assertFalse(modifier2.hashCode() == modifier3.hashCode());
 
-        modifier2.setScopes(scopeList3);
+        modifier2.copyScopes(scopeList3);
 
         assertEquals(modifier2, modifier2);
         assertEquals(modifier2.hashCode(), modifier2.hashCode());

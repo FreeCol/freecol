@@ -85,7 +85,7 @@ public class Effect extends FreeColSpecObjectType {
         setId(template.getId());
         setSpecification(template.getSpecification());
         this.probability = template.probability;
-        setScopes(template.getScopeList());
+        copyScopes(template.getScopeList());
         addFeatures(template);
     }
 

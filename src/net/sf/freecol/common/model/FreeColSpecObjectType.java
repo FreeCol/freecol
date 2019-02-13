@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -27,8 +28,6 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Scope;
-import net.sf.freecol.common.model.Scoped;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -54,7 +53,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * need them and there they may be omitted.
  */
 public abstract class FreeColSpecObjectType extends FreeColSpecObject
-    implements Named, Scoped {
+    implements Named {
 
     /** Whether the type is abstract, or can be instantiated. */
     private boolean abstractType;
@@ -69,7 +68,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
      * Scopes that might limit the action of this object to certain
      * types of objects.
      */
-    private List<Scope> scopes = null;
+    private ScopeContainer scopeContainer;
 
     // Do not serialize below.
 
@@ -166,6 +165,31 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         return this.abstractType;
     }
 
+    // Scope delegation
+
+    public final List<Scope> getScopeList() {
+        return ScopeContainer.getScopeList(this.scopeContainer);
+    }
+
+    public final Stream<Scope> getScopes() {
+        return ScopeContainer.getScopes(this.scopeContainer);
+    }
+
+    public final void copyScopes(Collection<Scope> scopes) {
+        this.scopeContainer = ScopeContainer.setScopes(this.scopeContainer, scopes);
+    }
+
+    public final void addScope(Scope scope) {
+        this.scopeContainer = ScopeContainer.addScope(this.scopeContainer, scope);
+    }
+
+    public final void removeScope(Scope scope) {
+        ScopeContainer.removeScope(this.scopeContainer, scope);
+    }
+
+    public boolean appliesTo(FreeColObject fco) {
+        return ScopeContainer.appliesTo(this.scopeContainer, fco);
+    }
 
     // Interface Named
 
@@ -176,50 +200,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     public final String getNameKey() {
         return Messages.nameKey(getId());
     }
-
-
-    // Interface Scoped, and scope support
-
-    /**
-     * {@inheritDoc}
-     */
-    public final List<Scope> getScopeList() {
-        return (this.scopes == null) ? Collections.<Scope>emptyList()
-            : this.scopes;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public final Stream<Scope> getScopes() {
-        return (this.scopes == null) ? Stream.<Scope>empty()
-            : this.scopes.stream();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public final void setScopes(List<Scope> scopes) {
-        this.scopes = scopes;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addScope(Scope scope) {
-        if (this.scopes == null) this.scopes = new ArrayList<>();
-        this.scopes.add(scope);
-    }
-
-    /**
-     * Remove a scope.
-     *
-     * @param scope The {@code Scope} to remove.
-     */
-    protected void removeScope(Scope scope) {
-        if (this.scopes != null) this.scopes.remove(scope);
-    }
-
 
     // Override FreeColObject
 
@@ -243,7 +223,8 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         if (o == null || !super.copyIn(o)) return false;
         this.abstractType = o.isAbstractType();
         this.featureContainer.copy(o.getFeatureContainer());
-        this.setScopes(o.getScopeList());
+        this.scopeContainer = ScopeContainer.setScopes(this.scopeContainer,
+                                                       o.getScopeList());
         this.index = o.getIndex();
         return true;
     }
@@ -274,7 +255,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
 
         for (Modifier modifier : getSortedModifiers()) modifier.toXML(xw);
 
-        for (Scope scope : getScopeList()) scope.toXML(xw);
+        ScopeContainer.toXML(this.scopeContainer, xw);
     }
 
     /**
@@ -295,7 +276,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         // Clear containers.
         if (xr.shouldClearContainers()) {
             if (this.featureContainer != null) this.featureContainer.clear();
-            setScopes(null);
+            ScopeContainer.clearScopes(this.scopeContainer);
         }
 
         super.readChildren(xr);
@@ -334,7 +315,8 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
             }
 
         } else if (Scope.TAG.equals(tag)) {
-            addScope(new Scope(xr));
+            this.scopeContainer = ScopeContainer
+                .addScope(this.scopeContainer, new Scope(xr));
 
         } else {
             super.readChild(xr);

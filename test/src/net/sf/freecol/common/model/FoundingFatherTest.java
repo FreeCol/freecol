@@ -151,7 +151,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         List<Scope> scopes = new ArrayList<>();
         scopes.add(dutchScope);
         scopes.add(frenchScope);
-        newFather.setScopes(scopes);
+        newFather.copyScopes(scopes);
         for (Player player : game.getPlayerList(alwaysTrue())) {
             assertEquals(player.getNationId(),
                          (player == french || player == dutch),
