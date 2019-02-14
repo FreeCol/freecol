@@ -426,7 +426,7 @@ public final class PlayersTable extends JTable {
 
         private final List<Nation> nations;
 
-        private final Map<Nation, Player> nationMap = new HashMap<>();
+        private final Map<Nation, Player> nationMap;
 
 
         /**
@@ -447,6 +447,7 @@ public final class PlayersTable extends JTable {
             final Predicate<Nation> nationPred = n -> !n.isUnknownEnemy()
                 && nationOptions.getNations().get(n) != null;
             this.nations = transform(spec.getNations(), nationPred);
+            this.nationMap = new HashMap<>(this.nations.size());
             for (Nation n : this.nations) this.nationMap.put(n, null);
             this.nationMap.put(thisPlayer.getNation(), thisPlayer);
         }

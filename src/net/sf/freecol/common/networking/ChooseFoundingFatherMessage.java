@@ -103,7 +103,7 @@ public class ChooseFoundingFatherMessage extends AttributeMessage {
      * @return A map of attributes.
      */
     private static Map<String, String> getAttributeMap(FreeColXMLReader xr) {
-        Map<String, String> ret = new HashMap<>();
+        Map<String, String> ret = new HashMap<>(fatherKeys.size());
         for (String key : fatherKeys) {
             String val = xr.getAttribute(key, (String)null);
             ret.put(key, val);

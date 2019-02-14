@@ -191,7 +191,7 @@ public final class StatisticsPanel extends FreeColPanel {
         panel.setBorder(Utility.localizedBorder(title));
         Box b = new Box(BoxLayout.PAGE_AXIS);
         panel.add(b);
-        Map<String, String> memory = new HashMap<>();
+        Map<String, String> memory = new HashMap<>(memoryKeys.length);
         Map<String, String> ai = new HashMap<>();
         for (String k : memoryKeys) {
             memory.put(Messages.message("memoryManager." + k),

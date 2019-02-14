@@ -203,8 +203,6 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
      */
     private static List<AnimationEvent> loadEvents(ZipInputStream zipStream)
         throws IOException {
-        List<AnimationEvent> events = new ArrayList<>();
-
         // Preload all files from the archive since we cannot use a
         // ZipFile for reading (as we should support an arbitrary stream).
         final Map<String, BufferedImage> loadingImages = new HashMap<>();
@@ -234,6 +232,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
                 + " is missing from the SZA.");
         }
         
+        List<AnimationEvent> events = new ArrayList<>(loadingDescriptor.size());
         for (String line : loadingDescriptor) {
             final int idx = line.indexOf('(');
             final int idx2 = line.indexOf("ms)");

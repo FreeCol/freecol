@@ -246,7 +246,7 @@ public class ServerRegion extends Region {
      */     
     public static List<ServerRegion> requireFixedRegions(Map map, LogBuilder lb) {
         final java.util.Map<String, Region> fixed = map.getFixedRegions();
-        List<ServerRegion> result = new ArrayList<>();
+        List<ServerRegion> result = new ArrayList<>(16);
 
         lb.add("Add regions ");
         // Create arctic/antarctic regions first, but only if they do

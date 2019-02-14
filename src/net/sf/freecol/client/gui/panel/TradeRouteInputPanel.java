@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.function.Function;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -398,11 +399,10 @@ public final class TradeRouteInputPanel extends FreeColPanel
         @Override
         protected Transferable createTransferable(JComponent c) {
             JList list = (JList)c;
-            DefaultListModel model = (DefaultListModel)list.getModel();
-            List<TradeRouteStop> stops = new ArrayList<>();
-            for (int index : list.getSelectedIndices()) {
-                stops.add((TradeRouteStop)model.get(index));
-            }
+            final DefaultListModel model = (DefaultListModel)list.getModel();
+            int[] indicies = list.getSelectedIndices();
+            List<TradeRouteStop> stops = new ArrayList<>(indicies.length);
+            for (int i : indicies) stops.add(i, (TradeRouteStop)model.get(i));
             return new StopListTransferable(stops);
         }
 

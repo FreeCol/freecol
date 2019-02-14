@@ -1251,9 +1251,10 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
      * @param lb A {@code LogBuilder} to log to.
      */
     public void updateTileImprovementPlans(LogBuilder lb) {
-        List<TileImprovementPlan> newPlans = new ArrayList<>();
-        for (WorkLocation wl : transform(colony.getAvailableWorkLocations(),
-                                         w -> w instanceof ColonyTile)) {
+        List<WorkLocation> wls = transform(colony.getAvailableWorkLocations(),
+                                           w -> w instanceof ColonyTile);
+        List<TileImprovementPlan> newPlans = new ArrayList<>(wls.size());
+        for (WorkLocation wl : wls) {
             Tile workTile = wl.getWorkTile();
             ColonyTile colonyTile = (ColonyTile)wl;
             if (workTile.getOwningSettlement() != colony

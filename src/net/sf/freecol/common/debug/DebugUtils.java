@@ -144,9 +144,10 @@ public class DebugUtils {
             .getBuildingType(buildingType.getId());
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
-        List<String> results = new ArrayList<>();
         int fails = 0;
-        for (Colony sColony : sPlayer.getColonyList()) {
+        List<Colony> sColonies = sPlayer.getColonyList();
+        List<String> results = new ArrayList<>(sColonies.size());
+        for (Colony sColony : sColonies) {
             Colony.NoBuildReason reason
                 = sColony.getNoBuildReason(sBuildingType, null);
             results.add(sColony.getName() + ": " + reason);

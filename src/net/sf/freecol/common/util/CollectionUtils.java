@@ -92,7 +92,7 @@ public class CollectionUtils {
      */
     @SafeVarargs
     public static <T> Set<T> makeUnmodifiableSet(T... members) {
-        Set<T> tmp = new HashSet<>();
+        Set<T> tmp = new HashSet<>(members.length);
         for (T t : members) tmp.add(t);
         return Collections.<T>unmodifiableSet(tmp);
     }
@@ -106,7 +106,7 @@ public class CollectionUtils {
      */
     @SafeVarargs
     public static <T> List<T> makeUnmodifiableList(T... members) {
-        List<T> tmp = new ArrayList<>();
+        List<T> tmp = new ArrayList<>(members.length);
         for (T t : members) tmp.add(t);
         return Collections.<T>unmodifiableList(tmp);
     }
@@ -126,7 +126,7 @@ public class CollectionUtils {
         if (keys.length != values.length) {
             throw new RuntimeException("Length mismatch");
         }
-        Map<K,V> tmp = new HashMap<K,V>();
+        Map<K,V> tmp = new HashMap<K,V>(keys.length);
         for (int i = 0; i < keys.length; i++) {
             tmp.put(keys[i], values[i]);
         }
@@ -144,7 +144,7 @@ public class CollectionUtils {
      */
     @SafeVarargs
     public static <T> Map<T, T> asMap(T... values) {
-        Map<T, T> ret = new HashMap<>();
+        Map<T, T> ret = new HashMap<>(values.length / 2);
         for (int i = 0; i < values.length-1; i += 2) {
             ret.put(values[i], values[i+1]);
         }
@@ -243,7 +243,7 @@ public class CollectionUtils {
                             throw new NoSuchElementException("Permutations exhausted");
                         }
                         List<T> pick = new ArrayList<>(original);
-                        List<T> result = new ArrayList<>();
+                        List<T> result = new ArrayList<>(n);
                         int current = index++;
                         int divisor = np;
                         for (int i = n; i > 0; i--) {

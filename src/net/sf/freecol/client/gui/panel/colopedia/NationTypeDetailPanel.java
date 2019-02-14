@@ -191,10 +191,8 @@ public class NationTypeDetailPanel
                 .getScaledSettlementTypeImage(nationType.getCapitalType())),
             SwingConstants.CENTER));
 
-        List<String> regionNames = new ArrayList<>();
-        for (String regionName : nationType.getRegions()) {
-            regionNames.add(Messages.getName(regionName));
-        }
+        List<String> regionNames = toList(map(nationType.getRegions(),
+                                          n -> Messages.getName(n)));
         panel.add(Utility.localizedLabel("colopedia.nationType.regions"));
         panel.add(new JLabel(join(", ", regionNames)));
 

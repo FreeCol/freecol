@@ -532,8 +532,9 @@ public final class InGameController extends Controller {
         }
 
         if (teleport) { // Teleport in the units.
-            Set<Tile> seen = new HashSet<>();
-            for (Unit u : transform(serverPlayer.getUnits(), Unit::isNaval)) {
+            List<Unit> naval = transform(serverPlayer.getUnits(), Unit::isNaval);
+            Set<Tile> seen = new HashSet<>(naval.size());
+            for (Unit u : naval) {
                 Tile entry = u.getFullEntryLocation();
                 u.setLocation(entry);//-vis(serverPlayer)
                 u.setWorkLeft(-1);

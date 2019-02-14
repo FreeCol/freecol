@@ -829,7 +829,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
     private List<JButton> unitButtons(final Map<UnitType, Suggestion> suggestions,
                                       List<UnitType> have, Colony colony) {
         final String cac = colony.getId();
-        List<JButton> result = new ArrayList<>();
+        List<JButton> result = new ArrayList<>(suggestions.size());
         final Comparator<UnitType> buttonComparator
             = Comparator.comparing(ut -> suggestions.get(ut),
                                    Suggestion.descendingAmountComparator);
@@ -1018,7 +1018,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
     private List<JLabel> unitTypeLabels(Map<UnitType, Integer> unitTypeMap,
                                         int maxSize, StringTemplate t) {
-        List<JLabel> result = new ArrayList<>();
+        List<JLabel> result = new ArrayList<>(maxSize);
         int n = 0;
         for (Entry<UnitType, Integer> e
                  : mapEntriesByValue(unitTypeMap, descendingIntegerComparator)) {

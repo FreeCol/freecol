@@ -59,7 +59,7 @@ public final class ReportProductionPanel extends ReportPanel {
     private final List<GoodsType> goodsTypes;
 
     /** The boxes with which to select goods types for display. */
-    private final List<JComboBox<String>> boxes = new ArrayList<>();
+    private final List<JComboBox<String>> boxes;
 
 
     /**
@@ -78,6 +78,7 @@ public final class ReportProductionPanel extends ReportPanel {
                                             gt -> Messages.getName(gt));
         goodsNames.add(0, Messages.message("nothing"));
         String[] model = goodsNames.toArray(new String[0]);
+        this.boxes = new ArrayList<>(NUMBER_OF_GOODS);
         for (int index = 0; index < NUMBER_OF_GOODS; index++) {
             JComboBox<String> newBox = new JComboBox<>(model);
             newBox.setSelectedIndex(0);

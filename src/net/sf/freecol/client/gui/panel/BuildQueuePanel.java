@@ -33,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -969,9 +970,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     private List<BuildableType> getBuildableTypes(JList<? extends BuildableType> list) {
-        List<BuildableType> result = new ArrayList<>();
-        if (list == null) return result;
+        if (list == null) return Collections.<BuildableType>emptyList();
         ListModel<? extends BuildableType> model = list.getModel();
+        List<BuildableType> result = new ArrayList<>(model.getSize());
         for (int index = 0; index < model.getSize(); index++) {
             result.add(model.getElementAt(index));
         }

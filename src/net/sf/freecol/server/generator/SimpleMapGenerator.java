@@ -241,8 +241,9 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         // Make new settlements.
-        Set<IndianSettlement> newSettlements = new HashSet<>();
-        for (Tile iTile : importMap.getTiles(isNotNull(Tile::getIndianSettlement))) {
+        List<Tile> iTiles = importMap.getTiles(isNotNull(Tile::getIndianSettlement)); 
+        Set<IndianSettlement> newSettlements = new HashSet<>(iTiles.size());
+        for (Tile iTile : iTiles) {
             final IndianSettlement is = iTile.getIndianSettlement();
             if (is.getOwner() == null) continue;
             final Player owner = game.getPlayerByNationId(is.getOwner()
@@ -319,10 +320,11 @@ public class SimpleMapGenerator implements MapGenerator {
         
         float shares = 0f;
         List<IndianSettlement> settlements = new ArrayList<>();
-        List<Player> indians = new ArrayList<>();
         HashMap<String, Territory> territoryMap = new HashMap<>();
 
-        for (Player player : game.getLiveNativePlayerList()) {
+        List<Player> players = game.getLiveNativePlayerList();
+        List<Player> indians = new ArrayList<>(players.size());
+        for (Player player : players) {
             switch (player.getNationType().getNumberOfSettlements()) {
             case HIGH:
                 shares += 4;

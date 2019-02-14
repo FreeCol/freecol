@@ -120,7 +120,7 @@ public class RearrangeColonyMessage extends AttributeMessage {
         public static List<Arrangement> getArrangements(Colony colony,
                                                         List<Unit> workers,
                                                         Colony scratch) {
-            List<Arrangement> ret = new ArrayList<>();
+            List<Arrangement> ret = new ArrayList<>(workers.size());
             for (Unit u : workers) {
                 Unit su = scratch.getCorresponding(u);
                 if (u.getLocation().getId().equals(su.getLocation().getId())
@@ -191,9 +191,9 @@ public class RearrangeColonyMessage extends AttributeMessage {
      * @return An attribute map.
      */
     private static Map<String, String> getAttributeMap(FreeColXMLReader xr) {
-        Map<String, String> ret = new HashMap<>();
-        ret.put(COLONY_TAG, xr.getAttribute(COLONY_TAG, (String)null));
         int n = xr.getAttribute(FreeColObject.ARRAY_SIZE_TAG, 0);
+        Map<String, String> ret = new HashMap<>(5 * n + 1);
+        ret.put(COLONY_TAG, xr.getAttribute(COLONY_TAG, (String)null));
         for (int i = 0; i < n; i++) {
             ret.put(Arrangement.unitKey(i),
                 xr.getAttribute(Arrangement.unitKey(i), (String)null));
@@ -305,8 +305,8 @@ public class RearrangeColonyMessage extends AttributeMessage {
      * @return A list of {@code Arrangement}s.
      */
     public List<Arrangement> getArrangements(Game game) {
-        List<Arrangement> ret = new ArrayList<>();
         int n = getIntegerAttribute(FreeColObject.ARRAY_SIZE_TAG, 0);
+        List<Arrangement> ret = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             ret.add(new Arrangement(game,
                                     getStringAttribute(Arrangement.unitKey(i)),

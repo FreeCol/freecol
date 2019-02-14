@@ -447,7 +447,6 @@ public class TerrainGenerator {
         final Game game = map.getGame();
         final Specification spec = game.getSpecification();
         final OptionGroup mapOptions = game.getMapGeneratorOptions();
-        List<ServerRegion> result = new ArrayList<>();
         float randomHillsRatio = 0.5f;
         // 50% of user settings will be allocated for random hills
         // here and there the rest will be allocated for large
@@ -460,6 +459,7 @@ public class TerrainGenerator {
                 / mapOptions.getRange(MapGeneratorOptions.MOUNTAIN_NUMBER)));
         lb.add("Number of mountain tiles is ", number, "\n",
             "Maximum length of mountain ranges is ", maximumLength, "\n");
+        List<ServerRegion> result = new ArrayList<>(number);
 
         // lookup the resources from specification
         final TileType hills = spec.getTileType("model.tile.hills");
@@ -636,8 +636,8 @@ public class TerrainGenerator {
         Game game = map.getGame();
         final TileType lakeType = map.getSpecification()
             .getTileType("model.tile.lake");
-        List<Tile> todo = new ArrayList<>();
-        List<ServerRegion> result = new ArrayList<>();
+        List<Tile> todo = new ArrayList<>(lakes.size()/10);
+        List<ServerRegion> result = new ArrayList<>(lakes.size()/10);
         int lakeCount = 0;
         while (!lakes.isEmpty()) {
             Tile tile = first(lakes);

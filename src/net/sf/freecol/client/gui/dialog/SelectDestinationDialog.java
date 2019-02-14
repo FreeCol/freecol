@@ -336,10 +336,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         final ImageLibrary lib = getImageLibrary();
         // Collect the goods the unit is carrying and set this.destinations.
-        final List<GoodsType> goodsTypes = new ArrayList<>();
-        for (Goods goods : unit.getCompactGoodsList()) {
-            goodsTypes.add(goods.getType());
-        }
+        final List<GoodsType> goodsTypes
+            = transform(unit.getCompactGoodsList(), alwaysTrue(),
+                        Goods::getType);
         loadDestinations(unit, goodsTypes);
 
         DefaultListModel<Destination> model

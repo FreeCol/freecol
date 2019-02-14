@@ -972,8 +972,10 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @return A list of tiles whose visibility changed.
      */
     public Set<Tile> exploreMap(final boolean reveal) {
-        Set<Tile> result = new HashSet<>();
-        for (Tile t : getGame().getMap().getTiles(t -> this.hasExplored(t) != reveal)) {
+        List<Tile> tiles = getGame().getMap()
+            .getTiles(t -> this.hasExplored(t) != reveal);
+        Set<Tile> result = new HashSet<>(tiles.size());
+        for (Tile t : tiles) {
             t.setExplored(this, reveal);//-vis(this)
             result.add(t);
         }
@@ -1824,7 +1826,7 @@ outer:  for (Effect effect : effects) {
             // all the changes.
             List<IndianSettlement> allSettlements = getIndianSettlementList();
             java.util.Map<IndianSettlement,
-                java.util.Map<Player, Tension.Level>> oldLevels = new HashMap<>();
+                java.util.Map<Player, Tension.Level>> oldLevels = new HashMap<>(allSettlements.size());
             for (IndianSettlement is : allSettlements) {
                 java.util.Map<Player, Tension.Level> oldLevel = new HashMap<>();
                 oldLevels.put(is, oldLevel);
@@ -1837,8 +1839,10 @@ outer:  for (Effect effect : effects) {
 
             // Do the settlement alarms first.
             for (IndianSettlement is : allSettlements) {
-                java.util.Map<Player, Integer> extra = new HashMap<>();
-                for (Player enemy : game.getLiveEuropeanPlayerList(this)) {
+                List<Player> enemies = game.getLiveEuropeanPlayerList(this);
+                java.util.Map<Player, Integer> extra
+                    = new HashMap<>(enemies.size());
+                for (Player enemy : enemies) {
                     extra.put(enemy, 0);
                 }
 

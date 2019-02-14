@@ -48,7 +48,7 @@ public class ProductionMap {
 
         public ProductionTree(AbstractGoods root, AbstractGoods... leafs) {
             if (leafs.length > 0) {
-                this.leafs = new ArrayList<>();
+                this.leafs = new ArrayList<>(leafs.length);
                 int amount = root.getAmount();
                 for (AbstractGoods leaf : leafs) {
                     this.leafs.add(new AbstractGoods(leaf));

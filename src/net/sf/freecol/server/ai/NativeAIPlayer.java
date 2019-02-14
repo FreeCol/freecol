@@ -381,7 +381,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
         List<AIUnit> aiUnits = getAIUnits();
 
         lb.mark();
-        List<AIUnit> done = new ArrayList<>();
+        List<AIUnit> done = new ArrayList<>(aiUnits.size());
         reasons.clear();
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();

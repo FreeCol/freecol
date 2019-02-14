@@ -679,7 +679,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @return A map of attributes.
      */
     public Map<String, String> getAttributeMap(String... attributes) {
-        Map<String, String> ret = new HashMap<>();
+        Map<String, String> ret = new HashMap<>(attributes.length);
         for (String a : attributes) ret.put(a, getAttribute(a, (String)null));
         return ret;
     }
@@ -709,8 +709,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @return A map of all the attributes.
      */
     public Map<String, String> getAllAttributes() {
-        Map<String, String> ret = new HashMap<>();
         int n = getParent().getAttributeCount();
+        Map<String, String> ret = new HashMap<>(n);
         for (int i = 0; i < n; i++) {
             String key = getParent().getAttributeLocalName(i);
             String value = getParent().getAttributeValue(i);

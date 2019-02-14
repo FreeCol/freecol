@@ -135,7 +135,7 @@ public class ConceptDetailPanel extends FreeColPanel
         DefaultMutableTreeNode node
             = new DefaultMutableTreeNode(new ColopediaTreeItem(this, id,
                     getName(), null));
-        List<DefaultMutableTreeNode> nodes = new ArrayList<>();
+        List<DefaultMutableTreeNode> nodes = new ArrayList<>(concepts.length);
         for (String concept : concepts) {
             String nodeId = "colopedia.concepts." + concept;
             String nodeName = Messages.getName(nodeId);

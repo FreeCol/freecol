@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +43,8 @@ public class MarketWas {
 
     private final Market market;
     private final int tax;
-    private final Map<GoodsType, Integer> costToBuy = new HashMap<>();
-    private final Map<GoodsType, Integer> paidForSale = new HashMap<>();
+    private final Map<GoodsType, Integer> costToBuy;
+    private final Map<GoodsType, Integer> paidForSale;
 
 
     /**
@@ -54,7 +55,10 @@ public class MarketWas {
     public MarketWas(Player player) {
         this.market = player.getMarket();
         this.tax = player.getTax();
-        for (MarketData md : this.market.getMarketDataValues()) {
+        Collection<MarketData> mdv = this.market.getMarketDataValues();
+        this.costToBuy = new HashMap<>(mdv.size());
+        this.paidForSale = new HashMap<>(mdv.size());
+        for (MarketData md : mdv) {
             this.costToBuy.put(md.getGoodsType(), md.getCostToBuy());
             this.paidForSale.put(md.getGoodsType(), md.getPaidForSale());
         }

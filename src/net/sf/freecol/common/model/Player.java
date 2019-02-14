@@ -1534,8 +1534,9 @@ public class Player extends FreeColGameObject implements Nameable {
         final UnitType defaultType = getSpecification().getDefaultUnitType(this);
         java.util.Map<UnitType, HashMap<String, Integer>> unitHash
             = new HashMap<>();
-        List<AbstractUnit> units = new ArrayList<>();
-        for (Unit unit : transform(getUnits(), Unit::isOffensiveUnit)) {
+        List<Unit> milUnits = transform(getUnits(), Unit::isOffensiveUnit);
+        List<AbstractUnit> units = new ArrayList<>(milUnits.size());
+        for (Unit unit : milUnits) {
             UnitType unitType = defaultType;
             if (unit.getType().getOffence() > 0
                 || unit.hasAbility(Ability.EXPERT_SOLDIER)) {

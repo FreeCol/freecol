@@ -71,12 +71,12 @@ public final class ReportRequirementsPanel extends ReportPanel {
     /**
      * Records the number of units indexed by colony and unit type.
      */
-    private final Map<Colony, TypeCountMap<UnitType>> unitCount = new HashMap<>();
+    private final Map<Colony, TypeCountMap<UnitType>> unitCount;
 
     /**
      * Records whether a colony can train a type of unit.
      */
-    private final Map<Colony, Set<UnitType>> canTrain = new HashMap<>();
+    private final Map<Colony, Set<UnitType>> canTrain;
 
 
     /**
@@ -97,6 +97,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         StyledDocument doc = textPane.getStyledDocument();
 
         // check which colonies can train which units
+        unitCount = new HashMap<>(colonies.size());
+        canTrain = new HashMap<>(colonies.size());
         for (Colony colony : colonies) {
             TypeCountMap<UnitType> newUnitCount = new TypeCountMap<>();
             Set<UnitType> newCanTrain = new HashSet<>();

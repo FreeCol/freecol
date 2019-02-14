@@ -863,7 +863,7 @@ public class ClientOptions extends OptionGroup {
     public static Map<String,String> getSpecialOptions()
         throws FreeColException {
         // Initialize the map
-        Map<String, String> ret = new HashMap<>();
+        Map<String, String> ret = new HashMap<>(specialKeys.size());
         for (String key : specialKeys) ret.put(key, null);
 
         // Extract the values and return

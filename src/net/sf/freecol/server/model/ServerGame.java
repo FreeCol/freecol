@@ -419,8 +419,9 @@ public class ServerGame extends Game implements TurnTaker {
                     cs.add(See.perhaps().always(strongest), is);
                 }
             });
-        Set<Unit> contacts = new HashSet<>();
-        for (Colony c : weakest.getColonyList()) {
+        List<Colony> cl = weakest.getColonyList();
+        Set<Unit> contacts = new HashSet<>(cl.size());
+        for (Colony c : cl) {
             updated.addAll(c.getOwnedTiles());
             ((ServerColony)c).csChangeOwner(strongest, false, cs);//-vis(both),-til
             lb.add(" ", c.getName());

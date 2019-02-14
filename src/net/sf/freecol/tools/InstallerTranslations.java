@@ -128,7 +128,7 @@ public class InstallerTranslations {
         }
 
         //Map<String, String> languageMappings = readLanguageMappings(LANGUAGE_CODES);
-        Map<String, String> languageMappings = new HashMap<>();
+        Map<String, String> languageMappings = new HashMap<>(IZPACK_CODES.length);
         for (String[] mapping : IZPACK_CODES) {
             languageMappings.put(mapping[0], mapping[1]);
         }

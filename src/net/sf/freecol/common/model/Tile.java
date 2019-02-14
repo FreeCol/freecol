@@ -1573,8 +1573,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         boolean ownedByIndians = false;
 
         // Collect the building and food goods types
-        java.util.Map<GoodsType, Integer> goodsMap = new HashMap<>();
-        for (GoodsType goodsType : spec.getGoodsTypeList()) {
+        List<GoodsType> typeList = spec.getGoodsTypeList();
+        java.util.Map<GoodsType, Integer> goodsMap
+            = new HashMap<>(typeList.size());
+        for (GoodsType goodsType : typeList) {
             if (goodsType.isBuildingMaterial()) {
                 while (goodsType.isRefined()) {
                     goodsType = goodsType.getInputType();

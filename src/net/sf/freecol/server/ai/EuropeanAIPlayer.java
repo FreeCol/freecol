@@ -591,10 +591,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             && randoms[cheatIndex++] < offensiveLandUnitCheatPercent) {
             // - collect enemies, prefer not to antagonize the strong or
             //   crush the weak
-            List<Player> enemies = new ArrayList<>();
-            List<Player> preferred = new ArrayList<>();
-            for (Player p : transform(game.getLivePlayers(player),
-                                      x -> player.atWarWith(x))) {
+            List<Player> wars = transform(game.getLivePlayers(player),
+                                          x -> player.atWarWith(x));
+            List<Player> preferred = new ArrayList<>(wars.size());
+            List<Player> enemies = new ArrayList<>(wars.size());
+            for (Player p : wars) {
                 enemies.add(p);
                 double strength = getStrengthRatio(p);
                 if (strength < 3.0/2.0 && strength > 2.0/3.0) {
@@ -1682,7 +1683,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     protected void giveNormalMissions(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
-        java.util.Map<Unit, String> reasons = new HashMap<>();
         BuildColonyMission bcm = null;
         Mission m;
 
@@ -1691,9 +1691,10 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         nScouts = scoutsNeeded();
 
         List<AIUnit> aiUnits = getAIUnits();
-        List<AIUnit> navalUnits = new ArrayList<>();
-        List<AIUnit> done = new ArrayList<>();
-        List<TransportMission> transportMissions = new ArrayList<>();
+        List<AIUnit> navalUnits = new ArrayList<>(aiUnits.size()/2);
+        List<AIUnit> done = new ArrayList<>(aiUnits.size());
+        List<TransportMission> transportMissions = new ArrayList<>(aiUnits.size()/2);
+        java.util.Map<Unit, String> reasons = new HashMap<>(aiUnits.size());
 
         // For all units, check if it is a candidate for a new
         // mission.  If it is not a candidate remove it from the

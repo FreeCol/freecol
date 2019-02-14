@@ -1027,9 +1027,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public List<Goods> getSellGoods(Unit unit) {
         // Collect all the candidate goods
-        List<Goods> result = new ArrayList<>();
-        for (Goods g : transform(getCompactGoodsList(),
-                                 g2 -> willSell(g2.getType()))) {
+        List<Goods> sellGoods = transform(getCompactGoodsList(),
+                                          g2 -> willSell(g2.getType()));
+        List<Goods> result = new ArrayList<>(sellGoods.size());
+        for (Goods g : sellGoods) {
             int amount = g.getAmount();
             int retain = getWantedGoodsAmount(g.getType());
             if (retain >= amount) continue;
