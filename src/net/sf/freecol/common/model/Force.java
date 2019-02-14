@@ -344,8 +344,8 @@ public class Force extends FreeColSpecObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append("<Force");
-        for (AbstractUnit au : this.landUnits) sb.append(" ").append(au);
-        for (AbstractUnit au : this.navalUnits) sb.append(" ").append(au);
+        for (AbstractUnit au : this.landUnits) sb.append(' ').append(au);
+        for (AbstractUnit au : this.navalUnits) sb.append(' ').append(au);
         sb.append('>');
         return sb.toString();
     }

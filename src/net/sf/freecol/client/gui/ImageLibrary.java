@@ -652,7 +652,7 @@ public final class ImageLibrary {
         forEach(mapEntriesByKey(resources), e -> {
                 String key = e.getKey();
                 decode.put(key.hashCode(), key);
-                sb.append(key).append("\n");
+                sb.append(key).append('\n');
             });
         sb.append("Cache\n");
         forEachMapEntry(ResourceManager.getImageCache(), e -> {

@@ -289,7 +289,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         // games upgraded from 0.10.x could still contain them.  We
         // should have done this earlier, but that fell through the
         // cracks...
-        int idx = id.indexOf(":");
+        int idx = id.indexOf(':');
         if (idx > 10) {
             String prefix = id.substring(0, idx);
             if ("tileitemcontainer".equals(prefix)) {

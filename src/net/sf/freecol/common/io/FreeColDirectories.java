@@ -696,7 +696,7 @@ public class FreeColDirectories {
         StringBuilder sb = new StringBuilder();
         sb.append("Deleted outdated (> ").append(validDays)
             .append(" old) autosave/s: ");
-        for (File f : files) sb.append(" ").append(f.getPath());
+        for (File f : files) sb.append(' ').append(f.getPath());
         return sb.toString();        
     }
 
@@ -712,7 +712,7 @@ public class FreeColDirectories {
         deleteFiles(files);
         StringBuilder sb = new StringBuilder();
         sb.append("Deleted autosave/s: ");
-        for (File f : files) sb.append(" ").append(f.getPath());
+        for (File f : files) sb.append(' ').append(f.getPath());
         return sb.toString();        
     }
 

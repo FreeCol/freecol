@@ -192,7 +192,7 @@ public class FreeColProgressBar extends JPanel {
 
         String stepSignal = (step < 0) ? "-" : "+";
         StringBuilder progress = new StringBuilder(32);
-        progress.append(String.valueOf(value)).append(stepSignal).append(Math.abs(step)).append("/").append(max);
+        progress.append(String.valueOf(value)).append(stepSignal).append(Math.abs(step)).append('/').append(max);
         String turnsString;
         if (max <= value) { // Already complete
             turnsString = "0";

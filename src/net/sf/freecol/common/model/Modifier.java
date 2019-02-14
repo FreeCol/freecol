@@ -638,7 +638,7 @@ public class Modifier extends Feature {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[Modifier ").append(getId());
         if (getSource() != null) {
-            sb.append(" (").append(getSource().getId()).append(")");
+            sb.append(" (").append(getSource().getId()).append(')');
         }
         sb.append(' ').append(modifierType)
             .append(' ').append(value);

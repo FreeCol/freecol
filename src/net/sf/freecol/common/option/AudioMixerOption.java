@@ -105,7 +105,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append(this.name).append("/")
+            sb.append(this.name).append('/')
                 .append((this.mixerInfo == null) ? "null" : this.mixerInfo.toString());
             return sb.toString();
         }

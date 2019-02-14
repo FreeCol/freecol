@@ -206,9 +206,9 @@ public class ForestMaker {
                     for (int i = 0; i < POWERS_OF_TWO.length; i++) {
                         if ((index & POWERS_OF_TWO[i]) == POWERS_OF_TWO[i]) {
                             branches[i] = true;
-                            sb.append("1");
+                            sb.append('1');
                         } else {
-                            sb.append("0");
+                            sb.append('0');
                         }
                     }
                     counter = sb.toString();
