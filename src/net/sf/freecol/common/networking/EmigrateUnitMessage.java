@@ -113,10 +113,11 @@ public class EmigrateUnitMessage extends AttributeMessage {
             }
             type = MigrationType.NORMAL;
         } else {
-            if (!serverPlayer.checkGold(europe.getCurrentRecruitPrice())) {
+            int cost = europe.getCurrentRecruitPrice();
+            if (!serverPlayer.checkGold(cost)) {
                 return serverPlayer.clientError("No migrants available at cost "
-                    + europe.getCurrentRecruitPrice()
-                    + " for player with " + serverPlayer.getGold() + " gold");
+                    + cost + " for player with "
+                    + serverPlayer.getGold() + " gold");
             }
             type = MigrationType.RECRUIT;
         }

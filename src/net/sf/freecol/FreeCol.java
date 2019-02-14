@@ -346,8 +346,9 @@ public final class FreeCol {
             && (cLang = specialOptions.get(ClientOptions.LANGUAGE)) != null
             && !Messages.AUTOMATIC.equalsIgnoreCase(cLang)
             && setLocale(cLang)) {
-            Messages.loadMessageBundle(getLocale());
-            logger.info("Loaded messages for " + getLocale());
+            Locale loc = getLocale();
+            Messages.loadMessageBundle(loc);
+            logger.info("Loaded messages for " + loc);
         }
 
         // Now we have the user mods directory and the locale is now

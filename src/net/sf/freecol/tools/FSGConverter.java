@@ -193,11 +193,9 @@ public class FSGConverter {
             if (args.length >= 3) {
                 out = new File(args[2]);
             } else {
-                String filename = in.getName()
-                    .replaceAll("." + FreeCol.FREECOL_SAVE_EXTENSION, ".xml");
-                if (filename.equals(in.getName())) {
-                    filename += ".xml";
-                }
+                String name = in.getName();
+                String filename = name.replaceAll("." + FreeCol.FREECOL_SAVE_EXTENSION, ".xml");
+                if (filename.equals(name)) filename += ".xml";
                 out = new File(filename);
             }
             try {

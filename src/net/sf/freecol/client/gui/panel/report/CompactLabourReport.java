@@ -421,12 +421,13 @@ public final class CompactLabourReport extends ReportPanel {
             }
         }
         LabourData.LocationData europe = unitData.getUnitsInEurope();
-        if (europe.getRowCount() > 0) {
+        int euRow = europe.getRowCount();
+        if (euRow > 0) {
             String nam = Messages.getName(getMyPlayer().getEurope());
             JButton button = createButton(nam,
                 (ActionEvent ae) -> { getGUI().showEuropePanel(); });
             reportPanel.add(button, "cell " + COLONY_COLUMN + " " + row
-                + " 1 " + europe.getRowCount());
+                + " 1 " + euRow);
             row = addLocationData(europe, null, row);
         }
         row = addNonLinkedLocation(unitData.getUnitsOnLand(),

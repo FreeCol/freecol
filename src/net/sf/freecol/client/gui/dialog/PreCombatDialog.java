@@ -138,12 +138,12 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScaleFactor());
         float offenceResult
             = FeatureContainer.applyModifiers(0f, turn, attackModifiers);
-        JLabel finalOffenceLabel = Utility.localizedLabel("finalResult");
-        finalOffenceLabel.setFont(bigFont);
+        JLabel finalLabel = Utility.localizedLabel("finalResult");
+        finalLabel.setFont(bigFont);
         panel.add(new JSeparator(JSeparator.HORIZONTAL),
                   "newline, span 3, growx");
         panel.add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
-        panel.add(finalOffenceLabel);
+        panel.add(finalLabel);
         JLabel finalOffenceResult
             = new JLabel(ModifierFormat.format(offenceResult));
         finalOffenceResult.setFont(bigFont);
@@ -151,9 +151,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
 
         float defenceResult
             = FeatureContainer.applyModifiers(0f, turn, defenceModifiers);
-        JLabel finalDefenceLabel = Utility.localizedLabel("finalResult");
-        finalDefenceLabel.setFont(bigFont);
-        panel.add(finalDefenceLabel, "skip");
+        panel.add(finalLabel, "skip");
         JLabel finalDefenceResult
             = new JLabel(ModifierFormat.format(defenceResult));
         finalDefenceResult.setFont(bigFont);

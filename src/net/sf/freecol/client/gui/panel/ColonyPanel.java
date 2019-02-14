@@ -694,11 +694,10 @@ public final class ColonyPanel extends PortPanel
 
             unitIcon = new ImageIcon(lib.getSmallerUnitImage(unit));
             StringBuilder sb = new StringBuilder(64);
+            String prodLabel = Messages.message("colonyPanel.producing");
             if (student != null) {
                 sb.append(unit.getDescription())
-                    .append(' ')
-                    .append(Messages.message("colonyPanel.producing"))
-                    .append(' ')
+                    .append(' ').append(prodLabel).append(' ')
                     .append(Messages.getName(unit.getType()
                             .getSkillTaught()))
                     .append(' ')
@@ -708,18 +707,14 @@ public final class ColonyPanel extends PortPanel
             } else if (wl != null && goodsType != null) {
                 int producing = wl.getProductionOf(unit, goodsType);
                 sb.append(unit.getDescription())
-                    .append(' ')
-                    .append(Messages.message("colonyPanel.producing"))
-                    .append(' ')
+                    .append(' ').append(prodLabel).append(' ')
                     .append(producing)
                     .append(' ')
                     .append(Messages.message(StringTemplate.template(goodsType)
                             .addAmount("%amount%", producing)));
             } else {
                 sb.append(unit.getDescription())
-                    .append(' ')
-                    .append(Messages.message("colonyPanel.producing"))
-                    .append(' ')
+                    .append(' ').append(prodLabel).append(' ')
                     .append(Messages.message("nothing"));
             }
             String menuTitle = sb.toString();

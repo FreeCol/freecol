@@ -501,14 +501,15 @@ public final class TileViewer extends FreeColClientHolder {
                     }
                 }
             } else if (!tile.isLand() || borderingTile.isLand()) {
-                if (borderingTileType.getIndex() < tileType.getIndex()
+                int bTIndex = borderingTileType.getIndex();
+                if (bTIndex < tileType.getIndex()
                     && !lib.getTerrainImage(tileType, 0, 0).equals(lib.getTerrainImage(borderingTileType, 0, 0))) {
                     // Draw land terrain with bordering land type, or
                     // ocean/high seas limit, if the tiles do not
                     // share same graphics (ocean & great river)
                     si = new SortableImage(lib.getBorderImage(borderingTileType,
-                            direction, x, y),
-                        borderingTileType.getIndex());
+                                                              direction, x, y),
+                                           bTIndex);
                     imageBorders.add(si);
                 }
             }
@@ -661,8 +662,9 @@ public final class TileViewer extends FreeColClientHolder {
                 if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                     // Draw the settlement chip
                     chip = lib.getIndianSettlementChip(g, is);
+                    int cWidth = chip.getWidth();
                     g.drawImage(chip, (int)xOffset, (int)yOffset, null);
-                    xOffset += chip.getWidth() + 2;
+                    xOffset += cWidth + 2;
 
                     // Draw the mission chip if needed.
                     Unit missionary = is.getMissionary();
@@ -672,7 +674,7 @@ public final class TileViewer extends FreeColClientHolder {
                         g.drawImage(lib.getMissionChip(g, missionary.getOwner(),
                                                        expert),
                                     (int)xOffset, (int)yOffset, null);
-                        xOffset += chip.getWidth() + 2;
+                        xOffset += cWidth + 2;
                     }
                 }
 

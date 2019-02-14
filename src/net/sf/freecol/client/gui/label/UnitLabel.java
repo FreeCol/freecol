@@ -434,8 +434,9 @@ public final class UnitLabel extends FreeColLabel
 
             if (unit.isDamaged()) {
                 String underRepair = Messages.message(unit.getRepairLabel());
-                String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
-                String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
+                int idx = underRepair.indexOf('(');
+                String underRepair1 = underRepair.substring(0, idx).trim();
+                String underRepair2 = underRepair.substring(idx).trim();
                 Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                                                    FontLibrary.FontSize.TINY, lib.getScaleFactor());
                 Image repairImage1 = lib.getStringImage(g, underRepair1, Color.RED, font);

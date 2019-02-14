@@ -1458,8 +1458,9 @@ public final class InGameController extends FreeColClientHolder {
      */
     private boolean moveExplore(Unit unit, Direction direction) {
         // Confirm the move.
-        final Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (!getGUI().confirm(unit.getTile(),
+        final Tile now = unit.getTile();
+        final Tile tile = now.getNeighbourOrNull(direction);
+        if (!getGUI().confirm(now,
                 StringTemplate.key("exploreLostCityRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             if (unit.getDestination() != null) askClearGotoOrders(unit);
@@ -1468,7 +1469,7 @@ public final class InGameController extends FreeColClientHolder {
 
         // Handle the mounds decision.
         if (tile.getLostCityRumour().getType() == LostCityRumour.RumourType.MOUNDS
-            && !getGUI().confirm(unit.getTile(),
+            && !getGUI().confirm(now,
                 StringTemplate.key("exploreMoundsRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             askServer().declineMounds(unit, direction); // LCR goes away

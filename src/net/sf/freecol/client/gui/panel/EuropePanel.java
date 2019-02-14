@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
@@ -203,7 +204,8 @@ public final class EuropePanel extends PortPanel {
                     // Fail if still in Europe if told to leave
                     if (unit.isInEurope()) return null;
                 }
-                if (comp.getParent() != null) comp.getParent().remove(comp);
+                Container parent = comp.getParent();
+                if (parent != null) parent.remove(comp);
                 inPortPanel.update();
                 docksPanel.update();
                 cargoPanel.update();

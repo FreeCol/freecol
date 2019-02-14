@@ -359,8 +359,9 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         // Now that all production has been stabilized, plan to
         // rearrange when the warehouse hits a limit.
         if (colony.getNetProductionOf(spec.getPrimaryFoodType()) < 0) {
-            int net = colony.getNetProductionOf(spec.getPrimaryFoodType());
-            int when = colony.getGoodsCount(spec.getPrimaryFoodType()) / -net;
+            GoodsType food = spec.getPrimaryFoodType();
+            int net = colony.getNetProductionOf(food);
+            int when = colony.getGoodsCount(food) / -net;
             nextRearrange = Math.max(0, Math.min(nextRearrange, when-1));
         }
         int warehouse = colony.getWarehouseCapacity();
@@ -1111,9 +1112,9 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         TypeCountMap<GoodsType> required = new TypeCountMap<>();
 
         // Add building materials.
-        if (colony.getCurrentlyBuilding() != null) {
-            for (AbstractGoods ag : colony.getCurrentlyBuilding()
-                     .getRequiredGoodsList()) {
+        BuildableType build = colony.getCurrentlyBuilding();
+        if (build != null) {
+            for (AbstractGoods ag : build.getRequiredGoodsList()) {
                 if (colony.getAdjustedNetProductionOf(ag.getType()) <= 0) {
                     required.incrementCount(ag.getType(), ag.getAmount());
                 }

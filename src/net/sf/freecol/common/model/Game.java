@@ -1636,9 +1636,11 @@ public class Game extends FreeColGameObject {
 
         if (xw.validForSave()) {
             xw.writeAttribute(NEXT_ID_TAG, nextId);
-        } else if (xw.getClientPlayer() != null) {
-            xw.writeAttribute(CLIENT_USER_NAME_TAG,
-                              xw.getClientPlayer().getName());
+        } else {
+            Player client = xw.getClientPlayer();
+            if (client != null) {
+                xw.writeAttribute(CLIENT_USER_NAME_TAG, client.getName());
+            }
         }
 
         xw.writeAttribute(UUID_TAG, getUUID());

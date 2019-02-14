@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -598,8 +599,9 @@ public final class Canvas extends JDesktopPane {
 
         final JInternalFrame f = (toolBox) ? new ToolBoxFrame()
             : new JInternalFrame();
-        if (f.getContentPane() instanceof JComponent) {
-            JComponent c = (JComponent) f.getContentPane();
+        Container con = f.getContentPane();
+        if (con instanceof JComponent) {
+            JComponent c = (JComponent)con;
             c.setOpaque(false);
             c.setBorder(null);
         }
@@ -796,8 +798,9 @@ public final class Canvas extends JDesktopPane {
             int foundScore = 0;
             Component found = null;
             for (Component c : allComponents) {
-                if (c.getBounds().intersects(r)) {
-                    Rectangle rr = c.getBounds().intersection(r);
+                Rectangle rb = c.getBounds();
+                if (rb.intersects(r)) {
+                    Rectangle rr = rb.intersection(r);
                     int score = (int)Math.round(rr.getWidth() * rr.getHeight());
                     if (foundScore < score) {
                         foundScore = score;

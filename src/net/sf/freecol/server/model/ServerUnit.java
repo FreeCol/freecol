@@ -321,9 +321,9 @@ public class ServerUnit extends Unit implements TurnTaker {
             cs.add(See.only(owner), carrier);
         }
         if (oldLocation instanceof Tile) {
-            if (carrier.getTile() != oldLocation) {
-                cs.addMove(See.only(owner), this, oldLocation,
-                           carrier.getTile());
+            Tile tile = carrier.getTile();
+            if (tile != oldLocation) {
+                cs.addMove(See.only(owner), this, oldLocation, tile);
                 owner.invalidateCanSeeTiles();//+vis(serverPlayer)
             }
             cs.addDisappear(owner, (Tile)oldLocation, this);

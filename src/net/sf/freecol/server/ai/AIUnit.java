@@ -391,8 +391,8 @@ public final class AIUnit extends TransportableAIObject {
         Location oldTarget = (m == null) ? null : m.getTarget();
         AIPlayer aiPlayer = getAIOwner();
 
-        if(aiPlayer instanceof EuropeanAIPlayer) {
-            EuropeanAIPlayer euaiPlayer = (EuropeanAIPlayer)getAIOwner();
+        if (aiPlayer instanceof EuropeanAIPlayer) {
+            EuropeanAIPlayer euaiPlayer = (EuropeanAIPlayer)aiPlayer;
             if (euaiPlayer.getPioneeringMission(this, null) != null) {
                 lb.add(", ", getMission());
                 euaiPlayer.updateTransport(this, oldTarget, lb);

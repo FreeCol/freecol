@@ -334,12 +334,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                         if (minimumIndex < preferredIndex + index) {
                             minimumIndex = preferredIndex + index;
                         }
-                        if (minimumIndex > targetModel.size()) {
-                            minimumIndex = targetModel.size();
-                        }
-                        if (minimumIndex > maximumIndex) {
-                            minimumIndex = maximumIndex;
-                        }
+                        minimumIndex = Math.min(Math.min(minimumIndex,
+                                targetModel.size()), maximumIndex);
                     }
                 }
                 targetModel.add(minimumIndex, toBuild);

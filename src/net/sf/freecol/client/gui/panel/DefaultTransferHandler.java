@@ -360,7 +360,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                         if (amountToTransfer > GoodsContainer.CARGO_SIZE * availableHolds) {
                             amountToTransfer = GoodsContainer.CARGO_SIZE * availableHolds;
                             label.setAmount(amountToTransfer);
-                            goods = label.getGoods();
                         }
                     }
                 }

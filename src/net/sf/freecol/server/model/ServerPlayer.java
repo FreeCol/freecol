@@ -4260,9 +4260,10 @@ outer:  for (Effect effect : effects) {
         // Initial agreement goes first to this player
         DiplomaticTrade agreement = DiplomaticTrade
             .makePeaceTreaty(DiplomaticTrade.TradeContext.CONTACT, this, other);
+        final long timeout = FreeCol.getTimeout(false);
         DiplomacySession session = (settlement == null)
-            ? new DiplomacySession(unit, otherUnit, FreeCol.getTimeout(false))
-            : new DiplomacySession(unit, settlement, FreeCol.getTimeout(false));
+            ? new DiplomacySession(unit, otherUnit, timeout)
+            : new DiplomacySession(unit, settlement, timeout);
         session.setAgreement(agreement);
         cs.add(See.only(this), session.getMessage(this));
         unit.setMovesLeft(0);

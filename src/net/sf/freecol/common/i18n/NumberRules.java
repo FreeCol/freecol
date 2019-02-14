@@ -161,8 +161,9 @@ public class NumberRules {
             case 1:
                 Rule rule = numberRule.getRule(Category.one);
                 if (rule != null) {
-                    if (null != rule.toString()) {
-                        switch (rule.toString()) {
+                    String val = rule.toString();
+                    if (null != val) {
+                        switch (val) {
                         case "n is 1":
                             number = PLURAL_NUMBER_RULE;
                             break;

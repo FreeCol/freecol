@@ -2745,10 +2745,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
                     // Temporary workaround for BR#2618 on input
                     Colony colony = tile.getColony();
-                    if (colony != null && colony.getApparentUnitCount() <= 0) {
+                    int apparent;
+                    if (colony != null
+                        && (apparent = colony.getApparentUnitCount()) <= 0) {
                         logger.warning("Copied colony " + colony.getId()
                             + " display unit count set to 1 from corrupt: "
-                            + colony.getApparentUnitCount());
+                            + apparent);
                         colony.setDisplayUnitCount(1);
                     }
                     // end workaround

@@ -169,9 +169,7 @@ public class ForestMaker {
                     try {
                         BufferedImage image = ImageIO.read(imageFile);
                         images.add(image);
-                        if (image.getHeight() > maximumHeight) {
-                            maximumHeight = image.getHeight();
-                        }
+                        maximumHeight = Math.min(image.getHeight(), maximumHeight);
                     } catch(IOException e) {
                         System.out.println("Unable to load image " + imageFile.getName() + ":\n");
                         e.printStackTrace();

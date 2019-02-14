@@ -1932,10 +1932,10 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         // Dispose of the unit.
-        cs.add(See.perhaps().always(serverPlayer),
-               (FreeColGameObject)unit.getLocation());
+        Location loc = unit.getLocation();
+        cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
         ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
-            unit.getLocation(), cs);//-vis(serverPlayer)
+                                    loc, cs);//-vis(serverPlayer)
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see the unit removal and the space it leaves.
@@ -2346,12 +2346,12 @@ public final class InGameController extends Controller {
         // Result depends on tension wrt this settlement.
         // Establish if at least not angry.
         final Tension tension = is.getAlarm(serverPlayer);
+        Location loc = unit.getLocation();
         switch (tension.getLevel()) {
         case HATEFUL: case ANGRY:
-            cs.add(See.perhaps().always(serverPlayer),
-                   (FreeColGameObject)unit.getLocation());
+            cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
             ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
-                unit.getLocation(), cs);//-vis(serverPlayer)
+                                        loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
 
@@ -2628,12 +2628,12 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         unit.setMovesLeft(0);
         csVisit(serverPlayer, is, 0, cs);
+        Location loc = unit.getLocation();
         switch (is.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed, might be visible to other players.
-            cs.add(See.perhaps().always(serverPlayer),
-                   (FreeColGameObject)unit.getLocation());
+            cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
             ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
-                unit.getLocation(), cs);//-vis(serverPlayer)
+                                        loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case ANGRY: // Learn nothing, not even a pet update
@@ -3482,10 +3482,10 @@ public final class InGameController extends Controller {
         // Hateful natives kill the scout right away.
         Tension tension = is.getAlarm(serverPlayer);
         if (tension.getLevel() == Tension.Level.HATEFUL) {
-            cs.add(See.perhaps().always(serverPlayer),
-                   (FreeColGameObject)unit.getLocation());
+            Location loc = unit.getLocation();
+            cs.add(See.perhaps().always(serverPlayer), (FreeColGameObject)loc);
             ((ServerUnit)unit).csRemove(See.perhaps().always(serverPlayer),
-                unit.getLocation(), cs);//-vis(serverPlayer)
+                                        loc, cs);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             result = "die";
         } else {
@@ -3837,8 +3837,8 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-        if (carrier.getSettlement() != null) {
-            Settlement settlement = carrier.getSettlement();
+        Settlement settlement = carrier.getSettlement();
+        if (settlement != null) {
             GoodsLocation.moveGoods(carrier, goodsType, amount, settlement);
             logger.finest(carrier
                 + " unloaded " + amount + " " + goodsType.getSuffix()
