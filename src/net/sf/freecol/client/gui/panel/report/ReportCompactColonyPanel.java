@@ -85,6 +85,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
     private static final Predicate<Unit> notWorkingPred = u ->
         u.getState() != Unit.UnitState.FORTIFIED && u.getState() != Unit.UnitState.SENTRY;
     
+    private static final JLabel emptyLabel = new JLabel();
+
     /** Container class for all the information about a colony. */
     private static class ColonySummary {
 
@@ -445,7 +447,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
     private void addTogether(List<? extends JComponent> components) {
         if (components.isEmpty()) {
-            reportPanel.add(new JLabel());
+            reportPanel.add(emptyLabel);
             return;
         }
         String layout = (components.size() > 1) ? "split " + components.size()
@@ -556,7 +558,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         } else {
             b = null;
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
+        reportPanel.add((b == null) ? emptyLabel : b);
 
         // Field: The number of potential colony tiles that need
         // exploring.
@@ -571,7 +573,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         } else {
             b = null;
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
+        reportPanel.add((b == null) ? emptyLabel : b);
 
         // Fields: The number of existing colony tiles that would
         // benefit from improvements.
@@ -613,7 +615,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             } else {
                 b = null;
             }
-            reportPanel.add((b == null) ? new JLabel() : b);
+            reportPanel.add((b == null) ? emptyLabel : b);
         }
 
         // Fields: The net production of each storable+non-trade-goods
@@ -701,7 +703,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             default:
                 throw new IllegalStateException("Bogus status: " + gp.status);
             }
-            reportPanel.add((c == null) ? new JLabel()
+            reportPanel.add((c == null) ? emptyLabel
                 : newButton(cac, Integer.toString(gp.amount), null, c, t));
         }
 
@@ -726,7 +728,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         } else {
             b = null;
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
+        reportPanel.add((b == null) ? emptyLabel : b);
 
         // Field: What is currently being built (clickable if on the
         // buildqueue) and the turns until it completes, including
@@ -810,7 +812,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Field: The units that could be upgraded, followed by the units
         // that could be added.
         if (s.improve.isEmpty() && s.want.isEmpty()) {
-            reportPanel.add(new JLabel());
+            reportPanel.add(emptyLabel);
         } else {
             buttons.clear();
             buttons.addAll(unitButtons(s.improve, s.couldWork, s.colony));
@@ -938,7 +940,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         Set<Tile> tiles = transform(rTileSuggestions,
                                     TileImprovementSuggestion::isExploration,
                                     ts -> ts.tile, Collectors.toSet());
-        reportPanel.add((tiles.isEmpty()) ? new JLabel()
+        reportPanel.add((tiles.isEmpty()) ? emptyLabel
             : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                        stpld("report.colony.exploring.summary")));
 
@@ -951,7 +953,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             tiles.addAll(transform(rTileSuggestions,
                                    matchKey(ti, ts -> ts.tileImprovementType),
                                    ts -> ts.tile, Collectors.toSet()));
-            reportPanel.add((tiles.isEmpty()) ? new JLabel()
+            reportPanel.add((tiles.isEmpty()) ? emptyLabel
                 : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                            stpld("report.colony.tile." + ti.getSuffix()
                                + ".summary")));
@@ -979,7 +981,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             default:
                 throw new IllegalStateException("Bogus status: " + gp.status);
             }
-            reportPanel.add((c == null) ? new JLabel()
+            reportPanel.add((c == null) ? emptyLabel
                 : newLabel(Integer.toString(gp.amount), null, c,
                     stpld("report.colony.production.summary")
                         .addNamed("%goods%", gt)));

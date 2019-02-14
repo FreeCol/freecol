@@ -73,11 +73,12 @@ public class TranslationReport {
         master.load(Files.newInputStream(filePath));
         //System.out.println("*** Found master property file with " + master.size() + " properties.\n");
 
+        Properties properties = new Properties();
         for (String name : languageFiles) {
             LanguageStatsRecord lstat = new LanguageStatsRecord();
             lstat.localFile = name;
             Path propPath = FileSystems.getDefault().getPath(args[0], name);
-            Properties properties = new Properties();
+            properties.clear();
             properties.load(Files.newInputStream(propPath));
             System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
             System.out.println("*** " + name + " ***");
