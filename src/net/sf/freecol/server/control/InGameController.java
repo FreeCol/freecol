@@ -1387,12 +1387,9 @@ public final class InGameController extends Controller {
                            + " has not won the game!");
         } else {
             final Specification spec = game.getSpecification();
-            spec.setBoolean(GameOptions.VICTORY_DEFEAT_REF,
-                            Boolean.FALSE);
-            spec.setBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS,
-                            Boolean.FALSE);
-            spec.setBoolean(GameOptions.VICTORY_DEFEAT_HUMANS,
-                            Boolean.FALSE);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_REF, false);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS, false);
+            spec.setBoolean(GameOptions.VICTORY_DEFEAT_HUMANS, false);
             logger.info("Disabled victory conditions, as "
                         + serverPlayer.getName()
                         + " has won, but is continuing to play.");
@@ -2360,7 +2357,7 @@ public final class InGameController extends Controller {
 
         case HAPPY: case CONTENT: case DISPLEASED:
             ServerIndianSettlement sis = (ServerIndianSettlement)is;
-            if (is.hasMissionary()) sis.csKillMissionary(false, cs);
+            if (is.hasMissionary()) sis.csKillMissionary(Boolean.FALSE, cs);
 
             // Always show the tile the unit was on
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());

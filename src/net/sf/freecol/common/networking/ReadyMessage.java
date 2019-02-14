@@ -120,6 +120,6 @@ public class ReadyMessage extends AttributeMessage {
      * @return True if the player is ready.
      */
     public boolean getValue() {
-        return getBooleanAttribute(VALUE_TAG, false);
+        return getBooleanAttribute(VALUE_TAG, Boolean.FALSE);
     }
 }

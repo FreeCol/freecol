@@ -2410,7 +2410,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         } else if (isLand() && Boolean.TRUE.equals(moveToEurope)) {
             lb.add("\n  Tile is land but has move-to-Europe: ", getId());
             if (fix) {
-                moveToEurope = false;
+                moveToEurope = Boolean.FALSE;
             } else {
                 result = -1;
             }

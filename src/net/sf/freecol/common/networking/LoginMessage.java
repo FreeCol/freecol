@@ -122,11 +122,11 @@ public class LoginMessage extends ObjectMessage {
     }
 
     private boolean getSinglePlayer() {
-        return getBooleanAttribute(SINGLE_PLAYER_TAG, false);
+        return getBooleanAttribute(SINGLE_PLAYER_TAG, Boolean.FALSE);
     }
 
     private boolean getCurrentPlayer() {
-        return getBooleanAttribute(CURRENT_PLAYER_TAG, false);
+        return getBooleanAttribute(CURRENT_PLAYER_TAG, Boolean.FALSE);
     }
 
     private Game getGame() {

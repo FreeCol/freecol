@@ -2768,7 +2768,7 @@ public final class Specification implements OptionContainer {
         // @compat 0.10.5
         ret |= checkOp(GameOptions.ENABLE_UPKEEP,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.NATURAL_DISASTERS,
                        GameOptions.GAMEOPTIONS_COLONY,
                        0, PercentageOption.class);
@@ -2780,7 +2780,7 @@ public final class Specification implements OptionContainer {
                        10, PercentageOption.class);
         ret |= checkOp(GameOptions.EMPTY_TRADERS,
                        GameOptions.GAMEOPTIONS_MAP,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         // end @compat 0.10.5
 
         // SAVEGAME_VERSION == 13
@@ -2788,7 +2788,7 @@ public final class Specification implements OptionContainer {
         // @compat 0.10.7
         ret |= checkOp(GameOptions.ONLY_NATURAL_IMPROVEMENTS,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       true, BooleanOption.class);
+                       Boolean.TRUE, BooleanOption.class);
         ret |= checkOp(GameOptions.PEACE_PROBABILITY,
                        GameOptions.GAMEOPTIONS_MAP,
                        90, PercentageOption.class);
@@ -2803,28 +2803,28 @@ public final class Specification implements OptionContainer {
                        2, IntegerOption.class);
         ret |= checkOp(GameOptions.FOUND_COLONY_DURING_REBELLION,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       true, BooleanOption.class);
+                       Boolean.TRUE, BooleanOption.class);
         // end @compat 0.10.7
 
         // @compat 0.11.0
         ret |= checkOp(GameOptions.BELL_ACCUMULATION_CAPPED,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.CAPTURE_UNITS_UNDER_REPAIR,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.PAY_FOR_BUILDING,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       true, BooleanOption.class);
+                       Boolean.TRUE, BooleanOption.class);
         ret |= checkOp(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.CUSTOMS_ON_COAST,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.EQUIP_EUROPEAN_RECRUITS,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       true, BooleanOption.class);
+                       Boolean.TRUE, BooleanOption.class);
         // end @compat 0.11.0
 
         // @compat 0.11.3
@@ -2842,10 +2842,10 @@ public final class Specification implements OptionContainer {
                        2, IntegerOption.class);
         ret |= checkOp(GameOptions.DISEMBARK_IN_COLONY,
                        GameOptions.GAMEOPTIONS_COLONY,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         ret |= checkOp(GameOptions.ENHANCED_TRADE_ROUTES,
                        GameOptions.GAMEOPTIONS_MAP,
-                       false, BooleanOption.class);
+                       Boolean.FALSE, BooleanOption.class);
         // end @compat 0.11.3
 
         // @compat 0.11.6

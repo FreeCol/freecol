@@ -3358,7 +3358,7 @@ outer:  for (Effect effect : effects) {
             if (sis.hasMissionary()) {
                 missionaryOwner = (ServerPlayer)sis.getMissionary().getOwner();
                 radius = sis.getMissionaryLineOfSight();
-                sis.csKillMissionary(true, cs);
+                sis.csKillMissionary(Boolean.TRUE, cs);
             }
         }
             

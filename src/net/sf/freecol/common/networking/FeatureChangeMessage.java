@@ -140,7 +140,7 @@ public class FeatureChangeMessage extends ObjectMessage {
      * @return True if the child object should be added to the parent.
      */
     private boolean getAdd() {
-        return getBooleanAttribute(ADD_TAG, false);
+        return getBooleanAttribute(ADD_TAG, Boolean.FALSE);
     }
 
     /**

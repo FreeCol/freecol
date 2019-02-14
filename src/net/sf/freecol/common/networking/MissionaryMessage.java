@@ -119,7 +119,7 @@ public class MissionaryMessage extends AttributeMessage {
         }
 
         Unit missionary = is.getMissionary();
-        boolean denounce = getBooleanAttribute(DENOUNCE_TAG, false);
+        boolean denounce = getBooleanAttribute(DENOUNCE_TAG, Boolean.FALSE);
         if (denounce) {
             if (missionary == null) {
                 return serverPlayer.clientError("Denouncing an empty mission at: "

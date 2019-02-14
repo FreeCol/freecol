@@ -185,7 +185,7 @@ public class AnimateAttackMessage extends ObjectMessage {
      * @return The result.
      */
     private boolean getResult() {
-        return getBooleanAttribute(SUCCESS_TAG, false);
+        return getBooleanAttribute(SUCCESS_TAG, Boolean.FALSE);
     }
 
     /**

@@ -146,6 +146,6 @@ public class ChatMessage extends AttributeMessage {
      * @return True if this ChatMessage is private.
      */
     public boolean isPrivate() {
-        return getBooleanAttribute(PRIVATE_TAG, false);
+        return getBooleanAttribute(PRIVATE_TAG, Boolean.FALSE);
     }
 }

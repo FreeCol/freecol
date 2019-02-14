@@ -2840,7 +2840,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     @Override
-    public Boolean canBeInput() {
+    public boolean canBeInput() {
         return true;
     }
 

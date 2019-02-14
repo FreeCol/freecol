@@ -75,11 +75,12 @@ public interface TradeLocation {
     }
 
     /**
-     * Returns whether a TradeLocation be set as the input location on a TradeRouteInputPanel
+     * Can a TradeLocation be set as the input location on a
+     * TradeRouteInputPanel
      *
-     * @return true, if possible, false by default
+     * @return True if possible, false by default.
      */
-    public default Boolean canBeInput() {
+    public default boolean canBeInput() {
         return false;
     }
 }

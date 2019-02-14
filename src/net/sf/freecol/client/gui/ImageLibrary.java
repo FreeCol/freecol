@@ -658,7 +658,7 @@ public final class ImageLibrary {
         forEachMapEntry(ResourceManager.getImageCache(), e -> {
                 Long key = e.getKey();
                 String rep = ResourceManager.imageUnhash(key);
-                Integer i = Integer.parseInt(firstPart(rep, "."));
+                int i = Integer.parseInt(firstPart(rep, "."));
                 sb.append(decode.get(i)).append('.').append(lastPart(rep, "."))
                     .append('\n');
             });
@@ -1557,7 +1557,7 @@ public final class ImageLibrary {
                                      Color border, Color background,
                                      double amount, Color fill,
                                      Color foreground,
-                                     Boolean filled) {
+                                     boolean filled) {
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
             FontLibrary.FontSize.TINY, Font.BOLD, this.scaleFactor);
         FontMetrics fm = g.getFontMetrics(font);
@@ -1573,7 +1573,7 @@ public final class ImageLibrary {
         g2.fillRect(0, 0, width, height);
         g2.setColor(background);
         g2.fillRect(1, 1, width - 2, height - 2);
-        if (filled.equals(false)) {
+        if (!filled) {
             if (amount > 0.0 && amount <= 1.0) {
                 g2.setColor(fill);
                 g2.fillRect(1, 1, width - 2, (int)((height - 2) * amount));

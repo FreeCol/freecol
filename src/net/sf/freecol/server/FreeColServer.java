@@ -1265,7 +1265,7 @@ public final class FreeColServer {
         // Restores previous setting when hiding it back again
         if (reveal) {
             FreeColDebugger.setNormalGameFogOfWar(spec.getBoolean(GameOptions.FOG_OF_WAR));
-            spec.setBoolean(GameOptions.FOG_OF_WAR, Boolean.FALSE);
+            spec.setBoolean(GameOptions.FOG_OF_WAR, false);
         } else {
             spec.setBoolean(GameOptions.FOG_OF_WAR,
                             FreeColDebugger.getNormalGameFogOfWar());

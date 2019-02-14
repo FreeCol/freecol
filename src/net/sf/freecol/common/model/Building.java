@@ -462,7 +462,7 @@ public class Building extends WorkLocation
     //   WorkLocation.getClaimTemplate: buildings do not need to be claimed.
 
     @Override
-    public Boolean goodSuggestionCheck(UnitType better, Unit unit, GoodsType goodsType) {
+    public boolean goodSuggestionCheck(UnitType better, Unit unit, GoodsType goodsType) {
         // Make sure the type can be added.
         if (this.canAddType(better)) {
             Colony colony = getColony();

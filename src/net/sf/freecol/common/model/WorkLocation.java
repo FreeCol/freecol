@@ -352,7 +352,7 @@ public abstract class WorkLocation extends UnitLocation
      *
      * @return True or false, depending on whether the suggestion is valid.
      */
-    protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType) {
+    protected boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType) {
         return goodSuggestionCheck(unitType, unit, goodsType, this);
     }
 
@@ -367,7 +367,7 @@ public abstract class WorkLocation extends UnitLocation
      *     the WorkLocation instance currently in in reference.
      * @return True or false, depending on whether the suggestion is valid.
      */
-    protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit,
+    protected boolean goodSuggestionCheck(UnitType unitType, Unit unit,
                                           GoodsType goodsType,
                                           WorkLocation workLocation) {
         return false;

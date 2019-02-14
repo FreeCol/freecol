@@ -115,6 +115,6 @@ public class SetAIMessage extends AttributeMessage {
      * @return The AI state.
      */
     public boolean getAI() {
-        return getBooleanAttribute(AI_TAG, false);
+        return getBooleanAttribute(AI_TAG, Boolean.FALSE);
     }
 }

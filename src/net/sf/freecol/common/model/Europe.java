@@ -535,7 +535,7 @@ public class Europe extends UnitLocation
     }
 
     @Override
-    public Boolean canBeInput() {
+    public boolean canBeInput() {
         return true;
     }
 

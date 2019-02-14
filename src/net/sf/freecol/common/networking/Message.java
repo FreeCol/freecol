@@ -276,7 +276,7 @@ public abstract class Message {
     protected Boolean getBooleanAttribute(String key, Boolean defaultValue) {
         if (hasAttribute(key)) {
             try {
-                return Boolean.parseBoolean(getStringAttribute(key));
+                return Boolean.valueOf(getStringAttribute(key));
             } catch (NumberFormatException nfe) {}
         }
         return defaultValue;
@@ -292,7 +292,7 @@ public abstract class Message {
     protected Integer getIntegerAttribute(String key, int defaultValue) {
         if (hasAttribute(key)) {
             try {
-                return Integer.parseInt(getStringAttribute(key));
+                return Integer.valueOf(getStringAttribute(key));
             } catch (NumberFormatException nfe) {}
         }
         return defaultValue;
@@ -588,7 +588,7 @@ public abstract class Message {
             }
             // If there is a "flush" attribute present, encourage the
             // client to display any new messages.
-            if (getBooleanAttribute("flush", false)) {
+            if (getBooleanAttribute("flush", Boolean.FALSE)) {
                 final Runnable displayModelMessagesRunnable = () -> {
                     freeColClient.getInGameController()
                         .displayModelMessages(false);
