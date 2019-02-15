@@ -130,10 +130,9 @@ public class GoToMission extends AbstractMission {
      */
     @Override
     public boolean isValid() {
-        return super.isValid()
-            && destination != null
-            // FIXME: check for disposed destinations
-            && destination.canAdd(getUnit());
+        // FIXME: check for disposed destinations
+        return destination != null && destination.canAdd(getUnit())
+            && super.isValid();
     }
 
     /**

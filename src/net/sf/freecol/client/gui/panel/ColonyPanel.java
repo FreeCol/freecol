@@ -266,8 +266,8 @@ public final class ColonyPanel extends PortPanel
         editable = colony.getOwner().getId().equals(player.getId());
 
         // Only enable the set goods button in debug mode when not spying
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && editable) {
+        if (editable
+            && FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             setGoodsButton = Utility.localizedButton("colonyPanel.setGoods");
             traceWorkButton = Utility.localizedButton("colonyPanel.traceWork");
         }
@@ -656,7 +656,7 @@ public final class ColonyPanel extends PortPanel
         final Colony colony = getColony();
         unloadButton.setEnabled(false);
         fillButton.setEnabled(false);
-        if (isEditable() && selectedUnitLabel != null) {
+        if (selectedUnitLabel != null && isEditable()) {
             Unit unit = selectedUnitLabel.getUnit();
             if (unit != null && unit.isCarrier() && unit.hasCargo()) {
                 unloadButton.setEnabled(true);

@@ -132,8 +132,8 @@ public abstract class ValuedAIObject extends AIObject {
     public boolean equals(Object other) {
         if (other instanceof ValuedAIObject) {
             ValuedAIObject ov = (ValuedAIObject)other;
-            return super.equals(ov)
-                && this.value == ov.value;
+            return this.value == ov.value
+                && super.equals(ov);
         }
         return false;
     }

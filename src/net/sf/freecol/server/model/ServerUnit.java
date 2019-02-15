@@ -380,8 +380,9 @@ public class ServerUnit extends Unit implements TurnTaker {
                 || (enemy = tile.getFirstUnit().getOwner()) == player) continue;
             for (Unit enemyUnit : transform(tile.getUnits(), u ->
                     (u.isNaval()
-                        && ((u.isOffensiveUnit() && player.atWarWith(enemy))
-                            || pirate || u.hasAbility(Ability.PIRACY))))) {
+                        && (pirate || u.hasAbility(Ability.PIRACY)
+                            || (u.isOffensiveUnit()
+                                && player.atWarWith(enemy)))))) {
                 double power = combatModel.getOffencePower(enemyUnit, this);
                 totalAttackPower += power;
                 if (power > attackPower) {
@@ -837,7 +838,7 @@ public class ServerUnit extends Unit implements TurnTaker {
             // Check for first landing
             String newLand = null;
             boolean firstLanding = !serverPlayer.isNewLandNamed();
-            if (serverPlayer.isEuropean() && firstLanding) {
+            if (firstLanding && serverPlayer.isEuropean()) {
                 newLand = serverPlayer.getNameForNewLand();
                 // Set the default value now to prevent multiple attempts.
                 // The user setNewLandName can override.
@@ -884,8 +885,8 @@ public class ServerUnit extends Unit implements TurnTaker {
 
         // Check for region discovery
         Region region = newTile.getDiscoverableRegion();
-        if (serverPlayer.isEuropean() && region != null
-            && region.checkDiscover(this)) {
+        if (region != null && region.checkDiscover(this)
+            && serverPlayer.isEuropean()) {
             cs.add(See.only(serverPlayer),
                    new NewRegionNameMessage(region, newTile, this,
                        serverPlayer.getNameForRegion(region)));

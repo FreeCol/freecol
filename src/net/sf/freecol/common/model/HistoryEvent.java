@@ -280,8 +280,8 @@ public class HistoryEvent extends StringTemplate {
         if (o instanceof HistoryEvent) {
             HistoryEvent h = (HistoryEvent)o;
             return turn == h.turn && eventType == h.eventType
-                && Utils.equals(playerId, h.playerId)
-                && score == h.score;
+                && score == h.score
+                && Utils.equals(playerId, h.playerId);
         }
         return false;
     }

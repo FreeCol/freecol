@@ -1946,8 +1946,8 @@ public class Unit extends GoodsLocation
      * @return True if the unit is a beached ship.
      */
     public boolean isBeached(Tile tile) {
-        return isNaval() && tile != null && tile.isLand()
-            && !tile.hasSettlement();
+        return tile != null && tile.isLand() && !tile.hasSettlement()
+            && isNaval();
     }
 
     /**
@@ -3202,8 +3202,8 @@ public class Unit extends GoodsLocation
      * @return True if this unit can attack.
      */
     public boolean canAttack(Unit defender) {
-        if (!isOffensiveUnit() || defender == null
-            || !defender.hasTile()) return false;
+        if (defender == null || !defender.hasTile()
+            || !isOffensiveUnit()) return false;
 
         Tile tile = defender.getTile();
         return (isNaval())

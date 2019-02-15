@@ -117,9 +117,8 @@ public class ImprovementMission extends AbstractMission {
      */
     @Override
     public boolean isValid() {
-        return super.isValid()
-            && improvement != null
-            && improvement.isWorkerAllowed(getUnit());
+        return improvement != null && improvement.isWorkerAllowed(getUnit())
+            && super.isValid();
     }
 
     /**

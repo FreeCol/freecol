@@ -188,8 +188,8 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         this.allButton = Utility.localizedButton("all");
         this.allButton.addActionListener((ActionEvent ae) -> {
                 JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
-                for (int i = 0; i < gl.getModel().getSize()
-                         && i < CaptureGoodsDialog.this.maxCargo; i++) {
+                int siz = gl.getModel().getSize();
+                for (int i = 0; i < siz && i < CaptureGoodsDialog.this.maxCargo; i++) {
                     GoodsItem gi = gl.getModel().getElementAt(i);
                     gi.setSelected(true);
                     updateComponents();

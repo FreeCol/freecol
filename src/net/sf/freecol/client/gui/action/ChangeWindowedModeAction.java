@@ -53,8 +53,8 @@ public final class ChangeWindowedModeAction extends SelectableAction {
     @Override
     public boolean shouldBeSelected() {
         final GUI gui = getGUI();
-        return super.shouldBeSelected()
-            && !(gui == null || gui.isWindowed());
+        return !(gui == null || gui.isWindowed())
+            && super.shouldBeSelected();
     }
 
 
@@ -66,8 +66,8 @@ public final class ChangeWindowedModeAction extends SelectableAction {
     @Override
     public boolean shouldBeEnabled() {
         final GUI gui = getGUI();
-        return super.shouldBeEnabled()
-            && !(gui == null || gui.isShowingSubPanel());
+        return !(gui == null || gui.isShowingSubPanel())
+            && super.shouldBeEnabled();
     }
     
 

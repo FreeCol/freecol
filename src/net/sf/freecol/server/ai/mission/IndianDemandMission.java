@@ -406,7 +406,7 @@ public final class IndianDemandMission extends Mission {
             int tension = Math.max(unitTension,
                 unit.getOwner().getTension(enemy).getValue());
             d = unit.getTile().getDirection(colony.getTile());
-            if (tension >= Tension.Level.CONTENT.getLimit() && d != null) {
+            if (d != null && tension >= Tension.Level.CONTENT.getLimit()) {
                 if (AIMessage.askAttack(aiUnit, d)) lbAttack(lb, colony);
             }
             return lbDone(lb, false, "refused at ", colony);

@@ -1051,7 +1051,8 @@ public class CollectionUtils {
      */
     public static <K,V> void forEachMapEntry(Map<K,V> map,
                                              Consumer<Entry<K,V>> consumer) {
-        if (map != null && !map.isEmpty() && consumer != null) {
+        if (consumer != null
+            && map != null && !map.isEmpty()) {
             forEach_internal(map.entrySet().stream(), alwaysTrue(), consumer);
         }
     }
@@ -1068,7 +1069,8 @@ public class CollectionUtils {
     public static <K,V> void forEachMapEntry(Map<K,V> map,
                                              Predicate<Entry<K,V>> predicate,
                                              Consumer<Entry<K,V>> consumer) {
-        if (map != null && !map.isEmpty() && consumer != null) {
+        if (consumer != null
+            && map != null && !map.isEmpty()) {
             forEach_internal(map.entrySet().stream(), predicate, consumer);
         }
     }

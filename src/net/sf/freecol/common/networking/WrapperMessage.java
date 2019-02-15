@@ -87,7 +87,7 @@ public abstract class WrapperMessage extends AttributeMessage {
      * {@inheritDoc}
      */
     public boolean isEmpty() {
-        return super.isEmpty() && this.message == null;
+        return this.message == null && super.isEmpty();
     }
 
     /**

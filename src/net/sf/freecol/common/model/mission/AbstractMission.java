@@ -147,9 +147,8 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      */
     @Override
     public boolean isValid() {
-        return unit != null
-            && !unit.isDisposed()
-            && repeatCount > 0;
+        return repeatCount > 0
+            && unit != null && !unit.isDisposed();
     }
 
     /**

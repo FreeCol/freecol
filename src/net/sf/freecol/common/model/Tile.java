@@ -1716,7 +1716,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
-        return (canProduce(goodsType, unitType) && tileItemContainer != null)
+        return (tileItemContainer != null && canProduce(goodsType, unitType))
             ? tileItemContainer.getProductionModifiers(goodsType, unitType)
             : Stream.<Modifier>empty();
     }
@@ -2620,7 +2620,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (tileItemContainer != null) tileItemContainer.toXML(xw);
 
         // Save the cached tiles to saved games.
-        if (xw.validForSave() && cachedTiles != null) {
+        if (cachedTiles != null && xw.validForSave()) {
             for (Player p : getGame().getLiveEuropeanPlayerList()) {
                 Tile t = getCachedTile(p);
                 if (t == null) continue;

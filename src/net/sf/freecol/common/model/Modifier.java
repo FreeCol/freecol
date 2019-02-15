@@ -607,11 +607,11 @@ public class Modifier extends Feature {
         if (o == this) return true;
         if (o instanceof Modifier) { 
             Modifier m = (Modifier)o;
-            return Utils.equals(this.modifierType, m.modifierType)
-                && this.value == m.value
+            return this.value == m.value
                 && this.increment == m.increment
-                && Utils.equals(this.incrementType, m.incrementType)
                 && this.modifierIndex == m.modifierIndex
+                && Utils.equals(this.modifierType, m.modifierType)
+                && Utils.equals(this.incrementType, m.incrementType)
                 && super.equals(o);
         }
         return false;

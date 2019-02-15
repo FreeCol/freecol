@@ -791,9 +791,10 @@ public class ServerPlayer extends Player implements TurnTaker {
         default:
             return false;
         }
-        return canHaveFoundingFathers() && currentFather == null
+        return currentFather == null
             && hasSettlements()
-            && getFatherCount() < spec.getFoundingFathers().size();
+            && getFatherCount() < spec.getFoundingFathers().size()
+            && canHaveFoundingFathers();
     }
 
     /**
@@ -961,8 +962,8 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @see #hasExplored
      */
     public Set<Tile> exploreForUnit(Unit unit) {
-        return (getGame() == null || getGame().getMap() == null
-                || unit == null || !unit.isOnTile())
+        return (unit == null || !unit.isOnTile()
+            || getGame() == null || getGame().getMap() == null)
             ? Collections.<Tile>emptySet()
             : exploreTiles(unit.getVisibleTileSet());
     }
@@ -1978,7 +1979,7 @@ outer:  for (Effect effect : effects) {
                       .add("%description%", father.getDescriptionKey()));
 
         List<AbstractUnit> units = father.getUnitList();
-        if (units != null && !units.isEmpty() && europe != null) {
+        if (europe != null && units != null && !units.isEmpty()) {
             createUnits(units, europe, random);//-vis: safe, Europe
             europeDirty = true;
         }

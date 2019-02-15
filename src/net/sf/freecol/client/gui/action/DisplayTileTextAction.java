@@ -81,11 +81,11 @@ public final class DisplayTileTextAction extends SelectableAction {
      */
     @Override
     public boolean shouldBeSelected() {
-        return super.shouldBeEnabled()
+        return display != null
             && freeColClient.getClientOptions() != null
-            && display != null
             && freeColClient.getClientOptions().getDisplayTileText()
-                == display.ordinal();
+                == display.ordinal()
+            && super.shouldBeEnabled();
     }
 
 

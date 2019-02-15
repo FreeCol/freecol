@@ -173,8 +173,8 @@ final class UnitAttackAnimation extends FreeColClientHolder {
             }
         }
 
-        if (fcc.getAnimationSpeed(this.defender.getOwner()) > 0
-            && !success) {
+        if (!success
+            && fcc.getAnimationSpeed(this.defender.getOwner()) > 0) {
             def = loadAnimation(this.defender, dirn.getReverseDirection());
             if (def) {
                 new UnitImageAnimation(fcc, this.defender, this.defenderTile,

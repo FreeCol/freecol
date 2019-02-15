@@ -545,9 +545,8 @@ public class SimpleCombatModel extends CombatModel {
                 result.addAll(settlement.getDefenceModifiers());
 
                 // Artillery defence bonus against an Indian raid
-                if (defender.hasAbility(Ability.BOMBARD)
-                    && attacker != null
-                    && ((Unit)attacker).getOwner().isIndian()) {
+                if (attacker != null && ((Unit)attacker).getOwner().isIndian()
+                    && defender.hasAbility(Ability.BOMBARD)) {
                     result.addAll(toList(spec.getModifiers(Modifier.ARTILLERY_AGAINST_RAID)));
                 }
 
@@ -566,8 +565,8 @@ public class SimpleCombatModel extends CombatModel {
             }
 
             // Fortify bonus
-            if (defender.getState() == Unit.UnitState.FORTIFIED
-                && !disableFortified) {
+            if (!disableFortified
+                && defender.getState() == Unit.UnitState.FORTIFIED) {
                 result.addAll(toList(spec.getModifiers(Modifier.FORTIFIED)));
             }
         }
@@ -733,7 +732,7 @@ public class SimpleCombatModel extends CombatModel {
                 // until the colony falls for lack of survivors.
                 // Ships in a falling colony will be damaged or sunk
                 // if they have no repair location.
-                if (!loser.isDefensiveUnit() && autoRole == null) {
+                if (autoRole == null && !loser.isDefensiveUnit()) {
                     List<Unit> ships = colony.getTile().getNavalUnits();
                     final CombatResult shipResult = (ships.isEmpty()) ? null
                         : (ships.get(0).getRepairLocation() == null)

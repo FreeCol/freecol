@@ -735,8 +735,7 @@ public final class FreeColClient {
      * @return True if the current player is owned by this client.
      */
     public boolean currentPlayerIsMyPlayer() {
-        return isInGame()
-            && this.game != null
+        return this.game != null && isInGame()
             && this.player != null
             && this.player.equals(this.game.getCurrentPlayer());
     }

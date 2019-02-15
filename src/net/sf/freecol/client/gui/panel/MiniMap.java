@@ -155,9 +155,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @return a {@code boolean} value
      */
     public boolean canZoomIn() {
-        return (freeColClient.getGame() != null
-                && freeColClient.getGame().getMap() != null
-                && tileSize < MAX_TILE_SIZE);
+        return tileSize < MAX_TILE_SIZE
+            && freeColClient.getGame() != null
+            && freeColClient.getGame().getMap() != null;
     }
 
     /**
@@ -166,9 +166,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @return a {@code boolean} value
      */
     public boolean canZoomOut() {
-        return (freeColClient.getGame() != null
-                && freeColClient.getGame().getMap() != null
-                && tileSize > MIN_TILE_SIZE);
+        return tileSize > MIN_TILE_SIZE
+            && freeColClient.getGame() != null
+            && freeColClient.getGame().getMap() != null;
     }
 
     private void setZoomOption(int tileSize) {

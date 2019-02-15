@@ -995,7 +995,7 @@ public final class FreeColServer {
 
             if (freeColServer != null) {
                 String owner = xr.getAttribute(OWNER_TAG, (String)null);
-                if (MAP_EDITOR_NAME.equals(owner) && specification == null) {
+                if (specification == null && MAP_EDITOR_NAME.equals(owner)) {
                     throw new FreeColException("error.mapEditorGame");
                 }
                 freeColServer.setSinglePlayer(xr.getAttribute(SINGLE_PLAYER_TAG,

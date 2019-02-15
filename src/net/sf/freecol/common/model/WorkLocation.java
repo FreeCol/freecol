@@ -306,9 +306,9 @@ public abstract class WorkLocation extends UnitLocation
     private Suggestion getSuggestion(Unit unit, ProductionType productionType,
                                      GoodsType goodsType) {
         // Check first if there is space.
-        if (((unit == null || !contains(unit)) && isFull())
-            || productionType == null
-            || goodsType == null) return null;
+        if (productionType == null
+            || goodsType == null
+            || ((unit == null || !contains(unit)) && isFull())) return null;
 
         final Specification spec = getSpecification();
         final Player owner = getOwner();
@@ -396,8 +396,8 @@ public abstract class WorkLocation extends UnitLocation
             }
         }
         // Check for a suggestion for an extra worker if there is space.
-        if (!isFull() && occ != null
-            && (work = occ.workType) != null
+        if (occ != null && (work = occ.workType) != null
+            && !isFull()
             && (sug = getSuggestion(null, occ.productionType, work)) != null) {
             result.put(null, sug);
         }

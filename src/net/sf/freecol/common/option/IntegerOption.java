@@ -145,7 +145,7 @@ public class IntegerOption extends AbstractOption<Integer> {
         final int oldValue = this.value;
         this.value = limitValue(value);
 
-        if (value != oldValue && isDefined) {
+        if (isDefined && value != oldValue) {
             firePropertyChange(VALUE_TAG, oldValue, (int)value);
         }
         isDefined = true;

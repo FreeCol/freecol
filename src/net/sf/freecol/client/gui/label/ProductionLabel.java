@@ -130,7 +130,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
 
         if (getType() == null) {
             FreeCol.trace(logger, "Bad production label (no type)");
-        } else if (getAmount() == 0 && stockNumber < 0) {
+        } else if (stockNumber < 0 && getAmount() == 0) {
             FreeCol.trace(logger, "Bad production label: " + ag
                 + " stock=" + stockNumber);
         }

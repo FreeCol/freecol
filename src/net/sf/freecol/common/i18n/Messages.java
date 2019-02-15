@@ -837,8 +837,8 @@ public class Messages {
             if (keyIndex < 0 || keyIndex > closeChoice) {
                 // key not found, choice might be a key itself
                 String otherKey = input.substring(pipeIndex + 1, closeChoice);
-                if (otherKey.startsWith("%") && otherKey.endsWith("%")
-                    && template != null) {
+                if (template != null
+                    && otherKey.startsWith("%") && otherKey.endsWith("%")) {
                     StringTemplate replacement
                         = template.getReplacement(otherKey);
                     if (replacement == null) {

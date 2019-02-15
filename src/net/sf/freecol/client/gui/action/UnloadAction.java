@@ -75,11 +75,10 @@ public class UnloadAction extends MapboardAction {
     protected boolean shouldBeEnabled() {
         final Unit carrier = getUnit();
         final Player player = freeColClient.getMyPlayer();
-        return super.shouldBeEnabled()
-            && carrier != null
-            && carrier.isCarrier()
+        return carrier != null && carrier.isCarrier()
             && carrier.getCargoSpaceTaken() > 0
-            && player != null && player.owns(carrier);
+            && player != null && player.owns(carrier)
+            && super.shouldBeEnabled();
     }
 
 

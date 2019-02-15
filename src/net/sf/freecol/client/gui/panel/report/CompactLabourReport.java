@@ -388,7 +388,7 @@ public final class CompactLabourReport extends ReportPanel {
                 + " 1 " + (row - buildingStartRow));
         }
 
-        if (data.getUnitData().showProduction() && row > notProducingStartRow) {
+        if (row > notProducingStartRow && data.getUnitData().showProduction()) {
             reportPanel.add(createEmptyLabel(), "cell " + PRODUCTION_COLUMN
                 + " " + notProducingStartRow
                 + " 1 " + (row - notProducingStartRow));
@@ -550,7 +550,7 @@ public final class CompactLabourReport extends ReportPanel {
 
         reportPanel.add(colonistLabel, "cell " + COLONIST_COLUMN + " " + row);
 
-        if (data.getUnitData().showProduction() && production > 0) {
+        if (production > 0 && data.getUnitData().showProduction()) {
             reportPanel.add(createNumberLabel(production, "report.labour.potentialProduction.tooltip"), "cell " + PRODUCTION_COLUMN + " " + row);
         }
     }

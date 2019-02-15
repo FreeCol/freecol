@@ -1355,8 +1355,8 @@ public final class MapViewer extends FreeColClientHolder {
 
         // Apply fog of war to flat parts of all tiles
         RescaleOp fow = null;
-        if (getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
-            && player != null) {
+        if (player != null
+            && getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
             // Knowing that we have FOW, prepare a rescaling for the
             // overlay step below.
             fow = new RescaleOp(new float[] { 0.8f, 0.8f, 0.8f, 1f },
@@ -1950,8 +1950,7 @@ public final class MapViewer extends FreeColClientHolder {
         // FOR DEBUGGING
         net.sf.freecol.server.ai.AIUnit au;
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && player != null
-            && !player.owns(unit)
+            && player != null && !player.owns(unit)
             && unit.getOwner().isAI()
             && getFreeColServer() != null
             && getFreeColServer().getAIMain() != null

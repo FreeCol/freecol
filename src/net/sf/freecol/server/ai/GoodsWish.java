@@ -252,9 +252,9 @@ public final class GoodsWish extends Wish {
     public boolean equals(Object other) {
         if (other instanceof GoodsWish) {
             GoodsWish og = (GoodsWish)other;
-            return super.equals(og)
+            return this.amountRequested == og.amountRequested
                 && Utils.equals(this.goodsType, og.goodsType)
-                && this.amountRequested == og.amountRequested;
+                && super.equals(og);
         }
         return false;
     }

@@ -2182,10 +2182,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The {@code TradeRoute} found.
      */
     public final TradeRoute getTradeRouteByName(final String name,
-        final TradeRoute exclude) {
+                                                final TradeRoute exclude) {
         synchronized (this.tradeRoutes) {
             return find(this.tradeRoutes,
-                        t -> t.getName().equals(name) && t != exclude);
+                        t -> t != exclude && t.getName().equals(name));
         }
     }
 
@@ -3635,7 +3635,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 return values;
             }
             int price = getLandPrice(tile);
-            if (price > 0 && !checkGold(price) && portCount > 0) {
+            if (price > 0 && portCount > 0 && !checkGold(price)) {
                 values.set(ColonyValueCategory.A_TILE.ordinal(),
                            MOD_STEAL);
             }

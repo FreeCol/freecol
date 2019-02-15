@@ -118,8 +118,9 @@ public abstract class SelectableAction extends MapboardAction {
     @Override
     protected boolean shouldBeEnabled() {
         final Player player = getFreeColClient().getMyPlayer();
-        return super.shouldBeEnabled() && getFreeColClient().getGame() != null
-            && player != null && player.getNewModelMessages().isEmpty();
+        return player != null && player.getNewModelMessages().isEmpty()
+            && getFreeColClient().getGame() != null
+            && super.shouldBeEnabled();
     }
 
     /**

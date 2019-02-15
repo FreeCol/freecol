@@ -1492,7 +1492,7 @@ public final class InGameController extends Controller {
                 UnitType toType = spec.getUnitChange(UnitChangeType.INDEPENDENCE,
                                                      fromType).to;
                 List<Unit> units = entry.getValue();
-                while (!units.isEmpty() && n < limit) {
+                while (n < limit && !units.isEmpty()) {
                     Unit unit = units.remove(0);
                     unit.changeType(toType);//-vis
                     cs.add(See.only(serverPlayer), unit);
@@ -2206,9 +2206,9 @@ public final class InGameController extends Controller {
             players.add(current);
 
             // If this is a debug run, update everyone and continue.
-            boolean debugSkip = !current.isAI()
-                && freeColServer.getSinglePlayer()
-                && debugOnlyAITurns > 0;
+            boolean debugSkip = debugOnlyAITurns > 0
+                && !current.isAI()
+                && freeColServer.getSinglePlayer();
             if (debugSkip) {
                 serverGame.sendToList(players, cs);
                 cs.clear();
@@ -3381,7 +3381,7 @@ public final class InGameController extends Controller {
 
         // Collect roles that cause a change, ordered by simplest change
         for (Arrangement a : transform(arrangements,
-                a -> a.role != a.unit.getRole() && a.role != defaultRole,
+                a -> a.role != defaultRole && a.role != a.unit.getRole(),
                 Function.<Arrangement>identity(),
                 Arrangement::roleComparison)) {
             if (!colony.equipForRole(a.unit, a.role, a.roleCount)) {

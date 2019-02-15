@@ -1330,7 +1330,7 @@ public final class ImageLibrary {
             : "." + Role.getRoleSuffix(roleId);
         String key = "image.unit." + unitType.getId() + roleQual
             + ((nativeEthnicity) ? ".native" : "");
-        if (!ResourceManager.hasImageResource(key) && nativeEthnicity) {
+        if (nativeEthnicity && !ResourceManager.hasImageResource(key)) {
             key = "image.unit." + unitType.getId() + roleQual;
         }
         return key;

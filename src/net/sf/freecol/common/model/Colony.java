@@ -1223,9 +1223,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         List<GoodsType> libertyTypeList = getSpecification()
                 .getLibertyGoodsTypeList();
         final int uc = getUnitCount();
-        if (calculateRebels(uc, sonsOfLiberty) <= uc + 1
-                && amount > 0
-                && !libertyTypeList.isEmpty()) {
+        if (amount > 0 && !libertyTypeList.isEmpty()
+            && calculateRebels(uc, sonsOfLiberty) <= uc + 1) {
             addGoods(libertyTypeList.get(0), amount);
         }
         updateSoL();

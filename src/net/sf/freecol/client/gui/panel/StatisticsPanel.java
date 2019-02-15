@@ -135,8 +135,8 @@ public final class StatisticsPanel extends FreeColPanel {
          */
         @Override
         public Object getValueAt(int row, int column) {
-            if ((row < getRowCount()) && (column < getColumnCount())
-                && (row >= 0) && (column >= 0)) {
+            if (0 <= row && 0 <= column
+                && row < getRowCount() && column < getColumnCount()) {
                 switch (column) {
                 case StatisticsModel.NAME_COLUMN:
                     return data[NAME_COLUMN][row];

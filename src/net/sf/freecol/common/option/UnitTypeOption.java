@@ -185,7 +185,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     public void generateChoices() {
         if (this.selector == null) {
             UnitType val = getValue();
-            if (this.choices.isEmpty() && val != null) this.choices.add(val);
+            if (val != null && this.choices.isEmpty()) this.choices.add(val);
         } else {
             List<UnitType> unitTypeList = getSpecification().getUnitTypeList();
             this.choices.clear();

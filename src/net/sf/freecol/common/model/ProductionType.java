@@ -522,11 +522,11 @@ public class ProductionType extends FreeColSpecObject {
         if (this == o) return true;
         if (o instanceof ProductionType) {
             ProductionType pt = (ProductionType)o;
-            return super.equals(o)
-                && this.unattended == pt.unattended
-                && Utils.equals(this.productionLevel, pt.productionLevel)
+            return this.unattended == pt.unattended
                 && listEquals(this.outputs, pt.outputs)
-                && listEquals(this.inputs, pt.inputs);
+                && listEquals(this.inputs, pt.inputs)
+                && Utils.equals(this.productionLevel, pt.productionLevel)
+                && super.equals(o);
         }
         return false;
     }

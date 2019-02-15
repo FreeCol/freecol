@@ -715,7 +715,7 @@ public class TerrainGenerator {
             // get an additional +1 bonus
             // FIXME: This probably has some false positives, means
             // river tiles that are NOT a river mouth next to this tile!
-            if (!t.hasRiver() && adjacentRiver) {
+            if (adjacentRiver && !t.hasRiver()) {
                 t.add(new TileImprovement(game, t, fishBonusRiverType, null));
             }
 

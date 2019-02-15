@@ -406,11 +406,10 @@ public abstract class Feature extends FreeColSpecObject
         if (o == this) return true;
         if (o instanceof Feature) {
             Feature feature = (Feature)o;
-            if (!super.equals(o)
-                || this.source != feature.source
+            if (this.source != feature.source
                 || this.duration != feature.duration
-                || this.temporary != feature.temporary)
-                return false;
+                || this.temporary != feature.temporary
+                || !super.equals(o)) return false;
             if (firstTurn == null) {
                 if (feature.firstTurn != null) return false;
             } else if (feature.firstTurn == null) {

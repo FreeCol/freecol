@@ -90,7 +90,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
         final boolean oldValue = this.value;
         this.value = value;
 
-        if (value != oldValue && isDefined) {
+        if (isDefined && value != oldValue) {
             firePropertyChange(VALUE_TAG, oldValue, (boolean)value);
         }
         isDefined = true;

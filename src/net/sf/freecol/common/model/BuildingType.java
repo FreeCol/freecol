@@ -652,9 +652,10 @@ public final class BuildingType extends BuildableType
         }
 
         // @compat 0.11.6
-        if (hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
-                && this.expertConnectionProduction == 0)
+        if (this.expertConnectionProduction == 0
+            && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)) {
             this.expertConnectionProduction = 4;
+        }
         // end @compat 0.11.6
     }
 

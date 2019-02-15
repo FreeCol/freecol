@@ -100,8 +100,8 @@ public abstract class MapControls extends FreeColClientHolder {
                 for (TileImprovementType type : spec.getTileImprovementTypeList()) {
                     FreeColAction action = am.getFreeColAction(type.getSuffix()
                                                                + "Action");
-                    if (!type.isNatural() && action != null
-                        && action.hasOrderButtons()) {
+                    if (action != null && action.hasOrderButtons()
+                        && !type.isNatural()) {
                         unitButtons.add(new UnitButton(am, type.getSuffix() + "Action"));
                     }
                 }

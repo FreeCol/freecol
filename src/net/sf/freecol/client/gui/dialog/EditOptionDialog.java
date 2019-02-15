@@ -65,7 +65,7 @@ public class EditOptionDialog extends FreeColConfirmDialog {
     @Override
     public Boolean getResponse() {
         Boolean result = super.getResponse();
-        if (result && this.ui != null) this.ui.updateOption();
+        if (this.ui != null && result) this.ui.updateOption();
         return result;
     }
 }

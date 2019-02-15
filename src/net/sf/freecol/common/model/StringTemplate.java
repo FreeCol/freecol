@@ -585,9 +585,9 @@ public class StringTemplate extends FreeColObject {
         if (this == o) return true;
         if (o instanceof StringTemplate) {
             StringTemplate t = (StringTemplate)o;
-            if (!super.equals(o)
-                || this.templateType != t.templateType
-                || !Utils.equals(this.defaultId, t.defaultId)) return false;
+            if (this.templateType != t.templateType
+                || !Utils.equals(this.defaultId, t.defaultId)
+                || !super.equals(o)) return false;
             switch (this.templateType) {
             case TEMPLATE:
                 if ((this.keys == null) != (t.keys == null))

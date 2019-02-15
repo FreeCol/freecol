@@ -166,8 +166,8 @@ public class BuildingToolTip extends JToolTip {
                     .addNamed("%goods%", outputType)));
         }
 
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && outputType != null) {
+        if (outputType != null
+            && FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             List<Modifier> mods
                 = sort(building.getProductionModifiers(outputType, null),
                        Modifier.ascendingModifierIndexComparator);

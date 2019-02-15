@@ -774,7 +774,7 @@ public class ColonyPlan {
                 }
             }
 
-            if (findBuildPlan(type) == null && !expectFail) {
+            if (!expectFail && findBuildPlan(type) == null) {
                 logger.warning("No building priority found for: " + type);
             }
         }
@@ -794,13 +794,12 @@ public class ColonyPlan {
                     prioritize(unitType, DEFENCE_WEIGHT,
                         1.0/*FIXME: how badly defended?*/);
                 }
-            } else if (unitType.hasAbility(Ability.CARRY_GOODS)) {
-                if (wagonNeed > 0.0) {
-                    double factor = 1.0;
-                    if ("trade".equals(advantage)) factor = 1.1;
-                    prioritize(unitType, TRANSPORT_WEIGHT * factor,
-                        wagonNeed/*FIXME: type.getSpace()*/);
-                }
+            } else if (wagonNeed > 0.0
+                && unitType.hasAbility(Ability.CARRY_GOODS)) {
+                double factor = 1.0;
+                if ("trade".equals(advantage)) factor = 1.1;
+                prioritize(unitType, TRANSPORT_WEIGHT * factor,
+                    wagonNeed/*FIXME: type.getSpace()*/);
             }
         }
 
@@ -1228,7 +1227,7 @@ public class ColonyPlan {
         List<WorkLocationPlan> wlps;
         WorkLocationPlan wlp;
         boolean done = false;
-        while (!workers.isEmpty() && !done) {
+        while (!done && !workers.isEmpty()) {
             // Decide what to produce: set the work location plan to
             // try (wlp), and the list the plan came from so it can
             // be recycled if successful (wlps).

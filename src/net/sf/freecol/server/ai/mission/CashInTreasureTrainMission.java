@@ -440,8 +440,7 @@ public final class CashInTreasureTrainMission extends Mission {
             final Europe europe = getUnit().getOwner().getEurope();
             if (unit.canCashInTreasureTrain()) {
                 AIUnit aiCarrier = null;
-                boolean cashin = unit.isInEurope()
-                    || europe == null
+                boolean cashin = europe == null || unit.isInEurope()
                     || unit.getTransportFee() == 0;
                 if (!cashin && aiUnit.getTransport() == null) {
                     cashin = assignCarrier(lb) == null;

@@ -1264,7 +1264,7 @@ public class Map extends FreeColGameObject implements Location {
             : null;
         final GoalDecider gd = GoalDeciders.getLocationGoalDecider(end);
         final SearchHeuristic sh = getManhattenHeuristic(end);
-        Unit embarkTo;
+        Unit embarkTo, endUnit;
 
         PathNode path;
         if (start.getContiguity() == end.getContiguity()) {
@@ -1301,10 +1301,10 @@ public class Map extends FreeColGameObject implements Location {
             path = searchMap(unit, start, gd, costDecider, INFINITY,
                              carrier, sh, lb);
 
-        } else if (start.isLand() && !end.isLand()
-            && end.getFirstUnit() != null
+        } else if (start.isLand()
+            && !end.isLand() && (endUnit = end.getFirstUnit()) != null
+            && unit != null && unit.getOwner().owns(endUnit)
             && !end.getContiguityAdjacent(start.getContiguity()).isEmpty()
-            && unit != null && unit.getOwner().owns(end.getFirstUnit())
             && (embarkTo = end.getCarrierForUnit(unit)) != null) {
             // Special case where a land unit is trying to move from
             // land to an adjacent ship.
@@ -1810,10 +1810,10 @@ public class Map extends FreeColGameObject implements Location {
             ? trivialSearchHeuristic : searchHeuristic;
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
-            ? ((start.hasSettlement()
-                    && start.getSettlement().isConnectedPort()
-                    && unit != null
-                    && unit.getLocation() == carrier) ? carrier : unit)
+            ? ((unit != null && unit.getLocation() == carrier
+                    && start.hasSettlement()
+                    && start.getSettlement().isConnectedPort())
+                ? carrier : unit)
             : offMapUnit;
         if (lb != null) lb.add("Search trace(unit=", unit,
             ", from=", start,
@@ -2184,10 +2184,10 @@ ok:     while (!openMap.isEmpty()) {
         for (; p != null && --limit > 0; p = q.poll()) {
             for (Direction d : Direction.values()) {
                 final Position np = new Position(p, d);
-                if (np.isValid(xmax, ymax)
-                    && boolmap[np.getX()][np.getY()]
-                    && !visited[np.getX()][np.getY()]) {
-                    visited[np.getX()][np.getY()] = true;
+                if (!np.isValid(xmax, ymax)) continue;
+                int nx = np.getX(), ny = np.getY();
+                if (boolmap[nx][ny] && !visited[nx][ny]) {
+                    visited[nx][ny] = true;
                     q.add(np);
                 }
             }
@@ -2446,7 +2446,7 @@ ok:     while (!openMap.isEmpty()) {
             // Mountains and Rivers were setting their parent to the
             // discoverable land region they are created within.  Move them
             // up to being children of the geographic region.
-            if (r.getDiscoverable() && p != null && p.getDiscoverable()) {
+            if (p != null && p.getDiscoverable() && r.getDiscoverable()) {
                 p = p.getParent();
                 r.setParent(p);
             }

@@ -386,7 +386,7 @@ public abstract class AIPlayer extends AIObject {
                                  market.getSalePriceComparator());
         List<Goods> loot = new ArrayList<>();
         int space = unit.getSpaceLeft();
-        while (!goods.isEmpty() && space > 0) {
+        while (space > 0 && !goods.isEmpty()) {
             Goods g = goods.remove(0);
             if (g.getSpaceTaken() > space) continue; // Approximate
             loot.add(g);

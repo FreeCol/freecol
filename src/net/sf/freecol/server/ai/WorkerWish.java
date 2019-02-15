@@ -222,9 +222,9 @@ public final class WorkerWish extends Wish {
     public boolean equals(Object other) {
         if (other instanceof WorkerWish) {
             WorkerWish ow = (WorkerWish)other;
-            return super.equals(ow)
+            return this.expertNeeded == ow.expertNeeded
                 && Utils.equals(this.unitType, ow.unitType)
-                && this.expertNeeded == ow.expertNeeded;
+                && super.equals(ow);
         }
         return false;
     }

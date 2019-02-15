@@ -1787,7 +1787,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         // quota.  Builders first to keep weak players in the game,
         // scouts next as they are profitable.  Pile onto any existing
         // building mission if there are no colonies.
-        if (!player.hasSettlements() && bcm != null) {
+        if (bcm != null && !player.hasSettlements()) {
             final Location bcmTarget = bcm.getTarget();
             for (AIUnit aiUnit : sort(aiUnits, builderComparator)) {
                 final Location oldTarget = ((m = aiUnit.getMission()) == null)
@@ -1913,7 +1913,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 continue;
             }
 
-            if (unit.isInEurope() && unit.isPerson() && nPorts > 0) {
+            if (nPorts > 0 && unit.isInEurope() && unit.isPerson()) {
                 // Choose a port to add to
                 if (ports == null) ports = player.getConnectedPortList();
                 Colony c = ports.remove(0);

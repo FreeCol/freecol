@@ -730,7 +730,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         int price = 0;
         UnitType unitType = null;
         List<UnitType> unitTypes = new ArrayList<>(mercenaryTypes);
-        while (!unitTypes.isEmpty() && count > 0) {
+        while (count > 0 && !unitTypes.isEmpty()) {
             unitType = getRandomMember(logger, "Merc unit",
                                        unitTypes, random);
             unitTypes.remove(unitType);

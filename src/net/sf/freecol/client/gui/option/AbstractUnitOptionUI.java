@@ -142,7 +142,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
                     n++;
                 }
             }
-            enable = isEditable() && n > 1;
+            enable = n > 1 && isEditable();
         } else {
             model = new DefaultComboBoxModel<>(new String[] {
                     Specification.DEFAULT_ROLE_ID });

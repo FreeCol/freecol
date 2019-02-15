@@ -420,9 +420,9 @@ public final class TradeRouteInputPanel extends FreeColPanel
         @Override
         public boolean importData(JComponent target, Transferable data) {
             JList<TradeRouteStop> stl = TradeRouteInputPanel.this.stopList;
-            if (canImport(target, data.getTransferDataFlavors())
-                && target == stl
-                && data instanceof StopListTransferable) {
+            if (target == stl
+                && data instanceof StopListTransferable
+                && canImport(target, data.getTransferDataFlavors())) {
                 List<TradeRouteStop> stops
                     = ((StopListTransferable)data).getStops();
                 DefaultListModel<TradeRouteStop> model

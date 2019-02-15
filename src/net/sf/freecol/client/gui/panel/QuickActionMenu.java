@@ -564,7 +564,7 @@ public final class QuickActionMenu extends JPopupMenu {
             menuItem = Utility.localizedMenuItem((tempUnit.getSettlement() != null) ? "unload" : "dumpCargo");
             menuItem.setActionCommand(UnitAction.UNLOAD.toString());
             menuItem.addActionListener(unitLabel);
-            menuItem.setEnabled(tempUnit.hasCargo() && !isUnitAtSea);
+            menuItem.setEnabled(!isUnitAtSea && tempUnit.hasCargo());
             this.add(menuItem);
         }
 
