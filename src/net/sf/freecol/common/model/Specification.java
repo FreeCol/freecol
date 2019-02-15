@@ -447,8 +447,11 @@ public final class Specification implements OptionContainer {
 
     /**
      * Update the game and map options from the user configuration files.
+     *
+     * @return True if any option was fixed.
      */
-    public void updateGameAndMapOptions() {
+    public boolean updateGameAndMapOptions() {
+        boolean ret = false;
         String gtag = GameOptions.TAG;
         File gof = FreeColDirectories
             .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
@@ -456,7 +459,7 @@ public final class Specification implements OptionContainer {
             : null;
         if (gog != null) {
             gog = mergeGroup(gog);
-            fixGameOptions();
+            ret |= fixGameOptions();
         } else {
             gog = getOptionGroup(gtag);
         }
@@ -469,11 +472,12 @@ public final class Specification implements OptionContainer {
             : null;
         if (mog != null) {
             mog = mergeGroup(mog);
-            fixMapGeneratorOptions();
+            ret |= fixMapGeneratorOptions();
         } else {
             mog = getOptionGroup(mtag);
         }
         mog.save(mof, null, true);
+        return ret;
     }
         
     /**
