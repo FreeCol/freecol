@@ -1005,15 +1005,15 @@ public final class InGameController extends FreeColClientHolder {
         boolean result = mt.isLegal();
         switch (mt) {
         case MOVE_HIGH_SEAS:
-            // Move on the map if there is no Europe or there is a
-            // destination that is not Europe, move to Europe if it is
-            // the destination, otherwise ask the player.
-            result = (getMyPlayer().getEurope() == null
-                || (destination != null && !(destination instanceof Europe)))
-                ? moveTile(unit, direction)
-                : (destination instanceof Europe)
+            // If the destination is Europe (and valid) move there,
+            // if the destination is null, ask what to do,
+            // otherwise just move on the map.
+            result = (destination instanceof Europe
+                      && getMyPlayer().getEurope() != null)
                 ? moveTowardEurope(unit, (Europe)destination)
-                : moveHighSeas(unit, direction);
+                : (destination == null)
+                ? moveHighSeas(unit, direction)
+                : moveTile(unit, direction);
             break;
         case MOVE:
             result = moveTile(unit, direction);
