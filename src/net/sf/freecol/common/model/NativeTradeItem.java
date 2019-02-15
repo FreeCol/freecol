@@ -225,12 +225,10 @@ public class NativeTradeItem extends GoodsTradeItem {
      */
     @Override
     public boolean equals(Object other) {
-        if (other instanceof NativeTradeItem) {
-            return this.price == ((NativeTradeItem)other).price
-                && this.haggleCount == ((NativeTradeItem)other).haggleCount
-                && super.equals((NativeTradeItem)other);
-        }
-        return false;
+        if (!(other instanceof NativeTradeItem)) return false;
+        return this.price == ((NativeTradeItem)other).price
+            && this.haggleCount == ((NativeTradeItem)other).haggleCount
+            && super.equals((NativeTradeItem)other);
     }
 
     /**

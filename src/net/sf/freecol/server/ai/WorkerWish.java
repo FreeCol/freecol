@@ -226,13 +226,11 @@ public final class WorkerWish extends Wish {
      */
     @Override
     public boolean equals(Object other) {
-        if (other instanceof WorkerWish) {
-            WorkerWish ow = (WorkerWish)other;
-            return this.expertNeeded == ow.expertNeeded
-                && Utils.equals(this.unitType, ow.unitType)
-                && super.equals(ow);
-        }
-        return false;
+        if (!(other instanceof WorkerWish)) return false;
+        WorkerWish ow = (WorkerWish)other;
+        return this.expertNeeded == ow.expertNeeded
+            && Utils.equals(this.unitType, ow.unitType)
+            && super.equals(ow);
     }
 
     /**

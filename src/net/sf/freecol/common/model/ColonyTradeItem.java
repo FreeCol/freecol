@@ -194,12 +194,10 @@ public class ColonyTradeItem extends TradeItem {
      */
     @Override
     public boolean equals(Object other) {
-        if (other instanceof ColonyTradeItem) {
-            return Utils.equals(this.colonyId, ((ColonyTradeItem)other).colonyId)
-                && Utils.equals(this.colonyName, ((ColonyTradeItem)other).colonyName)
-                && super.equals(other);
-        }
-        return false;
+        if (!(other instanceof ColonyTradeItem)) return false;
+        return Utils.equals(this.colonyId, ((ColonyTradeItem)other).colonyId)
+            && Utils.equals(this.colonyName, ((ColonyTradeItem)other).colonyName)
+            && super.equals(other);
     }
 
     /**

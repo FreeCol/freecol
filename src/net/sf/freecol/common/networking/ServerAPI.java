@@ -144,8 +144,7 @@ public abstract class ServerAPI {
         final Connection c = getConnection();
         if (c == null) {
             logger.log(Level.WARNING, "Not connected, did not " + operation
-                       + ": " + type);
-            return null;
+                + ": " + type);
         }
         return c;
     }

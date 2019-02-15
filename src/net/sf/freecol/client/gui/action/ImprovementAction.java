@@ -60,14 +60,12 @@ public class ImprovementAction extends UnitAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        if (super.shouldBeEnabled()) {
-            Unit selectedUnit = getGUI().getActiveUnit();
-            Tile tile = selectedUnit.getTile();
-            return tile != null && tile.isImprovementTypeAllowed(improvement)
-                && improvement.isWorkerAllowed(selectedUnit)
-                && selectedUnit.checkSetState(Unit.UnitState.IMPROVING);
-        }
-        return false;
+        if (!super.shouldBeEnabled()) return false;
+        Unit selectedUnit = getGUI().getActiveUnit();
+        Tile tile = selectedUnit.getTile();
+        return tile != null && tile.isImprovementTypeAllowed(improvement)
+            && improvement.isWorkerAllowed(selectedUnit)
+            && selectedUnit.checkSetState(Unit.UnitState.IMPROVING);
     }
 
 

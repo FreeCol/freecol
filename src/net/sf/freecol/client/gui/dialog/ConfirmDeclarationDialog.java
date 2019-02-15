@@ -437,13 +437,11 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
     @Override
     public List<String> getResponse() {
         Object value = getValue();
-        if (options.get(0).equals(value)) {
-            List<String> result = new ArrayList<>();
-            // Sanitize user input, used in save file name
-            result.add(this.nationField.getText().replaceAll("[^\\s\\w]", ""));
-            result.add(this.countryField.getText());
-            return result;
-        }
-        return null;
+        if (!options.get(0).equals(value)) return null;
+        List<String> result = new ArrayList<>();
+        // Sanitize user input, used in save file name
+        result.add(this.nationField.getText().replaceAll("[^\\s\\w]", ""));
+        result.add(this.countryField.getText());
+        return result;
     }
 }
