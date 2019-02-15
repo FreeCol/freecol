@@ -987,23 +987,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     }
 
     /**
-     * Gets the needed wagons for a tile/contiguity.
-     *
-     * @param tile The {@code Tile} to derive the contiguity from.
-     * @return The number of wagons needed.
-     */
-    public int getNeededWagons(Tile tile) {
-        if (tile != null) {
-            int contig = tile.getContiguity();
-            if (contig > 0) {
-                Integer i = wagonsNeeded.get(contig);
-                if (i != null) return i;
-            }
-        }
-        return 0;
-    }
-
-    /**
      * Changes the needed wagons map for a specified tile/contiguity.
      * If the change is zero, that is a special flag that a connected
      * port is available, and thus that the map should be initialized
@@ -1349,26 +1332,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     }
 
     /**
-     * Notify that a wish has been completed.  Called from AIColony.
-     *
-     * @param w The {@code Wish} to complete.
-     */
-    @Override
-    public void completeWish(Wish w) {
-        if (w instanceof WorkerWish) {
-            WorkerWish ww = (WorkerWish)w;
-            List<WorkerWish> wl = workerWishes.get(ww.getUnitType());
-            if (wl != null) wl.remove(ww);
-        } else if (w instanceof GoodsWish) {
-            GoodsWish gw = (GoodsWish)w;
-            List<GoodsWish> gl = goodsWishes.get(gw.getGoodsType());
-            if (gl != null) gl.remove(gw);
-        } else {
-            throw new IllegalStateException("Bogus wish: " + w);
-        }
-    }
-
-    /**
      * Consume a WorkerWish, yielding a WishRealizationMission for a unit.
      *
      * @param aiUnit The {@code AIUnit} to check.
@@ -1437,33 +1400,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             : 0;
     }
 
-    /**
-     * How many pioneers should we have?
-     *
-     * This is the desired total number, not the actual number which would
-     * take into account the number of existing PioneeringMissions.
-     *
-     * @return The desired number of pioneers for this player.
-     */
-    public int pioneersNeeded() {
-        return (tipMap.size() + 1) / 2;
-    }
-
-    /**
-     * How many scouts should we have?
-     *
-     * This is the desired total number, not the actual number which would
-     * take into account the number of existing ScoutingMissions.
-     *
-     * Current scheme for European AIs is to use up to three scouts in
-     * the early part of the game, then one.
-     *
-     * @return The desired number of scouts for this player.
-     */
-    @Override
-    public int scoutsNeeded() {
-        return 3 - (getGame().getTurn().getNumber() / 100);
-    }
 
     /**
      * Asks the server to recruit a unit in Europe on behalf of the AIPlayer.
@@ -2694,6 +2630,69 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         return bestFather;
     }
 
+    /**
+     * Gets the needed wagons for a tile/contiguity.
+     *
+     * @param tile The {@code Tile} to derive the contiguity from.
+     * @return The number of wagons needed.
+     */
+    public int getNeededWagons(Tile tile) {
+        if (tile != null) {
+            int contig = tile.getContiguity();
+            if (contig > 0) {
+                Integer i = wagonsNeeded.get(contig);
+                if (i != null) return i;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * How many pioneers should we have?
+     *
+     * This is the desired total number, not the actual number which would
+     * take into account the number of existing PioneeringMissions.
+     *
+     * @return The desired number of pioneers for this player.
+     */
+    public int pioneersNeeded() {
+        return (tipMap.size() + 1) / 2;
+    }
+
+    /**
+     * How many scouts should we have?
+     *
+     * This is the desired total number, not the actual number which would
+     * take into account the number of existing ScoutingMissions.
+     *
+     * Current scheme for European AIs is to use up to three scouts in
+     * the early part of the game, then one.
+     *
+     * @return The desired number of scouts for this player.
+     */
+    public int scoutsNeeded() {
+        return 3 - (getGame().getTurn().getNumber() / 100);
+    }
+
+    /**
+     * Notify that a wish has been completed.  Called from AIColony.
+     *
+     * @param w The {@code Wish} to complete.
+     */
+    public void completeWish(Wish w) {
+        if (w instanceof WorkerWish) {
+            WorkerWish ww = (WorkerWish)w;
+            List<WorkerWish> wl = workerWishes.get(ww.getUnitType());
+            if (wl != null) wl.remove(ww);
+        } else if (w instanceof GoodsWish) {
+            GoodsWish gw = (GoodsWish)w;
+            List<GoodsWish> gl = goodsWishes.get(gw.getGoodsType());
+            if (gl != null) gl.remove(gw);
+        } else {
+            throw new IllegalStateException("Bogus wish: " + w);
+        }
+    }
+    
 
     // Serialization
 

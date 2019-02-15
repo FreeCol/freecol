@@ -957,6 +957,34 @@ public final class NativeAIPlayer extends MissionAIPlayer {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int getNeededWagons(Tile tile) {
+        throw new RuntimeException("Can not happen");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int pioneersNeeded() {
+        throw new RuntimeException("Can not happen");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int scoutsNeeded() {
+        throw new RuntimeException("Can not happen");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void completeWish(Wish w) {
+        throw new RuntimeException("Can not happen");
+    }
+    
 
     // Serialization
 

@@ -590,18 +590,46 @@ public abstract class AIPlayer extends AIObject {
     }
 
 
-    // European players need to implement these for AIColony
+    // European players need to implement these for AIColony, other players
+    // can throw a can-not-happen error
 
-    public int getNeededWagons(Tile tile) {
-        return 0;
-    }
+    /**
+     * Gets the needed wagons for a tile/contiguity.
+     *
+     * @param tile The {@code Tile} to derive the contiguity from.
+     * @return The number of wagons needed.
+     */
+    public abstract int getNeededWagons(Tile tile);
 
-    public int scoutsNeeded() {
-        return 0;
-    }
+    /**
+     * How many pioneers should we have?
+     *
+     * This is the desired total number, not the actual number which would
+     * take into account the number of existing PioneeringMissions.
+     *
+     * @return The desired number of pioneers for this player.
+     */
+    public abstract int pioneersNeeded();
 
-    public void completeWish(Wish w) {
-    }
+    /**
+     * How many scouts should we have?
+     *
+     * This is the desired total number, not the actual number which would
+     * take into account the number of existing ScoutingMissions.
+     *
+     * Current scheme for European AIs is to use up to three scouts in
+     * the early part of the game, then one.
+     *
+     * @return The desired number of scouts for this player.
+     */
+    public abstract int scoutsNeeded();
+
+    /**
+     * Notify that a wish has been completed.  Called from AIColony.
+     *
+     * @param w The {@code Wish} to complete.
+     */
+    public abstract void completeWish(Wish w);
 
 
     // Serialization

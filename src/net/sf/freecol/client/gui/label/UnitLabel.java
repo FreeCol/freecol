@@ -427,7 +427,7 @@ public final class UnitLabel extends FreeColLabel
             }
         } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
                 getParent() instanceof InPortPanel ||
-                getParent() instanceof EuropePanel.DocksPanel ||
+                getParent() instanceof EuropePanel.EuropeanDocksPanel ||
                 getParent().getParent() instanceof ReportPanel) {
             String text = Messages.message(unit.getOccupationLabel(player, false));
             g.drawImage(lib.getOccupationIndicatorChip((Graphics2D)g, unit, text), 0, 0, null);

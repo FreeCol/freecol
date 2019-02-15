@@ -214,8 +214,6 @@ public class ServerPlayer extends Player implements TurnTaker {
     public final void initialize(Game game, boolean admin, Nation nation) {
         if (nation == null) throw new RuntimeException("Null nation");
 
-        this.initialize(game); // Attach to game
-        
         this.name = nation.getRulerName();
         this.admin = admin;
         this.nationId = nation.getId();

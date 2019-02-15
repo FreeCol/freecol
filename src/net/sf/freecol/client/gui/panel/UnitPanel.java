@@ -88,16 +88,12 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Add any property change listeners.
      */
-    protected void addPropertyChangeListeners() {
-        // do nothing
-    }
+    protected void addPropertyChangeListeners() {}
 
     /**
      * Remove any property change listeners.
      */
-    protected void removePropertyChangeListeners() {
-        // do nothing
-    }
+    protected void removePropertyChangeListeners() {}
 
     /**
      * Update this unit panel.
@@ -159,9 +155,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Select a UnitLabel based on some criterion.
      */
-    public void selectLabel() {
-        // Default to doing nothing
-    }
+    public abstract void selectLabel();
 
     /**
      * Select a given unit.

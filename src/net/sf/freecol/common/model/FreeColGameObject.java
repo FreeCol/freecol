@@ -101,14 +101,6 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Initialize and register this object in a given game.
-     *
-     * @param game The {@code Game} to attach this object to.
-     */
-    public final void initialize(Game game) {
-    }
-        
-    /**
      * Sets the unique identifier of this object and registers it in its
      * {@code Game} with that identifier, i.e. "intern" this object.
      *

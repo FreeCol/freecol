@@ -1379,6 +1379,14 @@ public final class ColonyPanel extends PortPanel
          * {@inheritDoc}
          */
         @Override
+        public void selectLabel() {
+            // do nothing
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public Component add(Component comp, boolean editState) {
             Container oldParent = comp.getParent();
             if (editState) {

@@ -274,7 +274,8 @@ public abstract class FreeColObject
      *
      * @param specification The {@code Specification} to use.
      */
-    protected void setSpecification(@SuppressWarnings("unused") Specification specification) {}
+    protected void setSpecification(@SuppressWarnings("unused")
+                                    Specification specification) {}
 
 
     // Game handling.
