@@ -178,11 +178,12 @@ public class ServerPlayer extends Player implements TurnTaker {
      * Special constructor to make a simple stub player with only the
      * connection information valid.  Needed when a new player logs in.
      *
+     * @param game The {@code Game} this player belongs to.
      * @param connection The initial {@code Connection}.
      */
-    public ServerPlayer(Connection connection) {
-        super(null);
-
+    public ServerPlayer(Game game, Connection connection) {
+        super(game);
+        
         setConnection(connection);
     }
 

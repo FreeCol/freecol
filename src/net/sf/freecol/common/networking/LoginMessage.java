@@ -210,7 +210,7 @@ public class LoginMessage extends ObjectMessage {
 
         } else {
             // OK, make a new player and complete initialization...
-            ServerPlayer serverPlayer = new ServerPlayer(connection);
+            ServerPlayer serverPlayer = new ServerPlayer(serverGame, connection);
             serverPlayer.initialize(serverGame,
                                     serverGame.getLivePlayerList().isEmpty(),
                                     nation);
