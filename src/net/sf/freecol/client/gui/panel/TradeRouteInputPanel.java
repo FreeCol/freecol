@@ -107,7 +107,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
             super(icon);
 
             this.goodsType = type;
-            setDisabledIcon(getDisabledIcon());
         }
 
         /**
@@ -777,6 +776,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * Convenience function to build a new {@code TradeRouteCargoLabel}.
      *
      * @param gt The {@code GoodsType} for the label.
+     * @return A {@code TradeRouteCargoLabel} for the goods type.
      */
     private TradeRouteCargoLabel buildCargoLabel(GoodsType gt) {
         final ImageLibrary lib = getImageLibrary();
