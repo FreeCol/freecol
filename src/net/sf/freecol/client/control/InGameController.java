@@ -2056,7 +2056,7 @@ public final class InGameController extends FreeColClientHolder {
             final GoodsType type = ag.getType();
             int present = stop.getGoodsCount(type);
             int exportAmount = stop.getExportAmount(type, 0);
-            int importAmount = FreeColObject.INFINITY;
+            int importAmount = INFINITY;
             TradeRouteStop unload = null;
             if (enhancedTradeRoutes) {
                 final List<TradeRouteStop> stops = unit.getCurrentStops();

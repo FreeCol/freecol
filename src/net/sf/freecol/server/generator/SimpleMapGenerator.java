@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -900,8 +901,7 @@ public class SimpleMapGenerator implements MapGenerator {
         new ServerUnit(game, galleon, player, unitType);
 
         Tile colonyTile = null;
-        for (Tile tempTile : map.getCircleTiles(startTile, true, 
-                                                FreeColObject.INFINITY)) {
+        for (Tile tempTile : map.getCircleTiles(startTile, true, INFINITY)) {
             if (tempTile.isPolar()) continue; // No initial polar colonies
             if (player.canClaimToFoundSettlement(tempTile)) {
                 colonyTile = tempTile;

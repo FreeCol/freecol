@@ -22,6 +22,7 @@ package net.sf.freecol.common.option;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Specification;
 
 

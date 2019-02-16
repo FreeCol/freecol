@@ -72,9 +72,6 @@ public abstract class FreeColObject
             };
 
 
-    public static final int INFINITY = Integer.MAX_VALUE;
-    public static final int UNDEFINED = Integer.MIN_VALUE;
-
     /** Fallback class index. */
     protected static final int DEFAULT_CLASS_INDEX = 1000;
 

@@ -31,6 +31,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;

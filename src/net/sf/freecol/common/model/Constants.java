@@ -27,6 +27,12 @@ package net.sf.freecol.common.model;
  */
 public interface Constants {
 
+    /** Generic "huge" value. */
+    public static final int INFINITY = Integer.MAX_VALUE;
+
+    /** Generic "unsure" value. */
+    public static final int UNDEFINED = Integer.MIN_VALUE;
+
     /** The result of checkIntegrity. */
     public static enum IntegrityType {
         INTEGRITY_GOOD(1),

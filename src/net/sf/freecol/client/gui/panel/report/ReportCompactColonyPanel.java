@@ -54,8 +54,8 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.ExportData;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -741,7 +741,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         if (s.build != null) {
             int turns = s.completeTurns;
             String bname = Messages.getName(s.build);
-            if (turns == FreeColObject.UNDEFINED) {
+            if (turns == UNDEFINED) {
                 t = stpld("report.colony.making.noconstruction")
                         .addName("%colony%", s.colony.getName());
                 b = newButton(qac, bname, null, cWarn, t);

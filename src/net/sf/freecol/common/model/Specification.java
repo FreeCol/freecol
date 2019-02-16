@@ -47,6 +47,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.option.AbstractOption;
@@ -769,7 +770,7 @@ public final class Specification implements OptionContainer {
                 spread.setMaximumValue(100);
                 prices.add(spread);
                 addAbstractOption(spread);
-            } else if (goodsType.getPrice() < FreeColSpecObjectType.INFINITY) {
+            } else if (goodsType.getPrice() < INFINITY) {
                 IntegerOption price
                     = new IntegerOption(base + "price", this);
                 price.setValue(goodsType.getPrice());

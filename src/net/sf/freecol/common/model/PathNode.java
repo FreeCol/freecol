@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.model;
 
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.util.LogBuilder;
 
@@ -277,8 +278,8 @@ public class PathNode {
      * @return The cost of moving to a {@code PathNode}.
      */
     public static int getCost(int turns, int movesLeft) {
-        return (turns >= FreeColObject.INFINITY / (TURN_FACTOR + 1))
-            ? FreeColObject.INFINITY
+        return (turns >= INFINITY / (TURN_FACTOR + 1))
+            ? INFINITY
             : TURN_FACTOR * turns + (TURN_FACTOR - movesLeft);
     }
         

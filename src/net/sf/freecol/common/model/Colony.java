@@ -1026,8 +1026,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public boolean canBreed(GoodsType goodsType) {
         int breedingNumber = goodsType.getBreedingNumber();
-        return (breedingNumber < GoodsType.INFINITY &&
-                breedingNumber <= getGoodsCount(goodsType));
+        return (breedingNumber < INFINITY
+            && breedingNumber <= getGoodsCount(goodsType));
     }
 
     /**
@@ -2754,9 +2754,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             int available = getGoodsCount(goods.getType());
 
             int breedingNumber = goods.getType().getBreedingNumber();
-            if (breedingNumber != GoodsType.INFINITY) {
-                available -= breedingNumber;
-            }
+            if (breedingNumber != INFINITY) available -= breedingNumber;
 
             if (buildable != null) {
                 available -= AbstractGoods.getCount(goods.getType(),

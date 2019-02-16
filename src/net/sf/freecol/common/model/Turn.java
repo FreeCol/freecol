@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
+import static net.sf.freecol.common.model.Constants.*;
 
 
 /**
@@ -253,7 +254,7 @@ public class Turn {
      * @return A descriptive string.
      */
     public static String getTurnsText(int turns) {
-        return (turns == FreeColObject.UNDEFINED)
+        return (turns == UNDEFINED)
             ? Messages.message("notApplicable")
             : (turns >= 0) ? Integer.toString(turns)
             : ">" + Integer.toString(-turns - 1);

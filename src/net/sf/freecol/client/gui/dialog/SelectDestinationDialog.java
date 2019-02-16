@@ -57,6 +57,7 @@ import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -483,7 +484,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                                              tradePred, settlementTileMapper));
         MultipleAdjacentDecider md = new MultipleAdjacentDecider(locs);
         unit.search(unit.getLocation(), md.getGoalDecider(), null,
-                    FreeColObject.INFINITY, null);
+                    INFINITY, null);
         final Function<Entry<Location, PathNode>, Destination> dmapper = e -> {
             Settlement s = e.getKey().getTile().getSettlement();
             PathNode p = e.getValue();

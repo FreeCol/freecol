@@ -22,6 +22,7 @@ package net.sf.freecol.common.model.pathfinding;
 import java.util.function.Predicate;
 
 import net.sf.freecol.common.model.Ability;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -116,7 +117,7 @@ public final class CostDeciders {
         public int getCost(Unit unit, Location oldLocation,
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
-            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY) {
+            if (cost != ILLEGAL_MOVE && cost != INFINITY) {
                 if (newLocation instanceof Europe) {
                     ; // ok
                 } else if (!newLocation.getTile().isExploredBy(unit.getOwner())) {
@@ -142,7 +143,7 @@ public final class CostDeciders {
         public int getCost(Unit unit, Location oldLocation,
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
-            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY) {
+            if (cost != ILLEGAL_MOVE && cost != INFINITY) {
                 Settlement settlement = newLocation.getSettlement();
                 if (settlement != null
                     && settlement.getOwner() != unit.getOwner()) {
@@ -171,7 +172,7 @@ public final class CostDeciders {
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
             Tile tile = newLocation.getTile();
-            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY
+            if (cost != ILLEGAL_MOVE && cost != INFINITY
                 && tile != null) {
                 final Unit defender = tile.getFirstUnit();
                 if (defender != null
@@ -208,7 +209,7 @@ public final class CostDeciders {
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
             Tile tile = newLocation.getTile();
-            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY && tile != null) {
+            if (cost != ILLEGAL_MOVE && cost != INFINITY && tile != null) {
                 // Move might end if there is a credible naval
                 // threat in an adjacent tile.
                 final Player owner = unit.getOwner();
@@ -260,7 +261,7 @@ public final class CostDeciders {
                 for (int i = 0; i < costDeciders.length; i++) {
                     int cost = costDeciders[i].getCost(unit, oldLocation,
                                                        newLocation, movesLeft);
-                    if (cost == ILLEGAL_MOVE || cost == Map.INFINITY) {
+                    if (cost == ILLEGAL_MOVE || cost == INFINITY) {
                         index = i;
                         return ILLEGAL_MOVE;
                     }

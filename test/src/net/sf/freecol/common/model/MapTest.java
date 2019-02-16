@@ -26,7 +26,7 @@ import java.util.Random;
 import java.util.Set;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.FreeColObject;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
@@ -388,7 +388,7 @@ public class MapTest extends FreeColTestCase {
 
         PathNode path = map.search(artillery, unitTile, gd,
                                    CostDeciders.avoidIllegal(),
-                                   FreeColObject.INFINITY, galleon, null);
+                                   INFINITY, galleon, null);
         assertTrue("Should find the French colony via a drop off",
                    path != null && path.getTransportDropNode() != null
                    && path.getLastNode().getTile() == colonyTile);
@@ -401,7 +401,7 @@ public class MapTest extends FreeColTestCase {
                    colonyTile2.hasSettlement());
         path = map.search(artillery, unitTile, gd,
                           CostDeciders.avoidIllegal(),
-                          FreeColObject.INFINITY, galleon, null);
+                          INFINITY, galleon, null);
         assertTrue("Should still find the first French colony via a drop off",
                    path != null && path.getTransportDropNode() != null
                    && path.getLastNode().getTile() == colonyTile);

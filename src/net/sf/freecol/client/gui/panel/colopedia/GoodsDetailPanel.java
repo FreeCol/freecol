@@ -37,7 +37,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.FreeColObject;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Role;
@@ -198,7 +198,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             }
         }
 
-        if (type.getBreedingNumber() < FreeColObject.INFINITY) {
+        if (type.getBreedingNumber() < INFINITY) {
             panel.add(Utility.localizedLabel("colopedia.goods.breedingNumber"),
                       "newline 20");
             panel.add(new JLabel(Integer.toString(type.getBreedingNumber())));

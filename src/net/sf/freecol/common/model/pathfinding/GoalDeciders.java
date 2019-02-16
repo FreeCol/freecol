@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.FreeColObject;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
@@ -206,7 +206,7 @@ public final class GoalDeciders {
     public static GoalDecider getLocationGoalDecider(final Location target) {
         return new GoalDecider() {
             private PathNode best = null;
-            private int bestCost = FreeColObject.INFINITY;
+            private int bestCost = INFINITY;
 
             @Override
             public PathNode getGoal() { return best; }
