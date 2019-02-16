@@ -3950,6 +3950,16 @@ public class Player extends FreeColGameObject implements Nameable {
         if (monarch != null) {
             result = result.combine(monarch.checkIntegrity(fix, lb));
         }
+        for (TradeRoute tr : new ArrayList<>(this.tradeRoutes)) {
+            IntegrityType tri = tr.checkIntegrity(fix, lb);
+            if (!tri.safe()) {
+                lb.add("\n  Dropping trade route: " + tr.getId());
+                removeTradeRoute(tr);
+                result = result.fix();
+            } else {
+                result = result.combine(tri);
+            }
+        }
         return result;
     }
 

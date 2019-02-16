@@ -121,6 +121,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     public boolean isValid(Player player) {
         return (location instanceof TradeLocation)
             && !((FreeColGameObject)location).isDisposed()
+            && ((FreeColGameObject)location).isInitialized()
             && ((location instanceof Ownable)
                 && player.owns((Ownable)location));
     }
