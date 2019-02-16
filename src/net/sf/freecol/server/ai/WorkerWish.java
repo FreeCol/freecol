@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -154,11 +155,11 @@ public final class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (unitType == null) {
             lb.add("\n  Wish unit without type: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }

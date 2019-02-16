@@ -42,7 +42,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.Constants;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -543,7 +543,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
                 || owner.isEuropean()
                 || !player.canClaimForSettlement(t)) continue;
             if (owner.atWarWith(player)) {
-                if (AIMessage.askClaimLand(t, this, Constants.STEAL_LAND)
+                if (AIMessage.askClaimLand(t, this, STEAL_LAND)
                     && player.owns(t)) {
                     lb.add(", stole tile ", t,
                           " from hostile ", owner.getName());
@@ -564,7 +564,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         }
         if (steal != null) {
             Player owner = steal.getOwner();
-            if (AIMessage.askClaimLand(steal, this, Constants.STEAL_LAND)
+            if (AIMessage.askClaimLand(steal, this, STEAL_LAND)
                 && player.owns(steal)) {
                 lb.add(", stole tile ", steal, " (score = ", score,
                       ") from ", owner.getName());
@@ -741,7 +741,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
             for (AIGoods aig : getExportGoods()) {
                 if (aig == null) {
                     ; // removeExportGoods(aig);
-                } else if (aig.checkIntegrity(false) < 0) {
+                } else if (!aig.checkIntegrity(false).safe()) {
                     goodsLog(aig, "reaps", lb);
                     dropExportGoods(aig);
                 } else if (aig.getGoods().getLocation() != colony) {
@@ -1417,11 +1417,11 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (colony == null || colony.isDisposed()) {
             lb.add("\n  Null colony: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }
@@ -1451,7 +1451,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         super.writeChildren(xw);
 
         for (AIGoods ag : getExportGoods()) {
-            if (ag.checkIntegrity(true) < 0) continue;
+            if (!ag.checkIntegrity(true).safe()) continue;
             xw.writeStartElement(AI_GOODS_LIST_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, ag);
@@ -1460,7 +1460,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         for (TileImprovementPlan tip : tileImprovementPlans) {
-            if (tip.checkIntegrity(true) < 0) continue;
+            if (!tip.checkIntegrity(true).safe()) continue;
 
             xw.writeStartElement(TILE_IMPROVEMENT_PLAN_LIST_TAG);
 
@@ -1473,7 +1473,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
             String tag = (w instanceof GoodsWish) ? GOODS_WISH_LIST_TAG
                 : (w instanceof WorkerWish) ? WORKER_WISH_LIST_TAG
                 : null;
-            if (w.checkIntegrity(true) < 0 || !w.shouldBeStored()
+            if (!w.checkIntegrity(true).safe() || !w.shouldBeStored()
                 || tag == null) continue;
 
             xw.writeStartElement(tag);

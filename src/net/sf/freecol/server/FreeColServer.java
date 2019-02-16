@@ -53,6 +53,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.metaserver.MetaServerUtils;
 import net.sf.freecol.common.metaserver.ServerInfo;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
@@ -213,7 +214,7 @@ public final class FreeColServer {
     private MapGenerator mapGenerator = null;
 
     /** The game integrity state. */
-    private int integrity = 1;
+    private IntegrityType integrity = IntegrityType.INTEGRITY_GOOD;
 
 
     /**
@@ -597,7 +598,7 @@ public final class FreeColServer {
      *
      * @return The integrity check result.
      */
-    public int getIntegrity() {
+    public IntegrityType getIntegrity() {
         return this.integrity;
     }
 
@@ -1066,10 +1067,10 @@ public final class FreeColServer {
         LogBuilder lb = new LogBuilder(512);
         this.integrity = serverGame.checkIntegrity(true, lb);
         switch (integrity) {
-        case 1:
+        case INTEGRITY_GOOD:
             logger.info("Game integrity test succeeded.");
             break;
-        case 0:
+        case INTEGRITY_FIXED:
             logger.info("Game integrity test failed, but fixed." + lb);
             break;
         default:
@@ -1087,18 +1088,18 @@ public final class FreeColServer {
         // AI initialization.
         AIMain aiMain = getAIMain();
         lb.truncate(0);
-        int aiIntegrity;
+        IntegrityType aiIntegrity = IntegrityType.INTEGRITY_GOOD;
         if (aiMain == null) {
-            aiIntegrity = -1;
+            aiIntegrity = aiIntegrity.fail();
             lb.add("\n  AIMain missing.");
         } else {
             aiIntegrity = aiMain.checkIntegrity(true, lb);
         }
         switch (aiIntegrity) {
-        case 1:
+        case INTEGRITY_GOOD:
             logger.info("AI integrity test succeeded.");
             break;
-        case 0:
+        case INTEGRITY_FIXED:
             logger.info("AI integrity test failed, but fixed." + lb);
             break;
         default:

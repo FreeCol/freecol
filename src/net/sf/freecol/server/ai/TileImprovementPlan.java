@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
@@ -270,17 +271,17 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (pioneer != null) {
-            result = Math.min(result, pioneer.checkIntegrity(fix, lb));
+            result = result.combine(pioneer.checkIntegrity(fix, lb));
         }
         if (type == null) {
             lb.add("\n  Tile improvement plan without type: ", getId());
-            result = -1;
+            result = result.fail();
         } else if (target == null) {
             lb.add("\n  Tile improvement plan without target: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }
@@ -312,7 +313,9 @@ public class TileImprovementPlan extends ValuedAIObject {
 
         xw.writeAttribute(TARGET_TAG, target);
 
-        if (pioneer != null && pioneer.checkIntegrity(false) > 0) {
+        // Only write the pioneer if it is in good condition
+        if (pioneer != null
+            && pioneer.checkIntegrity(false) == IntegrityType.INTEGRITY_GOOD) {
             xw.writeAttribute(PIONEER_TAG, pioneer);
         }
     }

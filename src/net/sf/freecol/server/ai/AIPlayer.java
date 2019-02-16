@@ -32,6 +32,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -253,14 +254,14 @@ public abstract class AIPlayer extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (player == null || player.isDisposed()) {
             lb.add("\n  AIPlayer without underlying player: ", getId());
-            result = -1;
+            result = result.fail();
         } else if (!player.isAI()) {
             lb.add("\n  AIPlayer that is not an AI: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }

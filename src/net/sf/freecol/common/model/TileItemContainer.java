@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Layer;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -515,10 +516,10 @@ public class TileItemContainer extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         for (TileItem ti : getTileItems()) {
-            int integ = ti.checkIntegrity(fix, lb);
+            IntegrityType integ = ti.checkIntegrity(fix, lb);
             if (fix) {
                 // There might still be maps floating around with
                 // rivers that go nowhere.
@@ -530,7 +531,7 @@ public class TileItemContainer extends FreeColGameObject {
                         // got upgraded with 0.11.x (x<6), so better be safe.
                         if (tim.getStyle() == null) {
                             lb.add("\n  TileImprovement null river style: ", tim);
-                            integ = -1;
+                            integ = integ.fail();
                         } else
                         // end @compat
 
@@ -540,19 +541,19 @@ public class TileItemContainer extends FreeColGameObject {
                         // would be changed to filter these out.
                         if ("0000".equals(tim.getStyle().toString())) {
                             lb.add("\n  TileImprovement 0000 river: ", tim);
-                            integ = -1;
+                            integ = integ.fail();
                         }
                     }
                 }
 
-                if (integ < 0) {
+                if (!integ.safe()) {
                     logger.warning("Removing broken TileImprovement: "
                         + ti.getId());
                     removeTileItem(ti);
-                    integ = 0;
+                    integ = integ.fix();
                 }
             }
-            result = Math.min(result, integ);
+            result = result.combine(integ);
         }
         return result;
     }

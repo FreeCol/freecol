@@ -40,6 +40,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -2397,24 +2398,25 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         Settlement settlement = getSettlement();
         if (settlement != null) {
-            result = Math.min(result, settlement.checkIntegrity(fix, lb));
+            result = result.combine(settlement.checkIntegrity(fix, lb));
         }
         if (tileItemContainer != null) {
-            result = Math.min(result, tileItemContainer.checkIntegrity(fix, lb));
+            result = result.combine(tileItemContainer.checkIntegrity(fix, lb));
         }
         if (type == null) {
             lb.add("\n  Tile has no type: ", getId());
-            result = -1; // Fundamentally unfixable
+            result = result.fail(); // Fundamentally unfixable
         } else if (isLand() && Boolean.TRUE.equals(moveToEurope)) {
             lb.add("\n  Tile is land but has move-to-Europe: ", getId());
             if (fix) {
                 moveToEurope = Boolean.FALSE;
+                result = result.fix();
             } else {
-                result = -1;
+                result = result.fail();
             }
         }
         return result;

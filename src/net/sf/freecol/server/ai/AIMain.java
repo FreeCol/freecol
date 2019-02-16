@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
 import net.sf.freecol.common.model.FreeColObject;
@@ -362,21 +363,21 @@ public class AIMain extends FreeColObject
      * @return -1 if there are problems remaining, zero if problems
      *     were fixed, +1 if no problems found at all.
      */
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = 1;
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = IntegrityType.INTEGRITY_GOOD;
         for (AIObject aio : getAIObjects()) {
-            int integ = aio.checkIntegrity(fix, lb);
-            if (integ < 0) {
+            IntegrityType integ = aio.checkIntegrity(fix, lb);
+            if (!integ.safe()) {
                 if (fix) {
                     lb.add("\n  Invalid AIObject dropped: ", aio.getId(),
                         "(", lastPart(aio.getClass().getName(), "."), ")");
                     removeAIObject(aio.getId());
                     aio.dispose();
-                    result = Math.min(result, 0);
+                    result = result.fix();
                 } else {
                     lb.add("\n  Invalid AIObject: ", aio.getId(),
                         "(", lastPart(aio.getClass().getName(), "."), ")");
-                    result = -1;
+                    result = result.fail();
                 }
             }
         }
@@ -387,10 +388,10 @@ public class AIMain extends FreeColObject
                 if (fix) {
                     lb.add("\n  Missing AIObject added: ", fcgo.getId());
                     setFreeColGameObject(fcgo.getId(), fcgo);
-                    result = Math.min(result, 0);
+                    result = result.fix();
                 } else {
                     lb.add("\n  Missing AIObject: ", fcgo.getId());
-                    result = -1;
+                    result = result.fail();
                 }
             }
         }
@@ -528,7 +529,7 @@ public class AIMain extends FreeColObject
         super.writeChildren(xw);
 
         for (AIObject aio : sort(getAIObjects())) {
-            if (aio.checkIntegrity(false) < 0) {
+            if (!aio.checkIntegrity(false).safe()) {
                 // We expect to see integrity failure when AIGoods are
                 // aboard a unit that gets destroyed or if its
                 // destination is destroyed, and probably more.  These

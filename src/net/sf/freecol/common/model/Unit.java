@@ -37,6 +37,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.CombatModel;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -4258,16 +4259,16 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (this.role == null) {
             if (fix) {
                 this.role = getSpecification().getDefaultRole();
                 lb.add("\n  Missing role set to default for: ", getId());
-                result = Math.min(result, 0);
+                result = result.fix();
             } else {
                 lb.add("\n  Missing role for: ", getId());
-                result = -1;
+                result = result.fail();
             }
         }
         if (this.destination != null) {
@@ -4276,10 +4277,10 @@ public class Unit extends GoodsLocation
                     this.destination = null;
                     lb.add("\n  Uninitialized destination cleared for: ",
                         getId());
-                    result = Math.min(result, 0);
+                    result = result.fix();
                 } else {
                     lb.add("\n  Uninitialized destination for: ", getId());
-                    result = -1;
+                    result = result.fail();
                 }
             }
         }
@@ -4291,10 +4292,10 @@ public class Unit extends GoodsLocation
                 this.state = UnitState.ACTIVE;
                 lb.add("\n  Improving unit without improvement made active: ",
                     getId());
-                result = Math.min(result, 0);
+                result = result.fix();
             } else {
                 lb.add("\n  Improving unit without improvement: ", getId());
-                result = -1;
+                result = result.fail();
             }
         }
         return result;

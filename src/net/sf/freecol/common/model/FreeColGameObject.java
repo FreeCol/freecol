@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -255,11 +256,10 @@ public abstract class FreeColGameObject extends FreeColObject {
      *
      * @param fix If true, fix problems if possible.
      * @param lb A {@code LogBuilder} to log to.
-     * @return -1 if there are problems remaining, zero if problems
-     *     were fixed, +1 if no problems found at all.
+     * @return A suitable {@code IntegrityType}.
      */
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        return 1;
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        return IntegrityType.INTEGRITY_GOOD;
     }
 
     // Override FreeColObject

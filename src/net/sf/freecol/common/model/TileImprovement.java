@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -605,14 +606,14 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
-        final Tile tile = getTile();
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
+        Tile tile = getTile();
         if (isRiver()) {
             // @compat 0.11.5 Prevent NPE, TileItemContainer rechecks this.
             if (style == null) {
                 lb.add("\n  Broken null style river at ", tile);
-                return -1;
+                return result.fail();
             }
             // end @compat 0.11.5
 
@@ -633,11 +634,11 @@ public class TileImprovement extends TileItem implements Named {
                                 setConnected(d, false);
                                 lb.add("\n  Removed broken river connection to ",
                                     d, " at ", tile);
-                                result = Math.min(0, result);
+                                result = result.fix();
                             } else {
                                 lb.add("\n  Broken river connection to ", d,
                                     " at ", tile);
-                                result = -1;
+                                result = result.fail();
                             }
                         }
                     } else if (t == null || !t.getType().isWater()) {
@@ -645,11 +646,11 @@ public class TileImprovement extends TileItem implements Named {
                             setConnected(d, false);
                             lb.add("\n  Removed broken river connection to ",
                                 d, " at ", tile);
-                            result = Math.min(0, result);
+                            result = result.fix();
                         } else {
                             lb.add("\n  Broken river connection to ", d,
                                 " at ", tile);
-                            result = -1;
+                            result = result.fail();
                         }
                     }
                 }
@@ -666,12 +667,12 @@ public class TileImprovement extends TileItem implements Named {
                 if (style != oldStyle) {
                     lb.add("\n  Bad road style from ", oldStyle,
                         " to ", style, " fixed at ", tile);
-                    result = Math.min(0, result);
+                    result = result.fix();
                 }
             }
             if (style == null) {
                 lb.add("\n  Broken road with null style at ", tile);
-                result = -1;
+                result = result.fail();
             }
             // end @compat 0.11.6
         }

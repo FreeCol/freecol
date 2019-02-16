@@ -33,6 +33,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
@@ -806,15 +807,15 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         final Unit unit = getUnit();
         if (unit == null) {
             lb.add("\n  AIUnit with null unit: ", getId());
-            result = -1;
+            result = result.fail();
         } else if (unit.isDisposed()) {
             lb.add("\n  AIUnit with disposed unit: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }

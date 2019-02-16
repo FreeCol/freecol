@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
@@ -351,9 +352,9 @@ public final class AIGoods extends TransportableAIObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
-        String why = (result < 0) ? "super"
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
+        String why = (!result.safe()) ? "super"
             : (goods == null) ? "null-goods"
             : (goods.getType() == null) ? "null-goods-type"
             : (goods.getAmount() <= 0) ? "non-positive-goods-amount"
@@ -365,14 +366,14 @@ public final class AIGoods extends TransportableAIObject {
             if (fix) {
                 lb.add("\n  Fixing disposed destination for: ", getId());
                 destination = null;
-                result = Math.min(result, 0);
+                result = result.fix();
             } else {
                 why = "disposed-destination";
             }
         }
         if (why != null) {
             lb.add("\n  AIGoods with ", why, ": ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }

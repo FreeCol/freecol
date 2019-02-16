@@ -53,6 +53,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -101,14 +102,14 @@ public final class FreeCol {
     /** The extension for FreeCol maps. */
     public static final String  FREECOL_MAP_EXTENSION = "fsm";
 
-    /** The Java version. */
+        /** The Java version. */
     private static final String JAVA_VERSION
         = System.getProperty("java.version");
 
     /** The maximum available memory. */
     private static final long MEMORY_MAX = Runtime.getRuntime().maxMemory();
     private static final long MEGA = 1000000; // Metric
-    
+
     public static final String  CLIENT_THREAD = "FreeColClient:";
     public static final String  SERVER_THREAD = "FreeColServer:";
     public static final String  METASERVER_THREAD = "FreeColMetaServer:";
@@ -1517,23 +1518,24 @@ public final class FreeCol {
      */
     private static void checkServerIntegrity(FreeColServer freeColServer) {
         String key;
-        int ret, check;
+        int ret;
+        IntegrityType integ = IntegrityType.INTEGRITY_GOOD;
         if (freeColServer == null) {
             logger.warning("Integrity test blocked");
-            check = -1;
+            integ = integ.fail();
         } else {
-            check = freeColServer.getIntegrity();
+            integ = freeColServer.getIntegrity();
         }
-        switch (check) {
-        case 1:
+        switch (integ) {
+        case INTEGRITY_GOOD:
             key = "cli.check-savegame.success";
             ret = 0;
             break;
-        case 0:
+        case INTEGRITY_FIXED:
             key = "cli.check-savegame.fixed";
             ret = 2;
             break;
-        case -1: default:
+        default:
             key = "cli.check-savegame.failed";
             ret = 3;
             break;

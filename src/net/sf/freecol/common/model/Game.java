@@ -40,6 +40,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
@@ -1522,8 +1523,8 @@ public class Game extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         lb.mark();
         synchronized (freeColGameObjects) {
             Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
@@ -1539,9 +1540,9 @@ public class Game extends FreeColGameObject {
                 }
                 if (fix) {
                     iterator.remove();
-                    result = Math.min(result, 0);
+                    result = result.fix();
                 } else {
-                    result = -1;
+                    result = result.fail();
                 }
             }
         }
@@ -1551,11 +1552,11 @@ public class Game extends FreeColGameObject {
 
         Map map = getMap();
         if (map != null) {
-            result = Math.min(result, getMap().checkIntegrity(fix, lb));
+            result = result.combine(getMap().checkIntegrity(fix, lb));
         }
         synchronized (this.players) {
             for (Player p : this.players) {
-                result = Math.min(result, p.checkIntegrity(fix, lb));
+                result = result.combine(p.checkIntegrity(fix, lb));
             }
         }
         return result;

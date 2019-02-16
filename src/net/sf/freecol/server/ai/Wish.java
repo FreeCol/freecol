@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.util.LogBuilder;
@@ -149,18 +150,17 @@ public abstract class Wish extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (transportable != null) {
-            result = Math.min(result, 
-                              transportable.checkIntegrity(fix, lb));
+            result = result.combine(transportable.checkIntegrity(fix, lb));
         }
         if (destination == null) {
             lb.add("\n  Wish destination null for: ", getId());
-            result = -1;
+            result = result.fail();
         } else if (((FreeColGameObject)destination).isDisposed()) {
             lb.add("\n  Wish destination disposed for: ", getId());
-            result = -1;
+            result = result.fail();
         }
         return result;
     }

@@ -48,6 +48,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
@@ -2684,13 +2685,13 @@ ok:     while (!openMap.isEmpty()) {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         final int hgt = getHeight(), wid = getWidth();
         for (int y = 0; y < hgt; y++) {
             for (int x = 0; x < wid; x++) {
                 Tile t = getTile(x, y);
-                result = Math.min(result, t.checkIntegrity(fix, lb));
+                result = result.combine(t.checkIntegrity(fix, lb));
             }
         }
         return result;

@@ -41,6 +41,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.GameOptions;
+import static net.sf.freecol.common.model.Constants.*;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -2873,11 +2874,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @param fix Fix problems if possible.
      * @param lb An optional {@code LogBuilder} to log to.
-     * @return Negative if there are problems remaining, zero if
-     *     problems were fixed, positive if no problems found at all.
+     * @return The integrity found.
      */
-    public int checkBuildQueueIntegrity(boolean fix, LogBuilder lb) {
-        int result = 1;
+    public IntegrityType checkBuildQueueIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = IntegrityType.INTEGRITY_GOOD;
         List<BuildableType> buildables = buildQueue.getValues();
         List<BuildableType> assumeBuilt = new ArrayList<>();
         for (int i = 0; i < buildables.size(); i++) {
@@ -2888,10 +2888,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             } else if (fix) {
                 if (lb != null) lb.add("\n  Invalid build queue item removed: ", bt.getId());
                 buildQueue.remove(i);
-                result = Math.min(result, 0);
+                result = result.fix();
             } else {
                 if (lb != null) lb.add("\n  Invalid build queue item: ", bt.getId());
-                result = -1;
+                result = result.fail();
             }
         }
         List<UnitType> unitTypes = populationQueue.getValues();
@@ -2904,10 +2904,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             } else if (fix) {
                 if (lb != null) lb.add("\n  Invalid population queue item removed: ", ut.getId());
                 populationQueue.remove(i);
-                result = Math.min(result, 0);
+                result = result.fix();
             } else {
                 if (lb != null) lb.add("\n  Invalid population queue item: ", ut.getId());
-                result = -1;
+                result = result.fail();
             }
         }
         return result;
@@ -2920,10 +2920,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
 
-        return Math.min(result, checkBuildQueueIntegrity(fix, lb));
+        return result.combine(checkBuildQueueIntegrity(fix, lb));
     }
 
 

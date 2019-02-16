@@ -27,6 +27,64 @@ package net.sf.freecol.common.model;
  */
 public interface Constants {
 
+    /** The result of checkIntegrity. */
+    public static enum IntegrityType {
+        INTEGRITY_GOOD(1),
+        INTEGRITY_FIXED(0),
+        INTEGRITY_FAIL(-1);
+
+        /** The magic value. */
+        private int val;
+
+        /**
+         * Build an integrity type with the given value.
+         *
+         * @param val The value.
+         */
+        IntegrityType(int val) {
+            this.val = val;
+        }
+
+        /**
+         * Is this integrity safe (i.e. non-failed).
+         *
+         * @return True if the integrity is safe.
+         */
+        public boolean safe() {
+            return this != INTEGRITY_FAIL;
+        }
+
+        /**
+         * Combine this integrity with another.
+         *
+         * @param it The other {@code IntegrityType}.
+         * @return The combined integrity.
+         */
+        public IntegrityType combine(IntegrityType it) {
+            return values()[1 + Math.min(this.val, it.val)];
+        }
+
+        /**
+         * Get the fixed version of this integrity.
+         *
+         * If the integrity is broken, nothing can happen.
+         *
+         * @return The fixed {@code IntegrityType}.
+         */
+        public IntegrityType fix() {
+            return combine(INTEGRITY_FIXED);
+        }
+
+        /**
+         * Get the failed version of this integrity.
+         *
+         * @return INTEGRITY_FAIL.
+         */
+        public IntegrityType fail() {
+            return INTEGRITY_FAIL;
+        }
+    };
+    
     /** Actions when an armed unit contacts a settlement. */
     public static enum ArmedUnitSettlementAction {
         SETTLEMENT_ATTACK,

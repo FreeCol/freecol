@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -180,14 +181,14 @@ public final class GoodsWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
-        int result = super.checkIntegrity(fix, lb);
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = super.checkIntegrity(fix, lb);
         if (goodsType == null) {
             lb.add("\n  GoodsWish without type: ", getId());
-            result = -1;
+            result = result.fail();
         } else if (amountRequested <= 0) {
             lb.add("\n  GoodsWish with non-positive requested: ", getId());
-            result = -1;
+            result = result.fail();
         }            
         return result;
     }

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
@@ -150,12 +151,13 @@ public abstract class AIObject extends FreeColObject {
      * @return -1 if there are problems remaining, zero if problems
      *     were fixed, +1 if no problems found at all.
      */
-    public int checkIntegrity(boolean fix, LogBuilder lb) {
+    public IntegrityType checkIntegrity(boolean fix, LogBuilder lb) {
+        IntegrityType result = IntegrityType.INTEGRITY_GOOD;
         if (!isInitialized()) {
             lb.add("\n  Uninitialized AI Object: ", getId());
-            return -1;
+            result = result.fail();
         }
-        return 1;
+        return result;
     }
 
     /**
@@ -165,7 +167,7 @@ public abstract class AIObject extends FreeColObject {
      * @return Negative if there are problems remaining, zero if
      *     problems were fixed, positive if no problems found at all.
      */
-    public int checkIntegrity(boolean fix) {
+    public IntegrityType checkIntegrity(boolean fix) {
         return checkIntegrity(fix, new LogBuilder(-1));
     }
 
