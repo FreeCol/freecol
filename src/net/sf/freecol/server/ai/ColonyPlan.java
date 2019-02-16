@@ -518,11 +518,11 @@ public class ColonyPlan {
             if (value > secondaryValue && secondaryRawMaterial != null) {
                 production.remove(secondaryRawMaterial);
                 production.remove(secondaryRawMaterial.getOutputType());
-                if (rawLuxuryGoodsTypes.contains(secondaryRawMaterial)) {
-                    rawLuxuryGoodsTypes.remove(secondaryRawMaterial);
-                    ;//luxuryGoodsTypes.remove(secondaryRawMaterial.getOutputType());
-                } else if (otherRawGoodsTypes.contains(secondaryRawMaterial)) {
-                    otherRawGoodsTypes.remove(secondaryRawMaterial);
+                if (rawLuxuryGoodsTypes.remove(secondaryRawMaterial)) {
+                    ; // OK remove worked
+                    //luxuryGoodsTypes.remove(secondaryRawMaterial.getOutputType());
+                } else if (otherRawGoodsTypes.remove(secondaryRawMaterial)) {
+                    ; // OK remove worked
                 }
             }
             if (value > primaryValue) {
