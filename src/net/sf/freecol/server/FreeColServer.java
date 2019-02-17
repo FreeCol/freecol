@@ -1031,8 +1031,10 @@ public final class FreeColServer {
                     }
 
                 } else if (AIMain.TAG.equals(tag)) {
-                    if (freeColServer == null) break;
-                    freeColServer.setAIMain(new AIMain(freeColServer, xr));
+                    AIMain aiMain =  new AIMain(freeColServer, xr);
+                    if (freeColServer != null) {
+                        freeColServer.setAIMain(aiMain);
+                    }
 
                 } else {
                     throw new XMLStreamException("Unknown tag"

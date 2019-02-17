@@ -296,7 +296,7 @@ public class TradeRoute extends FreeColGameObject
         Set<GoodsType> always = new HashSet<>(getStop(0).getCargo());
         boolean empty = true;
         int n = getStopCount();
-        for (int i = 0; i < n; i++){
+        for (int i = 0; i < n; i++) {
             TradeRouteStop stop = getStop(i);
             if (!TradeRoute.isStopValid(owner, stop)) {
                 return stop.invalidStopLabel(owner);

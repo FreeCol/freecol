@@ -757,12 +757,11 @@ public class TileImprovement extends TileItem implements Named {
                 logger.warning("At " + tile + " ignored nonempty style for "
                     + type + ": " + str);
         } else if (str == null) {
-            if (!isComplete() || getVirtual()) {
-                ; // Null style OK for incomplete or virtual roads
-            } else {
-                logger.warning("At " + tile + " unexpected null style for "
-                    + type);
-            }
+            // Null style OK for incomplete roads.  Virtual roads used
+            // to be null, but we are fixing that.  Some cached tiles
+            // were wrongly getting null style.  Do not bother
+            // complaining about these as they will get fixed and
+            // logged in checkIntegrity().
         } else if (str.length() != dirns.size()) {
             logger.warning("At " + tile + " ignored bogus style for "
                 + type + ": " + str);
