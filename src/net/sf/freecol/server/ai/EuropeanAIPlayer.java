@@ -1224,7 +1224,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         WorkerWish other = null;
         double bestCarriedValue = -1.0, bestOtherValue = -1.0;
         for (WorkerWish w : wishes) {
-            int turns = carrier.getTurnsToReach(w.getDestination());
+            Location dest = w.getDestination();
+            if (dest == null) continue; // Defend against crash
+            int turns = carrier.getTurnsToReach(dest);
             if (turns < Unit.MANY_TURNS) {
                 if (bestCarriedValue < (double)w.getValue() / turns) {
                     bestCarriedValue = (double)w.getValue() / turns;
