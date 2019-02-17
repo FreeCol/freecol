@@ -276,8 +276,6 @@ public final class FreeColClient {
             modMappings.addAll(f.getResourceMapping());
         }
         ResourceManager.setModMapping(modMappings);
-        // Update the actions, resources may have changed.
-        if (this.actionManager != null) updateActions();
 
         // Initialize Sound (depends on client options)
         this.soundController = new SoundController(this, sound);
@@ -286,6 +284,9 @@ public final class FreeColClient {
         gui.hideSplashScreen();
         gui.startGUI(size);
 
+        // Update the actions with the running GUI, resources may have changed.
+        if (this.actionManager != null) updateActions();
+        
         // Now the GUI is going, either:
         //   - load the saved game if one was supplied
         //   - use the debug shortcut to immediately start a new game with

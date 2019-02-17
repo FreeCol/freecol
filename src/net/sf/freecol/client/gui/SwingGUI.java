@@ -148,7 +148,6 @@ public class SwingGUI extends GUI {
         super(freeColClient, scaleFactor);
         
         this.graphicsDevice = getGoodGraphicsDevice();
-        this.mapViewer = new MapViewer(freeColClient);
         logger.info("GUI constructed using scale factor " + scaleFactor);
     }
 

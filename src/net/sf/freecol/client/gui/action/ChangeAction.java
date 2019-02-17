@@ -48,8 +48,6 @@ public class ChangeAction extends UnitAction {
      */
     public ChangeAction(FreeColClient freeColClient) {
         super(freeColClient, id);
-
-        update();
     }
 
 
