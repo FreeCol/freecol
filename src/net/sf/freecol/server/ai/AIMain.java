@@ -92,7 +92,6 @@ public class AIMain extends FreeColObject
      * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
-     * @see #readFromXML
      */
     public AIMain(FreeColServer freeColServer,
                   FreeColXMLReader xr) throws XMLStreamException {
@@ -590,12 +589,12 @@ public class AIMain extends FreeColObject
 
             // The AI data is quite shallow, so we can get away with
             // fixing up forward references just with this simple
-            // lookup.  AIObjects that can be forward referenced must
-            // ensure they complete initialization somewhere in their
-            // serialization read* routines.
+            // lookup.  We complete initialization of such objects
+            // with the call to setInitialized().
             AIObject aio;
             if (oid != null && (aio = getAIObject(oid)) != null) {
                 aio.readFromXML(xr);
+                aio.setInitialized();
 
             } else if (AIColony.TAG.equals(tag)) {
                 new AIColony(this, xr);

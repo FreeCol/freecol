@@ -89,7 +89,7 @@ public final class AIGoods extends TransportableAIObject {
 
         this.goods = new Goods(aiMain.getGame(), location, type, amount);
         this.destination = destination;
-        this.initialized = getGoods() != null;
+        setInitialized();
     }
 
     /**
@@ -105,9 +105,16 @@ public final class AIGoods extends TransportableAIObject {
                    FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        this.initialized = getGoods() != null;
+        setInitialized();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getGoods() != null;
+    }
 
     /**
      * Gets the goods this {@code AIGoods} is controlling.

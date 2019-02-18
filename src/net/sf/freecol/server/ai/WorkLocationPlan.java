@@ -58,9 +58,16 @@ public final class WorkLocationPlan extends AIObject {
 
         this.workLocation = workLocation;
         this.goodsType = goodsType;
-        this.initialized = getWorkLocation() != null && getGoodsType() != null;
+        setInitialized();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getWorkLocation() != null && getGoodsType() != null;
+    }
 
     /**
      * Gets the {@code WorkLocation} this

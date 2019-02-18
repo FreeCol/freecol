@@ -105,13 +105,19 @@ public abstract class Mission extends AIObject {
         super(aiMain);
 
         this.aiUnit = aiUnit;
-        this.initialized = this.aiUnit != null;
+        setInitialized();
 
         if (aiUnit != null && aiUnit.getMission() != this) {
             aiUnit.changeMission(this);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getAIUnit() != null;
+    }
 
     /**
      * Gets the AI-unit this mission has been created for.

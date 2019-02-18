@@ -92,7 +92,7 @@ public final class WorkerWish extends Wish {
         setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
-        this.initialized = this.destination != null && this.unitType != null;
+        setInitialized();
     }
 
     /**
@@ -108,9 +108,15 @@ public final class WorkerWish extends Wish {
                       FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        this.initialized = getDestination() != null && getUnitType() != null;
+        setInitialized();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = this.destination != null && this.unitType != null;
+    }
 
     /**
      * Updates this {@code WorkerWish} with the given attributes.

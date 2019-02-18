@@ -101,6 +101,7 @@ public abstract class AIPlayer extends AIObject {
         this.player = player;
         this.aiRandom = new Random(aiMain.getRandomSeed("Seed for " + getId()));
         this.serverAPI = new AIServerAPI(this);
+        setInitialized();
     }
 
     /**
@@ -117,8 +118,16 @@ public abstract class AIPlayer extends AIObject {
         super(aiMain, xr);
         
         this.serverAPI = new AIServerAPI(this);
+        setInitialized();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getPlayer() != null;
+    }
 
     /**
      * Gets the {@code Player} this {@code AIPlayer} is

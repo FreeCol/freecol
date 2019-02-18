@@ -145,7 +145,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         this.colony = colony;
         colony.addPropertyChangeListener(Colony.REARRANGE_COLONY, this);
 
-        this.initialized = getColony() != null;
+        setInitialized();
     }
 
     /**
@@ -161,21 +161,27 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         throws XMLStreamException {
         super(aiMain, xr);
 
-        this.initialized = getColony() != null;
+        setInitialized();
     }
+
 
     /**
      * Initialize the basic fields.
      */
     private void baseInitialize() {
         if (this.exportGoods != null) return;
-        this.colony = null;
         this.colonyPlan = null;
         this.exportGoods = new ArrayList<>();
         this.wishes = new ArrayList<>();
         this.tileImprovementPlans = new ArrayList<>();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getColony() != null;
+    }
 
     /**
      * Gets the {@code Colony} this {@code AIColony} controls.
@@ -1520,6 +1526,9 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         final AIMain aiMain = getAIMain();
         final String tag = xr.getLocalName();
 
+        // Note: the list elements are just references by identifier,
+        // and rely on their being a full definition somewhere in the
+        // <AIMain> structure.
         if (AI_GOODS_LIST_TAG.equals(tag)) {
             addExportGoods(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
                                            AIGoods.class, (AIGoods)null, true));

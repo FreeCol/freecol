@@ -117,7 +117,7 @@ public final class AIUnit extends TransportableAIObject {
 
         this.unit = unit;
         this.mission = null;
-        this.initialized = getUnit() != null;
+        setInitialized();
     }
 
     /**
@@ -133,9 +133,16 @@ public final class AIUnit extends TransportableAIObject {
                   FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        this.initialized = getUnit() != null;
+        setInitialized();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getUnit() != null;
+    }
 
     /**
      * Gets the {@code Unit} this {@code AIUnit} controls.

@@ -94,26 +94,35 @@ public abstract class AIObject extends FreeColObject {
 
 
     /**
-     * Convenience accessor for the main AI-object.
-     *
-     * @return The {@code AIMain}.
-     */
-    public final AIMain getAIMain() {
-        return this.aiMain;
-    }
-
-    /**
-     * Is this {@code AIObject} initialized?
+     * Is this AI object initialized?
      *
      * That is: it has been fully initialized by a detailed
      * constructor, or built with a simple constructor due to being
      * referenced by another object, but then updated with
      * {@link #readFromXML}.
      *
-     * @return {@code true} if this object is not initialized.
+     * @return True if this {@code AIObject} is initialized.
      */
     public final boolean isInitialized() {
         return this.initialized;
+    }
+
+    /**
+     * Set the initialized flag in this object.
+     *
+     * To be implemented by leaf classes, and called in their constructors
+     * plus the special case in readChild below where we resolve forward
+     * references.
+     */
+    public abstract void setInitialized();
+    
+    /**
+     * Convenience accessor for the main AI-object.
+     *
+     * @return The {@code AIMain}.
+     */
+    public final AIMain getAIMain() {
+        return this.aiMain;
     }
 
     /**

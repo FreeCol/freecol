@@ -91,7 +91,7 @@ public final class GoodsWish extends Wish {
         setValue(value);
         this.goodsType = goodsType;
         this.amountRequested = amountRequested;
-        this.initialized = this.goodsType != null && this.amountRequested > 0;
+        setInitialized();
     }
 
     /**
@@ -106,10 +106,17 @@ public final class GoodsWish extends Wish {
     public GoodsWish(AIMain aiMain,
                      FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
-
-        this.initialized = getGoodsType() != null && getGoodsAmount() > 0;
+        
+        setInitialized();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getGoodsType() != null && getGoodsAmount() > 0;
+    }
 
     /**
      * Updates this {@code GoodsWish} with the given attributes.

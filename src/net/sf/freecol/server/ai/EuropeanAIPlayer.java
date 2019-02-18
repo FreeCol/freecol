@@ -269,8 +269,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      */
     public EuropeanAIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player);
-
-        this.initialized = getPlayer() != null;
     }
 
     /**
@@ -283,8 +281,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     public EuropeanAIPlayer(AIMain aiMain,
                             FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
-
-        this.initialized = getPlayer() != null;
     }
 
 

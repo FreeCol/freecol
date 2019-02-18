@@ -63,8 +63,7 @@ public class TileImprovementPlan extends ValuedAIObject {
 
 
     /**
-     * Creates a new uninitialized {@code TileImprovementPlan}
-     * from the given XML-representation.
+     * Creates a new uninitialized {@code TileImprovementPlan}.
      *
      * @param aiMain The main AI-object.
      * @param id The object identifier.
@@ -79,7 +78,8 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
-     * Creates a new {@code TileImprovementPlan}.
+     * Creates a new {@code TileImprovementPlan} and initializes its
+     * critical fields.
      *
      * @param aiMain The main AI-object.
      * @param target The target {@code Tile} for the improvement.
@@ -96,7 +96,7 @@ public class TileImprovementPlan extends ValuedAIObject {
         this.type = type;
         this.pioneer = null;
         setValue(value);
-        this.initialized = getType() != null && getTarget() != null;
+        setInitialized();
     }
 
     /**
@@ -112,10 +112,17 @@ public class TileImprovementPlan extends ValuedAIObject {
                                FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        this.initialized = getType() != null && getTarget() != null;
+        setInitialized();
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialized() {
+        this.initialized = getType() != null && getTarget() != null;
+    }
+        
     /**
      * Gets the pioneer who have been assigned to making the
      * improvement described by this object.
