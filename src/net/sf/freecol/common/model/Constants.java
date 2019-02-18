@@ -35,9 +35,9 @@ public interface Constants {
 
     /** The result of checkIntegrity. */
     public static enum IntegrityType {
-        INTEGRITY_GOOD(1),
+        INTEGRITY_FAIL(-1),
         INTEGRITY_FIXED(0),
-        INTEGRITY_FAIL(-1);
+        INTEGRITY_GOOD(1);
 
         /** The magic value. */
         private int val;
