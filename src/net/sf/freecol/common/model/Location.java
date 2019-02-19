@@ -212,7 +212,7 @@ public interface Location extends ObjectWithId {
      * Return an ImageIcon for a Location
      *
      * @param cellHeight The size of a destination cell, used by Europe
-     * @param library The SwingGUI image library
+     * @param library The image library
      * @return The ImageIcon, null by default.
      */
     public default ImageIcon getLocationImage(final int cellHeight,

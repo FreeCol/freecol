@@ -39,7 +39,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
-import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
@@ -199,7 +199,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     @Override
     public IndianSettlement getResponse() {
         final Specification spec = freeColClient.getGame().getSpecification();
-        final SwingGUI gui = getGUI();
+        final GUI gui = getGUI();
         IndianSettlement ret = null;
         Set<Tile> tiles = is.getOwnedTiles();
         Object value = getValue();

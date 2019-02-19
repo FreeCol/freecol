@@ -43,7 +43,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColTcFile;
@@ -282,7 +282,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         JButton cancel = Utility.localizedButton("cancel");
         cancel.setActionCommand(String.valueOf(NewPanelAction.CANCEL));
         cancel.addActionListener(ae -> {
-                final SwingGUI gui = getGUI();
+                final GUI gui = getGUI();
                 gui.removeComponent(this);
                 if (getFreeColClient().isMapEditor()) {
                     gui.startMapEditorGUI();
@@ -545,7 +545,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     @Override
     public void actionPerformed(ActionEvent ae) {
         final ConnectController cc = getFreeColClient().getConnectController();
-        final SwingGUI gui = getGUI();
+        final GUI gui = getGUI();
         final String command = ae.getActionCommand();
 
         switch (Enum.valueOf(NewPanelAction.class, command)) {

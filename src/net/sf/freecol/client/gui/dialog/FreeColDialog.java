@@ -51,7 +51,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.SwingGUI;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -310,8 +310,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      *
      * @return The {@code GUI}.
      */
-    protected SwingGUI getGUI() {
-        return (SwingGUI)freeColClient.getGUI();
+    protected GUI getGUI() {
+        return freeColClient.getGUI();
     }
 
     /**

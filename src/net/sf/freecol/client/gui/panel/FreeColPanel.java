@@ -22,8 +22,8 @@ package net.sf.freecol.client.gui.panel;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -136,8 +136,8 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The current {@code GUI}.
      */
-    protected final SwingGUI getGUI() {
-        return (SwingGUI)freeColClient.getGUI();
+    protected final GUI getGUI() {
+        return freeColClient.getGUI();
     }
 
     /**

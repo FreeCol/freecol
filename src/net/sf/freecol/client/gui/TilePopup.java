@@ -67,7 +67,7 @@ public final class TilePopup extends JPopupMenu {
     public static final int UNIT_LINES_IN_OTHER_MENUS = 19;
 
     private final FreeColClient freeColClient;
-    private final SwingGUI gui;
+    private final GUI gui;
     private final Canvas canvas;
     private boolean hasAnItem = false;
 
@@ -85,7 +85,7 @@ public final class TilePopup extends JPopupMenu {
         super(Messages.message(tile.getSimpleLabel()));
 
         this.freeColClient = freeColClient;
-        this.gui = (SwingGUI)freeColClient.getGUI();
+        this.gui = freeColClient.getGUI();
         this.canvas = canvas;
 
         final InGameController igc = freeColClient.getInGameController();

@@ -84,7 +84,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
     private final FreeColClient freeColClient;
 
-    private final SwingGUI gui;
+    private final GUI gui;
 
     private final FreeColPanel parentPanel;
 
@@ -98,7 +98,7 @@ public final class QuickActionMenu extends JPopupMenu {
     public QuickActionMenu(FreeColClient freeColClient,
                            FreeColPanel freeColPanel) {
         this.freeColClient = freeColClient;
-        this.gui = (SwingGUI)freeColClient.getGUI();
+        this.gui = freeColClient.getGUI();
         this.parentPanel = freeColPanel;
     }
 
