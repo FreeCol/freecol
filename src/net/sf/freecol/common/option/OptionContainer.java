@@ -35,23 +35,21 @@ public interface OptionContainer {
     /**
      * Is an option present in the container.
      *
-     * @param R The underlying type of option.
      * @param T The actual return type.
      * @param id The object identifier.
      * @return True if the option is present.
      */
-    <T extends Option> boolean hasOption(String id, Class<T> returnClass);
+    public <T extends Option> boolean hasOption(String id, Class<T> returnClass);
     
     /**
      * Get an option in this group (or descendents) by object identifier.
      *
-     * @param R The underlying type of option.
      * @param T The actual return type.
      * @param id The object identifier.
      * @return The option, or a run time exception if the option does not
      *     exist or is of the wrong class.
      */
-    <T extends Option> T getOption(String id, Class<T> returnClass);
+    public <T extends Option> T getOption(String id, Class<T> returnClass);
 
     /**
      * Gets the value of a {@code BooleanOption}.

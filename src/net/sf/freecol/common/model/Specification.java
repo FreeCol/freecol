@@ -761,32 +761,36 @@ public final class Specification implements OptionContainer {
             a.setValue(customsOnCoast);
         }
 
-        logger.info("Specification clean following " + why + " complete"
-            + ", starting year=" + Turn.getStartingYear()
-            + ", season year=" + Turn.getSeasonYear()
-            + ", ages=[" + ages[0] + "," + ages[1] + "," + ages[2] + "]"
-            + ", seasons=" + Turn.getSeasonNumber()
-            + ", difficulty=" + difficultyLevel
-            + ", " + allTypes.size() + " FreeColSpecObjectTypes"
-            + ", " + allAbilities.size() + " Abilities"
-            + ", " + buildingTypeList.size() + " BuildingTypes"
-            + ", " + disasters.size() + " Disasters"
-            + ", " + europeanNationTypes.size() + " EuropeanNationTypes"
-            + ", " + events.size() + " Events"
-            + ", " + foundingFathers.size() + " FoundingFathers"
-            + ", " + goodsTypeList.size() + " GoodsTypes"
-            + ", " + indianNationTypes.size() + " IndianNationTypes"
-            + ", " + allModifiers.size() + " Modifiers"
-            + ", " + nations.size() + " Nations"
-            + ", " + allOptions.size() + " Options"
-            + ", " + allOptionGroups.size() + " Option Groups"
-            + ", " + resourceTypeList.size() + " ResourceTypes"
-            + ", " + roles.size() + " Roles"
-            + ", " + tileTypeList.size() + " TileTypes"
-            + ", " + tileImprovementTypeList.size() + " TileImprovementTypes"
-            + ", " + unitChangeTypeList.size() + " UnitChangeTypes"
-            + ", " + unitTypeList.size() + " UnitTypes"
-            + " read.");
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append("Specification clean following ").append(why)
+            .append(" complete, starting year=").append(Turn.getStartingYear())
+            .append(", season year=").append(Turn.getSeasonYear())
+            .append(", ages=[").append(ages[0])
+            .append(",").append(ages[1])
+            .append(",").append(ages[2])
+            .append("], seasons=").append(Turn.getSeasonNumber())
+            .append(", difficulty=").append(difficultyLevel)
+            .append(", ").append(allTypes.size()).append(" Types")
+            .append(", ").append(allAbilities.size()).append(" Abilities")
+            .append(", ").append(buildingTypeList.size()).append(" BuildingTypes")
+            .append(", ").append(disasters.size()).append(" Disasters")
+            .append(", ").append(europeanNationTypes.size()).append(" EuropeanNationTypes")
+            .append(", ").append(events.size()).append(" Events")
+            .append(", ").append(foundingFathers.size()).append(" FoundingFathers")
+            .append(", ").append(goodsTypeList.size()).append(" GoodsTypes")
+            .append(", ").append(indianNationTypes.size()).append(" IndianNationTypes")
+            .append(", ").append(allModifiers.size()).append(" Modifiers")
+            .append(", ").append(nations.size()).append(" Nations")
+            .append(", ").append(allOptions.size()).append(" Options")
+            .append(", ").append(allOptionGroups.size()).append(" Option Groups")
+            .append(", ").append(resourceTypeList.size()).append(" ResourceTypes")
+            .append(", ").append(roles.size()).append(" Roles")
+            .append(", ").append(tileTypeList.size()).append(" TileTypes")
+            .append(", ").append(tileImprovementTypeList.size()).append(" TileImprovementTypes")
+            .append(", ").append(unitChangeTypeList.size()).append(" UnitChangeTypes")
+            .append(", ").append(unitTypeList.size()).append(" UnitTypes")
+            .append(" read.");
+        logger.info(sb.toString());
     }
 
 
@@ -1907,7 +1911,7 @@ public final class Specification implements OptionContainer {
         if (o != null) return o;
 
         if (initialized) {
-            throw new IllegalArgumentException("Undefined FCGOT: " + id);
+            throw new RuntimeException("Undefined FCGOT: " + id);
         }
 
         // forward declaration of new type
@@ -1915,32 +1919,33 @@ public final class Specification implements OptionContainer {
     }
 
     /**
-     * Get the {@code FreeColSpecObjectType} with the given identifier.
+     * Build a new {@code FreeColSpecObjectType} with given identifier
+     * and class.
      *
      * @param <T> The actual return type.
-     * @param id The object identifier to look for.
+     * @param id The identifier to look for.
      * @param returnClass The expected {@code Class}.
-     * @return The {@code FreeColSpecObjectType} found.
+     * @return The new {@code FreeColSpecObjectType}.
      */
-    public <T extends FreeColSpecObjectType> T newType(String id,
-                                                       Class<T> returnClass) {
+    private <T extends FreeColSpecObjectType> T newType(String id,
+                                                        Class<T> returnClass) {
+        T result = null;
         try {
             Constructor<T> c = returnClass.getConstructor(String.class,
-                Specification.class);
-            T result = c.newInstance(id, this);
+                                                          Specification.class);
+            result = c.newInstance(id, this);
             allTypes.put(id, result);
-            return result;
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not construct: " + id, e);
         }
-        return null;
+        return result;
     }
 
     /**
      * Find a {@code FreeColSpecObjectType} by id and class.
      *
      * @param <T> The actual return type.
-     * @param id The object identifier to look for.
+     * @param id The identifier to look for.
      * @param returnClass The expected {@code Class}.
      * @return The {@code FreeColSpecObjectType} found if any.
      */
@@ -1954,7 +1959,7 @@ public final class Specification implements OptionContainer {
      * Find a {@code FreeColSpecObjectType} by id.
      *
      * @param id The identifier to look for.
-     * @return The {@code FreeColSpecObjectType} found if any.
+     * @return The {@code FreeColSpecObjectType} found, if any.
      */
     public FreeColSpecObjectType findType(String id) {
         return allTypes.get(id);

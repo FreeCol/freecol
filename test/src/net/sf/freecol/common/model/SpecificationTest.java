@@ -404,7 +404,9 @@ public final class SpecificationTest extends FreeColTestCase {
         try {
             spec.getUnitType("model.unit.caravel");
             fail("Caravel is defined.");
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
+            // Attempt to look up caravel should crash, this is the
+            // success branch
         }
 
         for (UnitType unitType : spec.getUnitTypeList()) {
