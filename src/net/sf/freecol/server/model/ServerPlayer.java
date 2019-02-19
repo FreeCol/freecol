@@ -3151,11 +3151,7 @@ outer:  for (Effect effect : effects) {
         // Damage the ship and send it off for repair
         Location shipLoc = (repair instanceof Colony) ? repair.getTile()
             : repair;
-        ship.setHitPoints(1);
-        ship.setDestination(null);
-        ship.setLocation(shipLoc);//-vis(player)
-        ship.setState(Unit.UnitState.ACTIVE);
-        ship.setMovesLeft(0);
+        ship.damageShip(shipLoc);//-vis(player)
         cs.add(See.only(player), (FreeColGameObject)shipLoc);
         player.invalidateCanSeeTiles();//+vis(player)
     }

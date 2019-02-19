@@ -951,26 +951,9 @@ public class ColonyPlan {
      * @return The unit that was replaced by the expert, or null if none.
      */
     private Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
-        final Role oldRole = expert.getRole();
-        final int oldRoleCount = expert.getRoleCount();
         final GoodsType work = expert.getType().getExpertProduction();
-        final GoodsType oldWork = expert.getWorkType();
-        final Unit other = find(others, u ->
-            (u.isPerson() && u.getWorkType() == work
-                && u.getType().getExpertProduction() != work));
-        if (other != null) {
-            Location l1 = expert.getLocation();
-            Location l2 = other.getLocation();
-            other.setLocation(colony.getTile());
-            expert.setLocation(l2);
-            expert.changeWorkType(work);
-            other.setLocation(l1);
-            if (oldWork != null) other.changeWorkType(oldWork);
-            Role tmpRole = other.getRole();
-            int tmpRoleCount = other.getRoleCount();
-            other.changeRole(oldRole, oldRoleCount);
-            expert.changeRole(tmpRole, tmpRoleCount);
-        }
+        final Unit other = find(others, u -> u.nonExpertWorker(work));
+        if (other != null) expert.swapWork(other);
         return other;
     }
 

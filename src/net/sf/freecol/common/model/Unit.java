@@ -1982,6 +1982,22 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Can this unit ambush another?
+     *
+     * @param defender The defending {@code Unit}.
+     * @return True if an ambush attack is possible.
+     */
+    public boolean canAmbush(Unit defender) {
+        return isOnTile() && getSettlement() == null
+            && defender.isOnTile() && defender.getSettlement() == null
+            && defender.getState() != UnitState.FORTIFIED
+            && (hasAbility(Ability.AMBUSH_BONUS)
+                || defender.hasAbility(Ability.AMBUSH_PENALTY))
+            && (getTile().hasAbility(Ability.AMBUSH_TERRAIN)
+                || defender.getTile().hasAbility(Ability.AMBUSH_TERRAIN));
+    }
+            
+    /**
      * Is an alternate unit a better defender than the current choice.
      * Prefer if there is no current defender, or if the alternate
      * unit is better armed, or provides greater defensive power and
@@ -2027,6 +2043,19 @@ public class Unit extends GoodsLocation
             c != notHere && c.hasAbility(Ability.REPAIR_UNITS);
         Location loc = getClosestColony(transform(player.getColonies(), repairPred));
         return (loc != null) ? loc : player.getEurope();
+    }
+
+    /**
+     * Damage this unit (which should be a ship).
+     *
+     * @param repair A {@code Location} to send the ship to for repair.
+     */
+    public void damageShip(Location repair) {
+        setHitPoints(1);
+        setDestination(null);
+        setLocation(repair);//-vis(player)
+        setState(Unit.UnitState.ACTIVE);
+        setMovesLeft(0);
     }
 
 
@@ -2898,8 +2927,90 @@ public class Unit extends GoodsLocation
             throw new IllegalArgumentException("findPath to null for " + this
                 + " from " + start + " on " + carrier);
         }
-        return getGame().getMap().findPath(this, start, end,
-                                           carrier, costDecider, lb);
+        return getGame().getMap().findPath(this, realStart(start, carrier),
+                                           end, carrier, costDecider, lb);
+    }
+
+    /**
+     * Unified argument tests for full path searches, which then finds
+     * the actual starting location for the path.  Deals with special
+     * cases like starting on a carrier and/or high seas.
+     *
+     * @param start The {@code Location} in which the path starts from.
+     * @param carrier An optional naval carrier {@code Unit} to use.
+     * @return The actual starting location.
+     * @throws IllegalArgumentException If there are any argument problems.
+     */
+    private Location realStart(final Location start, final Unit carrier) {
+        if (carrier != null && !carrier.canCarryUnits()) {
+            throw new IllegalArgumentException("Non-carrier carrier: "
+                + carrier);
+        } else if (carrier != null && !carrier.couldCarry(this)) {
+            throw new IllegalArgumentException("Carrier could not carry unit: "
+                + carrier + "/" + this);
+        }
+
+        Location entry;
+        if (start == null) {
+            throw new IllegalArgumentException("Null start: " + this);
+        } else if (start instanceof Unit) {
+            Location unitLoc = ((Unit)start).getLocation();
+            if (unitLoc == null) {
+                throw new IllegalArgumentException("Null on-carrier start: "
+                    + this + "/" + start);
+            } else if (unitLoc instanceof HighSeas) {
+                if (carrier == null) {
+                    throw new IllegalArgumentException("Null carrier when"
+                        + " starting on high seas: " + this);
+                } else if (carrier != start) {
+                    throw new IllegalArgumentException("Wrong carrier when"
+                        + " starting on high seas: " + this
+                        + "/" + carrier + " != " + start);
+                }
+                entry = carrier.resolveDestination();
+            } else {
+                entry = unitLoc;
+            }
+            
+        } else if (start instanceof HighSeas) {
+            if (isOnCarrier()) {
+                entry = getCarrier().resolveDestination();
+            } else if (isNaval()) {
+                entry = resolveDestination();
+            } else {
+                throw new IllegalArgumentException("No carrier when"
+                    + " starting on high seas: " + this
+                    + "/" + getLocation());
+            }
+        } else if (start instanceof Europe || start.getTile() != null) {
+            entry = start; // OK
+        } else {
+            throw new IllegalArgumentException("Invalid start: " + start);
+        }
+        // Valid result, reduce to tile if possible.
+        return (entry.getTile() != null) ? entry.getTile() : entry;
+    }
+
+    /**
+     * Convenience wrapper for the
+     * {@link net.sf.freecol.common.model.Map#search} function.
+     *
+     * @param start The {@code Location} to start the search from.
+     * @param gd The object responsible for determining whether a
+     *     given {@code PathNode} is a goal or not.
+     * @param cd An optional {@code CostDecider}
+     *     responsible for determining the path cost.
+     * @param maxTurns The maximum number of turns the given
+     *     {@code Unit} is allowed to move. This is the
+     *     maximum search range for a goal.
+     * @param carrier An optional naval carrier {@code Unit} to use.
+     * @return The path to a goal, or null if none can be found.
+     */
+    public PathNode search(Location start, GoalDecider gd,
+                           CostDecider cd, int maxTurns, Unit carrier) {
+        return (start == null) ? null
+            : getGame().getMap().search(this, realStart(start, carrier),
+                                        gd, cd, maxTurns, carrier, null);
     }
 
     /**
@@ -3166,28 +3277,6 @@ public class Unit extends GoodsLocation
      */
     public PathNode findOurNearestOtherSettlement() {
         return findOurNearestSettlement(true, Integer.MAX_VALUE, false);
-    }
-
-    /**
-     * Convenience wrapper for the
-     * {@link net.sf.freecol.common.model.Map#search} function.
-     *
-     * @param start The {@code Location} to start the search from.
-     * @param gd The object responsible for determining whether a
-     *     given {@code PathNode} is a goal or not.
-     * @param cd An optional {@code CostDecider}
-     *     responsible for determining the path cost.
-     * @param maxTurns The maximum number of turns the given
-     *     {@code Unit} is allowed to move. This is the
-     *     maximum search range for a goal.
-     * @param carrier An optional naval carrier {@code Unit} to use.
-     * @return The path to a goal, or null if none can be found.
-     */
-    public PathNode search(Location start, GoalDecider gd,
-                           CostDecider cd, int maxTurns, Unit carrier) {
-        return (start == null) ? null
-            : getGame().getMap().search(this, start, gd, cd, maxTurns,
-                                        carrier, null);
     }
 
     /**
@@ -3784,7 +3873,43 @@ public class Unit extends GoodsLocation
     }
     // end @compat 0.11.0
 
+    /**
+     * Is this unit a person that is making a given goods type, but not
+     * an expert at it.
+     *
+     * @param work The {@code GoodsType} to check.
+     * @return True if this unit is a non-expert worker.
+     */
+    public boolean nonExpertWorker(GoodsType work) {
+        return isPerson() && getWorkType() == work
+            && getType().getExpertProduction() != work;
+    }
 
+    /**
+     * Swap work with another unit.
+     *
+     * @param other The other {@code Unit}.
+     */
+    public void swapWork(Unit other) {
+        final Colony colony = getColony();
+        final Role oldRole = getRole();
+        final int oldRoleCount = getRoleCount();
+        final GoodsType work = getType().getExpertProduction();
+        final GoodsType oldWork = getWorkType();
+        Location l1 = getLocation();
+        Location l2 = other.getLocation();
+        other.setLocation(colony.getTile());
+        setLocation(l2);
+        changeWorkType(work);
+        other.setLocation(l1);
+        if (oldWork != null) other.changeWorkType(oldWork);
+        Role tmpRole = other.getRole();
+        int tmpRoleCount = other.getRoleCount();
+        other.changeRole(oldRole, oldRoleCount);
+        changeRole(tmpRole, tmpRoleCount);
+    }
+
+        
     // Message unpacking support.
 
     /**

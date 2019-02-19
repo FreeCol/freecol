@@ -1115,71 +1115,6 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Unified argument tests for full path searches, which then finds
-     * the actual starting location for the path.  Deals with special
-     * cases like starting on a carrier and/or high seas.
-     *
-     * @param unit The {@code Unit} to find the path for.
-     * @param start The {@code Location} in which the path starts from.
-     * @param carrier An optional naval carrier {@code Unit} to use.
-     * @return The actual starting location.
-     * @throws IllegalArgumentException If there are any argument problems.
-     */
-    private Location findRealStart(final Unit unit, final Location start,
-                                   final Unit carrier) {
-        // Unit checks.
-        if (unit == null) {
-            throw new IllegalArgumentException("Null unit.");
-        } else if (carrier != null && !carrier.canCarryUnits()) {
-            throw new IllegalArgumentException("Non-carrier carrier: "
-                + carrier);
-        } else if (carrier != null && !carrier.couldCarry(unit)) {
-            throw new IllegalArgumentException("Carrier could not carry unit: "
-                + carrier + "/" + unit);
-        }
-
-        Location entry;
-        if (start == null) {
-            throw new IllegalArgumentException("Null start: " + unit);
-        } else if (start instanceof Unit) {
-            Location unitLoc = ((Unit)start).getLocation();
-            if (unitLoc == null) {
-                throw new IllegalArgumentException("Null on-carrier start: "
-                    + unit + "/" + start);
-            } else if (unitLoc instanceof HighSeas) {
-                if (carrier == null) {
-                    throw new IllegalArgumentException("Null carrier when"
-                        + " starting on high seas: " + unit);
-                } else if (carrier != start) {
-                    throw new IllegalArgumentException("Wrong carrier when"
-                        + " starting on high seas: " + unit
-                        + "/" + carrier + " != " + start);
-                }
-                entry = carrier.resolveDestination();
-            } else {
-                entry = unitLoc;
-            }
-            
-        } else if (start instanceof HighSeas) {
-            if (unit.isOnCarrier()) {
-                entry = unit.getCarrier().resolveDestination();
-            } else if (unit.isNaval()) {
-                entry = unit.resolveDestination();
-            } else {
-                throw new IllegalArgumentException("No carrier when"
-                    + " starting on high seas: " + unit
-                    + "/" + unit.getLocation());
-            }
-        } else if (start instanceof Europe || start.getTile() != null) {
-            entry = start; // OK
-        } else {
-            throw new IllegalArgumentException("Invalid start: " + start);
-        }
-        // Valid result, reduce to tile if possible.
-        return (entry.getTile() != null) ? entry.getTile() : entry;
-    }
-
-    /**
      * Destination argument test for path searches.  Find the actual
      * destination of a path.
      *
@@ -1368,7 +1303,6 @@ public class Map extends FreeColGameObject implements Location {
         if (traceSearch) lb = new LogBuilder(1024);
 
         // Validate the arguments, reducing to either Europe or a Tile.
-        final Location realStart = findRealStart(unit, start, carrier);
         final Location realEnd;
         try {
             realEnd = findRealEnd(unit, end);
@@ -1386,14 +1320,14 @@ public class Map extends FreeColGameObject implements Location {
             // as we do not have the terrain type and thus can not
             // calculate costs, but relent if the unexplored tile borders
             // an explored one on the same contiguity.
-            Tile closest = (realStart instanceof Tile)
-                ? getClosestTile((Tile)realStart,
+            Tile closest = (start instanceof Tile)
+                ? getClosestTile((Tile)start,
                     transform(((Tile)realEnd).getSurroundingTiles(1, 1),
                         t -> t.isExplored()
-                            && isSameContiguity(t, realStart)))
+                            && isSameContiguity(t, start)))
                 : null;
             path = (closest == null) ? null
-                : this.findPath(unit, realStart, closest, carrier,
+                : this.findPath(unit, start, closest, carrier,
                                 costDecider, lb);
             if (path != null) {
                 PathNode last = path.getLastNode();
@@ -1401,12 +1335,12 @@ public class Map extends FreeColGameObject implements Location {
                     last.getTurns()+1, last.isOnCarrier(), last, null);
             }
 
-        } else if (realStart instanceof Europe && realEnd instanceof Europe) {
+        } else if (start instanceof Europe && realEnd instanceof Europe) {
             // 0: Europe->Europe: Create a trivial path.
-            path = new PathNode(realStart, unit.getMovesLeft(), 0,
+            path = new PathNode(start, unit.getMovesLeft(), 0,
                 false, null, null);
 
-        } else if (realStart instanceof Europe && realEnd instanceof Tile) {
+        } else if (start instanceof Europe && realEnd instanceof Tile) {
             // 1: Europe->Tile
             // Fail fast without an off map unit.
             if (offMapUnit == null
@@ -1443,17 +1377,17 @@ public class Map extends FreeColGameObject implements Location {
                 // the entry location.
             } else {
                 path.addTurns(offMapUnit.getSailTurns());
-                path.previous = new PathNode(realStart, unit.getMovesLeft(),
+                path.previous = new PathNode(start, unit.getMovesLeft(),
                     0, carrier != null, null, path);
                 path = path.previous;
                 if (carrier != null && unit.getLocation() != carrier) {
-                    path.previous = new PathNode(realStart, unit.getMovesLeft(),
+                    path.previous = new PathNode(start, unit.getMovesLeft(),
                         0, false, null, path);
                     path = path.previous;
                 }
             }
 
-        } else if (realStart instanceof Tile && realEnd instanceof Europe) {
+        } else if (start instanceof Tile && realEnd instanceof Europe) {
             // 2: Tile->Europe
             // Fail fast if Europe is unattainable.
             if (offMapUnit == null
@@ -1461,7 +1395,7 @@ public class Map extends FreeColGameObject implements Location {
                 path = null;
                 
                 // Search forwards to the high seas.
-            } else if ((p = searchMap(unit, (Tile)realStart,
+            } else if ((p = searchMap(unit, (Tile)start,
                         GoalDeciders.getHighSeasGoalDecider(),
                         costDecider, INFINITY, carrier, null, lb)) == null) {
                 path = null;
@@ -1474,27 +1408,27 @@ public class Map extends FreeColGameObject implements Location {
                 path = p;
             }
 
-        } else if (realStart instanceof Tile && realEnd instanceof Tile) {
+        } else if (start instanceof Tile && realEnd instanceof Tile) {
             // 3: Tile->Tile
             Direction d;
             Unit.MoveType mt;
             // Short circuit if adjacent and blocked
             if (unit != null
-                && (d = ((Tile)realStart).getDirection((Tile)realEnd)) != null
+                && (d = ((Tile)start).getDirection((Tile)realEnd)) != null
                 && (mt = unit.getMoveType(d)).isLegal()
                 && !mt.isProgress()) {
-                path = new PathNode(realStart, unit.getMovesLeft(), 0,
+                path = new PathNode(start, unit.getMovesLeft(), 0,
                                     carrier != null, null, null);
-                int cost = unit.getMoveCost((Tile)realStart, (Tile)realEnd,
+                int cost = unit.getMoveCost((Tile)start, (Tile)realEnd,
                                             unit.getMovesLeft());
                 path.next = new PathNode(realEnd, unit.getMovesLeft() - cost,
                                          0, false, path, null);
             } else {
-                path = findMapPath(unit, (Tile)realStart, (Tile)realEnd,
+                path = findMapPath(unit, (Tile)start, (Tile)realEnd,
                                    carrier, costDecider, lb);
             }
         } else {
-            throw new IllegalStateException("Can not happen: " + realStart
+            throw new IllegalStateException("Can not happen: " + start
                 + ", " + realEnd);
         }
 
@@ -1531,11 +1465,10 @@ public class Map extends FreeColGameObject implements Location {
                            LogBuilder lb) {
         if (traceSearch) lb = new LogBuilder(1024);
 
-        final Location realStart = findRealStart(unit, start, carrier);
         final Unit offMapUnit = (carrier != null) ? carrier : unit;
         
         PathNode p, path;
-        if (realStart instanceof Europe) {
+        if (start instanceof Europe) {
             // Fail fast if Europe is unattainable.
             if (offMapUnit == null
                 || !offMapUnit.getType().canMoveToHighSeas()) {
@@ -1553,12 +1486,12 @@ public class Map extends FreeColGameObject implements Location {
                 // will lose if the initial search fails due to a turn limit.
                 // FIXME: do something better.
             } else {
-                path = this.findPath(unit, realStart, p.getLastNode().getTile(),
+                path = this.findPath(unit, start, p.getLastNode().getTile(),
                                      carrier, costDecider, lb);
             }
 
         } else {
-            path = searchMap(unit, realStart.getTile(), goalDecider,
+            path = searchMap(unit, start.getTile(), goalDecider,
                              costDecider, maxTurns, carrier, null, lb);
         }
 
