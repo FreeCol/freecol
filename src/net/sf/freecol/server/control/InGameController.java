@@ -2551,6 +2551,10 @@ public final class InGameController extends Controller {
             }
             session = new NativeDemandSession(unit, colony, type, amount,
                                               getTimeout());
+            logger.info("Native demand(begin) " + session.getKey() + ": "
+                + serverPlayer.getName() + " unit " + unit
+                + " demands " + amount + " " + ((type == null) ? "gold" : type)
+                + " from " + colony.getName());
             cs.add(See.only(victim),
                    new IndianDemandMessage(unit, colony, type, amount));
         } else {
@@ -2558,10 +2562,13 @@ public final class InGameController extends Controller {
                 return serverPlayer.clientError("Replying to missing demand: "
                     + unit.getId() + "," + colony.getId());
             }
-            session.complete(result.booleanValue(), cs);
-            logger.info(serverPlayer.getName() + " unit " + unit
+            logger.info("Native demand("
+                + ((result.booleanValue()) ? "accepted" : "rejected")
+                + ") " + session.getKey() + ": "
+                + serverPlayer.getName() + " unit " + unit
                 + " demands " + amount + " " + ((type == null) ? "gold" : type)
-                + " from " + colony.getName() + " accepted: " + result);
+                + " from " + colony.getName());
+            session.complete(result.booleanValue(), cs);
         }
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
