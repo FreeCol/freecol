@@ -36,9 +36,9 @@ public interface CargoLabel {
      * @param comp The input Component to add.
      * @param carrier The Carrier to add the component too.
      * @param cargoPanel The CargoPanel to affect.
-     * @return The output Component to add.
+     * @return True if the component was added.
      */
-    public Component addCargo(Component comp, Unit carrier, CargoPanel cargoPanel);
+    public boolean addCargo(Component comp, Unit carrier, CargoPanel cargoPanel);
 
 
     /**

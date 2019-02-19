@@ -195,16 +195,15 @@ public class CargoPanel extends FreeColPanel
     }
 
     /**
-     * Add a {@code Component} of interface type {@code CargoLabel} to a carrier
-     *
      * {@inheritDoc}
      */
     @Override
     public Component add(Component comp, boolean editState) {
         if (carrier == null) {
             return null;
-        } else if (editState && comp instanceof CargoLabel) {
-            return ((CargoLabel) comp).addCargo(comp, carrier, this);
+        } else if (editState && comp instanceof CargoLabel
+            && ((CargoLabel)comp).addCargo(comp, carrier, this)) {
+            return comp;
         } else {
             super.add(comp);
         }

@@ -278,7 +278,7 @@ public final class UnitLabel extends FreeColLabel
      * {@inheritDoc}
      */
     @Override
-    public Component addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
+    public boolean addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
         Unit unit = ((UnitLabel)comp).getUnit();
         if (carrier.canAdd(unit)) {
             Container oldParent = comp.getParent();
@@ -286,10 +286,10 @@ public final class UnitLabel extends FreeColLabel
                 ((UnitLabel) comp).setSmall(false);
                 if (oldParent != null) oldParent.remove(comp);
                 cargoPanel.update();
-                return comp;
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     /**

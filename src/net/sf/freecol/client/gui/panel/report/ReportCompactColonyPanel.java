@@ -104,31 +104,49 @@ public final class ReportCompactColonyPanel extends ReportPanel
             CONSUMPTION, // Positive production but could consume more
         };
 
-        public static BinaryOperator<GoodsProduction> goodsProductionAccumulator
-            = (g1, g2) -> {
-                g1.amount += g2.amount;
-                g1.status = (g1.status == ProductionStatus.NONE
-                        && g2.status == ProductionStatus.NONE)
-                    ? ProductionStatus.NONE
-                    : (g1.amount < 0) ? ProductionStatus.BAD
-                    : (g1.amount > 0) ? ProductionStatus.GOOD
-                    : ProductionStatus.ZERO;
-                g1.extra = 0;
-                return g1;
-            };
 
         /** Container class for goods production. */
         public static class GoodsProduction {
 
+            /** Binary accumulation operator for goods production. */
+            public static BinaryOperator<GoodsProduction>
+                goodsProductionAccumulator = (g1, g2) -> g1.accumulate(g2);
+            
             public int amount;
             public ProductionStatus status;
             public int extra;
 
+            /**
+             * Build a new goods production container.
+             *
+             * @param amount The amount of goods.
+             * @param status The production status.
+             * @param extra Extra production.
+             */
             public GoodsProduction(int amount, ProductionStatus status,
                                    int extra) {
                 this.amount = amount;
                 this.status = status;
                 this.extra = extra;
+            }
+
+            /**
+             * Accumulate other production into this one.
+             *
+             * @param other The other {@code GoodsProduction}.
+             * @return This {@code GoodsProduction}.
+             */
+            public GoodsProduction accumulate(GoodsProduction other) {
+                this.amount += other.amount;
+                this.status = 
+                this.status = (this.status == ProductionStatus.NONE
+                        && other.status == ProductionStatus.NONE)
+                    ? ProductionStatus.NONE
+                    : (this.amount < 0) ? ProductionStatus.BAD
+                    : (this.amount > 0) ? ProductionStatus.GOOD
+                    : ProductionStatus.ZERO;
+                this.extra = 0;
+                return this;
             }
         };
 
@@ -898,7 +916,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             rBonus += s.bonus;
             rSizeChange += s.sizeChange;
             accumulateMap(rProduction, s.production,
-                          ColonySummary.goodsProductionAccumulator);
+                ColonySummary.GoodsProduction.goodsProductionAccumulator);
             teacherLen = Math.max(teacherLen, s.teachers.size());
             for (Unit u : s.teachers.keySet()) {
                 accumulateToMap(rTeachers, u.getType(), 1, integerAccumulator);

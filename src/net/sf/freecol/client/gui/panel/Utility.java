@@ -631,11 +631,9 @@ public final class Utility {
      *
      * @param comp The {@code JComponent} to localize.
      * @param key The key to use.
-     * @return The original {@code JComponent}.
      */
-    public static JComponent localizeToolTip(JComponent comp, String key) {
+    public static void localizeToolTip(JComponent comp, String key) {
         comp.setToolTipText(Messages.message(key));
-        return comp;
     }
 
     /**
@@ -645,10 +643,9 @@ public final class Utility {
      * @param template The {@code StringTemplate} to use.
      * @return The original {@code JComponent}.
      */
-    public static JComponent localizeToolTip(JComponent comp,
-                                             StringTemplate template) {
+    public static void localizeToolTip(JComponent comp,
+                                       StringTemplate template) {
         comp.setToolTipText(Messages.message(template));
-        return comp;
     }
 
 }

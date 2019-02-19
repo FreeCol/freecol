@@ -751,9 +751,8 @@ public class Flag {
      * corner.
      *
      * @param triangle The top left triangle.
-     * @return The transformed triangle.
      */
-    private GeneralPath transformBend(GeneralPath triangle) {
+    private void transformBend(GeneralPath triangle) {
         if (unionPosition == UnionPosition.TOP) {
             if (decoration == Decoration.BEND) {
                 triangle.transform(AffineTransform.getScaleInstance(-1, 1));
@@ -770,16 +769,14 @@ public class Flag {
                 triangle.transform(AffineTransform.getTranslateInstance(WIDTH, HEIGHT));
             }
         }
-        return triangle;
     }
 
     /**
      * Flip or rotate a left triangle so that it fits another side.
      *
      * @param triangle The left triangle.
-     * @return The transformed triangle.
      */
-    private GeneralPath transformTriangle(GeneralPath triangle) {
+    private void transformTriangle(GeneralPath triangle) {
         switch(unionPosition) {
         case TOP:
             triangle.transform(AffineTransform.getQuadrantRotateInstance(1));
@@ -796,7 +793,6 @@ public class Flag {
         case LEFT:
         default:
         }
-        return triangle;
     }
 
     private GeneralPath getUnionRhombus() {
