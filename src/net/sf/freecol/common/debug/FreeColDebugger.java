@@ -423,6 +423,10 @@ public class FreeColDebugger {
         LogBuilder lb = new LogBuilder(512);
         lb.add(warn, "\n");
         addStackTrace(lb);
-        logger.warning(lb.toString());
+        if (logger == null) {
+            System.err.println(lb.toString());
+        } else {
+            logger.warning(lb.toString());
+        }
     }
 }
