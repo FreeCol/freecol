@@ -440,16 +440,6 @@ public final class TileType extends FreeColSpecObjectType
                        ProductionType::getOutputs);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * Kludge to make this public so that MapViewer can see it.
-     */
-    @Override
-    public int getIndex() {
-        return super.getIndex();
-    }
-
 
     // Override FreeColObject
 

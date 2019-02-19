@@ -212,13 +212,6 @@ public abstract class TrivialMessage extends Message {
     /**
      * {@inheritDoc}
      */
-    public boolean canMerge() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void aiHandler(FreeColServer freeColServer, AIPlayer aiPlayer)
         throws FreeColException {
         throw new FreeColException(getType() + " aiHandler NYI");
