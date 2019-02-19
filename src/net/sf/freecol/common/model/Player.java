@@ -1532,10 +1532,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of military {@code AbstractUnit}s.
      */
     public List<AbstractUnit> getMilitaryUnits() {
-        final UnitType defaultType = getSpecification().getDefaultUnitType(this);
-        java.util.Map<UnitType, HashMap<String, Integer>> unitHash
-            = new HashMap<>();
+        final Specification spec = getSpecification();
+        final UnitType defaultType = spec.getDefaultUnitType(this);
         List<Unit> milUnits = transform(getUnits(), Unit::isOffensiveUnit);
+        java.util.Map<UnitType, HashMap<String, Integer>> unitHash
+            = new HashMap<>(milUnits.size());
         List<AbstractUnit> units = new ArrayList<>(milUnits.size());
         for (Unit unit : milUnits) {
             UnitType unitType = defaultType;
@@ -1544,7 +1545,9 @@ public class Player extends FreeColGameObject implements Nameable {
                 unitType = unit.getType();
             }
             HashMap<String, Integer> roleMap = unitHash.get(unitType);
-            if (roleMap == null) roleMap = new HashMap<>();
+            if (roleMap == null) {
+                roleMap = new HashMap<>(spec.getMilitaryRolesList().size());
+            }
             String roleId = unit.getRole().getId();
             Integer count = roleMap.get(roleId);
             roleMap.put(roleId, (count == null) ? 1 : count + 1);

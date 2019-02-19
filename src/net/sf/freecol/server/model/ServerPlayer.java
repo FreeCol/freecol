@@ -653,7 +653,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         }
 
         // All other units must disappear
-        Set<Tile> tiles = new HashSet<>();
+        Set<Tile> tiles = new HashSet<>(64);
         for (FreeColGameObject fcgo : game.getFreeColGameObjectList()) {
             if (fcgo instanceof Unit) {
                 Unit u = (Unit)fcgo;

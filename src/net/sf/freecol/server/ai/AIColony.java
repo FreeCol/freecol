@@ -292,7 +292,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         BuildableType oldBuild = colony.getCurrentlyBuilding();
         BuildableType build = colonyPlan.getBestBuildableType();
         if (build != oldBuild) {
-            List<BuildableType> queue = new ArrayList<>();
+            List<BuildableType> queue = new ArrayList<>(1);
             if (build != null) queue.add(build);
             AIMessage.askSetBuildQueue(this, queue);
             build = colony.getCurrentlyBuilding();

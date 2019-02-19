@@ -467,7 +467,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         final String cac = s.colony.getId();
         final UnitType defaultUnitType
             = spec.getDefaultUnitType(s.colony.getOwner());
-        List<JComponent> buttons = new ArrayList<>();
+        List<JComponent> buttons = new ArrayList<>(16);
         JButton b;
         Color c;
         StringTemplate t;

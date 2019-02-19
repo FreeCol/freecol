@@ -217,7 +217,7 @@ public final class Specification implements OptionContainer {
     // end @compat 0.10.x/0.11.x
 
     /** A map from specification object group identifier to a reader for it. */
-    private final Map<String, ChildReader> readerMap = new HashMap<>();
+    private final Map<String, ChildReader> readerMap = new HashMap<>(20);
 
     /* Containers filled from readers in the readerMap. */
 
@@ -290,9 +290,9 @@ public final class Specification implements OptionContainer {
 
     /* Other containers. */
 
-    private final Map<String, FreeColSpecObjectType> allTypes = new HashMap<>();
+    private final Map<String, FreeColSpecObjectType> allTypes = new HashMap<>(256);
 
-    private final Map<String, List<Ability>> allAbilities = new HashMap<>();
+    private final Map<String, List<Ability>> allAbilities = new HashMap<>(128);
 
     /** A cache of the military roles in decreasing order.  Do not serialize. */
     private List<Role> militaryRoles = null;

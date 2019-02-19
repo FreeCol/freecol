@@ -243,12 +243,13 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 return false;
             }
             if (!(transferData instanceof List<?>)) return false;
-
+            List<?> transferList = (List<?>)transferData;
+            
             // Collect the transferred buildables.
             final JList<BuildableType> bql
                 = BuildQueuePanel.this.buildQueueList;
-            List<IndexedBuildable> queue = new ArrayList<>();
-            for (Object object : (List<?>)transferData) {
+            List<IndexedBuildable> queue = new ArrayList<>(transferList.size());
+            for (Object object : transferList) {
                 // Fail if:
                 // - dropping a non-Buildable
                 // - dropping a unit in the Building list
@@ -791,7 +792,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             // Only one building of any kind
             if (current.contains(bt) || hasBuildingType(bt)) continue;
             
-            List<String> reasons = new ArrayList<>();
+            List<String> reasons = new ArrayList<>(8);
 
             // Coastal limit
             if (bt.hasAbility(Ability.COASTAL_ONLY)
@@ -855,7 +856,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         for (UnitType ut : spec.getBuildableUnitTypes()) {
             if (unbuildableTypes.contains(ut)) continue;
 
-            List<String> reasons = new ArrayList<>();
+            List<String> reasons = new ArrayList<>(8);
 
             // Population limit
             if (ut.getRequiredPopulation() > this.colony.getUnitCount()) {
