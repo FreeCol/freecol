@@ -45,7 +45,7 @@ import net.sf.freecol.common.util.Utils;
 public final class UnitImageAnimation extends FreeColClientHolder
     implements OutForAnimationCallback {
     
-    protected static final Logger logger = Logger.getLogger(UnitImageAnimation.class.getName());
+    private static final Logger logger = Logger.getLogger(UnitImageAnimation.class.getName());
 
     private final Unit unit;
     private final Tile tile;
