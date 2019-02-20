@@ -3070,10 +3070,8 @@ public final class InGameController extends Controller {
                 return serverPlayer.clientError("Unit " + unit.getId()
                     + " has no moves left.");
             }
-            nt = new NativeTrade(nt.getUnit(), nt.getIndianSettlement());
             // Register a session and ask the natives to price the goods.
-            session = new NativeTradeSession(nt);
-            nt.initialize();
+            nt = NativeTradeSession.openSession(nt);
             cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;
@@ -3208,6 +3206,7 @@ public final class InGameController extends Controller {
         default:
             return serverPlayer.clientError("Bogus action: " + action);
         }
+        logger.fine("Native trade(" + downCase(action.toString()) + ": " + nt);
 
         // Update the other player if needed
         getGame().sendToOthers(serverPlayer, cs);

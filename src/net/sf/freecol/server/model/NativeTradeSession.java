@@ -46,7 +46,7 @@ public class NativeTradeSession extends Session {
      *
      * @param nt The {@code NativeTrade}
      */
-    public NativeTradeSession(NativeTrade nt) {
+    private NativeTradeSession(NativeTrade nt) {
         super(makeSessionKey(NativeTradeSession.class, nt.getUnit(),
                              nt.getIndianSettlement()));
 
@@ -63,6 +63,21 @@ public class NativeTradeSession extends Session {
         return this.nt;
     }
 
+
+    /**
+     * Helper function to update a tentative native trade and open
+     * a session for it.
+     *
+     * @param nt The proposed {@code NativeTrade}.
+     * @return The updated {@code NativeTrade}.
+     */
+    public static NativeTrade openSession(NativeTrade nt) {
+        nt = new NativeTrade(nt.getUnit(), nt.getIndianSettlement());
+        new NativeTradeSession(nt);
+        nt.initialize();
+        return nt;
+    }
+        
     /**
      * {@inheritDoc}
      */
