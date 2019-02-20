@@ -112,7 +112,6 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
         final OptionGroup mapOptions = getMapGeneratorOptions();
 
         if (freeColClient.isInGame()) {
@@ -136,7 +135,6 @@ public class UpdateMapGeneratorOptionsMessage extends ObjectMessage {
             return serverPlayer.clientError("Can not change map generator options, "
                 + "server state = " + freeColServer.getServerState());
         }
-        final Specification spec = freeColServer.getGame().getSpecification();
         final OptionGroup mapOptions = getMapGeneratorOptions();
         if (mapOptions == null) {
             return serverPlayer.clientError("No map generator options to merge");

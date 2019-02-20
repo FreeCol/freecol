@@ -575,7 +575,6 @@ public class ServerPlayer extends Player implements TurnTaker {
             logger.info(getName() + " dead, can not recruit.");
             return DeadCheck.IS_DEAD;
         }
-        UnitType unitType = null;
         int price = Math.min(europe.getCurrentRecruitPrice(),
                              min(spec.getUnitTypesWithAbility(Ability.FOUND_COLONY),
                                  unitPricer));

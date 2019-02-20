@@ -1156,7 +1156,6 @@ public final class TransportMission extends Mission {
         float bestDirectValue = 0.0f, bestFallbackValue = 0.0f;
         for (TransportableAIObject t : euaip.getUrgentTransportables()) {
             if (t.isDisposed() || !t.carriableBy(carrier)) continue;
-            Location loc = t.getTransportSource();
             Cargo cargo;
             try {
                 cargo = Cargo.newCargo(t, carrier);

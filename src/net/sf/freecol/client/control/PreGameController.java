@@ -328,7 +328,6 @@ public final class PreGameController extends FreeColClientHolder {
         final Game game = getGame();
         
         for (FreeColObject fco : objects) {
-            FreeColGameObject fcgo = game.getFreeColGameObject(fco.getId());
             if (fco instanceof Game) {
                 if (game.preGameUpdate((Game)fco)) {
                     final FreeColClient fcc = getFreeColClient();

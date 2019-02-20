@@ -4713,7 +4713,6 @@ public class Unit extends GoodsLocation
                                          Player.class, (Player)null, true);
         if (xr.shouldIntern()) game.checkOwners(this, oldOwner);
 
-        UnitType oldUnitType = this.type;
         this.type = xr.getType(spec, UNIT_TYPE_TAG,
                                UnitType.class, (UnitType)null);
 

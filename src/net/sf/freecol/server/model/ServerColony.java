@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -259,6 +260,9 @@ public class ServerColony extends Colony implements TurnTaker {
         ServerPlayer owner = (ServerPlayer) getOwner();
         BuildableType buildable;
         boolean invalidate = false;
+        final Predicate<GoodsType> notBuildingPred
+            = gt -> gt.isBuildingMaterial() && !gt.isStorable()
+                && getTotalProductionOf(gt) > 0;
 
         while ((buildable = queue.getCurrentlyBuilding()) != null) {
             switch (getNoBuildReason(buildable, null)) {
@@ -269,11 +273,7 @@ public class ServerColony extends Colony implements TurnTaker {
             case NONE:
                 return buildable;
             case NOT_BUILDING:
-                for (GoodsType goodsType : transform(spec.getGoodsTypeList(),
-                        gt -> (gt.isBuildingMaterial()
-                            && !gt.isStorable()
-                            && getTotalProductionOf(gt) > 0))) {
-                    // Production is idle
+                if (any(spec.getGoodsTypeList(), notBuildingPred)) {
                     cs.addMessage(owner,
                         new ModelMessage(MessageType.WARNING,
                                          "model.colony.cannotBuild", this)

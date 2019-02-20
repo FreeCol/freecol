@@ -111,8 +111,6 @@ public class UpdateGameOptionsMessage extends ObjectMessage {
      */
     @Override
     public void clientHandler(FreeColClient freeColClient) {
-        final Game game = freeColClient.getGame();
-        final Specification spec = game.getSpecification();
         final OptionGroup gameOptions = getGameOptions();
 
         if (freeColClient.isInGame()) {

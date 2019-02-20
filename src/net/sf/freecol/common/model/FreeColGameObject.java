@@ -107,7 +107,6 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @param newId The unique identifier of this object.
      */
     public final void internId(final String newId) {
-        final Game game = getGame();
         if (this.game != null && newId != null && isInternable()) {
             final String oldId = getId();
             if (newId.equals(oldId)) {

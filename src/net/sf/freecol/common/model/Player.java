@@ -3772,6 +3772,9 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         // Apply modifiers for other settlements and units at distance.
+        final Predicate<Unit> hostileUnitPred
+            = u -> !this.owns(u) && u.isOffensiveUnit()
+                && this.atWarWith(u.getOwner());
         boolean supportingColony = false;
         for (int radius = 2; radius < DISTANCE_MAX; radius++) {
             for (Tile t : getGame().getMap().getCircleTiles(tile, false,
@@ -3796,13 +3799,10 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
 
-                for (Unit u : transform(t.getUnits(),
-                                        u -> (!owns(u) && u.isOffensiveUnit()
-                                            && atWarWith(u.getOwner())))) {
-                    values.set(ColonyValueCategory.A_NEARBY.ordinal(),
-                        values.get(ColonyValueCategory.A_NEARBY.ordinal())
-                        * MOD_ENEMY_UNIT[radius]);
-                }
+                int hostiles = count(t.getUnits(), hostileUnitPred);
+                values.set(ColonyValueCategory.A_NEARBY.ordinal(),
+                    values.get(ColonyValueCategory.A_NEARBY.ordinal())
+                        + hostiles * MOD_ENEMY_UNIT[radius]);
             }
         }
 

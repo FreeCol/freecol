@@ -112,13 +112,12 @@ public class GrayLayer extends Component {
         }
 
         Font nameFont = getFont();
-        FontMetrics nameFontMetrics = getFontMetrics(nameFont);
         Rectangle textBounds;
         int fontSize = DEFAULT_FONT_SIZE;
         int maxWidth = Math.min(MAX_TEXT_WIDTH, getSize().width);
         do {
             nameFont = nameFont.deriveFont(Font.BOLD, fontSize);
-            nameFontMetrics = getFontMetrics(nameFont);
+            FontMetrics nameFontMetrics = getFontMetrics(nameFont);
             textBounds = nameFontMetrics.getStringBounds(message, g)
                     .getBounds();
             fontSize -= FONT_SIZE_DECREMENT;

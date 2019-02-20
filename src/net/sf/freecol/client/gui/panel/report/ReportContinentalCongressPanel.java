@@ -109,7 +109,6 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         final int age = getGame().getAge();
         Map<String, Turn> electionTurns = getMyPlayer().getElectionTurns();
         for (FoundingFather father : getSpecification().getFoundingFathers()) {
-            String name = Messages.getName(father);
             JPanel panel = panels.get(father.getType());
             Image image;
             Turn turn = null;

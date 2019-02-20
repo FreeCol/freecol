@@ -2539,7 +2539,6 @@ public final class InGameController extends Controller {
     public ChangeSet indianDemand(final ServerPlayer serverPlayer, Unit unit,
                                   Colony colony, GoodsType type, int amount,
                                   Boolean result) {
-        final Game game = getGame();
         final ServerPlayer victim = (ServerPlayer) colony.getOwner();
         NativeDemandSession session = Session.lookup(NativeDemandSession.class,
                                                      unit, colony);

@@ -43,6 +43,8 @@ public class Building extends WorkLocation
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Building.class.getName());
 
+    private final static double EPSILON = 0.0001;
+
     public static final String TAG = "building";
     
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
@@ -346,12 +348,11 @@ public class Building extends WorkLocation
             }
         }
 
-        final double epsilon = 0.0001;
         for (AbstractGoods input : iterable(getInputs())) {
             GoodsType type = input.getType();
             // maximize consumption
             int consumption = (int)Math.floor(input.getAmount()
-                * minimumRatio + epsilon);
+                * minimumRatio + EPSILON);
             int maximumConsumption = (int)Math.floor(input.getAmount()
                 * maximumRatio);
             result.addConsumption(new AbstractGoods(type, consumption));
@@ -364,7 +365,7 @@ public class Building extends WorkLocation
             // minimize production, but add a magic little something
             // to counter rounding errors
             int production = (int)Math.floor(output.getAmount() * minimumRatio
-                + epsilon);
+                + EPSILON);
             int maximumProduction = (int)Math.floor(output.getAmount()
                 * maximumRatio);
             result.addProduction(new AbstractGoods(type, production));

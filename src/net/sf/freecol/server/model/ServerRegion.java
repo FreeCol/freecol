@@ -492,7 +492,7 @@ public class ServerRegion extends Region {
                 nNP, " North Pacific, ",
                 nSP, " South Pacific, ",
                 nNA, " North Atlantic, ",
-                nSP, " South Atlantic.\n");
+                nSA, " South Atlantic.\n");
         }
         return result;
     }

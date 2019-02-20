@@ -807,7 +807,6 @@ public class TerrainGenerator {
      */
     public Map generateMap(Game game, Map importMap, LandMap landMap,
                            LogBuilder lb) {
-        final Specification spec = game.getSpecification();
         final OptionGroup mapOptions = game.getMapGeneratorOptions();
         final int width = landMap.getWidth();
         final int height = landMap.getHeight();

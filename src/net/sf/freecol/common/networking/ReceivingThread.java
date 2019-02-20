@@ -274,9 +274,8 @@ final class ReceivingThread extends Thread {
     private Thread messageUpdate(final Message message) {
         if (message == null) return null;
         final String inTag = message.getType();
-        final Connection conn = this.connection;
 
-        return new UpdateThread(getName() + "-update-" + message.getType(),
+        return new UpdateThread(getName() + "-update-" + inTag,
                                 this.connection, message);
     }
 

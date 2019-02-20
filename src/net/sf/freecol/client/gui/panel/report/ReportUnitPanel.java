@@ -113,10 +113,10 @@ public abstract class ReportUnitPanel extends ReportPanel {
         display();
     }
 
+
     private final void gatherData() {
         // Add entries to where and reportables for the players units
         final Player player = getMyPlayer();
-        final Specification spec = getSpecification();
         for (Unit u : transform(player.getUnits(), u -> isReportable(u))) {
             appendToMapList(this.where, u.getLocation().up(), u);
             AbstractUnit au = find(this.reportables, AbstractUnit.matcher(u));
