@@ -400,14 +400,6 @@ public final class SpecificationTest extends FreeColTestCase {
         for (UnitType unitType : spec.getUnitTypeList()) {
             assertFalse("model.unit.caravel".equals(unitType.getId()));
         }
-
-        // restore original values
-        try {
-            spec = FreeColTcFile.getFreeColTcFile("freecol")
-                .getSpecification();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
     }
 
     public void testGetDefaultUnitType() {

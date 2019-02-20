@@ -892,7 +892,11 @@ public final class Specification implements OptionContainer {
 
                 } else if (FreeColSpecObjectType.DELETE_TAG.equals(tag)) {
                     FreeColSpecObjectType object = allTypes.remove(id);
-                    if (object != null) result.remove(object);
+                    if (object != null) {
+                        result.remove(object);
+                    } else {
+                        logger.warning("Delete " + id + " failed");
+                    }
 
                 } else {
                     T object = getType(id, type);
@@ -1889,9 +1893,9 @@ public final class Specification implements OptionContainer {
      */
     public <T extends FreeColSpecObjectType> T getType(String id,
                                                        Class<T> returnClass) {
-        FreeColSpecObjectType o = findType(id);
+        T o = findType(id, returnClass);
         if (o != null) {
-            return returnClass.cast(allTypes.get(id));
+            return o;
 
         } else if (initialized) {
             throw new IllegalArgumentException("Undefined FCGOT: " + id);
@@ -1911,13 +1915,26 @@ public final class Specification implements OptionContainer {
     }
 
     /**
+     * Find a {@code FreeColSpecObjectType} by id and class.
+     *
+     * @param <T> The actual return type.
+     * @param id The object identifier to look for.
+     * @param returnClass The expected {@code Class}.
+     * @return The {@code FreeColSpecObjectType} found if any.
+     */
+    private <T extends FreeColSpecObjectType> T findType(String id,
+                                                         Class<T> returnClass) {
+        FreeColSpecObjectType fcsot = findType(id);
+        return (fcsot == null) ? null : returnClass.cast(fcsot);
+    }
+
+    /**
      * Find a {@code FreeColSpecObjectType} by id.
      *
-     * @param id The identifier to look for, which must not be null.
+     * @param id The identifier to look for.
      * @return The {@code FreeColSpecObjectType} found if any.
      */
     public FreeColSpecObjectType findType(String id) {
-        if (id == null) throw new IllegalArgumentException("Null id");
         return allTypes.get(id);
     }
 
