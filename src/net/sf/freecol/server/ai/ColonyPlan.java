@@ -653,7 +653,7 @@ public class ColonyPlan {
         } else if (produce.contains(goodsType)) {
             if ("trade".equals(advantage)) factor = 1.2;
             double f = 0.1 * colony.getTotalProductionOf(goodsType.getInputType());
-            ret = prioritize(type, PRODUCTION_WEIGHT,
+            ret = prioritize(type, PRODUCTION_WEIGHT * factor,
                 f/*FIXME: improvement?*/);
         }
         return ret;
