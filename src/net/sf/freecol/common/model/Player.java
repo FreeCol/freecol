@@ -2844,7 +2844,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (isEuropean()
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
                 for (Player other : getGame().getLiveNativePlayerList(this)) {
-                    for (IndianSettlement is : getIndianSettlementsWithMissionaryList(this)) {
+                    for (IndianSettlement is : other.getIndianSettlementsWithMissionaryList(this)) {
                         tiles.addAll(is.getVisibleTileSet());
                     }
                 }
