@@ -82,6 +82,6 @@ public class ColonyWas {
         if (colony.getGoodsContainer() != null) {
             ret |= colony.getGoodsContainer().fireChanges();
         }
-        return true;
+        return ret;
     }
 }
