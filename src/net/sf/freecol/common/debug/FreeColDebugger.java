@@ -358,7 +358,9 @@ public class FreeColDebugger {
      * @param msg The message to log.
      */
     public static void debugLog(String msg) {
-        final Path path = Paths.get("/tmp", "freecol.debug");
+        String tmp = System.getenv("TMPDIR");
+        if (tmp == null) tmp = "/tmp";
+        final Path path = Paths.get(tmp, "freecol.debug");
         try (OutputStream fos = Files.newOutputStream(path, APPEND)) {
             try (PrintStream prs = new PrintStream(fos, true, "UTF-8")) {
                 prs.println(msg);
