@@ -1009,10 +1009,7 @@ public final class TransportMission extends Mission {
                     ? tryCargo(cargo, lb)
                     : CargoResult.TCONTINUE;
                 switch (result) {
-                case TCONTINUE:
-                    cont.add(cargo);
-                    break;
-                case TNEXT:
+                case TCONTINUE: case TNEXT:
                     cont.add(cargo);
                     break;
                 case TRETRY:

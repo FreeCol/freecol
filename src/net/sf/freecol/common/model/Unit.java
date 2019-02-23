@@ -787,18 +787,12 @@ public class Unit extends GoodsLocation
 
         // Now initiate the new UnitState
         switch (s) {
-        case ACTIVE:
-            setWorkLeft(-1);
-            break;
-        case SENTRY:
+        case ACTIVE: case FORTIFYING: case SENTRY:
             setWorkLeft(-1);
             break;
         case FORTIFIED:
             setWorkLeft(-1);
             movesLeft = 0;
-            break;
-        case FORTIFYING:
-            setWorkLeft(1);
             break;
         case IMPROVING:
             if (workImprovement == null) {

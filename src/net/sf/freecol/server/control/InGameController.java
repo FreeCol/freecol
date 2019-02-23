@@ -3142,7 +3142,8 @@ public final class InGameController extends Controller {
                 "movesLeft", String.valueOf(unit.getMovesLeft()));
             break;
 
-        case ACK_BUY_HAGGLE: case ACK_SELL_HAGGLE: // Successful haggle
+        case ACK_BUY_HAGGLE: case ACK_SELL_HAGGLE: case NAK_GOODS:
+            // Successful haggle or polite refusal of gift
             session.getNativeTrade().mergeFrom(nt);
             cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
@@ -3180,12 +3181,6 @@ public final class InGameController extends Controller {
             nt.removeFromUnit(item);
             session.getNativeTrade().mergeFrom(nt);
             session.getNativeTrade().setGift(false);
-            cs.add(See.only(otherPlayer),
-                   new NativeTradeMessage(action, nt));
-            break;
-
-        case NAK_GOODS: // Polite refusal of gift
-            session.getNativeTrade().mergeFrom(nt);
             cs.add(See.only(otherPlayer),
                    new NativeTradeMessage(action, nt));
             break;

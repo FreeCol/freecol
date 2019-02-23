@@ -466,7 +466,7 @@ public class ServerPlayer extends Player implements TurnTaker {
          *         && ((year > 1600) || (cannot get a unit from Europe)))
          */
         switch (getPlayerType()) {
-        case NATIVE: // All natives units are viable
+        case NATIVE: case UNDEAD: // All native and undead units are viable
             return (getUnitCount() == 0) ? DeadCheck.IS_DEAD
                 : DeadCheck.IS_ALIVE;
 
@@ -481,10 +481,6 @@ public class ServerPlayer extends Player implements TurnTaker {
 
         case ROYAL:
             return (checkForREFDefeat()) ? DeadCheck.IS_DEFEATED
-                : DeadCheck.IS_ALIVE;
-
-        case UNDEAD:
-            return (getUnitCount() == 0) ? DeadCheck.IS_DEAD
                 : DeadCheck.IS_ALIVE;
 
         default:

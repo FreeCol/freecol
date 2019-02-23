@@ -123,10 +123,7 @@ public class NumberRules {
         while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (null != tag) switch (tag) {
-                case VERSION_TAG:
-                    xr.nextTag();
-                    break;
-                case GENERATION_TAG:
+                case VERSION_TAG: case GENERATION_TAG:
                     xr.nextTag();
                     break;
                 case PLURALS_TAG:
