@@ -350,14 +350,22 @@ public class Connection implements Closeable {
      * Signal that this connection is disconnecting.
      */
     public void sendDisconnect() {
-        send(TrivialMessage.disconnectMessage);
+        try {
+            send(TrivialMessage.disconnectMessage);
+        } catch (FreeColException|IOException|XMLStreamException ex) {
+            logger.log(Level.WARNING, "Failed to send disconnect", ex);
+        }
     }
 
     /**
      * Send a reconnect message.
      */
     public void sendReconnect() {
-        send(TrivialMessage.reconnectMessage);
+        try {
+            send(TrivialMessage.reconnectMessage);
+        } catch (FreeColException|IOException|XMLStreamException ex) {
+            logger.log(Level.WARNING, "Failed to send reconnect", ex);
+        }
     }
 
     /**
@@ -428,7 +436,7 @@ public class Connection implements Closeable {
         QuestionMessage qm = new QuestionMessage(replyId, message);
         NetworkReplyObject nro
             = this.receivingThread.waitForNetworkReply(replyId);
-        if (!sendMessage(qm)) return null;
+        sendMessage(qm);
 
         // Block waiting for the reply to occur.  Expect a reply
         // message, except on shutdown.
@@ -450,23 +458,21 @@ public class Connection implements Closeable {
      * Public as this is called from ReceivingThread.
      *
      * @param message The {@code Message} to send.
-     * @return True if the message was null or successfully sent.
      * @exception FreeColException on extreme confusion.
      * @exception IOException on failure to send.
      * @exception XMLStreamException on stream problem.
      */
-    public boolean sendMessage(Message message)
+    public void sendMessage(Message message)
         throws FreeColException, IOException, XMLStreamException {
-        if (message == null) return true;
+        if (message == null) return;
         synchronized (this.outputLock) {
-            if (this.xw == null) return false;
+            if (this.xw == null) return;
             message.toXML(this.xw);
             this.xw.writeCharacters(END_OF_STREAM_ARRAY, 0,
                                     END_OF_STREAM_ARRAY.length);
             this.xw.flush();
         }
         logMessage(message, true);
-        return true;
     }
 
     /**
@@ -533,50 +539,39 @@ public class Connection implements Closeable {
      * @param message A {@code Message} to process.
      * @return True if the message was sent, the reply handled, and the
      *     reply was not an error message.
+     * @exception FreeColException on handler failure.
+     * @exception IOException if there is a problem sending messages.
+     * @exception XMLStreamException if there is a message format problem.
      */
-    public boolean request(Message message) {
-        if (message == null) return true;
+    public void request(Message message)
+        throws FreeColException, IOException, XMLStreamException {
+        if (message == null) return;
         final String reqTag = message.getType();
         String resTag;
-        try {
-            Message response = askMessage(message);
-            if (response == null) {
-                resTag = "(null)";
-            } else {
-                resTag = response.getType();
-                Message reply = handle(response);
-                assert reply == null;
-            }
-            logger.finest(this.name + " request(" + reqTag + " -> "
-                + resTag + ") ok");
-            return true;
-        } catch (Exception ex) {
-            logger.log(Level.FINEST, this.name + " request("
-                + reqTag + ") exception", ex);
+        Message response = askMessage(message);
+        if (response == null) {
+            resTag = "(null)";
+        } else {
+            resTag = response.getType();
+            Message reply = handle(response);
+            assert reply == null;
         }
-        return false;
     }
         
     /**
      * Client send.
      *
      * @param message A {@code Message} to send.
-     * @return True if the message was sent.
+     * @exception FreeColException on extreme confusion.
+     * @exception IOException on write error.
+     * @exception XMLStreamException if there is a message format problem.
      */
-    public boolean send(Message message) {
-        if (message == null) return true;
-        final String tag = message.getType();
-        try {
-            if (sendMessage(message)) {
-                logger.finest(this.name + " send(" + tag + ") ok");
-                return true;
-            }
-            logger.warning(this.name + " send(" + tag + ") failed");
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, this.name + " send("
-                + tag + ") exception", ex);
+    public void send(Message message)
+        throws FreeColException, IOException, XMLStreamException {
+        if (message != null) {
+            final String tag = message.getType();
+            sendMessage(message);
         }
-        return false;
     }
     
 

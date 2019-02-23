@@ -503,27 +503,15 @@ public final class Specification implements OptionContainer {
      * given {@code FreeColXMLReader}.
      *
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException if there is a problem with the stream.
      */
-    public Specification(FreeColXMLReader xr) {
+    public Specification(FreeColXMLReader xr) throws XMLStreamException {
         this();
         initialized = false;
-        load(xr);
+        readFromXML(xr);
         prepare(null, difficultyLevel);
         clean("load from stream");
         initialized = true;
-    }
-
-    /**
-     * Load a specification or fragment from a stream.
-     *
-     * @param xr The {@code FreeColXMLReader} to read from.
-     */
-    private void load(FreeColXMLReader xr) {
-        try {
-            readFromXML(xr);
-        } catch (Exception e) {
-            throw new RuntimeException("Error parsing specification", e);
-        }
     }
 
     /**
@@ -531,8 +519,9 @@ public final class Specification implements OptionContainer {
      * given {@code InputStream}.
      *
      * @param in The {@code InputStream} to read from.
+     * @exception XMLStreamException if there is a problem with the stream.
      */
-    public Specification(InputStream in) {
+    public Specification(InputStream in) throws XMLStreamException {
         this();
         initialized = false;
         load(in);
@@ -545,15 +534,14 @@ public final class Specification implements OptionContainer {
      * Load a specification or fragment from a stream.
      *
      * @param in The {@code InputStream} to read from.
+     * @exception XMLStreamException if there is a problem with the stream.
      */
-    private void load(InputStream in) {
+    private void load(InputStream in) throws XMLStreamException {
         try (
             FreeColXMLReader xr = new FreeColXMLReader(in);
         ) {
             xr.nextTag();
-            load(xr);
-        } catch (Exception e) {
-            throw new RuntimeException("Load specification stream error", e);
+            readFromXML(xr);
         }
     }
 
@@ -575,9 +563,9 @@ public final class Specification implements OptionContainer {
                 }
                 loadedMod = true;
                 logger.info("Loaded mod " + mod.getId());
-            } catch (IOException ioe) {
+            } catch (IOException|XMLStreamException ex) {
                 logger.log(Level.WARNING, "Read error in mod " + mod.getId(),
-                    ioe);
+                    ex);
             } catch (RuntimeException rte) {
                 logger.log(Level.WARNING, "Parse error in mod " + mod.getId(),
                     rte);
@@ -2102,7 +2090,7 @@ public final class Specification implements OptionContainer {
         File rolf = FreeColDirectories.getCompatibilityFile(ROLES_COMPAT_FILE_NAME);
         try (InputStream fis = Files.newInputStream(rolf.toPath())) {
             load(fis);
-        } catch (IOException e) {
+        } catch (IOException|XMLStreamException e) {
             logger.log(Level.WARNING, "Failed to load remedial roles.", e);
             return;
         }
@@ -2126,7 +2114,7 @@ public final class Specification implements OptionContainer {
         File uctf = FreeColDirectories.getCompatibilityFile(UNIT_CHANGE_TYPES_COMPAT_FILE_NAME);
         try (InputStream fis = Files.newInputStream(uctf.toPath())) {
             load(fis);
-        } catch (IOException e) {
+        } catch (IOException|XMLStreamException e) {
             logger.log(Level.WARNING, "Failed to load unit changes.", e);
             return;
         }

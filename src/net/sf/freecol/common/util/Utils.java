@@ -102,15 +102,14 @@ public class Utils {
      *
      * @param random A pseudo-random number source.
      * @return A {@code String} encapsulating the object state.
+     * @exception IOException is the byte stream output breaks.
      */
-    public static synchronized String getRandomState(Random random) {
+    public static synchronized String getRandomState(Random random)
+        throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
+        try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
             oos.writeObject(random);
             oos.flush();
-        } catch (IOException e) {
-            throw new IllegalStateException("IO exception in memory!?", e);
         }
         byte[] bytes = bos.toByteArray();
         StringBuilder sb = new StringBuilder(bytes.length * 2);

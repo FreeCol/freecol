@@ -63,8 +63,8 @@ public class CLDRTest extends FreeColTestCase {
         assertTrue(inputFile.exists());
         try (InputStream in = Files.newInputStream(inputFile.toPath())) {
             numberRules = new NumberRules(in);
-        } catch (IOException e) {
-            fail("Failed to open input stream.");
+        } catch (Exception e) {
+            fail("Failed to open input stream: " + e.toString());
         }
 
         assertNotNull(NumberRules.getNumberForLanguage("az"));

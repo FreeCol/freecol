@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +37,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
@@ -309,11 +312,17 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @param cs The {@code ChangeSet} to send.
      * @return True if the message was sent.
+     * @exception FreeColException
      */
     public boolean send(ChangeSet cs) {
-        return (isConnected())
-            ? this.connection.request(cs.build(this))
-            : false;
+        if (!isConnected()) return false;
+        try {
+            this.connection.request(cs.build(this));
+        } catch (FreeColException|IOException|XMLStreamException ex) {
+            logger.log(Level.WARNING, "send fail", ex);
+            return false;
+        }
+        return true;
     }
 
     /**

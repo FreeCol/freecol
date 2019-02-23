@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Modifier;
@@ -368,8 +370,12 @@ public final class SpecificationTest extends FreeColTestCase {
             + "</unit-types>"
             + "</freecol-specification>";
 
-        Specification spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
-
+        Specification spec = null;
+        try {
+            spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
+        } catch (XMLStreamException xse) {
+            fail("Spec read fail");
+        }
         assertNotNull(spec.getUnitType("model.unit.milkmaid"));
         assertNotNull(spec.getUnitType("model.unit.caravel"));
 
@@ -389,8 +395,12 @@ public final class SpecificationTest extends FreeColTestCase {
             + "</unit-types>"
             + "</freecol-specification>";
 
-        Specification spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
-
+        Specification spec = null;
+        try {
+            spec = new Specification(new ByteArrayInputStream(specification.getBytes()));
+        } catch (XMLStreamException xse) {
+            fail("Spec read fail");
+        }
         try {
             spec.getUnitType("model.unit.caravel");
             fail("Caravel is defined.");

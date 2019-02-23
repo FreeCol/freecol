@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -650,10 +651,18 @@ public abstract class AIPlayer extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+    protected void writeAttributes(FreeColXMLWriter xw)
+        throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(RANDOM_STATE_TAG, Utils.getRandomState(aiRandom));
+        String rs;
+        try {
+            rs = Utils.getRandomState(aiRandom);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Could not get random state", ioe);
+            return;
+        }
+        xw.writeAttribute(RANDOM_STATE_TAG, rs);
     }
 
     /**

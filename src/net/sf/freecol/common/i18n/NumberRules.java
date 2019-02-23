@@ -73,8 +73,9 @@ public class NumberRules {
      * CLDR plural rules.
      *
      * @param in an {@code InputStream} value
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public NumberRules(InputStream in) {
+    public NumberRules(InputStream in) throws XMLStreamException {
         load(in);
     }
 
@@ -96,9 +97,10 @@ public class NumberRules {
     }
 
 
-    public static void load(InputStream in) throws IOException {
-        FreeColXMLReader xr = new FreeColXMLReader(in);
-        readFromXML(xr);
+    public static void load(InputStream in) throws XMLStreamException {
+        try (FreeColXMLReader xr = new FreeColXMLReader(in)) {
+            readFromXML(xr);
+        }
     }
 
 

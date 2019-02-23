@@ -281,10 +281,8 @@ public class MetaServerUtils {
             return null;
         }
         try {
-            if (!mc.sendMessage(new ServerListMessage())) {
-                logger.warning("Error querying metaserver.");
-                return null;
-            }
+            mc.sendMessage(new ServerListMessage());
+
             final int MAXTRIES = 5;
             final int SLEEP_TIME = 1000; // 1s
             for (int n = MAXTRIES; n > 0; n--) {

@@ -623,9 +623,12 @@ public final class FreeColServer {
      * that has not yet logged in as a player.
      *
      * @param socket The client {@code Socket} the connection arrives on.
+     * @exception FreeColException on extreme confusion.
      * @exception IOException if the socket was already broken.
+     * @exception XMLStreamException on stream problem.
      */
-    public void addNewUserConnection(Socket socket) throws IOException {
+    public void addNewUserConnection(Socket socket)
+        throws FreeColException, IOException, XMLStreamException {
         final String name = socket.getInetAddress() + ":" + socket.getPort();
         Connection c = new Connection(socket, FreeCol.SERVER_THREAD + name)
             .setMessageHandler(this.userConnectionHandler);

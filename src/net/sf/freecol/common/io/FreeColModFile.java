@@ -91,9 +91,11 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      * Gets the Specification.
      *
      * @return The {@code Specification}, or null if none present.
-     * @exception IOException if an error occurs reading the specification.
+     * @exception IOException if an error occurs creating a stream to read.
+     * @exception XMLStreamException if there is an error reading the stream.
      */
-    public Specification getSpecification() throws IOException {
+    public Specification getSpecification() throws IOException,
+                                                   XMLStreamException {
         try (InputStream si = getSpecificationInputStream()) {
             return (si == null) ? null : new Specification(si);
         }

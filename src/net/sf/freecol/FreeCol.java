@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.FreeColException;
@@ -841,7 +843,9 @@ public final class FreeCol {
 
             if (line.hasOption("timeout")) {
                 String arg = line.getOptionValue("timeout");
-                if (!setTimeout(arg)) { // Not fatal
+                try {
+                    setTimeout(arg); // Not fatal
+                } catch (NumberFormatException nfe) {
                     gripe(StringTemplate.template("cli.error.timeout")
                         .addName("%string%", arg)
                         .addName("%minimum%", Long.toString(TIMEOUT_MIN)));
@@ -919,9 +923,9 @@ public final class FreeCol {
         Specification spec = null;
         try {
             if (tcf != null) spec = tcf.getSpecification();
-        } catch (IOException ioe) {
+        } catch (IOException|XMLStreamException ex) {
             System.err.println("Spec read failed in " + tcf.getId()
-                + ": " + ioe.getMessage() + "\n");
+                + ": " + ex.getMessage() + "\n");
         }
         if (spec != null) spec.prepare(advantages, difficulty);
         return spec;
@@ -1333,17 +1337,12 @@ public final class FreeCol {
      * Sets the timeout.
      *
      * @param timeout A string containing the new timeout.
-     * @return True if the timeout was set.
      */
-    public static boolean setTimeout(String timeout) {
-        try {
-            long result = Long.parseLong(timeout);
-            if (TIMEOUT_MIN <= result && result <= TIMEOUT_MAX) {
-                FreeCol.timeout = result;
-                return true;
-            }
-        } catch (NumberFormatException nfe) {}
-        return false;
+    public static void setTimeout(String timeout) {
+        long result = Long.parseLong(timeout);
+        if (TIMEOUT_MIN <= result && result <= TIMEOUT_MAX) {
+            FreeCol.timeout = result;
+        }
     }
 
     /**

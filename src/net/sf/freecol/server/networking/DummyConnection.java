@@ -90,11 +90,10 @@ public final class DummyConnection extends Connection {
      * {@inheritDoc}
      */
     @Override
-    public boolean sendMessage(Message message)
+    public void sendMessage(Message message)
         throws FreeColException, IOException {
         Message reply = askMessage(message);
         assert reply == null;
-        return true;
     }
 
     /**

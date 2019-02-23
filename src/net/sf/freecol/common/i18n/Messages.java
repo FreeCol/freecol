@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -158,7 +159,7 @@ public class Messages {
             if (cldr.exists()) {
                 try (InputStream in = Files.newInputStream(cldr.toPath())) {
                     NumberRules.load(in);
-                } catch (IOException e) {
+                } catch (IOException|XMLStreamException e) {
                     System.err.println("Failed to read CLDR rules: "
                         + e.getMessage());
                 }

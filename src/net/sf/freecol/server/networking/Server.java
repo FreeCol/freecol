@@ -232,12 +232,12 @@ public final class Server extends Thread {
                         // Undocumented null return has been seen
                         this.freeColServer.addNewUserConnection(sock);
                     }
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     // Catch all exceptions.  There have been
                     // sightings of spurious NPEs and other fail in
                     // the Java libraries.
                     if (this.running) {
-                        logger.log(Level.WARNING, "Connection failed: ", e);
+                        logger.log(Level.WARNING, "Connection failed: ", ex);
                     }
                 }
             }

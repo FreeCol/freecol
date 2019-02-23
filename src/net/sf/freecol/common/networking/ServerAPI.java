@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
@@ -158,7 +160,15 @@ public abstract class ServerAPI {
     private boolean send(Message message) {
         if (message == null) return true;
         final Connection c = check("send", message.getType());
-        return (c == null) ? false : c.send(message);
+        if (c != null) {
+            try {
+                c.send(message);
+                return true;
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, "Failed to send", ex);
+            }
+        }
+        return false;
     }
 
     /**
@@ -178,7 +188,16 @@ public abstract class ServerAPI {
     private boolean ask(Message message) {
         if (message == null) return true;
         final Connection c = check("ask", message.getType());
-        return (c == null) ? false : c.request(message);
+        if (c != null) {
+            try {
+                c.request(message);
+                return true;
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, "Failed to ask", ex);
+            }
+        }
+        return false;
+                
     }
 
 
