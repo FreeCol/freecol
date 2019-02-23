@@ -1040,7 +1040,7 @@ public class Map extends FreeColGameObject implements Location {
          * {@inheritDoc}
          */
         @Override
-        public Tile next() throws NoSuchElementException {
+        public Tile next() {
             if (!hasNext()) {
                 throw new NoSuchElementException("CircleIterator exhausted");
             }
