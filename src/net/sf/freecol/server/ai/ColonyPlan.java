@@ -943,21 +943,6 @@ public class ColonyPlan {
     }
 
     /**
-     * Tries to swap an expert unit for another doing its job.
-     *
-     * @param expert The expert {@code Unit}.
-     * @param others A list of other {@code Unit}s to test against.
-     * @param colony The {@code Colony} the units are working in.
-     * @return The unit that was replaced by the expert, or null if none.
-     */
-    private Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
-        final GoodsType work = expert.getType().getExpertProduction();
-        final Unit other = find(others, u -> u.nonExpertWorker(work));
-        if (other != null) expert.swapWork(other);
-        return other;
-    }
-
-    /**
      * Finds a plan on a list that produces a given goods type.
      *
      * @param goodsType The {@code GoodsType} to produce.
@@ -1421,11 +1406,11 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         while (expert < experts.size()) {
             Unit u1 = experts.get(expert);
             Unit other;
-            if ((other = trySwapExpert(u1, experts, col)) != null) {
+            if ((other = u1.trySwapExpert(experts)) != null) {
                 lb.add("    Swapped ", u1.getId(), "(",
                     u1.getType().getSuffix(), ") for ", other, "\n");
                 experts.remove(u1);
-            } else if ((other = trySwapExpert(u1, nonExperts, col)) != null) {
+            } else if ((other = u1.trySwapExpert(nonExperts)) != null) {
                 lb.add("    Swapped ", u1.getId(), "(",
                     u1.getType().getSuffix(), ") for ", other, "\n");
                 experts.remove(u1);
@@ -1436,7 +1421,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         for (Unit u : new ArrayList<>(workers)) {
             GoodsType work = u.getType().getExpertProduction();
             if (work != null) {
-                Unit other = trySwapExpert(u, col.getUnitList(), col);
+                Unit other = u.trySwapExpert(col.getUnitList());
                 if (other != null) {
                     lb.add("    Swapped ", u.getId(), "(",
                         u.getType().getSuffix(), ") for ", other, "\n");

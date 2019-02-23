@@ -3880,9 +3880,25 @@ public class Unit extends GoodsLocation
      * @param work The {@code GoodsType} to check.
      * @return True if this unit is a non-expert worker.
      */
-    public boolean nonExpertWorker(GoodsType work) {
+    private boolean nonExpertWorker(GoodsType work) {
         return isPerson() && getWorkType() == work
             && getType().getExpertProduction() != work;
+    }
+
+    /**
+     * Try to swap this unit if it is an expert for another that is
+     * doing its job.
+     *
+     * @param others A list of other {@code Unit}s to test against.
+     * @param colony The {@code Colony} the units are working in.
+     * @return The unit that was replaced by this expert, or null if none.
+     */
+    public Unit trySwapExpert(List<Unit> others) {
+        final GoodsType work = getType().getExpertProduction();
+        if (work == null) return null;
+        final Unit other = find(others, u -> u.nonExpertWorker(work));
+        if (other != null) swapWork(other);
+        return other;
     }
 
     /**
