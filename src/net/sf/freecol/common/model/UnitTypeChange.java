@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -46,7 +48,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
     public int turns;
 
     // @compat 0.11.6
-    static int fakeIdIndex = 1;
+    private static AtomicInteger fakeIdIndex = new AtomicInteger(0);
     // end @compat 0.11.6
 
 
@@ -154,8 +156,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
         // handle mods.
         String id = getId();
         if (id == null || "".equals(id)) {
-            id = "model.unitChange.faked." + fakeIdIndex++;
-            setId(id);
+            setId("model.unitChange.faked." + fakeIdIndex.incrementAndGet());
         }
         // end @compat 0.11.6
     }
