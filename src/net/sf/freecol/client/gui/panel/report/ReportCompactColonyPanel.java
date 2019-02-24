@@ -109,7 +109,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         public static class GoodsProduction {
 
             /** Binary accumulation operator for goods production. */
-            public static BinaryOperator<GoodsProduction>
+            public static final BinaryOperator<GoodsProduction>
                 goodsProductionAccumulator = (g1, g2) -> g1.accumulate(g2);
             
             public int amount;
