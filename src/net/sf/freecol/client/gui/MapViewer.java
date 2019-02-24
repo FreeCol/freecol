@@ -658,13 +658,13 @@ public final class MapViewer extends FreeColClientHolder {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
             final JLabel unitLabel = createUnitLabel(unit);
-            final int width = unitLabel.getWidth();
-            final int height = unitLabel.getHeight();
-            i = 1;
-            unitLabel.setLocation(calculateUnitLabelPositionInTile(width,
-                    height, calculateTilePosition(sourceTile, false)));
+            unitLabel.setLocation(
+                calculateUnitLabelPositionInTile(unitLabel.getWidth(),
+                    unitLabel.getHeight(),
+                    calculateTilePosition(sourceTile, false)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
             getGUI().getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
+            i = 1;
         } else {
             i++;
         }

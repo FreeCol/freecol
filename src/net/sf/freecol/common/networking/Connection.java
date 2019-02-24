@@ -546,13 +546,8 @@ public class Connection implements Closeable {
     public void request(Message message)
         throws FreeColException, IOException, XMLStreamException {
         if (message == null) return;
-        final String reqTag = message.getType();
-        String resTag;
         Message response = askMessage(message);
-        if (response == null) {
-            resTag = "(null)";
-        } else {
-            resTag = response.getType();
+        if (response != null) {
             Message reply = handle(response);
             assert reply == null;
         }
@@ -568,10 +563,7 @@ public class Connection implements Closeable {
      */
     public void send(Message message)
         throws FreeColException, IOException, XMLStreamException {
-        if (message != null) {
-            final String tag = message.getType();
-            sendMessage(message);
-        }
+        if (message != null) sendMessage(message);
     }
     
 
