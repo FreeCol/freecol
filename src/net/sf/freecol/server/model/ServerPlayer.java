@@ -231,11 +231,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             this.setReady(true);
         } else if (nation.getType() != null) {
             this.nationType = nation.getType();
-            try {
-                addFeatures(nationType);
-            } catch (Throwable error) {
-                error.printStackTrace();
-            }
+            addFeatures(nationType);
             if (nationType.isEuropean()) {
                 /*
                  * Setting the amount of gold to

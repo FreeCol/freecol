@@ -96,7 +96,7 @@ public class GenerateDocumentation {
                 line = bufferedReader.readLine();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error reading resources: " + e.toString());
         }
     }
 
@@ -201,8 +201,8 @@ public class GenerateDocumentation {
                         stylesheet = factory.newTransformer(xsl);
                     } catch (TransformerException tce) {
                         System.err.println("Problem with " + XSL + " at: "
-                                                   + tce.getLocationAsString());
-                        tce.printStackTrace();
+                            + tce.getLocationAsString()
+                            + "\n" + tce.toString());
                         continue;
                     }
 
@@ -212,7 +212,7 @@ public class GenerateDocumentation {
                     stylesheet.transform(request, response);
                 }
                 catch (TransformerException e) {
-                    e.printStackTrace();
+                    System.err.println("Transformation error: " + e.toString());
                 }
             }
         }

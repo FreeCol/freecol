@@ -171,8 +171,8 @@ public class ForestMaker {
                         images.add(image);
                         maximumHeight = Math.min(image.getHeight(), maximumHeight);
                     } catch(IOException e) {
-                        System.out.println("Unable to load image " + imageFile.getName() + ":\n");
-                        e.printStackTrace();
+                        System.err.println("Unable to load image "
+                            + imageFile.getName() + ":\n" + e.toString());
                     }
                 }
             }

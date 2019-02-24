@@ -323,8 +323,7 @@ public final class FreeCol {
             for (LogLevel ll : logLevels) ll.buildLogger();
         } catch (FreeColException e) {
             System.err.println("Logging initialization failure: "
-                + e.getMessage());
-            e.printStackTrace();
+                + e.toString());
         }
         Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) -> {
                 baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
