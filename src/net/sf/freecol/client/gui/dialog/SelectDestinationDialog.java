@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -305,12 +307,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     private static final int CELL_HEIGHT = 48;
 
     /** Show only the player colonies.  FIXME: make a client option. */
-    private static boolean showOnlyMyColonies = true;
+    private static AtomicBoolean showOnlyMyColonies = new AtomicBoolean(true);
 
     /** How to order the destinations. */
-    private static Comparator<Destination> destinationComparator = null;
-    /** Lock for the destinationComparator. */
-    private static Object destinationComparatorLock = new Object();
+    private static AtomicReference<Comparator<Destination>>
+        destinationComparator = new AtomicReference<>(null);
     
     /** The available destinations. */
     private final List<Destination> destinations = new ArrayList<>();
@@ -364,9 +365,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         listScroller.setPreferredSize(new Dimension(300, 300));
 
         String omcb = Messages.message("selectDestinationDialog.onlyMyColonies");
-        this.onlyMyColoniesBox = new JCheckBox(omcb, showOnlyMyColonies);
+        this.onlyMyColoniesBox = new JCheckBox(omcb, showOnlyMyColonies.get());
         this.onlyMyColoniesBox.addChangeListener((ChangeEvent event) -> {
-                showOnlyMyColonies = onlyMyColoniesBox.isSelected();
+                showOnlyMyColonies.set(onlyMyColoniesBox.isSelected());
                 updateDestinationList();
             });
 
@@ -410,12 +411,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * @return The destination comparator.
      */
     private Comparator<Destination> getDestinationComparator() {
-        synchronized (destinationComparatorLock) {
-            if (destinationComparator == null) {
-                destinationComparator = Destination.getDestinationComparator(0);
-            }
-            return destinationComparator;
+        Comparator<Destination> ret = destinationComparator.get();
+        if (ret == null) {
+            ret = Destination.getDestinationComparator(0);
+            destinationComparator.set(ret);
         }
+        return ret;
     }
 
     /**
@@ -424,9 +425,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * @param dc The new destination comparator.
      */
     private void setDestinationComparator(Comparator<Destination> dc) {
-        synchronized (destinationComparatorLock) {
-            destinationComparator = dc;
-        }
+        destinationComparator.set(dc);
     }
     
     /**
@@ -517,7 +516,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         DefaultListModel<Destination> model
             = new DefaultListModel<>();
         for (Destination d : this.destinations) {
-            if (showOnlyMyColonies) {
+            if (showOnlyMyColonies.get()) {
                 if (d.location instanceof Europe
                     || d.location instanceof Map
                     || (d.location instanceof Colony
