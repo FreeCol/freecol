@@ -1017,7 +1017,7 @@ public final class ImageLibrary {
             String mask = riverStyle.getMask();
             // Ensure unconnected river tiles are visible in map editor
             key = "image.tileforest." + type.getId() + ".s"
-                + ((mask.equals("0000")) ? "0100" : mask);
+                + (("0000".equals(mask)) ? "0100" : mask);
             // Safety check providing fallback for incomplete mods
             if (ResourceManager.hasImageResource(key)) {
                 return getScaledImage(key, size, false);
@@ -1176,7 +1176,7 @@ public final class ImageLibrary {
             .stream()
             .map(key -> key.substring(RIVER_STYLE_PREFIX.length()))
             .filter(style ->
-                (all || !style.contains("1")) && !style.equals("0000"))
+                (all || !style.contains("1")) && !"0000".equals(style))
             .sorted().collect(Collectors.toList());
     }
 

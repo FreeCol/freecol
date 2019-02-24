@@ -225,8 +225,8 @@ public class GenerateDocumentation {
         final String[] splitKey = key.split("\\.");
         String found = resources.get(ourKey);
         if (found == null && splitKey.length > 2
-                && splitKey[0].equals("model")) {
-            String suffix = (splitKey[1].equals("tile")) ? ".center.r0" : "";
+                && "model".equals(splitKey[0])) {
+            String suffix = ("tile".equals(splitKey[1])) ? ".center.r0" : "";
             options[0] = splitKey[1];
             options[1] = splitKey[1] + "icon";
             for (String x : options) {

@@ -2342,7 +2342,7 @@ public final class Specification implements OptionContainer {
         for (UnitType ut : getUnitTypesWithAbility(Ability.REF_UNIT)) {
             if (!ut.containsAbilityKey(Ability.CAN_BE_SURRENDERED)) {
                 ut.addAbility(new Ability(Ability.CAN_BE_SURRENDERED, null,
-                        ut.getId().equals("model.unit.artillery")));
+                        "model.unit.artillery".equals(ut.getId())));
             }
         }
         // end @compat 0.11.6
@@ -3103,7 +3103,7 @@ public final class Specification implements OptionContainer {
         while (xr.moreTags()) {
             String childName = xr.getLocalName();
             // @compat 0.11.0
-            if (childName.equals(OLD_EQUIPMENT_TYPES_TAG)) {
+            if (OLD_EQUIPMENT_TYPES_TAG.equals(childName)) {
                 xr.swallowTag(OLD_EQUIPMENT_TYPES_TAG);
                 continue;
             }

@@ -310,7 +310,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
         if (null == command) return;
-        if (command.equals(OK)) {
+        if (OK.equals(command)) {
             final TradeRoute route = getRoute();
             if (this.unit != null && route != null) {
                 igc().assignTradeRoute(this.unit, route);
