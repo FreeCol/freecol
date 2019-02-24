@@ -78,14 +78,14 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
 
-    private final JPanel listPanel;
-    private JToggleButton settlementButton;
-    private final ButtonGroup group;
-
     /**
      * A native nation to use for native settlement type and skill.
      */
     private static Nation nativeNation = null;
+
+    private final JPanel listPanel;
+    private JToggleButton settlementButton;
+    private final ButtonGroup group;
 
 
     /**

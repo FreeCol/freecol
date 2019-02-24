@@ -126,6 +126,9 @@ public final class ImageLibrary {
                                ICON_LOCK = "image.icon.lock",
                                ICON_COIN = "image.icon.coin",
                                BELLS = "image.icon.model.goods.bells";
+    private static String RIVER_STYLE_PREFIX
+        = "image.tile.model.improvement.river.s";
+
 
     /** Helper to distinguish different types of paths. */
     public enum PathType {
@@ -1101,10 +1104,6 @@ public final class ImageLibrary {
         return getResourceTypeImage(resource.getType(),
                                     this.scaleFactor, false);
     }
-
-
-    private static String RIVER_STYLE_PREFIX
-        = "image.tile.model.improvement.river.s";
 
     /**
      * Returns the river image with the given style.

@@ -47,6 +47,11 @@ import net.sf.freecol.client.gui.dialog.Flag.UnionShape;
 public class FlagTest extends JFrame implements ActionListener, ItemListener {
 
 
+    private static final String[] FLAG_NAMES = {
+        "England", "Spain", "France", "Netherlands",
+        "Portugal", "Sweden", "Denmark", "Russia", "Custom"
+    };
+
     private final Flag[] FLAGS = {
         ConfirmDeclarationDialog.ENGLISH_FLAG,
         ConfirmDeclarationDialog.SPANISH_FLAG,
@@ -57,11 +62,6 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         ConfirmDeclarationDialog.DANISH_FLAG,
         ConfirmDeclarationDialog.RUSSIAN_FLAG,
         null // custom
-    };
-
-    private static final String[] FLAG_NAMES = {
-        "England", "Spain", "France", "Netherlands",
-        "Portugal", "Sweden", "Denmark", "Russia", "Custom"
     };
 
     private Flag flag;

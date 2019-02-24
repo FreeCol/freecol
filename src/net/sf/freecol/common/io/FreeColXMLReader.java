@@ -66,6 +66,31 @@ public class FreeColXMLReader extends StreamReaderDelegate
 
     private static final Logger logger = Logger.getLogger(FreeColXMLReader.class.getName());
 
+    /** Map for the XMLStreamConstants. */
+    private static final Map<Integer, String> tagStrings
+        = makeUnmodifiableMap(new Integer[] {
+                XMLStreamConstants.ATTRIBUTE,
+                XMLStreamConstants.CDATA,
+                XMLStreamConstants.CHARACTERS,
+                XMLStreamConstants.COMMENT,
+                XMLStreamConstants.DTD,
+                XMLStreamConstants.END_DOCUMENT,
+                XMLStreamConstants.END_ELEMENT,
+                XMLStreamConstants.ENTITY_DECLARATION,
+                XMLStreamConstants.ENTITY_REFERENCE,
+                XMLStreamConstants.NAMESPACE,
+                XMLStreamConstants.NOTATION_DECLARATION,
+                XMLStreamConstants.PROCESSING_INSTRUCTION,
+                XMLStreamConstants.SPACE,
+                XMLStreamConstants.START_DOCUMENT,
+                XMLStreamConstants.START_ELEMENT },
+            new String[] {
+                "Attribute", "CData", "Characters", "Comment", "DTD",
+                "EndDocument", "EndElement", "EntityDeclaration",
+                "EntityReference", "Namespace", "NotationDeclaration",
+                "ProcessingInstruction", "Space", "StartDocument",
+                "StartElement" });
+
     public static enum ReadScope {
         SERVER,     // Loading the game in the server
         NORMAL,     // Normal interning read
@@ -303,31 +328,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
         return id;
     }
     // end @compat 0.11.x
-
-    /** Map for the XMLStreamConstants. */
-    private static final Map<Integer, String> tagStrings
-        = makeUnmodifiableMap(new Integer[] {
-                XMLStreamConstants.ATTRIBUTE,
-                XMLStreamConstants.CDATA,
-                XMLStreamConstants.CHARACTERS,
-                XMLStreamConstants.COMMENT,
-                XMLStreamConstants.DTD,
-                XMLStreamConstants.END_DOCUMENT,
-                XMLStreamConstants.END_ELEMENT,
-                XMLStreamConstants.ENTITY_DECLARATION,
-                XMLStreamConstants.ENTITY_REFERENCE,
-                XMLStreamConstants.NAMESPACE,
-                XMLStreamConstants.NOTATION_DECLARATION,
-                XMLStreamConstants.PROCESSING_INSTRUCTION,
-                XMLStreamConstants.SPACE,
-                XMLStreamConstants.START_DOCUMENT,
-                XMLStreamConstants.START_ELEMENT },
-            new String[] {
-                "Attribute", "CData", "Characters", "Comment", "DTD",
-                "EndDocument", "EndElement", "EntityDeclaration",
-                "EntityReference", "Namespace", "NotationDeclaration",
-                "ProcessingInstruction", "Space", "StartDocument",
-                "StartElement" });
 
     /**
      * {@inheritDoc}

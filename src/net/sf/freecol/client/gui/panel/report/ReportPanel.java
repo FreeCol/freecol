@@ -52,16 +52,17 @@ public class ReportPanel extends FreeColPanel {
 
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
 
+    /**
+     * The default layout contrains of the {@code JScrollPane}s in this class.
+     */
+    private static final String SCROLL_PANE_SIZE
+        = "cell 0 1, height 100%, width 100%";
+
     protected final JPanel reportPanel;
 
     protected final JLabel header;
 
     protected JScrollPane scrollPane;
-
-    /**
-     * The default layout contrains of the {@code JScrollPane}s in this class.
-     */
-    private static final String SCROLL_PANE_SIZE = "cell 0 1, height 100%, width 100%";
 
 
     /**

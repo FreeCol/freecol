@@ -94,6 +94,13 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
     private static final Comparator<Unit> scoutComparator
         = Comparator.comparingInt(Unit::getScoutScore).reversed();
 
+    /**
+     * Goods that should be completely exported and only exported to
+     * prevent the warehouse filling.
+     */
+    private static final Set<GoodsType> fullExport = new HashSet<>();
+    private static final Set<GoodsType> partExport = new HashSet<>();
+
     /** The colony this AIColony is managing. */
     private Colony colony;
 
@@ -111,13 +118,6 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
 
     /** When should the workers in this Colony be rearranged? */
     private Turn rearrangeTurn = new Turn(0);
-
-    /**
-     * Goods that should be completely exported and only exported to
-     * prevent the warehouse filling.
-     */
-    private static final Set<GoodsType> fullExport = new HashSet<>();
-    private static final Set<GoodsType> partExport = new HashSet<>();
 
 
     /**

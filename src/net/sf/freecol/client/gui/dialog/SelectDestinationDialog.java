@@ -99,6 +99,26 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      */
     private static class Destination {
 
+        /** Basic destination comparator, that just uses the name field. */
+        private static Comparator<Destination> nameComparator
+            = new Comparator<Destination>() {
+                    public int compare(Destination d1, Destination d2) {
+                        if (!(d1.location instanceof Settlement)) return -1;
+                        if (!(d2.location instanceof Settlement)) return 1;
+                        return d1.name.compareTo(d2.name);
+                    }
+                };
+
+        /** Distance comparator, uses turns field then falls back to names. */
+        private static Comparator<Destination> distanceComparator
+            = Comparator.comparingInt(Destination::getTurns)
+                .thenComparing(Destination.nameComparator);
+
+        /** Owner comparator, uses the owner field then falls back to names. */
+        private static Comparator<Destination> ownerComparator
+            = Comparator.comparingInt(Destination::getScore)
+                .thenComparing(Destination.nameComparator);
+
         /** The unit that is travelling. */
         public final Unit unit;
 
@@ -243,25 +263,6 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             return this.score;
         }
 
-        /** Basic destination comparator, that just uses the name field. */
-        private static Comparator<Destination> nameComparator
-            = new Comparator<Destination>() {
-                    public int compare(Destination d1, Destination d2) {
-                        if (!(d1.location instanceof Settlement)) return -1;
-                        if (!(d2.location instanceof Settlement)) return 1;
-                        return d1.name.compareTo(d2.name);
-                    }
-                };
-
-        /** Distance comparator, uses turns field then falls back to names. */
-        private static Comparator<Destination> distanceComparator
-            = Comparator.comparingInt(Destination::getTurns)
-                .thenComparing(Destination.nameComparator);
-
-        /** Owner comparator, uses the owner field then falls back to names. */
-        private static Comparator<Destination> ownerComparator
-            = Comparator.comparingInt(Destination::getScore)
-                .thenComparing(Destination.nameComparator);
 
         public static int getDestinationComparatorIndex(Comparator<Destination> dc) {
             return (dc == nameComparator) ? 1
