@@ -366,8 +366,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         // appear at this location, otherwise at the best entry
         // location for it.
         int fail = 0;
-        for (int i = 0; i < n; i++) {
-            final TargetTuple t = targets.get(i);
+        for (TargetTuple t : targets) {
             final GoalDecider gd = GoalDeciders
                 .getDisembarkGoalDecider(t.colony.getTile());
             PathNode path = unit.search(t.entry, gd, null, 10, carrier);
@@ -397,8 +396,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
                 }
                 lb.add(")");
             } else { // They were all bad, just use the existing simple path
-                for (int i = 0; i < n; i++) {
-                    final TargetTuple t = targets.get(i);
+                for (TargetTuple t : targets) {
                     t.disembarkTile = t.path.getTransportDropNode()
                         .previous.getTile();
                 }

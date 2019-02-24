@@ -869,17 +869,8 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
      */
     public boolean completeWish(Goods goods, LogBuilder lb) {
         boolean ret = false;
-        int i = 0;
-        while (i < wishes.size()) {
-            if (wishes.get(i) instanceof GoodsWish) {
-                GoodsWish gw = (GoodsWish)wishes.get(i);
-                if (gw.satisfiedBy(goods)
-                    && completeWish(gw, goods.toString(), lb)) {
-                    ret = true;
-                    continue;
-                }
-            }
-            i++;
+        for (Wish wish : transform(wishes, w -> w.satisfiedBy(goods))) {
+            ret |= completeWish(wish, goods.toString(), lb);
         }
         return ret;
     }
@@ -893,17 +884,8 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
      */
     public boolean completeWish(Unit unit, LogBuilder lb) {
         boolean ret = false;
-        int i = 0;
-        while (i < wishes.size()) {
-            if (wishes.get(i) instanceof WorkerWish) {
-                WorkerWish ww = (WorkerWish)wishes.get(i);
-                if (ww.satisfiedBy(unit)
-                    && completeWish(ww, unit.toShortString(), lb)) {
-                    ret = true;
-                    continue;
-                }
-            }
-            i++;
+        for (Wish wish : transform(wishes, w -> w.satisfiedBy(unit))) {
+            ret |= completeWish(wish, unit.toShortString(), lb);
         }
         return ret;
     }
@@ -1168,17 +1150,15 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Drop wishes that are no longer needed.
-        int i = 0;
-        while (i < wishes.size()) {
-            if (wishes.get(i) instanceof GoodsWish) {
-                GoodsWish g = (GoodsWish)wishes.get(i);
-                GoodsType t = g.getGoodsType();
-                if (required.getCount(t) < colony.getGoodsCount(t)) {
-                    completeWish(g, "redundant", lb);
-                    continue;
-                }
-            }
-            i++;
+        for (Wish wish : transform(wishes, w -> {
+                    if (w instanceof GoodsWish) {
+                        GoodsType t = ((GoodsWish)w).getGoodsType();
+                        return required.getCount(t) < colony.getGoodsCount(t);
+                    } else {
+                        return false;
+                    }
+                })) {
+            completeWish(wish, "redundant", lb);
         }
 
         // Require wishes for what is missing.

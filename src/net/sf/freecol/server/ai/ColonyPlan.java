@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1403,19 +1404,18 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             }
         }
         int expert = 0;
-        while (expert < experts.size()) {
-            Unit u1 = experts.get(expert);
-            Unit other;
-            if ((other = u1.trySwapExpert(experts)) != null) {
+        Iterator<Unit> expertIterator = experts.iterator();
+        while (expertIterator.hasNext()) {
+            Unit u1 = expertIterator.next();
+            Unit other = u1.trySwapExpert(experts);
+            if (other != null) {
                 lb.add("    Swapped ", u1.getId(), "(",
                     u1.getType().getSuffix(), ") for ", other, "\n");
-                experts.remove(u1);
+                expertIterator.remove();
             } else if ((other = u1.trySwapExpert(nonExperts)) != null) {
                 lb.add("    Swapped ", u1.getId(), "(",
                     u1.getType().getSuffix(), ") for ", other, "\n");
-                experts.remove(u1);
-            } else {
-                expert++;
+                expertIterator.remove();
             }
         }
         for (Unit u : new ArrayList<>(workers)) {

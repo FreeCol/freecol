@@ -25,7 +25,9 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
@@ -132,6 +134,25 @@ public abstract class Wish extends ValuedAIObject {
             : null;
     }
 
+    /**
+     * Does a specified unit satisfy this wish?
+     *
+     * @param unit The {@code Unit} to test.
+     * @return True if the unit either matches exactly if expertRequired,
+     *     or at least matches in a land/naval sense if not.
+     */
+    public abstract boolean satisfiedBy(Unit unit);
+
+    /**
+     * Does some specified goods satisfy this wish?
+     *
+     * @param <T> The base type of the goods.
+     * @param goods The goods to test.
+     * @return True if the goods type matches and amount is not less than
+     *     that requested.
+     */
+    public abstract <T extends AbstractGoods> boolean satisfiedBy(T goods);
+    
 
     // Override AIObject
 
