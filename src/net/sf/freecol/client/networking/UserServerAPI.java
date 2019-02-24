@@ -85,6 +85,21 @@ public class UserServerAPI extends ServerAPI {
     }
 
     /**
+     * Set the connection.
+     *
+     * @param c The new {@code Connection}.
+     */
+    private synchronized void setConnection(Connection c) {
+        // Connection made, save the parameters
+        this.name = name;
+        this.host = host;
+        this.port = port;
+        c.setMessageHandler(this.messageHandler);
+        c.setWriteScope(FreeColXMLWriter.WriteScope.toServer());
+        this.connection = c;
+    }
+
+    /**
      * Create a new connection.
      *
      * @return The new <code>Connection</code>.
@@ -120,18 +135,9 @@ public class UserServerAPI extends ServerAPI {
     public Connection connect(String name, String host, int port)
         throws IOException {
         Connection c = newConnection(name, host, port);
-        synchronized (this) {
-            if (c != null) {
-                // Connection made, save the parameters
-                this.name = name;
-                this.host = host;
-                this.port = port;
-                c.setMessageHandler(this.messageHandler);
-                c.setWriteScope(FreeColXMLWriter.WriteScope.toServer());
-            }
-            this.connection = c;
-            return this.connection;
-        }
+        if (c == null) return null;
+        setConnection(c);
+        return c;
     }
 
     /**
