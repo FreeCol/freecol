@@ -95,7 +95,7 @@ public class ResourcesDetailPanel
             if (modifier.hasScope()) {
                 String scopes = transform(modifier.getScopes(),
                                           isNotNull(Scope::getType),
-                                          s -> Messages.getName(spec.findType(s.getType())),
+                                          s -> Messages.getName(spec.getType(s.getType())),
                                           Collectors.joining(", "));
                 if (!scopes.isEmpty()) text += " (" + scopes + ")";
             }

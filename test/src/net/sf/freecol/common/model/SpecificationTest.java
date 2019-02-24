@@ -401,13 +401,8 @@ public final class SpecificationTest extends FreeColTestCase {
         } catch (XMLStreamException xse) {
             fail("Spec read fail");
         }
-        try {
-            spec.getUnitType("model.unit.caravel");
-            fail("Caravel is defined.");
-        } catch (Exception e) {
-            // Attempt to look up caravel should crash, this is the
-            // success branch
-        }
+        assertNull("Caravel should be undefined",
+                   spec.getUnitType("model.unit.caravel"));
 
         for (UnitType unitType : spec.getUnitTypeList()) {
             assertFalse("model.unit.caravel".equals(unitType.getId()));

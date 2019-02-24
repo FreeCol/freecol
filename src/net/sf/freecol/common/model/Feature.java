@@ -353,7 +353,7 @@ public abstract class Feature extends FreeColSpecObject
         if (str == null) {
             setSource(null);
         } else if (spec != null) {
-            setSource(spec.findType(str));
+            setSource(spec.getType(str));
         }
 
         int firstTurn = xr.getAttribute(FIRST_TURN_TAG, UNDEFINED);

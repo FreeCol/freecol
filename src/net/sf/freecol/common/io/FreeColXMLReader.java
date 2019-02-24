@@ -1056,7 +1056,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             getAttribute(attributeName, (String)null);
 
         return (attrib == null) ? defaultValue
-            : spec.getType(attrib, returnClass);
+            : spec.findType(attrib, returnClass);
     }
 
     /**

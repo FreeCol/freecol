@@ -186,7 +186,7 @@ public final class Specification implements OptionContainer {
                     logger.warning("Null identifier, tag: " + tag);
 
                 } else if (FreeColSpecObjectType.DELETE_TAG.equals(tag)) {
-                    FreeColSpecObjectType object = allTypes.remove(id);
+                    FreeColSpecObjectType object = removeType(id);
                     if (object != null) {
                         result.remove(object);
                     } else {
@@ -194,8 +194,8 @@ public final class Specification implements OptionContainer {
                     }
 
                 } else {
-                    T object = getType(id, type);
-                    allTypes.put(id, object);
+                    T object = findType(id, type);
+                    addType(id, object);
 
                     // If this an existing object (with id) and the
                     // PRESERVE tag is present, then leave the
@@ -815,6 +815,50 @@ public final class Specification implements OptionContainer {
     }
 
     /**
+     * Get a {@code FreeColSpecObjectType} by id.
+     *
+     * @param id The identifier to look for.
+     * @return The {@code FreeColSpecObjectType} found if any.
+     */
+    public FreeColSpecObjectType getType(String id) {
+        return allTypes.get(id);
+    }
+
+    /**
+     * Find a {@code FreeColSpecObjectType} by id and class.
+     *
+     * @param <T> The actual return type.
+     * @param id The object identifier to look for.
+     * @param returnClass The expected {@code Class}.
+     * @return The {@code FreeColSpecObjectType} found if any.
+     */
+    private <T extends FreeColSpecObjectType> T getType(String id,
+                                                        Class<T> returnClass) {
+        FreeColSpecObjectType ret = getType(id);
+        return (ret == null) ? null : returnClass.cast(ret);
+    }
+
+    /**
+     * Add a type by identifier.
+     *
+     * @param id The identifier to associate with.
+     * @param type The {@code FreeColSpecObjectType} to add.
+     */
+    private void addType(String id, FreeColSpecObjectType type) {
+        allTypes.put(id, type);
+    }
+
+    /**
+     * Remove reference to a type.
+     *
+     * @param id The type identifier to remove.
+     * @return The removed {@code FreeColSpecObjectType}.
+     */
+    private FreeColSpecObjectType removeType(String id) {
+        return allTypes.remove(id);
+    }
+    
+    /**
      * Registers an Ability as defined.
      *
      * @param ability an {@code Ability} value
@@ -879,7 +923,7 @@ public final class Specification implements OptionContainer {
      * @param ff The {@code FoundingFather} to add.
      */
     public void addTestFather(FoundingFather ff) {
-        allTypes.put(ff.getId(), ff);
+        addType(ff.getId(), ff);
         foundingFathers.add(ff);
     }
 
@@ -1904,16 +1948,16 @@ public final class Specification implements OptionContainer {
     // General type retrieval
 
     /**
-     * Get the {@code FreeColSpecObjectType} with the given identifier.
+     * Find the {@code FreeColSpecObjectType} with the given identifier.
      *
      * @param <T> The actual return type.
      * @param id The object identifier to look for.
      * @param returnClass The expected {@code Class}.
      * @return The {@code FreeColSpecObjectType} found.
      */
-    public <T extends FreeColSpecObjectType> T getType(String id,
-                                                       Class<T> returnClass) {
-        T o = findType(id, returnClass);
+    public <T extends FreeColSpecObjectType> T findType(String id,
+                                                        Class<T> returnClass) {
+        T o = getType(id, returnClass);
         if (o != null) return o;
 
         if (initialized) {
@@ -1935,40 +1979,16 @@ public final class Specification implements OptionContainer {
      */
     private <T extends FreeColSpecObjectType> T newType(String id,
                                                         Class<T> returnClass) {
-        T result = null;
         try {
             Constructor<T> c = returnClass.getConstructor(String.class,
                                                           Specification.class);
-            result = c.newInstance(id, this);
-            allTypes.put(id, result);
+            T result = c.newInstance(id, this);
+            addType(id, result);
+            return result;
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not construct: " + id, e);
         }
-        return result;
-    }
-
-    /**
-     * Find a {@code FreeColSpecObjectType} by id and class.
-     *
-     * @param <T> The actual return type.
-     * @param id The identifier to look for.
-     * @param returnClass The expected {@code Class}.
-     * @return The {@code FreeColSpecObjectType} found if any.
-     */
-    private <T extends FreeColSpecObjectType> T findType(String id,
-                                                         Class<T> returnClass) {
-        FreeColSpecObjectType fcsot = findType(id);
-        return (fcsot == null) ? null : returnClass.cast(fcsot);
-    }
-
-    /**
-     * Find a {@code FreeColSpecObjectType} by id.
-     *
-     * @param id The identifier to look for.
-     * @return The {@code FreeColSpecObjectType} found, if any.
-     */
-    public FreeColSpecObjectType findType(String id) {
-        return allTypes.get(id);
+        return null;
     }
 
     /**
@@ -2153,7 +2173,7 @@ public final class Specification implements OptionContainer {
 
         // 0.10.x had no unknown enemy nation, just an unknown enemy
         // player, and the type was poorly established.
-        Nation ue = getUnknownEnemyNation();
+        Nation ue = findType(Nation.UNKNOWN_NATION_ID, Nation.class);
         ue.setType(getNationType("model.nationType.default"));
         if (!nations.contains(ue)) nations.add(ue);
 
