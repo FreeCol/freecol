@@ -91,6 +91,11 @@ public class FreeColDebugger {
     /** Show full mission information? */
     private static boolean showMissionInfo = false;
 
+    /** Stream for debugLog. */
+    private static PrintStream debugStream = null;
+    /** Lock for debugStream */
+    private static Object debugStreamLock = new Object();
+
 
     /**
      * Is a debug mode enabled in this game?
@@ -358,15 +363,22 @@ public class FreeColDebugger {
      * @param msg The message to log.
      */
     public static void debugLog(String msg) {
-        String tmp = System.getenv("TMPDIR");
-        if (tmp == null) tmp = "/tmp";
-        final Path path = Paths.get(tmp, "freecol.debug");
-        try (OutputStream fos = Files.newOutputStream(path, APPEND)) {
-            try (PrintStream prs = new PrintStream(fos, true, "UTF-8")) {
-                prs.println(msg);
+        synchronized (debugStreamLock) {
+            if (debugStream == null) {
+                String tmp = System.getenv("TMPDIR");
+                if (tmp == null) tmp = "/tmp";
+                final Path path = Paths.get(tmp, "freecol.debug");
+                try {
+                    OutputStream fos
+                        = Files.newOutputStream(path, CREATE, APPEND);
+                    debugStream = new PrintStream(fos, true, "UTF-8");
+                } catch (IOException ex) {
+                    ; // ignored
+                }
             }
-        } catch (IOException ex) {
-            ; // Ignored
+            if (debugStream != null) {
+                debugStream.println(msg);
+            }
         }
     }
 
