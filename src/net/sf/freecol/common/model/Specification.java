@@ -194,9 +194,11 @@ public final class Specification implements OptionContainer {
                     }
 
                 } else {
-                    T object = findType(id, type);
-                    addType(id, object);
-
+                    T object = getType(id, type);
+                    if (object == null) {
+                        object = newType(id, type);
+                        addType(id, object);
+                    }
                     // If this an existing object (with id) and the
                     // PRESERVE tag is present, then leave the
                     // attributes intact and only read the child
@@ -206,7 +208,7 @@ public final class Specification implements OptionContainer {
                     // attributes when just changing the children.
                     if (object.getId() != null
                         && xr.getAttribute(FreeColSpecObjectType.PRESERVE_TAG,
-                                           (String)null) != null) {
+                                           false)) {
                         object.readChildren(xr);
                     } else {
                         object.readFromXML(xr);
