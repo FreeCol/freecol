@@ -346,6 +346,13 @@ public final class Specification implements OptionContainer {
     public static final String UNIT_CHANGE_TYPES_COMPAT_FILE_NAME
         = "unit-change-types-compat.xml";
 
+    /** The default food type. */
+    private static final String DEFAULT_FOOD_TYPE = "model.goods.food";
+
+    /** The default nation type, which does nothing special. */
+    private static final String DEFAULT_NATION_TYPE
+        = "model.nationType.default";
+
     /** The default role. */
     public static final String DEFAULT_ROLE_ID = "model.role.default";
 
@@ -1413,14 +1420,17 @@ public final class Specification implements OptionContainer {
     }
 
     /**
-     * The general "Food" type is handled as a special case in many places.
-     * Introduce this routine to collect them into one place, in the hope
-     * we can one day deprecate this routine and clean up the special cases.
+     * Get the primary food type.
      *
-     * @return The main food type ("model.goods.food").
+     * FIXME: The "Food" type is handled as a special case in many
+     * places.  This routine was added to collect them into one place,
+     * in the hope we can one day deprecate this routine and clean up
+     * the special cases.
+     *
+     * @return The main food type.
      */
     public GoodsType getPrimaryFoodType() {
-        return getGoodsType("model.goods.food");
+        return getGoodsType(DEFAULT_FOOD_TYPE);
     }
 
     /**
@@ -1495,7 +1505,7 @@ public final class Specification implements OptionContainer {
     }
 
     public NationType getDefaultNationType() {
-        return getNationType("model.nationType.default");
+        return getNationType(DEFAULT_NATION_TYPE);
     }
 
 
