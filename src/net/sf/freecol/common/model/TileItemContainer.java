@@ -141,9 +141,8 @@ public class TileItemContainer extends FreeColGameObject {
      * @param item The {@code TileItem} to add.
      */
     private final void addTileItem(TileItem item) {
+        final int zIndex = item.getZIndex();
         int i = 0;
-        int size = tileItems.size();
-        int zIndex = item.getZIndex();
         synchronized (tileItems) {
             for (TileItem ti : tileItems) {
                 if (ti.getZIndex() < zIndex) break;
