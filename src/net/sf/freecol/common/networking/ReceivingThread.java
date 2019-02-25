@@ -213,21 +213,28 @@ final class ReceivingThread extends Thread {
     }
 
     /**
+     * Set the shouldRun state to false.
+     *
+     * @return The old value of shouldRun.
+     */
+    private synchronized boolean stopRun() {
+        boolean ret = this.shouldRun;
+        if (!this.shouldRun) return false;
+        this.shouldRun = false;
+        return true;
+    }
+        
+    /**
      * Stop this thread.
      *
      * @return True if the thread was previously running and is now stopped.
      */
     private boolean stopThread() {
-        boolean ret = this.shouldRun;
-        if (this.shouldRun) {
-            this.shouldRun = false;
-            Set<NetworkReplyObject> values;
-            synchronized (this) {
-                values = new HashSet<>(this.waitingThreads.values());
-            }
-            for (NetworkReplyObject o : values) o.interrupt();
+        if (!stopRun()) return false;
+        for (NetworkReplyObject o : this.waitingThreads.values()) {
+            o.interrupt();
         }
-        return ret;
+        return true;
     }
         
     /**
