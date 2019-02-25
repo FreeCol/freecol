@@ -1260,6 +1260,12 @@ public final class Specification implements OptionContainer {
             : 2;
     }
 
+    // -- Buildables --
+
+    public BuildableType getBuildableType(String id) {
+        return findType(id, BuildableType.class);
+    }
+
     // -- Buildings --
 
     public List<BuildingType> getBuildingTypeList() {

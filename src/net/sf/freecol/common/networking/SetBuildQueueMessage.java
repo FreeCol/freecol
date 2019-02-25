@@ -104,7 +104,7 @@ public class SetBuildQueueMessage extends AttributeMessage {
      */
     private List<BuildableType> getQueue(Specification spec) {
         return transform(getArrayAttributes(), alwaysTrue(),
-                         id -> spec.getType(id, BuildableType.class),
+                         id -> spec.getBuildableType(id),
                          toListNoNulls());
     }
 
