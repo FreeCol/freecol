@@ -419,7 +419,7 @@ public class Game extends FreeColGameObject {
     public FreeColGameObject getFreeColGameObject(String id) {
         if (id == null || id.isEmpty()) return null;
         final WeakReference<FreeColGameObject> ro;
-        synchronized (freeColGameObjects) {
+        synchronized (this.freeColGameObjects) {
             ro = freeColGameObjects.get(id);
         }
         if (ro == null) return null;
@@ -512,13 +512,13 @@ public class Game extends FreeColGameObject {
 
         logger.finest("removeFCGO/" + reason + ": " + id);
         notifyRemoveFreeColGameObject(id);
-        synchronized (freeColGameObjects) {
-            freeColGameObjects.remove(id);
+        synchronized (this.freeColGameObjects) {
+            this.freeColGameObjects.remove(id);
         }
 
         // Garbage collect the FCGOs if enough have been removed.
         if (++removeCount > REMOVE_GC_THRESHOLD) {
-            synchronized (freeColGameObjects) {
+            synchronized (this.freeColGameObjects) {
                 Iterator<FreeColGameObject> iter = getFreeColGameObjectIterator();
                 while (iter.hasNext()) iter.next();
             }
@@ -747,7 +747,7 @@ public class Game extends FreeColGameObject {
      */
     public List<FreeColGameObject> getFreeColGameObjectList() {
         List<FreeColGameObject> ret = new ArrayList<>();
-        synchronized (freeColGameObjects) {
+        synchronized (this.freeColGameObjects) {
             Iterator<FreeColGameObject> iter = getFreeColGameObjectIterator();
             while (iter.hasNext()) ret.add(iter.next());
         }
@@ -1142,18 +1142,27 @@ public class Game extends FreeColGameObject {
      * Sets the game map.
      *
      * @param newMap The new {@code Map} to use.
+     * @return The old {@code Map}.
      */
-    public void setMap(Map newMap) {
-        Map oldMap;
-        synchronized (this) {
-            oldMap = this.map;
-            this.map = newMap;
-        }
-        if (this.map != oldMap) {
+    public synchronized Map setMap(Map newMap) {
+        Map oldMap = this.map;
+        this.map = newMap;
+        return oldMap;
+    }
+
+    /**
+     * Change the map in this game, fixing player destinations.
+     *
+     * @param newMap The new {@code Map} to use.
+     */
+    public void changeMap(Map newMap) {
+        Map oldMap = setMap(newMap);
+        if (newMap != oldMap) {
             for (HighSeas hs : transform(getLivePlayers(), alwaysTrue(),
                                          Player::getHighSeas, toListNoNulls())) {
                 hs.removeDestination(oldMap);
-                hs.addDestination(this.map);
+
+                hs.addDestination(newMap);
             }
         }
     }
