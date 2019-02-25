@@ -416,12 +416,10 @@ public class Region extends FreeColGameObject implements Nameable {
      * @param unit The {@code Unit} that might have discovered the region.
      * @return True if the region has been discovered.
      */
-    public boolean checkDiscover(Unit unit) {
-        synchronized (this) {
-            if (this.discoverer == null) {
-                this.discoverer = unit.getId();
-                return true;
-            }
+    public synchronized boolean checkDiscover(Unit unit) {
+        if (this.discoverer == null) {
+            this.discoverer = unit.getId();
+            return true;
         }
         return false;
     }
