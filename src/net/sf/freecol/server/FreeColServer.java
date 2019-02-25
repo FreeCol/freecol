@@ -1034,9 +1034,11 @@ public final class FreeColServer {
                     }
 
                 } else if (AIMain.TAG.equals(tag)) {
-                    AIMain aiMain =  new AIMain(freeColServer, xr);
                     if (freeColServer != null) {
+                        AIMain aiMain = new AIMain(freeColServer, xr);
                         freeColServer.setAIMain(aiMain);
+                    } else { // Reading a map, ignore AI
+                        xr.swallowTag(AIMain.TAG);
                     }
 
                 } else {
