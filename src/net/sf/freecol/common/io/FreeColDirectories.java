@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -251,10 +252,9 @@ public class FreeColDirectories {
      */
     private static File userModsDirectory = null;
 
-    /** Lock for the comms writer. */
-    private static Object commsWriterLock = new Object();
     /** The comms writer. */
-    private static Writer commsWriter = null;
+    private static AtomicReference<Writer> commsWriter
+        = new AtomicReference<Writer>(null);
 
     
     /**
@@ -971,17 +971,17 @@ public class FreeColDirectories {
      * @exception FreeColException on error.
      */
     public static Writer getLogCommsWriter() throws FreeColException {
-        synchronized (commsWriterLock) {
-            if (commsWriter != null) return commsWriter;
+        Writer writer = commsWriter.get();
+        if (writer == null) {
             File file = new File(getUserCacheDirectory(), LOG_COMMS_FILE_NAME);
             if (file.exists()) deleteFile(file);
-            Writer writer = getFileUTF8AppendWriter(file);
+            writer = getFileUTF8AppendWriter(file);
             if (writer == null) {
                 throw new FreeColException("Can not create writer for comms log file: " + file.getPath());
             }
-            commsWriter = writer;
-            return commsWriter;
+            commsWriter.set(writer);
         }
+        return writer;
     }        
                              
     /**
