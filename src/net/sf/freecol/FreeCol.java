@@ -306,12 +306,6 @@ public final class FreeCol {
         StringTemplate key = FreeColDirectories.setUserDirectories();
         if (key != null) fatal(key);
 
-        // We used to display the result of setUserDirectories when we
-        // were doing a dodgy migration in 0.9 -> 0.10.  So userMsg is
-        // no longer really needed, but keep it around in case something
-        // similar comes up.
-        String userMsg = null;
-
         // Now we have the log file path, start logging.
         final Logger baseLogger = Logger.getLogger("");
         for (Handler handler : baseLogger.getHandlers()) {
@@ -363,14 +357,13 @@ public final class FreeCol {
         processSpecialOptions();
 
         // Report on where we are.
-        if (userMsg != null) logger.info(Messages.message(userMsg));
         logger.info(getConfiguration().toString());
 
         // Ready to specialize into client or server.
         if (standAloneServer) {
             startServer();
         } else {
-            startClient(userMsg);
+            startClient();
         }
     }
 
@@ -1477,10 +1470,8 @@ public final class FreeCol {
 
     /**
      * Start a client.
-     *
-     * @param userMsg An optional user message key.
      */
-    private static void startClient(String userMsg) {
+    private static void startClient() {
         Specification spec = null;
         File savegame = FreeColDirectories.getSavegameFile();
         if (debugStart) {
@@ -1505,7 +1496,7 @@ public final class FreeCol {
 
         final FreeColClient freeColClient
             = new FreeColClient(splashStream, fontName, guiScale, headless);
-        freeColClient.startClient(windowSize, userMsg, sound, introVideo,
+        freeColClient.startClient(windowSize, null, sound, introVideo,
                                   savegame, spec);
     }
 
