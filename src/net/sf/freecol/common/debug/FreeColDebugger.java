@@ -27,6 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import static java.nio.file.StandardOpenOption.*;
+
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -92,9 +94,8 @@ public class FreeColDebugger {
     private static boolean showMissionInfo = false;
 
     /** Stream for debugLog. */
-    private static PrintStream debugStream = null;
-    /** Lock for debugStream */
-    private static Object debugStreamLock = new Object();
+    private static final AtomicReference<PrintStream> debugStream
+        = new AtomicReference<PrintStream>(null);
 
 
     /**
@@ -363,23 +364,21 @@ public class FreeColDebugger {
      * @param msg The message to log.
      */
     public static void debugLog(String msg) {
-        synchronized (debugStreamLock) {
-            if (debugStream == null) {
-                String tmp = System.getenv("TMPDIR");
-                if (tmp == null) tmp = "/tmp";
-                final Path path = Paths.get(tmp, "freecol.debug");
-                try {
-                    OutputStream fos
-                        = Files.newOutputStream(path, CREATE, APPEND);
-                    debugStream = new PrintStream(fos, true, "UTF-8");
-                } catch (IOException ex) {
-                    ; // ignored
-                }
+        PrintStream print = debugStream.get();
+        if (print == null) {
+            String tmp = System.getenv("TMPDIR");
+            if (tmp == null) tmp = "/tmp";
+            final Path path = Paths.get(tmp, "freecol.debug");
+            try {
+                OutputStream fos
+                    = Files.newOutputStream(path, CREATE, APPEND);
+                print = new PrintStream(fos, true, "UTF-8");
+            } catch (IOException ex) {
+                ; // ignored
             }
-            if (debugStream != null) {
-                debugStream.println(msg);
-            }
+            debugStream.set(print);
         }
+        print.println(msg);
     }
 
     /**
