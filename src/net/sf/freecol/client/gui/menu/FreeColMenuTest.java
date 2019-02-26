@@ -52,8 +52,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = null;
 
-        FreeColClient client = new FreeColClient(null, null);
-        client.startClient(null, null, true, true, null, null);
+        FreeColClient client = FreeColClient.startTestClient(null);
 
         //Create the menu bar.
         menuBar = new InGameMenuBar(client, null);
@@ -135,8 +134,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     private static void createAndShowGUI() {
         //Create and set up the window.
         //JFrame frame = new JFrame("MenuDemo");
-        FreeColClient client = new FreeColClient(null, null);
-        client.startClient(null, null, true, true, null, null);
+        FreeColClient client = FreeColClient.startTestClient(null);
         FreeColFrame frame = new FreeColFrame(client,
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice(),
             null, null, true, null);

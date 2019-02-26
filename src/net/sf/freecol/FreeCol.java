@@ -64,6 +64,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.OSUtils;
 import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.Controller;
 
@@ -353,7 +354,11 @@ public final class FreeCol {
         FreeColModFile.loadMods();
         Messages.loadModMessageBundle(getLocale());
 
-        // Handle other special options
+        // Sort out the special graphics options before touching the GUI
+        // (which is initialized by FreeColClient).  These options control
+        // graphics pipeline initialization, and are ineffective if twiddled
+        // after the first Java2D call is made.
+        headless |= Utils.isHeadless();
         processSpecialOptions();
 
         // Report on where we are.
@@ -363,6 +368,12 @@ public final class FreeCol {
         if (standAloneServer) {
             startServer();
         } else {
+            if (headless) {
+                if (!FreeColDebugger.isInDebugMode()
+                    || FreeColDebugger.getDebugRunTurns() <= 0) {
+                    fatal(logger, Messages.message("client.headlessDebug"));
+                }
+            }
             startClient();
         }
     }
@@ -952,6 +963,27 @@ public final class FreeCol {
     // Accessors, mutators and support for the cli variables.
 
     /**
+     * Are we in headless mode, either externally true or explicitly
+     * from the command line.
+     *
+     * @return True if in headless mode.
+     */
+    public static boolean getHeadless() {
+        return headless;
+    }
+
+    /**
+     * Set the headless state.
+     *
+     * Used by the test suite.
+     *
+     * @param newHeadless The new headless state.
+     */
+    public static void setHeadless(boolean newHeadless) {
+        headless = newHeadless;
+    }
+
+    /**
      * Gets the default advantages type.
      *
      * @return Usually Advantages.SELECTABLE, but can be overridden at the
@@ -1501,14 +1533,8 @@ public final class FreeCol {
             // savegame was specified on command line
         }
 
-        // Sort out the special graphics options before touching the GUI
-        // (which is initialized by FreeColClient).  These options control
-        // graphics pipeline initialization, and are ineffective if twiddled
-        // after the first Java2D call is made.
-        
-
         final FreeColClient freeColClient
-            = new FreeColClient(splashStream, fontName, guiScale, headless);
+            = new FreeColClient(splashStream, fontName, guiScale);
         freeColClient.startClient(windowSize, null, sound, introVideo,
                                   savegame, spec);
     }

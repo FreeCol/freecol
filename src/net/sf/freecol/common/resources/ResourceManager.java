@@ -173,7 +173,7 @@ public class ResourceManager {
      * Create and start a new background preload thread.
      */
     private static void startBackgroundPreloading() {
-        if (Utils.isHeadless()) return; // Do not preload in headless mode
+        if (FreeCol.getHeadless()) return; // Do not preload in headless mode
 
         preloadThread = new Thread(FreeCol.CLIENT_THREAD + "-Resource loader") {
                 @Override

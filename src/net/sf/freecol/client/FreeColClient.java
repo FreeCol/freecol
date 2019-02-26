@@ -130,20 +130,12 @@ public final class FreeColClient {
      */
     private boolean loggedIn = false;
 
-    /** Run in headless mode. */
-    private final boolean headless;
-
     /** Cached value of server state. */
     private ServerState cachedServerState = null;
 
     /** Cached list of vacant players. */
     private List<String> cachedVacantPlayerNames = new ArrayList<>();
 
-    
-    public FreeColClient(final InputStream splashStream,
-                         final String fontName) {
-        this(splashStream, fontName, FreeCol.GUI_SCALE_DEFAULT, true);
-    }
 
     /**
      * Creates a new {@code FreeColClient}.  Creates the control
@@ -152,22 +144,14 @@ public final class FreeColClient {
      * @param splashStream A stream to read the splash image from.
      * @param fontName An optional override of the main font.
      * @param scale The scale factor for gui elements.
-     * @param headless Run in headless mode.
      */
     public FreeColClient(final InputStream splashStream, final String fontName,
-                         final float scale, boolean headless) {
+                         final float scale) {
         mapEditor = false;
-        this.headless = headless || Utils.isHeadless();
-        if (this.headless) {
-            if (!FreeColDebugger.isInDebugMode()
-                || FreeColDebugger.getDebugRunTurns() <= 0) {
-                FreeCol.fatal(logger, Messages.message("client.headlessDebug"));
-            }
-        }
 
         // Get the splash screen up early on to show activity.
-        gui = (this.headless) ? new GUI(this, scale)
-                              : new SwingGUI(this, scale);
+        gui = (FreeCol.getHeadless()) ? new GUI(this, scale)
+                                      : new SwingGUI(this, scale);
         gui.displaySplashScreen(splashStream);
 
         // Look for base data directory.  Failure is fatal.
@@ -216,7 +200,7 @@ public final class FreeColClient {
         ResourceManager.setTcMapping(tcData.getResourceMapping());
 
         // Swing system and look-and-feel initialization.
-        if (!this.headless) {
+        if (!FreeCol.getHeadless()) {
             try {
                 gui.installLookAndFeel(fontName);
             } catch (Exception e) {
@@ -226,6 +210,20 @@ public final class FreeColClient {
         }
         actionManager = new ActionManager(this);
         actionManager.initializeActions(inGameController, connectController);
+    }
+
+    /**
+     * Wrapper for the test suite to start a test client.
+     *
+     * @param spec The {@code Specification} to use in the new client.
+     * @return The new {@code FreeColClient}.
+     */
+    public static FreeColClient startTestClient(Specification spec) {
+        FreeCol.setHeadless(true);
+        FreeColClient freeColClient
+            = new FreeColClient(null, null, FreeCol.GUI_SCALE_DEFAULT);
+        freeColClient.startClient(null, null, false, false, null, spec);
+        return freeColClient;
     }
 
     /**
@@ -263,7 +261,7 @@ public final class FreeColClient {
                             final boolean showOpeningVideo,
                             final File savedGame,
                             final Specification spec) {
-        if (headless && savedGame == null && spec == null) {
+        if (FreeCol.getHeadless() && savedGame == null && spec == null) {
             FreeCol.fatal(logger, Messages.message("client.headlessRequires"));
         }
 
@@ -622,15 +620,6 @@ public final class FreeColClient {
     }
 
     /**
-     * Is the game in headless mode?
-     *
-     * @return a {@code boolean} value
-     */
-    public boolean isHeadless() {
-        return this.headless;
-    }
-
-    /**
      * Get the server state, or at least our most recently cached value.
      *
      * @return A server state.
@@ -773,7 +762,7 @@ public final class FreeColClient {
     private FreeColServer failToMain(Exception ex, StringTemplate template) {
         GUI.ErrorJob ej = gui.errorJob(ex, template);
         logger.log(Level.WARNING, Messages.message(template), ex);
-        if (isHeadless() // If this is a debug run, fail hard.
+        if (FreeCol.getHeadless() // If this is a debug run, fail hard.
             || FreeColDebugger.getDebugRunTurns() >= 0) {
             FreeCol.fatal(logger, ej.toString());
         }
