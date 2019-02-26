@@ -78,9 +78,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
 
-    /**
-     * A native nation to use for native settlement type and skill.
-     */
+    /** A native nation to use for native settlement type and skill. */
     private static Nation nativeNation = null;
 
     private final JPanel listPanel;
@@ -96,7 +94,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(FreeColClient freeColClient) {
         super(freeColClient, null, new BorderLayout());
 
-        nativeNation = first(getSpecification().getIndianNations());
+        // Initialize to a default value, then accept what was used last time
+        if (nativeNation == null) {
+            nativeNation = first(getSpecification().getIndianNations());
+        }
 
         listPanel = new JPanel(new GridLayout(2, 0));
 

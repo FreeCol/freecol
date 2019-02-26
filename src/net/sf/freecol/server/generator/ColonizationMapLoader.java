@@ -119,7 +119,9 @@ public class ColonizationMapLoader implements MapLoader {
     private static final byte[] header = {
         58, 0, 72, 0, 4, 0
     };
-    private static byte[] layer1;
+
+    private byte[] layer1;
+
 
     public ColonizationMapLoader(File file) throws IOException {
 
