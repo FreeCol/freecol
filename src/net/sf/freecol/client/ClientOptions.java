@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.HashMap;
@@ -484,9 +485,8 @@ public class ClientOptions extends OptionGroup {
         = Comparator.comparingInt(c -> c.getEstablished().getNumber());
 	
     /** Compare by name, initialized at run time. */
-    private static Comparator<Colony> colonyNameComparator = null;
-    /** Lock for the colony name comparator. */
-    private static Object colonyNameComparatorLock = new Object();
+    private static AtomicReference<Comparator<Colony>> colonyNameComparator
+        = new AtomicReference<Comparator<Colony>>(null);
     
     /** Compare by descending size then liberty. */
     private static final Comparator<Colony> colonySizeComparator
@@ -676,14 +676,14 @@ public class ClientOptions extends OptionGroup {
         case COLONY_COMPARATOR_SOL:
             return colonySoLComparator;
         case COLONY_COMPARATOR_NAME:
-            synchronized (colonyNameComparatorLock) {
-                if (colonyNameComparator == null) {
-                    // Can not be done statically, must wait for CLI parsing
-                    colonyNameComparator = Comparator.comparing(Colony::getName,
-                        Collator.getInstance(FreeCol.getLocale()));
-                }
-                return colonyNameComparator;
+            Comparator<Colony> cnc = colonyNameComparator.get();
+            if (cnc == null) {
+                // Can not be done statically, must wait for CLI parsing
+                cnc = Comparator.comparing(Colony::getName,
+                    Collator.getInstance(FreeCol.getLocale()));
+                colonyNameComparator.set(cnc);
             }
+            return cnc;
         default:
             throw new RuntimeException("Unknown comparator");
         }
