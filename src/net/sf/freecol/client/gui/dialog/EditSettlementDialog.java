@@ -134,12 +134,11 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         panel.add(Utility.localizedLabel("units"));
         panel.add(this.units);
 
-        final IndianSettlement fake = null;
         List<ChoiceItem<IndianSettlement>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("ok"), is).okOption());
-        c.add(new ChoiceItem<>(Messages.message("editSettlementDialog.removeSettlement"), fake));
-        c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
-            .cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("editSettlementDialog.removeSettlement"), null));
+        c.add(new ChoiceItem<>(Messages.message("cancel"),
+                               (IndianSettlement)null).cancelOption().defaultOption());
         initializeDialog(frame, DialogType.QUESTION, true, panel, new ImageIcon(
             getImageLibrary().getSmallSettlementImage(is)), c);
     }

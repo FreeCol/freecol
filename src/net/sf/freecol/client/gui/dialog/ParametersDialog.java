@@ -103,11 +103,11 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
         inputD.addActionListener(al);
         inputM.addActionListener(al);
 
-        final Parameters fake = null;
         List<ChoiceItem<Parameters>> c = choices();
-        c.add(new ChoiceItem<>(Messages.message("ok"), fake).okOption());
-        c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
-            .cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"),
+                               (Parameters)null).okOption());
+        c.add(new ChoiceItem<>(Messages.message("cancel"),
+                               (Parameters)null).cancelOption().defaultOption());
         initializeDialog(frame, DialogType.QUESTION, true, panel, null, c);
     }
 

@@ -81,12 +81,11 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         for (JCheckBox c : checkBoxes) panel.add(c);
         panel.setSize(panel.getPreferredSize());
 
-        List<Goods> fake = null;
         List<ChoiceItem<List<Goods>>> c = choices();
-        c.add(new ChoiceItem<>(Messages.message("ok"), fake)
-            .okOption().defaultOption());
-        c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
-            .cancelOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"),
+                               (List<Goods>)null).okOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("cancel"),
+                               (List<Goods>)null).cancelOption());
         initializeDialog(frame, DialogType.QUESTION, false, panel,
             new ImageIcon(getImageLibrary().getScaledUnitImage(unit)), c);
     }

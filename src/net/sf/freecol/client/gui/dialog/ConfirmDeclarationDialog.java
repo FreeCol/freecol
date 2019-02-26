@@ -347,12 +347,11 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         // Use the coat of arms image icon.  Is there something better?
         ImageIcon icon = new ImageIcon(getImageLibrary().getSmallNationImage(player.getNation()));
 
-        final List<String> fake = null;
         List<ChoiceItem<List<String>>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("confirmDeclarationDialog.areYouSure.yes"),
-                fake).okOption());
+                               (List<String>)null).okOption());
         c.add(new ChoiceItem<>(Messages.message("confirmDeclarationDialog.areYouSure.no"),
-                fake).cancelOption().defaultOption());
+                               (List<String>)null).cancelOption().defaultOption());
         initializeDialog(frame, DialogType.QUESTION, true, panel, icon, c);
     }
 

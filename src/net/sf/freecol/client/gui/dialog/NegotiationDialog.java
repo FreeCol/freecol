@@ -1009,18 +1009,19 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         }
         panel.setPreferredSize(panel.getPreferredSize());
 
-        DiplomaticTrade bogus = null;
         String str;
         List<ChoiceItem<DiplomaticTrade>> c = choices();
         if (agreement.getVersion() > 0) { // A new offer can not be accepted
             str = Messages.message("negotiationDialog.accept");
-            c.add(this.accept = new ChoiceItem<>(str, bogus));
+            c.add(this.accept = new ChoiceItem<>(str, (DiplomaticTrade)null));
         }
         str = Messages.message("negotiationDialog.send");
-        c.add(this.send = new ChoiceItem<>(str, bogus).okOption());
+        c.add(this.send = new ChoiceItem<>(str,
+                (DiplomaticTrade)null).okOption());
         if (agreement.getVersion() > 0 || context != TradeContext.CONTACT) {
             str = Messages.message("negotiationDialog.cancel");
-            c.add(new ChoiceItem<>(str, bogus).cancelOption().defaultOption());
+            c.add(new ChoiceItem<>(str,
+                    (DiplomaticTrade)null).cancelOption().defaultOption());
         }
         updateDialog();
 
