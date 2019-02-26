@@ -259,7 +259,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     }
 
 
-    public JComponent getDropTarget(JComponent component) {
+    private JComponent getDropTarget(JComponent component) {
         return (component instanceof DropTarget)
             ? component
             : (component.getParent() instanceof JComponent)

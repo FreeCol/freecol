@@ -767,7 +767,7 @@ public final class EuropePanel extends PortPanel {
     /**
      * Cleans up this EuropePanel.
      */
-    public void cleanup() {
+    private void cleanup() {
         log.cleanup();
         europeanDocksPanel.cleanup();
         marketPanel.cleanup();

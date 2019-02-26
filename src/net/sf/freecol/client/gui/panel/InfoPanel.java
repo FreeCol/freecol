@@ -519,7 +519,7 @@ public final class InfoPanel extends FreeColPanel {
      * Update this {@code InfoPanel} by selecting the correct internal
      * panel to display.
      */
-    public void update() {
+    private void update() {
         InfoPanelMode newMode = getMode();
         Player player = getFreeColClient().getMyPlayer();
         boolean fail = newMode == InfoPanelMode.END && player != null

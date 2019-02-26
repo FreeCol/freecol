@@ -85,7 +85,7 @@ public abstract class PortPanel extends FreeColPanel {
      * @param unit The {@code Unit} to select.
      * @return True if the selection succeeds.
      */
-    public boolean setSelectedUnit(Unit unit) {
+    protected boolean setSelectedUnit(Unit unit) {
         for (Component component : getComponents()) {
             if (component instanceof UnitLabel) {
                 UnitLabel label = (UnitLabel)component;

@@ -117,7 +117,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
      *
      * @return True if single player is selected.
      */
-    public boolean isSinglePlayer() {
+    private boolean isSinglePlayer() {
         return singlePlayer.isSelected();
     }
 

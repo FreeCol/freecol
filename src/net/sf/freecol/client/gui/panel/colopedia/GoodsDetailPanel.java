@@ -70,7 +70,6 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         super.addSubTrees(root, getSpecification().getGoodsTypeList());
     }

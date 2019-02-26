@@ -253,7 +253,7 @@ public final class MapEditorController extends FreeColClientHolder {
      *
      * @param file The {@code File}.
      */
-    public void loadGame(File file) {
+    private void loadGame(File file) {
         final FreeColClient fcc = getFreeColClient();
         final GUI gui = getGUI();
 

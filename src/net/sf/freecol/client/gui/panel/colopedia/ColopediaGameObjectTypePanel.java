@@ -112,7 +112,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
      * @param root a {@code DefaultMutableTreeNode}
      * @param types a List of FreeColSpecObjectTypes
      */
-    public void addSubTrees(DefaultMutableTreeNode root, List<T> types) {
+    protected void addSubTrees(DefaultMutableTreeNode root, List<T> types) {
         addSubTrees(root, id, types);
     }
 
@@ -123,8 +123,8 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
      * @param id The object identifier of the new branch node.
      * @param types a List of FreeColSpecObjectTypes
      */
-    public void addSubTrees(DefaultMutableTreeNode root, String id,
-                            List<T> types) {
+    protected void addSubTrees(DefaultMutableTreeNode root, String id,
+                               List<T> types) {
         String name = getName();
         ColopediaTreeItem cti = new ColopediaTreeItem(this, id, name, null);
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(cti);

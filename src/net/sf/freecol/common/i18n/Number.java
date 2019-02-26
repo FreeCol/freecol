@@ -64,7 +64,7 @@ public abstract class Number implements Selector {
      * @param selector a {@code double} value
      * @return a {@code String} value
      */
-    public String getKey(double selector) {
+    private String getKey(double selector) {
         return getCategory(selector).toString();
     }
 }

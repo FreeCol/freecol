@@ -321,7 +321,7 @@ public abstract class FreeColAction extends AbstractAction
      *         given {@code KeyStroke} if passed as a parameter to
      *         {@code getAWTKeyStroke(String)}.
      */
-    public static String getKeyStrokeText(KeyStroke keyStroke) {
+    private static String getKeyStrokeText(KeyStroke keyStroke) {
         return (keyStroke == null) ? "" : keyStroke.toString();
     }
 

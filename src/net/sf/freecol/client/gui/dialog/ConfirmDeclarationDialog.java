@@ -110,7 +110,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
          * {@inheritDoc}
          */
         @Override
-        public void setLabelValues(JLabel c, T value) {
+        protected void setLabelValues(JLabel c, T value) {
             c.setText(Messages.message(prefix + value));
         }
     }

@@ -37,7 +37,7 @@ public class FreeColTextAreaUI extends BasicTextAreaUI {
     private final JComponent c;
 
 
-    public FreeColTextAreaUI(JComponent c) {
+    private FreeColTextAreaUI(JComponent c) {
         this.c = c;
     }
 

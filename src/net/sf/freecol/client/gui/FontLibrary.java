@@ -228,9 +228,9 @@ public class FontLibrary {
      * @param scaleFactor The applied scale factor.
      * @return The created Font.
      */
-    public static Font createCompatibleFont(String string, FontType fontType,
-                                            FontSize fontSize,
-                                            int style, float scaleFactor) {
+    private static Font createCompatibleFont(String string, FontType fontType,
+                                             FontSize fontSize,
+                                             int style, float scaleFactor) {
         // TODO: Consider testing the normal font for compatibility and try
         //       some or all other available fonts for complete/longest match:
         //       header/simple->main->normal->simple/header->emergency

@@ -55,12 +55,12 @@ public class ModifierFormat {
             : modifierFormat.format(value);
     }
 
-    public static final String[] getModifierStrings(Modifier modifier) {
+    private static final String[] getModifierStrings(Modifier modifier) {
         return getModifierStrings(modifier.getValue(), modifier.getType());
     }
 
-    public static final String[] getModifierStrings(float value,
-                                                    ModifierType type) {
+    private static final String[] getModifierStrings(float value,
+                                                     ModifierType type) {
         String bonus = modifierFormat.format(value);
         if (value == Modifier.UNKNOWN) {
             return new String[] { " ", bonus, null };

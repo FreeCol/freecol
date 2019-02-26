@@ -123,9 +123,9 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param maximumProduction The maximum production.
      * @param stockNumber The lower bound on number of items to display.
      */
-    public ProductionLabel(FreeColClient freeColClient, ImageLibrary lib,
-                           AbstractGoods ag,
-                           int maximumProduction, int stockNumber) {
+    private ProductionLabel(FreeColClient freeColClient, ImageLibrary lib,
+                            AbstractGoods ag,
+                            int maximumProduction, int stockNumber) {
         super(lib, ag);
 
         if (getType() == null) {

@@ -1133,7 +1133,7 @@ public class Flag {
      * @param y The y coordinate of the star.
      * @return The star shape.
      */
-    public GeneralPath getStar(double x, double y) {
+    private GeneralPath getStar(double x, double y) {
         return getStar(-1, x, y);
     }
 
@@ -1145,7 +1145,7 @@ public class Flag {
      * @param y The y coordinate of the star.
      * @return The star shape.
      */
-    public GeneralPath getStar(double scale, double x, double y) {
+    private GeneralPath getStar(double scale, double x, double y) {
         GeneralPath newStar = new GeneralPath(star);
         if (scale > 0) {
             newStar.transform(AffineTransform.getScaleInstance(scale, scale));
@@ -1198,7 +1198,7 @@ public class Flag {
     }
 
 
-    public GeneralPath getGridOfStars(Rectangle2D.Double union) {
+    private GeneralPath getGridOfStars(Rectangle2D.Double union) {
         int[] bars = new int[2];
         for (int count = stars; count < 51; count++) {
             if (layout[count][0] > 0) {

@@ -71,7 +71,7 @@ public class ReportPanel extends FreeColPanel {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param key A key for the title.
      */
-    public ReportPanel(FreeColClient freeColClient, String key) {
+    protected ReportPanel(FreeColClient freeColClient, String key) {
         super(freeColClient, "ReportPanelUI",
               new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
 

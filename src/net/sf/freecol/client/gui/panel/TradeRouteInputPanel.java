@@ -826,7 +826,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * Enables the remove stop button if a stop is selected and disables it
      * otherwise.
      */
-    public void updateButtons() {
+    private void updateButtons() {
         this.addStopButton.setEnabled(this.stopListModel.getSize() 
             < this.destinationSelector.getItemCount() - 1);
         this.removeStopButton.setEnabled(this.stopList.getSelectedIndices()

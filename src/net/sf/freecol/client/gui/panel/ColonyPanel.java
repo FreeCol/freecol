@@ -878,21 +878,21 @@ public final class ColonyPanel extends PortPanel
     }
 
 
-    // Public update routines
+    // Update routines
 
-    public void updateBuildingsPanel() {
+    private void updateBuildingsPanel() {
         buildingsPanel.update();
     }
 
-    public void updateConstructionPanel() {
+    private void updateConstructionPanel() {
         constructionPanel.update();
     }
 
-    public void updateInPortPanel() {
+    private void updateInPortPanel() {
         inPortPanel.update();
     }
 
-    public void updateNetProductionPanel() {
+    private void updateNetProductionPanel() {
         final Colony colony = getColony();
         final Specification spec = colony.getSpecification();
         // FIXME: find out why the cache needs to be explicitly invalidated
@@ -910,19 +910,19 @@ public final class ColonyPanel extends PortPanel
         netProductionPanel.revalidate();
     }
 
-    public void updateOutsideColonyPanel() {
+    private void updateOutsideColonyPanel() {
         outsideColonyPanel.update();
     }
 
-    public void updatePopulationPanel() {
+    private void updatePopulationPanel() {
         populationPanel.update();
     }
 
-    public void updateTilesPanel() {
+    private void updateTilesPanel() {
         tilesPanel.update();
     }
 
-    public void updateWarehousePanel() {
+    private void updateWarehousePanel() {
         warehousePanel.update();
     }
 
@@ -1781,7 +1781,7 @@ public final class ColonyPanel extends PortPanel
              * {@inheritDoc}
              */
             @Override
-            public void cleanup() {
+            protected void cleanup() {
                 super.cleanup();
 
                 removeMouseListener(releaseListener);

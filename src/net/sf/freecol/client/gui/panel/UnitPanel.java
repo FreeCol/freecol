@@ -70,7 +70,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Initialize this unit panel.
      */
-    public void initialize() {
+    protected void initialize() {
         cleanup();
         addPropertyChangeListeners();
         update();
@@ -81,7 +81,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Clean up this unit panel.
      */
-    public void cleanup() {
+    protected void cleanup() {
         removePropertyChangeListeners();
     }
 
@@ -98,7 +98,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Update this unit panel.
      */
-    public void update() {
+    protected void update() {
         removeAll();
 
         if (portPanel != null) {
@@ -163,7 +163,7 @@ public abstract class UnitPanel extends MigPanel
      * @param unit The {@code Unit} to select.
      * @return True if the selection succeeds.
      */
-    public boolean setSelectedUnit(Unit unit) {
+    protected boolean setSelectedUnit(Unit unit) {
         for (Component component : getComponents()) {
             if (component instanceof UnitLabel) {
                 UnitLabel label = (UnitLabel)component;

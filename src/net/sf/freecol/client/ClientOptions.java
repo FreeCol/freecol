@@ -651,21 +651,21 @@ public class ClientOptions extends OptionGroup {
     }
 
     /**
-     * Return the client's preferred comparator for colonies.
+     * Get the client's preferred comparator for colonies.
      *
-     * @return a {@code Comparator} value
+     * @return The current colony {@code Comparator}.
      */
     public Comparator<Colony> getColonyComparator() {
         return getColonyComparator(getInteger(COLONY_COMPARATOR));
     }
 
     /**
-     * Return the colony comparator identified by type.
+     * Get the colony comparator identified by type.
      *
-     * @param type an {@code int} value
-     * @return a {@code Comparator} value
+     * @param The colony comparator option integer value.
+     * @return The corresponding colony {@code Comparator}.
      */
-    public static Comparator<Colony> getColonyComparator(int type) {
+    private static Comparator<Colony> getColonyComparator(int type) {
         switch (type) {
         case COLONY_COMPARATOR_AGE:
             return colonyAgeComparator;
@@ -685,7 +685,7 @@ public class ClientOptions extends OptionGroup {
                 return colonyNameComparator;
             }
         default:
-            throw new IllegalStateException("Unknown comparator");
+            throw new RuntimeException("Unknown comparator");
         }
     }
 

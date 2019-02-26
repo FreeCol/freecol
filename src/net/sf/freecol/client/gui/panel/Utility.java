@@ -225,7 +225,7 @@ public final class Utility {
      * @param text The text to display in the text area.
      * @return A suitable text area.
      */
-    public static JTextArea createTextArea(String text) {
+    private static JTextArea createTextArea(String text) {
         JTextArea textArea = new JTextArea(text);
         textArea.setOpaque(false);
         textArea.setLineWrap(true);

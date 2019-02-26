@@ -298,7 +298,7 @@ public final class ImageLibrary {
      * @param color The {@code Color} to complement.
      * @return A suitable border {@code Color}.
      */
-    public static Color makeStringBorderColor(Color color) {
+    private static Color makeStringBorderColor(Color color) {
         return (color.getRed() * 0.3
             + color.getGreen() * 0.59
             + color.getBlue() * 0.11 < 10) ? Color.WHITE
@@ -756,14 +756,6 @@ public final class ImageLibrary {
     }
     
     public static BufferedImage getBuildingTypeImage(BuildingType buildingType,
-                                                     Player player, float scale) {
-        final String key = getBuildingTypeKey(buildingType);
-        final String extraKey = key + "." + player.getNationResourceKey();
-        final boolean hasExtra = ResourceManager.hasImageResource(extraKey);
-        return getScaledImage((hasExtra) ? extraKey : key, scale, false);
-    }
-
-    public static BufferedImage getBuildingTypeImage(BuildingType buildingType,
                                                      float scale) {
         final String key = getBuildingTypeKey(buildingType);
         return getScaledImage(key, scale, false);
@@ -773,6 +765,15 @@ public final class ImageLibrary {
                                                      Dimension size) {
         final String key = getBuildingTypeKey(buildingType);
         return getScaledImage(key, size, false);
+    }
+
+    private static BufferedImage getBuildingTypeImage(BuildingType buildingType,
+                                                      Player player,
+                                                      float scale) {
+        final String key = getBuildingTypeKey(buildingType);
+        final String extraKey = key + "." + player.getNationResourceKey();
+        final boolean hasExtra = ResourceManager.hasImageResource(extraKey);
+        return getScaledImage((hasExtra) ? extraKey : key, scale, false);
     }
 
     public BufferedImage getScaledBuildingImage(Building building) {
@@ -827,11 +828,11 @@ public final class ImageLibrary {
 
     // Nation image handling
 
-    public static String getMercenaryLeaderKey(int n) {
+    private static String getMercenaryLeaderKey(int n) {
         return "image.flavor.model.mercenaries." + n;
     }
 
-    public static String getMonarchKey(String nationId) {
+    private static String getMonarchKey(String nationId) {
         return "image.flavor.monarch." + nationId;
     }
 
@@ -923,7 +924,7 @@ public final class ImageLibrary {
      * @param pt The {@code PathType}
      * @return The {@code BufferedImage}.
      */
-    public static BufferedImage getPathNextTurnImage(PathType pt) {
+    private static BufferedImage getPathNextTurnImage(PathType pt) {
         return (pt == null) ? null
             : getUnscaledImage(pt.getNextTurnImageKey());
     }
@@ -1009,9 +1010,9 @@ public final class ImageLibrary {
         return getForestImage(type, riverStyle, this.tileForestSize);
     }
 
-    public static BufferedImage getForestImage(TileType type,
-                                               TileImprovementStyle riverStyle,
-                                               Dimension size) {
+    private static BufferedImage getForestImage(TileType type,
+                                                TileImprovementStyle riverStyle,
+                                                Dimension size) {
         String key;
         if (riverStyle != null) {
             String mask = riverStyle.getMask();
@@ -1084,9 +1085,9 @@ public final class ImageLibrary {
         return getScaledImage(getResourceTypeKey(rt), size, grayscale);
     }
 
-    public static BufferedImage getResourceTypeImage(ResourceType rt,
-                                                     float scale,
-                                                     boolean grayscale) {
+    private static BufferedImage getResourceTypeImage(ResourceType rt,
+                                                      float scale,
+                                                      boolean grayscale) {
         return getScaledImage(getResourceTypeKey(rt), scale, grayscale);
     }
 
@@ -1116,17 +1117,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the river image with the given style and scale.
-     *
-     * @param style The improvement style identifier.
-     * @param scale A scale factor.
-     * @return The image with the given style.
-     */
-    public BufferedImage getRiverImage(String style, float scale) {
-        return getRiverImage(style, scaleDimension(this.tileSize, scale));
-    }
-
-    /**
      * Returns the river image with the given style.
      *
      * @param style the style code
@@ -1140,6 +1130,17 @@ public final class ImageLibrary {
 
     public BufferedImage getRiverImage(String style) {
         return getRiverImage(style, this.scaleFactor);
+    }
+
+    /**
+     * Returns the river image with the given style and scale.
+     *
+     * @param style The improvement style identifier.
+     * @param scale A scale factor.
+     * @return The image with the given style.
+     */
+    private BufferedImage getRiverImage(String style, float scale) {
+        return getRiverImage(style, scaleDimension(this.tileSize, scale));
     }
 
     public BufferedImage getSmallerRiverImage(String style) {
@@ -1195,12 +1196,12 @@ public final class ImageLibrary {
     }
 
 
-    public static String getSettlementTypeKey(SettlementType settlementType) {
+    private static String getSettlementTypeKey(SettlementType settlementType) {
         return "image.tileitem." + settlementType.getId();
     }
     
-    public static BufferedImage getSettlementTypeImage(SettlementType settlementType,
-                                                       float scale) {
+    private static BufferedImage getSettlementTypeImage(SettlementType settlementType,
+                                                        float scale) {
         final String key = getSettlementTypeKey(settlementType);
         return getScaledImage(key, scale, false);
     }
@@ -1355,8 +1356,8 @@ public final class ImageLibrary {
         return getScaledImage(key, scale, grayscale);
     }
 
-    public static BufferedImage getUnitTypeImage(UnitType unitType,
-                                                 float scale) {
+    private static BufferedImage getUnitTypeImage(UnitType unitType,
+                                                  float scale) {
         return getUnitTypeImage(unitType, unitType.getDisplayRoleId(), false,
                                 false, scale);
     }

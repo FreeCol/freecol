@@ -69,8 +69,8 @@ public class NewUnitPanel extends FreeColPanel {
      * @param label The label for the panel.
      * @param units A list of {@code UnitType}s to offer.
      */
-    public NewUnitPanel(FreeColClient freeColClient, LayoutManager layout,
-                        String label, List<UnitType> units) {
+    protected NewUnitPanel(FreeColClient freeColClient, LayoutManager layout,
+                           String label, List<UnitType> units) {
         super(freeColClient, null, layout);
 
         this.question = new JLabel(label);
@@ -88,7 +88,7 @@ public class NewUnitPanel extends FreeColPanel {
      * Updates this panel's labels so that the information it displays
      * is up to date.
      */
-    public final void update() {
+    public void update() {
         removeAll();
 
         final Player player = getMyPlayer();

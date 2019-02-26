@@ -649,7 +649,8 @@ public class GUI extends FreeColClientHolder {
     public TradeBuyAction getBuyChoice(Unit unit, Settlement settlement,
                                        Goods goods, int gold, boolean canBuy) {
         //Get Buy price on Europe Market for comparison
-        int euroPrice = unit.getOwner().getMarket().getBidPrice(goods.getType(), goods.getAmount());
+        int euroPrice = unit.getOwner().getMarket()
+            .getBidPrice(goods.getType(), goods.getAmount());
         StringTemplate template = StringTemplate.template("buy.text")
             .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goods.getLabel(true))
@@ -678,7 +679,8 @@ public class GUI extends FreeColClientHolder {
      *     or null if cancelled.
      */
     public final <T> T getChoice(Tile tile, Object explain,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
+                                 String cancelKey,
+                                 List<ChoiceItem<T>> choices) {
         return getChoice(tile, explain, (ImageIcon)null, cancelKey, choices);
     }
 
@@ -694,8 +696,10 @@ public class GUI extends FreeColClientHolder {
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, Object explain, GoodsType goodsType,
-                                 String cancelKey, List<ChoiceItem<T>> choices) {
+    private final <T> T getChoice(Tile tile, Object explain,
+                                  GoodsType goodsType,
+                                  String cancelKey,
+                                  List<ChoiceItem<T>> choices) {
         return getChoice(tile, explain,
             new ImageIcon(imageLibrary.getScaledGoodsTypeImage(goodsType)),
             cancelKey, choices);
@@ -713,8 +717,10 @@ public class GUI extends FreeColClientHolder {
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, Object explain, Nation nation,
-                                 String cancelKey, List<ChoiceItem<T>> choices) {
+    private final <T> T getChoice(Tile tile, Object explain,
+                                  Nation nation,
+                                  String cancelKey,
+                                  List<ChoiceItem<T>> choices) {
         return getChoice(tile, explain,
             new ImageIcon(imageLibrary.getScaledNationImage(nation)),
             cancelKey, choices);
@@ -1110,7 +1116,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param settlement The {@code Settlement} to display.
      */
-    public final void showSettlement(Settlement settlement) {
+    private final void showSettlement(Settlement settlement) {
         if (settlement instanceof Colony) {
             if (getMyPlayer().owns(settlement)) {
                 showColonyPanel((Colony)settlement, null);

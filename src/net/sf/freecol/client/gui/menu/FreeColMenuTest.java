@@ -44,11 +44,12 @@ import net.sf.freecol.client.gui.FreeColFrame;
  * Test the menus.
  */
 public class FreeColMenuTest implements ActionListener, ItemListener {
+
     JTextArea output;
     JScrollPane scrollPane;
     final String newline = "\n";
 
-    public JMenuBar createMenuBar() {
+    private JMenuBar createMenuBar() {
         JMenuBar menuBar = null;
 
         FreeColClient client = new FreeColClient(null, null);
@@ -62,7 +63,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
         return menuBar;
     }
 
-    public Container createContentPane() {
+    private Container createContentPane() {
         //Create the content-pane-to-be.
         JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.setOpaque(true);

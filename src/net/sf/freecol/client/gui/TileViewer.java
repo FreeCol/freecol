@@ -440,7 +440,7 @@ public final class TileViewer extends FreeColClientHolder {
      * @param g a {@code Graphics2D}
      * @param image the BufferedImage
      */
-    public void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
+    private void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
         int y = tileHeight - image.getHeight();
         if (y > 0) y /= 2;
         g.drawImage(image, (tileWidth - image.getWidth())/2, y, null);

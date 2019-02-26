@@ -399,23 +399,10 @@ public class FreeColDebugger {
      * @param thread The {@code Thread} to print.
      * @return A stack trace as a string.
      */
-    public static String stackTraceToString(Thread thread) {
+    private static String stackTraceToString(Thread thread) {
         LogBuilder lb = new LogBuilder(512);
         addStackTrace(lb, thread);
         return lb.toString();
-    }
-
-    /**
-     * Helper that adds a stack trace to a log builder.
-     *
-     * @param lb The {@code LogBuilder} to add to.
-     * @param thread The {@code Thread} to print.
-     */
-    public static void addStackTrace(LogBuilder lb, Thread thread) {
-        for (StackTraceElement s : thread.getStackTrace()) {
-            lb.add(s.toString(), "\n");
-        }
-        lb.shrink("\n");
     }
 
     /**
@@ -425,6 +412,19 @@ public class FreeColDebugger {
      */
     public static void addStackTrace(LogBuilder lb) {
         addStackTrace(lb, Thread.currentThread());
+    }
+
+    /**
+     * Helper that adds a stack trace to a log builder.
+     *
+     * @param lb The {@code LogBuilder} to add to.
+     * @param thread The {@code Thread} to print.
+     */
+    private static void addStackTrace(LogBuilder lb, Thread thread) {
+        for (StackTraceElement s : thread.getStackTrace()) {
+            lb.add(s.toString(), "\n");
+        }
+        lb.shrink("\n");
     }
 
     /**

@@ -1315,7 +1315,7 @@ public final class Canvas extends JDesktopPane {
      * @return {@code true} if the {@code Canvas} is displaying an
      *         internal frame.
      */
-    public boolean isShowingSubPanel() {
+    private boolean isShowingSubPanel() {
         return getShowingSubPanel() != null;
     }
 
@@ -2150,7 +2150,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display the map editor transform panel.
      */
-    public void showMapEditorTransformPanel() {
+    private void showMapEditorTransformPanel() {
         JInternalFrame f = addAsFrame(new MapEditorTransformPanel(freeColClient),
             true, PopupPosition.CENTERED, false);
         f.setLocation(f.getX(), 50);

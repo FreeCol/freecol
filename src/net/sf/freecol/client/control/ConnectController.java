@@ -195,6 +195,8 @@ public final class ConnectController extends FreeColClientHolder {
     /**
      * Request this client log in to <i>host:port</i>.
      *
+     * Public for the test suite.
+     *
      * @param user The name of the player to use.
      * @param host The name of the machine running the {@code FreeColServer}.
      * @param port The port to use when connecting to the host.

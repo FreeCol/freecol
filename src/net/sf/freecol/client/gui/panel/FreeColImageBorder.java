@@ -79,14 +79,14 @@ public class FreeColImageBorder extends AbstractBorder {
      * @param bottomLeftCornerImage SW-corner
      * @param leftImage W-border
      */
-    public FreeColImageBorder(BufferedImage topLeftCornerImage,
-                              BufferedImage topImage,
-                              BufferedImage topRightCornerImage,
-                              BufferedImage rightImage,
-                              BufferedImage bottomRightCornerImage,
-                              BufferedImage bottomImage,
-                              BufferedImage bottomLeftCornerImage,
-                              BufferedImage leftImage) {
+    private FreeColImageBorder(BufferedImage topLeftCornerImage,
+                               BufferedImage topImage,
+                               BufferedImage topRightCornerImage,
+                               BufferedImage rightImage,
+                               BufferedImage bottomRightCornerImage,
+                               BufferedImage bottomImage,
+                               BufferedImage bottomLeftCornerImage,
+                               BufferedImage leftImage) {
         this.topLeftCornerImage = topLeftCornerImage;
         this.topImage = topImage;
         this.topRightCornerImage = topRightCornerImage;

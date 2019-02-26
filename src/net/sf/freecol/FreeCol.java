@@ -1030,7 +1030,7 @@ public final class FreeCol {
      * @param arg The supplied difficulty argument.
      * @return The name of the selected difficulty, or null if none.
      */
-    public static String selectDifficulty(String arg) {
+    private static String selectDifficulty(String arg) {
         String difficulty
             = find(map(DIFFICULTIES, d -> "model.difficulty." + d),
                    Messages.matchesName(arg));
@@ -1092,7 +1092,7 @@ public final class FreeCol {
      * @param arg The optional command line argument to be parsed.
      * @return If the argument was correctly formatted.
      */
-    public static boolean setGUIScale(String arg) {
+    private static boolean setGUIScale(String arg) {
         boolean valid = true;
         if(arg == null) {
             guiScale = GUI_SCALE_MAX;
@@ -1146,7 +1146,7 @@ public final class FreeCol {
      * @param arg The supplied count argument.
      * @return A valid nation number, or negative on error.
      */
-    public static int selectEuropeanCount(String arg) {
+    private static int selectEuropeanCount(String arg) {
         try {
             int n = Integer.parseInt(arg);
             if (n >= EUROPEANS_MIN) {
@@ -1227,6 +1227,8 @@ public final class FreeCol {
     /**
      * Set the locale.
      *
+     * Public for the test suite.
+     *
      * @param localeArg The locale specification, null implies the
      *     default locale.
      * @return True if the {@code Locale} changed.
@@ -1281,7 +1283,7 @@ public final class FreeCol {
      * @param arg The server port number.
      * @return True if the port was set.
      */
-    public static boolean setServerPort(String arg) {
+    private static boolean setServerPort(String arg) {
         if (arg == null) return false;
         try {
             serverPort = Integer.parseInt(arg);

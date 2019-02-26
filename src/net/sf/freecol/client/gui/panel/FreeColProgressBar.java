@@ -122,7 +122,7 @@ public class FreeColProgressBar extends JPanel {
      * @param value the current value of the progress bar
      * @param step the expected increase next turn
      */
-    public void update(int min, int max, int value, int step) {
+    private void update(int min, int max, int value, int step) {
         this.min = min;
         this.max = max;
         this.value = value;

@@ -676,8 +676,8 @@ public final class InGameController extends FreeColClientHolder {
      * @param endOfTurn Use a turn report panel if necessary.
      * @return True if any messages were displayed.
      */
-    public boolean displayModelMessages(final boolean allMessages,
-                                        final boolean endOfTurn) {
+    private boolean displayModelMessages(final boolean allMessages,
+                                         final boolean endOfTurn) {
         final ClientOptions co = getClientOptions();
         final Player player = getMyPlayer();
         final Turn thisTurn = getGame().getTurn();
@@ -2751,14 +2751,12 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Choose a founding father from an offered list.
      *
-     * Called from GUI.showChooseFoundingFatherDialog
-     *
      * @param ffs A list of {@code FoundingFather}s to choose from.
      * @param ff The chosen {@code FoundingFather} (may be null).
      * @return True if a father was chosen.
      */
-    public boolean chooseFoundingFather(List<FoundingFather> ffs,
-                                        FoundingFather ff) {
+    private boolean chooseFoundingFather(List<FoundingFather> ffs,
+                                         FoundingFather ff) {
         if (ffs == null) return false;
 
         final Player player = getMyPlayer();
@@ -3060,14 +3058,12 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * Emigrate a unit from Europe.
      *
-     * Called from GUI.showEmigrationDialog.
-     *
      * @param player The {@code Player} that owns the unit.
      * @param slot The slot to emigrate from, [0..RECRUIT_COUNT].
      * @param n The number of remaining units known to be eligible to migrate.
      * @param foY True if this migration is due to a fountain of youth event.
      */
-    public void emigrate(Player player, int slot, int n, boolean foY) {
+    private void emigrate(Player player, int slot, int n, boolean foY) {
         if (player == null || !player.isColonial()
             || !MigrationType.validMigrantSlot(slot)) return;
 
@@ -3167,7 +3163,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param template A {@code StringTemplate} to display.
      * @param message An extra non-i18n message to display if debugging.
      */
-    public void error(StringTemplate template, String message) {
+    private void error(StringTemplate template, String message) {
         getGUI().showErrorMessage(template, message);
     }
 
@@ -3251,8 +3247,6 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * A player makes first contact with a native player.
      *
-     * Called from GUI.showFirstContactDialog
-     *
      * @param player The {@code Player} making contact.
      * @param other The native {@code Player} being contacted.
      * @param tile An optional {@code Tile} to offer the player if
@@ -3260,8 +3254,8 @@ public final class InGameController extends FreeColClientHolder {
      * @param result Whether the initial treaty was accepted.
      * @return True if first contact occurs.
      */
-    public boolean firstContact(Player player, Player other, Tile tile,
-                                boolean result) {
+    private boolean firstContact(Player player, Player other, Tile tile,
+                                 boolean result) {
         if (player == null || player == other || tile == null) return false;
 
         boolean ret = askServer().firstContact(player, other, tile, result);
@@ -3486,7 +3480,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param unit The {@code Unit} to use.
      * @return True if the unit joined a colony.
      */
-    public boolean joinColony(Unit unit) {
+    private boolean joinColony(Unit unit) {
         final Tile tile = unit.getTile();
         final Colony colony = (tile == null) ? null : tile.getColony();
         boolean ret = colony != null && askServer().joinColony(unit, colony)
@@ -3616,7 +3610,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param defenderId The identifier of the defender unit (may have sunk).
      * @return True if looting occurs.
      */
-    public boolean lootCargo(Unit unit, List<Goods> goods, String defenderId) {
+    private boolean lootCargo(Unit unit, List<Goods> goods, String defenderId) {
         if (unit == null || goods == null || goods.isEmpty()
             || defenderId == null) return false;
 
@@ -4046,7 +4040,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param name The name to use.
      * @return True if the new land was named.
      */
-    public boolean newLandName(Unit unit, String name) {
+    private boolean newLandName(Unit unit, String name) {
         if (unit == null || name == null) return false;
 
         // Respond to the server.
@@ -4090,16 +4084,14 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * The player names a new region.
      *
-     * Called from newRegionName, GUI.showNameNewRegionDialog
-     *
      * @param tile The {@code Tile} within the region.
      * @param unit The {@code Unit} that has discovered the region.
      * @param region The {@code Region} to name.
      * @param name The name to offer.
      * @return True if the new region was named.
      */
-    public boolean newRegionName(final Region region, final Tile tile,
-                                 final Unit unit, final String name) {
+    private boolean newRegionName(final Region region, final Tile tile,
+                                  final Unit unit, final String name) {
         if (tile == null || unit == null || region == null) return false;
 
         return askServer().newRegionName(region, tile, unit, name);
@@ -4174,7 +4166,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param turn The turn number.
      * @return True if the new turn occurs.
      */
-    public boolean newTurn(int turn) {
+    private boolean newTurn(int turn) {
         final Game game = getGame();
         final Player player = getMyPlayer();
 
@@ -4699,7 +4691,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param player The {@code Player} to be the new current player.
      * @return True if the current player changes.
      */
-    public boolean setCurrentPlayer(Player player) {
+    private boolean setCurrentPlayer(Player player) {
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && currentPlayerIsMyPlayer()) {
             getGUI().closeMenus();
@@ -4759,7 +4751,7 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * This player has died.
      */
-    public void setDead() {
+    private void setDead() {
         final FreeColClient fcc = getFreeColClient();
         final Player player = getMyPlayer();
         FreeColDebugger.finishDebugRun(fcc, true);
@@ -5029,12 +5021,10 @@ public final class InGameController extends FreeColClientHolder {
     /**
      * The player has won!
      *
-     * Called from GUI.showVictoryDialog
-     *
      * @param quit If true, leave this game and start a new one.
      * @return True.
      */
-    public boolean victory(Boolean quit) {
+    private boolean victory(Boolean quit) {
         if (quit) {
             getFreeColClient().getConnectController().newGame();
         } else {

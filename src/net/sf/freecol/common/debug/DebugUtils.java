@@ -391,8 +391,8 @@ public class DebugUtils {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param unit The {@code Unit} to add to.
      */
-    public static void addUnitGoods(final FreeColClient freeColClient,
-                                    final Unit unit) {
+    private static void addUnitGoods(final FreeColClient freeColClient,
+                                     final Unit unit) {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
         final Specification sSpec = sGame.getSpecification();

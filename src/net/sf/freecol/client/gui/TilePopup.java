@@ -235,8 +235,8 @@ public final class TilePopup extends JPopupMenu {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param tile The {@code Tile} to build menu items for.
      */
-    public void addDebugItems(final FreeColClient freeColClient, 
-                              final Tile tile) {
+    private void addDebugItems(final FreeColClient freeColClient, 
+                               final Tile tile) {
         addSeparator();
 
         JMenu changeOwnership = new JMenu("Change ownership");

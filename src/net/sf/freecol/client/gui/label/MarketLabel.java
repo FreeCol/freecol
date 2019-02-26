@@ -67,7 +67,7 @@ public final class MarketLabel extends AbstractGoodsLabel
     /**
      * Update this label.
      */
-    public void update() {
+    private void update() {
         final GoodsType type = getType();
         final Player player = market.getOwner();
         String toolTipText = Messages.getName(type);

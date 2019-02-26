@@ -43,7 +43,7 @@ public class MigPanel extends JPanel {
         this.uiClassId = null;
     }
 
-    public MigPanel(String uiClassId, LayoutManager layout) {
+    protected MigPanel(String uiClassId, LayoutManager layout) {
         super(layout);
         
         this.uiClassId = uiClassId;
