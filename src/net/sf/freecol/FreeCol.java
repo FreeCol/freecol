@@ -488,11 +488,22 @@ public final class FreeCol {
     }
 
     /**
+     * Quit and exit with an error.
+     *
+     * @param logger An optional {@code Logger} to log to.
+     * @param err The error message.
+     */
+    public static void fatal(Logger logger, String err) {
+        if (logger != null) logger.log(Level.SEVERE, err);
+        FreeCol.fatal(err);
+    }
+
+    /**
      * Exit printing fatal error message.
      *
      * @param template A {@code StringTemplate} to print.
      */
-    public static void fatal(StringTemplate template) {
+    private static void fatal(StringTemplate template) {
         fatal(Messages.message(template));
     }
 
@@ -501,7 +512,7 @@ public final class FreeCol {
      *
      * @param err The error message to print.
      */
-    public static void fatal(String err) {
+    private static void fatal(String err) {
         if (err == null || err.isEmpty()) {
             err = "Bogus null fatal error message";
             Thread.dumpStack();
@@ -515,7 +526,7 @@ public final class FreeCol {
      *
      * @param template A {@code StringTemplate} to print.
      */
-    public static void gripe(StringTemplate template) {
+    private static void gripe(StringTemplate template) {
         System.err.println(Messages.message(template));
     }
 
@@ -524,7 +535,7 @@ public final class FreeCol {
      *
      * @param key A message key.
      */
-    public static void gripe(String key) {
+    private static void gripe(String key) {
         System.err.println(Messages.message(key));
     }
 

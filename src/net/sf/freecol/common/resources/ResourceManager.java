@@ -257,7 +257,7 @@ public class ResourceManager {
             logger.warning("getImageResource(" + key + ") failed");
             r = mergedContainer.getImageResource(REPLACEMENT_IMAGE);
             if (r == null) {
-                FreeColClient.fatal("Failed getting replacement image.");
+                FreeCol.fatal(logger, "Failed getting replacement image.");
             }
         }
         return r;
@@ -330,7 +330,7 @@ public class ResourceManager {
                 + ") failed");
             if ((image = getImageResource(REPLACEMENT_IMAGE)
                     .getImage(size, grayscale)) == null) {
-                FreeColClient.fatal("Failed getting replacement image.");
+                FreeCol.fatal(logger, "Failed getting replacement image.");
             }
         } else {
             imageCache.put(hashKey, image);

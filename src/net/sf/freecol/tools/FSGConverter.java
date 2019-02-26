@@ -202,7 +202,7 @@ public class FSGConverter {
                 FSGConverter fsgc = FSGConverter.getFSGConverter();
                 fsgc.convertToXML(in, out);
             } catch (IOException e) {
-                FreeCol.fatal("An error occured while converting the file.");
+                FreeCol.fatal(null, "An error occured while converting the file.");
             }
         } else {
             printUsage();

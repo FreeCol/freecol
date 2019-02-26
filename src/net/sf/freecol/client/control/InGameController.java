@@ -4712,7 +4712,7 @@ public final class InGameController extends FreeColClientHolder {
             FreeColDebugger.finishDebugRun(getFreeColClient(), false);
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
                 && DebugUtils.checkDesyncAction(getFreeColClient())) {
-                FreeCol.fatal("Exiting on desynchronization");
+                FreeCol.fatal(logger, "Exiting on desynchronization");
             }
 
             // Save the game (if it isn't newly loaded)

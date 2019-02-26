@@ -161,7 +161,7 @@ public final class FreeColClient {
         if (this.headless) {
             if (!FreeColDebugger.isInDebugMode()
                 || FreeColDebugger.getDebugRunTurns() <= 0) {
-                fatal(Messages.message("client.headlessDebug"));
+                FreeCol.fatal(logger, Messages.message("client.headlessDebug"));
             }
         }
 
@@ -182,8 +182,9 @@ public final class FreeColClient {
             }
         }
         if (baseData == null) {
-            fatal(Messages.message(StringTemplate.template("client.baseData")
-                          .addName("%dir%", baseDirectory.getName()))
+            FreeCol.fatal(logger,
+                Messages.message(StringTemplate.template("client.baseData")
+                    .addName("%dir%", baseDirectory.getName()))
                 + ((ioeMessage == null) ? "" : "\n" + ioeMessage));
         }
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
@@ -219,7 +220,8 @@ public final class FreeColClient {
             try {
                 gui.installLookAndFeel(fontName);
             } catch (Exception e) {
-                fatal(Messages.message("client.laf") + "\n" + e.getMessage());
+                FreeCol.fatal(logger,
+                    Messages.message("client.laf") + "\n" + e.getMessage());
             }
         }
         actionManager = new ActionManager(this);
@@ -262,7 +264,7 @@ public final class FreeColClient {
                             final File savedGame,
                             final Specification spec) {
         if (headless && savedGame == null && spec == null) {
-            fatal(Messages.message("client.headlessRequires"));
+            FreeCol.fatal(logger, Messages.message("client.headlessRequires"));
         }
 
         // Load the client options, which handle reloading the
@@ -385,16 +387,6 @@ public final class FreeColClient {
 
         //logger.info("Final client options: " + clop.toString());
         return clop;
-    }
-
-    /**
-     * Quit and exit with an error.
-     *
-     * @param err The error message.
-     */
-    public static void fatal(String err) {
-        logger.log(Level.SEVERE, err);
-        FreeCol.fatal(err);
     }
 
 
@@ -783,7 +775,7 @@ public final class FreeColClient {
         logger.log(Level.WARNING, Messages.message(template), ex);
         if (isHeadless() // If this is a debug run, fail hard.
             || FreeColDebugger.getDebugRunTurns() >= 0) {
-            FreeCol.fatal(ej.toString());
+            FreeCol.fatal(logger, ej.toString());
         }
         ej.setRunnable(invokeMainPanel(null)).invokeLater();
         return null;
@@ -1007,7 +999,7 @@ public final class FreeColClient {
         try {
             gui.quit();
         } catch (Exception e) {
-            FreeCol.fatal("Failed to shutdown gui: " + e);
+            FreeCol.fatal(logger, "Failed to shutdown gui: " + e);
         }
         FreeCol.quit(0);
     }

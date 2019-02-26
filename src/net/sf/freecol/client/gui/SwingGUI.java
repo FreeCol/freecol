@@ -50,6 +50,7 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.Timer;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapTransform;
@@ -171,7 +172,7 @@ public class SwingGUI extends GUI {
             return lge.getDefaultScreenDevice();
         } catch (HeadlessException he) {}
 
-        FreeColClient.fatal("Could not find a GraphicsDevice!");
+        FreeCol.fatal(logger, "Could not find a GraphicsDevice!");
         return null;
     }
 
