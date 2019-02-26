@@ -108,10 +108,8 @@ public abstract class Session {
      *
      * @return True if the session is complete.
      */
-    public boolean isComplete() {
-        synchronized (this) {
-            return this.completed;
-        }
+    public synchronized boolean isComplete() {
+        return this.completed;
     }
     
     /**
@@ -125,12 +123,9 @@ public abstract class Session {
      *     occur when completing this session.
      * @return True if the session was already complete.
      */
-    public boolean complete(ChangeSet cs) {
-        boolean ret;
-        synchronized (this) {
-            ret = this.completed;
-            this.completed = true;
-        }
+    public synchronized boolean complete(ChangeSet cs) {
+        boolean ret = this.completed;
+        this.completed = true;
         return ret;
     }
 
