@@ -66,6 +66,11 @@ public class TranslationReport {
                     return name.matches("FreeColMessages_" + localeKey + ".*\\.properties");
                 }
             });
+        if (languageFiles == null) {
+            System.err.println("No language files found in "
+                + directory.toString());
+            System.exit(1);
+        }
 
         Path filePath = FileSystems.getDefault().getPath(args[0],
             "FreeColMessages.properties");
@@ -274,4 +279,3 @@ public class TranslationReport {
     }
 
 }
-

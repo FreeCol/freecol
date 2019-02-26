@@ -69,7 +69,12 @@ public class DesktopEntry {
                             && name.endsWith(".properties");
                 }
             });
-            
+            if (sourceFiles == null) {
+                System.err.println("No messages files found in "
+                    + SOURCE_DIRECTORY.toString());
+                System.exit(1);
+            }
+
             for (String name : sourceFiles) {
                 
                 System.out.println("Processing source file: " + name);

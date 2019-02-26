@@ -59,6 +59,11 @@ public class MergeTranslations {
                     return name.matches("FreeColMessages_" + localeKey + ".*\\.properties");
                 }
             });
+        if (sourceFiles == null) {
+            System.err.println("No messages files found in "
+                + sourceDirectory.toString());
+            System.exit(1);
+        }
         
         for (String name : sourceFiles) {
 

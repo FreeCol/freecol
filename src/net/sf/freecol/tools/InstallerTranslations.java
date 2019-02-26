@@ -141,6 +141,11 @@ public class InstallerTranslations {
                     return name.matches("FreeColMessages_.*\\.properties");
                 }
             });
+        if (sourceFiles == null) {
+            System.err.println("No messages files found in "
+                + SOURCE_DIRECTORY.toString());
+            System.exit(1);
+        }
 
         for (String name : sourceFiles) {
 
