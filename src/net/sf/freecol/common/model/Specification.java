@@ -467,7 +467,7 @@ public final class Specification implements OptionContainer {
      */
     public Specification() {
         logger.fine("Initializing Specification");
-        for (Source source : sources) allTypes.put(source.getId(), source);
+        for (Source source : sources) addType(source.getId(), source);
 
         readerMap.put(BUILDING_TYPES_TAG,
                       new TypeReader<>(BuildingType.class, buildingTypeList));
