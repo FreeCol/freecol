@@ -129,14 +129,14 @@ public class ProductionInfo {
      *
      * @return True if at maximum production.
      */
-    public boolean hasMaximumProduction() {
+    public boolean atMaximumProduction() {
         if (maximumProduction.isEmpty()) return true;
 
-        for (int index = 0; index < production.size(); index++) {
-            if (maximumProduction.size() < index) return true;
-
-            if (maximumProduction.get(index).getAmount()
-                > production.get(index).getAmount()) return false;
+        for (AbstractGoods ag : production) {
+            AbstractGoods agMax = find(this.maximumConsumption,
+                                       AbstractGoods.matches(ag.getType()));
+            if (agMax != null && agMax.getAmount() > ag.getAmount())
+                return false;
         }
         return true;
     }
