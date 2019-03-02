@@ -264,7 +264,7 @@ public class Role extends BuildableType {
      * @param from The source role identifier.
      * @param capture The identifier for the role to capture.
      */
-    public void addRoleChange(String from, String capture) {
+    private void addRoleChange(String from, String capture) {
         if (roleChanges == null) roleChanges = new ArrayList<>();
         roleChanges.add(new RoleChange(from, capture));
     }

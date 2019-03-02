@@ -50,7 +50,8 @@ public abstract class TradeItem extends FreeColGameObject {
      * @param source The source {@code Player}.
      * @param destination The destination {@code Player}.
      */
-    public TradeItem(Game game, String id, Player source, Player destination) {
+    protected TradeItem(Game game, String id, Player source,
+                        Player destination) {
         super(game, id);
 
         this.source = source;
@@ -64,7 +65,8 @@ public abstract class TradeItem extends FreeColGameObject {
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public TradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
+    protected TradeItem(Game game, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(game, "");
 
         readFromXML(xr);

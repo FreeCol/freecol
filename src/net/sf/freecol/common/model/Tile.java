@@ -1052,6 +1052,22 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Get a label for a nearby location.
+     *
+     * @param direction The {@code Direction} from this tile to the
+     *     nearby location.
+     * @param location A {@code StringTemplate} describing the location.
+     * @return A {@code StringTemplate} stating that the location
+     *     is nearby.
+     */
+    private StringTemplate getNearLocationLabel(Direction direction,
+                                               StringTemplate location) {
+        return StringTemplate.template("model.tile.nearLocation")
+            .addNamed("%direction%", direction)
+            .addStringTemplate("%location%", location);
+    }
+    
+    /**
      * Get a detailed label for this tile.
      *
      * @return A suitable {@code StringTemplate}.
@@ -1983,7 +1999,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     should not cache it.
      * @param copied An optional {@code Tile} to cache.
      */
-    public void cacheUnseen(Player player, Tile copied) {
+    private void cacheUnseen(Player player, Tile copied) {
         if (cachedTiles == null) return;
         for (Player p : transform(getGame().getLiveEuropeanPlayers(player),
                 p -> !p.canSee(this) && getCachedTile(p) == this)) {
@@ -2036,8 +2052,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param skill The skill taught by the settlement.
      * @param wanted The goods wanted by the settlement.
      */
-    public void setIndianSettlementInternals(Player player, UnitType skill,
-                                             List<GoodsType> wanted) {
+    private void setIndianSettlementInternals(Player player, UnitType skill,
+                                              List<GoodsType> wanted) {
         IndianSettlementInternals isi = getPlayerIndianSettlement(player);
         if (isi == null) {
             isi = new IndianSettlementInternals();
@@ -2195,22 +2211,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return this;
     }
 
-    /**
-     * Get a label for a nearby location.
-     *
-     * @param direction The {@code Direction} from this tile to the
-     *     nearby location.
-     * @param location A {@code StringTemplate} describing the location.
-     * @return A {@code StringTemplate} stating that the location
-     *     is nearby.
-     */
-    public StringTemplate getNearLocationLabel(Direction direction,
-                                               StringTemplate location) {
-        return StringTemplate.template("model.tile.nearLocation")
-            .addNamed("%direction%", direction)
-            .addStringTemplate("%location%", location);
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -2535,7 +2535,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    public void internalToXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
+    private void internalToXML(FreeColXMLWriter xw, String tag)
+        throws XMLStreamException {
         xw.writeStartElement(tag);
 
         writeAttributes(xw);

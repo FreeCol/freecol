@@ -164,7 +164,7 @@ public class Resource extends TileItem {
      * @param usedQuantity The quantity that was used up.
      * @return The final value of quantity.
      */
-    public int useQuantity(int usedQuantity) {
+    private int useQuantity(int usedQuantity) {
         if (quantity == UNLIMITED) {
             ; // No change
         } else if (quantity >= usedQuantity) {

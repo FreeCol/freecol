@@ -102,7 +102,7 @@ public class Scope extends FreeColObject {
             k = "";
         } else {
             k = Messages.getName(k);
-            if (isMatchNegated()) k = "!" + k;
+            if (getMatchNegated()) k = "!" + k;
         }
         return k;
     }
@@ -112,10 +112,17 @@ public class Scope extends FreeColObject {
      *
      * @return True if this scope matches null.
      */
-    public boolean isMatchesNull() {
+    private boolean getMatchesNull() {
         return matchesNull;
     }
 
+    /**
+     * Set the match-null value.
+     *
+     * Public for the test suite.
+     *
+     * @param newMatchesNull The new match-null value.
+     */
     public void setMatchesNull(final boolean newMatchesNull) {
         this.matchesNull = newMatchesNull;
     }
@@ -125,7 +132,7 @@ public class Scope extends FreeColObject {
      *
      * @return True if this match is negated.
      */
-    public boolean isMatchNegated() {
+    public boolean getMatchNegated() {
         return matchNegated;
     }
 
@@ -231,8 +238,8 @@ public class Scope extends FreeColObject {
         this.abilityValue = o.getAbilityValue();
         this.methodName = o.getMethodName();
         this.methodValue = o.getMethodValue();
-        this.matchesNull = o.isMatchesNull();
-        this.matchNegated = o.isMatchNegated();
+        this.matchesNull = o.getMatchesNull();
+        this.matchNegated = o.getMatchNegated();
         return true;
     }
 

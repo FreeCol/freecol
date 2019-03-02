@@ -247,7 +247,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * @param unitType The {@code UnitType} to check.
      * @return True if the {@code UnitType} can build this improvement.
      */
-    public boolean isWorkerTypeAllowed(UnitType unitType) {
+    private boolean isWorkerTypeAllowed(UnitType unitType) {
         return allowedWorkers == null || allowedWorkers.isEmpty()
             || allowedWorkers.contains(unitType.getId());
     }

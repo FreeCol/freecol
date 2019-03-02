@@ -109,6 +109,8 @@ public class Turn {
     /**
      * Converts an integer year and specified season to a turn-integer-value.
      *
+     * Public for the test suite.
+     *
      * @param year The year to convert.
      * @param season The season index.
      * @return The integer value of the corresponding turn.
@@ -155,6 +157,8 @@ public class Turn {
     /**
      * Gets the year the given turn is in.
      *
+     * Public for the test suite.
+     *
      * @param turn The turn number to get the year for.
      * @return The calculated year based on the turn number.
      */
@@ -166,6 +170,8 @@ public class Turn {
 
     /**
      * Gets the season index of the given turn number.
+     *
+     * Public for the test suite.
      *
      * @param turn The turn number to calculate from.
      * @return The season index corresponding to the turn number or negative

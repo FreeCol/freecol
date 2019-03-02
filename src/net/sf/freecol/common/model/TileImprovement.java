@@ -256,6 +256,8 @@ public class TileImprovement extends TileItem implements Named {
      * Is this tile improvement connected to a similar improvement on
      * a neighbouring tile?
      *
+     * Public for the test suite.
+     *
      * @param direction The {@code Direction} to check.
      * @return True if this improvement is connected.
      */
@@ -316,7 +318,7 @@ public class TileImprovement extends TileItem implements Named {
      * @param goodsType The {@code GoodsType} to test.
      * @return A production {@code Modifier}, or null if none applicable.
      */
-    public Modifier getProductionModifier(GoodsType goodsType) {
+    private Modifier getProductionModifier(GoodsType goodsType) {
         return (isComplete()) ? type.getProductionModifier(goodsType) : null;
     }
 

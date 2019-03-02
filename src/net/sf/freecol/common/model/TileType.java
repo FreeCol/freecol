@@ -371,6 +371,8 @@ public final class TileType extends FreeColSpecObjectType
      * of colony center tile and production level.  If the production
      * level is null, all production levels will be returned.
      *
+     * Public for the test suite.
+     *
      * @param unattended Whether the production is unattended.
      * @param level The production level.
      * @return A list of {@code ProductionType}s.

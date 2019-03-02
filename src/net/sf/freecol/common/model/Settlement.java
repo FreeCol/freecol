@@ -82,7 +82,7 @@ public abstract class Settlement extends GoodsLocation
      * @param name The settlement name.
      * @param tile The containing {@code Tile}.
      */
-    public Settlement(Game game, Player owner, String name, Tile tile) {
+    protected Settlement(Game game, Player owner, String name, Tile tile) {
         super(game);
 
         this.owner = owner;
@@ -371,7 +371,7 @@ public abstract class Settlement extends GoodsLocation
      * @param goodsType a {@code GoodsType} value
      * @return an {@code int} value
      */
-    public int getConsumptionOf(GoodsType goodsType) {
+    protected int getConsumptionOf(GoodsType goodsType) {
         return Math.max(0, sum(getUnits(),
                                u -> u.getType().getConsumptionOf(goodsType)));
     }
@@ -383,7 +383,7 @@ public abstract class Settlement extends GoodsLocation
      * @param goodsTypes {@code GoodsType} values
      * @return an {@code int} value
      */
-    public int getConsumptionOf(List<GoodsType> goodsTypes) {
+    protected int getConsumptionOf(List<GoodsType> goodsTypes) {
         return (goodsTypes == null) ? 0
             : sum(goodsTypes, gt -> getConsumptionOf(gt));
     }
@@ -405,7 +405,7 @@ public abstract class Settlement extends GoodsLocation
      * @param goods A list of {@code AbstractGoods}
      * @return True if the settlement can provide the equipment.
      */
-    public boolean canProvideGoods(List<AbstractGoods> goods) {
+    protected boolean canProvideGoods(List<AbstractGoods> goods) {
         return all(goods, ag -> {
                 int available = getGoodsCount(ag.getType());
                 int breedingNumber = ag.getType().getBreedingNumber();

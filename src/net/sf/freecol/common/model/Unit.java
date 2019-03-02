@@ -1493,6 +1493,8 @@ public class Unit extends GoodsLocation
     /**
      * Get the skill another unit type can teach this unit.
      *
+     * Public for the test suite.
+     *
      * @param teacherType The {@code UnitType} to teach this unit.
      * @return The {@code UnitType} (skill) this unit can learn.
      */
@@ -1750,7 +1752,7 @@ public class Unit extends GoodsLocation
      *
      * @return The current stop index, or negative on failure.
      */
-    public int validateCurrentStop() {
+    private int validateCurrentStop() {
         if (tradeRoute == null) {
             currentStop = -1;
         } else {
@@ -2848,9 +2850,9 @@ public class Unit extends GoodsLocation
      * @param costDecider An option {@code CostDecider}.
      * @return A suitable {@code Comparator}.
      */
-    public Comparator<Tile> getPathComparator(final Location start,
-                                              final Unit carrier,
-                                              final CostDecider costDecider) {
+    private Comparator<Tile> getPathComparator(final Location start,
+                                               final Unit carrier,
+                                               final CostDecider costDecider) {
         return cachingIntComparator((Tile t) -> {
                 PathNode p = this.findPath(start, t, carrier,
                                            costDecider, null);

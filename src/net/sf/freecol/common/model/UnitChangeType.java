@@ -149,6 +149,8 @@ public class UnitChangeType extends FreeColSpecObjectType {
     /**
      * Add a new change.
      *
+     * Public for the test suite.
+     *
      * @param uc The {@code UnitTypeChange} to add.
      */
     public void addUnitTypeChange(UnitTypeChange uc) {

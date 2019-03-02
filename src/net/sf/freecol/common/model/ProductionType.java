@@ -78,7 +78,7 @@ public class ProductionType extends FreeColSpecObject {
      *
      * @param outputs A list of the {@code AbstractGoods} produced.
      */
-    public ProductionType(List<AbstractGoods> outputs) {
+    private ProductionType(List<AbstractGoods> outputs) {
         this((Specification)null);
 
         this.outputs = outputs;
@@ -273,7 +273,7 @@ public class ProductionType extends FreeColSpecObject {
      * @param type The {@code GoodsType} to add.
      * @param amount The amount of goods.
      */
-    public void addOutput(GoodsType type, int amount) {
+    private void addOutput(GoodsType type, int amount) {
         if (this.outputs == null) this.outputs = new ArrayList<>(1);
         this.outputs.add(new AbstractGoods(type, amount));
     }
@@ -353,7 +353,7 @@ public class ProductionType extends FreeColSpecObject {
      * @param goodsType The optional {@code GoodsType} to check.
      * @return The best production.
      */
-    public AbstractGoods getBestOutputFor(GoodsType goodsType) {
+    private AbstractGoods getBestOutputFor(GoodsType goodsType) {
         final Predicate<AbstractGoods> typePred = ag ->
             goodsType == null || ag.getType() == goodsType;
         return maximize(getOutputs(), typePred,

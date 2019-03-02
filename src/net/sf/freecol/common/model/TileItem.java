@@ -48,7 +48,7 @@ public abstract class TileItem extends FreeColGameObject
      * @param game The enclosing {@code Game}.
      * @param tile The location of this {@code TileItem}.
      */
-    public TileItem(Game game, Tile tile) {
+    protected TileItem(Game game, Tile tile) {
         super(game);
 
         if (tile == null) {

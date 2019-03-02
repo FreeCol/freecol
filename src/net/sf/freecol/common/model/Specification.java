@@ -1060,7 +1060,7 @@ public final class Specification implements OptionContainer {
      * @return The merged {@code OptionGroup} from this
      *     {@code Specification}.
      */
-    public OptionGroup mergeGroup(OptionGroup group) {
+    private OptionGroup mergeGroup(OptionGroup group) {
         OptionGroup realGroup = allOptionGroups.get(group.getId());
         if (realGroup == null || !realGroup.isEditable()) return realGroup;
 
@@ -1141,6 +1141,8 @@ public final class Specification implements OptionContainer {
     /**
      * Applies the given difficulty level to the current
      * specification.
+     *
+     * Public for the test suite.
      *
      * @param level The difficulty level {@code OptionGroup} to apply.
      */
@@ -2846,7 +2848,7 @@ public final class Specification implements OptionContainer {
      *
      * @return True if an option was missing and added.
      */
-    public boolean fixGameOptions() {
+    private boolean fixGameOptions() {
         boolean ret = false;
         // SAVEGAME_VERSION == 11
 
@@ -2963,7 +2965,7 @@ public final class Specification implements OptionContainer {
      *
      * @return True if an option was missing and added.
      */
-    public boolean fixMapGeneratorOptions() {
+    private boolean fixMapGeneratorOptions() {
         boolean ret = false;
         // SAVEGAME_VERSION == 11
         // SAVEGAME_VERSION == 12
