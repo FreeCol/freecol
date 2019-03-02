@@ -478,8 +478,7 @@ public class FreeColDirectories {
     private static File deriveDirectory(File root, String subdir) {
         File dir;
         return (isGoodDirectory(root)
-            && (dir = new File(root, subdir)) != null
-            && insistDirectory(dir)) ? dir : null;
+            && insistDirectory(dir = new File(root, subdir))) ? dir : null;
     }
 
     /**

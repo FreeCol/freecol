@@ -67,11 +67,8 @@ public class FontResource extends Resource {
                 String name = resourceLocator.getSchemeSpecificPart();
                 font = Font.decode(name.substring(SCHEME.length()));
             }
-
-            if (font != null) {
-                GraphicsEnvironment.getLocalGraphicsEnvironment()
-                    .registerFont(font);
-            }
+            GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .registerFont(font);
 
             logger.info("Loaded font: " + font.getFontName()
                 + " from: " + resourceLocator);

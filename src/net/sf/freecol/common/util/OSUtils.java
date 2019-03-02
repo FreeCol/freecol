@@ -88,12 +88,10 @@ public class OSUtils {
 
             // Use Runtime to launch browser
             String[] browser = getBrowserExecString(url);
-            if (browser != null) {
-                try {
-                    Runtime.getRuntime().exec(browser);
-                } catch (IOException re) {
-                    logger.log(Level.FINEST, "Web browser failed to launch via Runtime Class.", re);
-                }
+            try {
+                Runtime.getRuntime().exec(browser);
+            } catch (IOException re) {
+                logger.log(Level.FINEST, "Web browser failed to launch via Runtime Class.", re);
             }
         }
     }

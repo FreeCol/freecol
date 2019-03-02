@@ -4229,15 +4229,13 @@ public class Player extends FreeColGameObject implements Nameable {
         } else {
             Player player = xw.getClientPlayer();
             Tension t = getTension(player);
-            if (t != null) {
-                xw.writeStartElement(TENSION_TAG);
+            xw.writeStartElement(TENSION_TAG);
 
-                xw.writeAttribute(PLAYER_TAG, player);
+            xw.writeAttribute(PLAYER_TAG, player);
 
-                xw.writeAttribute(VALUE_TAG, t.getValue());
+            xw.writeAttribute(VALUE_TAG, t.getValue());
 
-                xw.writeEndElement();
-            }
+            xw.writeEndElement();
 
             if (missionsBanned(player)) {
                 xw.writeStartElement(BAN_MISSIONS_TAG);

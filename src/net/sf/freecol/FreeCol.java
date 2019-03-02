@@ -1410,14 +1410,14 @@ public final class FreeCol {
      * @param arg The window size specification.
      */
     private static void setWindowSize(String arg) {
-        String[] xy;
-        if (arg != null
-            && (xy = arg.split("[^0-9]")) != null
-            && xy.length == 2) {
-            try {
-                windowSize = new Dimension(Integer.parseInt(xy[0]),
-                                           Integer.parseInt(xy[1]));
-            } catch (NumberFormatException nfe) {}
+        if (arg != null) {
+            String[] xy =arg.split("[^0-9]");
+            if (xy.length == 2) {
+                try {
+                    windowSize = new Dimension(Integer.parseInt(xy[0]),
+                                               Integer.parseInt(xy[1]));
+                } catch (NumberFormatException nfe) {}
+            }
         }
         if (windowSize == null) windowSize = new Dimension(-1, -1);
     }
@@ -1604,8 +1604,7 @@ public final class FreeCol {
                     + ": " + e.getMessage());
                 return;
             }
-            if (publicServer && freeColServer != null
-                && !freeColServer.getPublicServer()) {
+            if (publicServer && !freeColServer.getPublicServer()) {
                 gripe(Messages.message("server.noRouteToServer"));
             }
         }

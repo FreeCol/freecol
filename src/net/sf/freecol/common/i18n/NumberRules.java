@@ -155,17 +155,15 @@ public class NumberRules {
                 Rule rule = numberRule.getRule(Category.one);
                 if (rule != null) {
                     String val = rule.toString();
-                    if (null != val) {
-                        switch (val) {
-                        case "n is 1":
-                            number = PLURAL_NUMBER_RULE;
-                            break;
-                        case "n in 0..1":
-                            number = ZERO_ONE_NUMBER_RULE;
-                            break;
-                        default:
-                            break;
-                        }
+                    switch (val) {
+                    case "n is 1":
+                        number = PLURAL_NUMBER_RULE;
+                        break;
+                    case "n in 0..1":
+                        number = ZERO_ONE_NUMBER_RULE;
+                        break;
+                    default:
+                        break;
                     }
                 }
                 break;

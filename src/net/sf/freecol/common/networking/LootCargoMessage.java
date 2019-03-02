@@ -146,7 +146,7 @@ public class LootCargoMessage extends ObjectMessage {
         final String loserId = getLoserId();
         final List<Goods> goods = getGoods();
 
-        if (unit == null || goods == null) return;
+        if (unit == null) return;
 
         igc(freeColClient).lootCargoHandler(unit, goods, loserId);
         clientGeneric(freeColClient);

@@ -776,8 +776,7 @@ public class ServerUnit extends Unit implements TurnTaker {
         } else {
             if (getMoveCost(newTile) <= 0) {
                 logger.warning("Move of unit: " + getId()
-                    + " from: " + ((oldLocation == null) ? "null"
-                        : oldLocation.getTile().getId())
+                    + " from: " + oldLocation.getTile().getId()
                     + " to: " + newTile.getId()
                     + " has bogus cost: " + getMoveCost(newTile));
                 setMovesLeft(0);

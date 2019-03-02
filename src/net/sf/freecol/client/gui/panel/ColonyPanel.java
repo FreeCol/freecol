@@ -766,13 +766,11 @@ public final class ColonyPanel extends PortPanel
             }
         }
         colonyUnitsMenu.addSeparator();
-        if (colonyUnitsMenu != null) {
-            int elements = colonyUnitsMenu.getSubElements().length;
-            if (elements > 0) {
-                int lastIndex = colonyUnitsMenu.getComponentCount() - 1;
-                if (colonyUnitsMenu.getComponent(lastIndex) instanceof JPopupMenu.Separator) {
-                    colonyUnitsMenu.remove(lastIndex);
-                }
+        int elements = colonyUnitsMenu.getSubElements().length;
+        if (elements > 0) {
+            int lastIndex = colonyUnitsMenu.getComponentCount() - 1;
+            if (colonyUnitsMenu.getComponent(lastIndex) instanceof JPopupMenu.Separator) {
+                colonyUnitsMenu.remove(lastIndex);
             }
         }
         colonyUnitsMenu.show(getGUI().getCanvas(), 0, 0);

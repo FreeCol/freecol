@@ -482,8 +482,8 @@ public class ServerIndianSettlement extends IndianSettlement
         cs.add(See.only(null).perhaps((ServerPlayer)enemy), this);
 
         // No messages about improving tension
-        if (newLevel == null || (oldLevel != null
-                && oldLevel.getLimit() > newLevel.getLimit())) return;
+        if (newLevel == null
+            || oldLevel.getLimit() > newLevel.getLimit()) return;
 
         // Send a message to the enemy that tension has increased.
         String key = "model.player.alarmIncrease." + getAlarm(enemy).getKey();

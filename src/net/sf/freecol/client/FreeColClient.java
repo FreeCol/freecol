@@ -832,7 +832,7 @@ public final class FreeColClient {
         } catch (IOException ioe) {
             return failToMain(ioe, "server.initialize");
         }
-        if (publicServer && fcs != null && !fcs.getPublicServer()) {
+        if (publicServer && !fcs.getPublicServer()) {
             return failToMain(null, "server.noRouteToServer");
         }
 

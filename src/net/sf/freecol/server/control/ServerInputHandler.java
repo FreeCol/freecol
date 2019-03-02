@@ -68,8 +68,8 @@ public final class ServerInputHandler extends FreeColServerHolder
         }
         final Game game = freeColServer.getGame();
         final boolean current = message.currentPlayerMessage();
-        ChangeSet cs = (current && (game == null || serverPlayer == null
-                || serverPlayer != game.getCurrentPlayer()))
+        ChangeSet cs = (current
+            && (game == null || serverPlayer != game.getCurrentPlayer()))
             ? serverPlayer.clientError("Received: " + message.getType()
                 + " out of turn from player: " + serverPlayer.getNation())
             : message.serverHandler(freeColServer, serverPlayer);

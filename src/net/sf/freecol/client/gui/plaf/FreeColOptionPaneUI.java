@@ -101,8 +101,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
                 ChoiceItem ci = (ChoiceItem)buttons[i];
                 String label = ci.toString();
                 Icon icon = ci.getIcon();
-                b = (icon == null) ? new JButton(label)
-                    : (label == null || label.isEmpty()) ? new JButton(icon)
+                b = (label == null || label.isEmpty()) ? new JButton(icon)
                     : new JButton(label, icon);
                 b.setName("OptionPane.button." + label);
                 if (ci.isOK()) this.okIndex = i;
@@ -120,7 +119,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
             maxWidth = Math.max(maxWidth, b.getMinimumSize().width);
             maxHeight = Math.max(maxHeight, b.getMinimumSize().height);
             ActionListener buttonListener = createButtonActionListener(i);
-            if (buttonListener != null) b.addActionListener(buttonListener);
+            b.addActionListener(buttonListener);
             this.newButtons[i] = b;
         }
         if (maxWidth > 0) {

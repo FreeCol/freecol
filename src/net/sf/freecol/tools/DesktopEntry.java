@@ -96,18 +96,18 @@ public class DesktopEntry {
                     int index = line.indexOf('=');
                     if (index >= 0) {
                         String key = line.substring(0, index).trim();
-                        if (null != key) switch (key) {
-                            case GENERIC_NAME:
-                                result.append("GenericName");
-                                foundGenericName = true;
-                                break;
-                            case COMMENT:
-                                result.append("Comment");
-                                foundComment = true;
-                                break;
-                            default:
-                                line = bufferedReader.readLine();
-                                continue;
+                        switch (key) {
+                        case GENERIC_NAME:
+                            result.append("GenericName");
+                            foundGenericName = true;
+                            break;
+                        case COMMENT:
+                            result.append("Comment");
+                            foundComment = true;
+                            break;
+                        default:
+                            line = bufferedReader.readLine();
+                            continue;
                         }
                         if (languageCode != null) {
                             result.append('[' + languageCode + "]");

@@ -165,7 +165,7 @@ public final class Cargo {
             // Where is the transportable dropped?  At the drop node,
             // or at its predecessor from the carrier point of view.
             PathNode drop = pick.getTransportDropNode();
-            if (drop == null || drop.previous == null) {
+            if (drop.previous == null) {
                 throw new IllegalStateException("Cargo failure " + t
                     + " " + deliver.fullPathToString()
                     + " " + pick.fullPathToString()

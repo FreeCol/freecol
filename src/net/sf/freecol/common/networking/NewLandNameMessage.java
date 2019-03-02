@@ -93,7 +93,7 @@ public class NewLandNameMessage extends AttributeMessage {
         final Unit unit = getUnit(freeColClient.getMyPlayer());
         final String defaultName = getNewLandName();
 
-        if (unit == null || defaultName == null || !unit.hasTile()) return;
+        if (defaultName == null || !unit.hasTile()) return;
 
         igc(freeColClient).newLandNameHandler(unit, defaultName);
         clientGeneric(freeColClient);

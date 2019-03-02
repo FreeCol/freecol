@@ -2002,7 +2002,7 @@ ok:     while (!openMap.isEmpty()) {
                     }
                     stepLog = " " + step + "_";
                 }
-                assert move != null && move.getCost() >= 0;
+                assert move.getCost() >= 0;
                 // Tighten the bounds on a previously seen case if possible
                 if (closed != null) {
                     if (move.canImprove(closed)) {

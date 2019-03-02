@@ -1599,77 +1599,70 @@ public final class MapViewer extends FreeColClientHolder {
             specs[0] = new TextSpecification(name, font);
 
             BufferedImage nameImage = createLabel(g, specs, backgroundColor);
-            if (nameImage != null) {
-                int spacing = 3;
-                BufferedImage leftImage = null;
-                BufferedImage rightImage = null;
-                if (settlement instanceof Colony) {
-                    Colony colony = (Colony)settlement;
-                    String string = Integer.toString(
-                        colony.getApparentUnitCount());
-                    leftImage = createLabel(g, string,
-                        ((colony.getPreferredSizeChange() > 0)
-                            ? italicFont : font),
-                        backgroundColor);
-                    if (player.owns(settlement)) {
-                        int bonusProduction = colony.getProductionBonus();
-                        if (bonusProduction != 0) {
-                            String bonus = (bonusProduction > 0)
-                                ? "+" + bonusProduction
-                                : Integer.toString(bonusProduction);
-                            rightImage = createLabel(g, bonus, font,
-                                                     backgroundColor);
-                        }
-                    }
-                } else if (settlement instanceof IndianSettlement) {
-                    IndianSettlement is = (IndianSettlement) settlement;
-                    if (is.getType().isCapital()) {
-                        leftImage = createCapitalLabel(
-                            nameImage.getHeight(), 5, backgroundColor);
-                    }
-
-                    Unit missionary = is.getMissionary();
-                    if (missionary != null) {
-                        boolean expert = missionary.hasAbility(
-                            Ability.EXPERT_MISSIONARY);
-                        backgroundColor = missionary.getOwner()
-                                                    .getNationColor();
-                        backgroundColor = new Color(
-                            backgroundColor.getRed(),
-                            backgroundColor.getGreen(),
-                            backgroundColor.getBlue(), 128);
-                        rightImage = createReligiousMissionLabel(
-                            nameImage.getHeight(), 5,
-                            backgroundColor, expert);
+            int spacing = 3;
+            BufferedImage leftImage = null;
+            BufferedImage rightImage = null;
+            if (settlement instanceof Colony) {
+                Colony colony = (Colony)settlement;
+                String string = Integer.toString(colony.getApparentUnitCount());
+                leftImage = createLabel(g, string,
+                    ((colony.getPreferredSizeChange() > 0)
+                        ? italicFont : font),
+                    backgroundColor);
+                if (player.owns(settlement)) {
+                    int bonusProduction = colony.getProductionBonus();
+                    if (bonusProduction != 0) {
+                        String bonus = (bonusProduction > 0)
+                            ? "+" + bonusProduction
+                            : Integer.toString(bonusProduction);
+                        rightImage = createLabel(g, bonus, font,
+                            backgroundColor);
                     }
                 }
-
-                int width = (int)((nameImage.getWidth()
-                        * lib.getScaleFactor())
-                    + ((leftImage != null)
-                        ? (leftImage.getWidth()
-                            * lib.getScaleFactor()) + spacing
-                        : 0)
-                    + ((rightImage != null)
-                        ? (rightImage.getWidth()
-                            * lib.getScaleFactor()) + spacing
-                        : 0));
-                int labelOffset = (tileWidth - width)/2;
-                yOffset -= (nameImage.getHeight()
-                    * lib.getScaleFactor())/2;
-                if (leftImage != null) {
-                    g.drawImage(leftImage, labelOffset, yOffset, null);
-                    labelOffset += (leftImage.getWidth()
-                        * lib.getScaleFactor()) + spacing;
+            } else if (settlement instanceof IndianSettlement) {
+                IndianSettlement is = (IndianSettlement) settlement;
+                if (is.getType().isCapital()) {
+                    leftImage = createCapitalLabel(nameImage.getHeight(),
+                        5, backgroundColor);
                 }
-                g.drawImage(nameImage, labelOffset, yOffset, null);
-                if (rightImage != null) {
-                    labelOffset += (nameImage.getWidth()
-                        * lib.getScaleFactor()) + spacing;
-                    g.drawImage(rightImage, labelOffset, yOffset, null);
+                
+                Unit missionary = is.getMissionary();
+                if (missionary != null) {
+                    boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
+                    backgroundColor = missionary.getOwner().getNationColor();
+                    backgroundColor = new Color(backgroundColor.getRed(),
+                                                backgroundColor.getGreen(),
+                                                backgroundColor.getBlue(), 128);
+                    rightImage = createReligiousMissionLabel(nameImage.getHeight(), 5,
+                                                             backgroundColor, expert);
                 }
-                break;
             }
+            
+            int width = (int)((nameImage.getWidth()
+                    * lib.getScaleFactor())
+                + ((leftImage != null)
+                    ? (leftImage.getWidth()
+                        * lib.getScaleFactor()) + spacing
+                    : 0)
+                + ((rightImage != null)
+                    ? (rightImage.getWidth()
+                        * lib.getScaleFactor()) + spacing
+                    : 0));
+            int labelOffset = (tileWidth - width)/2;
+            yOffset -= (nameImage.getHeight()
+                * lib.getScaleFactor())/2;
+            if (leftImage != null) {
+                g.drawImage(leftImage, labelOffset, yOffset, null);
+                labelOffset += (leftImage.getWidth()
+                    * lib.getScaleFactor()) + spacing;
+            }
+            g.drawImage(nameImage, labelOffset, yOffset, null);
+            if (rightImage != null) {
+                labelOffset += (nameImage.getWidth()
+                    * lib.getScaleFactor()) + spacing;
+                g.drawImage(rightImage, labelOffset, yOffset, null);
+            }
+            break;
         }
     }
 
