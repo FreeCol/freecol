@@ -78,8 +78,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * This panel displays the compact colony report.
  */
-public final class ReportCompactColonyPanel extends ReportPanel
-    implements ActionListener {
+public final class ReportCompactColonyPanel extends ReportPanel {
 
     /** Predicate to select units that are not working. */
     private static final Predicate<Unit> notWorkingPred = u ->

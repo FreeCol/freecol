@@ -42,8 +42,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * This panel displays the Labour Report.
  */
-public final class ReportLabourDetailPanel extends ReportPanel
-    implements ActionListener {
+public final class ReportLabourDetailPanel extends ReportPanel {
     
     private final Map<UnitType, Map<Location, Integer>> data;
     private final TypeCountMap<UnitType> unitCount;

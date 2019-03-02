@@ -52,7 +52,7 @@ import net.sf.freecol.common.util.RandomChoice;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * {@code Colony} where working is possible.
  */
-public class Colony extends Settlement implements Nameable, TradeLocation {
+public class Colony extends Settlement implements TradeLocation {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 

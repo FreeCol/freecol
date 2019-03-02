@@ -42,7 +42,7 @@ import net.sf.freecol.common.util.RandomChoice;
 /**
  * Represents a tile improvement, such as a river or road.
  */
-public class TileImprovement extends TileItem implements Named {
+public class TileImprovement extends TileItem {
 
     private static final Logger logger = Logger.getLogger(TileImprovement.class.getName());
 

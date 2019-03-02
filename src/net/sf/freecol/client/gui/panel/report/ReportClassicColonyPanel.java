@@ -54,8 +54,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * This panel displays the classic version of the colony report.
  */
-public final class ReportClassicColonyPanel extends ReportPanel
-    implements ActionListener {
+public final class ReportClassicColonyPanel extends ReportPanel {
 
     /**
      * Compare buildings by their underlying type index (which reduces
