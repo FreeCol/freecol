@@ -57,7 +57,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      * @param id The object identifier.
      * @param specification The {@code Specification} to refer to.
      */
-    public AbstractOption(String id, Specification specification) {
+    protected AbstractOption(String id, Specification specification) {
         super(specification);
 
         setId(id);
@@ -68,7 +68,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      *
      * @param id The object identifier.
      */
-    public AbstractOption(String id) {
+    protected AbstractOption(String id) {
         this(id, null);
     }
 

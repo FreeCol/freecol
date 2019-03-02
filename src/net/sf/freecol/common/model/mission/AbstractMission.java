@@ -54,6 +54,27 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
 
 
     /**
+     * Creates a new {@code AbstractMission} instance.
+     *
+     * @param game a {@code Game} value
+     * @param id The object identifier.
+     */
+    public AbstractMission(Game game, String id) {
+        super(game, id);
+    }
+
+    /**
+     * Creates a new {@code AbstractMission} instance.
+     *
+     * @param game a {@code Game} value
+     * @param xr a {@code FreeColXMLReader} value
+     */
+    protected AbstractMission(Game game, FreeColXMLReader xr) {
+        super(game, null);
+    }
+
+
+    /**
      * Returns the Unit this mission was assigned to.
      *
      * @return an {@code Unit} value
@@ -71,27 +92,6 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     public AbstractMission(Game game) {
         super(game);
     }
-
-    /**
-     * Creates a new {@code AbstractMission} instance.
-     *
-     * @param game a {@code Game} value
-     * @param xr a {@code FreeColXMLReader} value
-     */
-    public AbstractMission(Game game, FreeColXMLReader xr) {
-        super(game, null);
-    }
-
-    /**
-     * Creates a new {@code AbstractMission} instance.
-     *
-     * @param game a {@code Game} value
-     * @param id The object identifier.
-     */
-    public AbstractMission(Game game, String id) {
-        super(game, id);
-    }
-
 
     /**
      * Set the {@code Unit} value.

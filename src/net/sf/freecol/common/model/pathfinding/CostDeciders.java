@@ -362,6 +362,8 @@ public final class CostDeciders {
      * across the terrain (no additional cost for blocking enemy units
      * etc) but excluding settlements.
      *
+     * Public for the test suite.
+     *
      * @return The {@code CostDecider}.
      */
     public static CostDecider avoidSettlements() {

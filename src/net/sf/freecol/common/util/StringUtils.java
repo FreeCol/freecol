@@ -154,7 +154,7 @@ public class StringUtils {
      * @param delim Characters to consider as word delimiting.
      * @return The best breaking point or negative if none found.
      */
-    public static int getBreakingPoint(String string, String delim) {
+    private static int getBreakingPoint(String string, String delim) {
         int center = string.length() / 2;
         for (int offset = 0; offset < center; offset++) {
             if (delim.indexOf(string.charAt(center + offset)) >= 0) {
@@ -253,7 +253,7 @@ public class StringUtils {
      * @param locale The {@code Locale} to apply.
      * @return The converted string.
      */
-    public static String downCase(String s, Locale locale) {
+    private static String downCase(String s, Locale locale) {
         return (s == null || s.length() == 0) ? s : s.toLowerCase(locale);
     }
 
@@ -274,7 +274,7 @@ public class StringUtils {
      * @param locale The {@code Locale} to apply.
      * @return The converted string.
      */
-    public static String upCase(String s, Locale locale) {
+    private static String upCase(String s, Locale locale) {
         return (s == null || s.length() == 0) ? s : s.toUpperCase(locale);
     }
 }

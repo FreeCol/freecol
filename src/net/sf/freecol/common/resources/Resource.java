@@ -75,7 +75,7 @@ public abstract class Resource {
      * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      */
-    public Resource(URI resourceLocator) {
+    protected Resource(URI resourceLocator) {
         this.resourceLocator = resourceLocator;
     }
 

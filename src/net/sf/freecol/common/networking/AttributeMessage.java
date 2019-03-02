@@ -76,7 +76,7 @@ public class AttributeMessage extends TrivialMessage {
      * @param type The message type.
      * @param attributeMap A map of key,value pairs.
      */
-    public AttributeMessage(String type, Map<String, String> attributeMap) {
+    protected AttributeMessage(String type, Map<String, String> attributeMap) {
         this(type);
 
         setStringAttributeMap(attributeMap);

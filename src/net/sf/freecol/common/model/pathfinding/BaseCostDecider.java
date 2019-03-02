@@ -127,8 +127,8 @@ class BaseCostDecider implements CostDecider {
      * @return The new movement cost, with this.movesLeft and this.newTurns
      *     adjusted.
      */
-    public int adjust(Unit unit, Tile oldTile, Tile newTile,
-                      int movesLeftBefore) {
+    protected int adjust(Unit unit, Tile oldTile, Tile newTile,
+                         int movesLeftBefore) {
         int cost = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
         if (cost <= movesLeftBefore) {
             this.movesLeft = movesLeftBefore - cost;
