@@ -125,6 +125,36 @@ public class Relation {
      * {@inheritDoc}
      */
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof Relation) {
+            Relation other = (Relation)o;
+            return this.low == other.low && this.high == other.high
+                && this.mod == other.mod
+                && this.negated == other.negated
+                && this.integer == other.integer;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + this.low;
+        hash = 31 * hash + this.high;
+        hash = 31 * hash + this.mod;
+        hash = 31 * hash + ((this.negated) ? 1 : 0)
+            + ((this.integer) ? 2 : 0);
+        return hash;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append("n ");

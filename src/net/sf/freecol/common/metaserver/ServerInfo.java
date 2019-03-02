@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.metaserver;
 
-import static net.sf.freecol.common.util.Utils.*;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -182,7 +182,7 @@ public class ServerInfo {
         this.isGameStarted = isGameStarted;
         this.version = version;
         this.gameState = gameState;
-        this.lastUpdated = now();
+        this.lastUpdated = Utils.now();
     }
 
     /**
@@ -198,6 +198,43 @@ public class ServerInfo {
 
 
     // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof ServerInfo) {
+            ServerInfo other = (ServerInfo)o;
+            return Utils.equals(this.name, other.name)
+                && Utils.equals(this.address, other.address)
+                && this.port == other.port
+                && this.currentlyPlaying == other.currentlyPlaying
+                && this.slotsAvailable == other.slotsAvailable
+                && this.isGameStarted == other.isGameStarted
+                && Utils.equals(this.version, other.version)
+                && this.gameState == other.gameState;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + Utils.hashCode(this.name);
+        hash = 31 * hash + Utils.hashCode(this.address);
+        hash = 31 * hash + this.port;
+        hash = 31 * hash + this.currentlyPlaying;
+        hash = 31 * hash + this.slotsAvailable;
+        hash = 31 * hash + ((this.isGameStarted) ? 1 : 0);
+        hash = 31 * hash + Utils.hashCode(this.version);
+        hash = 31 * hash + this.gameState;
+        return hash;
+    }
 
     /**
      * {@inheritDoc}
