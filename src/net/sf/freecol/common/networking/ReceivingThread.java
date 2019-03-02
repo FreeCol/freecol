@@ -219,7 +219,6 @@ final class ReceivingThread extends Thread {
      * @return The old value of shouldRun.
      */
     private synchronized boolean stopRun() {
-        boolean ret = this.shouldRun;
         if (!this.shouldRun) return false;
         this.shouldRun = false;
         return true;
