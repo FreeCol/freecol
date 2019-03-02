@@ -77,6 +77,7 @@ import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -696,5 +697,27 @@ public class ServerGame extends Game implements TurnTaker {
             // because it is no longer a live player.
             // if (loser != null) sendElement(loser, cs);
         }
+    }
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        // Two games are not the same just because they have the same
+        // identifier, but to avoid having to check everything in the
+        // Game just insist on object equality for the equals() test,
+        // and accept the basic id-based hashCode().
+        return this == o;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Utils.hashCode(getId());
     }
 }

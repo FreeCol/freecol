@@ -1822,17 +1822,16 @@ public class Game extends FreeColGameObject {
 
 
     // Override Object
-    //
-    // Two games are not the same just because they have the same
-    // identifier, but to avoid having to check everything in the Game
-    // just insist on object equality for the equals() test, and
-    // accept the basic id-based hashCode().
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean equals(Object o) {
+        // Two games are not the same just because they have the same
+        // identifier, but to avoid having to check everything in the
+        // Game just insist on object equality for the equals() test,
+        // and accept the basic id-based hashCode().
         return this == o;
     }
 
