@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -325,11 +326,8 @@ public class ModelMessage extends StringTemplate {
             sb.append(getSourceId());
             switch (getTemplateType()) {
             case TEMPLATE:
-                for (String k : getKeys()) {
-                    if ("%goods%".equals(k)) {
-                        sb.append('-').append(getReplacement(k).getId());
-                    }
-                }
+                StringTemplate t = getReplacement("%goods%");
+                if (t != null) sb.append('-').append(t.getId());
                 break;
             default:
                 break;
@@ -356,10 +354,11 @@ public class ModelMessage extends StringTemplate {
         List<Object> result = new ArrayList<>();
         result.add(Messages.message(this));
 
-        for (String key : getKeys()) {
+        for (SimpleEntry<String,StringTemplate> e : entryList()) {
             // Then for each key, check if it can be made into a link.
             // If not, ignore it.
-            String val = Messages.message(getReplacement(key));
+            String key = e.getKey();
+            String val = Messages.message(e.getValue());
             if (val == null) continue;
             Object b = Utility.getMessageButton(key, val, player, source);
             if (b == null) continue;

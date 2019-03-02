@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -725,13 +726,13 @@ public class Messages {
         String result = "";
         switch (template.getTemplateType()) {
         case LABEL:
-            List<StringTemplate> replacements = template.getReplacements();
-            if (replacements.isEmpty()) {
+            if (template.isEmpty()) {
                 result = message(template.getId());
             } else {
                 StringBuilder sb = new StringBuilder(64);
-                for (StringTemplate other : replacements) {
-                    sb.append(template.getId()).append(message(other));
+                for (SimpleEntry<String,StringTemplate> e
+                         : template.entryList()) {
+                    sb.append(template.getId()).append(message(e.getValue()));
                 }
                 if (sb.length() >= template.getId().length()) {
                     result = sb.toString().substring(template.getId().length());
@@ -747,9 +748,9 @@ public class Messages {
                 result = messageBundle.get(template.getDefaultId());
             }
             result = replaceChoices(result, template);
-            for (String key : template.getKeys()) {
-                result = result.replace(key,
-                                        message(template.getReplacement(key)));
+            for (SimpleEntry<String, StringTemplate> e
+                     : template.entryList()) {
+                result = result.replace(e.getKey(), message(e.getValue()));
             }
             break;
         case KEY:

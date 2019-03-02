@@ -21,6 +21,8 @@ package net.sf.freecol.common.i18n;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
 import java.util.Locale;
 
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -102,34 +104,34 @@ public class MessagesTest extends FreeColTestCase {
     }
 
     public void testMessageString() {
-        assertTrue("Press enter in order to end the turn."
-            .equals(Messages.message("infoPanel.endTurn")));
-        assertTrue("Trade Advisor"
-            .equals(Messages.message("reportTradeAction.name")));
+        assertEquals("Press enter in order to end the turn.",
+            Messages.message("infoPanel.endTurn"));
+        assertEquals("Trade Advisor",
+            Messages.message("reportTradeAction.name"));
 
         // With parameters
-        assertTrue("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%"
-            .equals(Messages.message("menuBar.statusLine")));
+        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%",
+            Messages.message("menuBar.statusLine"));
 
         // Long String
-        assertTrue("Food is necessary to feed your colonists and to breed horses. A new colonist is born whenever a colony has 200 units of food or more."
-            .equals(Messages.message("model.goods.food.description")));
+        assertEquals("Food is necessary to feed your colonists and to breed horses. A new colonist is born whenever a colony has 200 units of food or more.",
+            Messages.message("model.goods.food.description"));
 
         // Message not found
-        assertTrue(noSuchKey.equals(Messages.message(noSuchKey)));
+        assertEquals(noSuchKey, Messages.message(noSuchKey));
     }
 
 
     public void testChangeLocaleSettings() {
         Messages.loadMessageBundle(Locale.US);
 
-        assertTrue("Trade Advisor"
-            .equals(Messages.message("reportTradeAction.name")));
+        assertEquals("Trade Advisor",
+            Messages.message("reportTradeAction.name"));
 
         Messages.loadMessageBundle(Locale.GERMANY);
 
-        assertTrue("Handelsberater"
-            .equals(Messages.message("reportTradeAction.name")));
+        assertEquals("Handelsberater",
+            Messages.message("reportTradeAction.name"));
     }
 
     // Tests if messages with special chars (like $) are well processed
@@ -163,47 +165,40 @@ public class MessagesTest extends FreeColTestCase {
         Messages.loadMessageBundle(Locale.US);
         // template with key not in message bundle
         StringTemplate s1 = StringTemplate.key("!no.such.string.template");
-        assertTrue(s1.getId()
-            .equals(Messages.message(s1)));
+        assertEquals(s1.getId(), Messages.message(s1));
 
         StringTemplate s2 = StringTemplate.key("model.tile.plains.name");
-        assertTrue("Plains"
-            .equals(Messages.message(s2)));
+        assertEquals("Plains", Messages.message(s2));
 
         StringTemplate t1 = AbstractGoods
             .getLabel(game.getSpecification().getPrimaryFoodType(), 100);
-        assertEquals(2, t1.getKeys().size());
-        assertEquals(2, t1.getReplacements().size());
+        assertEquals(2, t1.entryList().size());
+        List<SimpleEntry<String,StringTemplate>> e = t1.entryList();
         assertEquals(StringTemplate.TemplateType.KEY,
-                     t1.getReplacements().get(0).getTemplateType());
+                     e.get(0).getValue().getTemplateType());
         assertEquals(StringTemplate.TemplateType.NAME,
-                     t1.getReplacements().get(1).getTemplateType());
-        assertTrue("model.abstractGoods.label"
-            .equals(t1.getId()));
-        assertTrue("100 Food"
-            .equals(Messages.message(t1)));
+                     e.get(1).getValue().getTemplateType());
+        assertEquals("model.abstractGoods.label",
+            t1.getId());
+        assertEquals("100 Food", Messages.message(t1));
 
         StringTemplate t2 = StringTemplate.label(" / ")
             .add("model.goods.food.name")
             .addName("xyz");
-        assertTrue("Food / xyz"
-            .equals(Messages.message(t2)));
+        assertEquals("Food / xyz", Messages.message(t2));
 
         Colony colony = getStandardColony();
-        assertTrue("New Amsterdam"
-            .equals(colony.getName()));
+        assertEquals("New Amsterdam", colony.getName());
 
         StringTemplate t3 = StringTemplate.template("model.building.locationLabel")
             .addName("%location%", colony.getName());
-        assertTrue("In New Amsterdam"
-            .equals(Messages.message(t3)));
+        assertEquals("In New Amsterdam", Messages.message(t3));
 
         StringTemplate t4 = StringTemplate.label("")
             .addName("(")
             .add("model.goods.food.name")
             .addName(")");
-        assertTrue("(Food)"
-            .equals(Messages.message(t4)));
+        assertEquals("(Food)", Messages.message(t4));
     }
 
     public void testReplaceGarbage() {
@@ -214,8 +209,7 @@ public class MessagesTest extends FreeColTestCase {
         try {
             Messages.loadMessages(stream);
         } catch (IOException ioe) { fail(); }
-        assertTrue("abc   def"
-            .equals(Messages.message("some.key")));
+        assertEquals("abc   def", Messages.message("some.key"));
     }
 
     public void testReplaceNumber() {
@@ -233,21 +227,21 @@ public class MessagesTest extends FreeColTestCase {
         // default Number is Other
         Messages.setGrammaticalNumber(NumberRules.OTHER_NUMBER_RULE);
         for (double d : numbers) {
-            assertTrue("abcother|xyz".equals(Messages.message(StringTemplate
-                        .template("some.key")
-                        .addAmount("%number%", d))));
+            assertEquals("abcother|xyz",
+                Messages.message(StringTemplate.template("some.key")
+                    .addAmount("%number%", d)));
         }
         // apply English rules
         Messages.setGrammaticalNumber(NumberRules.PLURAL_NUMBER_RULE);
         for (double d : numbers) {
             if (d == 1) {
-                assertTrue("abcone|xyz".equals(Messages.message(StringTemplate
-                            .template("some.key")
-                            .addAmount("%number%", d))));
+                assertEquals("abcone|xyz",
+                    Messages.message(StringTemplate.template("some.key")
+                        .addAmount("%number%", d)));
             } else {
-                assertTrue("abcother|xyz".equals(Messages.message(StringTemplate
-                            .template("some.key")
-                            .addAmount("%number%", d))));
+                assertEquals("abcother|xyz",
+                    Messages.message(StringTemplate.template("some.key")
+                        .addAmount("%number%", d)));
             }
         }
     }
@@ -259,21 +253,21 @@ public class MessagesTest extends FreeColTestCase {
         String expected = "After months at sea, you have finally arrived off the "
             + "coast of an unknown continent. Sail eastward in order to discover "
             + "the New World and to claim it for the Crown.";
-        assertTrue(expected.equals(Messages.message(template)));
+        assertEquals(expected, Messages.message(template));
 
         template = StringTemplate.template(testKey)
             .add("%direction%", "west");
         expected = "After months at sea, you have finally arrived off the "
             + "coast of an unknown continent. Sail westward in order to discover "
             + "the New World and to claim it for the Crown.";
-        assertTrue(expected.equals(Messages.message(template)));
+        assertEquals(expected, Messages.message(template));
 
         template = StringTemplate.template(testKey)
             .add("%direction%", "whatever");
         expected = "After months at sea, you have finally arrived off the "
             + "coast of an unknown continent. Sail into the wind in order to discover "
             + "the New World and to claim it for the Crown.";
-        assertTrue(expected.equals(Messages.message(template)));
+        assertEquals(expected, Messages.message(template));
     }
 
     public void testReplaceChoicesPlural() {
@@ -287,26 +281,26 @@ public class MessagesTest extends FreeColTestCase {
             Messages.loadMessages(stream);
         } catch (IOException ioe) { fail(); }
 
-        assertTrue("artillery"
-            .equals(Messages.message("unit.key")));
+        assertEquals("artillery",
+            Messages.message("unit.key"));
 
-        assertTrue("This is one of several tests."
-            .equals(Messages.message(StringTemplate.template("some.key")
-                                                   .addAmount("%number%", 0))));
-        assertTrue("This is a test."
-            .equals(Messages.message(StringTemplate.template("some.key")
-                                                   .addAmount("%number%", 1))));
-        assertTrue("This is one of several tests."
-            .equals(Messages.message(StringTemplate.template("some.key")
-                                                   .addAmount("%number%", 2))));
-        assertTrue("This is one of several tests."
-            .equals(Messages.message(StringTemplate.template("some.key")
-                                                   .addAmount("%number%", 24))));
+        assertEquals("This is one of several tests.",
+            Messages.message(StringTemplate.template("some.key")
+                                           .addAmount("%number%", 0)));
+        assertEquals("This is a test.",
+            Messages.message(StringTemplate.template("some.key")
+                                           .addAmount("%number%", 1)));
+        assertEquals("This is one of several tests.",
+            Messages.message(StringTemplate.template("some.key")
+                                           .addAmount("%number%", 2)));
+        assertEquals("This is one of several tests.",
+            Messages.message(StringTemplate.template("some.key")
+                                           .addAmount("%number%", 24)));
 
         StringTemplate template = StringTemplate.template("unit.template")
             .addAmount("%number%", 1)
             .add("%unit%", "unit.key");
-        assertTrue("1 piece of artillery".equals(Messages.message(template)));
+        assertEquals("1 piece of artillery", Messages.message(template));
     }
 
     public void testReplaceChoicesGrammar() {
@@ -320,23 +314,21 @@ public class MessagesTest extends FreeColTestCase {
             Messages.loadMessages(stream);
         } catch (IOException ioe) { fail(); }
 
-        assertTrue("French people"
-            .equals(Messages.message("key.france")));
+        assertEquals("French people", Messages.message("key.france"));
 
         StringTemplate t1 = StringTemplate.template("key.france")
             .addTagged("%randomKey%", "country");
-        assertTrue("France"
-            .equals(Messages.message(t1)));
+        assertEquals("France", Messages.message(t1));
 
         StringTemplate t2 = StringTemplate.template("greeting1")
             .add("%nation%", "key.france");
-        assertTrue("The French people are happy to see you."
-            .equals(Messages.message(t2)));
+        assertEquals("The French people are happy to see you.",
+            Messages.message(t2));
 
         StringTemplate t3 = StringTemplate.template("greeting2")
             .add("%nation%", "key.france");
-        assertTrue("The French are happy to see you."
-            .equals(Messages.message(t3)));
+        assertEquals("The French are happy to see you.",
+            Messages.message(t3));
     }
 
     public void testNestedChoices() {
@@ -354,12 +346,12 @@ public class MessagesTest extends FreeColTestCase {
         StringTemplate t = StringTemplate.template("key1")
             .addName("%colony%", "someColony")
             .add("%goods%", "key2");
-        assertTrue("someColony tuottaa tuotetta viljaa."
-            .equals(Messages.message(t)));
-        assertTrue("Ruoka"
-            .equals(Messages.message(StringTemplate.key("key3"))));
-        assertTrue("Ruoka"
-            .equals(Messages.message("key3")));
+        assertEquals("someColony tuottaa tuotetta viljaa.",
+            Messages.message(t));
+        assertEquals("Ruoka",
+            Messages.message(StringTemplate.key("key3")));
+        assertEquals("Ruoka",
+            Messages.message("key3"));
     }
 
     public void testREFMessages() {
@@ -370,7 +362,7 @@ public class MessagesTest extends FreeColTestCase {
         String expected = "The Crown has added 1 King's Regular"
             + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
-        assertTrue(expected.equals(Messages.message(template)));
+        assertEquals(expected, Messages.message(template));
 
         template = StringTemplate
             .template(Monarch.MonarchAction.ADD_TO_REF.getTextKey())
@@ -379,7 +371,7 @@ public class MessagesTest extends FreeColTestCase {
         expected = "The Crown has added 2 Pieces of Artillery"
             + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
-        assertTrue(expected.equals(Messages.message(template)));
+        assertEquals(expected, Messages.message(template));
 
         template = StringTemplate
             .template(Monarch.MonarchAction.ADD_TO_REF.getTextKey())
@@ -388,13 +380,13 @@ public class MessagesTest extends FreeColTestCase {
         expected = "The Crown has added 3 Men of War"
             + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
-        assertTrue(expected.equals(Messages.message(template)));
+        assertEquals(expected, Messages.message(template));
     }
 
     public void testAbstractUnitDescription() {
         AbstractUnit au = new AbstractUnit("model.unit.merchantman",
                                            Specification.DEFAULT_ROLE_ID, 1);
-        assertTrue("one Merchantman".equals(au.getDescription()));
+        assertEquals("one Merchantman", au.getDescription());
     }
 
     public void testUnitDescription() {

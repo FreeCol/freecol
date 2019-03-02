@@ -2513,9 +2513,8 @@ public final class InGameController extends FreeColClientHolder {
         // Show the warnings if applicable.
         if (getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)) {
             StringTemplate warnings = tile.getBuildColonyWarnings(unit);
-            if (!warnings.getReplacements().isEmpty()
-                && !getGUI().confirm(tile, warnings,
-                                unit, "buildColony.yes", "buildColony.no")) {
+            if (!warnings.isEmpty() && !getGUI().confirm(tile, warnings,
+                    unit, "buildColony.yes", "buildColony.no")) {
                 return false;
             }
         }
