@@ -107,8 +107,8 @@ import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.Video;
-
-import static net.sf.freecol.common.util.StringUtils.lastPart;
+import net.sf.freecol.common.util.Introspector;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -905,22 +905,18 @@ public class SwingGUI extends GUI {
         // Always instantiate in game.
         if (enable && mapControls == null) {
             String className = getClientOptions().getString(ClientOptions.MAP_CONTROLS);
+            final String panelName = "net.sf.freecol.client.gui.panel."
+                + lastPart(className, ".");
             try {
-                final String panelName = "net.sf.freecol.client.gui.panel."
-                    + lastPart(className, ".");
-                Class<?> controls = Class.forName(panelName);
-                mapControls = (MapControls)controls
-                    .getConstructor(FreeColClient.class)
-                    .newInstance(getFreeColClient());
-                logger.info("Instantiated " + panelName);
-            } catch (Exception e) {
-                logger.log(Level.INFO, "Fallback to CornerMapControls from "
-                    + className, e);
-                mapControls = new CornerMapControls(getFreeColClient());
-            }
-            if (mapControls != null) {
+                mapControls = (MapControls)Introspector.instantiate(panelName,
+                    new Class[] { FreeColClient.class },
+                    new Object[] { getFreeColClient() });
                 mapControls.addToComponent(canvas);
                 mapControls.update();
+                logger.info("Instantiated " + panelName);
+            } catch (Introspector.IntrospectorException ie) {
+                logger.log(Level.WARNING, "Failed in make map controls for: "
+                    + panelName, ie);
             }
         } else if (!enable && mapControls != null) {
             mapControls.removeFromComponent(canvas);

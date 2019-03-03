@@ -80,6 +80,10 @@ public final class Specification implements OptionContainer {
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
+    /** Fixed class array argument used in newType(). */
+    private static final Class[] newTypeClasses
+        = new Class[] { String.class, Specification.class };
+    
     // Special reader classes for spec objects
     private interface ChildReader {
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
@@ -1979,7 +1983,9 @@ public final class Specification implements OptionContainer {
         }
 
         // forward declaration of new type
-        return newType(id, returnClass);
+        o = newType(id, returnClass);
+        addType(id, o);
+        return o;
     }
 
     /**
@@ -1989,18 +1995,16 @@ public final class Specification implements OptionContainer {
      * @param <T> The actual return type.
      * @param id The identifier to look for.
      * @param returnClass The expected {@code Class}.
-     * @return The new {@code FreeColSpecObjectType}.
+     * @return The new {@code FreeColSpecObjectType} or null on error.
      */
     private <T extends FreeColSpecObjectType> T newType(String id,
                                                         Class<T> returnClass) {
         try {
-            Constructor<T> c = returnClass.getConstructor(String.class,
-                                                          Specification.class);
-            T result = c.newInstance(id, this);
-            addType(id, result);
-            return result;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not construct: " + id, e);
+            return Introspector.instantiate(returnClass, newTypeClasses,
+                                            new Object[] { id, this });
+        } catch (Introspector.IntrospectorException ie) {
+            logger.log(Level.WARNING, "newType(" + id
+                + "," + returnClass.getName() + ") failed", ie);
         }
         return null;
     }
