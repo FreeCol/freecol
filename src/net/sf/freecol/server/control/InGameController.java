@@ -2261,7 +2261,9 @@ public final class InGameController extends Controller {
                              navalType);//-vis(serverPlayer)
         UnitType landType = getRandomMember(logger, "Choose undead army",
                                             landUnits, random);
-        new ServerUnit(game, theFlyingDutchman, serverPlayer, landType);//-vis
+        Unit undead = new ServerUnit(game, theFlyingDutchman,
+                                     serverPlayer, landType);//-vis
+        assert undead != null;
         serverPlayer.setDead(false);
         serverPlayer.changePlayerType(PlayerType.UNDEAD);
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)

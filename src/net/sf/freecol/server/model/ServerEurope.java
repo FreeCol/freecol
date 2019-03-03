@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -221,16 +222,19 @@ public class ServerEurope extends Europe implements TurnTaker {
      *
      * @param n The number of new units.
      * @param random A pseudo-random number source.
+     * @return The generated units.
      */
-    public void generateFountainRecruits(int n, Random random) {
+    public List<Unit> generateFountainRecruits(int n, Random random) {
         final Game game = getGame();
         final Player owner = getOwner();
+        List<Unit> ret = new ArrayList<>();
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
         for (int k = 0; k < n; k++) {
             UnitType ut = RandomChoice.getWeightedRandom(logger, "Choose FoY",
                                                          recruits, random);
-            new ServerUnit(game, this, owner, ut);//-vis: safe, Europe
+            ret.add(new ServerUnit(game, this, owner, ut));//-vis: safe, Europe
         }
+        return ret;
     }
 
     /**
