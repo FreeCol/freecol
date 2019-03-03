@@ -273,7 +273,7 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * @return True if the most hated nation changed.
      */
-    public boolean updateMostHated() {
+    private boolean updateMostHated() {
         final Player old = this.mostHated;
         final Predicate<Player> hatedPred = p -> {
             Tension alarm = getAlarm(p);

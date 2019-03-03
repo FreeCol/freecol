@@ -104,7 +104,7 @@ public final class MissionaryMission extends Mission {
      *     (uses the unit location if null).
      * @return A target for this mission, or null if none found.
      */
-    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+    private static Location extractTarget(AIUnit aiUnit, PathNode path) {
         if (path == null) return null;
         final Location loc = path.getLastNode().getLocation();
         Settlement settlement = (loc == null) ? null : loc.getSettlement();

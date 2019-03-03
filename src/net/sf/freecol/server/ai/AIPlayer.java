@@ -96,7 +96,7 @@ public abstract class AIPlayer extends AIObject {
      * @param player The {@code ServerPlayer} to associate this
      *            AI player with.
      */
-    public AIPlayer(AIMain aiMain, ServerPlayer player) {
+    protected AIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player.getId());
 
         this.player = player;
@@ -281,7 +281,7 @@ public abstract class AIPlayer extends AIObject {
      *
      * @param runnable The {@code Runnable} work to do.
      */
-    public void invoke(final Runnable runnable) {
+    protected void invoke(final Runnable runnable) {
         Thread thread = new Thread(runnable,
             FreeCol.SERVER_THREAD + "AIPlayer(" + getPlayer().getName() + ")");
         thread.start();

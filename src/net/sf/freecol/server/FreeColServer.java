@@ -763,7 +763,7 @@ public final class FreeColServer {
      * @param msg The {@code Message} to send.
      * @param conn An optional {@code Connection} to omit.
      */
-    public void sendToAll(Message msg, Connection conn) {
+    private void sendToAll(Message msg, Connection conn) {
         getServer().sendToAll(msg, conn);
     }
 
@@ -943,8 +943,8 @@ public final class FreeColServer {
      * @param freeColServer Use this (optional) server to load into.
      * @return The game found in the stream.
      */
-    public static ServerGame readGame(File file, Specification spec,
-                                      FreeColServer freeColServer) {
+    private static ServerGame readGame(File file, Specification spec,
+                                       FreeColServer freeColServer) {
         ServerGame serverGame = null;
         try {
             serverGame = FreeColServer.readGame(new FreeColSavegameFile(file),
@@ -1142,7 +1142,7 @@ public final class FreeColServer {
      * @return The updated {@code Game}.
      * @exception FreeColException on map generation failure.
      */
-    public Game buildGame() throws FreeColException {
+    private Game buildGame() throws FreeColException {
         final ServerGame serverGame = getGame();
         final Specification spec = serverGame.getSpecification();
 
@@ -1335,7 +1335,7 @@ public final class FreeColServer {
      *
      * @return True if the meta-server was updated.
      */
-    public synchronized boolean registerWithMetaServer() {
+    private synchronized boolean registerWithMetaServer() {
         if (!this.publicServer) return false;
         boolean ret = MetaServerUtils.registerServer(getServerInfo());
         if (!ret) this.publicServer = false;

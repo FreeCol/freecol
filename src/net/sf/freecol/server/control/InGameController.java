@@ -1063,8 +1063,8 @@ public final class InGameController extends Controller {
      * @param carrier The {@code Unit} to carry the goods.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet buyGoods(ServerPlayer serverPlayer, GoodsType type,
-                              int amount, Unit carrier) {
+    private ChangeSet buyGoods(ServerPlayer serverPlayer, GoodsType type,
+                               int amount, Unit carrier) {
         if (!serverPlayer.canTrade(type, Access.EUROPE)) {
             return serverPlayer.clientError("Can not trade boycotted goods");
         }
@@ -3574,8 +3574,8 @@ public final class InGameController extends Controller {
      * @param carrier The {@code Unit} carrying the goods.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet sellGoods(ServerPlayer serverPlayer, GoodsType type,
-                               int amount, Unit carrier) {
+    private ChangeSet sellGoods(ServerPlayer serverPlayer, GoodsType type,
+                                int amount, Unit carrier) {
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = carrier.getGoodsContainer();
         container.saveState();

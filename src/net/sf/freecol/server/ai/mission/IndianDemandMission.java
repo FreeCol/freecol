@@ -153,7 +153,7 @@ public final class IndianDemandMission extends Mission {
      * @param target The target {@code Colony}.
      * @return The goods to demand.
      */
-    public Goods selectGoods(Colony target) {
+    private Goods selectGoods(Colony target) {
         final Specification spec = getSpecification();
         final List<GoodsType> goodsTypes = transform(spec.getGoodsTypeList(),
             gt -> target.getGoodsCount(gt) > 0);

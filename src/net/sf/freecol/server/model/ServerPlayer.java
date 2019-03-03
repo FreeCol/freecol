@@ -596,7 +596,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @return True if this REF player has been defeated.
      */
-    public boolean checkForREFDefeat() {
+    private boolean checkForREFDefeat() {
         if (!isREF()) return false;
 
         // No one to fight?  Either the rebels are dead, or the REF
@@ -758,7 +758,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @return The new founding father, or null if none available or ready.
      */
-    public FoundingFather checkFoundingFather() {
+    private FoundingFather checkFoundingFather() {
         FoundingFather father = null;
         if (currentFather != null) {
             int extraLiberty = getRemainingFoundingFatherCost();
@@ -802,7 +802,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @param random A pseudo-random number source.
      * @return A list of FoundingFathers.
      */
-    public List<FoundingFather> getRandomFoundingFathers(Random random) {
+    private List<FoundingFather> getRandomFoundingFathers(Random random) {
         // Build weighted random choice for each father type
         final Game game = getGame();
         final Specification spec = game.getSpecification();
@@ -862,7 +862,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @return True if the player score changed.
      */
-    public boolean updateScore() {
+    private boolean updateScore() {
         int oldScore = this.score;
         this.score = sum(getUnits(), Unit::getScoreValue)
             + sum(getColonies(), Colony::getLiberty)
@@ -1327,7 +1327,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @param other The {@code ServerPlayer} to add.
      */
-    public void addStanceChange(ServerPlayer other) {
+    private void addStanceChange(ServerPlayer other) {
         if (!stanceDirty.contains(other)) stanceDirty.add(other);
     }
 
@@ -1439,7 +1439,13 @@ public class ServerPlayer extends Player implements TurnTaker {
         }
     }
 
-    public void csPayUpkeep(Random random, ChangeSet cs) {
+    /**
+     * Pay upkeep on the player resources.
+     *
+     * @param random A pseudo-random number source.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    private void csPayUpkeep(Random random, ChangeSet cs) {
         final Specification spec = getSpecification();
         final Disaster bankruptcy = spec.getDisaster(Disaster.BANKRUPTCY);
 
@@ -1489,8 +1495,8 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      * @param probability The percentage probability of a disaster occuring.
      */
-    public void csNaturalDisasters(Random random, ChangeSet cs,
-                                   int probability) {
+    private void csNaturalDisasters(Random random, ChangeSet cs,
+                                    int probability) {
         if (randomInt(logger, "Natural disaster", random, 100) < probability) {
             List<Colony> colonies = getColonyList();
             int size = colonies.size();
@@ -1693,14 +1699,16 @@ outer:  for (Effect effect : effects) {
         return messages;
     }
 
-    public Building getBuildingForEffect(Colony colony, Effect effect, Random random) {
+    private Building getBuildingForEffect(Colony colony, Effect effect,
+                                          Random random) {
         List<Building> buildings = colony.getBurnableBuildings();
         return (buildings.isEmpty()) ? null
             : getRandomMember(logger, "Select building for effect",
                               buildings, random);
     }
 
-    public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
+    private Unit getUnitForEffect(Colony colony, Effect effect,
+                                  Random random) {
         List<Unit> units = transform(colony.getAllUnitsList(),
                                      u -> effect.appliesTo(u.getType()));
         return (units.isEmpty()) ? null
@@ -1742,6 +1750,8 @@ outer:  for (Effect effect : effects) {
      * Add or remove a standard yearly amount of storable goods, and a
      * random extra amount of a random type.  Then push out all the
      * accumulated trades.
+     *
+     * Public for the test suite.
      *
      * @param random A pseudo-random number source.
      * @param cs A {@code ChangeSet} to update.

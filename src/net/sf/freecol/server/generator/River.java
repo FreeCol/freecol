@@ -201,8 +201,7 @@ public class River {
      * @param lastSection The last section of the river flowing into this one.
      * @param tile The {@code Tile} of the confluence.
      */
-    public void grow(RiverSection lastSection, Tile tile) {
-
+    private void grow(RiverSection lastSection, Tile tile) {
         boolean found = false;
 
         for (RiverSection section : sections) {
@@ -229,7 +228,7 @@ public class River {
      * @param tile A map tile.
      * @return true if the given tile is next to this river.
      */
-    public boolean isNextToSelf(Tile tile) {
+    private boolean isNextToSelf(Tile tile) {
         return any(Direction.longSides,
             d -> this.contains(tile.getNeighbourOrNull(d)));
     }
@@ -240,7 +239,7 @@ public class River {
      * @param tile A map tile.
      * @return true if the given tile is next to a river, lake or sea.
      */
-    public boolean isNextToWater(Tile tile) {
+    private boolean isNextToWater(Tile tile) {
         return any(Direction.longSides,
             d -> {
                 Tile t = tile.getNeighbourOrNull(d);
@@ -254,7 +253,7 @@ public class River {
      * @param tile A map tile.
      * @return true if this river already contains the given tile.
      */
-    public boolean contains(Tile tile) {
+    private boolean contains(Tile tile) {
         return any(getSections(), rs -> rs.getTile() == tile);
     }
 

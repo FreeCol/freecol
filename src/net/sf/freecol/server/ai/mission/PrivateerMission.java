@@ -103,7 +103,7 @@ public final class PrivateerMission extends Mission {
      *     (uses the unit location if null).
      * @return A target for this mission, or null if none found.
      */
-    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+    private static Location extractTarget(AIUnit aiUnit, PathNode path) {
         if (path == null) return null;
         final Unit unit = aiUnit.getUnit();
         final Player owner = unit.getOwner();
@@ -199,8 +199,8 @@ public final class PrivateerMission extends Mission {
      * @param deferOK Not implemented in this mission.
      * @return A path to the new target.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range, 
-                                          boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range, 
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();

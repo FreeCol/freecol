@@ -197,8 +197,8 @@ public final class BuildColonyMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range,
-                                          boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();

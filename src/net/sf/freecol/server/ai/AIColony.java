@@ -952,8 +952,8 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
      * @param value The urgency of the wish.
      * @param lb A {@code LogBuilder} to log to.
      */
-    public void requireGoodsWish(GoodsType type, int amount, int value,
-                                 LogBuilder lb) {
+    private void requireGoodsWish(GoodsType type, int amount, int value,
+                                  LogBuilder lb) {
         GoodsWish gw = (GoodsWish)find(wishes, w -> w instanceof GoodsWish
             && ((GoodsWish)w).getGoodsType() == type);
         if (gw != null) {
@@ -976,8 +976,8 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
      * @param value The urgency of the wish.
      * @param lb A {@code LogBuilder} to log to.
      */
-    public void requireWorkerWish(UnitType type, boolean expertNeeded,
-                                  int value, LogBuilder lb) {
+    private void requireWorkerWish(UnitType type, boolean expertNeeded,
+                                   int value, LogBuilder lb) {
         WorkerWish ww = (WorkerWish)find(wishes, w -> w instanceof WorkerWish
             && ((WorkerWish)w).getUnitType() == type);
         if (ww != null) {
@@ -1232,6 +1232,8 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Creates a list of the {@code Tile}-improvements which will
      * increase the production by this {@code Colony}.
+     *
+     * Public for the test suite.
      *
      * @see TileImprovementPlan
      * @param lb A {@code LogBuilder} to log to.

@@ -187,7 +187,7 @@ public class ColonizationSaveGameReader {
 
     private final byte[] data;
 
-    public ColonizationSaveGameReader(byte[] data) {
+    private ColonizationSaveGameReader(byte[] data) {
         this.data = Arrays.copyOf(data, data.length);
     }
 

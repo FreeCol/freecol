@@ -188,7 +188,7 @@ public class AIMain extends FreeColObject
      * @see #getAIObject(String)
      * @return The {@code AIObject}.
      */
-    public AIObject getAIObject(FreeColGameObject fcgo) {
+    private AIObject getAIObject(FreeColGameObject fcgo) {
         return getAIObject(fcgo.getId());
     }
 

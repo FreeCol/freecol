@@ -203,7 +203,7 @@ public abstract class Mission extends AIObject {
      * @param unit The {@code Unit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidUnitReason(Unit unit) {
+    private static String invalidUnitReason(Unit unit) {
         return (unit == null) ? "unit-null"
             : (!unit.isInitialized()) ? "unit-uninitialized"
             : (unit.isDisposed()) ? "unit-disposed"

@@ -166,8 +166,8 @@ public final class DefendSettlementMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range,
-                                          boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();
@@ -185,8 +185,8 @@ public final class DefendSettlementMission extends Mission {
      * @param deferOK Enables deferral (not implemented in this mission).
      * @return A suitable target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    private static Location findTarget(AIUnit aiUnit, int range,
+                                       boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path) : null;
     }

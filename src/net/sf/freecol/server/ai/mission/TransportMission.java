@@ -647,7 +647,7 @@ public final class TransportMission extends Mission {
      * @return True if the cargo is no longer on board and not on the
      *     transport list, or is on board but is scheduled to be dumped.
      */
-    public boolean dumpCargo(Cargo cargo, LogBuilder lb) {
+    private boolean dumpCargo(Cargo cargo, LogBuilder lb) {
         TransportableAIObject t = cargo.getTransportable();
         if (isCarrying(t)) t.leaveTransport();
         if (!isCarrying(t) && tFind(t) != null) removeCargo(cargo);
@@ -670,7 +670,7 @@ public final class TransportMission extends Mission {
      * @param lb A {@code LogBuilder} to log to.
      * @return True if the queuing succeeded.
      */
-    public boolean requeueCargo(Cargo cargo, LogBuilder lb) {
+    private boolean requeueCargo(Cargo cargo, LogBuilder lb) {
         final TransportableAIObject t = cargo.getTransportable();
         boolean ret = false;
         assert tFind(t) == cargo;

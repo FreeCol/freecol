@@ -84,7 +84,7 @@ public class FSGConverter {
      *      if it already exists.
      * @throws IOException if thrown while reading or writing the files. 
      */
-    public void convertToXML(File in, File out) throws IOException {
+    private void convertToXML(File in, File out) throws IOException {
         try (InputStream fis = Files.newInputStream(in.toPath());
             OutputStream fos = Files.newOutputStream(out.toPath())) {
             convertToXML(fis, fos);
@@ -106,7 +106,7 @@ public class FSGConverter {
      * @param outs The output stream.
      * @exception IOException if thrown while reading or writing the streams. 
      */
-    public void convertToXML(InputStream ins, OutputStream outs)
+    private void convertToXML(InputStream ins, OutputStream outs)
         throws IOException {
         BufferedInputStream in = new BufferedInputStream(ins);
         try (BufferedOutputStream out = new BufferedOutputStream(outs)) {

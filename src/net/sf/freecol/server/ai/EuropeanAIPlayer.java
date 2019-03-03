@@ -347,7 +347,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param spec The {@code Specification} to initialize from.
      */
-    public static synchronized void initializeFromSpecification(Specification spec) {
+    private static synchronized void initializeFromSpecification(Specification spec) {
         if (pioneerRole != null) return;
         pioneerRole = spec.getRoleWithAbility(Ability.IMPROVE_TERRAIN, null);
         scoutRole = spec.getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null);
@@ -735,8 +735,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param lb A {@code LogBuilder} to log to.
      */
     public void allocateTransportables(List<TransportableAIObject> transportables,
-                                        List<TransportMission> missions,
-                                        LogBuilder lb) {
+                                       List<TransportMission> missions,
+                                       LogBuilder lb) {
         if (transportables.isEmpty()) return;
         if (missions.isEmpty()) return;
 
@@ -828,6 +828,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Rebuilds a map of locations to TileImprovementPlans.
      *
      * Called by startWorking at the start of every turn.
+     *
      * Public for the test suite.
      *
      * @param lb A {@code LogBuilder} to log to.
@@ -1211,7 +1212,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param unitType The {@code UnitType} to find a wish for.
      * @return The best worker wish for the unit.
      */
-    public WorkerWish getBestWorkerWish(AIUnit aiUnit, UnitType unitType) {
+    private WorkerWish getBestWorkerWish(AIUnit aiUnit, UnitType unitType) {
         List<WorkerWish> wishes = workerWishes.get(unitType);
         if (wishes == null) return null;
 
@@ -1335,7 +1336,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param aiUnit The {@code AIUnit} to check.
      * @param ww The {@code WorkerWish} to consume.
      */
-    public void consumeWorkerWish(AIUnit aiUnit, WorkerWish ww) {
+    private void consumeWorkerWish(AIUnit aiUnit, WorkerWish ww) {
         final Unit unit = aiUnit.getUnit();
         List<WorkerWish> wwL = workerWishes.get(unit.getType());
         wwL.remove(ww);
@@ -1350,7 +1351,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param aig The {@code AIGoods} to use.
      * @param gw The {@code GoodsWish} to consume.
      */
-    public void consumeGoodsWish(AIGoods aig, GoodsWish gw) {
+    private void consumeGoodsWish(AIGoods aig, GoodsWish gw) {
         final Goods goods = aig.getGoods();
         List<GoodsWish> gwL = goodsWishes.get(goods.getType());
         gwL.remove(gw);
@@ -1370,7 +1371,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @return The desired number of colony builders for this player.
      */
-    public int buildersNeeded() {
+    private int buildersNeeded() {
         Player player = getPlayer();
         if (!player.canBuildColonies()) return 0;
 
@@ -1408,7 +1409,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param slot The migration slot to recruit from.
      * @return The new AIUnit created by this action or null on failure.
      */
-    public AIUnit recruitAIUnitInEurope(int slot) {
+    private AIUnit recruitAIUnitInEurope(int slot) {
         AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
         if (europe == null) return null;
@@ -1437,10 +1438,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param unitType The {@code UnitType} to train.
      * @return the new AIUnit created by this action. May be null.
      */
-    public AIUnit trainAIUnitInEurope(UnitType unitType) {
-        if (unitType==null) {
-            throw new IllegalArgumentException("Invalid UnitType.");
-        }
+    private AIUnit trainAIUnitInEurope(UnitType unitType) {
+        if (unitType == null) throw new RuntimeException("Invalid UnitType.");
 
         AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
@@ -1903,7 +1902,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param aiUnit The {@code AIUnit} to choose for.
      * @return A suitable {@code Mission}, or null if none found.
      */
-    public Mission getSimpleMission(AIUnit aiUnit) {
+    private Mission getSimpleMission(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
         Mission m, ret;
         final Mission old = ((m = aiUnit.getMission()) != null && m.isValid())
@@ -1990,7 +1989,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param target An optional target {@code Location}.
      * @return A new mission, or null if impossible.
      */
-    public Mission getBuildColonyMission(AIUnit aiUnit, Location target) {
+    private Mission getBuildColonyMission(AIUnit aiUnit, Location target) {
         String reason = BuildColonyMission.invalidReason(aiUnit);
         if (reason != null) return null;
         final Unit unit = aiUnit.getUnit();
@@ -2008,7 +2007,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A new mission, or null if impossible.
      */
-    public Mission getCashInTreasureTrainMission(AIUnit aiUnit) {
+    private Mission getCashInTreasureTrainMission(AIUnit aiUnit) {
         String reason = CashInTreasureTrainMission.invalidReason(aiUnit);
         if (reason != null) return null;
         final Unit unit = aiUnit.getUnit();
@@ -2025,7 +2024,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param relaxed Use a relaxed cost decider to choose the target.
      * @return A new mission, or null if impossible.
      */
-    public Mission getDefendSettlementMission(AIUnit aiUnit, boolean relaxed) {
+    private Mission getDefendSettlementMission(AIUnit aiUnit, boolean relaxed) {
         if (DefendSettlementMission.invalidReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location loc = unit.getLocation();
@@ -2148,7 +2147,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param wish An optional {@code WorkerWish} to realize.
      * @return A new mission, or null if impossible.
      */
-    public Mission getWishRealizationMission(AIUnit aiUnit, WorkerWish wish) {
+    private Mission getWishRealizationMission(AIUnit aiUnit, WorkerWish wish) {
         if (WishRealizationMission.invalidReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         if (wish == null) {

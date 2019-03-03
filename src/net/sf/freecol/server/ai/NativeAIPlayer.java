@@ -209,6 +209,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
 
     /**
      * Greedily equips braves with horses and muskets.
+     *
      * Public for the test suite.
      *
      * @param is The {@code IndianSettlement} where the equipping occurs.
@@ -231,6 +232,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
 
     /**
      * Takes the necessary actions to secure an indian settlement
+     *
      * Public for the test suite.
      *
      * @param is The {@code IndianSettlement} to secure.
@@ -795,7 +797,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
      * @param nt The {@code NativeTrade} to update.
      * @param anger A penalty to the native prices due to anger.
      */
-    public void updateTrade(NativeTrade nt, int anger) {
+    private void updateTrade(NativeTrade nt, int anger) {
         final Specification spec = getSpecification();
         final Turn turn = getGame().getTurn();
         final IndianSettlement is = nt.getIndianSettlement();

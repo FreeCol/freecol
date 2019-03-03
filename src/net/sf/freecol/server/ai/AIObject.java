@@ -53,7 +53,7 @@ public abstract class AIObject extends FreeColObject {
      *
      * @param aiMain The main AI-object.
      */
-    public AIObject(AIMain aiMain) {
+    protected AIObject(AIMain aiMain) {
         this.aiMain = aiMain;
         this.initialized = false;
     }
@@ -66,7 +66,7 @@ public abstract class AIObject extends FreeColObject {
      * @param id The object identifier.
      * @see AIMain#addAIObject(String, AIObject)
      */
-    public AIObject(AIMain aiMain, String id) {
+    protected AIObject(AIMain aiMain, String id) {
         this(aiMain);
 
         if (id != null) {
@@ -84,8 +84,8 @@ public abstract class AIObject extends FreeColObject {
      *     during parsing.
      * @see AIObject#readFromXML
      */
-    public AIObject(AIMain aiMain,
-                    FreeColXMLReader xr) throws XMLStreamException {
+    protected AIObject(AIMain aiMain, FreeColXMLReader xr)
+        throws XMLStreamException {
         this(aiMain);
 
         readFromXML(xr);
@@ -103,7 +103,7 @@ public abstract class AIObject extends FreeColObject {
      *
      * @return True if this {@code AIObject} is initialized.
      */
-    public final boolean isInitialized() {
+    private final boolean isInitialized() {
         return this.initialized;
     }
 

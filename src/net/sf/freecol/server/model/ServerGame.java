@@ -282,7 +282,7 @@ public class ServerGame extends Game implements TurnTaker {
      *
      * @param random A pseudo-random number source.
      */
-    public final void randomize(Random random) {
+    private final void randomize(Random random) {
         if (random != null) NameCache.requireCitiesOfCibola(random);
     }
 

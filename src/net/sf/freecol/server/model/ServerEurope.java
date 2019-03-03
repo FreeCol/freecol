@@ -133,7 +133,7 @@ public class ServerEurope extends Europe implements TurnTaker {
      *
      * @param random A pseudo-random number source.
      */
-    public void fillRecruitables(Random random) {
+    private void fillRecruitables(Random random) {
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
         UnitType unitType;
         do {
@@ -192,7 +192,7 @@ public class ServerEurope extends Europe implements TurnTaker {
      *
      * @return A weighted list of recruitable unit types.
      */
-    public List<RandomChoice<UnitType>> generateRecruitablesList() {
+    private List<RandomChoice<UnitType>> generateRecruitablesList() {
         final Player owner = getOwner();
         return transform(getSpecification().getUnitTypeList(),
                          ut -> ut.isRecruitable()

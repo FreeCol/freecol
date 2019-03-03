@@ -125,7 +125,7 @@ public class RiverSection {
      * @param direction The {@code Direction} of the branch.
      * @return The branch size.
      */
-    public final int getBranch(Direction direction) {
+    private final int getBranch(Direction direction) {
         Integer val = branches.get(direction);
         return (val == null) ? TileImprovement.NO_RIVER : val;
     }

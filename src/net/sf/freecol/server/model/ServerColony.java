@@ -435,7 +435,7 @@ public class ServerColony extends Colony implements TurnTaker {
      * @param building The {@code Building} to build.
      * @return True if the building was built.
      */
-    public boolean buildBuilding(Building building) {
+    private boolean buildBuilding(Building building) {
         Tile copied = (building.getType().isDefenceType())
             ? getTile().getTileToCache() : null;
         if (!addBuilding(building)) return false;

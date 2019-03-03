@@ -217,7 +217,7 @@ public final class PioneeringMission extends Mission {
      * @param path A {@code PathNode} to extract a target from.
      * @return A target for this mission, or null if none found.
      */
-    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+    private static Location extractTarget(AIUnit aiUnit, PathNode path) {
         if (path == null) return null;
         final Location loc = path.getLastNode().getLocation();
         return (loc == null) ? null
@@ -294,8 +294,8 @@ public final class PioneeringMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range,
-                                          boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();

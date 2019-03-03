@@ -171,7 +171,7 @@ public class GenerateDocumentation {
     }
     */
     
-    public static void generateDocumentation(String[] languages) {
+    private static void generateDocumentation(String[] languages) {
         for (String name : sourceFiles) {
 
             String languageCode = name.substring(15, name.length() - 11);

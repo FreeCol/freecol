@@ -975,8 +975,8 @@ public class ColonyPlan {
      * @param workers A list of potential {@code Unit}s to try.
      * @return The best worker for the job.
      */
-    public static Unit getBestWorker(WorkLocation wl, GoodsType goodsType,
-                                     List<Unit> workers) {
+    protected static Unit getBestWorker(WorkLocation wl, GoodsType goodsType,
+                                        List<Unit> workers) {
         if (workers == null || workers.isEmpty()) return null;
         final Colony colony = wl.getColony();
         final GoodsType outputType = (goodsType.isStoredAs())
