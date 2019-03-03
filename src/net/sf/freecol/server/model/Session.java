@@ -62,7 +62,6 @@ public abstract class Session {
         }
         this.key = key;
         this.completed = false;
-        addSession(key, this);
         logger.finest("Created session: " + key);
     }
 
@@ -77,14 +76,13 @@ public abstract class Session {
     }
 
     /**
-     * Add a new session.
+     * Register a new session.
      *
-     * @param key The session key.
      * @param session The associated {@code Session}.
      */
-    private static void addSession(String key, Session session) {
+    public void register() {
         synchronized (allSessions) {
-            allSessions.put(key, session);
+            allSessions.put(this.getKey(), this);
         }
     }
 

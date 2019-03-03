@@ -702,7 +702,7 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer),
                    new MonarchActionMessage(action, template, monarchKey)
                        .setTax(taxRaise));
-            new MonarchSession(serverPlayer, action, taxRaise, goods);
+            new MonarchSession(serverPlayer, action, taxRaise, goods).register();
             break;
         case LOWER_TAX_WAR: case LOWER_TAX_OTHER:
             int oldTax = serverPlayer.getTax();
@@ -808,7 +808,7 @@ public final class InGameController extends Controller {
                        .addStringTemplate("%mercenaries%",
                            AbstractUnit.getListLabel(", ", mercenaries)),
                        monarchKey));
-            new MonarchSession(serverPlayer, action, mercenaries, mercPrice);
+            new MonarchSession(serverPlayer, action, mercenaries, mercPrice).register();
             break;
         case HESSIAN_MERCENARIES:
             final List<AbstractUnit> hessians = new ArrayList<>();
@@ -1883,6 +1883,7 @@ public final class InGameController extends Controller {
                     + " with " + agreement);
             }
             session = new DiplomacySession(ourUnit, otherColony, getTimeout());
+            session.register();
             logger.info("New diplomacy session: " + session);
         } else {
             logger.info("Continuing diplomacy session: " + session
@@ -2550,6 +2551,7 @@ public final class InGameController extends Controller {
             }
             session = new NativeDemandSession(unit, colony, type, amount,
                                               getTimeout());
+            session.register();
             logger.info("Native demand(begin) " + session.getKey() + ": "
                 + serverPlayer.getName() + " unit " + unit
                 + " demands " + amount + " " + ((type == null) ? "gold" : type)

@@ -3490,7 +3490,7 @@ outer:  for (Effect effect : effects) {
         List<Goods> capture = loser.getGoodsList();
         if (!capture.isEmpty() && winner.hasSpaceLeft()) {
             for (Goods g : capture) g.setLocation(null);
-            new LootSession(winner, loser, capture);
+            new LootSession(winner, loser, capture).register();
             cs.add(See.only(winnerPlayer),
                    new LootCargoMessage(winner, loser.getId(), capture));
         }
@@ -4117,7 +4117,7 @@ outer:  for (Effect effect : effects) {
                 .addStringTemplate("%mercenaries%",
                     AbstractUnit.getListLabel(", ", mercenaries)),
                 Integer.toString(n)));
-        new MonarchSession(this, action, mercenaries, price);
+        new MonarchSession(this, action, mercenaries, price).register();
     }
         
     /**
@@ -4237,6 +4237,7 @@ outer:  for (Effect effect : effects) {
             // was made.
             DiplomacySession ds = new DiplomacySession(tile.getFirstUnit(),
                 tile.getOwningSettlement(), FreeCol.getTimeout(false));
+            ds.register();
             ds.setAgreement(DiplomaticTrade
                 .makePeaceTreaty(DiplomaticTrade.TradeContext.CONTACT,
                                  this, other));
@@ -4275,6 +4276,7 @@ outer:  for (Effect effect : effects) {
         DiplomacySession session = (settlement == null)
             ? new DiplomacySession(unit, otherUnit, timeout)
             : new DiplomacySession(unit, settlement, timeout);
+        session.register();
         session.setAgreement(agreement);
         cs.add(See.only(this), session.getMessage(this));
         unit.setMovesLeft(0);

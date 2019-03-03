@@ -73,7 +73,7 @@ public class NativeTradeSession extends Session {
      */
     public static NativeTrade openSession(NativeTrade nt) {
         nt = new NativeTrade(nt.getUnit(), nt.getIndianSettlement());
-        new NativeTradeSession(nt);
+        new NativeTradeSession(nt).register();
         nt.initialize();
         return nt;
     }
