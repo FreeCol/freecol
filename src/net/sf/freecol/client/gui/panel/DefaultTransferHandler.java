@@ -121,12 +121,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                                         bestSize.width, bestSize.height);
                 Point point = new Point(bestSize.width / 2,
                                         bestSize.height / 2);
-                try {
-                    return tk.createCustomCursor(scaled, point,
-                                                 "freeColDragIcon");
-                } catch (Exception ex) {
-                    ; // Fall through
-                }
+                return tk.createCustomCursor(scaled, point,
+                                             "freeColDragIcon");
             }
             return null;
         }

@@ -252,12 +252,10 @@ public class MetaServerUtils {
                 return updateTimer(si);
             default:
                 logger.log(Level.WARNING, "Wrong metaMessage type: " + type);
-                return false;
+                break;
             }
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Meta-server " + type.toString()
-                + " failed: " + FreeCol.getMetaServerAddress()
-                + ":" + FreeCol.getMetaServerPort(), ex);
+        } catch (FreeColException|IOException|XMLStreamException ex) {
+            logger.log(Level.WARNING, "Meta message " + type + " failure", ex);
         }
         return false;
     }
@@ -291,8 +289,8 @@ public class MetaServerUtils {
                 delay(SLEEP_TIME, "Delay interrupted");
             }
             if (ret == null) logger.warning("No response from metaserver.");
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Exception getting server list", ex);
+        } catch (FreeColException|IOException|XMLStreamException ex) {
+            logger.log(Level.WARNING, "Get server list failure", ex);
         } finally {
             mc.close();
         }

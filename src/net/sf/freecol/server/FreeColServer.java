@@ -898,8 +898,6 @@ public final class FreeColServer {
             fos.closeEntry();
         } catch (XMLStreamException e) {
             throw new IOException("Failed to save (XML)", e);
-        } catch (Exception e) {
-            throw new IOException("Failed to save", e);
         }
     }
 
@@ -926,8 +924,12 @@ public final class FreeColServer {
      * @param file The {@code File} to read from.
      * @param spec An optional {@code Specification} to use.
      * @return The {@code Map} found in the stream.
+     * @exception FreeColException if the format is incompatible.
+     * @exception IOException if the stream can not be created.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public static Map readMap(File file, Specification spec) {
+    public static Map readMap(File file, Specification spec)
+        throws FreeColException, IOException, XMLStreamException {
         ServerGame serverGame = readGame(file, spec, null);
         return (serverGame == null) ? null : serverGame.getMap();
     }
@@ -942,17 +944,17 @@ public final class FreeColServer {
      * @param spec An optional {@code Specification} to use.
      * @param freeColServer Use this (optional) server to load into.
      * @return The game found in the stream.
+     * @exception FreeColException if the format is incompatible.
+     * @exception IOException if the stream can not be created.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
     private static ServerGame readGame(File file, Specification spec,
-                                       FreeColServer freeColServer) {
-        ServerGame serverGame = null;
-        try {
-            serverGame = FreeColServer.readGame(new FreeColSavegameFile(file),
-                                                spec, freeColServer);
-            logger.info("Read file " + file.getPath());
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Read failed for " + file.getPath(), e);
-        }
+                                       FreeColServer freeColServer)
+        throws FreeColException, IOException, XMLStreamException {
+        ServerGame serverGame
+            = FreeColServer.readGame(new FreeColSavegameFile(file),
+                                     spec, freeColServer);
+        logger.info("Read file " + file.getPath());
 
         // If importing as a result of "Start Game" in the map editor,
         // consume the file.
@@ -979,7 +981,7 @@ public final class FreeColServer {
     public static ServerGame readGame(final FreeColSavegameFile fis,
                                       Specification specification,
                                       FreeColServer freeColServer)
-        throws IOException, FreeColException, XMLStreamException {
+        throws FreeColException, IOException, XMLStreamException {
         final int savegameVersion = fis.getSavegameVersion();
         logger.info("Found savegame version " + savegameVersion);
         if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
@@ -1227,8 +1229,16 @@ public final class FreeColServer {
         LogBuilder lb = new LogBuilder(256);
         File importFile = serverGame.getMapGeneratorOptions()
             .getFile(MapGeneratorOptions.IMPORT_FILE);
-        Map importMap = (importFile == null) ? null
-            : FreeColServer.readMap(importFile, serverGame.getSpecification());
+        Map importMap = null;
+        if (importFile != null) {
+            try {
+                importMap = FreeColServer.readMap(importFile,
+                    serverGame.getSpecification());
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, "Failed to import map: "
+                    + importFile.getName(), ex);
+            }
+        }
         Map ret = getMapGenerator().generateMap(serverGame, importMap, lb);
         lb.shrink("\n");
         lb.log(logger, Level.FINER);
@@ -1335,7 +1345,7 @@ public final class FreeColServer {
      *
      * @return True if the meta-server was updated.
      */
-    private synchronized boolean registerWithMetaServer() {
+    public synchronized boolean registerWithMetaServer() {
         if (!this.publicServer) return false;
         boolean ret = MetaServerUtils.registerServer(getServerInfo());
         if (!ret) this.publicServer = false;

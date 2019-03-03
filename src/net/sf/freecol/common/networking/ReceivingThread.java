@@ -93,10 +93,10 @@ final class ReceivingThread extends Thread {
             try {
                 this.conn.sendMessage(new ReplyMessage(this.replyId, reply));
                 logger.log(Level.FINEST, getName() + " -> " + replyTag);
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, getName() + ": response " + replyTag
-                    + "fail", ex);
-            }
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, getName() + " -> " + replyTag
+                    + " failed", ex);
+            }                
         }
     };
 
@@ -140,9 +140,10 @@ final class ReceivingThread extends Thread {
             try {
                 this.conn.sendMessage(reply);
                 logger.log(Level.FINEST, getName() + " -> " + outTag);
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, getName() + ": send exception", ex);
-            }
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                logger.log(Level.WARNING, getName() + " -> " + outTag
+                    + " failed", ex);
+            }                
         }
     };
 
@@ -340,14 +341,15 @@ final class ReceivingThread extends Thread {
             // A question.  Build a thread to handle it and send a reply.
 
             replyId = this.connection.getReplyId();
+            Message m = null;
             try {
-                Message m = this.connection.reader();
+                m = this.connection.reader();
                 assert m instanceof QuestionMessage;
                 t = messageQuestion((QuestionMessage)m, replyId);
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, getName() + ": question fail", ex);
-                askToStop("listen-question-fail");
-            }
+            } catch (FreeColException fce) {
+                logger.log(Level.WARNING, "No reader for " + replyId, fce);
+                t = null;
+            }                
             break;
             
         default:
@@ -398,8 +400,6 @@ final class ReceivingThread extends Thread {
                     disconnect();
                 }
             }
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, getName() + ": unexpected fail", ex);
         } finally {
             askToStop("run complete");
         }

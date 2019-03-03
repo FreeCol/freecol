@@ -22,6 +22,7 @@ package net.sf.freecol.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
@@ -82,8 +83,8 @@ public class GenerateDocumentation {
         System.out.println("Processing source file: resources.properties");
         File sourceFile = new File(RULE_DIRECTORY, "resources.properties");
         try (
-                Reader reader = Utils.getFileUTF8Reader(sourceFile);
-                BufferedReader bufferedReader = new BufferedReader(reader);
+             Reader reader = Utils.getFileUTF8Reader(sourceFile);
+             BufferedReader bufferedReader = new BufferedReader(reader);
         ) {
             String line = bufferedReader.readLine();
             while (line != null) {
@@ -95,8 +96,8 @@ public class GenerateDocumentation {
                 }
                 line = bufferedReader.readLine();
             }
-        } catch (Exception e) {
-            System.err.println("Error reading resources: " + e.toString());
+        } catch (IOException ioe) {
+            System.err.println("Error reading resources: " + ioe.toString());
         }
     }
 

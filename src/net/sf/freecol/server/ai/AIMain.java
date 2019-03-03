@@ -636,10 +636,12 @@ public class AIMain extends FreeColObject
                 super.readChild(xr);
             }
         } catch (Exception e) {
+            // Nothing above apparently tries to throw an exception
+            // that can end up here, but that keeps changing and
+            // this is a great place to resynchronize the reader
+            // so keep this in place.
             logger.log(Level.WARNING, "Exception reading AIObject: "
                        + tag + ", id=" + oid, e);
-            // We are hosed.  Try to resynchronize at the end of the tag
-            // or aiMain.
             final String mainTag = TAG;
             while (xr.moreTags() || !(xr.atTag(tag) || xr.atTag(mainTag)));
         }

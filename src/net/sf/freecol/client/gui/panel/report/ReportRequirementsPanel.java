@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
@@ -345,10 +346,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
         try {
             doc.insertString(doc.getLength(), "\n\n" + newMessage,
-                             doc.getStyle("regular"));
+                doc.getStyle("regular"));
 
-            ArrayList<Colony> withSurplus = new ArrayList<>();
-            ArrayList<Integer> theSurplus = new ArrayList<>();
+            List<Colony> withSurplus = new ArrayList<>();
+            List<Integer> theSurplus = new ArrayList<>();
             for (Colony col : colonies) {
                 int amount = colony.getAdjustedNetProductionOf(input);
                 if (amount > 0) {
@@ -366,22 +367,19 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 for (int index = 0; index < withSurplus.size() - 1; index++) {
                     String amount = " (" + theSurplus.get(index) + ")";
                     StyleConstants.setComponent(doc.getStyle("button"),
-                                                createColonyButton(withSurplus.get(index), amount, false));
+                        createColonyButton(withSurplus.get(index), amount, false));
                     doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                     doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
                 }
                 Colony lastColony = withSurplus.get(withSurplus.size() - 1);
                 String amount = " (" + theSurplus.get(theSurplus.size() - 1) + ")";
                 StyleConstants.setComponent(doc.getStyle("button"),
-                                            createColonyButton(lastColony, amount, false));
+                    createColonyButton(lastColony, amount, false));
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
             }
-
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Production warning fail", e);
+        } catch (BadLocationException ble) {
+            logger.log(Level.WARNING, "Bad insert location", ble);
         }
-
     }
 
     private JButton createColonyButton(Colony colony, boolean headline) {

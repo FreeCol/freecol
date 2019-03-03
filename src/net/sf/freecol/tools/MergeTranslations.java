@@ -22,6 +22,7 @@ package net.sf.freecol.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.DateFormat;
@@ -124,11 +125,10 @@ public class MergeTranslations {
                 }
                 line = bufferedReader.readLine();
             }
-        } catch (Exception e) {
-            // forget it
+        } catch (IOException ioe) {
+            System.err.println("Error reading file " + file.getName()
+                + ": " + ioe.toString());
         }
         return result;
     }
-
 }
-

@@ -20,9 +20,13 @@
 package net.sf.freecol.server.generator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Vector;
 
+import javax.xml.stream.XMLStreamException;
+
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColObject;
@@ -194,9 +198,15 @@ public class MapGeneratorTest extends FreeColTestCase {
         final Specification spec = game.getSpecification();
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
+        Map importMap = null;
         for (File importFile : FreeColDirectories.getMapFileList()) {
             spec.setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
-            Map importMap = FreeColServer.readMap(importFile, spec);
+            try {
+                importMap = FreeColServer.readMap(importFile, spec);
+            } catch (FreeColException|IOException|XMLStreamException ex) {
+                fail("Map read of " + importFile.getName() + " failed: "
+                    + ex.toString());
+            }
             assertNotNull(gen.generateMap(game, importMap, new LogBuilder(-1)));
         }
         // Clear import file option

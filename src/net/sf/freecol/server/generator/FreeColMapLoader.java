@@ -59,13 +59,13 @@ public class FreeColMapLoader implements MapLoader {
      * Constructor for the FreeColMapLoader class.
      *
      * @param file The File to load.
+     * @exception FreeColException if the format is incompatible.
+     * @exception IOException if the stream can not be created.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public FreeColMapLoader(File file) {
-
+    public FreeColMapLoader(File file)
+        throws FreeColException, IOException, XMLStreamException {
         this.importMap = FreeColServer.readMap(file, null);
-        if (this.importMap == null) {
-            throw new RuntimeException("No map found in file (" + file + ").");
-        }
     }
 
     /**

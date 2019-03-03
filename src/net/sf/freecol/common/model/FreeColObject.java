@@ -1033,12 +1033,12 @@ public abstract class FreeColObject
      */
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass) {
         T ret = null;
-        try (
-             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize()));
-             ) {
+        try (FreeColXMLReader xr
+            = new FreeColXMLReader(new StringReader(this.serialize()))) {
             ret = xr.copy(game, returnClass);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Copy of " + getId()
+                + " to " + returnClass.getName() + "failed", xse);
         }
         return ret;
     }
@@ -1055,12 +1055,13 @@ public abstract class FreeColObject
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass,
         Player player) {
         T ret = null;
-        try (
-             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize(player)));
-             ) {
+        try (FreeColXMLReader xr
+            = new FreeColXMLReader(new StringReader(this.serialize(player)))) {
             ret = xr.copy(game, returnClass);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Copy of " + getId()
+                + " to " + returnClass.getName()
+                + " for " + player.getId() + "failed", xse);
         }
         return ret;
     }
@@ -1194,24 +1195,23 @@ public abstract class FreeColObject
                                    String[] fields) throws XMLStreamException {
         final Class theClass = getClass();
 
-        try {
-            xw.writeStartElement(getXMLTagName());
+        xw.writeStartElement(getXMLTagName());
 
-            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
 
-            xw.writeAttribute(PARTIAL_ATTRIBUTE_TAG, true);
+        xw.writeAttribute(PARTIAL_ATTRIBUTE_TAG, true);
 
-            for (String field : fields) {
-                Introspector intro = new Introspector(theClass, field);
-                xw.writeAttribute(field, intro.getter(this));
+        for (String field : fields) {
+            Introspector intro = new Introspector(theClass, field);
+            try {
+                String value = intro.getter(this);
+                xw.writeAttribute(field, value);
+            } catch (Introspector.IntrospectorException ie) {
+                logger.log(Level.WARNING, "Failed to write field: " + field, ie);
             }
-
-            xw.writeEndElement();
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Partial write failed for "
-                       + theClass.getName(), e);
         }
+
+        xw.writeEndElement();
     }
 
     /**
