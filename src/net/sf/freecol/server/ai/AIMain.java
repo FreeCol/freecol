@@ -585,8 +585,6 @@ public class AIMain extends FreeColObject
         final String oid = xr.readId();
 
         try {
-            Wish wish = null;
-
             // The AI data is quite shallow, so we can get away with
             // fixing up forward references just with this simple
             // lookup.  We complete initialization of such objects
@@ -624,7 +622,7 @@ public class AIMain extends FreeColObject
                 || OLD_GOODS_WISH_TAG.equals(tag)
                 // end @compat 0.11.3
                        ) {
-                wish = new GoodsWish(this, xr);
+                new GoodsWish(this, xr);
 
             } else if (TileImprovementPlan.TAG.equals(tag)
                 // @compat 0.11.3
@@ -634,17 +632,11 @@ public class AIMain extends FreeColObject
                 new TileImprovementPlan(this, xr);
 
             } else if (WorkerWish.TAG.equals(tag)) {
-                wish = new WorkerWish(this, xr);
+                new WorkerWish(this, xr);
             
             } else {
                 super.readChild(xr);
             }
-            
-            if (wish != null) {
-                AIColony ac = wish.getDestinationAIColony();
-                if (ac != null) ac.addWish(wish);
-            }
-
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception reading AIObject: "
                        + tag + ", id=" + oid, e);

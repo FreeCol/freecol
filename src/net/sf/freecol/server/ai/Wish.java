@@ -76,6 +76,9 @@ public abstract class Wish extends ValuedAIObject {
      */
     public Wish(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
+
+        AIColony ac = getDestinationAIColony();
+        if (ac != null) ac.addWish(this);
     }
 
 
