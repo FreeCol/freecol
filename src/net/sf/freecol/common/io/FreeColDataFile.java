@@ -95,8 +95,6 @@ public class FreeColDataFile {
      * @return The name of the base directory in the zip-file or null on error.
      */
     private static String findJarDirectory(File file) {
-        String expected = file.getName();
-        expected = expected.substring(0, expected.lastIndexOf('.'));
         try (
             JarFile jf = new JarFile(file);
         ) {
