@@ -415,10 +415,11 @@ public class AIMain extends FreeColObject
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (getAIObject(id) != null || !shouldHaveAIObject(fcgo)) return;
         if (!id.equals(fcgo.getId())) {
-            throw new IllegalArgumentException("!id.equals(fcgo.getId())");
+            throw new RuntimeException("!id.equals(fcgo.getId())");
         }
+        AIObject aio = null;
         if (fcgo instanceof Colony) {
-            new AIColony(this, (Colony)fcgo);
+            aio = new AIColony(this, (Colony)fcgo);
         } else if (fcgo instanceof ServerPlayer) {
             ServerPlayer player = (ServerPlayer)fcgo;
             if (player.getPlayerType() == null) {
@@ -428,16 +429,19 @@ public class AIMain extends FreeColObject
                 logger.info("Temporarily ignoring incomplete AI player: "
                     + fcgo.getId());
             } else if (player.isIndian()) {
-                new NativeAIPlayer(this, player);
+                aio = new NativeAIPlayer(this, player);
             } else if (player.isREF()) {
-                new REFAIPlayer(this, player);
+                aio = new REFAIPlayer(this, player);
             } else if (player.isEuropean()) {
-                new EuropeanAIPlayer(this, player);
+                aio = new EuropeanAIPlayer(this, player);
             } else {
-                throw new IllegalArgumentException("Bogus player: " + player);
+                throw new RuntimeException("Bogus player: " + player);
             }
         } else if (fcgo instanceof Unit) {
-            new AIUnit(this, (Unit)fcgo);
+            aio = new AIUnit(this, (Unit)fcgo);
+        }
+        if (aio == null) {
+            throw new RuntimeException("Bogus non-AI FCGO: " + fcgo);
         }
     }
 
@@ -587,54 +591,63 @@ public class AIMain extends FreeColObject
             // fixing up forward references just with this simple
             // lookup.  We complete initialization of such objects
             // with the call to setInitialized().
-            AIObject aio;
+            AIObject aio = null;
+            boolean indirect = false;
             if (oid != null && (aio = getAIObject(oid)) != null) {
                 aio.readFromXML(xr);
                 aio.setInitialized();
 
             } else if (AIColony.TAG.equals(tag)) {
-                new AIColony(this, xr);
+                aio = new AIColony(this, xr);
 
             } else if (AIGoods.TAG.equals(tag)) {
-                new AIGoods(this, xr);
+                aio = new AIGoods(this, xr);
 
             } else if (AIPlayer.TAG.equals(tag)) {
                 Player p = getGame().getFreeColGameObject(oid, Player.class);
                 if (p != null) {
                     if (p.isIndian()) {
-                        new NativeAIPlayer(this, xr);
+                        aio = new NativeAIPlayer(this, xr);
                     } else if (p.isREF()) {
-                        new REFAIPlayer(this, xr);
+                        aio = new REFAIPlayer(this, xr);
                     } else if (p.isEuropean()) {
-                        new EuropeanAIPlayer(this, xr);
+                        aio = new EuropeanAIPlayer(this, xr);
                     } else {
-                        throw new RuntimeException("Bogus AIPlayer: " + p);
+                        throw new XMLStreamException("Bogus AIPlayer: " + p);
                     }
                 }
 
             } else if (AIUnit.TAG.equals(tag)) {
-                new AIUnit(this, xr);
+                aio = new AIUnit(this, xr);
 
             } else if (GoodsWish.TAG.equals(tag)
                 // @compat 0.11.3
                 || OLD_GOODS_WISH_TAG.equals(tag)
                 // end @compat 0.11.3
                        ) {
-                new GoodsWish(this, xr);
+                aio = new GoodsWish(this, xr);
 
             } else if (TileImprovementPlan.TAG.equals(tag)
                 // @compat 0.11.3
                 || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
                 // end @compat
                        ) {
-                new TileImprovementPlan(this, xr);
+                aio = new TileImprovementPlan(this, xr);
 
             } else if (WorkerWish.TAG.equals(tag)) {
-                new WorkerWish(this, xr);
+                aio = new WorkerWish(this, xr);
             
             } else {
+                System.err.println("AT " + tag + " with " + oid);
+                indirect = true;
                 super.readChild(xr);
             }
+            if (aio == null && !indirect) {
+                throw new XMLStreamException("Bad AI object at " + tag
+                    + " with " + oid);
+            }
+        } catch (XMLStreamException xse) { // Expected
+            throw xse;
         } catch (Exception e) {
             // Nothing above apparently tries to throw an exception
             // that can end up here, but that keeps changing and
