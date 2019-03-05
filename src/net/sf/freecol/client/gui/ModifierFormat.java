@@ -92,7 +92,7 @@ public class ModifierFormat {
         }
         if (result == null && source instanceof Named) {
             result = Messages.getName((Named)source);
-            if (result != null && result.isEmpty()) result = null;
+            if (result.isEmpty()) result = null;
         }
         if (result == null) result = Messages.getName(source.getId());
         return result;

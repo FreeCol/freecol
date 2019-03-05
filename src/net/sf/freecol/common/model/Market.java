@@ -462,7 +462,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public void update(GoodsType goodsType) {
         MarketData data = requireMarketData(goodsType);
-        if (data != null) data.update();
+        data.update();
     }
 
     /**
