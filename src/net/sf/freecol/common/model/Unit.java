@@ -4036,6 +4036,14 @@ public class Unit extends GoodsLocation
         return this.type.getPriority();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Stream<Modifier> getConsumptionModifiers(String id) {
+        return getModifiers(id);
+    }
+
 
     // Interface Ownable
 

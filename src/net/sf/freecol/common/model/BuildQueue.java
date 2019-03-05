@@ -210,15 +210,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      * {@inheritDoc}
      */
     @Override
-    public boolean hasAbility(String id) {
-        return Ability.CONSUME_ALL_OR_NOTHING.equals(id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Stream<Modifier> getModifiers(String id) {
+    public Stream<Modifier> getConsumptionModifiers(String id) {
         return Stream.<Modifier>empty();
     }
 

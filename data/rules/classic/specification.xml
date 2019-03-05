@@ -2968,8 +2968,6 @@
       <unit id="ship" type="model.unit.caravel"/>
       <settlement id="model.settlement.colony" capital="false"
                   claimable-radius="1" visible-radius="2">
-        <ability id="model.ability.consumeAllOrNothing"
-                 value="true"/>
         <modifier id="model.modifier.defence" index="50"
                   type="percentage" value="50"/>
       </settlement>

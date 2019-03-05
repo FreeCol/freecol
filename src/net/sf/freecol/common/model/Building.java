@@ -625,6 +625,14 @@ public class Building extends WorkLocation
         return getType().getPriority();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Stream<Modifier> getConsumptionModifiers(String id) {
+        return getModifiers(id);
+    }
+
 
     // Interface Named
 

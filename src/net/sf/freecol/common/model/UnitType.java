@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.swing.JList;
 import javax.swing.ListModel;
@@ -502,6 +503,15 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
+     * Is this unit type able to build a colony?
+     *
+     * @return True if this unit type can build colonies.
+     */
+    public boolean canBuildColony() {
+        return hasAbility(Ability.FOUND_COLONY);
+    }
+
+    /**
      * Can this unit type move to the High Seas?
      *
      * ATM this is synonymous with being a naval unit, but we should use
@@ -625,9 +635,7 @@ public final class UnitType extends BuildableType implements Consumer {
     // Interface Consumer
 
     /**
-     * Gets a list of goods this Consumer consumes.
-     *
-     * @return The goods consumed by this unit type.
+     * {@inheritDoc}
      */
     @Override
     public List<AbstractGoods> getConsumedGoods() {
@@ -638,11 +646,7 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
-     * Gets the priority of this Consumer.  The higher the priority,
-     * the earlier will the Consumer be allowed to consume the goods
-     * it requires.
-     *
-     * @return The priority of this unit type.
+     * {@inheritDoc}
      */
     @Override
     public int getPriority() {
@@ -650,12 +654,11 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
-     * Is this unit type able to build a colony?
-     *
-     * @return True if this unit type can build colonies.
+     * {@inheritDoc}
      */
-    public boolean canBuildColony() {
-        return hasAbility(Ability.FOUND_COLONY);
+    @Override
+    public Stream<Modifier> getConsumptionModifiers(String id) {
+        return getModifiers(id);
     }
 
 

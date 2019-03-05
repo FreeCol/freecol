@@ -76,20 +76,6 @@ public interface Consumer {
      */
     public int getPriority();
 
-
-    /**
-     * Returns whether the consumer has the ability with the given
-     * identifier.  The ability most relevant to consumers is
-     * "consumeAllOrNothing", which implies that the consumer will not
-     * consume any goods if its requirements can not be met and is
-     * used by BuildQueues.
-     *
-     * @param id The object identifier.
-     * @return True if the ability is present.
-     */
-    public boolean hasAbility(String id);
-
-
     /**
      * Get the modifier set with the given id. The modifier most
      * relevant to consumers is "consumeOnlySurplusProduction", which
@@ -99,5 +85,5 @@ public interface Consumer {
      * @param id The object identifier.
      * @return The stream of {@code Modifier}s found.
      */
-    public Stream<Modifier> getModifiers(String id);
+    public Stream<Modifier> getConsumptionModifiers(String id);
 }
