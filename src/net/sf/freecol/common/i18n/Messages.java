@@ -750,7 +750,9 @@ public class Messages {
             result = replaceChoices(result, template);
             for (SimpleEntry<String, StringTemplate> e
                      : template.entryList()) {
-                result = result.replace(e.getKey(), message(e.getValue()));
+                if (e.getKey() != null) {
+                    result = result.replace(e.getKey(), message(e.getValue()));
+                }
             }
             break;
         case KEY:
