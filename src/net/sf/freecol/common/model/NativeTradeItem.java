@@ -224,11 +224,14 @@ public class NativeTradeItem extends GoodsTradeItem {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof NativeTradeItem)) return false;
-        return this.price == ((NativeTradeItem)other).price
-            && this.haggleCount == ((NativeTradeItem)other).haggleCount
-            && super.equals((NativeTradeItem)other);
+    public boolean equals(Object o) {
+        if (o instanceof NativeTradeItem) {
+            NativeTradeItem other = (NativeTradeItem)o;
+            return this.price == other.price
+                && this.haggleCount == other.haggleCount
+                && super.equals(other);
+        }
+        return false;
     }
 
     /**

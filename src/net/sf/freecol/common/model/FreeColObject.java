@@ -1377,8 +1377,8 @@ public abstract class FreeColObject
     @Override
     public boolean equals(Object o) {
         if (o instanceof FreeColObject) {
-            FreeColObject fco = (FreeColObject)o;
-            return Utils.equals(this.id, fco.id);
+            FreeColObject other = (FreeColObject)o;
+            return Utils.equals(this.id, other.id);
         }
         return false;
     }

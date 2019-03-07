@@ -100,9 +100,10 @@ public class ForestMaker {
         @Override
         public boolean equals(Object other) {
             if (other instanceof ImageLocation) {
-                return this.compareTo((ImageLocation)other) == 0;
+                return this.compareTo((ImageLocation)other) == 0
+                    && super.equals(other);
             }
-            return super.equals(other);
+            return false;
         }
 
         /**

@@ -171,11 +171,13 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object other) {
-            if (other instanceof TargetTuple) {
-                return this.compareTo((TargetTuple)other) == 0;
+        public boolean equals(Object o) {
+            if (o instanceof TargetTuple) {
+                TargetTuple other = (TargetTuple)o;
+                return this.compareTo(other) == 0
+                    && super.equals(other);
             }
-            return super.equals(other);
+            return false;
         }
 
         /**

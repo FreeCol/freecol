@@ -99,7 +99,7 @@ public final class TileViewer extends FreeColClientHolder {
             if (other instanceof SortableImage) {
                 return this.compareTo((SortableImage)other) == 0;
             }
-            return super.equals(other);
+            return false;
         }
 
         /**

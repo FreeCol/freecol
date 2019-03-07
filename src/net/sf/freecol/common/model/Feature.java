@@ -405,27 +405,28 @@ public abstract class Feature extends FreeColSpecObject
     public boolean equals(Object o) {
         if (o == this) return true;
         if (o instanceof Feature) {
-            Feature feature = (Feature)o;
-            if (this.source != feature.source
-                || this.duration != feature.duration
-                || this.temporary != feature.temporary
-                || !super.equals(o)) return false;
-            if (firstTurn == null) {
-                if (feature.firstTurn != null) return false;
-            } else if (feature.firstTurn == null) {
+            Feature other = (Feature)o;
+            if (this.source != other.source
+                || this.duration != other.duration
+                || this.temporary != other.temporary)
                 return false;
-            } else if (firstTurn.getNumber() != feature.firstTurn.getNumber()) {
+            if (firstTurn == null) {
+                if (other.firstTurn != null) return false;
+            } else if (other.firstTurn == null) {
+                return false;
+            } else if (firstTurn.getNumber() != other.firstTurn.getNumber()) {
                 return false;
             }
             if (lastTurn == null) {
-                if (feature.lastTurn != null) return false;
-            } else if (feature.lastTurn == null) {
+                if (other.lastTurn != null) return false;
+            } else if (other.lastTurn == null) {
                 return false;
-            } else if (lastTurn.getNumber() != feature.lastTurn.getNumber()) {
+            } else if (lastTurn.getNumber() != other.lastTurn.getNumber()) {
                 return false;
             }
             return ScopeContainer.equalScopes(this.scopeContainer,
-                                              feature.scopeContainer);
+                                              other.scopeContainer)
+                && super.equals(other);
         }
         return false;
     }

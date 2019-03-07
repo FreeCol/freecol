@@ -224,8 +224,8 @@ public class Map extends FreeColGameObject implements Location {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o instanceof Position) {
-                Position p = (Position)o;
-                return x == p.x && y == p.y;
+                Position other = (Position)o;
+                return x == other.x && y == other.y;
             }
             return false;
         }

@@ -461,12 +461,12 @@ public class ModelMessage extends StringTemplate {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof ModelMessage) {
-            ModelMessage m = (ModelMessage)o;
-            return messageType == m.messageType
-                && displayed == m.displayed
-                && Utils.equals(sourceId, m.sourceId)
-                && Utils.equals(displayId, m.displayId)
-                && super.equals(m);
+            ModelMessage other = (ModelMessage)o;
+            return messageType == other.messageType
+                && displayed == other.displayed
+                && Utils.equals(sourceId, other.sourceId)
+                && Utils.equals(displayId, other.displayId)
+                && super.equals(other);
         }
         return false;
     }

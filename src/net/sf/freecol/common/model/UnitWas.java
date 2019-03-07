@@ -217,11 +217,13 @@ public class UnitWas implements Comparable<UnitWas> {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof UnitWas) {
-            return this.compareTo((UnitWas)other) == 0;
+    public boolean equals(Object o) {
+        if (o instanceof UnitWas) {
+            UnitWas other = (UnitWas)o;
+            return this.compareTo(other) == 0
+                && super.equals(other);
         }
-        return super.equals(other);
+        return false;
     }
     
     /**

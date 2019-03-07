@@ -351,45 +351,45 @@ public class Scope extends FreeColObject {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (o instanceof Scope) {
-            Scope otherScope = (Scope) o;
-            if (matchNegated != otherScope.matchNegated) {
+            Scope other = (Scope)o;
+            if (matchNegated != other.matchNegated) {
                 return false;
             }
-            if (matchesNull != otherScope.matchesNull) {
+            if (matchesNull != other.matchesNull) {
                 return false;
             }
             if (type == null) {
-                if (otherScope.getType() != null) {
+                if (other.getType() != null) {
                     return false;
                 }
-            } else if (!type.equals(otherScope.getType())) {
+            } else if (!type.equals(other.getType())) {
                 return false;
             }
             if (abilityId == null) {
-                if (!Utils.equals(otherScope.getAbilityId(), abilityId)) {
+                if (!Utils.equals(other.getAbilityId(), abilityId)) {
                     return false;
                 }
-            } else if (!abilityId.equals(otherScope.getAbilityId())) {
+            } else if (!abilityId.equals(other.getAbilityId())) {
                 return false;
             }
-            if (abilityValue != otherScope.getAbilityValue()) {
+            if (abilityValue != other.getAbilityValue()) {
                 return false;
             }
             if (methodName == null) {
-                if (!Utils.equals(otherScope.getMethodName(), methodName)) {
+                if (!Utils.equals(other.getMethodName(), methodName)) {
                     return false;
                 }
-            } else if (!methodName.equals(otherScope.getMethodName())) {
+            } else if (!methodName.equals(other.getMethodName())) {
                 return false;
             }
             if (methodValue == null) {
-                if (!Utils.equals(otherScope.getMethodValue(), methodValue)) {
+                if (!Utils.equals(other.getMethodValue(), methodValue)) {
                     return false;
                 }
-            } else if (!methodValue.equals(otherScope.getMethodValue())) {
+            } else if (!methodValue.equals(other.getMethodValue())) {
                 return false;
             }
-            return true;
+            return super.equals(other);
         }
         return false;
     }

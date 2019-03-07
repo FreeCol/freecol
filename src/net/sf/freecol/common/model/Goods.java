@@ -319,8 +319,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     @Override
     public boolean equals(Object o) {
         if (o instanceof Goods) {
-            Goods g = (Goods)o;
-            return this.location == g.location && super.equals(g);
+            Goods other = (Goods)o;
+            return this.location == other.location
+                && super.equals(other);
         }
         return false;
     }

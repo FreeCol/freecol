@@ -396,11 +396,13 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof TransportableAIObject)) return false;
-        TransportableAIObject ot = (TransportableAIObject)other;
-        return super.equals(ot)
-            && Utils.equals(this.transport, ot.transport);
+    public boolean equals(Object o) {
+        if (o instanceof TransportableAIObject) {
+            TransportableAIObject other = (TransportableAIObject)o;
+            return Utils.equals(this.transport, other.transport)
+                && super.equals(other);
+        }
+        return false;
     }
 
     /**

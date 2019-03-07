@@ -129,11 +129,11 @@ public abstract class ValuedAIObject extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof ValuedAIObject) {
-            ValuedAIObject ov = (ValuedAIObject)other;
-            return this.value == ov.value
-                && super.equals(ov);
+    public boolean equals(Object o) {
+        if (o instanceof ValuedAIObject) {
+            ValuedAIObject other = (ValuedAIObject)o;
+            return this.value == other.value
+                && super.equals(other);
         }
         return false;
     }

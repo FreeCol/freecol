@@ -277,8 +277,9 @@ public class AbstractGoods extends FreeColObject implements Named {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof AbstractGoods) {
-            AbstractGoods ag = (AbstractGoods)o;
-            return type == ag.type && amount == ag.amount;
+            AbstractGoods other = (AbstractGoods)o;
+            return this.type == other.type && this.amount == other.amount
+                && super.equals(other);
         }
         return false;
     }

@@ -211,9 +211,10 @@ public class TileTypeChange extends FreeColSpecObjectType {
     @Override
     public boolean equals(Object other) {
         if (other instanceof TileTypeChange) {
-            return this.compareTo((TileTypeChange)other) == 0;
+            return this.compareTo((TileTypeChange)other) == 0
+                && super.equals(other);
         }
-        return super.equals(other);
+        return false;
     }
 
     /**

@@ -551,8 +551,9 @@ public final class Ability extends Feature {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof Ability) {
-            return this.value == ((Ability)o).value
-                && super.equals(o);
+            Ability other = (Ability)o;
+            return this.value == other.value
+                && super.equals(other);
         }
         return false;
     }

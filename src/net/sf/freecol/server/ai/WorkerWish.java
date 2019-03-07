@@ -233,12 +233,14 @@ public final class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof WorkerWish)) return false;
-        WorkerWish ow = (WorkerWish)other;
-        return this.expertNeeded == ow.expertNeeded
-            && Utils.equals(this.unitType, ow.unitType)
-            && super.equals(ow);
+    public boolean equals(Object o) {
+        if (o instanceof WorkerWish) {
+            WorkerWish other = (WorkerWish)o;
+            return this.expertNeeded == other.expertNeeded
+                && Utils.equals(this.unitType, other.unitType)
+                && super.equals(other);
+        }
+        return false;
     }
 
     /**

@@ -235,12 +235,14 @@ public abstract class Wish extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Wish)) return false;
-        Wish ow = (Wish)other;
-        return super.equals(ow)
-            && Utils.equals(this.destination, ow.destination)
-            && Utils.equals(this.transportable, ow.transportable);
+    public boolean equals(Object o) {
+        if (o instanceof Wish) {
+            Wish other = (Wish)o;
+            return Utils.equals(this.destination, other.destination)
+                && Utils.equals(this.transportable, other.transportable)
+                && super.equals(other);
+        }
+        return false;
     }
 
     /**

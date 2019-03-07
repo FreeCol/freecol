@@ -606,13 +606,13 @@ public class Modifier extends Feature {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (o instanceof Modifier) { 
-            Modifier m = (Modifier)o;
-            return this.value == m.value
-                && this.increment == m.increment
-                && this.modifierIndex == m.modifierIndex
-                && Utils.equals(this.modifierType, m.modifierType)
-                && Utils.equals(this.incrementType, m.incrementType)
-                && super.equals(o);
+            Modifier other = (Modifier)o;
+            return this.value == other.value
+                && this.increment == other.increment
+                && this.modifierIndex == other.modifierIndex
+                && Utils.equals(this.modifierType, other.modifierType)
+                && Utils.equals(this.incrementType, other.incrementType)
+                && super.equals(other);
         }
         return false;
     }

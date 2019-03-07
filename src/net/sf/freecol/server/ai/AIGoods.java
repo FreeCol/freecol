@@ -457,12 +457,14 @@ public final class AIGoods extends TransportableAIObject {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof AIGoods)) return false;
-        AIGoods oa = (AIGoods)other;
-        return super.equals(oa)
-            && Utils.equals(this.goods, oa.goods)
-            && Utils.equals(this.destination, oa.destination);
+    public boolean equals(Object o) {
+        if (o instanceof AIGoods) {
+            AIGoods other = (AIGoods)o;
+            return Utils.equals(this.goods, other.goods)
+                && Utils.equals(this.destination, other.destination)
+                && super.equals(other);
+        }
+        return false;
     }
 
     /**
