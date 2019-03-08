@@ -1461,7 +1461,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
 
     // Interface TradeLocation
-    //   getGoodsCount provided by GoodsLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getAvailableGoodsCount(GoodsType goodsType) {
+        return getGoodsCount(goodsType);
+    }
 
     /**
      * {@inheritDoc}
@@ -1487,6 +1494,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         return capacity - present;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getLocationName(TradeLocation tradeLocation) {
         return ((IndianSettlement) tradeLocation).getName();

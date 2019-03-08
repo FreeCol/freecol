@@ -2054,7 +2054,7 @@ public final class InGameController extends FreeColClientHolder {
         while (iterator.hasNext()) {
             AbstractGoods ag = iterator.next();
             final GoodsType type = ag.getType();
-            int present = stop.getGoodsCount(type);
+            int present = stop.getAvailableGoodsCount(type);
             int exportAmount = stop.getExportAmount(type, 0);
             int importAmount = INFINITY;
             TradeRouteStop unload = null;
@@ -2153,7 +2153,7 @@ public final class InGameController extends FreeColClientHolder {
                 left.addNamed(ag);
                 continue;
             }
-            int present = stop.getGoodsCount(type);
+            int present = stop.getAvailableGoodsCount(type);
             Location why = limit.get(type);
             if (present == 0) {
                 loaded.addStringTemplate(ag.getLabel());

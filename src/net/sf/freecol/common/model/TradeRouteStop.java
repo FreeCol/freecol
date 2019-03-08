@@ -234,9 +234,9 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public int getGoodsCount(GoodsType goodsType) {
+    public int getAvailableGoodsCount(GoodsType goodsType) {
         return (location instanceof TradeLocation)
-            ? ((TradeLocation)location).getGoodsCount(goodsType)
+            ? ((TradeLocation)location).getAvailableGoodsCount(goodsType)
             : 0;
     }
 
@@ -260,6 +260,9 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
             : 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getLocationName(TradeLocation tradeLocation) {
         return null;

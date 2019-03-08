@@ -2806,7 +2806,26 @@ public class Colony extends Settlement implements TradeLocation {
 
 
     // Interface TradeLocation
-    //   getGoodsCount provided in GoodsContainer
+
+    /**
+     * Calculate the present field.
+     *
+     * @param goodsType The {@link GoodsType} to check for got import/export.
+     * @param turns The number of turns before the goods is required.
+     * @return The amount of goods to export.
+     */
+    private int returnPresent(GoodsType goodsType, int turns) {
+        return Math.max(0, getGoodsCount(goodsType)
+            + turns * getNetProductionOf(goodsType));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getAvailableGoodsCount(GoodsType goodsType) {
+        return getGoodsCount(goodsType);
+    }
 
     /**
      * {@inheritDoc}
@@ -2831,28 +2850,23 @@ public class Colony extends Settlement implements TradeLocation {
         return Math.max(0, capacity - present);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getLocationName(TradeLocation tradeLocation) {
         Colony colony = (Colony) tradeLocation;
         return colony.getName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean canBeInput() {
         return true;
     }
 
-    /**
-     * Calculate the present field.
-     *
-     * @param goodsType The {@link GoodsType} to check for got import/export.
-     * @param turns The number of turns before the goods is required.
-     * @return The amount of goods to export.
-     */
-    private int returnPresent(GoodsType goodsType, int turns) {
-        return Math.max(0, getGoodsCount(goodsType)
-            + turns * getNetProductionOf(goodsType));
-    }
 
     //
     // Miscellaneous low level

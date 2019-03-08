@@ -502,7 +502,7 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     @Override
-    public int getGoodsCount(GoodsType goodsType) {
+    public int getAvailableGoodsCount(GoodsType goodsType) {
         return GoodsContainer.HUGE_CARGO_SIZE;
     }
 
@@ -511,7 +511,8 @@ public class Europe extends UnitLocation
      */
     @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
-        return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
+        return (getOwner().canTrade(goodsType))
+            ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
     }
 
@@ -520,20 +521,30 @@ public class Europe extends UnitLocation
      */
     @Override
     public int getImportAmount(GoodsType goodsType, int turns) {
-        return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
+        return (getOwner().canTrade(goodsType))
+            ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getLocationName(TradeLocation tradeLocation) {
         return ((Europe) tradeLocation).getNameKey();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JLabel getNameAsJlabel() {
         return Utility.localizedLabel(getLocationName(this));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean canBeInput() {
         return true;

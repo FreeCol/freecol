@@ -35,7 +35,7 @@ public interface TradeLocation {
      * @param goodsType The {@code GoodsType} to check.
      * @return The amount of goods present.
      */
-    public int getGoodsCount(GoodsType goodsType);
+    public int getAvailableGoodsCount(GoodsType goodsType);
 
     /**
      * Gets the amount of a given goods type that can be exported from
@@ -66,9 +66,10 @@ public interface TradeLocation {
     public String getLocationName(TradeLocation tradeLocation);
 
     /**
-     * Return the name of this instance as a JLabel
+     * Get the name of this instance as a JLabel.
      *
-     * @return The JLabel with the result of {@link #getLocationName(TradeLocation)}
+     * @return The {@code JLabel} with the result of
+     *     {@link #getLocationName(TradeLocation)}
      */
     public default JLabel getNameAsJlabel() {
         return new JLabel(getLocationName(this));
