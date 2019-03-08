@@ -170,6 +170,7 @@ public final class ConnectController extends FreeColClientHolder {
             newGame();
             break;
         case RECONNECT:
+        default: // default "can not happen", but if so, reconnect is safest
             fcc.logout(false);
             final String name = player.getName();
             try {
