@@ -39,6 +39,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public class EuropeanNationType extends NationType {
 
     public static final String TAG = "european-nation-type";
+    private static final String DEFAULT_MAP_KEY = "default";
+    private static final String EXPERT_MAP_KEY = "expert";
 
     /** Whether this is an REF Nation. */
     private boolean ref = false;
@@ -80,7 +82,16 @@ public class EuropeanNationType extends NationType {
         this.startingUnitMap.putAll(startingUnitMap);
     }
 
-
+    /**
+     * Get the map key, either expert or default, according to a boolean.
+     *
+     * @param b The boolean to test.
+     * @return The map key.
+     */
+    private String getMapKey(boolean b) {
+        return (b) ? EXPERT_MAP_KEY : DEFAULT_MAP_KEY;
+    }
+    
     /**
      * Gets the starting units for this nation type.
      *
@@ -88,7 +99,7 @@ public class EuropeanNationType extends NationType {
      */
     public List<AbstractUnit> getStartingUnits() {
         boolean ex = getSpecification().getBoolean(GameOptions.EXPERT_STARTING_UNITS);
-        return getStartingUnits(String.valueOf(ex));
+        return getStartingUnits(getMapKey(ex));
     }
 
     /**
@@ -100,7 +111,8 @@ public class EuropeanNationType extends NationType {
      */
     public List<AbstractUnit> getStartingUnits(String key) {
         Map<String, AbstractUnit> result = new HashMap<>();
-        Map<String, AbstractUnit> defaultMap = startingUnitMap.get(null);
+        Map<String, AbstractUnit> defaultMap
+            = startingUnitMap.get(DEFAULT_MAP_KEY);
         Map<String, AbstractUnit> difficultyMap = startingUnitMap.get(key);
         if (defaultMap != null) {
             result.putAll(defaultMap);
@@ -119,11 +131,11 @@ public class EuropeanNationType extends NationType {
      * @param expert Is this an expert unit?
      */
     private void addStartingUnit(String id, AbstractUnit unit, boolean expert) {
-        String exTag = (expert) ? Boolean.TRUE.toString() : null;
-        Map<String, AbstractUnit> units = startingUnitMap.get(exTag);
+        String mapTag = getMapKey(expert);
+        Map<String, AbstractUnit> units = startingUnitMap.get(mapTag);
         if (units == null) {
             units = new HashMap<>();
-            startingUnitMap.put(exTag, units);
+            startingUnitMap.put(mapTag, units);
         }
         units.put(id, unit);
     }
@@ -205,13 +217,13 @@ public class EuropeanNationType extends NationType {
         if (startingUnitMap != null && !startingUnitMap.isEmpty()) {
             Map<String, AbstractUnit> map;
             // default map
-            if ((map = startingUnitMap.get(null)) != null) {
+            if ((map = startingUnitMap.get(DEFAULT_MAP_KEY)) != null) {
                 for (Map.Entry<String, AbstractUnit> entry : map.entrySet()) {
                     writeUnit(xw, entry.getKey(), entry.getValue(), false);
                 }
             }
             // expert map
-            if ((map = startingUnitMap.get(Boolean.TRUE.toString())) != null) {
+            if ((map = startingUnitMap.get(EXPERT_MAP_KEY)) != null) {
                 for (Map.Entry<String, AbstractUnit> entry : map.entrySet()) {
                     writeUnit(xw, entry.getKey(), entry.getValue(), true);
                 }
