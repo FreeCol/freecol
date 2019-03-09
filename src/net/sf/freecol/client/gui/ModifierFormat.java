@@ -49,10 +49,9 @@ public class ModifierFormat {
         return Messages.message("modifierFormat.unknown");
     }
 
-    public static final String format(double value) {
-        return (value == Modifier.UNKNOWN)
-            ? getUnknownValue()
-            : modifierFormat.format(value);
+    public static final String format(float value) {
+        return Modifier.isKnown(value) ? modifierFormat.format(value)
+            : getUnknownValue();
     }
 
     private static final String[] getModifierStrings(Modifier modifier) {
@@ -62,7 +61,7 @@ public class ModifierFormat {
     private static final String[] getModifierStrings(float value,
                                                      ModifierType type) {
         String bonus = modifierFormat.format(value);
-        if (value == Modifier.UNKNOWN) {
+        if (!Modifier.isKnown(value)) {
             return new String[] { " ", bonus, null };
         }
         String[] result = (value < 0)

@@ -316,12 +316,33 @@ public class Modifier extends Feature {
     }
 
     /**
+     * Is this a "known" value.
+     *
+     * @param value The value to test.
+     * @return True if the value is known.
+     */
+    public static boolean isKnown(float value) {
+        return Float.compare(value, UNKNOWN) != 0;
+    }
+
+    /**
+     * Does this modifier have a known value?
+     *
+     * That is, is it not set to the UNKNOWN value.
+     *
+     * @return True if the value is known.
+     */
+    public boolean isKnown() {
+        return Modifier.isKnown(this.value);
+    }
+
+    /**
      * Get the modifier value.
      *
      * @return The modifier value.
      */
     public final float getValue() {
-        return value;
+        return this.value;
     }
 
     /**
@@ -335,9 +356,9 @@ public class Modifier extends Feature {
             if (hasIncrement()) {
                 float f = (turn.getNumber() - getFirstTurn().getNumber())
                     * increment;
-                return apply(value, f, incrementType);
+                return apply(this.value, f, incrementType);
             } else {
-                return value;
+                return this.value;
             }
         } else {
             return 0;
@@ -607,8 +628,8 @@ public class Modifier extends Feature {
         if (o == this) return true;
         if (o instanceof Modifier) { 
             Modifier other = (Modifier)o;
-            return this.value == other.value
-                && this.increment == other.increment
+            return Float.compare(this.value, other.value) == 0
+                && Float.compare(this.increment, other.increment) == 0
                 && this.modifierIndex == other.modifierIndex
                 && Utils.equals(this.modifierType, other.modifierType)
                 && Utils.equals(this.incrementType, other.incrementType)

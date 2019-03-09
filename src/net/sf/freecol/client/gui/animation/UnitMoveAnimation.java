@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.animation;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.lang.Math;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -127,10 +128,8 @@ final class UnitMoveAnimation extends FreeColClientHolder
         final int labelHeight = unitLabel.getHeight();
         final Point srcPoint = gui.getAnimationPosition(labelWidth, labelHeight, srcP);
         final Point dstPoint = gui.getAnimationPosition(labelWidth, labelHeight, dstP);
-        final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
-            : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
-        final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0
-            : (srcPoint.getY() > dstPoint.getY()) ? -1 : 1;
+        final int stepX = (int)Math.signum(dstPoint.getX() - srcPoint.getX());
+        final int stepY = (int)Math.signum(dstPoint.getY() - srcPoint.getY());
 
         Point point = srcPoint;
         long time = now(), dropFrames = 0;

@@ -464,8 +464,8 @@ public final class QuickActionMenu extends JPopupMenu {
                                                    expertType);
             if (uc != null) {
                 int maxExperience = unit.getType().getMaximumExperience();
-                double probability = uc.probability * experience
-                    / (double)maxExperience;
+                float probability = uc.probability * experience
+                    / (float)maxExperience;
                 String jobName = Messages.message(goods.getWorkingAsKey());
                 JPanel experiencePanel = new MigPanel(new MigLayout("wrap 3"));
                 experiencePanel.add(new JLabel(new ImageIcon(
