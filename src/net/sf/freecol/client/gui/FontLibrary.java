@@ -210,8 +210,7 @@ public class FontLibrary {
         Font font = (fontKey == null)
             ? mainFont
             : ResourceManager.getFont(fontKey);
-        font = font.deriveFont(style, scaledSize);
-        return font;
+        return font.deriveFont(style, scaledSize);
     }
 
     /**
@@ -237,19 +236,18 @@ public class FontLibrary {
         float scaledSize = calcScaledSize(fontSize, scaleFactor);
         String fontKey = getFontKey(fontType);
         Font font = null;
-        if(fontType != FontType.NORMAL) {
+        if (fontType != FontType.NORMAL) {
             font = ResourceManager.getFont(fontKey);
-            if(font.canDisplayUpTo(string) != -1)
+            if (font.canDisplayUpTo(string) != -1)
                 font = null;
         }
-        if(font == null) {
+        if (font == null) {
             fontKey = getFontKey(FontType.NORMAL);
             font = (fontKey == null)
                 ? mainFont
                 : ResourceManager.getFont(fontKey);
         }
-        font = font.deriveFont(style, scaledSize);
-        return font;
+        return font.deriveFont(style, scaledSize);
     }
 
     private static float calcScaledSize(FontSize fontSize, float scaleFactor) {
