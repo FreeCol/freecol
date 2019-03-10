@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
@@ -92,7 +93,7 @@ public class IndianDemandMessage extends AttributeMessage {
         final Colony colony = getColony(game);
         final GoodsType type = getType(game);
         final int amount = getAmount();
-        final Boolean initialResult = getResult();
+        final IndianDemandAction initialResult = getResult();
 
         aiPlayer.indianDemandHandler(unit, colony, type, amount, initialResult);
     }
@@ -133,7 +134,7 @@ public class IndianDemandMessage extends AttributeMessage {
         final Game game = freeColServer.getGame();
         final String unitId = getStringAttribute(UNIT_TAG);
         final String colonyId = getStringAttribute(COLONY_TAG);
-        final Boolean result = getResult();
+        final IndianDemandAction result = getResult();
         
         Unit unit;
         Colony colony;
@@ -226,8 +227,9 @@ public class IndianDemandMessage extends AttributeMessage {
      *
      * @return The result of this demand.
      */
-    public Boolean getResult() {
-        return getBooleanAttribute(RESULT_TAG, (Boolean)null);
+    public IndianDemandAction getResult() {
+        return getEnumAttribute(RESULT_TAG, IndianDemandAction.class,
+                                IndianDemandAction.INDIAN_DEMAND_DONE);
     }
 
     /**
@@ -236,8 +238,8 @@ public class IndianDemandMessage extends AttributeMessage {
      * @param result The new result of this demand.
      * @return This message.
      */
-    public IndianDemandMessage setResult(Boolean result) {
-        setBooleanAttribute(RESULT_TAG, result);
+    public IndianDemandMessage setResult(IndianDemandAction result) {
+        setEnumAttribute(RESULT_TAG, result);
         return this;
     }
 }

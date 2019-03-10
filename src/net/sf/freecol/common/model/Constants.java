@@ -109,9 +109,13 @@ public interface Constants {
         CLAIM_STEAL
     }
 
-    /** Price used to denote claiming land by stealing it. */
-    public static final int STEAL_LAND = -1;
-
+    /** Actions surrounding native demands at colonies. */
+    public static enum IndianDemandAction {
+        INDIAN_DEMAND_ACCEPT,
+        INDIAN_DEMAND_REJECT,
+        INDIAN_DEMAND_DONE
+    }
+    
     /** Actions with a missionary at a native settlement. */
     public static enum MissionaryAction {
         MISSIONARY_ESTABLISH_MISSION,
@@ -132,6 +136,9 @@ public interface Constants {
         SCOUT_SETTLEMENT_TRIBUTE,
         SCOUT_SETTLEMENT_ATTACK
     }
+
+    /** Price used to denote claiming land by stealing it. */
+    public static final int STEAL_LAND = -1;
 
     /** Choice of sales action at a native settlement. */
     public static enum TradeAction {

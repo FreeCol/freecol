@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
@@ -589,7 +590,8 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType type, int amount, Boolean result) {
+                                GoodsType type, int amount,
+                                IndianDemandAction result) {
         return ask(new IndianDemandMessage(unit, colony, type, amount)
                        .setResult(result));
     }

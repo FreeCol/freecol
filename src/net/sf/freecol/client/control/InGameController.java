@@ -3438,7 +3438,9 @@ public final class InGameController extends FreeColClientHolder {
             invokeLater(() ->
                 getGUI().showNativeDemandDialog(unit, colony, type, amount,
                     (Boolean accept) ->
-                        askServer().indianDemand(unit, colony, type, amount, accept)));
+                        askServer().indianDemand(unit, colony, type, amount,
+                            ((accept) ? IndianDemandAction.INDIAN_DEMAND_ACCEPT
+                                : IndianDemandAction.INDIAN_DEMAND_REJECT))));
             return;
         case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
             accepted = true;

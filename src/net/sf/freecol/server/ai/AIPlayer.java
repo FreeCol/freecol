@@ -370,11 +370,12 @@ public abstract class AIPlayer extends AIObject {
      * @param initial The acceptance state of the demand.
      */
     public void indianDemandHandler(Unit unit, Colony colony, GoodsType type,
-                                    int amount, Boolean initial) {
-        Boolean result = indianDemand(unit, colony, type, amount, initial);
+                                    int amount, IndianDemandAction initial) {
+        IndianDemandAction result
+            = indianDemand(unit, colony, type, amount, initial);
         logger.finest("AI handling native demand by " + unit
             + " at " + colony + " result: " + initial + " -> " + result);
-        if (result != null) {
+        if (result != IndianDemandAction.INDIAN_DEMAND_DONE) {
             invoke(() -> {
                     AIMessage.askIndianDemand(this, unit, colony, type,
                                               amount, result);
@@ -538,12 +539,12 @@ public abstract class AIPlayer extends AIObject {
      * @param type The {@code GoodsType} demanded.
      * @param amount The amount of gold demanded.
      * @param accept The acceptance state of the demand.
-     * @return True if this player accepts the demand, false if the demand
-     *     is rejected, null if no further consideration is required.
+     * @return The result of the demand.
      */
-    public Boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType type, int amount, Boolean accept) {
-        return Boolean.FALSE;
+    public IndianDemandAction indianDemand(Unit unit, Colony colony,
+                                           GoodsType type, int amount,
+                                           IndianDemandAction accept) {
+        return IndianDemandAction.INDIAN_DEMAND_REJECT;
     }
 
     /**

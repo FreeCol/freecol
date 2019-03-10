@@ -324,13 +324,23 @@ public abstract class Message {
     }
             
     /**
-     * Sets an attribute in this message with n boolean value.
+     * Sets an attribute in this message with a boolean value.
      *
      * @param key The attribute to set.
      * @param value The value of the attribute.
      */
     protected void setBooleanAttribute(String key, Boolean value) {
         if (value != null) setStringAttribute(key, Boolean.toString(value));
+    }
+
+    /**
+     * Sets an attribute in this message with an enum value.
+     *
+     * @param key The attribute to set.
+     * @param value The value of the attribute.
+     */
+    protected void setEnumAttribute(String key, Enum<?> value) {
+        if (value != null) setStringAttribute(key, downCase(value.toString()));
     }
 
     /**

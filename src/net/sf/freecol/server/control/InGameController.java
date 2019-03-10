@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Disaster;
@@ -2541,7 +2542,7 @@ public final class InGameController extends Controller {
      */
     public ChangeSet indianDemand(final ServerPlayer serverPlayer, Unit unit,
                                   Colony colony, GoodsType type, int amount,
-                                  Boolean result) {
+                                  IndianDemandAction result) {
         final ServerPlayer victim = (ServerPlayer) colony.getOwner();
         NativeDemandSession session = Session.lookup(NativeDemandSession.class,
                                                      unit, colony);
@@ -2565,13 +2566,12 @@ public final class InGameController extends Controller {
                 return serverPlayer.clientError("Replying to missing demand: "
                     + unit.getId() + "," + colony.getId());
             }
-            logger.info("Native demand("
-                + ((result.booleanValue()) ? "accepted" : "rejected")
-                + ") " + session.getKey() + ": "
-                + serverPlayer.getName() + " unit " + unit
+            logger.info("Native demand(" + result + ") " + session.getKey()
+                + ": " + serverPlayer.getName() + " unit " + unit
                 + " demands " + amount + " " + ((type == null) ? "gold" : type)
                 + " from " + colony.getName());
-            session.complete(result.booleanValue(), cs);
+            session.complete(result == IndianDemandAction.INDIAN_DEMAND_ACCEPT,
+                             cs);
         }
         getGame().sendToOthers(serverPlayer, cs);
         return cs;

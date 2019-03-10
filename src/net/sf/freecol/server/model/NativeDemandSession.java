@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
@@ -93,7 +94,9 @@ public class NativeDemandSession extends TimedSession {
         final ServerPlayer colonyPlayer = getColonyOwner();
         
         colonyPlayer.csCompleteNativeDemand(demandPlayer,
-            this.unit, this.colony, this.type, this.amount, result, cs);
+            this.unit, this.colony, this.type, this.amount,
+            ((result) ? IndianDemandAction.INDIAN_DEMAND_ACCEPT
+                : IndianDemandAction.INDIAN_DEMAND_REJECT), cs);
     }
 
     /**

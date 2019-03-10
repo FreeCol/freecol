@@ -37,7 +37,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
-import net.sf.freecol.common.model.Constants;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -692,30 +692,23 @@ public final class NativeAIPlayer extends MissionAIPlayer {
     //   selectFoundingFather
 
     /**
-     * Decides whether to accept an Indian demand, or not.
-     *
-     * @param unit The {@code Unit} making demands.
-     * @param colony The {@code Colony} where demands are being made.
-     * @param type The {@code GoodsType} demanded.
-     * @param amount The amount of gold demanded.
-     * @param accept The acceptance state of the demand.
-     * @return True if this player accepts the demand, false if rejected,
-     *     null if no further action is required.
+     * {@inheritDoc}
      */
-    public Boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType type, int amount, Boolean accept) {
+    public IndianDemandAction indianDemand(Unit unit, Colony colony,
+                                           GoodsType type, int amount,
+                                           IndianDemandAction accept) {
         final Player player = getPlayer();
         AIUnit aiu;
         IndianDemandMission mission;
         if (unit.getOwner() == player) { // Its one of ours
             if ((aiu = getAIUnit(unit)) != null // and its valid and demanding
                 && (mission = aiu.getMission(IndianDemandMission.class)) != null
-                && accept != null) {
-                mission.setSucceeded(accept);
+                && accept != IndianDemandAction.INDIAN_DEMAND_DONE) {
+                mission.setSucceeded(accept == IndianDemandAction.INDIAN_DEMAND_ACCEPT);
             }
         }
-            
-        return (Boolean)null;
+        // Once we get here, the demand is settled
+        return IndianDemandAction.INDIAN_DEMAND_DONE;
     }
 
     /**

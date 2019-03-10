@@ -4367,13 +4367,14 @@ outer:  for (Effect effect : effects) {
     public void csCompleteNativeDemand(ServerPlayer demandPlayer,
                                        Unit unit, Colony colony,
                                        GoodsType type, int amount,
-                                       boolean result, ChangeSet cs) {
+                                       IndianDemandAction result,
+                                       ChangeSet cs) {
         // Always inform the demander of the result.
         cs.add(See.only(demandPlayer),
                    new IndianDemandMessage(unit, colony, type, amount)
                        .setResult(result));
 
-        if (result) {
+        if (result == IndianDemandAction.INDIAN_DEMAND_ACCEPT) {
             if (type == null) {
                 this.modifyGold(-amount);
                 demandPlayer.modifyGold(amount);
