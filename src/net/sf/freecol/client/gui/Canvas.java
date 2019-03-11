@@ -781,7 +781,7 @@ public final class Canvas extends JDesktopPane {
         List<Component> allComponents
             = transform(this.getComponents(),
                         c -> !(c instanceof GrayLayer) && c.isValid());
-        for (FreeColDialog<?> fcd : dialogs) allComponents.add(fcd);
+        allComponents.addAll(dialogs);
 
         // Find the position with the least overlap
         int bestScore = Integer.MAX_VALUE;

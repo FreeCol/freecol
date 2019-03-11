@@ -818,7 +818,21 @@ public class Map extends FreeColGameObject implements Location {
      * @param predicate The <code>Predicate</code> to check.
      * @return A {@code List} of all matching {@code Tile}s.
      */
-    public List<Tile> getTiles(Predicate<Tile> predicate) {
+    public Set<Tile> getTileSet(Predicate<Tile> predicate) {
+        Set<Tile> ret = new HashSet<>();
+        for (Tile t : this.tileList) {
+            if (predicate.test(t)) ret.add(t);
+        }
+        return ret;
+    }
+
+    /**
+     * Get a list of all the tiles that match a predicate.
+     *
+     * @param predicate The <code>Predicate</code> to check.
+     * @return A {@code List} of all matching {@code Tile}s.
+     */
+    public List<Tile> getTileList(Predicate<Tile> predicate) {
         List<Tile> ret = new ArrayList<>();
         for (Tile t : this.tileList) {
             if (predicate.test(t)) ret.add(t);
@@ -915,6 +929,18 @@ public class Map extends FreeColGameObject implements Location {
         return ret;
     }
 
+    /**
+     * Get a shuffled list of all the tiles.
+     *
+     * @param random A pseudo-random number source.
+     * @return A shuffled list of all the {@code Tile}s in this map.
+     */
+    public List<Tile> getShuffledTiles(Random random) {
+        List<Tile> ret = new ArrayList<>(this.tileList);
+        randomShuffle(logger, "All tile shuffle", ret, random);
+        return ret;
+    }
+        
     /**
      * An iterator returning positions in a spiral starting at a given
      * center tile.  The center tile is never included in the returned

@@ -242,7 +242,7 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         // Make new settlements.
-        List<Tile> iTiles = importMap.getTiles(isNotNull(Tile::getIndianSettlement)); 
+        List<Tile> iTiles = importMap.getTileList(isNotNull(Tile::getIndianSettlement)); 
         Set<IndianSettlement> newSettlements = new HashSet<>(iTiles.size());
         for (Tile iTile : iTiles) {
             final IndianSettlement is = iTile.getIndianSettlement();
@@ -391,8 +391,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // order picking out as many as possible suitable tiles for
         // native settlements such that can be guaranteed at least one
         // layer of surrounding tiles to own.
-        List<Tile> allTiles = map.getTiles(alwaysTrue());
-        randomShuffle(logger, "All tile shuffle", allTiles, random);
+        List<Tile> allTiles = map.getShuffledTiles(random);
         final int minDistance = spec.getRange(GameOptions.SETTLEMENT_NUMBER);
         List<Tile> settlementTiles = new ArrayList<>();
         for (Tile tile : allTiles) {

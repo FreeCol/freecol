@@ -667,17 +667,17 @@ public class ServerPlayer extends Player implements TurnTaker {
         cs.add(See.only(this), tiles);
 
         // Remove settlements.  Update formerly owned tiles.
-        tiles.clear();
         List<Settlement> settlements = getSettlementList();
         while (!settlements.isEmpty()) {
             csDisposeSettlement(settlements.remove(0), cs);
         }
 
         // Clean up remaining tile ownerships
-        for (Tile t : game.getMap().getTiles(matchKeyEquals(this, Tile::getOwner))) {
+        tiles.clear();
+        tiles.addAll(game.getMap().getTileList(matchKeyEquals(this, Tile::getOwner)));
+        for (Tile t : tiles) {
             t.cacheUnseen();//+til
             t.changeOwnership(null, null);//-til
-            tiles.add(t);
         }
 
         // Remove units
@@ -973,19 +973,17 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @return A list of tiles whose visibility changed.
      */
     public Set<Tile> exploreMap(final boolean reveal) {
-        List<Tile> tiles = getGame().getMap()
-            .getTiles(t -> this.hasExplored(t) != reveal);
-        Set<Tile> result = new HashSet<>(tiles.size());
+        Set<Tile> tiles = getGame().getMap()
+            .getTileSet(t -> this.hasExplored(t) != reveal);
         for (Tile t : tiles) {
             t.setExplored(this, reveal);//-vis(this)
-            result.add(t);
         }
         invalidateCanSeeTiles();//+vis(this)
         if (!reveal) {
             for (Settlement s : getSettlementList()) exploreForSettlement(s);
             for (Unit u : getUnitSet()) exploreForUnit(u);
         }
-        return result;
+        return tiles;
     }
 
     /**

@@ -41,7 +41,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.MapGeneratorOptions;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerGame;
@@ -136,7 +135,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         // Sufficient land?
         int total = m.getWidth() * m.getHeight();
-        int land = count(m.getTiles(Tile::isLand));
+        int land = m.getTileSet(Tile::isLand).size();
         // Land Mass requirement fulfilled?
         assertTrue(100 * land / total >= g.getMapGeneratorOptions()
                    .getInteger(MapGeneratorOptions.LAND_MASS));

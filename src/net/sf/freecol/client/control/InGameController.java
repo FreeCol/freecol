@@ -748,10 +748,8 @@ public final class InGameController extends FreeColClientHolder {
             }
         }
         if (!messages.isEmpty()) {
-            for (ModelMessage m : messages) {
-                player.addModelMessage(m);
-                turnReportMessages.add(m);
-            }
+            turnReportMessages.addAll(messages);
+            for (ModelMessage m : messages) player.addModelMessage(m);
             displayModelMessages(false, false);
             fail = true;
         }
