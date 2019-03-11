@@ -169,7 +169,7 @@ public final class PrivateerMission extends Mission {
      * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
-                                              boolean deferOK) {
+        @SuppressWarnings("unused") boolean deferOK) {
         return new GoalDecider() {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;

@@ -806,7 +806,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param lb A {@code LogBuilder} to log to.
      */
-    private void bringGifts(LogBuilder lb) {
+    private void bringGifts(@SuppressWarnings("unused") LogBuilder lb) {
         return;
     }
 
@@ -817,7 +817,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param lb A {@code LogBuilder} to log to.
      */
-    private void demandTribute(LogBuilder lb) {
+    private void demandTribute(@SuppressWarnings("unused") LogBuilder lb) {
         return;
     }
 

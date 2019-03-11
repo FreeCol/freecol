@@ -167,7 +167,7 @@ public final class DefendSettlementMission extends Mission {
      * @return A path to the new target, or null if none found.
      */
     private static PathNode findTargetPath(AIUnit aiUnit, int range,
-                                           boolean deferOK) {
+        @SuppressWarnings("unused") boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location start = unit.getPathStartLocation();

@@ -1699,7 +1699,8 @@ outer:  for (Effect effect : effects) {
         return messages;
     }
 
-    private Building getBuildingForEffect(Colony colony, Effect effect,
+    private Building getBuildingForEffect(Colony colony,
+                                          @SuppressWarnings("unused") Effect effect,
                                           Random random) {
         List<Building> buildings = colony.getBurnableBuildings();
         return (buildings.isEmpty()) ? null
@@ -3037,8 +3038,8 @@ outer:  for (Effect effect : effects) {
      * @param colony The {@code Colony} to damage ships in.
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csDamageColonyShips(Unit attacker, Colony colony,
-                                     ChangeSet cs) {
+    private void csDamageColonyShips(@SuppressWarnings("unused") Unit attacker,
+                                     Colony colony, ChangeSet cs) {
         boolean captureRepairing = getSpecification()
             .getBoolean(GameOptions.CAPTURE_UNITS_UNDER_REPAIR);
         List<Unit> units = transform(colony.getTile().getUnits(),
