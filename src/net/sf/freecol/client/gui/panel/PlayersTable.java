@@ -209,7 +209,7 @@ public final class PlayersTable extends JTable {
                 });
         private final JComboBox<NationState> allStateBox
             = new JComboBox<>(NationState.values());
-        private JComboBox activeBox;
+        private JComboBox<NationState> activeBox = null;
 
 
         public AvailableCellEditor() {
@@ -222,6 +222,14 @@ public final class PlayersTable extends JTable {
             allStateBox.addActionListener(listener);
         }
 
+        private JComboBox<NationState> getActiveBox(int row) {
+            NationType nationType = ((Nation) getValueAt(row, NATION_COLUMN))
+                .getType();
+            this.activeBox = (nationType instanceof EuropeanNationType)
+                ? this.allStateBox
+                : this.aiStateBox;
+            return this.activeBox;
+        }
 
         // Implement AbstractCellEditor
 
@@ -231,17 +239,16 @@ public final class PlayersTable extends JTable {
         @Override
         public Component getTableCellEditorComponent(JTable table,
             Object value, boolean isSelected, int row, int column) {
-            NationType nationType = ((Nation) getValueAt(row, NATION_COLUMN))
-                .getType();
-            activeBox = (nationType instanceof EuropeanNationType)
-                ? allStateBox
-                : aiStateBox;
-            return activeBox;
+            return getActiveBox(row);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object getCellEditorValue() {
-            return activeBox.getSelectedItem();
+            return (this.activeBox == null) ? null
+                : this.activeBox.getSelectedItem();
         }
     }
 
