@@ -19,8 +19,11 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
@@ -39,8 +42,8 @@ public class MonarchTest extends FreeColTestCase {
         try (StringWriter sw = new StringWriter();
             FreeColXMLWriter xw = new FreeColXMLWriter(sw)) {
             dutch.getMonarch().toXML(xw);
-        } catch (Exception e) {
-            fail(e.toString());
+        } catch (IOException|XMLStreamException ex) {
+            fail(ex.toString());
         }
     }
 

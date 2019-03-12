@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -444,8 +445,8 @@ public final class SpecificationTest extends FreeColTestCase {
             spec.loadMods(mods);
             UnitType milkmaid = spec.getUnitType("model.unit.milkmaid");
             assertEquals(numberOfUnitTypes + 1, spec.getUnitTypeList().size());
-        } catch (Exception e) {
-            fail(e.getMessage());
+        } catch (IOException|XMLStreamException ex) {
+            fail(ex.toString());
         }
     }
 }

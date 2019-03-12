@@ -179,21 +179,16 @@ public class SerializationTest extends FreeColTestCase {
     public void testDifficulty() throws Exception {
         Specification spec1 = null;
         Specification spec2 = null;
-        try {
-            spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
-            spec1.applyDifficultyLevel("model.difficulty.veryEasy");
-            StringWriter sw = new StringWriter();
-            try (FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                    FreeColXMLWriter.WriteScope.toSave())) {
-                spec1.toXML(xw);
-            } catch (IOException ioe) {
-                fail(ioe.getMessage());
-            }
-
-            spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
-        } catch (Exception e) {
-            fail(e.getMessage());
+        spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
+        spec1.applyDifficultyLevel("model.difficulty.veryEasy");
+        StringWriter sw = new StringWriter();
+        try (FreeColXMLWriter xw = new FreeColXMLWriter(sw,
+                FreeColXMLWriter.WriteScope.toSave())) {
+            spec1.toXML(xw);
+        } catch (IOException ioe) {
+            fail(ioe.getMessage());
         }
+        spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
 
         assertNotNull(spec1);
         assertNotNull(spec2);
@@ -216,21 +211,16 @@ public class SerializationTest extends FreeColTestCase {
     public void testGeneratedLists() throws Exception {
         Specification spec1 = null;
         Specification spec2 = null;
-        try {
-            spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
-            spec1.applyDifficultyLevel("model.difficulty.veryEasy");
-            StringWriter sw = new StringWriter();
-            try (FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                    FreeColXMLWriter.WriteScope.toSave(), false)) {
-                spec1.toXML(xw);
-            } catch (IOException ioe) {
-                fail(ioe.getMessage());
-            }
-
-            spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
-        } catch (Exception e) {
-            fail(e.getMessage());
+        spec1 = FreeColTcFile.getFreeColTcFile("classic").getSpecification();
+        spec1.applyDifficultyLevel("model.difficulty.veryEasy");
+        StringWriter sw = new StringWriter();
+        try (FreeColXMLWriter xw = new FreeColXMLWriter(sw,
+                FreeColXMLWriter.WriteScope.toSave(), false)) {
+            spec1.toXML(xw);
+        } catch (IOException ioe) {
+            fail(ioe.getMessage());
         }
+        spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
 
         List<GoodsType> food1 = spec1.getFoodGoodsTypeList();
         List<GoodsType> food2 = spec2.getFoodGoodsTypeList();

@@ -619,13 +619,14 @@ public class FreeColTestCase extends TestCase {
      * @param value an {@code int} value
      */
     public void setProductionBonus(Colony colony, int value) {
+        Field productionBonus;
         try {
-            Field productionBonus = Colony.class.getDeclaredField("productionBonus");
+            productionBonus = Colony.class.getDeclaredField("productionBonus");
             productionBonus.setAccessible(true);
             productionBonus.setInt(colony, value);
             colony.invalidateCache();
-        } catch (Exception e) {
-            // do nothing
+        } catch (NoSuchFieldException|IllegalAccessException ex) {
+            fail(ex.toString());
         }
     }
 

@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.i18n.Number.Category;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -63,8 +65,8 @@ public class CLDRTest extends FreeColTestCase {
         assertTrue(inputFile.exists());
         try (InputStream in = Files.newInputStream(inputFile.toPath())) {
             numberRules = new NumberRules(in);
-        } catch (Exception e) {
-            fail("Failed to open input stream: " + e.toString());
+        } catch (IOException|XMLStreamException ex) {
+            fail(ex.toString());
         }
 
         assertNotNull(NumberRules.getNumberForLanguage("az"));

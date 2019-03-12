@@ -19,12 +19,15 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Modifier;
@@ -673,8 +676,8 @@ public class BuildingTest extends FreeColTestCase {
                 FreeColXMLWriter xw = new FreeColXMLWriter(sw,
                     FreeColXMLWriter.WriteScope.toSave(), false)) {
                 building.toXML(xw);
-            } catch (Exception e) {
-                fail(e.toString());
+            } catch (IOException|XMLStreamException ex) {
+                fail(ex.toString());
             }
         }
     }
