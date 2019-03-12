@@ -137,7 +137,6 @@ public final class ReportCompactColonyPanel extends ReportPanel {
              */
             public GoodsProduction accumulate(GoodsProduction other) {
                 this.amount += other.amount;
-                this.status = 
                 this.status = (this.status == ProductionStatus.NONE
                         && other.status == ProductionStatus.NONE)
                     ? ProductionStatus.NONE
@@ -769,7 +768,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                         .addAmount("%turns%", turns);
                 b = newButton(qac, bname + " " + Integer.toString(turns), null,
                               cGood, t);
-            } else if (turns < 0) {
+            } else { // turns < 0
                 turns = -(turns + 1);
                 t = stpld("report.colony.making.blocking")
                         .addName("%colony%", s.colony.getName())

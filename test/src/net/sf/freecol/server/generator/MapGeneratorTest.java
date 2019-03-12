@@ -21,8 +21,9 @@ package net.sf.freecol.server.generator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -112,16 +113,6 @@ public class MapGeneratorTest extends FreeColTestCase {
         // Apply the difficulty level
         //spec().applyDifficultyLevel("model.difficulty.medium");
 
-        Vector<Player> players = new Vector<Player>();
-
-        for (Nation n : spec().getNations()) {
-            if (n.isUnknownEnemy()) continue;
-            Player p = new ServerPlayer(g, false, n);
-            p.setAI(!n.getType().isEuropean() || n.getType().isREF());
-            g.addPlayer(p);
-            players.add(p);
-        }
-
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
         gen.generateMap(g, null, new LogBuilder(-1));
         assertNotNull("New map", g.getMap());
@@ -158,8 +149,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1));
 
-        Vector<Player> players = new Vector<Player>();
-
+        List<Player> players = new ArrayList<>();
         for (Nation n : spec().getNations()) {
             if (n.isUnknownEnemy()) continue;
             Player p = new ServerPlayer(g, false, n);

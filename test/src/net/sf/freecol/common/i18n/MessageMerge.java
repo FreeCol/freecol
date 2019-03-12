@@ -143,16 +143,12 @@ public final class MessageMerge {
                     break;
                 }
                 char  c = (char) data;
-                if ( '\r' == c )
-                {
+                if ( '\r' == c ) {
                     // do nothing
-                }
-                if ( '\n' == c )
-                {
+                } else if ( '\n' == c )  {
                     lineList.add( line.toString() );
                     line.setLength( 0 );
-                }
-                else {
+                } else {
                     line.append( c );
                 }
             }

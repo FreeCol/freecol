@@ -832,8 +832,7 @@ public class SimpleCombatModel extends CombatModel {
                     crs.add((winner.canCaptureEquipment(loserRole) != null)
                         ? CombatResult.CAPTURE_EQUIP
                         : CombatResult.LOSE_EQUIP);
-                    if (loserMustDie
-                        || loser.losingEquipmentKillsUnit()) {
+                    if (loser.losingEquipmentKillsUnit()) {
                         crs.add(CombatResult.SLAUGHTER_UNIT);
                     } else if (loser.losingEquipmentDemotesUnit()) {
                         crs.add(CombatResult.DEMOTE_UNIT);

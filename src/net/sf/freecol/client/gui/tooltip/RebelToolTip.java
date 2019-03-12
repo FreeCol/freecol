@@ -156,7 +156,7 @@ public class RebelToolTip extends JToolTip {
         } else if (grow >= 0) {
             add(Utility.localizedLabel("rebelToolTip.changeMore"));
             add(new JLabel(String.valueOf(grow)), "skip");
-        } else if (grow < 0) {
+        } else { // grow < 0
             add(Utility.localizedLabel("rebelToolTip.changeLess"));
             add(new JLabel(String.valueOf(-grow)), "skip");
         }
