@@ -28,4 +28,8 @@ public final class Merge {
 
     List<String> lineFromFile2;
 
+    public Merge(List<String> l1, List<String> l2) {
+        this.lineFromFile1 = l1;
+        this.lineFromFile2 = l2;
+    }
 }

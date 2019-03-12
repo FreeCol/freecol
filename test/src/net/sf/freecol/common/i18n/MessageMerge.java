@@ -58,9 +58,8 @@ public final class MessageMerge {
         final String  pathToFile2 = args[1];
 
         final MergeTableModel  mergeTableModel = new MergeTableModel();
-        mergeTableModel.merge = new Merge();
-        mergeTableModel.merge.lineFromFile1 = loadLinesFromFile( pathToFile1 );
-        mergeTableModel.merge.lineFromFile2 = loadLinesFromFile( pathToFile2 );
+        mergeTableModel.merge = new Merge(loadLinesFromFile( pathToFile1 ),
+            loadLinesFromFile( pathToFile2 ));
 
         final JTable  mergeTable = new JTable( mergeTableModel );
         mergeTable.setSelectionMode( ListSelectionModel.SINGLE_INTERVAL_SELECTION );
