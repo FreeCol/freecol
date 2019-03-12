@@ -146,7 +146,7 @@ public class IndianDemandMessage extends AttributeMessage {
                         + unitId);
                 }
                 colony = unit.getAdjacentSettlement(colonyId, Colony.class);
-                if (result != null) {
+                if (result != IndianDemandAction.INDIAN_DEMAND_DONE) {
                     return serverPlayer.clientError("Result in demand: "
                         + serverPlayer.getId() + " " + result);
                 }
