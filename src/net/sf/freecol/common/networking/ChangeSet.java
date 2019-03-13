@@ -51,7 +51,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -77,9 +76,11 @@ public class ChangeSet {
         private static final int ALL = 1;
         private static final int PERHAPS = 0;
         private static final int ONLY = -1;
-        private ServerPlayer seeAlways;
-        private ServerPlayer seePerhaps;
-        private ServerPlayer seeNever;
+        private static final See SEE_ALL = new See(ALL);
+        private static final See SEE_PERHAPS = new See(PERHAPS);
+        private Player seeAlways;
+        private Player seePerhaps;
+        private Player seeNever;
         private final int type;
 
         private See(int type) {
@@ -90,12 +91,12 @@ public class ChangeSet {
         /**
          * Check this visibility with respect to a player.
          *
-         * @param player The {@code ServerPlayer} to consider.
+         * @param player The {@code Player} to consider.
          * @param perhapsResult The result if the visibility is ambiguous.
          * @return If the player satisfies the visibility test return VISIBLE,
          *     or INVISIBLE on failure, or SPECIAL if indeterminate.
          */
-        public SeeCheck check(ServerPlayer player) {
+        public SeeCheck check(Player player) {
             return 
                 (player != null && player == seeNever) ? SeeCheck.INVISIBLE
                 : (player != null && player == seeAlways) ? SeeCheck.VISIBLE
@@ -111,29 +112,29 @@ public class ChangeSet {
         /**
          * Make this change visible to all players.
          *
-         * @return a {@code See} value
+         * @return SEE_ALL.
          */
         public static See all() {
-            return new See(ALL);
+            return SEE_ALL;
         }
 
         /**
          * Make this change visible to all players, provided they can
          * see the objects that are being changed.
          *
-         * @return a {@code See} value
+         * @return SEE_PERHAPS.
          */
         public static See perhaps() {
-            return new See(PERHAPS);
+            return SEE_PERHAPS;
         }
 
         /**
          * Make this change visible only to the given player.
          *
-         * @param player a {@code ServerPlayer} value
-         * @return a {@code See} value
+         * @param player The {@code Player} to see this change.
+         * @return A {@code See}(ONLY) with attached player.
          */
-        public static See only(ServerPlayer player) {
+        public static See only(Player player) {
             return new See(ONLY).always(player);
         }
 
@@ -142,10 +143,10 @@ public class ChangeSet {
         /**
          * Make this change visible to the given player.
          *
-         * @param player a {@code ServerPlayer} value
-         * @return a {@code See} value
+         * @param player The {@code Player} to see this change.
+         * @return A {@code See} with attached player.
          */
-        public See always(ServerPlayer player) {
+        public See always(Player player) {
             seeAlways = player;
             return this;
         }
@@ -154,10 +155,10 @@ public class ChangeSet {
          * Make this change visible to the given player, provided the
          * player can see the objects being changed.
          *
-         * @param player a {@code ServerPlayer} value
-         * @return a {@code See} value
+         * @param player The {@code Player} to perhaps see this change.
+         * @return A {@code See} with attached player.
          */
-        public See perhaps(ServerPlayer player) {
+        public See perhaps(Player player) {
             seePerhaps = player;
             return this;
         }
@@ -165,10 +166,10 @@ public class ChangeSet {
         /**
          * Make this change invisible to the given player.
          *
-         * @param player a {@code ServerPlayer} value
-         * @return a {@code See} value
+         * @param player The {@code Player} that can not see this change.
+         * @return A {@code See} with attached player.
          */
-        public See except(ServerPlayer player) {
+        public See except(Player player) {
             seeNever = player;
             return this;
         }
@@ -221,11 +222,11 @@ public class ChangeSet {
         /**
          * Check this changes visibility to a given player.
          *
-         * @param serverPlayer The {@code ServerPlayer} to check.
+         * @param player The {@code player} to check.
          * @return The visibility result.
          */
-        protected SeeCheck check(ServerPlayer serverPlayer) {
-            return this.see.check(serverPlayer);
+        protected SeeCheck check(Player player) {
+            return this.see.check(player);
         }
 
         /**
@@ -243,30 +244,30 @@ public class ChangeSet {
          *
          * Override in subclasses with special cases.
          *
-         * @param serverPlayer The {@code ServerPlayer} to consider.
+         * @param player The {@code Player} to consider.
          * @return True if this {@code Change} should be sent.
          */
-        public boolean isNotifiable(ServerPlayer serverPlayer) {
-            return check(serverPlayer) == SeeCheck.VISIBLE;
+        public boolean isNotifiable(Player player) {
+            return check(player) == SeeCheck.VISIBLE;
         }
 
         /**
          * Are the secondary changes consequent to this Change?
          *
-         * @param serverPlayer The {@code ServerPlayer} to consider.
+         * @param player The {@code Player} to consider.
          * @return The consequent {@code Change}, or null if none.
          */
-        public Change consequence(ServerPlayer serverPlayer) {
+        public Change consequence(Player player) {
             return null;
         }
 
         /**
          * Specialize a Change for a particular player.
          *
-         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param player The {@code Player} to update.
          * @return A specialized {@code Message}.
          */
-        public abstract T toMessage(ServerPlayer serverPlayer);
+        public abstract T toMessage(Player player);
     }
 
     /**
@@ -316,10 +317,11 @@ public class ChangeSet {
         /**
          * Is the attacker visible to a player?
          *
+         * @param player The {@code Player} to test.
          * @return The attacker visibility.
          */
-        private boolean attackerVisible(ServerPlayer serverPlayer) {
-            return serverPlayer.canSeeUnit(this.attacker);
+        private boolean attackerVisible(Player player) {
+            return player.canSeeUnit(this.attacker);
         }
 
         /**
@@ -332,20 +334,20 @@ public class ChangeSet {
          * invisible to other players as the animation happens while
          * the settlement stands.
          *
+         * @param player The {@code Player} to test.
          * @return The defender visibility.
          */
-        private boolean defenderVisible(ServerPlayer serverPlayer) {
-            return serverPlayer.canSeeUnit(this.defender)
-                && (!this.defenderInSettlement
-                    || serverPlayer.owns(this.defender));
+        private boolean defenderVisible(Player player) {
+            return player.canSeeUnit(this.defender)
+                && (!this.defenderInSettlement || player.owns(this.defender));
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public boolean isNotifiable(ServerPlayer serverPlayer) {
-            switch (check(serverPlayer)) {
+        public boolean isNotifiable(Player player) {
+            switch (check(player)) {
             case VISIBLE: return true;
             case INVISIBLE: return false;
             case SPECIAL: break;
@@ -353,23 +355,23 @@ public class ChangeSet {
             // Do not just use canSeeUnit because that gives a false
             // negative for units in settlements, which should be
             // animated.
-            return serverPlayer.owns(attacker)
-                || serverPlayer.owns(defender)
-                || (serverPlayer.canSee(attacker.getTile())
-                    && serverPlayer.canSee(defender.getTile()));
+            return player.owns(attacker)
+                || player.owns(defender)
+                || (player.canSee(attacker.getTile())
+                    && player.canSee(defender.getTile()));
         }
 
         /**
          * {@inheritDoc}
          */
-        public AnimateAttackMessage toMessage(ServerPlayer serverPlayer) {
-            if (!isNotifiable(serverPlayer)) return null;
-            Unit a = (serverPlayer.owns(attacker)) ? attacker
-                : attacker.reduceVisibility(attacker.getTile(), serverPlayer);
-            Unit d = (serverPlayer.owns(defender)) ? defender
-                : defender.reduceVisibility(defender.getTile(), serverPlayer);
+        public AnimateAttackMessage toMessage(Player player) {
+            if (!isNotifiable(player)) return null;
+            Unit a = (player.owns(attacker)) ? attacker
+                : attacker.reduceVisibility(attacker.getTile(), player);
+            Unit d = (player.owns(defender)) ? defender
+                : defender.reduceVisibility(defender.getTile(), player);
             return new AnimateAttackMessage(a, d, success,
-                !attackerVisible(serverPlayer), !defenderVisible(serverPlayer));
+                !attackerVisible(player), !defenderVisible(player));
         }
 
 
@@ -419,7 +421,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
-        public AttributeMessage toMessage(ServerPlayer serverPlayer) {
+        public AttributeMessage toMessage(Player player) {
             return new AttributeMessage(AttributeMessage.TAG,
                                         key, value).setMergeable(true);
         }
@@ -473,16 +475,16 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public boolean isNotifiable(ServerPlayer serverPlayer) {
-            return check(serverPlayer) == SeeCheck.VISIBLE;
+        public boolean isNotifiable(Player player) {
+            return check(player) == SeeCheck.VISIBLE;
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public FeatureChangeMessage toMessage(ServerPlayer serverPlayer) {
-            return (!isNotifiable(serverPlayer)) ? null
+        public FeatureChangeMessage toMessage(Player player) {
+            return (!isNotifiable(player)) ? null
                 : new FeatureChangeMessage(this.parent, this.child, this.add);
         }
 
@@ -531,8 +533,8 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public T toMessage(ServerPlayer serverPlayer) {
-            return (isNotifiable(serverPlayer)) ? this.message : null;
+        public T toMessage(Player player) {
+            return (isNotifiable(player)) ? this.message : null;
         }
 
 
@@ -581,14 +583,14 @@ public class ChangeSet {
         /**
          * Can a player see the old tile?
          *
-         * @param serverPlayer The {@code ServerPlayer} to test.
+         * @param player The {@code Player} to test.
          * @return True if the old tile is visible.
          */
-        private boolean seeOld(ServerPlayer serverPlayer) {
+        private boolean seeOld(Player player) {
             Tile oldTile = oldLocation.getTile();
-            return serverPlayer.owns(unit)
+            return player.owns(unit)
                 || (oldTile != null
-                    && serverPlayer.canSee(oldTile)
+                    && player.canSee(oldTile)
                     && !(oldTile.hasSettlement()
                         || (oldLocation instanceof Unit)));
         }
@@ -596,11 +598,11 @@ public class ChangeSet {
         /**
          * Can a player see the new tile?
          *
-         * @param serverPlayer The {@code ServerPlayer} to test.
+         * @param player The {@code Player} to test.
          * @return True if the new tile is visible.
          */
-        private boolean seeNew(ServerPlayer serverPlayer) {
-            return serverPlayer.canSeeUnit(unit);
+        private boolean seeNew(Player player) {
+            return player.canSeeUnit(unit);
         }
 
 
@@ -608,24 +610,23 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public boolean isNotifiable(ServerPlayer serverPlayer) {
-            switch (check(serverPlayer)) {
+        public boolean isNotifiable(Player player) {
+            switch (check(player)) {
             case VISIBLE: return true;
             case INVISIBLE: return false;
             case SPECIAL: break;
             }
-            return seeOld(serverPlayer) || seeNew(serverPlayer);
+            return seeOld(player) || seeNew(player);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Change consequence(ServerPlayer serverPlayer) {
-            return (seeOld(serverPlayer) && !seeNew(serverPlayer)
-                    && !unit.isDisposed())
-                ? new RemoveChange(See.only(serverPlayer),
-                                   unit.getLocation(), Stream.of(unit))
+        public Change consequence(Player player) {
+            return (seeOld(player) && !seeNew(player) && !unit.isDisposed())
+                ? new RemoveChange(See.only(player), unit.getLocation(),
+                                   Stream.of(unit))
                 : null;
         }
 
@@ -633,13 +634,12 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public AnimateMoveMessage toMessage(ServerPlayer serverPlayer) {
-            if (!isNotifiable(serverPlayer)) return null;
+        public AnimateMoveMessage toMessage(Player player) {
+            if (!isNotifiable(player)) return null;
             final Tile oldTile = oldLocation.getTile();
-            final Unit u = (serverPlayer.owns(unit)) ? unit
-                : unit.reduceVisibility(oldLocation.getTile(), serverPlayer);
-            return new AnimateMoveMessage(u, oldTile, newTile,
-                                          !seeOld(serverPlayer));
+            final Unit u = (player.owns(unit)) ? unit
+                : unit.reduceVisibility(oldLocation.getTile(), player);
+            return new AnimateMoveMessage(u, oldTile, newTile, !seeOld(player));
         }
 
 
@@ -694,8 +694,8 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public boolean isNotifiable(ServerPlayer serverPlayer) {
-            switch (check(serverPlayer)) {
+        public boolean isNotifiable(Player player) {
+            switch (check(player)) {
             case VISIBLE: return true;
             case INVISIBLE: return false;
             case SPECIAL: break;
@@ -704,10 +704,10 @@ public class ChangeSet {
             if (fcgo instanceof Unit) {
                 // Units have a precise test, use that rather than
                 // the more general interface-based tests.
-                return serverPlayer.canSeeUnit((Unit)fcgo);
+                return player.canSeeUnit((Unit)fcgo);
             }
             // If we own it, we can see it.
-            if (fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo)) {
+            if (fcgo instanceof Ownable && player.owns((Ownable)fcgo)) {
                 return true;
             }
             // We do not own it, so the only way we could see it is if
@@ -721,7 +721,7 @@ public class ChangeSet {
             }
             if (fcgo instanceof Location) {
                 Tile tile = ((Location)fcgo).getTile();
-                return serverPlayer.canSee(tile);
+                return player.canSee(tile);
             }
             return false;
         }
@@ -730,10 +730,9 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public UpdateMessage toMessage(ServerPlayer serverPlayer) {
-            return (!isNotifiable(serverPlayer)) ? null
-                : new UpdateMessage(serverPlayer,
-                    Collections.singletonList(this.fcgo));
+        public UpdateMessage toMessage(Player player) {
+            return (!isNotifiable(player)) ? null
+                : new UpdateMessage(player, Collections.singletonList(this.fcgo));
         }
 
 
@@ -782,7 +781,7 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public PartialMessage toMessage(ServerPlayer serverPlayer) {
+        public PartialMessage toMessage(Player player) {
             return new PartialMessage(this.map);
         }
 
@@ -811,19 +810,19 @@ public class ChangeSet {
      */
     private static class PlayerChange extends Change<AddPlayerMessage> {
 
-        private final List<ServerPlayer> serverPlayers = new ArrayList<>();
+        private final List<Player> players = new ArrayList<>();
 
 
         /**
          * Build a new PlayerChange.
          *
          * @param see The visibility of this change.
-         * @param serverPlayers The {@code ServerPlayer}s to add.
+         * @param newPlayers The {@code Player}s to add.
          */
-        public PlayerChange(See see, List<ServerPlayer> serverPlayers) {
+        public PlayerChange(See see, List<? extends Player> newPlayers) {
             super(see);
-            this.serverPlayers.clear();
-            this.serverPlayers.addAll(serverPlayers);
+            this.players.clear();
+            this.players.addAll(newPlayers);
         }
 
 
@@ -831,10 +830,10 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public AddPlayerMessage toMessage(ServerPlayer serverPlayer) {
-            if (!isNotifiable(serverPlayer)) return null;
+        public AddPlayerMessage toMessage(Player player) {
+            if (!isNotifiable(player)) return null;
 
-            return new AddPlayerMessage(serverPlayer, this.serverPlayers);
+            return new AddPlayerMessage(player, this.players);
         }
 
 
@@ -846,11 +845,8 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append('[').append(getClass().getName())
-                .append(' ').append(see);
-            for (ServerPlayer sp : this.serverPlayers) {
-                sb.append(' ').append(sp.getId());
-            }
+            sb.append('[').append(getClass().getName()).append(' ').append(see);
+            for (Player p : this.players) sb.append(' ').append(p.getId());
             sb.append(']');
             return sb.toString();
         }
@@ -896,12 +892,12 @@ public class ChangeSet {
          * Should we tell a player to remove all the objects or just
          * the main one?
          *
-         * @param serverPlayer A {@code ServerPlayer} to check.
+         * @param player A {@code Player} to check.
          * @return True if all the objects must go.
          */
-        private boolean fullRemoval(ServerPlayer serverPlayer) {
+        private boolean fullRemoval(Player player) {
             FreeColGameObject fcgo = getMainObject();
-            return fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo);
+            return fcgo instanceof Ownable && player.owns((Ownable)fcgo);
         }            
 
 
@@ -909,8 +905,8 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public boolean isNotifiable(ServerPlayer serverPlayer) {
-            switch (check(serverPlayer)) {
+        public boolean isNotifiable(Player player) {
+            switch (check(player)) {
             case VISIBLE: return true;
             case INVISIBLE: return false;
             case SPECIAL: break;
@@ -919,23 +915,23 @@ public class ChangeSet {
             // other-player settlement present.
             Settlement settlement;
             return tile != null
-                && serverPlayer.canSee(tile)
+                && player.canSee(tile)
                 && ((settlement = tile.getSettlement()) == null
                     || settlement.isDisposed()
-                    || serverPlayer.owns(settlement));
+                    || player.owns(settlement));
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public RemoveMessage toMessage(ServerPlayer serverPlayer) {
+        public RemoveMessage toMessage(Player player) {
             final String divertId = (tile != null) ? tile.getId()
-                : serverPlayer.getId();
+                : player.getId();
             // The main object may be visible, but the contents are
             // only visible if the deeper ownership test succeeds.
             return new RemoveMessage(divertId,
-                ((fullRemoval(serverPlayer)) ? this.contents
+                ((fullRemoval(player)) ? this.contents
                     : Collections.singletonList(getMainObject())));
         }
 
@@ -986,8 +982,8 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public SpySettlementMessage toMessage(ServerPlayer serverPlayer) {
-            return (!isNotifiable(serverPlayer)) ? null
+        public SpySettlementMessage toMessage(Player player) {
+            return (!isNotifiable(player)) ? null
                 : new SpySettlementMessage(unit, settlement);
         }
 
@@ -1039,8 +1035,8 @@ public class ChangeSet {
          * {@inheritDoc}
          */
         @Override
-        public SetStanceMessage toMessage(ServerPlayer serverPlayer) {
-            return (!isNotifiable(serverPlayer)) ? null
+        public SetStanceMessage toMessage(Player player) {
+            return (!isNotifiable(player)) ? null
                 : new SetStanceMessage(stance, first, second);
         }
 
@@ -1181,12 +1177,12 @@ public class ChangeSet {
      * Helper function to add a removal for an object that disappears
      * (that is, moves where it can not be seen) to a ChangeSet.
      *
-     * @param owner The {@code ServerPlayer} that owns this object.
+     * @param owner The {@code Player} that owns this object.
      * @param tile The {@code Tile} where the object was.
      * @param fcgo The {@code FreeColGameObject} that disappears.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addDisappear(ServerPlayer owner, Tile tile,
+    public ChangeSet addDisappear(Player owner, Tile tile,
                                   FreeColGameObject fcgo) {
         changes.add(new RemoveChange(See.perhaps().except(owner), tile,
                                      Stream.of(fcgo)));
@@ -1197,17 +1193,15 @@ public class ChangeSet {
     /**
      * Helper function to add or remove an Ability to a FreeColGameObject.
      *
-     * @param serverPlayer The owning {@code ServerPlayer}.
+     * @param player The owning {@code Player}.
      * @param object The {@code FreeColGameObject} to add to.
      * @param ability The {@code Ability} to add/remove.
      * @param add If true, add the ability.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addAbility(ServerPlayer serverPlayer,
-                                FreeColGameObject object, Ability ability,
-                                boolean add) {
-        changes.add(new FeatureChange(See.only(serverPlayer),
-                                      object, ability, add));
+    public ChangeSet addAbility(Player player, FreeColGameObject object,
+                                Ability ability, boolean add) {
+        changes.add(new FeatureChange(See.only(player), object, ability, add));
         if (add) {
             object.addAbility(ability);
         } else {
@@ -1219,17 +1213,15 @@ public class ChangeSet {
     /**
      * Helper function to add or remove a Modifier to a FreeColGameObject.
      *
-     * @param serverPlayer The owning {@code ServerPlayer}.
+     * @param player The owning {@code Player}.
      * @param object The {@code FreeColGameObject} to add to.
      * @param modifier The {@code Modifier} to add/remove.
      * @param add If true, add the modifier.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addModifier(ServerPlayer serverPlayer,
-                                 FreeColGameObject object, Modifier modifier,
-                                 boolean add) {
-        changes.add(new FeatureChange(See.only(serverPlayer),
-                                      object, modifier, add));
+    public ChangeSet addModifier(Player player, FreeColGameObject object,
+                                 Modifier modifier, boolean add) {
+        changes.add(new FeatureChange(See.only(player), object, modifier, add));
         if (add) {
             object.addModifier(modifier);
         } else {
@@ -1248,7 +1240,7 @@ public class ChangeSet {
      */
     public ChangeSet addGlobalHistory(Game game, HistoryEvent history) {
         for (Player p : game.getLiveEuropeanPlayerList()) {
-            addHistory((ServerPlayer)p, history);
+            addHistory(p, history);
         }
         return this;
     }
@@ -1257,15 +1249,15 @@ public class ChangeSet {
      * Helper function to add a message to all the European players.
      *
      * @param game The {@code Game} to find players in.
-     * @param omit An optional {@code ServerPlayer} to omit.
+     * @param omit An optional {@code Player} to omit.
      * @param message The {@code ModelMessage} to add.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addGlobalMessage(Game game, ServerPlayer omit,
+    public ChangeSet addGlobalMessage(Game game, Player omit,
                                       ModelMessage message) {
         for (Player p : game.getLiveEuropeanPlayerList()) {
-            if (p == (Player)omit) continue;
-            addMessage((ServerPlayer)p, message);
+            if (p == omit) continue;
+            addMessage(p, message);
         }
         return this;
     }
@@ -1274,15 +1266,14 @@ public class ChangeSet {
      * Helper function to add a history event to a ChangeSet.
      * Also adds the history to the owner.
      *
-     * @param serverPlayer The {@code ServerPlayer} making history.
+     * @param player The {@code Player} making history.
      * @param history The {@code HistoryEvent} to add.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addHistory(ServerPlayer serverPlayer,
-                                HistoryEvent history) {
-        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
+    public ChangeSet addHistory(Player player, HistoryEvent history) {
+        changes.add(new FeatureChange(See.only(player), player,
                                       history, true));
-        serverPlayer.addHistory(history);
+        player.addHistory(history);
         return this;
     }
 
@@ -1294,9 +1285,7 @@ public class ChangeSet {
      * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addMessage(Player player, ModelMessage message) {
-        ServerPlayer serverPlayer = (ServerPlayer)player;
-        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
-                                      message, true));
+        changes.add(new FeatureChange(See.only(player), player, message, true));
         return this;
     }
 
@@ -1336,12 +1325,12 @@ public class ChangeSet {
      * pre-game to update other players, but the actual player may not
      * yet even have a Game.
      *
-     * @param serverPlayer The new {@code ServerPlayer} to add.
+     * @param player The new {@code Player} to add.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addNewPlayer(ServerPlayer serverPlayer) {
-        changes.add(new PlayerChange(See.all().except(serverPlayer),
-                                     Collections.singletonList(serverPlayer)));
+    public ChangeSet addNewPlayer(Player player) {
+        changes.add(new PlayerChange(See.all().except(player),
+                                     Collections.singletonList(player)));
         return this;
     }
 
@@ -1351,11 +1340,11 @@ public class ChangeSet {
      * Used when adding the AI players en masse, or when adding the REF.
      * No care need be taken with visibility wrt AIs.
      *
-     * @param serverPlayers A list of new {@code ServerPlayer}s to add.
+     * @param players A list of new {@code Player}s to add.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addPlayers(List<ServerPlayer> serverPlayers) {
-        changes.add(new PlayerChange(See.all(), serverPlayers));
+    public ChangeSet addPlayers(List<? extends Player> players) {
+        changes.add(new PlayerChange(See.all(), players));
         return this;
     }
 
@@ -1394,19 +1383,18 @@ public class ChangeSet {
     /**
      * Helper function to add a sale change to a ChangeSet.
      *
-     * @param serverPlayer The {@code ServerPlayer} making the sale.
+     * @param player The {@code Player} making the sale.
      * @param settlement The {@code Settlement} that is buying.
      * @param type The {@code GoodsType} bought.
      * @param price The per unit price.
      * @return The updated {@code ChangeSet}.
      */
-    public ChangeSet addSale(ServerPlayer serverPlayer, Settlement settlement,
+    public ChangeSet addSale(Player player, Settlement settlement,
                              GoodsType type, int price) {
         Game game = settlement.getGame();
         LastSale sale = new LastSale(settlement, type, game.getTurn(), price);
-        changes.add(new FeatureChange(See.only(serverPlayer), serverPlayer,
-                                      sale, true));
-        serverPlayer.addLastSale(sale);
+        changes.add(new FeatureChange(See.only(player), player, sale, true));
+        player.addLastSale(sale);
         return this;
     }
 
@@ -1418,8 +1406,7 @@ public class ChangeSet {
      * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addSpy(Unit unit, Settlement settlement) {
-        changes.add(new SpyChange(See.only((ServerPlayer)unit.getOwner()),
-                                  unit, settlement));
+        changes.add(new SpyChange(See.only(unit.getOwner()), unit, settlement));
         return this;
     }
 
@@ -1454,11 +1441,11 @@ public class ChangeSet {
     /**
      * Build an update message.
      *
-     * @param serverPlayer The {@code ServerPlayer} to send the update to.
+     * @param player The {@code Player} to send the update to.
      * @return A {@code Message} encapsulating an update of the objects to
      *     consider, or null if there is nothing to report.
      */
-    public Message build(ServerPlayer serverPlayer) {
+    public Message build(Player player) {
         if (this.changes.isEmpty()) return null;
 
         // Convert eligible changes to messages and sort by priority,
@@ -1466,12 +1453,12 @@ public class ChangeSet {
         List<Message> messages = new ArrayList<>();
         List<Message> diverted = new ArrayList<>();
         for (Change c : this.changes) {
-            if (!c.isNotifiable(serverPlayer)) continue;
-            Message m = c.toMessage(serverPlayer);
+            if (!c.isNotifiable(player)) continue;
+            Message m = c.toMessage(player);
             List<Message> onto = (m.canMerge()) ? diverted : messages;
             onto.add(m);
-            if ((c = c.consequence(serverPlayer)) != null) {
-                m = c.toMessage(serverPlayer);
+            if ((c = c.consequence(player)) != null) {
+                m = c.toMessage(player);
                 onto = (m.canMerge()) ? diverted : messages;
                 onto.add(m);
             }
@@ -1512,14 +1499,12 @@ public class ChangeSet {
      * Convenience function to create an i18n client error message and
      * wrap it into a change set.
      *
-     * @param serverPlayer An optional {@code ServerPlayer} to restrict
-     *     visibility to.
+     * @param player An optional {@code Player} to restrict visibility to.
      * @param template An i18n template.
      * @return A new {@code ChangeSet}.
      */
-    public static ChangeSet clientError(ServerPlayer serverPlayer,
-                                        StringTemplate template) {
-        See see = (serverPlayer == null) ? See.all() : See.only(serverPlayer);
+    public static ChangeSet clientError(Player player, StringTemplate template) {
+        See see = (player == null) ? See.all() : See.only(player);
         return clientError(see, template);
     }
 
@@ -1542,14 +1527,12 @@ public class ChangeSet {
      * Convenience function to create a non-i18n client error message
      * and wrap it into a change set.
      *
-     * @param serverPlayer An optional {@code ServerPlayer} to restrict
-     *     visibility to.
+     * @param player An optional {@code Player} to restrict visibility to.
      * @param message The message.
      * @return A new {@code ChangeSet}.
      */
-    public static ChangeSet clientError(ServerPlayer serverPlayer,
-                                        String message) {
-        See see = (serverPlayer == null) ? See.all() : See.only(serverPlayer);
+    public static ChangeSet clientError(Player player, String message) {
+        See see = (player == null) ? See.all() : See.only(player);
         return clientError(see, message);
     }
 
@@ -1571,14 +1554,12 @@ public class ChangeSet {
     /**
      * Convenience function to create a change set containing a message.
      *
-     * @param serverPlayer An optional {@code ServerPlayer} to restrict
-     *     visibility to.
+     * @param player An optional {@code Player} to restrict visibility to.
      * @param message The {@code Message} to wrap.
      * @return A new {@code ChangeSet}.
      */
-    public static ChangeSet simpleChange(ServerPlayer serverPlayer,
-                                         Message message) {
-        See see = (serverPlayer == null) ? See.all() : See.only(serverPlayer);
+    public static ChangeSet simpleChange(Player player, Message message) {
+        See see = (player == null) ? See.all() : See.only(player);
         return simpleChange(see, message);
     }
 
@@ -1598,11 +1579,11 @@ public class ChangeSet {
     /**
      * Get a new ChangeSet that changes a player AI state.
      *
-     * @param serverPlayer The {@code ServerPlayer} to change.
+     * @param player The {@code Player} to change.
      * @param ai The new AI state.
      */
-    public static ChangeSet aiChange(ServerPlayer serverPlayer, boolean ai) {
-        return simpleChange(See.all(), new SetAIMessage(serverPlayer, ai));
+    public static ChangeSet aiChange(Player player, boolean ai) {
+        return simpleChange(See.all(), new SetAIMessage(player, ai));
     }
 
 

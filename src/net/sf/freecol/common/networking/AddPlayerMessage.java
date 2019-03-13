@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -43,7 +42,7 @@ public class AddPlayerMessage extends ObjectMessage {
     public static final String TAG = "addPlayer";
 
     /** The player to specialize the players for. */
-    private final ServerPlayer destination;
+    private final Player destination;
 
 
     /**
@@ -51,8 +50,7 @@ public class AddPlayerMessage extends ObjectMessage {
      *
      * @param players A list of {@code Player}s to add.
      */
-    public AddPlayerMessage(ServerPlayer destination,
-                            List<? extends Player> players) {
+    public AddPlayerMessage(Player destination, List<Player> players) {
         super(TAG);
 
         this.destination = destination;

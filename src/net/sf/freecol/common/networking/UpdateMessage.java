@@ -34,7 +34,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -45,15 +44,15 @@ public class UpdateMessage extends ObjectMessage {
     public static final String TAG = "update";
 
     /** The player to specialize the objects for. */
-    private final ServerPlayer destination;
+    private final Player destination;
 
 
     /**
      * Create a new {@code UpdateMessage}.
      *
-     * @param destination The destination {@code ServerPlayer}.
+     * @param destination The destination {@code Player}.
      */
-    private UpdateMessage(ServerPlayer destination) {
+    private UpdateMessage(Player destination) {
         super(TAG);
 
         this.destination = destination;
@@ -62,10 +61,10 @@ public class UpdateMessage extends ObjectMessage {
     /**
      * Create a new {@code UpdateMessage}.
      *
-     * @param destination The destination {@code ServerPlayer}.
+     * @param destination The destination {@code Player}.
      * @param fco A {@code FreeColGameObject}s to add.
      */
-    public UpdateMessage(ServerPlayer destination,
+    public UpdateMessage(Player destination,
                          FreeColGameObject fcgo) {
         this(destination);
 
@@ -75,10 +74,10 @@ public class UpdateMessage extends ObjectMessage {
     /**
      * Create a new {@code UpdateMessage}.
      *
-     * @param destination The destination {@code ServerPlayer}.
+     * @param destination The destination {@code Player}.
      * @param fcgos A list of {@code FreeColObject}s to add.
      */
-    public UpdateMessage(ServerPlayer destination,
+    public UpdateMessage(Player destination,
                          List<FreeColGameObject> fcgos) {
         this(destination);
 
@@ -94,7 +93,7 @@ public class UpdateMessage extends ObjectMessage {
      */
     public UpdateMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
-        this((ServerPlayer)null);
+        this((Player)null);
 
         FreeColXMLReader.ReadScope rs
             = xr.replaceScope(FreeColXMLReader.ReadScope.NOINTERN);

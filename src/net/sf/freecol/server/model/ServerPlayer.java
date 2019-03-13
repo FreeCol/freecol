@@ -990,22 +990,6 @@ public class ServerPlayer extends Player implements TurnTaker {
     }
 
     /**
-     * Checks if this player can see a unit.
-     *
-     * @param unit The {@code Unit} to check.
-     * @return True if the {@code Unit} is visible to the player.
-     */
-    public boolean canSeeUnit(Unit unit) {
-        Tile tile;
-        return (this.owns(unit)) ? true
-            : ((tile = unit.getTile()) == null) ? false
-            : (!this.canSee(tile)) ? false
-            : (tile.hasSettlement()) ? false
-            : (unit.isOnCarrier()) ? false
-            : true;
-    }
-
-    /**
      * Given a tile and new radius of visibility, explore unexplored tiles
      * and return those plus the previously invisible tiles.
      *
@@ -1426,7 +1410,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         Tension.Level oldLevel = getTension(player).getLevel();
         getTension(player).modify(add);
         if (oldLevel != getTension(player).getLevel()) {
-            cs.add(See.only((ServerPlayer)player), this);
+            cs.add(See.only(player), this);
         }
 
         // Propagate tension change as settlement alarm to all
@@ -3741,8 +3725,7 @@ outer:  for (Effect effect : effects) {
             changed = colony.ejectUnits(building, building.getUnitList());//-til
             colony.destroyBuilding(building);//-til
             changed |= building.getType().isDefenceType();
-            cs.addRemove(See.only((ServerPlayer)colony.getOwner()), colony, 
-                         building);//-vis: safe, buildings are ok
+            cs.addRemove(See.only(colony.getOwner()), colony, building);//-vis: safe, buildings are ok
             building.dispose();
             // Have any abilities been removed that gate other production,
             // e.g. removing docks should shut down fishing.

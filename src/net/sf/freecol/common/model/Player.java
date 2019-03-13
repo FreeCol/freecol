@@ -2822,6 +2822,22 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Checks if this player can see a unit.
+     *
+     * @param unit The {@code Unit} to check.
+     * @return True if the {@code Unit} is visible to the player.
+     */
+    public boolean canSeeUnit(Unit unit) {
+        Tile tile;
+        return (this.owns(unit)) ? true
+            : ((tile = unit.getTile()) == null) ? false
+            : (!this.canSee(tile)) ? false
+            : (tile.hasSettlement()) ? false
+            : (unit.isOnCarrier()) ? false
+            : true;
+    }
+
+    /**
      * Get the set of tiles visible to this player.
      *
      * @return A set of visible {@code Tile}s.

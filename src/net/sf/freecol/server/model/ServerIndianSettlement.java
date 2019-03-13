@@ -458,7 +458,7 @@ public class ServerIndianSettlement extends IndianSettlement
         boolean ret = equipForRole(unit, role, roleCount);
 
         if (ret) {
-            cs.add(See.only((ServerPlayer)getOwner()), getTile());
+            cs.add(See.only(getOwner()), getTile());
         }
         return ret;
     }
@@ -479,7 +479,7 @@ public class ServerIndianSettlement extends IndianSettlement
             || !hasContacted(enemy) || !enemy.hasExplored(getTile())) return;
 
         // Tension has changed, update the enemy
-        cs.add(See.only(null).perhaps((ServerPlayer)enemy), this);
+        cs.add(See.only(null).perhaps(enemy), this);
 
         // No messages about improving tension
         if (newLevel == null

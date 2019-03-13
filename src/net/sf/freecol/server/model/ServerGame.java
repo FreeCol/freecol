@@ -258,9 +258,9 @@ public class ServerGame extends Game implements TurnTaker {
     /**
      * Update the players.
      *
-     * @param players A list of new {@code ServerPlayer}s.
+     * @param players A list of new {@code Player}s.
      */
-    public void updatePlayers(List<ServerPlayer> players) {
+    public void updatePlayers(List<? extends Player> players) {
         if (!players.isEmpty()) {
             sendToAll(new ChangeSet().addPlayers(players));
         }

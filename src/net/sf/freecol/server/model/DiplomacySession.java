@@ -321,9 +321,9 @@ public class DiplomacySession extends TimedSession {
         ChangeSet cs = new ChangeSet();
         boolean ret = complete(false, cs);
         if (!ret) { // Withdraw offer
-            cs.add(See.only((ServerPlayer)this.agreement.getSender()),
+            cs.add(See.only(this.agreement.getSender()),
                    new CloseMessage(dialogName));
-            cs.add(See.only((ServerPlayer)this.agreement.getRecipient()),
+            cs.add(See.only(this.agreement.getRecipient()),
                    new CloseMessage(dialogName));
         }
         getGame().sendToAll(cs);

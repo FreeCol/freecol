@@ -194,17 +194,17 @@ public class LoginMessage extends ObjectMessage {
 
         if ((serverGame = freeColServer.waitForGame()) == null) {
             // No game found
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.timeOut"));
 
         } else if ((nation = serverGame.getVacantNation()) == null) {
             // No nation available
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.maximumPlayers"));
 
         } else if ((present = (ServerPlayer)getPlayer(serverGame)) != null) {
             // Can not use the same name as existing player
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.userNameInUse")
                     .addName("%name%", userName));
 
@@ -260,17 +260,17 @@ public class LoginMessage extends ObjectMessage {
         
         if (FreeColServer.MAP_EDITOR_NAME.equals(userName)) {
             // Trying to start a map, see BR#2976 -> IR#217
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("error.mapEditorGame"));
 
         } else if ((serverGame = freeColServer.getGame()) == null) {
             // No game found
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.noSuchGame"));
 
         } else if ((present = (ServerPlayer)getPlayer(serverGame)) == null) {
             // Player not present
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.userNameNotPresent")
                     .addName("%name%", userName)
                     .addName("%names%",
@@ -280,13 +280,13 @@ public class LoginMessage extends ObjectMessage {
 
         } else if (present.isConnected()) {
             // Another player already connected on the name
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.userNameInUse")
                     .addName("%name%", userName));
 
         } else if (present.isAI()) {
             // Should not connect to AI
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.userNameInUse")
                     .addName("%name%", userName));
 
@@ -328,12 +328,12 @@ public class LoginMessage extends ObjectMessage {
         ChangeSet ret;
         
         if ((serverGame = freeColServer.getGame()) == null) {
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.noSuchGame"));
 
         } else if ((present = (ServerPlayer)getPlayer(serverGame)) == null) {
             // Player not present
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.userNameNotPresent")
                     .addName("%name%", userName)
                     .addName("%names%",
@@ -343,7 +343,7 @@ public class LoginMessage extends ObjectMessage {
 
         } else if (!present.isAI() && present.isConnected()) {
             // Another human player already connected on the name
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.userNameInUse")
                     .addName("%name%", userName));
 
@@ -386,15 +386,15 @@ public class LoginMessage extends ObjectMessage {
         ChangeSet ret;
 
         if (userName == null || userName.isEmpty()) {
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.missingUserName"));
 
         } else if (version == null || version.isEmpty()) {
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.missingVersion"));
 
         } else if (!version.equals(FreeCol.getVersion())) {
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.wrongFreeColVersion")
                     .addName("%clientVersion%", version)
                     .addName("%serverVersion%", FreeCol.getVersion()));
@@ -413,7 +413,7 @@ public class LoginMessage extends ObjectMessage {
             break;
 
         case END_GAME: default:
-            ret = ChangeSet.clientError((ServerPlayer)null,
+            ret = ChangeSet.clientError((Player)null,
                 StringTemplate.template("server.couldNotLogin"));
             break;
         }
