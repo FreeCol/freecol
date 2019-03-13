@@ -662,12 +662,8 @@ public final class FreeCol {
                 printUsage(options, 0);
             }
 
-            if (line.hasOption("default-locale")) {
-                ; // Do nothing, already handled in main().
-            }
-            if (line.hasOption("freecol-data")) {
-                ; // Do nothing, already handled in main().
-            }
+            // Ignore "default-locale", "freecol-data", which are
+            // already handled in main()
 
             if (line.hasOption("advantages")) {
                 String arg = line.getOptionValue("advantages");
