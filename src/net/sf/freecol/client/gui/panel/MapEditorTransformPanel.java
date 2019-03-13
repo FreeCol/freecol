@@ -65,8 +65,6 @@ import net.sf.freecol.server.model.ServerIndianSettlement;
 /**
  * A panel for choosing the current {@code MapTransform}.
  *
- * <br><br>
- *
  * This panel is only used when running in
  * {@link net.sf.freecol.client.FreeColClient#isMapEditor() map editor mode}.
  *
@@ -77,184 +75,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
-
-    /** A native nation to use for native settlement type and skill. */
-    private static Nation nativeNation = null;
-
-    private final JPanel listPanel;
-    private JToggleButton settlementButton;
-    private final ButtonGroup group;
-
-
-    /**
-     * Creates a panel to choose a map transform.
-     *
-     * @param freeColClient The {@code FreeColClient} for the game.
-     */
-    public MapEditorTransformPanel(FreeColClient freeColClient) {
-        super(freeColClient, null, new BorderLayout());
-
-        // Initialize to a default value, then accept what was used last time
-        if (nativeNation == null) {
-            nativeNation = first(getSpecification().getIndianNations());
-        }
-
-        listPanel = new JPanel(new GridLayout(2, 0));
-
-        group = new ButtonGroup();
-        //Add an invisible, move button to de-select all others
-        group.add(new JToggleButton());
-        buildList();
-
-        JScrollPane sl = new JScrollPane(listPanel,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        sl.getViewport().setOpaque(false);
-        add(sl);
-    }
-
-
-    /**
-     * Builds the buttons for all the terrains.
-     */
-    private void buildList() {
-        final Specification spec = getSpecification();
-        final Dimension terrainSize = ImageLibrary
-            .scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE,
-                            ImageLibrary.SMALLER_SCALE);
-        final Dimension riverSize = ImageLibrary
-            .scaleDimension(ImageLibrary.TILE_SIZE,
-                            ImageLibrary.SMALLER_SCALE);
-
-        for (TileType type : spec.getTileTypeList()) {
-            listPanel.add(buildButton(getGUI().createTileImageWithOverlayAndForest(type, terrainSize),
-                    Messages.getName(type),
-                    new TileTypeTransform(type)));
-        }
-
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", riverSize),
-                Messages.message("mapEditorTransformPanel.minorRiver"),
-                new RiverTransform(TileImprovement.SMALL_RIVER)));
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", riverSize),
-                Messages.message("mapEditorTransformPanel.majorRiver"),
-                new RiverTransform(TileImprovement.LARGE_RIVER)));
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("2022", riverSize),
-                Messages.message("mapEditorTransformPanel.changeRiverConnections"),
-                new RiverStyleTransform(RiverStyleTransform.CHANGE_CONNECTIONS)));
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("1022", riverSize),
-                Messages.message("mapEditorTransformPanel.setRiverStyle"),
-                new RiverStyleTransform(RiverStyleTransform.SET_STYLE)));
-
-        final ResourceType rt = first(spec.getResourceTypeList());
-        listPanel.add(buildButton(ImageLibrary.getResourceTypeImage(rt,
-                    riverSize, false),
-                Messages.message("mapEditorTransformPanel.resource"),
-                new ResourceTransform()));
-
-        listPanel.add(buildButton(ImageLibrary
-                .getScaledImage(ImageLibrary.LOST_CITY_RUMOUR, riverSize, false),
-                Messages.getName(ModelMessage.MessageType.LOST_CITY_RUMOUR),
-                new LostCityRumourTransform()));
-
-        SettlementType settlementType = nativeNation.getType().getCapitalType();
-        listPanel.add(buildButton(ImageLibrary.getSettlementTypeImage(settlementType, riverSize),
-                Messages.message("settlement"),
-                new SettlementTransform()));
-    }
-
-    /**
-     * Builds the button for the given terrain.
-     *
-     * @param image an {@code Image} value
-     * @param text a {@code String} value
-     * @param mt a {@code MapTransform} value
-     * @return A suitable button.
-     */
-    private JToggleButton buildButton(Image image, String text,
-                                      final MapTransform mt) {
-        final MapEditorController ctlr
-            = getFreeColClient().getMapEditorController();
-        JPanel descriptionPanel = new JPanel(new BorderLayout());
-        descriptionPanel.add(new JLabel(new ImageIcon(image)),
-                             BorderLayout.CENTER);
-        descriptionPanel.add(new JLabel(text, JLabel.CENTER),
-                BorderLayout.PAGE_END);
-        descriptionPanel.setBackground(Color.RED);
-        mt.setDescriptionPanel(descriptionPanel);
-
-        ImageIcon icon = new ImageIcon(image);
-        final JToggleButton button = new JToggleButton(icon);
-        button.setToolTipText(text);
-        button.setOpaque(false);
-        group.add(button);
-        button.addActionListener((ActionEvent ae) -> {
-                MapTransform newMapTransform = null;
-                if (ctlr.getMapTransform() != mt) {
-                    if (mt instanceof RiverStyleTransform) {
-                        RiverStyleTransform rst = (RiverStyleTransform)mt;
-                        boolean all = rst.getType() != RiverStyleTransform.CHANGE_CONNECTIONS;
-                        String style = getGUI()
-                            .showRiverStyleDialog(ImageLibrary
-                                .getRiverStyleKeys(all));
-                        if (style != null) rst.setStyle(style);
-                    }
-                    newMapTransform = mt;
-                }
-                ctlr.setMapTransform(newMapTransform);
-                if (newMapTransform == null && mt != null) {
-                    // Select the invisible button, de-selecting all others
-                    group.setSelected(group.getElements().nextElement()
-                        .getModel(), true);
-                }
-            });
-        button.setBorder(null);
-        return button;
-    }
-
-    /**
-     * Ask the user for a resource choice from a list.
-     *
-     * Ripped out of ResourceTransform to dodge the name clash with
-     * CollectionUtils.transform which we want to use here.
-     *
-     * @param resources A list of {@code ResourceType}s to choose from.
-     * @return The chosen {@code ResourceType}.
-     */
-    private ResourceType getResourceChoice(List<ResourceType> resources) {
-        final Function<ResourceType, ChoiceItem<ResourceType>> mapper
-            = rt -> new ChoiceItem<ResourceType>(Messages.getName(rt), rt);
-        return getGUI().getChoice(null, 
-            Messages.message("mapEditorTransformPanel.chooseResource"),
-            "cancel",
-            transform(resources, alwaysTrue(), mapper));
-    }
-
-    /**
-     * Set the native nation.
-     *
-     * @param newNativeNation The new native {@code Nation}.
-     */
-    public static void setNativeNation(Nation newNativeNation) {
-        nativeNation = newNativeNation;
-    }
-
-    public static final class TileTypeTransform extends MapTransform {
-        private final TileType tileType;
-
-        private TileTypeTransform(TileType tileType) {
-            this.tileType = tileType;
-        }
-
-        public TileType getTileType() {
-            return tileType;
-        }
-
-        @Override
-        public void transform(Tile t) {
-            t.changeType(tileType);
-            t.removeLostCityRumour();
-        }
-    }
 
     private static final class RiverTransform extends MapTransform {
         private final int magnitude;
@@ -378,12 +198,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private class SettlementTransform extends MapTransform {
         @Override
         public void transform(Tile t) {
-            if (!t.isLand()
-                || t.hasSettlement()
-                || nativeNation == null) return;
-            UnitType skill = first(((IndianNationType)nativeNation.getType())
+            if (!t.isLand() || t.hasSettlement()) return;
+            UnitType skill = first(((IndianNationType)getNativeNation().getType())
                 .getSkills()).getObject();
-            Player nativePlayer = getGame().getPlayerByNation(nativeNation);
+            Player nativePlayer = getGame().getPlayerByNation(getNativeNation());
             if (nativePlayer == null) return;
             String name = nativePlayer.getSettlementName(null);
             ServerIndianSettlement sis
@@ -393,6 +211,192 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             sis.placeSettlement(true);
             sis.addUnits(null);
             logger.info("Add settlement " + sis.getName() + " to tile " + t);
+        }
+    }
+
+    /** A native nation to use for native settlement type and skill. */
+    private static Nation nativeNation;
+
+    private final JPanel listPanel;
+    private JToggleButton settlementButton;
+    private final ButtonGroup group;
+
+
+    /**
+     * Creates a panel to choose a map transform.
+     *
+     * @param freeColClient The {@code FreeColClient} for the game.
+     */
+    public MapEditorTransformPanel(FreeColClient freeColClient) {
+        super(freeColClient, null, new BorderLayout());
+
+        listPanel = new JPanel(new GridLayout(2, 0));
+
+        group = new ButtonGroup();
+        //Add an invisible, move button to de-select all others
+        group.add(new JToggleButton());
+        buildList();
+
+        JScrollPane sl = new JScrollPane(listPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        sl.getViewport().setOpaque(false);
+        add(sl);
+    }
+
+
+    /**
+     * Get the last used native nation.
+     *
+     * @return A suitable {@code Nation}.
+     */     
+    private Nation getNativeNation() {
+        if (nativeNation == null) { // Initialize if not yet set
+            nativeNation = first(getSpecification().getIndianNations());
+        }
+        return nativeNation;
+    }
+
+    /**
+     * Set the native nation.
+     *
+     * @param newNativeNation The new native {@code Nation}.
+     */
+    public static void setNativeNation(Nation newNativeNation) {
+        nativeNation = newNativeNation;
+    }
+    
+    /**
+     * Builds the buttons for all the terrains.
+     */
+    private void buildList() {
+        final Specification spec = getSpecification();
+        final Dimension terrainSize = ImageLibrary
+            .scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE,
+                            ImageLibrary.SMALLER_SCALE);
+        final Dimension riverSize = ImageLibrary
+            .scaleDimension(ImageLibrary.TILE_SIZE,
+                            ImageLibrary.SMALLER_SCALE);
+
+        for (TileType type : spec.getTileTypeList()) {
+            listPanel.add(buildButton(getGUI().createTileImageWithOverlayAndForest(type, terrainSize),
+                    Messages.getName(type),
+                    new TileTypeTransform(type)));
+        }
+
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", riverSize),
+                Messages.message("mapEditorTransformPanel.minorRiver"),
+                new RiverTransform(TileImprovement.SMALL_RIVER)));
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", riverSize),
+                Messages.message("mapEditorTransformPanel.majorRiver"),
+                new RiverTransform(TileImprovement.LARGE_RIVER)));
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("2022", riverSize),
+                Messages.message("mapEditorTransformPanel.changeRiverConnections"),
+                new RiverStyleTransform(RiverStyleTransform.CHANGE_CONNECTIONS)));
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("1022", riverSize),
+                Messages.message("mapEditorTransformPanel.setRiverStyle"),
+                new RiverStyleTransform(RiverStyleTransform.SET_STYLE)));
+
+        final ResourceType rt = first(spec.getResourceTypeList());
+        listPanel.add(buildButton(ImageLibrary.getResourceTypeImage(rt,
+                    riverSize, false),
+                Messages.message("mapEditorTransformPanel.resource"),
+                new ResourceTransform()));
+
+        listPanel.add(buildButton(ImageLibrary
+                .getScaledImage(ImageLibrary.LOST_CITY_RUMOUR, riverSize, false),
+                Messages.getName(ModelMessage.MessageType.LOST_CITY_RUMOUR),
+                new LostCityRumourTransform()));
+
+        SettlementType settlementType = getNativeNation().getType()
+            .getCapitalType();
+        listPanel.add(buildButton(ImageLibrary.getSettlementTypeImage(settlementType, riverSize),
+                Messages.message("settlement"),
+                new SettlementTransform()));
+    }
+
+    /**
+     * Builds the button for the given terrain.
+     *
+     * @param image an {@code Image} value
+     * @param text a {@code String} value
+     * @param mt a {@code MapTransform} value
+     * @return A suitable button.
+     */
+    private JToggleButton buildButton(Image image, String text,
+                                      final MapTransform mt) {
+        final MapEditorController ctlr
+            = getFreeColClient().getMapEditorController();
+        JPanel descriptionPanel = new JPanel(new BorderLayout());
+        descriptionPanel.add(new JLabel(new ImageIcon(image)),
+                             BorderLayout.CENTER);
+        descriptionPanel.add(new JLabel(text, JLabel.CENTER),
+                BorderLayout.PAGE_END);
+        descriptionPanel.setBackground(Color.RED);
+        mt.setDescriptionPanel(descriptionPanel);
+
+        ImageIcon icon = new ImageIcon(image);
+        final JToggleButton button = new JToggleButton(icon);
+        button.setToolTipText(text);
+        button.setOpaque(false);
+        group.add(button);
+        button.addActionListener((ActionEvent ae) -> {
+                MapTransform newMapTransform = null;
+                if (ctlr.getMapTransform() != mt) {
+                    if (mt instanceof RiverStyleTransform) {
+                        RiverStyleTransform rst = (RiverStyleTransform)mt;
+                        boolean all = rst.getType() != RiverStyleTransform.CHANGE_CONNECTIONS;
+                        String style = getGUI()
+                            .showRiverStyleDialog(ImageLibrary
+                                .getRiverStyleKeys(all));
+                        if (style != null) rst.setStyle(style);
+                    }
+                    newMapTransform = mt;
+                }
+                ctlr.setMapTransform(newMapTransform);
+                if (newMapTransform == null && mt != null) {
+                    // Select the invisible button, de-selecting all others
+                    group.setSelected(group.getElements().nextElement()
+                        .getModel(), true);
+                }
+            });
+        button.setBorder(null);
+        return button;
+    }
+
+    /**
+     * Ask the user for a resource choice from a list.
+     *
+     * Ripped out of ResourceTransform to dodge the name clash with
+     * CollectionUtils.transform which we want to use here.
+     *
+     * @param resources A list of {@code ResourceType}s to choose from.
+     * @return The chosen {@code ResourceType}.
+     */
+    private ResourceType getResourceChoice(List<ResourceType> resources) {
+        final Function<ResourceType, ChoiceItem<ResourceType>> mapper
+            = rt -> new ChoiceItem<ResourceType>(Messages.getName(rt), rt);
+        return getGUI().getChoice(null, 
+            Messages.message("mapEditorTransformPanel.chooseResource"),
+            "cancel",
+            transform(resources, alwaysTrue(), mapper));
+    }
+
+    public static final class TileTypeTransform extends MapTransform {
+        private final TileType tileType;
+
+        private TileTypeTransform(TileType tileType) {
+            this.tileType = tileType;
+        }
+
+        public TileType getTileType() {
+            return tileType;
+        }
+
+        @Override
+        public void transform(Tile t) {
+            t.changeType(tileType);
+            t.removeLostCityRumour();
         }
     }
 }
