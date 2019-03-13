@@ -1699,6 +1699,7 @@ public class Game extends FreeColGameObject {
         Player unknown = getUnknownEnemy();
         if (unknown != null) unknown.toXML(xw);
 
+        Map map = getMap();
         if (map != null) map.toXML(xw);
     }
 
@@ -1784,7 +1785,7 @@ public class Game extends FreeColGameObject {
                 throw new XMLStreamException("Tried to read " + tag
                     + " with null specification");
             }
-            map = xr.readFreeColObject(game, Map.class);
+            setMap(xr.readFreeColObject(game, Map.class));
 
         } else if (NationOptions.TAG.equals(tag)) {
             if (this.specification == null) {
