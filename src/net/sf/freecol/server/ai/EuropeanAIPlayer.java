@@ -408,7 +408,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     if (target != null) break;
                 }
                 if (target == null) {
-                    throw new RuntimeException("Initial colony fail!");
+                    throw new RuntimeException("Initial colony fail: " + u);
                 }
                 if ((m = getBuildColonyMission(aiu, target)) != null) {
                     lb.add(m, ", ");
@@ -1439,7 +1439,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return the new AIUnit created by this action. May be null.
      */
     private AIUnit trainAIUnitInEurope(UnitType unitType) {
-        if (unitType == null) throw new RuntimeException("Invalid UnitType.");
+        if (unitType == null) {
+            throw new RuntimeException("Invalid UnitType: " + this);
+        }
 
         AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
@@ -2209,7 +2211,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         // This is happening, very rarely.  Hopefully now fixed by
         // synchronizing access to AIMain.aiObjects.
         if (getAIMain().getAIPlayer(player) != this) {
-            throw new RuntimeException("EuropeanAIPlayer integrity fail");
+            throw new RuntimeException("EuropeanAIPlayer integrity fail: " + player);
         }
         clearAIUnits();
         player.clearNationCache();

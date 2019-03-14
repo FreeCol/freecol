@@ -103,7 +103,8 @@ public class PreCombatDialog extends FreeColConfirmDialog {
                 lib.getScaledSettlementImage(settlement)));
 
         } else {
-            throw new IllegalStateException("Bogus attack");
+            throw new RuntimeException("Bogus attack: " + attacker
+                + " v " + defender);
         }
 
         panel.add(new JLabel(attackerName), "span 3, align center");

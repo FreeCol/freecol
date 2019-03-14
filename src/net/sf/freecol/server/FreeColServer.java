@@ -65,6 +65,7 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChangeSet;
@@ -897,7 +898,7 @@ public final class FreeColServer {
             }
             fos.closeEntry();
         } catch (XMLStreamException e) {
-            throw new IOException("Failed to save (XML)", e);
+            throw new IOException("Failed to save (XML): " + file.getName(), e);
         }
     }
 
@@ -985,7 +986,8 @@ public final class FreeColServer {
         final int savegameVersion = fis.getSavegameVersion();
         logger.info("Found savegame version " + savegameVersion);
         if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
-            throw new FreeColException("server.incompatibleVersions");
+            throw new FreeColException("server.incompatibleVersions: "
+                + savegameVersion + " < " + MINIMUM_SAVEGAME_VERSION);
         }
 
         ServerGame serverGame = null;
@@ -1001,7 +1003,7 @@ public final class FreeColServer {
             if (freeColServer != null) {
                 String owner = xr.getAttribute(OWNER_TAG, (String)null);
                 if (specification == null && MAP_EDITOR_NAME.equals(owner)) {
-                    throw new FreeColException("error.mapEditorGame");
+                    throw new FreeColException("Can not start a map editor map as a game: " + fis.getPath());
                 }
                 freeColServer.setSinglePlayer(xr.getAttribute(SINGLE_PLAYER_TAG,
                                                               true));

@@ -142,9 +142,9 @@ public enum Stance implements Named {
             }
             break;
         default:
-            throw new RuntimeException("Bogus newStance");
+            throw new RuntimeException("Bogus newStance: " + newStance);
         }
-        throw new RuntimeException("Bogus stance");
+        throw new RuntimeException("Bogus stance: " + this);
     }
 
     /**

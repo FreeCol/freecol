@@ -118,7 +118,7 @@ public class IndianDemandMessage extends AttributeMessage {
             logger.warning("IndianDemand with null colony");
             return;
         } else if (!player.owns(colony)) {
-            throw new IllegalArgumentException("Demand to anothers colony");
+            throw new RuntimeException("Demand to anothers colony: " + colony);
         }
 
         igc(freeColClient).indianDemandHandler(unit, colony, goodsType, amount);

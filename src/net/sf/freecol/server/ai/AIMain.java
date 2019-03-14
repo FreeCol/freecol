@@ -218,7 +218,7 @@ public class AIMain extends FreeColObject
      */
     public void addAIObject(String id, AIObject aiObject) {
         if (aiObject == null) {
-            throw new NullPointerException("aiObject == null");
+            throw new NullPointerException("aiObject == null: " + this);
         }
         boolean present;
         synchronized (aiObjects) {
@@ -415,7 +415,7 @@ public class AIMain extends FreeColObject
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (getAIObject(id) != null || !shouldHaveAIObject(fcgo)) return;
         if (!id.equals(fcgo.getId())) {
-            throw new RuntimeException("!id.equals(fcgo.getId())");
+            throw new RuntimeException("!id.equals(fcgo.getId()): " + id);
         }
         AIObject aio = null;
         if (fcgo instanceof Colony) {

@@ -868,7 +868,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
 
         String id = readId();
         if (id == null) {
-            throw new XMLStreamException("Object identifier not found.");
+            throw new XMLStreamException("Null object identifier for: " + returnClass.getName());
         }
         T ret;
         FreeColObject fco = uninterned.get(id);

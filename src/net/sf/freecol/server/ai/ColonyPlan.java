@@ -191,8 +191,8 @@ public class ColonyPlan {
      * @param colony The colony to make a {@code ColonyPlan} for.
      */
     public ColonyPlan(AIMain aiMain, Colony colony) {
-        if (aiMain == null) throw new IllegalArgumentException("Null AIMain");
-        if (colony == null) throw new IllegalArgumentException("Null colony");
+        if (aiMain == null) throw new RuntimeException("Null AIMain: " + this);
+        if (colony == null) throw new RuntimeException("Null colony: " + this);
 
         this.aiMain = aiMain;
         this.colony = colony;

@@ -1474,7 +1474,7 @@ public class Unit extends GoodsLocation
     public UnitTypeChange getUnitChange(String change, UnitType toType,
                                         Player player) {
         if (player == null) {
-            throw new RuntimeException("getUnitChange null player");
+            throw new RuntimeException("getUnitChange null player: " + change);
         }
         UnitChangeType uct = getSpecification().getUnitChangeType(change);
         if (uct != null && uct.getOwnerChange() != (player != getOwner())) {
@@ -2626,7 +2626,7 @@ public class Unit extends GoodsLocation
      *      the high seas.
      */
     public Location resolveDestination() {
-        if (!isAtSea()) throw new IllegalArgumentException("Not at sea.");
+        if (!isAtSea()) throw new RuntimeException("Not at sea: " + this);
         TradeRouteStop stop = getStop();
         Location dst = (TradeRoute.isStopValid(this, stop))
             ? stop.getLocation()
@@ -3675,7 +3675,7 @@ public class Unit extends GoodsLocation
      */
     public boolean canCashInTreasureTrain(Location loc) {
         if (!canCarryTreasure()) {
-            throw new IllegalStateException("Can't carry treasure");
+            throw new RuntimeException("Can't carry treasure: " + this);
         }
         if (loc == null) return false;
 
@@ -4233,7 +4233,7 @@ public class Unit extends GoodsLocation
     @Override
     public boolean remove(Locatable locatable) {
         if (locatable == null) {
-            throw new IllegalArgumentException("Locatable must not be 'null'.");
+            throw new RuntimeException("Locatable must not be null: " + this);
         } else if (locatable instanceof Unit && canCarryUnits()) {
             if (super.remove(locatable)) {
                 spendAllMoves();

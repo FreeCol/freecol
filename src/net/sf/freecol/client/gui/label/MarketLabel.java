@@ -58,7 +58,9 @@ public final class MarketLabel extends AbstractGoodsLabel
     public MarketLabel(ImageLibrary lib, GoodsType type, Market market) {
         super(lib, new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
 
-        if (market == null) throw new IllegalArgumentException("Null market");
+        if (market == null) {
+            throw new RuntimeException("Null market for " + this);
+        }
         this.market = market;
         update();
     }

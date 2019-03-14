@@ -967,7 +967,7 @@ public class Map extends FreeColGameObject implements Location {
          */
         public CircleIterator(Tile center, boolean isFilled, int radius) {
             if (center == null) {
-                throw new IllegalArgumentException("center must not be null.");
+                throw new RuntimeException("center must not be null: " + this);
             }
             this.radius = radius;
             n = 0;
@@ -1068,7 +1068,7 @@ public class Map extends FreeColGameObject implements Location {
         @Override
         public Tile next() {
             if (!hasNext()) {
-                throw new NoSuchElementException("CircleIterator exhausted");
+                throw new NoSuchElementException("CircleIterator exhausted: " + n);
             }
             Tile result = getTile(x, y);
             nextTile();
@@ -1152,7 +1152,7 @@ public class Map extends FreeColGameObject implements Location {
     private Location findRealEnd(Unit unit, Location end) {
         while (true) {
             if (end == null) {
-                throw new IllegalArgumentException("Null end.");
+                throw new RuntimeException("Null end for: " + unit);
             } else if (end instanceof Europe) {
                 return end;
             } else if (end instanceof Map) {
@@ -1162,7 +1162,7 @@ public class Map extends FreeColGameObject implements Location {
             } else if (unit != null) {
                 return unit.resolveDestination();
             } else {
-                throw new IllegalArgumentException("Invalid end: " + end);
+                throw new RuntimeException("Invalid end: " + end);
             }
         }
     }
@@ -2237,16 +2237,16 @@ ok:     while (!openMap.isEmpty()) {
         final TileType ocean = spec.getTileType("model.tile.ocean");
         final TileType highSeas = spec.getTileType("model.tile.highSeas");
         if (highSeas == null) {
-            throw new RuntimeException("HighSeas TileType must exist");
+            throw new RuntimeException("HighSeas TileType must exist: "+spec);
         }
         if (ocean == null) {
-            throw new RuntimeException("Ocean TileType must exist");
+            throw new RuntimeException("Ocean TileType must exist: " + spec);
         }
         if (distToLandFromHighSeas < 0) {
-            throw new RuntimeException("Land<->HighSeas distance can not be negative");
+            throw new RuntimeException("Land<->HighSeas distance can not be negative: " + distToLandFromHighSeas);
         }
         if (maxDistanceToEdge < 0) {
-            throw new RuntimeException("Distance to edge can not be negative");
+            throw new RuntimeException("Distance to edge can not be negative: " + maxDistanceToEdge);
         }
 
         // Reset all highSeas tiles to the default ocean type.
@@ -2513,7 +2513,7 @@ ok:     while (!openMap.isEmpty()) {
         // Used to add units to their entry location.  Dropped as this
         // is handled explicitly in the server.
         if (locatable instanceof Unit) {
-            throw new RuntimeException("Disabled Map.add(Unit)");
+            throw new RuntimeException("Disabled Map.add(Unit): " + locatable);
         }
         return false;
     }

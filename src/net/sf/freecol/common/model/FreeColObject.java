@@ -1287,7 +1287,7 @@ public abstract class FreeColObject
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         String tag = xr.getLocalName();
         if (tag == null) {
-            throw new XMLStreamException("Parse error, null opening tag.");
+            throw new XMLStreamException("Parse error, null opening tag: " + this);
         }
         try {
             while (xr.moreTags()) {

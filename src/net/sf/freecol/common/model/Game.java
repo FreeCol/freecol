@@ -407,7 +407,7 @@ public class Game extends FreeColGameObject {
      * @return Nothing.
      */
     public int getNextId() {
-        throw new RuntimeException("game.getNextId not implemented");
+        throw new RuntimeException("game.getNextId not implemented: " + this);
     }
 
     /**
@@ -460,9 +460,9 @@ public class Game extends FreeColGameObject {
      */
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (id == null || id.isEmpty()) {
-            throw new RuntimeException("Null or empty identifier");
+            throw new RuntimeException("Null/empty identifier: " + this);
         } else  if (fcgo == null) {
-            throw new RuntimeException("Null FreeColGameObject");
+            throw new RuntimeException("Null FreeColGameObject: " + id);
         }
 
         final WeakReference<FreeColGameObject> wr = new WeakReference<>(fcgo);
@@ -482,9 +482,9 @@ public class Game extends FreeColGameObject {
      */
     public void addFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (id == null || id.isEmpty()) {
-            throw new RuntimeException("Null/empty id.");
+            throw new RuntimeException("Null/empty identifier: " + this);
         } else if (fcgo == null) {
-            throw new RuntimeException("Null FreeColGameObject.");
+            throw new RuntimeException("Null FreeColGameObject: " + id);
         }
 
         final FreeColGameObject old = getFreeColGameObject(id);
@@ -507,8 +507,9 @@ public class Game extends FreeColGameObject {
      * @exception IllegalArgumentException If the identifier is null or empty.
      */
     public void removeFreeColGameObject(String id, String reason) {
-        if (id == null) throw new IllegalArgumentException("Null identifier.");
-        if (id.isEmpty()) throw new IllegalArgumentException("Empty identifier.");
+        if (id == null || id.isEmpty()) {
+            throw new RuntimeException("Null/empty identifier: " + this);
+        }
 
         logger.finest("removeFCGO/" + reason + ": " + id);
         notifyRemoveFreeColGameObject(id);
@@ -729,7 +730,8 @@ public class Game extends FreeColGameObject {
             @Override
             public void remove() {
                 if (this.fcgoState == FcgoState.INVALID) {
-                    throw new IllegalStateException("No current entry");
+                    throw new RuntimeException("No current entry: "
+                        + this.fcgoState);
                 }
                 final String key = this.readAhead.getKey();
                 this.fcgoState = FcgoState.INVALID;

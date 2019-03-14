@@ -229,7 +229,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
         
         if (loadingDescriptor.isEmpty()) {
             throw new IOException(ANIMATION_DESCRIPTOR_FILE
-                + " is missing from the SZA.");
+                + " is missing from the SZA: " + zipStream);
         }
         
         List<AnimationEvent> events = new ArrayList<>(loadingDescriptor.size());
@@ -238,7 +238,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
             final int idx2 = line.indexOf("ms)");
             if (idx < 0 || idx2 <= idx) {
                 throw new IOException(ANIMATION_DESCRIPTOR_FILE
-                    + " should use the format: FILNAME (TIMEms)");
+                    + " should use the format: FILNAME (TIMEms) in: " + line);
             }
             final String imageName = line.substring(0, idx).trim();
             final int ms = Integer.parseInt(line.substring(idx+1, idx2));

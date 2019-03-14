@@ -465,7 +465,7 @@ public class TerrainGenerator {
         final TileType hills = spec.getTileType("model.tile.hills");
         final TileType mountains = spec.getTileType("model.tile.mountains");
         if (hills == null || mountains == null) {
-            throw new RuntimeException("Both Hills and Mountains TileTypes must be defined");
+            throw new RuntimeException("Both Hills and Mountains TileTypes must be defined: " + spec);
         }
 
         // Generate the mountain ranges

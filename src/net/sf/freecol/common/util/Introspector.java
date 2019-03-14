@@ -62,7 +62,7 @@ public class Introspector {
      */
     public Introspector(Class<?> theClass, String field) {
         if (field == null || field.isEmpty()) {
-            throw new IllegalArgumentException("Field may not be empty");
+            throw new RuntimeException("Field may not be empty: " + this);
         }
         this.theClass = theClass;
         this.field = field;
@@ -154,8 +154,8 @@ public class Introspector {
         if (argType.isEnum()) {
             try {
                 method = Enum.class.getMethod("valueOf", Class.class, String.class);
-            } catch (NoSuchMethodException | SecurityException e) {
-                throw new IllegalArgumentException("Enum.getMethod(valueOf(Class, String))", e);
+            } catch (NoSuchMethodException|SecurityException e) {
+                throw new RuntimeException("Enum.getMethod(valueOf(Class, String)): " + argType, e);
             }
         } else {
             if (argType.isPrimitive()) {

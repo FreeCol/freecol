@@ -92,7 +92,7 @@ public class Relation {
         if ("n".equals(token)) {
             token = input.remove(0);
         } else {
-            throw new IllegalArgumentException("Relation must start with 'n'.");
+            throw new RuntimeException("Relation must start with 'n': " + token);
         }
         if ("mod".equals(token)) {
             mod = Integer.parseInt(input.remove(0));

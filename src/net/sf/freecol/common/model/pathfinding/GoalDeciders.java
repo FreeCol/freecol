@@ -57,7 +57,7 @@ public final class GoalDeciders {
     public static GoalDecider getComposedGoalDecider(final boolean all,
         final GoalDecider... gds) {
         if (gds.length < 2) {
-            throw new IllegalArgumentException("Short GoalDecider list");
+            throw new RuntimeException("Short GoalDecider list: " + gds.length);
         }
 
         return new GoalDecider() {

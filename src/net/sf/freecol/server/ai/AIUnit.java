@@ -642,7 +642,7 @@ public final class AIUnit extends TransportableAIObject {
      */
     @Override
     public void setTransportDestination(Location destination) {
-        throw new RuntimeException("AI unit transport destination set by mission.");
+        throw new RuntimeException("AI unit transport destination set by mission:" + destination);
     }
 
     /**

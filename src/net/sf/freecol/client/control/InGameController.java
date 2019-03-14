@@ -3431,7 +3431,8 @@ public final class InGameController extends FreeColClientHolder {
         final Player player = getMyPlayer();
 
         boolean accepted;
-        switch (getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE)) {
+        int opt = getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
+        switch (opt) {
         case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
             invokeLater(() ->
                 getGUI().showNativeDemandDialog(unit, colony, type, amount,
@@ -3447,7 +3448,7 @@ public final class InGameController extends FreeColClientHolder {
             accepted = false;
             break;
         default:
-            throw new RuntimeException("Impossible option value.");
+            throw new RuntimeException("Impossible option value: " + opt);
         }
 
         final String nation = Messages.message(unit.getOwner().getNationLabel());

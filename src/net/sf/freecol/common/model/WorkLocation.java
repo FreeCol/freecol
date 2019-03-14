@@ -502,7 +502,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     public int getTotalProductionOf(GoodsType goodsType) {
         if (goodsType == null) {
-            throw new IllegalArgumentException("Null GoodsType.");
+            throw new RuntimeException("Null GoodsType: " + this);
         }
         return AbstractGoods.getCount(goodsType, getProduction());
     }
@@ -582,7 +582,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return The production of the given type of goods.
      */
     public int getProductionOf(Unit unit, GoodsType goodsType) {
-        if (unit == null) throw new IllegalArgumentException("Null unit.");
+        if (unit == null) throw new RuntimeException("Null unit: " + this);
         return (!produces(goodsType)) ? 0
             : Math.max(0, getPotentialProduction(goodsType, unit.getType()));
     }

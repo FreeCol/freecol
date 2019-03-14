@@ -196,7 +196,7 @@ public abstract class AIObject extends FreeColObject {
      */
     @Override
     public final void setSpecification(Specification specification) {
-        throw new RuntimeException("Can not set specification");
+        throw new RuntimeException("Can not set specification: " + this);
     }
     
     /**
@@ -212,7 +212,7 @@ public abstract class AIObject extends FreeColObject {
      */
     @Override
     public final void setGame(Game game) {
-        throw new RuntimeException("Can not set game");
+        throw new RuntimeException("Can not set game: " + this);
     }
 
     // Overide FreeColObject

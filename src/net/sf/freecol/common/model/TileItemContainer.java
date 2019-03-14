@@ -64,7 +64,7 @@ public class TileItemContainer extends FreeColGameObject {
         super(game);
 
         if (tile == null) {
-            throw new IllegalArgumentException("Tile must not be 'null'.");
+            throw new RuntimeException("Tile must not be null: " + this);
         }
         this.tile = tile;
     }

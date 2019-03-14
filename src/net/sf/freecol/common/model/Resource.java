@@ -67,7 +67,7 @@ public class Resource extends TileItem {
         super(game, tile);
 
         if (type == null) {
-            throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
+            throw new RuntimeException("Type must not be null: " + this);
         }
         this.type = type;
         this.quantity = quantity;

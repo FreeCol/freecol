@@ -52,7 +52,7 @@ public abstract class TileItem extends FreeColGameObject
         super(game);
 
         if (tile == null) {
-            throw new IllegalArgumentException("Parameter 'tile' must not be 'null'.");
+            throw new RuntimeException("Tile must not be null: " + this);
         }
         this.tile = tile;
     }
@@ -171,7 +171,8 @@ public abstract class TileItem extends FreeColGameObject
             tile = (Tile)newLocation;
             return true;
         }
-        throw new IllegalArgumentException("newLocation is not a Tile");
+        throw new RuntimeException("newLocation is not a Tile: "
+            + newLocation);
     }
 
     /**

@@ -685,7 +685,7 @@ public class ClientOptions extends OptionGroup {
             }
             return cnc;
         default:
-            throw new RuntimeException("Unknown comparator");
+            throw new RuntimeException("Unknown comparator: " + type);
         }
     }
 

@@ -440,7 +440,7 @@ public class Modifier extends Feature {
                                        final float increment,
                                        Turn firstTurn, Turn lastTurn) {
         if (firstTurn == null) {
-            throw new IllegalArgumentException("Null firstTurn");
+            throw new RuntimeException("Null firstTurn: " + this);
         }
         this.incrementType = incrementType;
         this.increment = increment;

@@ -191,7 +191,9 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     @Override
     public void setValue(List<AbstractOption<T>> value) {
         // Fail fast: the list value may be empty, but it must not be null.
-        if (value==null) throw new IllegalArgumentException("Null ListOption");
+        if (value == null) {
+            throw new RuntimeException("Null ListOption: " + this);
+        }
 
         List<AbstractOption<T>> oldValue = new ArrayList<>(this.value);
         this.value.clear();

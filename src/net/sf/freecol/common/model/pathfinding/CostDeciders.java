@@ -246,7 +246,7 @@ public final class CostDeciders {
      */
     public static CostDecider getComposedCostDecider(final CostDecider... cds) {
         if (cds.length < 2) {
-            throw new IllegalArgumentException("Short CostDecider list");
+            throw new RuntimeException("Short CostDecider list: " + cds.length);
         }
 
         return new CostDecider() {

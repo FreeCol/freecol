@@ -97,7 +97,7 @@ public class TileImprovement extends TileItem {
                            TileImprovementStyle style) {
         super(game, tile);
         if (type == null) {
-            throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
+            throw new RuntimeException("Type must not be null: " + this);
         }
         this.type = type;
         if (!type.isNatural()) {

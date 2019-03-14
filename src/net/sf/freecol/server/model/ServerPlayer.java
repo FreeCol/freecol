@@ -215,7 +215,9 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @param nation The nation for this player.
      */
     public final void initialize(Game game, boolean admin, Nation nation) {
-        if (nation == null) throw new RuntimeException("Null nation");
+        if (nation == null) {
+            throw new RuntimeException("Null nation: " + this);
+        }
 
         this.name = nation.getRulerName();
         this.admin = admin;
@@ -489,7 +491,8 @@ public class ServerPlayer extends Player implements TurnTaker {
                 : DeadCheck.IS_ALIVE;
 
         default:
-            throw new IllegalStateException("Bogus player type");
+            throw new RuntimeException("Bogus player type: "
+                + getPlayerType());
         }
 
         // Quick check for a colony.  Do not log, this is the common case.
@@ -2222,7 +2225,7 @@ outer:  for (Effect effect : effects) {
                     .addStringTemplate("%unit%", unit.getLabel()));
             break;
         default:
-            throw new IllegalArgumentException("Bogus migration type");
+            throw new RuntimeException("Bogus migration type: " + type);
         }
         cs.add(See.only(this), europe);
     }
@@ -2286,7 +2289,8 @@ outer:  for (Effect effect : effects) {
             defenderTile = defenderUnit.getTile();
             cs.addAttribute(See.only(this), "sound", "sound.attack.bombard");
         } else {
-            throw new IllegalStateException("Bogus combat");
+            throw new RuntimeException("Bogus combat: " + attacker
+                + " v " + defender);
         }
         assert defenderTile != null;
 
@@ -2296,7 +2300,7 @@ outer:  for (Effect effect : effects) {
             crs = combatModel.generateAttackResult(random, attacker, defender);
         }
         if (crs.isEmpty()) {
-            throw new IllegalStateException("empty attack result");
+            throw new RuntimeException("empty attack result: " + this);
         }
         // Extract main result, insisting it is one of the fundamental cases,
         // and add the animation.
@@ -4263,8 +4267,8 @@ outer:  for (Effect effect : effects) {
             other = (ServerPlayer)otherUnit.getOwner();
             ds = DiplomacySession.findContactSession(unit, otherUnit);
         } else {
-            throw new RuntimeException("Non-null settlement or "
-                    + "other unit required.");
+            throw new RuntimeException("Non-null settlement (" + settlement
+                + ") or other unit ( " + otherUnit + ") required");
         }
         if (ds != null) return; // Ongoing contact, no action required
         

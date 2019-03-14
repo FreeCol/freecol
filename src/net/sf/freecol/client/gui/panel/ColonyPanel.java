@@ -2161,7 +2161,7 @@ public final class ColonyPanel extends PortPanel
                     }
                     // Check reason again, claim should be satisfied.
                     if (tile.getOwningSettlement() != colony) {
-                        throw new IllegalStateException("Claim failed");
+                        throw new RuntimeException("Claim failed: " + claim);
                     }
                 }
 

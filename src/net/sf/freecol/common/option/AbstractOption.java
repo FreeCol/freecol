@@ -108,7 +108,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      */
     protected void setValue(String valueString, String defaultValueString)
         throws XMLStreamException {
-        throw new XMLStreamException("Unsupported method: setValue.");
+        throw new XMLStreamException("setValue unsupported: " + this);
     }
 
     /**

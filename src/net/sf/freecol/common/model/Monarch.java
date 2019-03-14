@@ -160,7 +160,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         super(game);
 
         if (player == null) {
-            throw new IllegalStateException("player == null");
+            throw new RuntimeException("player == null: " + this);
         }
         this.player = player;
 

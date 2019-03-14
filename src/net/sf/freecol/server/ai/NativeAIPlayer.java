@@ -544,7 +544,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
             Colony target = RandomChoice.getWeightedRandom(logger,
                 "Choose gift colony", nearbyColonies, getAIRandom());
             if (target == null) {
-                throw new IllegalStateException("No gift target!?!");
+                throw new RuntimeException("No gift target: " + this);
             }
 
             // Send the unit.
@@ -956,28 +956,28 @@ public final class NativeAIPlayer extends MissionAIPlayer {
      * {@inheritDoc}
      */
     public int getNeededWagons(Tile tile) {
-        throw new RuntimeException("Can not happen");
+        throw new RuntimeException("Can not happen: " + this);
     }
 
     /**
      * {@inheritDoc}
      */
     public int pioneersNeeded() {
-        throw new RuntimeException("Can not happen");
+        throw new RuntimeException("Can not happen: " + this);
     }
 
     /**
      * {@inheritDoc}
      */
     public int scoutsNeeded() {
-        throw new RuntimeException("Can not happen");
+        throw new RuntimeException("Can not happen: " + this);
     }
 
     /**
      * {@inheritDoc}
      */
     public void completeWish(Wish w) {
-        throw new RuntimeException("Can not happen");
+        throw new RuntimeException("Can not happen: " + this);
     }
     
 

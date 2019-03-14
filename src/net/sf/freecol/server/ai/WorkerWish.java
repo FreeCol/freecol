@@ -86,7 +86,7 @@ public final class WorkerWish extends Wish {
         this(aiMain, TAG + ":" + aiMain.getNextId());
 
         if (destination == null) {
-            throw new NullPointerException("destination == null");
+            throw new NullPointerException("destination == null: " + this);
         }
 
         this.destination = destination;

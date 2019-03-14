@@ -333,7 +333,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
 
         this.specification = getSpecification();
         if (this.specification == null) {
-            throw new RuntimeException("No specification found");
+            throw new RuntimeException("No specification found for: " + this);
         }
         this.difficulty = this.specification
             .getDifficultyOptionGroup(FreeCol.getDifficulty());
@@ -344,7 +344,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             this.difficulty = getSelectedDifficulty();
         }
         if (this.difficulty == null) {
-            throw new RuntimeException("No difficulty found");
+            throw new RuntimeException("No difficulty found for: " + this);
         }
         logger.info("NewPanel initialized with " + this.specification.getId()
             + "/" + this.difficulty.getId());

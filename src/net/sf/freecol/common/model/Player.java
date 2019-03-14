@@ -2912,7 +2912,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return An object representing the tension level.
      */
     public Tension getTension(Player player) {
-        if (player == null) throw new IllegalStateException("Null player.");
+        if (player == null) {
+            throw new RuntimeException("Null player: " + this);
+        }
         Tension newTension = tension.get(player);
         if (newTension == null) {
             newTension = new Tension(Tension.TENSION_MIN);
@@ -3038,10 +3040,10 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean setStance(Player player, Stance newStance) {
         if (player == null) {
-            throw new IllegalArgumentException("Player must not be 'null'.");
+            throw new RuntimeException("Player must not be 'null': " + this);
         }
         if (player == this) {
-            throw new IllegalArgumentException("Cannot set the stance towards ourselves.");
+            throw new RuntimeException("Cannot set the stance towards ourselves: " + this);
         }
         if (newStance == null) {
             stance.remove(player.getId());

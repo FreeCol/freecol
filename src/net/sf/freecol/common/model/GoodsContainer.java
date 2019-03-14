@@ -119,7 +119,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public void setLocation(Location location) {
         if (location == null) {
-            throw new IllegalArgumentException("Null GoodsContainer Location.");
+            throw new RuntimeException("Null GoodsContainer location: " + this);
         }
         this.parent = location;
     }

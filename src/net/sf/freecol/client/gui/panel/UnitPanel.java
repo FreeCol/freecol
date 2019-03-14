@@ -60,7 +60,9 @@ public abstract class UnitPanel extends MigPanel
                         PortPanel portPanel, String name, boolean editable) {
         super(uiClassId, layout);
 
-        if (portPanel == null) throw new RuntimeException("Null port panel.");
+        if (portPanel == null) {
+            throw new RuntimeException("Null port panel for: " + this);
+        }
         this.portPanel = portPanel;
         this.editable = editable;
         setName(name);

@@ -124,7 +124,8 @@ public class CollectionUtils {
      */
     public static <K,V> Map<K,V> makeUnmodifiableMap(K[] keys, V[] values) {
         if (keys.length != values.length) {
-            throw new RuntimeException("Length mismatch");
+            throw new RuntimeException("Length mismatch: " + keys.length
+                + " != " + values.length);
         }
         Map<K,V> tmp = new HashMap<K,V>(keys.length);
         for (int i = 0; i < keys.length; i++) {
@@ -240,7 +241,7 @@ public class CollectionUtils {
                     @Override
                     public List<T> next() {
                         if (!hasNext()) {
-                            throw new NoSuchElementException("Permutations exhausted");
+                            throw new NoSuchElementException("Permutations exhausted: " + n);
                         }
                         List<T> pick = new ArrayList<>(original);
                         List<T> result = new ArrayList<>(n);
@@ -257,7 +258,7 @@ public class CollectionUtils {
 
                     @Override
                     public void remove() {
-                        throw new RuntimeException("remove() not implemented");
+                        throw new RuntimeException("remove() not implemented: " + this);
                     }
                 };
             }

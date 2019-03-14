@@ -992,7 +992,7 @@ public final class TransportMission extends Mission {
                     cargo.clear();
                     break;
                 case TNEXT: default:
-                    throw new IllegalStateException("Can not happen");
+                    throw new RuntimeException("Can not happen: " + result);
                 }
             }
             curr.clear();
@@ -1023,7 +1023,7 @@ public final class TransportMission extends Mission {
                     cargo.clear();
                     break;
                 default:
-                    throw new IllegalStateException("Can not happen");
+                    throw new RuntimeException("Can not happen: " + result);
                 }
             }
 

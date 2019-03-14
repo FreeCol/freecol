@@ -244,7 +244,7 @@ public final class Specification implements OptionContainer {
          */
         @Override
         public void toXML(FreeColXMLWriter xw) {
-            throw new RuntimeException("Can not happen");
+            throw new RuntimeException("Can not happen: " + this);
         }
 
         /**
@@ -1019,7 +1019,7 @@ public final class Specification implements OptionContainer {
      */
     public OptionGroup getOptionGroup(String id) {
         if (id == null) {
-            throw new RuntimeException("OptionGroup with null id.");
+            throw new RuntimeException("OptionGroup with null id: " + this);
         } else if (!this.allOptionGroups.containsKey(id)) {
             throw new RuntimeException("Missing OptionGroup: " + id);
         } else {

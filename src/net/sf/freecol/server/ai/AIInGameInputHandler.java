@@ -62,11 +62,11 @@ public final class AIInGameInputHandler extends FreeColServerHolder
         super(freeColServer);
         
         if (serverPlayer == null) {
-            throw new NullPointerException("serverPlayer == null");
+            throw new NullPointerException("serverPlayer == null: " + this);
         } else if (!serverPlayer.isAI()) {
-            throw new RuntimeException("Applying AIInGameInputHandler to a non-AI player!");
+            throw new RuntimeException("Applying AIInGameInputHandler to a non-AI player: " + serverPlayer);
         } else if (aiMain == null) {
-            throw new NullPointerException("aiMain == null");
+            throw new NullPointerException("aiMain == null: " + this);
         }
 
         // FIXME: Do not precalculate the AIPlayer, it may still be being initialized

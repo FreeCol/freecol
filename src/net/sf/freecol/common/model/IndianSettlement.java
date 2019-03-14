@@ -817,8 +817,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public int getPriceToBuy(GoodsType type, int amount) {
         if (amount > GoodsContainer.CARGO_SIZE) {
-            throw new IllegalArgumentException("Amount > "
-                + GoodsContainer.CARGO_SIZE);
+            throw new RuntimeException("Amount " + amount
+                + " > " + GoodsContainer.CARGO_SIZE);
         }
 
         int price = 0;
@@ -983,8 +983,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public int getPriceToSell(GoodsType type, int amount) {
         if (amount > GoodsContainer.CARGO_SIZE) {
-            throw new IllegalArgumentException("Amount > "
-                + GoodsContainer.CARGO_SIZE);
+            throw new RuntimeException("Amount " + amount
+                + " > " + GoodsContainer.CARGO_SIZE);
         }
         final int full = GOODS_BASE_PRICE + getType().getTradeBonus();
 

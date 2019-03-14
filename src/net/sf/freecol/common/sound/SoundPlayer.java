@@ -188,7 +188,7 @@ public final class SoundPlayer {
                        PercentageOption volumeOption) {
         setMixer(mixerOption.getValue());
         if (getMixer() == null) {
-            throw new IllegalStateException("Mixer unavailable.");
+            throw new RuntimeException("Mixer unavailable: " + mixerOption);
         }
         mixerOption.addPropertyChangeListener((PropertyChangeEvent e) -> {
                 setMixer((MixerWrapper)e.getNewValue());

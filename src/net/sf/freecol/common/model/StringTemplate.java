@@ -240,7 +240,7 @@ public class StringTemplate extends FreeColObject {
      */
     private void addPair(String key, StringTemplate value) {
         if (key == null && value == null) {
-            throw new RuntimeException("Null key and pair");
+            throw new RuntimeException("Null key and pair: " + this);
         }
         if (this.kv == null) this.kv = new ArrayList<>();
         this.kv.add(new SimpleEntry<>(key, value));

@@ -401,7 +401,7 @@ public class OptionGroup extends AbstractOption<OptionGroup>
     public <T extends Option> T getOption(String id,
                                           Class<T> returnClass) {
         if (id == null) {
-            throw new RuntimeException("Null id");
+            throw new RuntimeException("Null id: " + this);
         } else if (!this.optionMap.containsKey(id)) {
             throw new RuntimeException("Missing option: " + id);
         } else {

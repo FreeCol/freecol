@@ -205,7 +205,7 @@ public abstract class FreeColAction extends AbstractAction
      */
     @Override
     public FreeColAction clone() throws CloneNotSupportedException {
-        throw new CloneNotSupportedException("FreeColAction can not be cloned.");
+        throw new CloneNotSupportedException("FreeColAction can not be cloned:" + this);
     }
 
     /**

@@ -145,7 +145,9 @@ public class OggVorbisDecoderFactory {
             while (n > 0) {
                 if (bufCount <= 0) {
                     int ret = getBody(inputStream);
-                    if (ret < 0) throw new IOException("Ogg decoding error");
+                    if (ret < 0) {
+                        throw new IOException("Ogg decoding error: " + this);
+                    }
                     if (ret == 0) break;
                     bufCount = ret;
                     offset = 0;
@@ -173,7 +175,9 @@ public class OggVorbisDecoderFactory {
             while (n > 0) {
                 if (bufCount <= 0) {
                     int ret = getBody(inputStream);
-                    if (ret < 0) throw new IOException("Ogg decoding error");
+                    if (ret < 0) {
+                        throw new IOException("Ogg decoding error: " + this);
+                    }
                     if (ret == 0) break;
                     bufCount = ret;
                     offset = 0;

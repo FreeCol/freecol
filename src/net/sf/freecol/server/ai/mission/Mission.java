@@ -651,7 +651,8 @@ public abstract class Mission extends AIObject {
         if (target == null) return MoveType.MOVE_ILLEGAL;
         final Tile targetTile = target.getTile();
         if (!(target instanceof Europe) && targetTile == null) {
-            throw new IllegalStateException("Target neither Europe nor Tile");
+            throw new RuntimeException("Target neither Europe nor Tile: "
+                + target);
         }
         final Unit unit = getUnit();
         AIUnit aiCarrier = aiUnit.getTransport();

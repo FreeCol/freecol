@@ -462,7 +462,7 @@ public class Europe extends UnitLocation
      */
     @Override
     public boolean equipForRole(Unit unit, Role role, int roleCount) {
-        throw new RuntimeException("Only valid in the server.");
+        throw new RuntimeException("Only valid in the server: " + this);
     }
 
 

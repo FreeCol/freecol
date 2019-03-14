@@ -675,7 +675,7 @@ public final class MapViewer extends FreeColClientHolder {
     private void releaseUnitOutForAnimation(final Unit unit) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
-            throw new IllegalStateException("Tried to release unit that was not out for animation");
+            throw new RuntimeException("Unit not out for animation: " + unit);
         }
         if (i == 1) {
             unitsOutForAnimation.remove(unit);
