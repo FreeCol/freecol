@@ -85,12 +85,15 @@ public class UserServerAPI extends ServerAPI {
     }
 
     /**
-     * Set the connection.
+     * A connection has been made, save it and its parameters.
      *
      * @param c The new {@code Connection}.
+     * @param name The connection name.
+     * @param host The host connected to.
+     * @param port The port connected to.
      */
-    private synchronized void setConnection(Connection c) {
-        // Connection made, save the parameters
+    private synchronized void setConnection(Connection c, String name,
+                                            String host, int port) {
         this.name = name;
         this.host = host;
         this.port = port;
@@ -136,7 +139,7 @@ public class UserServerAPI extends ServerAPI {
         throws IOException {
         Connection c = newConnection(name, host, port);
         if (c == null) return null;
-        setConnection(c);
+        setConnection(c, name, host, port);
         return c;
     }
 
@@ -155,7 +158,7 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     public Connection reconnect() throws IOException {
-        return connect(getName(), getHost(), getPort());
+        return newConnection(getName(), getHost(), getPort());
     }
 
     /**
