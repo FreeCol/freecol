@@ -1329,11 +1329,9 @@ public final class FreeColServer {
      */
     private ServerInfo getServerInfo() {
         int slots = count(getGame().getLiveEuropeanPlayers(),
-            p -> !p.isREF() && ((ServerPlayer)p).isAI()
-                && !((ServerPlayer)p).isConnected());
+            p -> !p.isREF() && ((ServerPlayer)p).isAI() && !p.isConnected());
         int players = count(getGame().getLivePlayers(),
-            p -> !((ServerPlayer)p).isAI()
-                && ((ServerPlayer)p).isConnected());
+            p -> !((ServerPlayer)p).isAI() && p.isConnected());
         return new ServerInfo(getName(),
                               null, -1, // Missing these at this point
                               slots, players,

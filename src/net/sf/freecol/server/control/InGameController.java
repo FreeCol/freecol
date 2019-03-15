@@ -987,9 +987,9 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer),
                    serverPlayer.collectNewTiles(visible));
             // Coronado
-            for (ServerPlayer sp : transform(game.getConnectedPlayers(serverPlayer),
-                                             coronadoPred)) {
-                cs.add(See.only(sp), sp.exploreForSettlement(settlement));//-vis(sp)
+            for (Player sp : transform(game.getConnectedPlayers(serverPlayer),
+                                       coronadoPred)) {
+                cs.add(See.only(sp), ((ServerPlayer)sp).exploreForSettlement(settlement));//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(sp,
                     new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
@@ -1299,9 +1299,9 @@ public final class InGameController extends Controller {
 
         if (settlement != null && serverPlayer.isEuropean()) {
             // Define Coronado to make all colony-owned tiles visible
-            for (ServerPlayer sp : transform(sg.getConnectedPlayers(serverPlayer),
-                                             coronadoPred)) {
-                sp.exploreTile(tile);
+            for (Player sp : transform(sg.getConnectedPlayers(serverPlayer),
+                                       coronadoPred)) {
+                ((ServerPlayer)sp).exploreTile(tile);
                 cs.add(See.only(sp), tile);
                 sp.invalidateCanSeeTiles();//+vis(sp)
             }
@@ -2128,12 +2128,12 @@ public final class InGameController extends Controller {
             // Are there humans left?
             // FIXME: see if this can be relaxed so we can run large
             // AI-only simulations.
-            List<ServerPlayer> connected = serverGame.getConnectedPlayers();
+            List<Player> connected = serverGame.getConnectedPlayers();
             boolean onlyAI = all(connected, Player::isAI);
             if (onlyAI) {
                 final Comparator<Player> scoreComp
                     = Comparator.comparingInt(Player::getScore).reversed();
-                winner = first(sort(connected, scoreComp));
+                winner = (ServerPlayer)first(sort(connected, scoreComp));
                 logger.info("No human player left, winner is: " + winner);
                 if (debugOnlyAITurns > 0) { // Complete debug runs
                     FreeColDebugger.signalEndDebugRun();
@@ -2204,7 +2204,7 @@ public final class InGameController extends Controller {
             // Prepare to update, with current player last so that it
             // does not immediately start moving and cause further
             // changes which conflict with these updates.
-            List<ServerPlayer> players = serverGame.getConnectedPlayers(current);
+            List<Player> players = serverGame.getConnectedPlayers(current);
             players.add(current);
 
             // If this is a debug run, update everyone and continue.

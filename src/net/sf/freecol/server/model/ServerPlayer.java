@@ -270,20 +270,14 @@ public class ServerPlayer extends Player implements TurnTaker {
     }
 
 
-    /**
-     * Is this player is currently connected to the server?
-     *
-     * @return True if this player is currently connected to the server.
-     */
-    public final boolean isConnected() {
-        return this.connection != null;
-    }
+    // Fully implement Connection routines and use them for comms
 
     /**
      * Gets the connection of this player.
      *
      * @return The {@code Connection}.
      */
+    @Override
     public final Connection getConnection() {
         return this.connection;
     }
@@ -293,6 +287,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      *
      * @param connection The {@code Connection}.
      */
+    @Override
     public final void setConnection(Connection connection) {
         this.connection = connection;
     }

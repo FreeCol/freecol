@@ -45,7 +45,7 @@ import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.model.Constants.*;
-import net.sf.freecol.common.model.NationOptions.NationState;
+import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -602,6 +602,36 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
 
+    // Connection routines, which only work in ServerPlayer
+
+    /**
+     * Is this player is currently connected to the server?
+     *
+     * @return True if this player is currently connected to the server.
+     */
+    public final boolean isConnected() {
+        return getConnection() != null;
+    }
+
+    /**
+     * Gets the connection of this player.
+     *
+     * @return The {@code Connection}.
+     */
+    public Connection getConnection() {
+        throw new RuntimeException("getConnection called on Player: " + this);
+    }
+
+    /**
+     * Sets the connection of this player.
+     *
+     * @param connection The {@code Connection}.
+     */
+    public void setConnection(Connection connection) {
+        throw new RuntimeException("setConnection called on Player: " + this);
+    }
+
+
     //
     // Player / nation types and the implications thereof
     //
@@ -818,10 +848,10 @@ public class Player extends FreeColGameObject implements Nameable {
     public void setNation(Nation newNation) {
         Nation oldNation = getNation();
         nationId = newNation.getId();
-        java.util.Map<Nation, NationState> nations
+        java.util.Map<Nation, NationOptions.NationState> nations
             = getGame().getNationOptions().getNations();
-        nations.put(oldNation, NationState.AVAILABLE);
-        nations.put(newNation, NationState.NOT_AVAILABLE);
+        nations.put(oldNation, NationOptions.NationState.AVAILABLE);
+        nations.put(newNation, NationOptions.NationState.NOT_AVAILABLE);
     }
 
     /**

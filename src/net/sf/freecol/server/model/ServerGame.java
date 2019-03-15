@@ -148,20 +148,18 @@ public class ServerGame extends Game implements TurnTaker {
     }
 
     /**
-     * Get a list of connected server players, optionally excluding
-     * supplied ones.
+     * Get a list of connected players, optionally excluding supplied ones.
      *
      * Do *not* restrict this only to live players, dead players still
      * need to be communicated with (e.g. to tell them they are dead,
      * or to revive them).
      *
-     * @param serverPlayers The {@code ServerPlayer}s to exclude.
-     * @return A list of all connected server players, with exclusions.
+     * @param players The {@code Player}s to exclude.
+     * @return A list of all connected players, with exclusions.
      */
-    public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
+    public List<Player> getConnectedPlayers(Player... players) {
         final Predicate<Player> connPred = p ->
-            ((ServerPlayer)p).isConnected()
-                && none(serverPlayers, matchKey((ServerPlayer)p));
+            p.isConnected() && none(players, matchKey(p));
         synchronized (this.players) {
             return transform(this.players, connPred, p -> (ServerPlayer)p);
         }
@@ -179,39 +177,39 @@ public class ServerGame extends Game implements TurnTaker {
     /**
      * Send a change set to all players, optionally excluding one.
      *
-     * @param serverPlayer A {@code ServerPlayer} to exclude.
+     * @param player A {@code Player} to exclude.
      * @param cs The {@code ChangeSet} encapsulating the update.
      */
-    public void sendToOthers(ServerPlayer serverPlayer, ChangeSet cs) {
-        sendToList(getConnectedPlayers(serverPlayer), cs);
+    public void sendToOthers(Player player, ChangeSet cs) {
+        sendToList(getConnectedPlayers(player), cs);
     }
 
     /**
      * Send a change set to a list of players.
      *
-     * @param serverPlayers The list of {@code ServerPlayer}s to send to.
+     * @param players The list of {@code Player}s to send to.
      * @param cs The {@code ChangeSet} to send.
      */
-    public void sendToList(List<ServerPlayer> serverPlayers, ChangeSet cs) {
-        for (ServerPlayer s : serverPlayers) sendTo(s, cs);
+    public void sendToList(List<Player> players, ChangeSet cs) {
+        for (Player p : players) sendTo(p, cs);
     }
 
     /**
      * Send a change set to one player.
      *
-     * @param serverPlayer The {@code ServerPlayer} to send to.
+     * @param player The {@code Player} to send to.
      * @param cs The {@code ChangeSet} to send.
      * @return True if the change was sent.
      */
-    public boolean sendTo(ServerPlayer serverPlayer, ChangeSet cs) {
+    public boolean sendTo(Player player, ChangeSet cs) {
         try {
-            return serverPlayer.send(cs);
+            return ((ServerPlayer)player).send(cs);
         } catch (Exception e) {
             // Catch all manner of exceptions here to localize failure to
             // just one player.  Nothing is expected, but the entire output
             // side of serialization is potentially exercised here, so it is
             // a good place to find new fails.
-            logger.log(Level.WARNING, "sendTo(" + serverPlayer.getId()
+            logger.log(Level.WARNING, "sendTo(" + player.getId()
                 + "," + cs + ") failed", e);
         }
         return false;
