@@ -1174,7 +1174,7 @@ public class Game extends FreeColGameObject {
      *
      * @return The current {@code NationOptions}.
      */
-    public final NationOptions getNationOptions() {
+    public final synchronized NationOptions getNationOptions() {
         return nationOptions;
     }
 
@@ -1185,7 +1185,7 @@ public class Game extends FreeColGameObject {
      *
      * @param newNationOptions The new {@code NationOptions} value.
      */
-    public final void setNationOptions(final NationOptions newNationOptions) {
+    public final synchronized void setNationOptions(final NationOptions newNationOptions) {
         this.nationOptions = newNationOptions;
     }
 
@@ -1611,10 +1611,10 @@ public class Game extends FreeColGameObject {
 
         // Allow creation, might be first sight of the map.
         // Do map early, so map references work
-        this.setMap(update(o.getMap(), Map.class, true));
+        setMap(update(o.getMap(), Map.class, true));
 
         this.unknownEnemy = update(o.getUnknownEnemy(), false);
-        this.nationOptions = o.getNationOptions();
+        setNationOptions(o.getNationOptions());
         this.currentPlayer = updateRef(o.getCurrentPlayer(), Player.class);
         this.turn = o.getTurn();
         this.spanishSuccession = o.getSpanishSuccession();
@@ -1678,10 +1678,12 @@ public class Game extends FreeColGameObject {
         super.writeChildren(xw);
 
         if (specification != null) {
-            // Specification *must be first* if present.
-            // It is not necessarily present when reading maps, but an
-            // overriding spec is provided there so all should be well.
-            specification.toXML(xw);
+            synchronized (this.specification) {
+                // Specification *must be first* if present.
+                // It is not necessarily present when reading maps, but an
+                // overriding spec is provided there so all should be well.
+                this.specification.toXML(xw);
+            }
         }
 
         for (String cityName : NameCache.getCitiesOfCibola()) {
@@ -1693,16 +1695,19 @@ public class Game extends FreeColGameObject {
             xw.writeEndElement();
         }
 
-        nationOptions.toXML(xw);
+        synchronized (this.nationOptions) {
+            this.nationOptions.toXML(xw);
+        }
 
-        synchronized (this.players) { // Should be sorted
+        synchronized (this.players) { // Should already be sorted
             for (Player p : this.players) p.toXML(xw);
         }
         Player unknown = getUnknownEnemy();
         if (unknown != null) unknown.toXML(xw);
 
-        Map map = getMap();
-        if (map != null) map.toXML(xw);
+        synchronized (this.map) {
+            this.map.toXML(xw);
+        }
     }
 
     /**
@@ -1794,7 +1799,7 @@ public class Game extends FreeColGameObject {
                 throw new XMLStreamException("Tried to read " + tag
                     + " with null specification");
             }
-            nationOptions = new NationOptions(xr, specification);
+            setNationOptions(new NationOptions(xr, specification));
 
         } else if (Player.TAG.equals(tag)) {
             if (this.specification == null) {
@@ -1809,9 +1814,7 @@ public class Game extends FreeColGameObject {
             }
 
         } else if (Specification.TAG.equals(tag)) {
-            logger.info(((this.specification == null) ? "Loading" : "Reloading")
-                + " specification.");
-            this.specification = new Specification(xr);
+            setSpecification(new Specification(xr));
 
         } else {
             super.readChild(xr);
