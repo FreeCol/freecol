@@ -85,18 +85,24 @@ public class UserServerAPI extends ServerAPI {
     }
 
     /**
-     * A connection has been made, save it and its parameters.
+     * Update the connection parameters so as to allow reconnection.
      *
-     * @param c The new {@code Connection}.
      * @param name The connection name.
      * @param host The host connected to.
      * @param port The port connected to.
      */
-    private synchronized void setConnection(Connection c, String name,
-                                            String host, int port) {
+    private synchronized void updateParameters(String name, String host, int port) {
         this.name = name;
         this.host = host;
         this.port = port;
+    }        
+
+    /**
+     * A connection has been made, save it and its parameters.
+     *
+     * @param c The new {@code Connection}.
+     */
+    private synchronized void updateConnection(Connection c) {
         c.setMessageHandler(this.messageHandler);
         c.setWriteScope(FreeColXMLWriter.WriteScope.toServer());
         this.connection = c;
@@ -139,7 +145,8 @@ public class UserServerAPI extends ServerAPI {
         throws IOException {
         Connection c = newConnection(name, host, port);
         if (c == null) return null;
-        setConnection(c, name, host, port);
+        updateConnection(c);
+        updateParameters(name, host, port);
         return c;
     }
 
@@ -158,7 +165,9 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     public Connection reconnect() throws IOException {
-        return newConnection(getName(), getHost(), getPort());
+        Connection c = newConnection(getName(), getHost(), getPort());
+        if (c != null) updateConnection(c);
+        return c;
     }
 
     /**
