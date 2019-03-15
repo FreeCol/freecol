@@ -312,7 +312,7 @@ public abstract class Message {
                                                      T defaultValue) {
         T result = defaultValue;
         if (hasAttribute(key)) {
-            String kv = getStringAttribute(key);
+            String kv = upCase(getStringAttribute(key));
             try {
                 result = Enum.valueOf(returnClass, kv);
             } catch (Exception e) {
