@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Game;
@@ -59,12 +58,12 @@ public class NameCache {
     private final static String CIBOLA_PREFIX
         = "nameCache.lostCityRumour.cityName.";
 
-    /** Name keys for the cities of Cibola. */
-    private static AtomicReference<List<String>> cibolaKeys
-        = new AtomicReference<List<String>>(null);
+    /** Cities of Cibola. */
+    private static List<String> cibolaKeys = null;
+    private static final Object cibolaLock = new Object();
 
     /** Mercenary leaders. */
-    private static List<String> mercenaryLeaders = new ArrayList<>();
+    private static List<String> mercenaryLeaders = null;
     private static final Object mercenaryLock = new Object();
 
     /** Region names and index. */
@@ -140,18 +139,19 @@ public class NameCache {
      * @param random A pseudo-random number source.
      */
     public static void requireCitiesOfCibola(Random random) {
-        List<String> keys = cibolaKeys.get();
-        if (keys != null) return;
-        keys = new ArrayList<>();
-        collectNames(CIBOLA_PREFIX, keys);
-        int count = keys.size();
-        // Actually, store the keys.
-        keys.clear();
-        for (int i = 0; i < count; i++) {
-            keys.add(CIBOLA_PREFIX + i);
+        synchronized (cibolaLock) {
+            if (cibolaKeys == null) {
+                cibolaKeys = new ArrayList<>();
+                collectNames(CIBOLA_PREFIX, cibolaKeys);
+                int count = cibolaKeys.size();
+                // Actually, store the keys.
+                cibolaKeys.clear();
+                for (int i = 0; i < count; i++) {
+                    cibolaKeys.add(CIBOLA_PREFIX + i);
+                }
+                randomShuffle(logger, "Cibola", cibolaKeys, random);
+            }
         }
-        randomShuffle(logger, "Cibola", keys, random);
-        cibolaKeys.set(keys);
     }
 
     /**
@@ -338,9 +338,10 @@ public class NameCache {
      * @return A name for a city of Cibola, or null if exhausted.
      */
     public static String getNextCityOfCibola() {
-        List<String> keys = cibolaKeys.get();
-        return (keys == null || keys.isEmpty()) ? null
-            : Messages.message(keys.remove(0));
+        synchronized (cibolaLock) {
+            return (cibolaKeys == null || cibolaKeys.isEmpty()) ? null
+                : Messages.message(cibolaKeys.remove(0));
+        }
     }
 
     /**
@@ -349,16 +350,19 @@ public class NameCache {
      * @return A list of city names.
      */
     public static List<String> getCitiesOfCibola() {
-        List<String> keys = cibolaKeys.get();
-        return (keys != null) ? keys : Collections.<String>emptyList();
+        synchronized (cibolaLock) {
+            return (cibolaKeys == null) ? Collections.<String>emptyList()
+                : cibolaKeys;
+        }
     }
 
     /**
      * Clear the city of Cibola cache.
      */
     public static void clearCitiesOfCibola() {
-        List<String> keys = cibolaKeys.get();
-        if (keys != null) keys.clear();
+        synchronized (cibolaLock) {
+            if (cibolaKeys != null) cibolaKeys.clear();
+        }
     }
 
     /**
@@ -367,12 +371,10 @@ public class NameCache {
      * @param key The key to add.
      */
     public static void addCityOfCibola(String key) {
-        List<String> keys = cibolaKeys.get();
-        if (keys == null) {
-            keys = new ArrayList<>();
-            cibolaKeys.set(keys);
+        synchronized (cibolaLock) {
+            if (cibolaKeys == null) cibolaKeys = new ArrayList<>();
+            cibolaKeys.add(key);
         }
-        keys.add(key);
     }
 
     /**
