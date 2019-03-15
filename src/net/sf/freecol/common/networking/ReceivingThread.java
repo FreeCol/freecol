@@ -402,6 +402,5 @@ final class ReceivingThread extends Thread {
         } finally {
             askToStop("run complete");
         }
-        logger.info(getName() + ": finished");
     }
 }
