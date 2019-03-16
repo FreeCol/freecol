@@ -102,7 +102,7 @@ public class SetNationMessage extends AttributeMessage {
         
         final Game game = freeColServer.getGame();
         final Player other = getPlayer(game);
-        if (other != null && (ServerPlayer)other != serverPlayer) {
+        if (other != null && other != (Player)serverPlayer) {
             return serverPlayer.clientError("Player " + other.getId()
                 + " set from " + serverPlayer.getId());
         }

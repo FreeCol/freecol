@@ -675,9 +675,9 @@ public final class FreeColServer {
     /**
      * Establish the connections for an AI player.
      *
-     * @param aiPlayer The AI {@code ServerPlayer} to connect.
+     * @param aiPlayer The AI {@code Player} to connect.
      */
-    private void addAIConnection(ServerPlayer aiPlayer) {
+    private void addAIConnection(Player aiPlayer) {
         DummyConnection theConnection
             = new DummyConnection("Server-to-AI-" + aiPlayer.getSuffix());
         theConnection.setMessageHandler(this.inputHandler);
@@ -738,11 +738,10 @@ public final class FreeColServer {
             final Game game = buildGame();
             for (Player player : transform(game.getLivePlayers(),
                                            p -> !p.isAI())) {
-                ServerPlayer serverPlayer = (ServerPlayer)player;
-                serverPlayer.invalidateCanSeeTiles();
+                ((ServerPlayer)player).invalidateCanSeeTiles();
                 ChangeSet cs = new ChangeSet();
-                cs.add(See.only(serverPlayer), game);
-                serverPlayer.send(cs);
+                cs.add(See.only(player), game);
+                ((ServerPlayer)player).send(cs);
             }
             break;
         case LOAD_GAME: // Do nothing, game has been sent.
@@ -1126,8 +1125,7 @@ public final class FreeColServer {
 
         for (Player player : serverGame.getLivePlayerList()) {
             if (player.isAI()) {
-                ServerPlayer aiPlayer = (ServerPlayer)player;
-                addAIConnection(aiPlayer);
+                addAIConnection(player);
             }
             if (player.isEuropean()) {
                 // The map will be invalid, so trigger a recalculation of the
@@ -1277,8 +1275,8 @@ public final class FreeColServer {
     public void exploreMapForAllPlayers(boolean reveal) {
         final Specification spec = getSpecification();
 
-        for (Player player : getGame().getLiveEuropeanPlayerList()) {
-            ((ServerPlayer)player).exploreMap(reveal);
+        for (Player p : getGame().getLiveEuropeanPlayerList()) {
+            ((ServerPlayer)p).exploreMap(reveal);
         }
      
         // Removes fog of war when revealing the whole map
@@ -1291,8 +1289,8 @@ public final class FreeColServer {
                             FreeColDebugger.getNormalGameFogOfWar());
         }
 
-        for (Player player : getGame().getLiveEuropeanPlayerList()) {
-            ((ServerPlayer)player).getConnection().sendReconnect();
+        for (Player p : getGame().getLiveEuropeanPlayerList()) {
+            p.getConnection().sendReconnect();
         }
     }
 
@@ -1305,7 +1303,7 @@ public final class FreeColServer {
      */
     public ServerPlayer getPlayer(final Connection conn) {
         final Predicate<Player> connPred
-            = matchKeyEquals(conn, p -> ((ServerPlayer)p).getConnection());
+            = matchKeyEquals(conn, p -> p.getConnection());
         return (ServerPlayer)getGame().getPlayer(connPred);
     }
 

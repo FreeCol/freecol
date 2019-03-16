@@ -128,11 +128,11 @@ public class InciteMessage extends AttributeMessage {
         }
 
         MoveType type;
-        ServerPlayer enemy = (ServerPlayer)getEnemy(game);
+        Player enemy = getEnemy(game);
         if (enemy == null) {
             return serverPlayer.clientError("Not a player: "
                 + getStringAttribute(ENEMY_TAG));
-        } else if (enemy == serverPlayer) {
+        } else if (enemy == (Player)serverPlayer) {
             return serverPlayer.clientError("Inciting against oneself!");
         } else if (!enemy.isEuropean()) {
             return serverPlayer.clientError("Inciting against non-European!");
@@ -146,7 +146,7 @@ public class InciteMessage extends AttributeMessage {
 
         // Valid, proceed to incite.
         return igc(freeColServer)
-            .incite(serverPlayer, unit, is, enemy, gold);
+            .incite(serverPlayer, unit, is, (ServerPlayer)enemy, gold);
     }
 
 

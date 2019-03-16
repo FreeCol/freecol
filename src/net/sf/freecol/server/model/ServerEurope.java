@@ -96,18 +96,19 @@ public class ServerEurope extends Europe implements TurnTaker {
         }
 
         // Sell any excess
-        final ServerPlayer owner = (ServerPlayer)getOwner();
+        final Player owner = getOwner();
         for (AbstractGoods ag : transform(req, g -> g.getAmount() < 0)) {
-            int rm = owner.sellInEurope(null, null, ag.getType(), -ag.getAmount());
+            int rm = ((ServerPlayer)owner).sellInEurope(null, null, ag.getType(), -ag.getAmount());
             if (rm > 0) {
-                owner.addExtraTrade(new AbstractGoods(ag.getType(), rm));
+                ((ServerPlayer)owner).addExtraTrade(new AbstractGoods(ag.getType(), rm));
             }
         }
         // Buy what is needed
         for (AbstractGoods ag : transform(req, AbstractGoods::isPositive)) {
-            int m = owner.buyInEurope(null, null, ag.getType(), ag.getAmount());
+            int m = ((ServerPlayer)owner).buyInEurope(null, null,
+                ag.getType(), ag.getAmount());
             if (m > 0) {
-                owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));
+                ((ServerPlayer)owner).addExtraTrade(new AbstractGoods(ag.getType(), -m));
             }
         }
 
@@ -271,12 +272,12 @@ public class ServerEurope extends Europe implements TurnTaker {
         boolean ret = equipForRole(unit, role, roleCount);
 
         if (ret) {
-            ServerPlayer serverPlayer = (ServerPlayer)getOwner();
-            cs.addPartial(See.only(serverPlayer), serverPlayer,
-                "gold", String.valueOf(serverPlayer.getGold()));
-            cs.add(See.only(serverPlayer), unit);
-            serverPlayer.flushExtraTrades(random);
-            serverPlayer.csFlushMarket(cs);
+            Player owner = getOwner();
+            cs.addPartial(See.only(owner), owner,
+                "gold", String.valueOf(owner.getGold()));
+            cs.add(See.only(owner), unit);
+            ((ServerPlayer)owner).flushExtraTrades(random);
+            ((ServerPlayer)owner).csFlushMarket(cs);
         }
         return ret;
     }

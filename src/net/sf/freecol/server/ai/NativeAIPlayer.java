@@ -107,7 +107,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
      * @param player The player that should be associated with this
      *            {@code AIPlayer}.
      */
-    public NativeAIPlayer(AIMain aiMain, ServerPlayer player) {
+    public NativeAIPlayer(AIMain aiMain, Player player) {
         super(aiMain, player);
 
         this.initialized = getPlayer() != null;
@@ -163,15 +163,14 @@ public final class NativeAIPlayer extends MissionAIPlayer {
      * @param lb A {@code LogBuilder} to log to.
      */
     private void determineStances(LogBuilder lb) {
-        final ServerPlayer serverPlayer = (ServerPlayer)getPlayer();
+        final Player player = getPlayer();
         lb.mark();
 
-        for (Player p : getGame().getLivePlayerList(serverPlayer)) {
+        for (Player p : getGame().getLivePlayerList(player)) {
             Stance newStance = determineStance(p);
-            if (newStance != serverPlayer.getStance(p)) {
+            if (newStance != player.getStance(p)) {
                 getAIMain().getFreeColServer().getInGameController()
-                    .changeStance(serverPlayer, newStance, 
-                                  (ServerPlayer)p, true);
+                    .changeStance(player, newStance, p, true);
                 lb.add(" ", p.getDebugName(), "->", newStance, ", ");
             }
         }

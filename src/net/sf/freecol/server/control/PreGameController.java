@@ -262,7 +262,7 @@ public final class PreGameController extends Controller {
      * Handle a request for vacant players.
      */
     public ChangeSet vacantPlayers() {
-        return ChangeSet.simpleChange((ServerPlayer)null,
+        return ChangeSet.simpleChange((Player)null,
             new VacantPlayersMessage()
                 .setVacantPlayers(getFreeColServer().getGame()));
     }

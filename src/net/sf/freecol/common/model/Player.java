@@ -40,11 +40,13 @@ import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.networking.ChangeSet;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -632,6 +634,39 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
 
+    // Error wrangling
+
+    /**
+     * Convenience function to create a client error message for this
+     * player, log it, and wrap it into a change set.
+     *
+     * @param template An i18n template.
+     * @return A new {@code ChangeSet}.
+     */
+    public ChangeSet clientError(StringTemplate template) {
+        logger.warning(Messages.message(template));
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
+            Thread.dumpStack();
+        }
+        return ChangeSet.clientError(ChangeSet.See.only(this), template);
+    }
+
+    /**
+     * Convenience function to create a client error message, log it,
+     * and wrap it into a change set.
+     *
+     * @param message The non-i18n message.
+     * @return A new {@code ChangeSet}.
+     */
+    public ChangeSet clientError(String message) {
+        logger.warning(message);
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
+            Thread.dumpStack();
+        }
+        return ChangeSet.clientError(ChangeSet.See.only(this), message);
+    }
+
+    
     //
     // Player / nation types and the implications thereof
     //

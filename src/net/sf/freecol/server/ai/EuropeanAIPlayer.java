@@ -267,7 +267,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param player The player that should be associated with this
      *            {@code AIPlayer}.
      */
-    public EuropeanAIPlayer(AIMain aiMain, ServerPlayer player) {
+    public EuropeanAIPlayer(AIMain aiMain, Player player) {
         super(aiMain, player);
     }
 
@@ -1486,8 +1486,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     ; // Peace treaty holds for now
                 } else {
                     getAIMain().getFreeColServer().getInGameController()
-                        .changeStance(serverPlayer, newStance,
-                                      (ServerPlayer)p, true);
+                        .changeStance(serverPlayer, newStance, p, true);
                     lb.add(" ", p.getDebugName(), "->", newStance, ", ");
                 }
             }

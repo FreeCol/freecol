@@ -25,12 +25,12 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.FreeColServerHolder;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -42,7 +42,7 @@ public final class AIInGameInputHandler extends FreeColServerHolder
     private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
 
     /** The player for whom I work. */
-    private final ServerPlayer serverPlayer;
+    private final Player player;
 
     /** The main AI object. */
     private final AIMain aiMain;
@@ -52,25 +52,25 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      * The constructor to use.
      *
      * @param freeColServer The main server.
-     * @param serverPlayer The {@code ServerPlayer} that is being
+     * @param serverPlayer The {@code Player} that is being
      *     managed by this AIInGameInputHandler.
      * @param aiMain The main AI-object.
      */
     public AIInGameInputHandler(FreeColServer freeColServer,
-                                ServerPlayer serverPlayer,
-                                AIMain aiMain) {
+                                Player player, AIMain aiMain) {
         super(freeColServer);
         
-        if (serverPlayer == null) {
+        if (player == null) {
             throw new NullPointerException("serverPlayer == null: " + this);
-        } else if (!serverPlayer.isAI()) {
-            throw new RuntimeException("Applying AIInGameInputHandler to a non-AI player: " + serverPlayer);
+        } else if (!player.isAI()) {
+            throw new RuntimeException("Applying AIInGameInputHandler to a non-AI player: " + player);
         } else if (aiMain == null) {
             throw new NullPointerException("aiMain == null: " + this);
         }
 
-        // FIXME: Do not precalculate the AIPlayer, it may still be being initialized
-        this.serverPlayer = serverPlayer;
+        // FIXME: Do not precalculate the AIPlayer, it may still be
+        // being initialized
+        this.player = player;
         this.aiMain = aiMain;
     }
 
@@ -80,7 +80,7 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      * @return The {@code AIPlayer}.
      */
     private AIPlayer getMyAIPlayer() {
-        return this.aiMain.getAIPlayer(this.serverPlayer);
+        return this.aiMain.getAIPlayer(this.player);
     }
 
 

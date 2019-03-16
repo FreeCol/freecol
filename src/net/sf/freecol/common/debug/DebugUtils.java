@@ -198,8 +198,7 @@ public class DebugUtils {
             transform(sSpec.getFoundingFathers(), noFatherPred, mapper,
                       Comparator.naturalOrder()));
         if (father != null) {
-            server.getInGameController()
-                .addFoundingFather((ServerPlayer)sPlayer, father);
+            server.getInGameController().addFoundingFather((ServerPlayer)sPlayer, father);
         }
     }
 

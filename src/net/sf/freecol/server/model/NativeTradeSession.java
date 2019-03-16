@@ -88,7 +88,7 @@ public class NativeTradeSession extends Session {
         if (this.nt.hasNotTraded()) { // Reset the moves if nothing happened
             Unit unit = this.nt.getUnit();
             unit.setMovesLeft(this.movesLeft);
-            cs.addPartial(See.only((ServerPlayer)unit.getOwner()), unit,
+            cs.addPartial(See.only(unit.getOwner()), unit,
                 "movesLeft", String.valueOf(unit.getMovesLeft()));
         }
         this.nt.setDone();

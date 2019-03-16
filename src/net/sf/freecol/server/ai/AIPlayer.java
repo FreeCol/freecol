@@ -80,7 +80,7 @@ public abstract class AIPlayer extends AIObject {
         = Comparator.comparing(AIUnit::getUnit, Unit.locComparator);
 
     /** The FreeColGameObject this AIObject contains AI-information for. */
-    private ServerPlayer player;
+    private Player player;
 
     /** The PRNG to use for this AI player. */
     private Random aiRandom;
@@ -93,10 +93,9 @@ public abstract class AIPlayer extends AIObject {
      * Creates a new AI player.
      *
      * @param aiMain The {@code AIMain} the player exists within.
-     * @param player The {@code ServerPlayer} to associate this
-     *            AI player with.
+     * @param player The {@code Player} to associate this AI player with.
      */
-    protected AIPlayer(AIMain aiMain, ServerPlayer player) {
+    protected AIPlayer(AIMain aiMain, Player player) {
         super(aiMain, player.getId());
 
         this.player = player;

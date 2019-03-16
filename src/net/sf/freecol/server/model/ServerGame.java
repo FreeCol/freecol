@@ -161,7 +161,7 @@ public class ServerGame extends Game implements TurnTaker {
         final Predicate<Player> connPred = p ->
             p.isConnected() && none(players, matchKey(p));
         synchronized (this.players) {
-            return transform(this.players, connPred, p -> (ServerPlayer)p);
+            return transform(this.players, connPred);
         }
     }
 
@@ -267,12 +267,12 @@ public class ServerGame extends Game implements TurnTaker {
     /**
      * Change the AI state of a player.
      *
-     * @param serverPlayer The {@code ServerPlayer} to change.
+     * @param player The {@code Player} to change.
      * @param ai The new AI state.
      */
-    public void changeAI(ServerPlayer serverPlayer, boolean ai) {
-        serverPlayer.setAI(ai);
-        sendToAll(ChangeSet.aiChange(serverPlayer, ai));
+    public void changeAI(Player player, boolean ai) {
+        player.setAI(ai);
+        sendToAll(ChangeSet.aiChange(player, ai));
     }
 
     /**
@@ -287,24 +287,24 @@ public class ServerGame extends Game implements TurnTaker {
     /**
      * Checks if anybody has won this game.
      *
-     * @return The {@code Player} who has won the game or null if none.
+     * @return The {@code ServerPlayer} who has won the game or null if none.
      */
-    public Player checkForWinner() {
+    public ServerPlayer checkForWinner() {
         final Specification spec = getSpecification();
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
             Player winner = find(getLiveEuropeanPlayers(),
                 p -> p.getPlayerType() == Player.PlayerType.INDEPENDENT);
-            if (winner != null) return winner;
+            if (winner != null) return (ServerPlayer)winner;
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
             List<Player> winners = transform(getLiveEuropeanPlayers(),
                                              p -> !p.isREF());
-            if (winners.size() == 1) return winners.get(0);
+            if (winners.size() == 1) return (ServerPlayer)winners.get(0);
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
             List<Player> winners = transform(getLiveEuropeanPlayers(),
                                              p -> !p.isAI());
-            if (winners.size() == 1) return winners.get(0);
+            if (winners.size() == 1) return (ServerPlayer)winners.get(0);
         }
         return null;
     }
@@ -342,22 +342,18 @@ public class ServerGame extends Game implements TurnTaker {
     }
 
     /**
-     * Checks for and if necessary performs the War of Spanish
-     * Succession changes.
+     * Is it time for the Spanish Succession settlement?
      *
-     * Visibility changes for the winner, loser is killed/irrelevant.
-     *
-     * @param cs A {@code ChangeSet} to update.
-     * @param lb A {@code LogBuilder} to log to.
      * @param event The Spanish Succession {@code Event}.
-     * @return The {@code ServerPlayer} that is eliminated if
-     *     any, or null if none found.
+     * @param players A list to fill with the strongest and weakest AIs.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return True if the Spanish Succession can proceed.
      */
-    private ServerPlayer csSpanishSuccession(ChangeSet cs, LogBuilder lb,
-                                             Event event) {
+    private boolean spanishSuccessionReady(Event event, List<Player> players,
+                                           LogBuilder lb) {
         final Limit yearLimit
             = event.getLimit("model.limit.spanishSuccession.year");
-        if (!yearLimit.evaluate(this)) return null;
+        if (!yearLimit.evaluate(this)) return false;
 
         final Limit weakLimit
             = event.getLimit("model.limit.spanishSuccession.weakestPlayer");
@@ -393,10 +389,32 @@ public class ServerGame extends Game implements TurnTaker {
         }
         lb.truncate(lb.size() - sep.length());
         lb.add("]");
+        players.add(weakAI);
+        players.add(0, strongAI); // Strong first
+        return ready;
+    }
+
+    /**
+     * Checks for and if necessary performs the War of Spanish
+     * Succession changes.
+     *
+     * Visibility changes for the winner, loser is killed/irrelevant.
+     *
+     * @param cs A {@code ChangeSet} to update.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param event The Spanish Succession {@code Event}.
+     * @return The {@code ServerPlayer} that is eliminated if
+     *     any, or null if none found.
+     */
+    private ServerPlayer csSpanishSuccession(ChangeSet cs, LogBuilder lb,
+                                             Event event) {
         // Do not proceed if no player meets the support limit or if there
         // are not clearly identifiable strong and weak AIs.
-        if (!ready
-            || weakAI == null || strongAI == null
+        List<Player> ail = new ArrayList<>();
+        if (!spanishSuccessionReady(event, ail, lb)) return null;
+        final Player strongAI = ail.get(0);
+        final Player weakAI = ail.get(1);
+        if (weakAI == null || strongAI == null
             || weakAI == strongAI) return null;
 
         lb.add(" => ", weakAI.getName(), " cedes ", strongAI.getName(), ":");
@@ -410,27 +428,27 @@ public class ServerGame extends Game implements TurnTaker {
                 lb.add(" ", is.getName(), "(mission)");
                 is.getTile().cacheUnseen(strongest);//+til
                 tiles.add(is.getTile());
-                is.setContacted(strongest);//-til
+                is.setContacted(strongAI);//-til
                 ServerUnit missionary = (ServerUnit)is.getMissionary();
-                if (weakest.csChangeOwner(missionary, strongest,//-vis(both),-til
+                if (weakest.csChangeOwner(missionary, strongAI,//-vis(both),-til
                                           UnitChangeType.CAPTURE, null, cs)) {
-                    is.getTile().updateIndianSettlement(strongest);
-                    cs.add(See.perhaps().always(strongest), is);
+                    is.getTile().updateIndianSettlement(strongAI);
+                    cs.add(See.perhaps().always(strongAI), is);
                 }
             });
-        List<Colony> cl = weakest.getColonyList();
+        List<Colony> cl = weakAI.getColonyList();
         Set<Unit> contacts = new HashSet<>(cl.size());
         for (Colony c : cl) {
             updated.addAll(c.getOwnedTiles());
-            ((ServerColony)c).csChangeOwner(strongest, false, cs);//-vis(both),-til
+            ((ServerColony)c).csChangeOwner(strongAI, false, cs);//-vis(both),-til
             lb.add(" ", c.getName());
             contacts.add(c.getFirstUnit());
         }
-        for (Unit unit : weakest.getUnitSet()) {
+        for (Unit unit : weakAI.getUnitSet()) {
             lb.add(" ", unit.getId());
             if (unit.isOnCarrier()) {
                 ; // Allow carrier to handle
-            } else if (!weakest.csChangeOwner(unit, strongest, //-vis(both)
+            } else if (!((ServerPlayer)weakAI).csChangeOwner(unit, strongAI, //-vis(both)
                     UnitChangeType.CAPTURE, null, cs)) {
                 logger.warning("Owner change failed for " + unit);
             } else {
@@ -438,10 +456,10 @@ public class ServerGame extends Game implements TurnTaker {
                 unit.setState(Unit.UnitState.ACTIVE);
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongAI.getEurope());//-vis
-                    cs.add(See.only(strongest), unit);
+                    cs.add(See.only(strongAI), unit);
                 } else if (unit.getLocation() instanceof HighSeas) {
                     unit.setLocation(strongAI.getHighSeas());//-vis
-                    cs.add(See.only(strongest), unit);
+                    cs.add(See.only(strongAI), unit);
                 } else if (unit.isOnTile()) {
                     Tile tile = unit.getTile();
                     if (!tiles.contains(tile)) tiles.add(tile);
@@ -463,7 +481,7 @@ public class ServerGame extends Game implements TurnTaker {
         tiles.removeAll(updated);
         cs.add(See.perhaps(), tiles);
         
-        weakest.csWithdraw(cs, //+vis(weakest)
+        ((ServerPlayer)weakAI).csWithdraw(cs, //+vis(weakest)
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              "model.game.spanishSuccession", strongAI)
                 .addStringTemplate("%loserNation%", loser)
@@ -471,13 +489,13 @@ public class ServerGame extends Game implements TurnTaker {
             new HistoryEvent(getTurn(), HistoryEvent.HistoryEventType.SPANISH_SUCCESSION, null)
                 .addStringTemplate("%loserNation%", loser)
                 .addStringTemplate("%nation%", winner));
-        strongest.invalidateCanSeeTiles();//+vis(strongest)
+        strongAI.invalidateCanSeeTiles();//+vis(strongest)
 
         // Trace fail where not all units are transferred
         for (FreeColGameObject fcgo : getFreeColGameObjectList()) {
             if (fcgo instanceof Ownable
-                && ((Ownable)fcgo).getOwner() == weakest) {
-                throw new RuntimeException("Lurking " + weakest.getId()
+                && ((Ownable)fcgo).getOwner() == weakAI) {
+                throw new RuntimeException("Lurking " + weakAI.getId()
                     + " fcgo: " + fcgo);
             }
         }
@@ -500,15 +518,15 @@ public class ServerGame extends Game implements TurnTaker {
      */
     public boolean csAcceptTrade(DiplomaticTrade agreement, Unit unit,
                                  Settlement settlement, ChangeSet cs) {
-        final ServerPlayer srcPlayer = (ServerPlayer)agreement.getSender();
-        final ServerPlayer dstPlayer = (ServerPlayer)agreement.getRecipient();
+        final Player srcPlayer = agreement.getSender();
+        final Player dstPlayer = agreement.getRecipient();
         boolean visibilityChange = false;
         
         // Check trade carefully before committing.
         boolean fail = false;
         for (TradeItem tradeItem : agreement.getItems()) {
-            final ServerPlayer source = (ServerPlayer)tradeItem.getSource();
-            final ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
+            final Player source = tradeItem.getSource();
+            final Player dest = tradeItem.getDestination();
             if (!tradeItem.isValid()) {
                 logger.warning("Trade with invalid tradeItem: " + tradeItem);
                 fail = true;
@@ -576,8 +594,8 @@ public class ServerGame extends Game implements TurnTaker {
         if (fail) return false;
 
         for (TradeItem tradeItem : agreement.getItems()) {
-            final ServerPlayer source = (ServerPlayer)tradeItem.getSource();
-            final ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
+            final Player source = tradeItem.getSource();
+            final Player dest = tradeItem.getDestination();
             // Collect changes for updating.  Not very OO but
             // TradeItem should not know about server internals.
             // Take care to show items that change hands to the *old*
@@ -585,7 +603,7 @@ public class ServerGame extends Game implements TurnTaker {
             Stance stance = tradeItem.getStance();
             if (stance != null
                 && source.getStance(dest) != stance
-                && !source.csChangeStance(stance, dest, true, cs)) {
+                && !((ServerPlayer)source).csChangeStance(stance, dest, true, cs)) {
                 logger.warning("Stance trade failure: " + stance);
             }
             Colony colony = tradeItem.getColony(getGame());
@@ -618,9 +636,9 @@ public class ServerGame extends Game implements TurnTaker {
                     cs.add(See.only(source), settlement.getGoodsContainer());
                 }
             }
-            ServerPlayer victim = (ServerPlayer)tradeItem.getVictim();
+            Player victim = tradeItem.getVictim();
             if (victim != null) {
-                if (source.csChangeStance(Stance.WAR, victim, true, cs)) {
+                if (((ServerPlayer)source).csChangeStance(Stance.WAR, victim, true, cs)) {
                     // Have to add in an explicit stance change and
                     // message because the player does not normally
                     // have visibility of stance changes between other nations.
@@ -639,7 +657,7 @@ public class ServerGame extends Game implements TurnTaker {
             }                
             ServerUnit newUnit = (ServerUnit)tradeItem.getUnit();
             if (newUnit != null && settlement != null) {
-                ServerPlayer former = (ServerPlayer)newUnit.getOwner();
+                Player former = newUnit.getOwner();
                 Tile oldTile = newUnit.getTile();
                 Location newLoc;
                 if (unit.isOnCarrier()) {
@@ -655,8 +673,8 @@ public class ServerGame extends Game implements TurnTaker {
                 } else {
                     newLoc = settlement.getTile();
                 }
-                if (source.csChangeOwner(newUnit, dest, UnitChangeType.CAPTURE,
-                                         newLoc, cs)) {//-vis(both)
+                if (((ServerPlayer)source).csChangeOwner(newUnit, dest,
+                        UnitChangeType.CAPTURE, newLoc, cs)) {//-vis(both)
                     newUnit.setMovesLeft(0);
                     cs.add(See.perhaps().always(former), oldTile);
                 }

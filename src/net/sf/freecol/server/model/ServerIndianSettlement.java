@@ -151,7 +151,7 @@ public class ServerIndianSettlement extends IndianSettlement
     public void csStartTurn(Random random, ChangeSet cs) {
         final Unit missionary = getMissionary();
         if (missionary == null) return;
-        final ServerPlayer other = (ServerPlayer)missionary.getOwner();
+        final Player other = missionary.getOwner();
         final Tile tile = getTile();
         final Turn turn = getGame().getTurn();
 
@@ -376,18 +376,18 @@ public class ServerIndianSettlement extends IndianSettlement
         if (missionary == old) return;
 
         final Tile tile = getTile();
-        final ServerPlayer newOwner = (missionary == null) ? null
-            : (ServerPlayer)missionary.getOwner();
+        final Player newOwner = (missionary == null) ? null
+            : missionary.getOwner();
         tile.cacheUnseen(newOwner);//+til
 
         if (old != null) {
-            final ServerPlayer oldOwner = (ServerPlayer)old.getOwner(); 
+            final Player oldOwner = old.getOwner(); 
             setMissionary(null);//-vis(oldOwner),-til
             tile.updateIndianSettlement(oldOwner);
             ((ServerUnit)old).csRemove(See.only(oldOwner),
                 null, cs);//-vis(oldOwner)
             cs.add(See.only(oldOwner), tile);
-            oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
+            ((ServerPlayer)oldOwner).invalidateCanSeeTiles();//+vis(oldOwner)
         }
 
         if (missionary != null) {
@@ -404,7 +404,7 @@ public class ServerIndianSettlement extends IndianSettlement
             tile.updateIndianSettlement(newOwner);
 
             cs.add(See.only(newOwner),
-                   newOwner.collectNewTiles(getMissionaryVisibleTiles()));
+                ((ServerPlayer)newOwner).collectNewTiles(getMissionaryVisibleTiles()));
             cs.add(See.perhaps().always(newOwner), tile);
             newOwner.invalidateCanSeeTiles();//+vis(newOwner)
         }
@@ -423,7 +423,7 @@ public class ServerIndianSettlement extends IndianSettlement
         csChangeMissionary(null, cs);
         
         // Inform the enemy of loss of mission
-        ServerPlayer missionaryOwner = (ServerPlayer)missionary.getOwner();
+        Player missionaryOwner = missionary.getOwner();
         if (destroy != null) {
             if (destroy) {
                 cs.addMessage(missionaryOwner,
@@ -507,9 +507,9 @@ public class ServerIndianSettlement extends IndianSettlement
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        final Specification spec = getSpecification();
+        final Player owner = getOwner();
         lb.add(this);
-        ServerPlayer owner = (ServerPlayer) getOwner();
-        Specification spec = getSpecification();
 
         // Produce goods.
         List<GoodsType> goodsList = spec.getGoodsTypeList();
@@ -534,7 +534,7 @@ public class ServerIndianSettlement extends IndianSettlement
         if (getUnitCount() <= 0) {
             if (tile.isEmpty()) {
                 lb.add(" COLLAPSED, ");
-                owner.csDisposeSettlement(this, cs);//+vis(owner)
+                ((ServerPlayer)owner).csDisposeSettlement(this, cs);//+vis(owner)
                 return;
             }
             tile.getFirstUnit().setLocation(this);//-vis,til: safe in settlement

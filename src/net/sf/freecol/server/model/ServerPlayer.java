@@ -162,7 +162,7 @@ public class ServerPlayer extends Player implements TurnTaker {
     private int remainingEmigrants = 0;
 
     /** Players with respect to which stance has changed. */
-    private final List<ServerPlayer> stanceDirty = new ArrayList<>();
+    private final List<Player> stanceDirty = new ArrayList<>();
 
     /** Accumulate extra trades here. */
     private final List<AbstractGoods> extraTrades = new ArrayList<>();
@@ -316,36 +316,6 @@ public class ServerPlayer extends Player implements TurnTaker {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Convenience function to create a client error message for this
-     * player, log it, and wrap it into a change set.
-     *
-     * @param template An i18n template.
-     * @return A new {@code ChangeSet}.
-     */
-    public ChangeSet clientError(StringTemplate template) {
-        logger.warning(Messages.message(template));
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-            Thread.dumpStack();
-        }
-        return ChangeSet.clientError(See.only(this), template);
-    }
-
-    /**
-     * Convenience function to create a client error message, log it,
-     * and wrap it into a change set.
-     *
-     * @param message The non-i18n message.
-     * @return A new {@code ChangeSet}.
-     */
-    public ChangeSet clientError(String message) {
-        logger.warning(message);
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-            Thread.dumpStack();
-        }
-        return ChangeSet.clientError(See.only(this), message);
     }
 
     /**
@@ -1089,8 +1059,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         for (Entry<Tile, Settlement> e : claims.entrySet()) {
             Tile t = e.getKey();
             claimant = e.getValue();
-            ServerPlayer newOwner = (claimant == null) ? null
-                : (ServerPlayer)claimant.getOwner();
+            Player newOwner = (claimant == null) ? null : claimant.getOwner();
             t.changeOwnership(newOwner, claimant);//-til
         }
     }
@@ -1305,9 +1274,9 @@ public class ServerPlayer extends Player implements TurnTaker {
     /**
      * Adds a player to the list of players for whom the stance has changed.
      *
-     * @param other The {@code ServerPlayer} to add.
+     * @param other The {@code Player} to add.
      */
-    private void addStanceChange(ServerPlayer other) {
+    private void addStanceChange(Player other) {
         if (!stanceDirty.contains(other)) stanceDirty.add(other);
     }
 
@@ -1320,9 +1289,8 @@ public class ServerPlayer extends Player implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      * @return True if there was a change in stance at all.
      */
-    public boolean csChangeStance(Stance stance, ServerPlayer otherPlayer,
+    public boolean csChangeStance(Stance stance, Player otherPlayer,
                                   boolean symmetric, ChangeSet cs) {
-        ServerPlayer other = otherPlayer;
         boolean change = false;
         Stance old = getStance(otherPlayer);
 
@@ -1337,22 +1305,22 @@ public class ServerPlayer extends Player implements TurnTaker {
                 .addStringTemplate("%nation%", otherPlayer.getNationLabel()));
             logger.info("Stance modification " + getName()
                 + " " + old + " -> " + stance + " wrt " + otherPlayer.getName());
-            this.addStanceChange(other);
+            this.addStanceChange(otherPlayer);
             if (old != Stance.UNCONTACTED) {
-                cs.addMessage(other,
+                cs.addMessage(otherPlayer,
                     new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      stance.getStanceChangeKey(), this)
                         .addStringTemplate("%nation%", getNationLabel()));
             }
             cs.addStance(See.only(this), this, stance, otherPlayer);
-            cs.addStance(See.only(other), this, stance, otherPlayer);
+            cs.addStance(See.only(otherPlayer), this, stance, otherPlayer);
             change = true;
         }
         if (symmetric && (old = otherPlayer.getStance(this)) != stance) {
             int modifier = old.getTensionModifier(stance);
             otherPlayer.setStance(this, stance);
             if (modifier != 0) {
-                other.csModifyTension(this, modifier, cs);//+til
+                ((ServerPlayer)otherPlayer).csModifyTension(this, modifier, cs);//+til
             }
             cs.addHistory(otherPlayer, new HistoryEvent(getGame().getTurn(),
                     HistoryEvent.getEventTypeFromStance(stance), this)
@@ -1360,7 +1328,7 @@ public class ServerPlayer extends Player implements TurnTaker {
             logger.info("Stance modification " + otherPlayer.getName()
                 + " " + old + " -> " + stance
                 + " wrt " + getName() + " (symmetric)");
-            other.addStanceChange(this);
+            ((ServerPlayer)otherPlayer).addStanceChange(this);
             if (old != Stance.UNCONTACTED) {
                 cs.addMessage(this,
                     new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
@@ -1369,7 +1337,7 @@ public class ServerPlayer extends Player implements TurnTaker {
                             otherPlayer.getNationLabel()));
             }
             cs.addStance(See.only(this), otherPlayer, stance, this);
-            cs.addStance(See.only(other), otherPlayer, stance, this);
+            cs.addStance(See.only(otherPlayer), otherPlayer, stance, this);
             change = true;
         }
 
@@ -2027,7 +1995,7 @@ outer:  for (Effect effect : effects) {
                         is.setAlarm(this, new Tension(Tension.TENSION_MIN));//-til
                         cs.add(See.only(this), is);
                     }
-                    csChangeStance(Stance.PEACE, (ServerPlayer)p, true, cs);
+                    csChangeStance(Stance.PEACE, p, true, cs);
                 }
                 break;
 
@@ -2122,7 +2090,7 @@ outer:  for (Effect effect : effects) {
      */
     public void csClaimLand(Tile tile, Settlement settlement, int price,
                             ChangeSet cs) {
-        ServerPlayer owner = (ServerPlayer)tile.getOwner();
+        final Player owner = tile.getOwner();
         Settlement ownerSettlement = tile.getOwningSettlement();
         tile.cacheUnseen();//+til
         tile.changeOwnership(this, settlement);//-vis(?),-til
@@ -2138,8 +2106,8 @@ outer:  for (Effect effect : effects) {
         } else if (price < 0 && owner.isIndian()) {
             ServerIndianSettlement sis = (ServerIndianSettlement)ownerSettlement;
             if (sis == null) {
-                owner.csModifyTension(this, Tension.TENSION_ADD_LAND_TAKEN,
-                                      cs);
+                ((ServerPlayer)owner).csModifyTension(this,
+                    Tension.TENSION_ADD_LAND_TAKEN, cs);
             } else {
                 sis.csModifyAlarm(this, Tension.TENSION_ADD_LAND_TAKEN,
                                   true, cs);
@@ -2230,15 +2198,14 @@ outer:  for (Effect effect : effects) {
         Settlement attackerSettlement = null;
         Tile attackerTile = null;
         Unit defenderUnit = null;
-        //ServerPlayer attackerPlayer = null;
-        ServerPlayer defenderPlayer = null;
+        Player defenderPlayer = null;
         Tile defenderTile = null;
         if (isAttack) {
             attackerUnit = (Unit)attacker;
-            //attackerPlayer = (ServerPlayer)attackerUnit.getOwner();
+            //attackerPlayer = attackerUnit.getOwner();
             attackerTile = attackerUnit.getTile();
             defenderUnit = (Unit)defender;
-            defenderPlayer = (ServerPlayer)defenderUnit.getOwner();
+            defenderPlayer = defenderUnit.getOwner();
             defenderTile = defenderUnit.getTile();
             boolean bombard = attackerUnit.hasAbility(Ability.BOMBARD);
             cs.addAttribute(See.only(this), "sound",
@@ -2261,10 +2228,9 @@ outer:  for (Effect effect : effects) {
             }
         } else if (isBombard) {
             attackerSettlement = (Settlement)attacker;
-            //attackerPlayer = (ServerPlayer)attackerSettlement.getOwner();
             attackerTile = attackerSettlement.getTile();
             defenderUnit = (Unit)defender;
-            defenderPlayer = (ServerPlayer)defenderUnit.getOwner();
+            defenderPlayer = defenderUnit.getOwner();
             defenderTile = defenderUnit.getTile();
             cs.addAttribute(See.only(this), "sound", "sound.attack.bombard");
         } else {
@@ -2641,7 +2607,7 @@ outer:  for (Effect effect : effects) {
                 }
             }
             if (defenderPlayer.isEuropean()) {
-                defenderPlayer.csChangeStance(Stance.WAR, this, true, cs);
+                ((ServerPlayer)defenderPlayer).csChangeStance(Stance.WAR, this, true, cs);
             } else if (defenderPlayer.isIndian()) {
                 if (result == CombatResult.WIN) {
                     defenderTension += Tension.TENSION_ADD_MINOR;
@@ -2654,8 +2620,8 @@ outer:  for (Effect effect : effects) {
                                      attackerTension, cs);//+til
             }
             if (defenderTension != 0) {
-                defenderPlayer.csModifyTension(this,
-                                               defenderTension, cs);//+til
+                ((ServerPlayer)defenderPlayer).csModifyTension(this,
+                    defenderTension, cs);//+til
             }
         }
 
@@ -2734,8 +2700,8 @@ outer:  for (Effect effect : effects) {
      */
     private void csAutoequipUnit(Unit unit, Settlement settlement,
                                  ChangeSet cs) {
-        ServerPlayer player = (ServerPlayer) unit.getOwner();
-        cs.addMessage(player,
+        final Player owner = unit.getOwner();
+        cs.addMessage(owner,
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                              "combat.automaticDefence", unit)
                 .addStringTemplate("%unit%", unit.getLabel())
@@ -2751,10 +2717,10 @@ outer:  for (Effect effect : effects) {
      */
     private void csBurnMissions(Unit attacker, IndianSettlement is,
                                 ChangeSet cs) {
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        StringTemplate attackerNation = attackerPlayer.getNationLabel();
-        ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
-        StringTemplate nativeNation = nativePlayer.getNationLabel();
+        final Player attackerPlayer = attacker.getOwner();
+        final StringTemplate attackerNation = attackerPlayer.getNationLabel();
+        final Player nativePlayer = is.getOwner();
+        final StringTemplate nativeNation = nativePlayer.getNationLabel();
 
         // Message only for the European player
         cs.addMessage(attackerPlayer,
@@ -2796,13 +2762,13 @@ outer:  for (Effect effect : effects) {
      */
     private void csCaptureColony(Unit attacker, ServerColony colony,
                                  Random random, ChangeSet cs) {
-        Game game = attacker.getGame();
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        StringTemplate attackerNation = attacker.getApparentOwnerName();
-        ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
-        StringTemplate colonyNation = colonyPlayer.getNationLabel();
-        Tile tile = colony.getTile();
-        int plunder = colony.getPlunder(attacker, random);
+        final Game game = attacker.getGame();
+        final Player attackerPlayer = attacker.getOwner();
+        final StringTemplate attackerNation = attacker.getApparentOwnerName();
+        final Player colonyPlayer = colony.getOwner();
+        final StringTemplate colonyNation = colonyPlayer.getNationLabel();
+        final Tile tile = colony.getTile();
+        final int plunder = colony.getPlunder(attacker, random);
 
         // Handle history and messages before colony handover
         cs.addHistory(attackerPlayer,
@@ -2829,7 +2795,7 @@ outer:  for (Effect effect : effects) {
                 .addStringTemplate("%enemyUnit%", attacker.getLabel())
                 .addStringTemplate("%enemyNation%", attackerNation)
                 .addAmount("%amount%", plunder));
-        colonyPlayer.csLoseLocation(colony, cs);
+        ((ServerPlayer)colonyPlayer).csLoseLocation(colony, cs);
 
         // Allocate some plunder
         if (plunder > 0) {
@@ -2870,16 +2836,16 @@ outer:  for (Effect effect : effects) {
     private void csCaptureConvert(Unit attacker, IndianSettlement is,
                                   Random random, ChangeSet cs) {
         final Specification spec = getGame().getSpecification();
-        ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();
-        ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
-        StringTemplate convertNation = nativePlayer.getNationLabel();
-        List<Unit> units = is.getAllUnitsList();
+        final Player attackerPlayer = attacker.getOwner();
+        final Player nativePlayer = is.getOwner();
+        final StringTemplate convertNation = nativePlayer.getNationLabel();
+
         ServerUnit convert = (ServerUnit)getRandomMember(logger,
-            "Choose convert", units, random);
-        if (nativePlayer.csChangeOwner(convert, attackerPlayer,
-                                       UnitChangeType.CONVERSION,
-                                       attacker.getTile(),
-                                       cs)) { //-vis(attackerPlayer)
+            "Choose convert", is.getAllUnitsList(), random);
+        if (((ServerPlayer)nativePlayer).csChangeOwner(convert, attackerPlayer,
+                UnitChangeType.CONVERSION,
+                attacker.getTile(),
+                cs)) { //-vis(attackerPlayer)
             convert.changeRole(spec.getDefaultRole(), 0);
             for (Goods g : convert.getCompactGoodsList()) convert.removeGoods(g);
             convert.setMovesLeft(0);
@@ -2918,8 +2884,9 @@ outer:  for (Effect effect : effects) {
      */
     private void csCaptureEquipment(Unit winner, Unit loser,
                                     Role role, ChangeSet cs) {
-        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
-        ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
+        final Player winnerPlayer = winner.getOwner();
+        final Player loserPlayer = loser.getOwner();
+
         Role newRole = winner.canCaptureEquipment(role);
         if (newRole != null) {
             List<AbstractGoods> newGoods
@@ -2964,14 +2931,14 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csCaptureUnit(Unit winner, Unit loser, ChangeSet cs) {
-        ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
-        StringTemplate loserNation = loserPlayer.getNationLabel();
-        StringTemplate loserLocation = loser.getLocation()
+        final Player loserPlayer = loser.getOwner();
+        final StringTemplate loserNation = loserPlayer.getNationLabel();
+        final StringTemplate loserLocation = loser.getLocation()
             .getLocationLabelFor(loserPlayer);
-        StringTemplate loserLabel = loser.getLabel();
-        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
-        StringTemplate winnerNation = winner.getApparentOwnerName();
-        StringTemplate winnerLocation = winner.getLocation()
+        final StringTemplate loserLabel = loser.getLabel();
+        final Player winnerPlayer = winner.getOwner();
+        final StringTemplate winnerNation = winner.getApparentOwnerName();
+        final StringTemplate winnerLocation = winner.getLocation()
             .getLocationLabelFor(winnerPlayer);
 
         // Capture the unit.  There are visibility implications for
@@ -2983,8 +2950,8 @@ outer:  for (Effect effect : effects) {
         String key;
         String change = (winnerPlayer.isUndead()) ? UnitChangeType.UNDEAD
             : UnitChangeType.CAPTURE;
-        if (loserPlayer.csChangeOwner(loser, winnerPlayer, change,
-                                      winner.getTile(), cs)) {//-vis(both)
+        if (((ServerPlayer)loserPlayer).csChangeOwner(loser, winnerPlayer,
+                change, winner.getTile(), cs)) {//-vis(both)
             loser.setMovesLeft(0);
             loser.setState(Unit.UnitState.ACTIVE);
             cs.add(See.perhaps().always(loserPlayer), oldTile);
@@ -3026,7 +2993,7 @@ outer:  for (Effect effect : effects) {
         List<Unit> units = transform(colony.getTile().getUnits(),
             u -> u.isNaval() && !(captureRepairing && u.isDamaged()));
         if (!units.isEmpty()) {
-            final ServerPlayer shipPlayer = (ServerPlayer)colony.getOwner();
+            final Player shipPlayer = colony.getOwner();
             final Unit ship = units.get(0);
             final Location repairLocation = ship.getRepairLocation();
             StringTemplate t = StringTemplate.label(", ");
@@ -3052,13 +3019,13 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csDamageShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        StringTemplate attackerNation = attacker.getApparentOwnerName();
-        ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        Location shipLocation = ship.getLocation();
-        Location repair = ship.getRepairLocation();
-        StringTemplate repairLoc = repair.getLocationLabelFor(shipPlayer);
-        StringTemplate shipNation = ship.getApparentOwnerName();
+        final Player attackerPlayer = attacker.getOwner();
+        final StringTemplate attackerNation = attacker.getApparentOwnerName();
+        final Player shipPlayer = ship.getOwner();
+        final Location shipLocation = ship.getLocation();
+        final Location repair = ship.getRepairLocation();
+        final StringTemplate repairLoc = repair.getLocationLabelFor(shipPlayer);
+        final StringTemplate shipNation = ship.getApparentOwnerName();
 
         cs.addMessage(attackerPlayer,
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -3090,12 +3057,12 @@ outer:  for (Effect effect : effects) {
      */
     private void csDamageShipBombard(Settlement settlement, Unit ship,
                                      ChangeSet cs) {
-        ServerPlayer attackerPlayer = (ServerPlayer)settlement.getOwner();
-        ServerPlayer shipPlayer = (ServerPlayer)ship.getOwner();
-        Building building = ((Colony)settlement).getStockade();
-        Location repair = ship.getRepairLocation();
-        StringTemplate repairLoc = repair.getLocationLabelFor(shipPlayer);
-        StringTemplate shipNation = ship.getApparentOwnerName();
+        final Player attackerPlayer = settlement.getOwner();
+        final Player shipPlayer = ship.getOwner();
+        final Building building = ((Colony)settlement).getStockade();
+        final Location repair = ship.getRepairLocation();
+        final StringTemplate repairLoc = repair.getLocationLabelFor(shipPlayer);
+        final StringTemplate shipNation = ship.getApparentOwnerName();
 
         cs.addMessage(attackerPlayer,
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -3128,7 +3095,7 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csDamageShip(Unit ship, Location repair, ChangeSet cs) {
-        ServerPlayer player = (ServerPlayer) ship.getOwner();
+        final Player owner = ship.getOwner();
 
         // Lose the goods and units aboard
         for (Goods g : ship.getCompactGoodsList()) {
@@ -3136,7 +3103,7 @@ outer:  for (Effect effect : effects) {
         }
         for (Unit u : ship.getUnitList()) {
             ship.remove(u);
-            ((ServerUnit)u).csRemove(See.only(player),
+            ((ServerUnit)u).csRemove(See.only(owner),
                 null, cs);//-vis: safe, within unit
         }
 
@@ -3144,8 +3111,8 @@ outer:  for (Effect effect : effects) {
         Location shipLoc = (repair instanceof Colony) ? repair.getTile()
             : repair;
         ship.damageShip(shipLoc);//-vis(player)
-        cs.add(See.only(player), (FreeColGameObject)shipLoc);
-        player.invalidateCanSeeTiles();//+vis(player)
+        cs.add(See.only(owner), (FreeColGameObject)shipLoc);
+        ((ServerPlayer)owner).invalidateCanSeeTiles();//+vis(player)
     }
 
     /**
@@ -3156,17 +3123,16 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csDemoteUnit(Unit winner, Unit loser, ChangeSet cs) {
-        final ServerPlayer loserPlayer = (ServerPlayer)loser.getOwner();
+        final Player loserPlayer = loser.getOwner();
         final StringTemplate loserNation = loser.getApparentOwnerName();
         final StringTemplate loserLocation = loser.getLocation()
             .getLocationLabelFor(loserPlayer);
         final StringTemplate loserLabel = loser.getLabel();
-        final ServerPlayer winnerPlayer = (ServerPlayer)winner.getOwner();
+        final Player winnerPlayer = winner.getOwner();
         final StringTemplate winnerNation = winner.getApparentOwnerName();
         final StringTemplate winnerLocation = winner.getLocation()
             .getLocationLabelFor(winnerPlayer);
         final String suffix = loser.getType().getSuffix(); // pre-demotion value
-        String key;
         
         UnitTypeChange uc = loser.getUnitChange(UnitChangeType.DEMOTION);
         if (uc == null || uc.to == loser.getType()) {
@@ -3177,7 +3143,7 @@ outer:  for (Effect effect : effects) {
         loser.changeType(uc.to);//-vis(loserPlayer)
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
 
-        key = "combat.unitDemoted.enemy." + suffix;
+        String key = "combat.unitDemoted.enemy." + suffix;
         cs.addMessage(winnerPlayer,
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                              key, winner)
@@ -3209,12 +3175,12 @@ outer:  for (Effect effect : effects) {
      */
     private void csDestroyColony(Unit attacker, Colony colony, Random random,
                                  ChangeSet cs) {
-        Game game = attacker.getGame();
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        StringTemplate attackerNation = attacker.getApparentOwnerName();
-        ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
-        StringTemplate colonyNation = colonyPlayer.getNationLabel();
-        int plunder = colony.getPlunder(attacker, random);
+        final Game game = attacker.getGame();
+        final Player attackerPlayer = attacker.getOwner();
+        final StringTemplate attackerNation = attacker.getApparentOwnerName();
+        final Player colonyPlayer = colony.getOwner();
+        final StringTemplate colonyNation = colonyPlayer.getNationLabel();
+        final int plunder = colony.getPlunder(attacker, random);
 
         // Handle history and messages before colony destruction.
         cs.addHistory(colonyPlayer,
@@ -3235,7 +3201,7 @@ outer:  for (Effect effect : effects) {
                 .addName("%colony%", colony.getName())
                 .addStringTemplate("%nation%", colonyNation)
                 .addStringTemplate("%attackerNation%", attackerNation));
-        colonyPlayer.csLoseLocation(colony, cs);
+        ((ServerPlayer)colonyPlayer).csLoseLocation(colony, cs);
 
         // Allocate some plunder.
         if (plunder > 0) {
@@ -3263,14 +3229,14 @@ outer:  for (Effect effect : effects) {
                                      Random random, ChangeSet cs) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        Tile tile = is.getTile();
-        ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();
-        ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
-        StringTemplate attackerNation = attackerPlayer.getNationLabel();
-        StringTemplate nativeNation = nativePlayer.getNationLabel();
-        String settlementName = is.getName();
-        boolean capital = is.isCapital();
-        int plunder = is.getPlunder(attacker, random);
+        final Tile tile = is.getTile();
+        final Player attackerPlayer = attacker.getOwner();
+        final Player nativePlayer = is.getOwner();
+        final StringTemplate attackerNation = attackerPlayer.getNationLabel();
+        final StringTemplate nativeNation = nativePlayer.getNationLabel();
+        final String settlementName = is.getName();
+        final boolean capital = is.isCapital();
+        final int plunder = is.getPlunder(attacker, random);
 
         // Remaining units lose their home.
         for (Unit u : is.getOwnedUnitList()) {
@@ -3316,7 +3282,7 @@ outer:  for (Effect effect : effects) {
                                  attacker)
                     .addStringTemplate("%nation%", nativeNation));
         }
-        if (nativePlayer.checkForDeath() == DeadCheck.IS_DEAD) {
+        if (((ServerPlayer)nativePlayer).checkForDeath() == DeadCheck.IS_DEAD) {
             h = new HistoryEvent(game.getTurn(),
                 HistoryEvent.HistoryEventType.DESTROY_NATION, this)
                     .addStringTemplate("%nation%", attackerNation)
@@ -3337,9 +3303,10 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
+        final Player owner = settlement.getOwner();
+        final Set<Tile> owned = settlement.getOwnedTiles();
+
         logger.finest("Disposing of " + settlement.getName());
-        ServerPlayer owner = (ServerPlayer)settlement.getOwner();
-        Set<Tile> owned = settlement.getOwnedTiles();
         for (Tile t : owned) t.cacheUnseen();//+til
         Tile centerTile = settlement.getTile();
         ServerPlayer missionaryOwner = null;
@@ -3364,7 +3331,7 @@ outer:  for (Effect effect : effects) {
         }
 
         // Reassign the tiles owned by the settlement, if possible
-        owner.reassignTiles(owned, null);
+        ((ServerPlayer)owner).reassignTiles(owned, null);
 
         See vis = See.perhaps().always(owner);
         if (missionaryOwner != null) vis.except(missionaryOwner);
@@ -3402,12 +3369,12 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csEvadeAttack(Unit attacker, Unit defender, ChangeSet cs) {
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        StringTemplate attackerNation = attacker.getApparentOwnerName();
-        Location attackerLocation = attacker.getLocation();
-        ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
-        StringTemplate defenderNation = defender.getApparentOwnerName();
-        Location defenderLocation = defender.getLocation();
+        final Player attackerPlayer = attacker.getOwner();
+        final StringTemplate attackerNation = attacker.getApparentOwnerName();
+        final Location attackerLocation = attacker.getLocation();
+        final Player defenderPlayer = defender.getOwner();
+        final StringTemplate defenderNation = defender.getApparentOwnerName();
+        final Location defenderLocation = defender.getLocation();
 
         cs.addMessage(attackerPlayer,
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -3436,10 +3403,10 @@ outer:  for (Effect effect : effects) {
      */
     private void csEvadeBombard(Settlement settlement, Unit defender,
                                 ChangeSet cs) {
-        ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
-        ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
-        StringTemplate defenderNation = defender.getApparentOwnerName();
-        Building building = ((Colony)settlement).getStockade();
+        final Player attackerPlayer = settlement.getOwner();
+        final Player defenderPlayer = defender.getOwner();
+        final StringTemplate defenderNation = defender.getApparentOwnerName();
+        final Building building = ((Colony)settlement).getStockade();
 
         cs.addMessage(attackerPlayer,
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -3468,7 +3435,8 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
-        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
+        final Player winnerPlayer = winner.getOwner();
+
         List<Goods> capture = loser.getGoodsList();
         if (!capture.isEmpty() && winner.hasSpaceLeft()) {
             for (Goods g : capture) g.setLocation(null);
@@ -3488,15 +3456,15 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
-        ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
-        StringTemplate defenderNation = defenderPlayer.getNationLabel();
-        Settlement settlement = defender.getSettlement();
-        Role role = defender.getAutomaticRole();
-        StringTemplate defenderLabel = Messages.getUnitLabel(null,
+        final Player defenderPlayer = defender.getOwner();
+        final StringTemplate defenderNation = defenderPlayer.getNationLabel();
+        final Settlement settlement = defender.getSettlement();
+        final Role role = defender.getAutomaticRole();
+        final StringTemplate defenderLabel = Messages.getUnitLabel(null,
             defender.getType().getId(), 1, defenderPlayer.getNation().getId(),
             role.getId(), null);
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        StringTemplate attackerNation = attacker.getApparentOwnerName();
+        final Player attackerPlayer = attacker.getOwner();
+        final StringTemplate attackerNation = attacker.getApparentOwnerName();
 
         // Autoequipment is not actually with the unit, it is stored
         // in the settlement of the unit.  Remove it from there.
@@ -3534,17 +3502,16 @@ outer:  for (Effect effect : effects) {
      */
     private void csLoseEquip(Unit winner, Unit loser, ChangeSet cs) {
         final Specification spec = getSpecification();
-        ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
-        StringTemplate loserNation = loserPlayer.getNationLabel();
-        StringTemplate loserLocation = loser.getLocation()
+        final Player loserPlayer = loser.getOwner();
+        final StringTemplate loserNation = loserPlayer.getNationLabel();
+        final StringTemplate loserLocation = loser.getLocation()
             .getLocationLabelFor(loserPlayer);
-        StringTemplate loserLabel = loser.getLabel();
-        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
-        StringTemplate winnerNation = winner.getApparentOwnerName();
-        StringTemplate winnerLocation = winner.getLocation()
+        final StringTemplate loserLabel = loser.getLabel();
+        final Player winnerPlayer = winner.getOwner();
+        final StringTemplate winnerNation = winner.getApparentOwnerName();
+        final StringTemplate winnerLocation = winner.getLocation()
             .getLocationLabelFor(winnerPlayer);
-        Role role = loser.getRole();
-        String key;
+        final Role role = loser.getRole();
 
         Role downgrade = role.getDowngrade();
         if (downgrade != null) {
@@ -3576,7 +3543,8 @@ outer:  for (Effect effect : effects) {
                     .addStringTemplate("%enemyUnit%", winner.getLabel()));
             loser.setState(Unit.UnitState.ACTIVE);
         } else {
-            key = "combat.unitDemoted.enemy." + loser.getType().getSuffix();
+            String key = "combat.unitDemoted.enemy."
+                + loser.getType().getSuffix();
             cs.addMessage(winnerPlayer,
                 new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                  key, winner)
@@ -3632,10 +3600,10 @@ outer:  for (Effect effect : effects) {
      */
     private void csPillageColony(Unit attacker, Colony colony,
                                  Random random, ChangeSet cs) {
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        StringTemplate attackerNation = attacker.getApparentOwnerName();
-        ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
-        StringTemplate colonyNation = colonyPlayer.getNationLabel();
+        final Player attackerPlayer = attacker.getOwner();
+        final StringTemplate attackerNation = attacker.getApparentOwnerName();
+        final Player colonyPlayer = colony.getOwner();
+        final StringTemplate colonyNation = colonyPlayer.getNationLabel();
 
         // Collect the damagable buildings, ships, movable goods.
         List<Building> buildingList = colony.getBurnableBuildings();
@@ -3751,7 +3719,7 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csPromoteUnit(Unit winner, ChangeSet cs) {
-        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
+        final Player winnerPlayer = winner.getOwner();
         StringTemplate winnerLabel = winner.getLabel();
 
         UnitTypeChange uc = winner.getUnitChange(UnitChangeType.PROMOTION);
@@ -3783,8 +3751,8 @@ outer:  for (Effect effect : effects) {
         List<Unit> units = transform(colony.getTile().getUnits(),
             u -> u.isNaval() && !(captureRepairing && u.isDamaged()));
         if (!units.isEmpty()) {
-            final ServerPlayer shipPlayer = (ServerPlayer)colony.getOwner();
-            final ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();
+            final Player shipPlayer = colony.getOwner();
+            final Player attackerPlayer = attacker.getOwner();
             StringTemplate t = StringTemplate.label(", ");
             for (Unit u : units) {
                 csSinkShip(u, attackerPlayer, cs);
@@ -3806,12 +3774,12 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csSinkShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
-        ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        StringTemplate shipNation = ship.getApparentOwnerName();
-        Location shipLocation = ship.getLocation();
-        Unit attackerUnit = attacker;
-        ServerPlayer attackerPlayer = (ServerPlayer) attackerUnit.getOwner();
-        StringTemplate attackerNation = attackerUnit.getApparentOwnerName();
+        final Player shipPlayer = ship.getOwner();
+        final StringTemplate shipNation = ship.getApparentOwnerName();
+        final Location shipLocation = ship.getLocation();
+        final Unit attackerUnit = attacker;
+        final Player attackerPlayer = attackerUnit.getOwner();
+        final StringTemplate attackerNation = attackerUnit.getApparentOwnerName();
 
         cs.addMessage(attackerPlayer,
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -3842,11 +3810,11 @@ outer:  for (Effect effect : effects) {
      */
     private void csSinkShipBombard(Settlement settlement, Unit ship,
                                    ChangeSet cs) {
-        ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
-        ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        StringTemplate shipNation = ship.getApparentOwnerName();
-        Building building = ((Colony)settlement).getStockade();
-        
+        final Player attackerPlayer = settlement.getOwner();
+        final Player shipPlayer = ship.getOwner();
+        final StringTemplate shipNation = ship.getApparentOwnerName();
+        final Building building = ((Colony)settlement).getStockade();
+
         cs.addMessage(attackerPlayer,
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                              "combat.shipSunkByBombardment.enemy", settlement)
@@ -3872,13 +3840,11 @@ outer:  for (Effect effect : effects) {
      * Sink the ship.
      *
      * @param ship The naval {@code Unit} to sink.
-     * @param attackerPlayer The {@code ServerPlayer} that
-     * attacked, or null
+     * @param attackerPlayer The {@code Player} that attacked, or null
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csSinkShip(Unit ship, ServerPlayer attackerPlayer,
-                            ChangeSet cs) {
-        ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
+    private void csSinkShip(Unit ship, Player attackerPlayer, ChangeSet cs) {
+        final Player shipPlayer = ship.getOwner();
         ((ServerUnit)ship).csRemove(See.perhaps().always(shipPlayer),
             ship.getLocation(), cs);//-vis(shipPlayer)
         shipPlayer.invalidateCanSeeTiles();//+vis(shipPlayer)
@@ -3896,21 +3862,21 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csSlaughterUnit(Unit winner, Unit loser, ChangeSet cs) {
-        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
-        StringTemplate winnerNation = winner.getApparentOwnerName();
-        Location winnerLoc = (winner.isInColony()) ? winner.getColony()
+        final Player winnerPlayer = winner.getOwner();
+        final StringTemplate winnerNation = winner.getApparentOwnerName();
+        final Location winnerLoc = (winner.isInColony()) ? winner.getColony()
             : winner.getLocation();
-        StringTemplate winnerLocation
+        final StringTemplate winnerLocation
             = winnerLoc.getLocationLabelFor(winnerPlayer);
-        ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
-        StringTemplate loserNation = loser.getApparentOwnerName();
-        Location loserLoc = (loser.isInColony()) ? loser.getColony()
+        final Player loserPlayer = loser.getOwner();
+        final StringTemplate loserNation = loser.getApparentOwnerName();
+        final Location loserLoc = (loser.isInColony()) ? loser.getColony()
             : loser.getLocation();
-        StringTemplate loserLocation
+        final StringTemplate loserLocation
             = loserLoc.getLocationLabelFor(loserPlayer);
-        String key;
 
-        key = "combat.unitSlaughtered.enemy." + loser.getType().getSuffix();
+        String key = "combat.unitSlaughtered.enemy."
+            + loser.getType().getSuffix();
         cs.addMessage(winnerPlayer,
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                              key, winner)
@@ -3929,7 +3895,7 @@ outer:  for (Effect effect : effects) {
                 .addStringTemplate("%enemyNation%", winnerNation)
                 .addStringTemplate("%enemyUnit%", winner.getLabel()));
         if (loserPlayer.isIndian()
-            && loserPlayer.checkForDeath() == DeadCheck.IS_DEAD) {
+            && ((ServerPlayer)loserPlayer).checkForDeath() == DeadCheck.IS_DEAD) {
             StringTemplate nativeNation = loserPlayer.getNationLabel();
             cs.addGlobalHistory(getGame(),
                 new HistoryEvent(getGame().getTurn(),
@@ -4169,11 +4135,11 @@ outer:  for (Effect effect : effects) {
     /**
      * Make contact between two nations if necessary.
      *
-     * @param other The other {@code ServerPlayer}.
+     * @param other The other {@code Player}.
      * @param cs A {@code ChangeSet} to update.
      * @return True if this was a first contact.
      */
-    public boolean csContact(ServerPlayer other, ChangeSet cs) {
+    public boolean csContact(Player other, ChangeSet cs) {
         if (hasContacted(other)) return false;
 
         // Must be a first contact!
@@ -4201,14 +4167,13 @@ outer:  for (Effect effect : effects) {
     /**
      * Initiate first contact between this European and native player.
      *
-     * @param other The native {@code ServerPlayer}.
+     * @param other The native {@code Player}.
      * @param tile The {@code Tile} contact is made at if this is
      *     a first landing in the new world and it is owned by the
      *     other player.
      * @param cs A {@code ChangeSet} to update.
      */
-    public void csNativeFirstContact(ServerPlayer other, Tile tile,
-                                     ChangeSet cs) {
+    public void csNativeFirstContact(Player other, Tile tile, ChangeSet cs) {
         cs.add(See.only(this),
                new FirstContactMessage(this, other, tile));
         csChangeStance(Stance.PEACE, other, true, cs);
@@ -4237,12 +4202,12 @@ outer:  for (Effect effect : effects) {
     public void csEuropeanFirstContact(Unit unit, Settlement settlement,
                                        Unit otherUnit, ChangeSet cs) {
         DiplomacySession ds;
-        ServerPlayer other;
+        Player other;
         if (settlement instanceof Colony) {
-            other = (ServerPlayer)settlement.getOwner();
+            other = settlement.getOwner();
             ds = DiplomacySession.findContactSession(unit, settlement);
         } else if (otherUnit != null) {
-            other = (ServerPlayer)otherUnit.getOwner();
+            other = otherUnit.getOwner();
             ds = DiplomacySession.findContactSession(unit, otherUnit);
         } else {
             throw new RuntimeException("Non-null settlement (" + settlement
@@ -4276,15 +4241,14 @@ outer:  for (Effect effect : effects) {
      * -vis(owner,newOwner)
      *
      * @param unit The {@code Unit} to change ownership of.
-     * @param newOwner The new owning {@code ServerPlayer}.
+     * @param newOwner The new owning {@code Player}.
      * @param change An optional accompanying change type.
      * @param loc A optional new {@code Location} for the unit.
      * @param cs A {@code ChangeSet} to update.
      * @return True if the new owner can have this unit.
      */
-    public boolean csChangeOwner(Unit unit, ServerPlayer newOwner,
-                                 String change, Location loc,
-                                 ChangeSet cs) {
+    public boolean csChangeOwner(Unit unit, Player newOwner, String change,
+                                 Location loc, ChangeSet cs) {
         if (newOwner == this) return true; // No transfer needed
 
         final Tile oldTile = unit.getTile();
@@ -4329,7 +4293,8 @@ outer:  for (Effect effect : effects) {
         if (unit.isCarrier()) {
             cs.addRemoves(See.only(this), unit, unit.getUnitList());
         }
-        cs.add(See.only(newOwner), newOwner.exploreForUnit(unit));
+        cs.add(See.only(newOwner),
+               ((ServerPlayer)newOwner).exploreForUnit(unit));
         return true;
     }
 
@@ -4547,18 +4512,17 @@ outer:  for (Effect effect : effects) {
 
         // Update stances
         while (!stanceDirty.isEmpty()) {
-            ServerPlayer s = stanceDirty.remove(0);
+            Player s = stanceDirty.remove(0);
             Stance sta = getStance(s);
             boolean war = sta == Stance.WAR;
             if (sta == Stance.UNCONTACTED) continue;
             for (Player p : game.getLiveEuropeanPlayerList(this)) {
-                ServerPlayer sp = (ServerPlayer) p;
                 if (p == s || !p.hasContacted(this)
                     || !p.hasContacted(s)) continue;
                 if (p.hasAbility(Ability.BETTER_FOREIGN_AFFAIRS_REPORT)
                     || war) {
-                    cs.addStance(See.only(sp), this, sta, s);
-                    cs.addMessage(sp,
+                    cs.addStance(See.only(p), this, sta, s);
+                    cs.addMessage(p,
                         new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                          sta.getOtherStanceChangeKey(), this)
                             .addStringTemplate("%attacker%", getNationLabel())

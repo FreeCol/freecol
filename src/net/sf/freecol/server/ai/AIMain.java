@@ -420,8 +420,8 @@ public class AIMain extends FreeColObject
         AIObject aio = null;
         if (fcgo instanceof Colony) {
             aio = new AIColony(this, (Colony)fcgo);
-        } else if (fcgo instanceof ServerPlayer) {
-            ServerPlayer player = (ServerPlayer)fcgo;
+        } else if (fcgo instanceof Player) {
+            Player player = (Player)fcgo;
             if (player.getPlayerType() == null) {
                 // No point doing anything with the object yet, as we
                 // need the player type before we can create the

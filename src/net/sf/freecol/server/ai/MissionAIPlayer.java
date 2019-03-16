@@ -43,7 +43,6 @@ import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
-import net.sf.freecol.server.model.ServerPlayer;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -91,10 +90,9 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * Creates a new AI player.
      *
      * @param aiMain The {@code AIMain} the player exists within.
-     * @param player The {@code ServerPlayer} to associate this
-     *            AI player with.
+     * @param player The {@code Player} to associate this AI player with.
      */
-    public MissionAIPlayer(AIMain aiMain, ServerPlayer player) {
+    public MissionAIPlayer(AIMain aiMain, Player player) {
         super(aiMain, player);
     }
 
@@ -107,8 +105,8 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public MissionAIPlayer(AIMain aiMain,
-                    FreeColXMLReader xr) throws XMLStreamException {
+    public MissionAIPlayer(AIMain aiMain, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(aiMain, xr);
     }
 

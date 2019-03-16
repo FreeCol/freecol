@@ -140,16 +140,16 @@ public class FirstContactMessage extends AttributeMessage {
             return serverPlayer.clientError("Not our player: " + playerId);
         }
 
-        ServerPlayer otherPlayer = (ServerPlayer)getOtherPlayer(game);
+        Player otherPlayer = getOtherPlayer(game);
         if (otherPlayer == null) {
             return serverPlayer.clientError("Invalid other player: " + otherId);
-        } else if (otherPlayer == serverPlayer) {
+        } else if (otherPlayer == (Player)serverPlayer) {
             return serverPlayer.clientError("First contact with self!?!");
         }
 
         // Proceed to contact.
         return igc(freeColServer)
-            .nativeFirstContact(serverPlayer, otherPlayer,
+            .nativeFirstContact(serverPlayer, (ServerPlayer)otherPlayer,
                                 getTile(game), getResult());
     }
 

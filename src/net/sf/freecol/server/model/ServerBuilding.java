@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -77,7 +78,7 @@ public class ServerBuilding extends Building implements TurnTaker {
      * @param cs A {@code ChangeSet} to update.
      */
     private void csTeach(ChangeSet cs) {
-        final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
+        final Player owner = getColony().getOwner();
         
         for (Unit teacher : getUnitList()) {
             Unit student = teacher.getStudent();
@@ -116,7 +117,7 @@ public class ServerBuilding extends Building implements TurnTaker {
      * @return True if teaching occurred.
      */
     public boolean csCheckTeach(Unit teacher, ChangeSet cs) {
-        final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
+        final Player owner = getColony().getOwner();
 
         Unit student = teacher.getStudent();
         if (student != null
@@ -140,7 +141,7 @@ public class ServerBuilding extends Building implements TurnTaker {
      * @return True if teaching occurred.
      */
     private boolean csTrainStudent(Unit teacher, Unit student, ChangeSet cs) {
-        final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
+        final Player owner = getColony().getOwner();
         StringTemplate oldName = student.getLabel();
         UnitType skill = student.getTeachingType(teacher);
         boolean ret = skill != null;
@@ -178,7 +179,7 @@ public class ServerBuilding extends Building implements TurnTaker {
      */
     private boolean csAssignStudent(Unit teacher, ChangeSet cs) {
         final Colony colony = getColony();
-        final ServerPlayer owner = (ServerPlayer)colony.getOwner();
+        final Player owner = colony.getOwner();
         final Unit student = colony.findStudent(teacher);
         if (student == null) {
             cs.addMessage(owner,

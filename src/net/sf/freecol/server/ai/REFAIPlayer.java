@@ -62,7 +62,6 @@ import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.PrivateerMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
@@ -207,7 +206,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
      * @param player The player that should be associated with this
      *            {@code REFAIPlayer}.
      */
-    public REFAIPlayer(AIMain aiMain, ServerPlayer player) {
+    public REFAIPlayer(AIMain aiMain, Player player) {
         super(aiMain, player);
 
         this.initialized = getPlayer() != null;
@@ -220,8 +219,8 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public REFAIPlayer(AIMain aiMain,
-                       FreeColXMLReader xr) throws XMLStreamException {
+    public REFAIPlayer(AIMain aiMain, FreeColXMLReader xr)
+        throws XMLStreamException {
         super(aiMain, xr);
 
         this.initialized = getPlayer() != null;

@@ -194,10 +194,10 @@ public class DiplomacySession extends TimedSession {
      * Utility to create a message using the current session parameters and
      * trade agreement, given a desired destination player.
      *
-     * @param destination The {@code ServerPlayer} to send the message to.
+     * @param destination The {@code Player} to send the message to.
      * @return A new {@code DiplomacyMessage} for the destination player.
      */
-    public DiplomacyMessage getMessage(ServerPlayer destination) {
+    public DiplomacyMessage getMessage(Player destination) {
         return (destination.owns(this.unit))
             ? ((this.otherUnit == null)
                 ? new DiplomacyMessage(this.unit, this.settlement, this.agreement)
@@ -283,10 +283,10 @@ public class DiplomacySession extends TimedSession {
             }
             this.agreement.setStatus((result) ? TradeStatus.ACCEPT_TRADE
                                               : TradeStatus.REJECT_TRADE);
-            ServerPlayer sp = (ServerPlayer)this.agreement.getSender();
+            Player sp = this.agreement.getSender();
             cs.add(See.only(sp), getMessage(sp));
-            sp = (ServerPlayer)this.agreement.getRecipient();
-            cs.add(See.only(sp), getMessage(sp));
+            Player rp = this.agreement.getRecipient();
+            cs.add(See.only(rp), getMessage(rp));
         }
         this.unit.setMovesLeft(0);
         cs.add(See.only(getOwner()), this.unit);
