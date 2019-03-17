@@ -58,8 +58,7 @@ public class REFTest extends FreeColTestCase {
         InGameController igc = ServerTestHelper.getInGameController();
 
         // Create player
-        final ServerPlayer player1 = (ServerPlayer)game
-            .getPlayerByNationId("model.nation.dutch");
+        final ServerPlayer player1 = getServerPlayer(game, "model.nation.dutch");
         final Force exf = player1.getMonarch().getExpeditionaryForce();
         // Update to have full naval capacity
         exf.prepareToBoard();
@@ -88,8 +87,7 @@ public class REFTest extends FreeColTestCase {
         Random random = ServerTestHelper.getServer().getServerRandom();
 
         // Create player
-        final ServerPlayer player1 = (ServerPlayer)game
-            .getPlayerByNationId("model.nation.dutch");
+        final ServerPlayer player1 = getServerPlayer(game, "model.nation.dutch");
         final Monarch monarch = player1.getMonarch();
         game.setTurn(new Turn(200));
         assertTrue("REF addition",

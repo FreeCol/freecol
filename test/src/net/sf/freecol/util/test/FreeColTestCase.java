@@ -738,4 +738,15 @@ public class FreeColTestCase extends TestCase {
         }
         uct.addUnitTypeChange(utc);
     }
+
+    /**
+     * Helper function to get a server player by id.
+     *
+     * @param game The {@code Game} to look in.
+     * @param id The player identifier.
+     * @return The {@code ServerPlayer} found.
+     */
+    public ServerPlayer getServerPlayer(Game game, String id) {
+        return (ServerPlayer)game.getPlayerByNationId(id);
+    }
 }

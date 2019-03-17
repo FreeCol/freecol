@@ -62,8 +62,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create players, settlement and unit
-        ServerPlayer inca = (ServerPlayer)game.getPlayerByNationId("model.nation.inca");
-        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer inca = getServerPlayer(game, "model.nation.inca");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         dutch.exploreMap(true);
 
         Tile settlementTile = map.getTile(2, 1);

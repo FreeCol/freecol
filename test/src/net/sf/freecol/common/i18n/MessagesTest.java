@@ -393,12 +393,10 @@ public class MessagesTest extends FreeColTestCase {
         // Unit.getDescription/getFullDescription are just wrappers around
         // Messages.getTemplate/getFullTemplate.
         Game game = getStandardGame();
-        ServerPlayer dutch = (ServerPlayer)game
-            .getPlayerByNationId("model.nation.dutch");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         Nation refNation = dutch.getNation().getREFNation();
         ServerPlayer dutchREF = new ServerPlayer(game, false, refNation);
-        ServerPlayer sioux = (ServerPlayer)game
-            .getPlayerByNationId("model.nation.sioux");
+        ServerPlayer sioux = getServerPlayer(game, "model.nation.sioux");
         Unit unit;
 
         // King's regulars

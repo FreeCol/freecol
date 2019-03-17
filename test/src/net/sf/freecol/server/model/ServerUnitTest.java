@@ -143,7 +143,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         Tile plain = game.getMap().getTile(5, 8);
         plain.setExplored(dutch, true);
         plain.setOwner(dutch);
@@ -187,7 +187,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         Map map = game.getMap();
         map.getTile(5, 8).setExplored(dutch, true);
         map.getTile(6, 8).setExplored(dutch, true);
@@ -271,7 +271,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
         map.getTile(5, 8).setExplored(dutch, true);
@@ -429,7 +429,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
         tile.setOwner(dutch);

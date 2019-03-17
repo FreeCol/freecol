@@ -64,8 +64,8 @@ public class ContactTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Tile tile1 = map.getTile(6, 8);
         tile1.setExplored(dutch, true);
         tile1.setExplored(french, true);
@@ -95,8 +95,8 @@ public class ContactTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
-        ServerPlayer iroquois = (ServerPlayer) game.getPlayerByNationId("model.nation.iroquois");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer iroquois = getServerPlayer(game, "model.nation.iroquois");
         Tile tile1 = map.getTile(6, 8);
         tile1.setExplored(dutch, true);
         Tile tile2 = map.getTile(5, 8);
@@ -130,8 +130,8 @@ public class ContactTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
         tile1.setExplored(french, true);
@@ -160,8 +160,8 @@ public class ContactTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
-        ServerPlayer iroquois = (ServerPlayer) game.getPlayerByNationId("model.nation.iroquois");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer iroquois = getServerPlayer(game, "model.nation.iroquois");
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
         Tile tile2 = map.getTile(4, 8);
@@ -194,8 +194,8 @@ public class ContactTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer apache = (ServerPlayer) game.getPlayerByNationId("model.nation.apache");
-        ServerPlayer french = (ServerPlayer) game.getPlayerByNationId("model.nation.french");
+        ServerPlayer apache = getServerPlayer(game, "model.nation.apache");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(french, true);
         Tile tile2 = map.getTile(4, 8);
@@ -224,8 +224,8 @@ public class ContactTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer apache = (ServerPlayer) game.getPlayerByNationId("model.nation.apache");
-        ServerPlayer iroquois = (ServerPlayer) game.getPlayerByNationId("model.nation.iroquois");
+        ServerPlayer apache = getServerPlayer(game, "model.nation.apache");
+        ServerPlayer iroquois = getServerPlayer(game, "model.nation.iroquois");
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         Tile tile3 = map.getTile(3, 8);
@@ -251,8 +251,8 @@ public class ContactTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer apache = (ServerPlayer) game.getPlayerByNationId("model.nation.apache");
-        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer apache = getServerPlayer(game, "model.nation.apache");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
         Tile tile2 = map.getTile(4, 8);
@@ -279,8 +279,8 @@ public class ContactTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer apache = (ServerPlayer) game.getPlayerByNationId("model.nation.apache");
-        ServerPlayer iroquois = (ServerPlayer) game.getPlayerByNationId("model.nation.iroquois");
+        ServerPlayer apache = getServerPlayer(game, "model.nation.apache");
+        ServerPlayer iroquois = getServerPlayer(game, "model.nation.iroquois");
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         Tile tile3 = map.getTile(3, 8);
@@ -307,8 +307,8 @@ public class ContactTest extends FreeColTestCase {
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer) game.getPlayerByNationId("model.nation.french");
+        ServerPlayer dutch = getServerPlayer(game, "model.nation.dutch");
+        ServerPlayer french = getServerPlayer(game, "model.nation.french");
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
         tile1.setExplored(french, true);
