@@ -1677,7 +1677,7 @@ public class Game extends FreeColGameObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (specification != null) {
+        if (this.specification != null) {
             synchronized (this.specification) {
                 // Specification *must be first* if present.
                 // It is not necessarily present when reading maps, but an
@@ -1705,8 +1705,10 @@ public class Game extends FreeColGameObject {
         Player unknown = getUnknownEnemy();
         if (unknown != null) unknown.toXML(xw);
 
-        synchronized (this.map) {
-            this.map.toXML(xw);
+        if (this.map != null) {
+            synchronized (this.map) {
+                this.map.toXML(xw);
+            }
         }
     }
 
