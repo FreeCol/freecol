@@ -203,12 +203,12 @@ public class ServerGame extends Game implements TurnTaker {
      */
     public boolean sendTo(Player player, ChangeSet cs) {
         try {
-            return ((ServerPlayer)player).send(cs);
+            return player.send(cs);
         } catch (Exception e) {
-            // Catch all manner of exceptions here to localize failure to
-            // just one player.  Nothing is expected, but the entire output
-            // side of serialization is potentially exercised here, so it is
-            // a good place to find new fails.
+            // Catch all manner of exceptions here to localize failure
+            // to just one player.  Nothing is *expected*, but the
+            // entire output side of serialization is potentially
+            // exercised here, so it is a good place to find new fails.
             logger.log(Level.WARNING, "sendTo(" + player.getId()
                 + "," + cs + ") failed", e);
         }
@@ -448,7 +448,7 @@ public class ServerGame extends Game implements TurnTaker {
             lb.add(" ", unit.getId());
             if (unit.isOnCarrier()) {
                 ; // Allow carrier to handle
-            } else if (!((ServerPlayer)weakAI).csChangeOwner(unit, strongAI, //-vis(both)
+            } else if (!weakest.csChangeOwner(unit, strongAI, //-vis(both)
                     UnitChangeType.CAPTURE, null, cs)) {
                 logger.warning("Owner change failed for " + unit);
             } else {
@@ -481,7 +481,7 @@ public class ServerGame extends Game implements TurnTaker {
         tiles.removeAll(updated);
         cs.add(See.perhaps(), tiles);
         
-        ((ServerPlayer)weakAI).csWithdraw(cs, //+vis(weakest)
+        weakest.csWithdraw(cs, //+vis(weakest)
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              "model.game.spanishSuccession", strongAI)
                 .addStringTemplate("%loserNation%", loser)

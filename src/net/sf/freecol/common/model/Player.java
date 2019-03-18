@@ -633,6 +633,16 @@ public class Player extends FreeColGameObject implements Nameable {
         throw new RuntimeException("setConnection called on Player: " + this);
     }
 
+    /**
+     * Send a change set across the connection.
+     *
+     * @param cs The {@code ChangeSet} to send.
+     * @return True if the message was sent.
+     */
+    public boolean send(ChangeSet cs) {
+        throw new RuntimeException("send called on Player: " + this);
+    }
+
 
     // Error wrangling
 

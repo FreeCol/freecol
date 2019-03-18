@@ -273,9 +273,7 @@ public class ServerPlayer extends Player implements TurnTaker {
     // Fully implement Connection routines and use them for comms
 
     /**
-     * Gets the connection of this player.
-     *
-     * @return The {@code Connection}.
+     * {@inheritDoc}
      */
     @Override
     public final Connection getConnection() {
@@ -283,9 +281,7 @@ public class ServerPlayer extends Player implements TurnTaker {
     }
 
     /**
-     * Sets the connection of this player.
-     *
-     * @param connection The {@code Connection}.
+     * {@inheritDoc}
      */
     @Override
     public final void setConnection(Connection connection) {
@@ -293,20 +289,9 @@ public class ServerPlayer extends Player implements TurnTaker {
     }
 
     /**
-     * Disconnect this player.
+     * {@inheritDoc}
      */
-    public void disconnect() {
-        if (this.connection != null) this.connection.close();
-        setConnection(null);
-    }
-            
-    /**
-     * Send a change set to this player.
-     *
-     * @param cs The {@code ChangeSet} to send.
-     * @return True if the message was sent.
-     * @exception FreeColException
-     */
+    @Override
     public boolean send(ChangeSet cs) {
         if (!isConnected()) return false;
         try {
@@ -318,6 +303,9 @@ public class ServerPlayer extends Player implements TurnTaker {
         return true;
     }
 
+
+    // Extra server side routines
+    
     /**
      * Update the current father.
      *
@@ -3112,7 +3100,7 @@ outer:  for (Effect effect : effects) {
             : repair;
         ship.damageShip(shipLoc);//-vis(player)
         cs.add(See.only(owner), (FreeColGameObject)shipLoc);
-        ((ServerPlayer)owner).invalidateCanSeeTiles();//+vis(player)
+        owner.invalidateCanSeeTiles();//+vis(player)
     }
 
     /**

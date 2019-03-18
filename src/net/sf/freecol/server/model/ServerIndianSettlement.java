@@ -387,7 +387,7 @@ public class ServerIndianSettlement extends IndianSettlement
             ((ServerUnit)old).csRemove(See.only(oldOwner),
                 null, cs);//-vis(oldOwner)
             cs.add(See.only(oldOwner), tile);
-            ((ServerPlayer)oldOwner).invalidateCanSeeTiles();//+vis(oldOwner)
+            oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
         }
 
         if (missionary != null) {

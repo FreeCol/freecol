@@ -193,12 +193,12 @@ public class ColonyTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(5);
-        ServerPlayer serverPlayer = (ServerPlayer)colony.getOwner();
+        Player player = colony.getOwner();
 
         assertEquals(0, countParties(colony));
-        colony.addModifier(serverPlayer.makeTeaPartyModifier());
+        colony.addModifier(((ServerPlayer)player).makeTeaPartyModifier());
         assertEquals(1, countParties(colony));
-        Modifier m = serverPlayer.makeTeaPartyModifier();
+        Modifier m = ((ServerPlayer)player).makeTeaPartyModifier();
         m.setFirstTurn(new Turn(game.getTurn().getNumber() + 1));
         colony.addModifier(m);
         assertEquals(2, countParties(colony));

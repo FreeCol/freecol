@@ -247,16 +247,14 @@ public final class InGameController extends Controller {
      * Public version of csAddFoundingFather so it can be used in the
      * test code and DebugMenu.
      *
-     * @param serverPlayer The {@code ServerPlayer} who gains a father.
+     * @param player The {@code Player} who gains a father.
      * @param father The {@code FoundingFather} to add.
      */
-    public void addFoundingFather(ServerPlayer serverPlayer,
-                                  FoundingFather father) {
+    public void addFoundingFather(Player player, FoundingFather father) {
         ChangeSet cs = new ChangeSet();
-        serverPlayer.csAddFoundingFather(father, random, cs);
-        cs.addAttribute(See.only(serverPlayer), "flush",
-                        Boolean.TRUE.toString());
-        getGame().sendTo(serverPlayer, cs);
+        ((ServerPlayer)player).csAddFoundingFather(father, random, cs);
+        cs.addAttribute(See.only(player), "flush", Boolean.TRUE.toString());
+        getGame().sendTo(player, cs);
     }
 
     /**
@@ -288,7 +286,7 @@ public final class InGameController extends Controller {
         final Player owner = colony.getOwner();
         colony.csChangeOwner(serverPlayer, false, cs);//-vis(serverPlayer,owner)
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
-        ((ServerPlayer)owner).invalidateCanSeeTiles();//+vis(owner)
+        owner.invalidateCanSeeTiles();//+vis(owner)
         getGame().sendToAll(cs);
     }
 
@@ -568,11 +566,11 @@ public final class InGameController extends Controller {
      * hence the special handling.
      *
      * @param serverPlayer The REF {@code ServerPlayer} that is granting.
-     * @param independent The newly independent {@code ServerPlayer}.
+     * @param independent The newly independent {@code Player}.
      * @param cs A {@code ChangeSet} to update.
      */
     private void csGiveIndependence(ServerPlayer serverPlayer,
-                                    ServerPlayer independent, ChangeSet cs) {
+                                    Player independent, ChangeSet cs) {
         serverPlayer.csChangeStance(Stance.PEACE, independent, true, cs);
         independent.changePlayerType(PlayerType.INDEPENDENT);
         Game game = getGame();
@@ -635,7 +633,8 @@ public final class InGameController extends Controller {
         cs.add(See.only(independent), independent);
 
         // Reveal the map on independence.
-        cs.add(See.only(independent), independent.exploreMap(true));
+        cs.add(See.only(independent),
+               ((ServerPlayer)independent).exploreMap(true));
     }
 
     private StringTemplate unitTemplate(String base, List<Unit> units) {
@@ -2108,7 +2107,7 @@ public final class InGameController extends Controller {
             switch (current.checkForDeath()) {
             case IS_DEFEATED:
                 for (Player p : current.getRebels()) {
-                    csGiveIndependence(current, (ServerPlayer)p, cs);
+                    csGiveIndependence(current, p, cs);
                 }
                 // Fall through
             case IS_DEAD:
@@ -2467,12 +2466,12 @@ public final class InGameController extends Controller {
      * @param serverPlayer The {@code ServerPlayer} that is inciting.
      * @param unit The missionary {@code Unit} inciting.
      * @param is The {@code IndianSettlement} to incite.
-     * @param enemy The {@code ServerPlayer} to be incited against.
+     * @param enemy The {@code Player} to be incited against.
      * @param gold The amount of gold in the bribe.
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet incite(ServerPlayer serverPlayer, Unit unit,
-        IndianSettlement is, ServerPlayer enemy, int gold) {
+                            IndianSettlement is, Player enemy, int gold) {
         ChangeSet cs = new ChangeSet();
 
         Tile tile = is.getTile();
@@ -2481,10 +2480,9 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), tile);
 
         // How much gold will be needed?
-        ServerPlayer enemyPlayer = enemy;
         Player nativePlayer = is.getOwner();
         int payingValue = nativePlayer.getTension(serverPlayer).getValue();
-        int targetValue = nativePlayer.getTension(enemyPlayer).getValue();
+        int targetValue = nativePlayer.getTension(enemy).getValue();
         int goldToPay = (payingValue > targetValue) ? 10000 : 5000;
         goldToPay += 20 * (payingValue - targetValue);
         goldToPay = Math.max(goldToPay, 650);
@@ -2499,7 +2497,7 @@ public final class InGameController extends Controller {
                                  "missionarySettlement.inciteGoldFail",
                                  serverPlayer, is)
                     .addStringTemplate("%player%",
-                        enemyPlayer.getNationLabel())
+                        enemy.getNationLabel())
                     .addAmount("%amount%", goldToPay));
             unit.setMovesLeft(0);
             cs.addPartial(See.only(serverPlayer), unit,
@@ -2508,9 +2506,9 @@ public final class InGameController extends Controller {
             // Success.  Raise the tension for the native player with respect
             // to the European player.  Let resulting stance changes happen
             // naturally in the AI player turn/s.
-            ((ServerPlayer)nativePlayer).csModifyTension(enemyPlayer,
+            ((ServerPlayer)nativePlayer).csModifyTension(enemy,
                 Tension.WAR_MODIFIER, cs);//+til
-            enemyPlayer.csModifyTension(serverPlayer,
+            ((ServerPlayer)enemy).csModifyTension(serverPlayer,
                 Tension.TENSION_ADD_WAR_INCITER, cs);//+til
             serverPlayer.modifyGold(-gold);
             nativePlayer.modifyGold(gold);
@@ -2959,13 +2957,13 @@ public final class InGameController extends Controller {
      * benefit.
      *
      * @param serverPlayer The {@code ServerPlayer} making contact.
-     * @param other The native {@code ServerPlayer} to contact.
+     * @param other The native {@code Player} to contact.
      * @param tile A {@code Tile} on offer at first landing.
      * @param result Whether the initial peace treaty was accepted.
      * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet nativeFirstContact(ServerPlayer serverPlayer,
-                                        ServerPlayer other, Tile tile,
+                                        Player other, Tile tile,
                                         boolean result) {
         ChangeSet cs = new ChangeSet();
         DiplomacySession session = null;
@@ -2989,9 +2987,9 @@ public final class InGameController extends Controller {
         } else {
             // Consider not accepting the treaty to be an insult and
             // ban missions.
-            other.csModifyTension(serverPlayer,
+            ((ServerPlayer)other).csModifyTension(serverPlayer,
                 Tension.TENSION_ADD_MAJOR, cs);//+til
-            other.addMissionBan(serverPlayer);
+            ((ServerPlayer)other).addMissionBan(serverPlayer);
         }
         if (session != null) session.complete(result, cs);
         getGame().sendToOthers(serverPlayer, cs);

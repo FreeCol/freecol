@@ -1862,7 +1862,7 @@ public class InGameControllerTest extends FreeColTestCase {
         event.setValue("model.building.printingPress");
         events.add(event);
         father.setEvents(events);
-        igc.addFoundingFather((ServerPlayer)colony.getOwner(), father);
+        igc.addFoundingFather(colony.getOwner(), father);
 
         assertTrue(colony.getBuilding(press) != null);
     }

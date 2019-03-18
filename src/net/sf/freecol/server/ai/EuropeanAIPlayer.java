@@ -1476,17 +1476,17 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param lb A {@code LogBuilder} to log to.
      */
     private void determineStances(LogBuilder lb) {
-        final ServerPlayer serverPlayer = (ServerPlayer)getPlayer();
+        final Player player = getPlayer();
         lb.mark();
 
-        for (Player p : getGame().getLivePlayerList(serverPlayer)) {
+        for (Player p : getGame().getLivePlayerList(player)) {
             Stance newStance = determineStance(p);
-            if (newStance != serverPlayer.getStance(p)) {
+            if (newStance != player.getStance(p)) {
                 if (newStance == Stance.WAR && peaceHolds(p)) {
                     ; // Peace treaty holds for now
                 } else {
                     getAIMain().getFreeColServer().getInGameController()
-                        .changeStance(serverPlayer, newStance, p, true);
+                        .changeStance(player, newStance, p, true);
                     lb.add(" ", p.getDebugName(), "->", newStance, ", ");
                 }
             }

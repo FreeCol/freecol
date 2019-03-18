@@ -611,11 +611,10 @@ public final class FreeColServer {
     public void endGame() {
         changeServerState(ServerState.END_GAME);
         for (Player p : getGame().getLiveEuropeanPlayerList()) {
-            ServerPlayer sp = (ServerPlayer)p;
-            if (sp.isAdmin()) continue;
-            sp.send(new ChangeSet()
-                .add(See.only(sp),
-                     new LogoutMessage(sp, LogoutReason.QUIT)));
+            if (p.isAdmin()) continue;
+            p.send(new ChangeSet()
+                .add(See.only(p),
+                     new LogoutMessage(p, LogoutReason.QUIT)));
         }
     }
         
@@ -665,11 +664,15 @@ public final class FreeColServer {
     /**
      * Remove a player connection.
      *
-     * @param serverPlayer The {@code ServerPlayer} to disconnect.
+     * @param player The {@code Player} to disconnect.
      */
-    public void removePlayerConnection(ServerPlayer serverPlayer) {
-        getServer().removeConnection(serverPlayer.getConnection());
-        serverPlayer.disconnect();
+    public void removePlayerConnection(Player player) {
+        Connection conn = player.getConnection();
+        if (conn != null) {
+            getServer().removeConnection(conn);
+            conn.close();
+            player.setConnection(null);
+        }
     }
 
     /**
@@ -738,10 +741,10 @@ public final class FreeColServer {
             final Game game = buildGame();
             for (Player player : transform(game.getLivePlayers(),
                                            p -> !p.isAI())) {
-                ((ServerPlayer)player).invalidateCanSeeTiles();
+                player.invalidateCanSeeTiles();
                 ChangeSet cs = new ChangeSet();
                 cs.add(See.only(player), game);
-                ((ServerPlayer)player).send(cs);
+                player.send(cs);
             }
             break;
         case LOAD_GAME: // Do nothing, game has been sent.
@@ -753,7 +756,7 @@ public final class FreeColServer {
         }
 
         changeServerState(ServerState.IN_GAME);
-        sendToAll(TrivialMessage.startGameMessage, (ServerPlayer)null);
+        sendToAll(TrivialMessage.startGameMessage, (Player)null);
         updateMetaServer();
     }
 
@@ -771,11 +774,10 @@ public final class FreeColServer {
      * Send a message to all connections.
      *
      * @param msg The {@code Message} to send.
-     * @param serverPlayer An optional {@code ServerPlayer} to omit.
+     * @param player An optional {@code Player} to omit.
      */
-    public void sendToAll(Message msg, ServerPlayer serverPlayer) {
-        sendToAll(msg, (serverPlayer == null) ? null
-            : serverPlayer.getConnection());
+    public void sendToAll(Message msg, Player player) {
+        sendToAll(msg, (player == null) ? null : player.getConnection());
     }
 
 
@@ -1326,10 +1328,12 @@ public final class FreeColServer {
      * @return A suitable record.
      */
     private ServerInfo getServerInfo() {
-        int slots = count(getGame().getLiveEuropeanPlayers(),
-            p -> !p.isREF() && ((ServerPlayer)p).isAI() && !p.isConnected());
-        int players = count(getGame().getLivePlayers(),
-            p -> !((ServerPlayer)p).isAI() && p.isConnected());
+        final Predicate<Player> absentAI
+            = p -> !p.isREF() && p.isAI() && !p.isConnected();
+        final Predicate<Player> liveHuman
+            = p -> !p.isAI() && p.isConnected();
+        int slots = count(getGame().getLiveEuropeanPlayers(), absentAI);
+        int players = count(getGame().getLiveEuropeanPlayers(), liveHuman);
         return new ServerInfo(getName(),
                               null, -1, // Missing these at this point
                               slots, players,

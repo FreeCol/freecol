@@ -146,7 +146,7 @@ public class InciteMessage extends AttributeMessage {
 
         // Valid, proceed to incite.
         return igc(freeColServer)
-            .incite(serverPlayer, unit, is, (ServerPlayer)enemy, gold);
+            .incite(serverPlayer, unit, is, enemy, gold);
     }
 
 
