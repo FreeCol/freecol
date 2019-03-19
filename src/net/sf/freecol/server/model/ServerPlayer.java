@@ -4199,7 +4199,7 @@ outer:  for (Effect effect : effects) {
             ds = DiplomacySession.findContactSession(unit, otherUnit);
         } else {
             throw new RuntimeException("Non-null settlement (" + settlement
-                + ") or other unit ( " + otherUnit + ") required");
+                + ") or other unit (null) required");
         }
         if (ds != null) return; // Ongoing contact, no action required
         
