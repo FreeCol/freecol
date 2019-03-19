@@ -223,7 +223,7 @@ public final class UnitLabel extends FreeColLabel
         } else {
             Icon imageIcon = new ImageIcon(lib.getScaledUnitImage(unit));
             if (unit.getLocation() instanceof ColonyTile) {
-                Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+                Dimension tileSize = lib.scale(ImageLibrary.TILE_SIZE);
                 tileSize.width /= 2;
                 tileSize.height = imageIcon.getIconHeight();
                 setSize(tileSize);

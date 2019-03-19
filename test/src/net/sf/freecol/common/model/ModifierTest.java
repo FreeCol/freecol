@@ -236,18 +236,23 @@ public class ModifierTest extends FreeColTestCase {
         Turn turn;
 
         // only modifier2
-        assertEquals(3f, featureContainer.applyModifiers(1, new Turn(9),
-                                                         "test", frigate));
+        turn = new Turn(9);
+        assertEquals(3f, FeatureContainer.applyModifiers(1, turn,
+                featureContainer.getModifiers("test", frigate, turn)));
         // both modifiers
-        assertEquals(4f, featureContainer.applyModifiers(1, new Turn(10),
-                                                         "test", frigate));
-        assertEquals(5f, featureContainer.applyModifiers(1, new Turn(11),
-                                                         "test", frigate));
-        assertEquals(9f, featureContainer.applyModifiers(1, new Turn(15),
-                                                         "test", frigate));
+        turn = new Turn(10);
+        assertEquals(4f, FeatureContainer.applyModifiers(1, turn,
+                featureContainer.getModifiers("test", frigate, turn)));
+        turn = new Turn(11);
+        assertEquals(5f, FeatureContainer.applyModifiers(1, new Turn(11),
+                featureContainer.getModifiers("test", frigate, turn)));
+        turn = new Turn(15);
+        assertEquals(9f, FeatureContainer.applyModifiers(1, turn,
+                featureContainer.getModifiers("test", frigate, turn)));
         // only modifier2
-        assertEquals(3f, featureContainer.applyModifiers(1, new Turn(16),
-                                                         "test", frigate));
+        turn = new Turn(16);
+        assertEquals(3f, FeatureContainer.applyModifiers(1, turn,
+                featureContainer.getModifiers("test", frigate, turn)));
     }
 
     public void testHashEquals() {
@@ -340,7 +345,8 @@ public class ModifierTest extends FreeColTestCase {
         featureContainer.addModifier(modifier2);
         featureContainer.addModifier(modifier3);
 
-        assertEquals(Modifier.UNKNOWN,
-            featureContainer.applyModifiers(1, new Turn(15), "test", null));
+        Turn turn = new Turn(15);
+        assertEquals(Modifier.UNKNOWN, FeatureContainer.applyModifiers(1, turn,
+                featureContainer.getModifiers("test", null, turn)));
     }
 }

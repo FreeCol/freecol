@@ -1527,7 +1527,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         int n = turn.getNumber() - peaceTurn;
         float prob = (float)Math.pow(peaceProb, n);
         // Apply Franklin's modifier
-        prob = p.applyModifiers(prob, turn, Modifier.PEACE_TREATY);
+        prob = p.apply(prob, turn, Modifier.PEACE_TREATY);
         return prob > 0.0f
             && (randomInt(logger, "Peace holds?",  getAIRandom(), 100)
                 < (int)(100.0f * prob));

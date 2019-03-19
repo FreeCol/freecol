@@ -1178,7 +1178,7 @@ public class DebugUtils {
             int amount = sis.getGoodsCount(gt);
             int prod = sis.getTotalProductionOf(gt);
             if (amount > 0 || prod != 0) {
-                lb.add(Messages.message(AbstractGoods.getLabel(gt, amount)),
+                lb.add(Messages.message(new AbstractGoods(gt, amount).getLabel()),
                     " ", ((prod > 0) ? "+" : ""), prod, "\n");
             }
         }

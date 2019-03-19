@@ -303,8 +303,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 Messages.message("mapEditorTransformPanel.resource"),
                 new ResourceTransform()));
 
-        listPanel.add(buildButton(ImageLibrary
-                .getScaledImage(ImageLibrary.LOST_CITY_RUMOUR, riverSize, false),
+        listPanel.add(buildButton(ImageLibrary.getLCRImage(riverSize),
                 Messages.getName(ModelMessage.MessageType.LOST_CITY_RUMOUR),
                 new LostCityRumourTransform()));
 

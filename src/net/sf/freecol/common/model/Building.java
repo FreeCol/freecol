@@ -270,9 +270,9 @@ public class Building extends WorkLocation
                 if (available >= capacity) {
                     minimumRatio = maximumRatio = 0.0;
                 } else {
-                    int divisor = (int)getType().applyModifiers(0f, turn,
+                    int divisor = (int)getType().apply(0f, turn,
                         Modifier.BREEDING_DIVISOR);
-                    int factor = (int)getType().applyModifiers(0f, turn,
+                    int factor = (int)getType().apply(0f, turn,
                         Modifier.BREEDING_FACTOR);
                     int production = (available < goodsType.getBreedingNumber()
                         || divisor <= 0) ? 0
@@ -291,7 +291,7 @@ public class Building extends WorkLocation
                 // Unattended production always applies for buildings!
                 production += getBaseProduction(null, goodsType, null);
                 production = applyModifiers(production, turn,
-                    getProductionModifiers(goodsType, null));
+                                            getProductionModifiers(goodsType, null));
                 production = (int)Math.floor(production);
                 // Beware!  If we ever unify this code with ColonyTile,
                 // ColonyTiles have outputs with zero amount.

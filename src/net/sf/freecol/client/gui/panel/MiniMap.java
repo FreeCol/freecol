@@ -367,7 +367,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (getParent() != null) {
             int miniRectX = (getGUI().getFocus().getX() - firstColumn) * tileSize;
             int miniRectY = (getGUI().getFocus().getY() - firstRow) * tileSize / 4;
-            Dimension mapTileSize = library.scaleDimension(ImageLibrary.TILE_SIZE);
+            Dimension mapTileSize = library.scale(ImageLibrary.TILE_SIZE);
             int miniRectWidth = (getParent().getWidth() / mapTileSize.width + 1) * tileSize;
             int miniRectHeight = (getParent().getHeight() / mapTileSize.height + 1) * tileSize / 2;
             if (miniRectX + miniRectWidth / 2 > width) {

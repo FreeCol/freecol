@@ -95,7 +95,7 @@ public abstract class FreeColObject
      * @return The class, or null if none found.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends FreeColObject> Class<T> getFreeColObjectClass(String name) {
+    public static <T extends FreeColObject> Class<T> getFreeColObjectClassByName(String name) {
         final String type = "net.sf.freecol.common.model."
             + capitalize(name);
         final Class<T> c = (Class<T>)Introspector.getClassByName(type);
@@ -177,7 +177,7 @@ public abstract class FreeColObject
      * @param id The identifier to examine.
      * @return The type part of the identifier, or null on error.
      */
-    public static String getIdType(String id) {
+    public static String getIdTypeByName(String id) {
         if (id != null) {
             int col = id.lastIndexOf(':');
             return (col >= 0) ? id.substring(0, col) : id;
@@ -191,7 +191,7 @@ public abstract class FreeColObject
      * @return The type part of the identifier, or null on error.
      */
     public String getIdType() {
-        return getIdType(getId());
+        return getIdTypeByName(getId());
     }
 
     /**
@@ -432,7 +432,7 @@ public abstract class FreeColObject
      */
     public final boolean hasAbility(String id, FreeColSpecObjectType fcgot,
                                     Turn turn) {
-        return FeatureContainer.hasAbility(getAbilities(id, fcgot, turn));
+        return FeatureContainer.allAbilities(getAbilities(id, fcgot, turn));
     }
 
     /**
@@ -654,8 +654,8 @@ public abstract class FreeColObject
      * @param id The object identifier.
      * @return The modified number.
      */
-    public final float applyModifiers(float number, Turn turn, String id) {
-        return applyModifiers(number, turn, id, null);
+    public final float apply(float number, Turn turn, String id) {
+        return apply(number, turn, id, null);
     }
 
     /**
@@ -669,22 +669,9 @@ public abstract class FreeColObject
      *     modifier applies to.
      * @return The modified number.
      */
-    public final float applyModifiers(float number, Turn turn,
-                                      String id, FreeColSpecObjectType fcgot) {
+    public final float apply(float number, Turn turn, String id,
+                             FreeColSpecObjectType fcgot) {
         return applyModifiers(number, turn, getModifiers(id, fcgot, turn));
-    }
-
-    /**
-     * Applies a collection of modifiers to the given number.
-     *
-     * @param number The number to modify.
-     * @param turn An optional applicable {@code Turn}.
-     * @param mods The {@code Modifier}s to apply.
-     * @return The modified number.
-     */
-    public static final float applyModifiers(float number, Turn turn,
-                                             Collection<Modifier> mods) {
-        return FeatureContainer.applyModifiers(number, turn, mods);
     }
 
     /**
@@ -697,6 +684,19 @@ public abstract class FreeColObject
      */
     public static final float applyModifiers(float number, Turn turn,
                                              Stream<Modifier> mods) {
+        return FeatureContainer.applyModifiers(number, turn, mods);
+    }
+
+    /**
+     * Applies a collection of modifiers to the given number.
+     *
+     * @param number The number to modify.
+     * @param turn An optional applicable {@code Turn}.
+     * @param mods The {@code Modifier}s to apply.
+     * @return The modified number.
+     */
+    public static final float applyModifiers(float number, Turn turn,
+                                             Collection<Modifier> mods) {
         return FeatureContainer.applyModifiers(number, turn, mods);
     }
 

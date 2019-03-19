@@ -932,7 +932,7 @@ public class Colony extends Settlement implements TradeLocation {
      * @return True if the building is available at zero cost.
      */
     public boolean isAutomaticBuild(BuildingType buildingType) {
-        float value = owner.applyModifiers(100f, getGame().getTurn(),
+        float value = owner.apply(100f, getGame().getTurn(),
                 Modifier.BUILDING_PRICE_BONUS, buildingType);
         return value == 0f && canBuild(buildingType);
     }
@@ -1281,7 +1281,7 @@ public class Colony extends Settlement implements TradeLocation {
 
         float membership = (liberty * 100.0f) / (LIBERTY_PER_REBEL * uc);
         membership = applyModifiers(membership, getGame().getTurn(),
-                getOwner().getModifiers(Modifier.SOL));
+                                    getOwner().getModifiers(Modifier.SOL));
         if (membership < 0.0f) {
             membership = 0.0f;
         } else if (membership > 100.0f) {
@@ -1411,7 +1411,7 @@ public class Colony extends Settlement implements TradeLocation {
      * @return True if the population can be reduced.
      */
     public boolean canReducePopulation() {
-        return getUnitCount() > applyModifiers(0f, getGame().getTurn(),
+        return getUnitCount() > apply(0f, getGame().getTurn(),
                 Modifier.MINIMUM_COLONY_SIZE);
     }
 
@@ -2621,8 +2621,7 @@ public class Colony extends Settlement implements TradeLocation {
      */
     @Override
     public int getGoodsCapacity() {
-        return (int)applyModifiers(0f, getGame().getTurn(),
-                Modifier.WAREHOUSE_STORAGE);
+        return (int)apply(0f, getGame().getTurn(), Modifier.WAREHOUSE_STORAGE);
     }
 
     /**

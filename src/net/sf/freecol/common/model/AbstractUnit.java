@@ -144,20 +144,9 @@ public class AbstractUnit extends FreeColObject {
      * @return A {@code StringTemplate} describing the abstract unit.
      */
     public StringTemplate getLabel() {
-        return getLabel(getId(), getRoleId(), getNumber());
+        return getLabelInternal(getId(), getRoleId(), getNumber());
     }
-
-    /**
-     * Gets a template describing an arbitrary single abstract unit.
-     *
-     * @param typeId The unit type identifier.
-     * @param roleId The role identifier.
-     * @return A {@code StringTemplate} describing the abstract unit.
-     */
-    public static StringTemplate getLabel(String typeId, String roleId) {
-        return getLabel(typeId, roleId, 1);
-    }
-        
+       
     /**
      * Gets a template describing an arbitrary abstract unit.
      *
@@ -166,8 +155,9 @@ public class AbstractUnit extends FreeColObject {
      * @param number The number of units.
      * @return A {@code StringTemplate} describing the abstract unit.
      */
-    public static StringTemplate getLabel(String typeId, String roleId,
-                                          int number) {
+    private static StringTemplate getLabelInternal(String typeId,
+                                                   String roleId,
+                                                   int number) {
         StringTemplate tmpl = Messages.getUnitLabel(null, typeId, number,
                                                     null, roleId, null);
         return StringTemplate.template("model.abstractUnit.label")

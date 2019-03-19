@@ -229,11 +229,11 @@ public class ServerUnit extends Unit implements TurnTaker {
         if (deliver != null) { // Deliver goods if any
             final Turn turn = getGame().getTurn();
             int amount = deliver.getAmount();
-            amount = (int)this.applyModifiers(amount, turn,
+            amount = (int)this.apply(amount, turn,
                 Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
             Settlement settlement = tile.getOwningSettlement();
             if (settlement != null && owner.owns(settlement)) {
-                amount = (int)settlement.applyModifiers(amount, turn,
+                amount = (int)settlement.apply(amount, turn,
                     Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
                 settlement.addGoods(deliver.getType(), amount);
             }

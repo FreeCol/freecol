@@ -291,7 +291,8 @@ public class Game extends FreeColGameObject {
      * @return The new uninitialized object, or null on error.
      */
     public static <T extends FreeColObject> T newInstance(Game game,
-        Class<T> returnClass, boolean server) {
+                                                          Class<T> returnClass,
+                                                          boolean server) {
         // Do not restrict trying the full (Game,String) constructor
         // to just server objects as there are simpler FCOs that
         // implement it (e.g. Goods).
@@ -330,30 +331,6 @@ public class Game extends FreeColGameObject {
         return null;
     }
 
-    /**
-     * Instantiate an uninitialized FreeColGameObject within this game.
-     *
-     * @param <T> The actual return type.
-     * @param returnClass The required {@code FreeColObject} class.
-     * @param server Create a server object if possible.
-     * @return The new uninitialized object, or null on error.
-     */
-    public <T extends FreeColObject> T newInstance(Class<T> returnClass,
-                                                   boolean server) {
-        return newInstance(this, returnClass, server);
-    }
-
-    /**
-     * Instantiate an uninitialized FreeColGameObject within a game.
-     *
-     * @param <T> The actual return type.
-     * @param returnClass The required {@code FreeColObject} class.
-     * @return The new uninitialized object, or null on error.
-     */
-    public <T extends FreeColObject> T newInstance(Class<T> returnClass) {
-        return newInstance(this, returnClass, false); // Default to non-server
-    }
-    
     /**
      * Get the difficulty level of this game.
      *
@@ -1500,7 +1477,7 @@ public class Game extends FreeColGameObject {
      * @return The location class.
      */
     public static Class<? extends FreeColGameObject> getLocationClass(String id) {
-        return locationClasses.get(capitalize(FreeColObject.getIdType(id)));
+        return locationClasses.get(capitalize(FreeColObject.getIdTypeByName(id)));
     }
 
     /**
@@ -1514,11 +1491,12 @@ public class Game extends FreeColGameObject {
      *     the stream.
      */
     public <T extends FreeColObject> T unserialize(String xml,
-        Class<T> returnClass) throws XMLStreamException {
+                                                   Class<T> returnClass)
+        throws XMLStreamException {
         try {
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
             xr.nextTag();
-            T ret = newInstance(returnClass);
+            T ret = newInstance(this, returnClass, false);
             ret.readFromXML(xr);
             return ret;
 

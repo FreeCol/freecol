@@ -1434,8 +1434,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The percentage defence bonus.
      */
     public int getDefenceBonusPercentage() {
-        return (int)getType().applyModifiers(100f, getGame().getTurn(),
-                                             Modifier.DEFENCE)
+        return (int)getType().apply(100f, getGame().getTurn(), Modifier.DEFENCE)
             - 100;
     }
 
@@ -1719,7 +1718,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         int amount = getBaseProduction(null, goodsType, unitType);
         amount = (int)applyModifiers(amount, getGame().getTurn(),
-            getProductionModifiers(goodsType, unitType));
+                                     getProductionModifiers(goodsType, unitType));
         return (amount < 0) ? 0 : amount;
     }
 

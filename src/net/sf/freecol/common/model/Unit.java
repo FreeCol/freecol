@@ -448,7 +448,7 @@ public class Unit extends GoodsLocation
                 if (Messages.containsKey(equipmentKey)) {
                     // Currently only used for missionary which does not
                     // have equipment that directly corresponds to goods.
-                    extra = AbstractGoods.getLabel(equipmentKey, 1);
+                    extra = AbstractGoods.getAbstractLabel(equipmentKey, 1);
                 } else {
                     // Other roles can be characterized by their goods.
                     List<AbstractGoods> requiredGoods
@@ -2525,8 +2525,7 @@ public class Unit extends GoodsLocation
     @Override
     public int getInitialMovesLeft() {
         Turn turn = getGame().getTurn();
-        return (int)applyModifiers(this.type.getMovement(), turn,
-                                   Modifier.MOVEMENT_BONUS, this.type);
+        return (int)apply(this.type.getMovement(), turn, Modifier.MOVEMENT_BONUS, this.type);
     }
 
     /**
@@ -2553,9 +2552,8 @@ public class Unit extends GoodsLocation
      */
     public int getSailTurns() {
         float base = getSpecification().getInteger(GameOptions.TURNS_TO_SAIL);
-        return (int)getOwner().applyModifiers(base, getGame().getTurn(),
-                                              Modifier.SAIL_HIGH_SEAS,
-                                              this.type);
+        return (int)getOwner().apply(base, getGame().getTurn(),
+                                     Modifier.SAIL_HIGH_SEAS, this.type);
     }
 
     /**
@@ -3637,8 +3635,8 @@ public class Unit extends GoodsLocation
     public float getConvertProbability() {
         final Specification spec = getSpecification();
         int opt = spec.getInteger(GameOptions.NATIVE_CONVERT_PROBABILITY);
-        return 0.01f * applyModifiers(opt, getGame().getTurn(),
-                                      Modifier.NATIVE_CONVERT_BONUS);
+        return 0.01f * apply(opt, getGame().getTurn(),
+                             Modifier.NATIVE_CONVERT_BONUS);
     }
 
     /**
@@ -3707,7 +3705,7 @@ public class Unit extends GoodsLocation
             float fee = (getSpecification()
                 .getInteger(GameOptions.TREASURE_TRANSPORT_FEE)
                 * getTreasureAmount()) / 100.0f;
-            return (int)getOwner().applyModifiers(fee, getGame().getTurn(),
+            return (int)getOwner().apply(fee, getGame().getTurn(),
                 Modifier.TREASURE_TRANSPORT_FEE, this.type);
         }
         return 0;

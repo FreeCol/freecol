@@ -700,24 +700,21 @@ public class BuildingTest extends FreeColTestCase {
         modifier = first(modifiers);
         assertEquals(100f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockadeType.applyModifiers(0f, turn,
-                Modifier.MINIMUM_COLONY_SIZE));
+        assertEquals(0f, stockadeType.apply(0f, turn, Modifier.MINIMUM_COLONY_SIZE));
 
         modifiers = toList(fortType.getModifiers(Modifier.DEFENCE));
         assertEquals(1, modifiers.size());
         modifier = first(modifiers);
         assertEquals(150f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockadeType.applyModifiers(0f, turn,
-                Modifier.MINIMUM_COLONY_SIZE));
+        assertEquals(0f, stockadeType.apply(0f, turn, Modifier.MINIMUM_COLONY_SIZE));
 
         modifiers = toList(fortressType.getModifiers(Modifier.DEFENCE));
         assertEquals(1, modifiers.size());
         modifier = first(modifiers);
         assertEquals(200f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockadeType.applyModifiers(0f, turn,
-                Modifier.MINIMUM_COLONY_SIZE));
+        assertEquals(0f, stockadeType.apply(0f, turn, Modifier.MINIMUM_COLONY_SIZE));
     }
 
     public void testCottonClothProduction() {

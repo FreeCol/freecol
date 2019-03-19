@@ -2009,7 +2009,7 @@ public final class ColonyPanel extends PortPanel
                 setOpaque(false);
                 // Size and position:
                 Dimension size = getGUI().getTileImageLibrary()
-                    .scaleDimension(ImageLibrary.TILE_SIZE);
+                    .scale(ImageLibrary.TILE_SIZE);
                 setSize(size);
                 setLocation(((2 - x) + y) * size.width / 2,
                     (x + y) * size.height / 2);

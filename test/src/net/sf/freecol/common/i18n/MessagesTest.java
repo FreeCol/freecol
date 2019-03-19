@@ -170,8 +170,8 @@ public class MessagesTest extends FreeColTestCase {
         StringTemplate s2 = StringTemplate.key("model.tile.plains.name");
         assertEquals("Plains", Messages.message(s2));
 
-        StringTemplate t1 = AbstractGoods
-            .getLabel(game.getSpecification().getPrimaryFoodType(), 100);
+        StringTemplate t1 = new AbstractGoods(spec().getPrimaryFoodType(),
+                                              100).getLabel();
         assertEquals(2, t1.entryList().size());
         List<SimpleEntry<String,StringTemplate>> e = t1.entryList();
         assertEquals(StringTemplate.TemplateType.KEY,

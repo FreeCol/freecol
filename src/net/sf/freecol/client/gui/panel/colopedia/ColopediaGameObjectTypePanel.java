@@ -125,14 +125,14 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
      */
     protected void addSubTrees(DefaultMutableTreeNode root, String id,
                                List<T> types) {
+        final ImageLibrary lib = getImageLibrary();
         String name = getName();
         ColopediaTreeItem cti = new ColopediaTreeItem(this, id, name, null);
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(cti);
         int width = ImageLibrary.ICON_SIZE.width;
         int height = ImageLibrary.ICON_SIZE.height;
         for (FreeColSpecObjectType type : types) {
-            Image image = ImageLibrary
-                .getObjectImage(type, ImageLibrary.ICON_SIZE);
+            Image image = lib.getObjectImage(type, ImageLibrary.ICON_SIZE);
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
             BufferedImage centeredImage

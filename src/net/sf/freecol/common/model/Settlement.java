@@ -234,7 +234,7 @@ public abstract class Settlement extends GoodsLocation
      * @return The line of sight value.
      */
     public int getLineOfSight() {
-        return (int)applyModifiers((float)getType().getVisibleRadius(),
+        return (int)apply((float)getType().getVisibleRadius(),
             getGame().getTurn(), Modifier.LINE_OF_SIGHT_BONUS);
     }
 

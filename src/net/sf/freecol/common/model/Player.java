@@ -1257,8 +1257,8 @@ public class Player extends FreeColGameObject implements Nameable {
         // has already been reduced.  We want to apply the bonus to the
         // sum of the *unreduced* immigration target and the increment.
         int unreduced = Math.round(current
-            / applyModifiers(1f, turn, Modifier.RELIGIOUS_UNREST_BONUS));
-        immigrationRequired = (int)applyModifiers(unreduced + base, turn,
+            / apply(1f, turn, Modifier.RELIGIOUS_UNREST_BONUS));
+        immigrationRequired = (int)apply(unreduced + base, turn,
             Modifier.RELIGIOUS_UNREST_BONUS);;
         logger.finest("Immigration for " + getId() + " updated " + current
             + " -> " + immigrationRequired);
@@ -1371,8 +1371,7 @@ public class Player extends FreeColGameObject implements Nameable {
         final List<GoodsType> goodsTypes = spec.getLibertyGoodsTypeList();
         int nextTurn = sum(getColonies(), c ->
                            sum(goodsTypes, gt -> c.getTotalProductionOf(gt)));
-        return (int)applyModifiers((float)nextTurn, getGame().getTurn(),
-                                   Modifier.LIBERTY);
+        return (int)apply((float)nextTurn, getGame().getTurn(), Modifier.LIBERTY);
     }
 
     /**
@@ -3245,8 +3244,7 @@ public class Player extends FreeColGameObject implements Nameable {
                   gt -> gt != spec.getPrimaryFoodType(),
                   gt -> tile.getPotentialProduction(gt, null))
             + 100;
-        return (int)applyModifiers(price, getGame().getTurn(),
-                                   Modifier.LAND_PAYMENT_MODIFIER);
+        return (int)apply(price, getGame().getTurn(), Modifier.LAND_PAYMENT_MODIFIER);
     }
 
     /**

@@ -82,8 +82,7 @@ public class NationTypeDetailPanel
         nations.addAll(getSpecification().getEuropeanNationTypes());
         nations.addAll(getSpecification().getREFNationTypes());
         nations.addAll(getSpecification().getIndianNationTypes());
-        ImageIcon icon = new ImageIcon(ImageLibrary
-            .getScaledImage(ImageLibrary.BELLS, ImageLibrary.ICON_SIZE, false));
+        ImageIcon icon = new ImageIcon(ImageLibrary.getLibertyImage());
         for (NationType type : nations) {
             parent.add(buildItem(type, icon));
         }

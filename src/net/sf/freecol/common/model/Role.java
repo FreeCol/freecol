@@ -275,7 +275,7 @@ public class Role extends BuildableType {
      * @return The offense value.
      */
     public double getOffence() {
-        return applyModifiers(0.0f, null, Modifier.OFFENCE);
+        return apply(0.0f, null, Modifier.OFFENCE);
     }
 
     /**
@@ -293,7 +293,7 @@ public class Role extends BuildableType {
      * @return The defence value.
      */
     private double getDefence() {
-        return applyModifiers(0.0f, null, Modifier.DEFENCE);
+        return apply(0.0f, null, Modifier.DEFENCE);
     }
 
     /**

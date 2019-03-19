@@ -142,21 +142,23 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
     /**
-     * Get a label for these goods.
-     *
-     * @return The label for these goods.
-     */
-    public StringTemplate getLabel() {
-        return getLabel(getType(), getAmount());
-    }
-
-    /**
      * Are these goods storable.
      *
      * @return True if the goods are storable.
      */
     public boolean isStorable() {
         return getType().isStorable();
+    }
+
+    /**
+     * Get a label for these goods.
+     *
+     * @return The label for these goods.
+     */
+    public StringTemplate getLabel() {
+        return StringTemplate.template("model.abstractGoods.label")
+            .addNamed("%goods%", getType())
+            .addAmount("%amount%", getAmount());
     }
 
     /**
@@ -173,26 +175,15 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
     /**
-     * Get a label given a goods type and amount.
-     *
-     * @param type The {@code GoodsType} to display.
-     * @param amount The amount of goods.
-     * @return The goods label.
-     */
-    public static StringTemplate getLabel(GoodsType type, int amount) {
-        return StringTemplate.template("model.abstractGoods.label")
-            .addNamed("%goods%", type)
-            .addAmount("%amount%", amount);
-    }
-
-    /**
      * Get a label given a key and amount.
+     *
+     * Used for arbitrary objects, such as the missionary's bible.
      *
      * @param key A key for the goods to display.
      * @param amount The amount of goods.
      * @return The goods label.
      */
-    public static StringTemplate getLabel(String key, int amount) {
+    public static StringTemplate getAbstractLabel(String key, int amount) {
         return StringTemplate.template("model.abstractGoods.label")
             .add("%goods%", key)
             .addAmount("%amount%", amount);

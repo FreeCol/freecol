@@ -103,7 +103,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             JScrollPane imageScrollPane = new JScrollPane(panel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            tabs.addTab(Messages.message(FoundingFather.getTypeKey(type)), null,
+            tabs.addTab(Messages.message(type.getTypeKey()), null,
                         imageScrollPane, null);
         }
         final int age = getGame().getAge();

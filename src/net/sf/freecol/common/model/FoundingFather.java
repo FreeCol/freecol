@@ -57,6 +57,15 @@ public class FoundingFather extends FreeColSpecObjectType {
         public String getKey() {
             return getEnumKey(this);
         }
+
+        /**
+         * Get a message key for the type of a FoundingFather.
+         *
+         * @return The message key.
+         */
+        public String getTypeKey() {
+            return "model.foundingFather." + downCase(this.toString());
+        }
     }
 
     /** The type of this FoundingFather. */
@@ -112,17 +121,7 @@ public class FoundingFather extends FreeColSpecObjectType {
      * @return A type key.
      */
     public String getTypeKey() {
-        return getTypeKey(type);
-    }
-
-    /**
-     * Get a message key for the type of a FoundingFather.
-     *
-     * @param type The {@code FoundingFatherType} to make a key for.
-     * @return The message key.
-     */
-    public static String getTypeKey(FoundingFatherType type) {
-        return "model.foundingFather." + type.getKey();
+        return type.getTypeKey();
     }
 
     /**

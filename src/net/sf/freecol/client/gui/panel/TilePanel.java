@@ -150,7 +150,7 @@ public final class TilePanel extends FreeColPanel {
                 int expertPotential = amount;
                 final UnitType expert = spec.getExpertForProducing(gt);
                 if (expert != null) {
-                    expertPotential = (int)expert.applyModifiers(amount,
+                    expertPotential = (int)expert.apply(amount,
                         getGame().getTurn(), gt.getId());
                 }
                 if (amount > 0) {

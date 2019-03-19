@@ -1390,7 +1390,8 @@ public final class MapViewer extends FreeColClientHolder {
             g.translate(xt - xt0, yt - yt0);
             xt0 = xt; yt0 = yt;
             
-            BufferedImage overlayImage = lib.getOverlayImage(t, overlayCache);
+            BufferedImage overlayImage
+                = lib.getScaledOverlayImage(t, overlayCache);
             RescaleOp rop = (player == null || player.canSee(t)) ? null : fow;
             tv.displayTileItems(g, t, rop, overlayImage);
             tv.displaySettlementWithChipsOrPopulationNumber(g, t, withNumbers,

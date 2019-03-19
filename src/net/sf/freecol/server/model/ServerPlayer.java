@@ -364,7 +364,7 @@ public class ServerPlayer extends Player implements TurnTaker {
 
         // Set initial immigration target
         int i0 = spec.getInteger(GameOptions.INITIAL_IMMIGRATION);
-        immigrationRequired = (int)applyModifiers((float)i0, null,
+        immigrationRequired = (int)apply((float)i0, null,
             Modifier.RELIGIOUS_UNREST_BONUS);
 
         // Add initial gold
@@ -1211,8 +1211,8 @@ public class ServerPlayer extends Player implements TurnTaker {
             if (container != null) container.addGoods(type, a);
             market.modifyIncomeBeforeTaxes(type, -price);
             market.modifyIncomeAfterTaxes(type, -price);
-            int ma = (int)applyModifiers((float)a, getGame().getTurn(),
-                                         Modifier.TRADE_BONUS, type);
+            int ma = (int)apply((float)a, getGame().getTurn(),
+                                Modifier.TRADE_BONUS, type);
             market.addGoodsToMarket(type, -ma);
             marketAmount += ma;
             propagateToEuropeanMarkets(type, -a, random);
@@ -1249,8 +1249,8 @@ public class ServerPlayer extends Player implements TurnTaker {
             if (container != null) container.addGoods(type, -a);
             market.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
             market.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
-            int ma = (int)applyModifiers((float)a, getGame().getTurn(),
-                                         Modifier.TRADE_BONUS, type);
+            int ma = (int)apply((float)a, getGame().getTurn(),
+                                Modifier.TRADE_BONUS, type);
             market.addGoodsToMarket(type, ma);
             marketAmount += ma;
             propagateToEuropeanMarkets(type, a, random);
@@ -1836,7 +1836,7 @@ outer:  for (Effect effect : effects) {
                 // Apply modifiers, and commit the total change.
                 forEachMapEntry(extra, e -> e.getValue() != 0, e -> {
                         final Player player = e.getKey();
-                        int change = (int)player.applyModifiers((float)e.getValue(),
+                        int change = (int)player.apply((float)e.getValue(),
                             game.getTurn(), Modifier.NATIVE_ALARM_MODIFIER);
                         ((ServerIndianSettlement)is)
                             .csModifyAlarm(player, change, true, cs);//+til
@@ -2022,8 +2022,8 @@ outer:  for (Effect effect : effects) {
                     }
                     // Revealed tiles in 11x11 block in Col1
                     final int fullRadius = (int)father
-                        .applyModifiers((float)colony.getLineOfSight(),
-                                        turn, Modifier.EXPOSED_TILES_RADIUS);
+                        .apply((float)colony.getLineOfSight(),
+                               turn, Modifier.EXPOSED_TILES_RADIUS);
                     tiles.addAll(exploreTiles(t.getSurroundingTiles(1,
                                 fullRadius)));
                     cs.add(See.only(this), tiles);

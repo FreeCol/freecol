@@ -924,7 +924,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     public <T extends FreeColObject> T readFreeColObject(Game game)
         throws XMLStreamException {
         final String tag = getLocalName();
-        Class<T> returnClass = FreeColObject.getFreeColObjectClass(tag);
+        Class<T> returnClass = FreeColObject.getFreeColObjectClassByName(tag);
         if (returnClass == null) {
             throw new XMLStreamException("No class: " + tag);
         }

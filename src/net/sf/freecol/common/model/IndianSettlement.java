@@ -1038,8 +1038,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             amount -= retain;
             if (unit != null) {
                 amount = Math.round(applyModifiers((float)amount,
-                        getGame().getTurn(),
-                        unit.getModifiers(Modifier.TRADE_VOLUME_PENALTY)));
+                                                   getGame().getTurn(),
+                                                   unit.getModifiers(Modifier.TRADE_VOLUME_PENALTY)));
             }
             if (amount < TRADE_MINIMUM_SIZE) continue;
             if (amount > GoodsContainer.CARGO_SIZE) {

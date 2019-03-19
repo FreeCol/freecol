@@ -104,7 +104,7 @@ public class ClaimLandMessage extends AttributeMessage {
         }
 
         Class<? extends FreeColObject> c = FreeColObject
-            .getFreeColObjectClass(FreeColObject.getIdType(claimantId));
+            .getFreeColObjectClassByName(FreeColObject.getIdTypeByName(claimantId));
         Unit unit = null;
         Settlement settlement = null;
         if (Unit.class.isAssignableFrom(c)) {

@@ -186,7 +186,7 @@ public class Flag {
     public static final double BEND_X = DECORATION_SIZE;
     public static final double BEND_Y = DECORATION_SIZE / SQRT_3;
 
-    private static final GeneralPath star = getStar();
+    private static final GeneralPath star = get5Star();
 
     /**
      * The distribution of stars in the "union", based on historical
@@ -1108,7 +1108,7 @@ public class Flag {
      *
      * @return the basic star shape
      */
-    private static GeneralPath getStar() {
+    private static GeneralPath get5Star() {
         GeneralPath star = new GeneralPath(GeneralPath.WIND_NON_ZERO);
         double angle = 2 * Math.PI / 5;
         double radius = STAR_SIZE / 2;

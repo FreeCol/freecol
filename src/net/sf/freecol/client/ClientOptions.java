@@ -656,7 +656,7 @@ public class ClientOptions extends OptionGroup {
      * @return The current colony {@code Comparator}.
      */
     public Comparator<Colony> getColonyComparator() {
-        return getColonyComparator(getInteger(COLONY_COMPARATOR));
+        return getColonyComparatorInternal(getInteger(COLONY_COMPARATOR));
     }
 
     /**
@@ -665,7 +665,7 @@ public class ClientOptions extends OptionGroup {
      * @param The colony comparator option integer value.
      * @return The corresponding colony {@code Comparator}.
      */
-    private static Comparator<Colony> getColonyComparator(int type) {
+    private static Comparator<Colony> getColonyComparatorInternal(int type) {
         switch (type) {
         case COLONY_COMPARATOR_AGE:
             return colonyAgeComparator;
