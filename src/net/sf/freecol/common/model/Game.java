@@ -1541,7 +1541,7 @@ public class Game extends FreeColGameObject {
 
         Map map = getMap();
         if (map != null) {
-            result = result.combine(getMap().checkIntegrity(fix, lb));
+            result = result.combine(map.checkIntegrity(fix, lb));
         }
         synchronized (this.players) {
             for (Player p : this.players) {
@@ -1683,11 +1683,8 @@ public class Game extends FreeColGameObject {
         Player unknown = getUnknownEnemy();
         if (unknown != null) unknown.toXML(xw);
 
-        if (this.map != null) {
-            synchronized (this.map) {
-                this.map.toXML(xw);
-            }
-        }
+        Map map = getMap();
+        if (map != null) map.toXML(xw);
     }
 
     /**
