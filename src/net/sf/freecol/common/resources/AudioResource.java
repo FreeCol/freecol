@@ -49,7 +49,7 @@ public class AudioResource extends Resource {
     public AudioResource(URI resourceLocator) throws IOException {
         super(resourceLocator);
         File f = new File(resourceLocator);
-        if (SoundPlayer.getAudioInputStream(f) != null) this.file = f;
+        this.file = (SoundPlayer.getAudioInputStream(f) != null) ? f : null;
     }
 
 
@@ -59,6 +59,6 @@ public class AudioResource extends Resource {
      * @return The {@code File} for this resource.
      */
     public File getAudio() {
-        return file;
+        return this.file;
     }
 }
