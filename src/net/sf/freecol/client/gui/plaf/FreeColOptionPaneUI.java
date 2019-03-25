@@ -88,7 +88,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         final String okLabel = Messages.message("ok");
         final String cancelLabel = Messages.message("cancel");
         Object[] buttons = getButtons();
-        List<JButton> newButtons = new ArrayList<>();
+        List<JButton> newButtons = new ArrayList<>(buttons.length);
 
         int maxWidth = 0, maxHeight = 0;
         for (int i = 0; i < buttons.length; i++) {

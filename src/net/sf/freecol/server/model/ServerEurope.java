@@ -228,7 +228,7 @@ public class ServerEurope extends Europe implements TurnTaker {
     public List<Unit> generateFountainRecruits(int n, Random random) {
         final Game game = getGame();
         final Player owner = getOwner();
-        List<Unit> ret = new ArrayList<>();
+        List<Unit> ret = new ArrayList<>(n);
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
         for (int k = 0; k < n; k++) {
             UnitType ut = RandomChoice.getWeightedRandom(logger, "Choose FoY",

@@ -884,7 +884,7 @@ public class SimpleMapGenerator implements MapGenerator {
                                         LogBuilder lb) {
         final Game game = map.getGame();
         final Specification spec = game.getSpecification();
-        List<Unit> ret = new ArrayList<>();
+        List<Unit> ret = new ArrayList<>(20);
         // In debug mode give each player a few more units and a colony.
         UnitType unitType = spec.getUnitType("model.unit.galleon");
         Unit galleon = new ServerUnit(game, startTile, player, unitType);
