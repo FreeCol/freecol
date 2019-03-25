@@ -265,13 +265,11 @@ public final class GoodsWish extends Wish {
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof GoodsWish) {
-            GoodsWish other = (GoodsWish)o;
-            return this.amountRequested == other.amountRequested
-                && Utils.equals(this.goodsType, other.goodsType)
-                && super.equals(other);
-        }
-        return false;
+        if (!(o instanceof GoodsWish)) return false;
+        GoodsWish other = (GoodsWish)o;
+        return this.amountRequested == other.amountRequested
+            && Utils.equals(this.goodsType, other.goodsType)
+            && super.equals(other);
     }
 
     /**

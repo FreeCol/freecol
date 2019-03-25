@@ -363,14 +363,12 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof TileImprovementPlan) {
-            TileImprovementPlan other = (TileImprovementPlan)o;
-            return Utils.equals(this.type, other.type)
-                && Utils.equals(this.target, other.target)
-                && Utils.equals(this.pioneer, other.pioneer)
-                && super.equals(other);
-        }
-        return false;
+        if (!(o instanceof TileImprovementPlan)) return false;
+        TileImprovementPlan other = (TileImprovementPlan)o;
+        return Utils.equals(this.type, other.type)
+            && Utils.equals(this.target, other.target)
+            && Utils.equals(this.pioneer, other.pioneer)
+            && super.equals(other);
     }
 
     /**

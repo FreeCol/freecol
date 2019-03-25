@@ -939,13 +939,11 @@ if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL")
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof AIUnit) {
-            AIUnit other = (AIUnit)o;
-            return Utils.equals(this.unit, other.unit)
-                && Utils.equals(this.mission, other.mission)
-                && super.equals(other);
-        }
-        return false;
+        if (!(o instanceof AIUnit)) return false;
+        AIUnit other = (AIUnit)o;
+        return Utils.equals(this.unit, other.unit)
+            && Utils.equals(this.mission, other.mission)
+            && super.equals(other);
     }
 
     /**

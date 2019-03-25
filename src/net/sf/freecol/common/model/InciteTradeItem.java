@@ -174,12 +174,10 @@ public class InciteTradeItem extends TradeItem {
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof InciteTradeItem) {
-            InciteTradeItem other = (InciteTradeItem)o;
-            return Utils.equals(this.victim, other.victim)
-                && super.equals(other);
-        }
-        return false;
+        if (!(o instanceof InciteTradeItem)) return false;
+        InciteTradeItem other = (InciteTradeItem)o;
+        return Utils.equals(this.victim, other.victim)
+            && super.equals(other);
     }
 
     /**

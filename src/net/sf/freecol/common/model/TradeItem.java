@@ -294,13 +294,11 @@ public abstract class TradeItem extends FreeColGameObject {
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof TradeItem) {
-            TradeItem other = (TradeItem)o;
-            return Utils.equals(this.source, other.source)
-                && Utils.equals(this.destination, other.destination)
-                && super.equals(other);
-        }
-        return false;
+        if (!(o instanceof TradeItem)) return false;
+        TradeItem other = (TradeItem)o;
+        return Utils.equals(this.source, other.source)
+            && Utils.equals(this.destination, other.destination)
+            && super.equals(other);
     }
 
     /**
