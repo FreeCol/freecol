@@ -649,7 +649,7 @@ public class StringTemplate extends FreeColObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append(templateType).append(":").append(getId());
+        sb.append(templateType).append(':').append(getId());
         if (this.defaultId != null) {
             sb.append('(').append(this.defaultId).append(')');
         }
