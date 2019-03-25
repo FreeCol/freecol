@@ -214,8 +214,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
 
         private JList<? extends BuildableType> source = null;
-        //private int[] indices = null;
-        private int numberOfItems = 0; // number of items to be added
 
         
         // Override TransferHandler
@@ -307,8 +305,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     return false;
                 }
 
-                this.numberOfItems = queue.size();
-
                 // Remove all transferring elements from the build queue.
                 for (IndexedBuildable ib : queue) {
                     targetModel.removeElementAt(ib.getIndex());
@@ -358,7 +354,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         protected void exportDone(JComponent source, Transferable data, 
                                   int action) {
             //this.indices = null;
-            this.numberOfItems = 0;
             updateAllLists();
         }
 
