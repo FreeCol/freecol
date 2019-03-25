@@ -501,7 +501,8 @@ public final class TileViewer extends FreeColClientHolder {
             } else if (!tile.isLand() || borderingTile.isLand()) {
                 int bTIndex = borderingTileType.getIndex();
                 if (bTIndex < tileType.getIndex()
-                    && !lib.getTerrainImageKey(tileType, 0, 0).equals(lib.getTerrainImageKey(borderingTileType, 0, 0))) {
+                    && !ImageLibrary.getTerrainImageKey(tileType, 0, 0)
+                    .equals(ImageLibrary.getTerrainImageKey(borderingTileType, 0, 0))) {
                     // Draw land terrain with bordering land type, or
                     // ocean/high seas limit, if the tiles do not
                     // share same graphics (ocean & great river)

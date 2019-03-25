@@ -304,7 +304,7 @@ public class StringTemplate extends FreeColObject {
             throw new RuntimeException("Cannot add key-value pair"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(key, this.key(value));
+        return complete(key, StringTemplate.key(value));
     }
 
     /**
@@ -321,7 +321,7 @@ public class StringTemplate extends FreeColObject {
             throw new RuntimeException("Cannot add a single string"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(null, this.key(value));
+        return complete(null, StringTemplate.key(value));
     }
 
     /**
@@ -339,7 +339,7 @@ public class StringTemplate extends FreeColObject {
             throw new RuntimeException("Cannot add key-name pair"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(key, this.name(value));
+        return complete(key, StringTemplate.name(value));
     }
 
     /**
@@ -357,7 +357,7 @@ public class StringTemplate extends FreeColObject {
             throw new RuntimeException("Cannot add key-object pair"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(key, this.key(Messages.nameKey(object.getId())));
+        return complete(key, StringTemplate.key(Messages.nameKey(object.getId())));
     }
 
     /**
@@ -374,7 +374,7 @@ public class StringTemplate extends FreeColObject {
             throw new RuntimeException("Cannot add a single string"
                 + " to StringTemplate." + this.templateType);
         }
-        return complete(null, this.name(value));
+        return complete(null, StringTemplate.name(value));
     }
 
     /**
