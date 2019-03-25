@@ -84,7 +84,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
             int retirementTurn = highScore.getRetirementTurn();
             reportPanel.add((retirementTurn <= 0)
                 ? Utility.localizedLabel("notApplicable")
-                : Utility.localizedLabel(Turn.getLabel(retirementTurn)));
+                : Utility.localizedLabel(Turn.getTurnLabel(retirementTurn)));
 
             reportPanel.add(Utility.localizedLabel("report.highScores.score"),
                             "skip");
@@ -99,7 +99,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
             int independenceTurn = highScore.getIndependenceTurn();
             reportPanel.add((independenceTurn <= 0)
                 ? Utility.localizedLabel("no")
-                : Utility.localizedLabel(Turn.getLabel(independenceTurn)));
+                : Utility.localizedLabel(Turn.getTurnLabel(independenceTurn)));
 
             reportPanel.add(Utility.localizedLabel("report.highScores.nation"),
                             "skip");

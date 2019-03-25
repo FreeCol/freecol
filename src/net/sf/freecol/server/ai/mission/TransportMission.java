@@ -718,7 +718,7 @@ public final class TransportMission extends Mission {
         for (Cargo cargo : tCopy()) {
             dump = false;
             TransportableAIObject t = cargo.getTransportable();
-            reason = invalidReason(aiCarrier, cargo.getCarrierTarget());
+            reason = invalidMissionReason(aiCarrier, cargo.getCarrierTarget());
             if (reason != null || (reason = cargo.check(aiCarrier)) != null) {
                 // Just remove, it is invalid
                 removeCargo(cargo);
@@ -1185,7 +1185,7 @@ public final class TransportMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null)
             ? reason
@@ -1215,13 +1215,23 @@ public final class TransportMission extends Mission {
     }
             
     /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The {@code AIUnit} to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
+    }
+
+    /**
      * Why would this mission be invalid with the given AI unit and location?
      *
      * @param aiUnit The {@code AIUnit} to check.
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason;
         return ((reason = invalidMissionReason(aiUnit)) != null)
             ? reason
@@ -1232,15 +1242,6 @@ public final class TransportMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
-    /**
-     * Why would this mission be invalid with the given AI unit?
-     *
-     * @param aiUnit The {@code AIUnit} to check.
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
-    }
 
     // End of cargoes handling.
 
@@ -1381,7 +1382,7 @@ public final class TransportMission extends Mission {
     @Override
     public String invalidReason() {
         final AIUnit aiUnit = getAIUnit();
-        String reason = invalidReason(aiUnit, getTarget());
+        String reason = invalidMissionReason(aiUnit, getTarget());
         Cargo cargo;
         return (reason != null) ? reason
             : ((cargo = tFirst()) == null) ? null

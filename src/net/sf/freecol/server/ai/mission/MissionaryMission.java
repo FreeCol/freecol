@@ -199,8 +199,8 @@ public final class MissionaryMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A new target for this mission.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    public static Location findMissionTarget(AIUnit aiUnit, int range,
+                                             boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path == null) ? null : extractTarget(aiUnit, path);
     }
@@ -213,7 +213,7 @@ public final class MissionaryMission extends Mission {
      *     if none.
      */
     public static String prepare(AIUnit aiUnit) {
-        String reason = invalidReason(aiUnit);
+        String reason = invalidUnitReason(aiUnit);
         if (reason == null) {
             final Unit unit = aiUnit.getUnit();
             if (!unit.hasAbility(Ability.ESTABLISH_MISSION)
@@ -234,7 +234,7 @@ public final class MissionaryMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason to not perform the mission, or null if none.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
@@ -289,8 +289,8 @@ public final class MissionaryMission extends Mission {
      * @param aiUnit The {@code AIUnit} to test.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -300,7 +300,7 @@ public final class MissionaryMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -346,7 +346,7 @@ public final class MissionaryMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 20, true);
+        return findMissionTarget(getAIUnit(), 20, true);
     }
 
     /**
@@ -354,7 +354,7 @@ public final class MissionaryMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
     
     /**
@@ -382,7 +382,7 @@ public final class MissionaryMission extends Mission {
             // accept fallback targets.
             lbAt(lb);
             Location completed = getTarget();
-            Location newTarget = findTarget(aiUnit, 20, false);
+            Location newTarget = findMissionTarget(aiUnit, 20, false);
             if (newTarget == null || newTarget == completed) {
                 return lbFail(lb, false, "retarget failed");
             }

@@ -125,7 +125,7 @@ public final class IndianDemandMission extends Mission {
      * @return True if the unit is carrying goods.
      */
     private boolean hasTribute() {
-        return hasTribute(getAIUnit());
+        return hasMissionTribute(getAIUnit());
     }
 
     /**
@@ -134,7 +134,7 @@ public final class IndianDemandMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return True if the unit is carrying goods.
      */
-    private static boolean hasTribute(AIUnit aiUnit) {
+    private static boolean hasMissionTribute(AIUnit aiUnit) {
         return aiUnit.getUnit().hasGoodsCargo();
     }
 
@@ -220,7 +220,7 @@ public final class IndianDemandMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         IndianSettlement home;
         return (reason != null)
@@ -264,8 +264,8 @@ public final class IndianDemandMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -275,7 +275,7 @@ public final class IndianDemandMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -331,7 +331,7 @@ public final class IndianDemandMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**

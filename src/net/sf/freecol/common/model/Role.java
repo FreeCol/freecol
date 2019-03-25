@@ -128,7 +128,7 @@ public class Role extends BuildableType {
      * @return The role suffix.
      */
     public String getRoleSuffix() {
-        return Role.getRoleSuffix(getId());
+        return Role.getRoleIdSuffix(getId());
     }
 
     /**
@@ -137,7 +137,7 @@ public class Role extends BuildableType {
      * @param roleId A role identifier.
      * @return The role suffix.
      */
-    public static String getRoleSuffix(String roleId) {
+    public static String getRoleIdSuffix(String roleId) {
         return lastPart(roleId, ".");
     }
 
@@ -312,7 +312,7 @@ public class Role extends BuildableType {
      * @return True if the other role is compatible.
      */
     public boolean isCompatibleWith(Role other) {
-        return isCompatibleWith(this, other);
+        return Role.rolesCompatible(this, other);
     }
 
     /**
@@ -322,7 +322,7 @@ public class Role extends BuildableType {
      * @param role2 The other {@code Role} to compare.
      * @return True if the roles are compatible.
      */
-    public static boolean isCompatibleWith(Role role1, Role role2) {
+    public static boolean rolesCompatible(Role role1, Role role2) {
         if (role1 == null) {
             return role2 == null;
         } else if (role2 == null) {

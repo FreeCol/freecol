@@ -162,7 +162,7 @@ public class Map extends FreeColGameObject implements Location {
          * @return True if the given position is within the bounds of the map.
          */
         public boolean isValid(int width, int height) {
-            return Map.isValid(x, y, width, height);
+            return Map.inBox(x, y, width, height);
         }
 
         /**
@@ -178,7 +178,7 @@ public class Map extends FreeColGameObject implements Location {
          * @param by The y-coordinate of the second position.
          * @return The distance in tiles between the positions.
          */
-        public static int getDistance(int ax, int ay, int bx, int by) {
+        public static int getXYDistance(int ax, int ay, int bx, int by) {
             int r = (bx - ax) - (ay - by) / 2;
 
             if (by > ay && ay % 2 == 0 && by % 2 != 0) {
@@ -200,7 +200,7 @@ public class Map extends FreeColGameObject implements Location {
          * @return The distance in tiles to the other position.
          */
         public int getDistance(Position position) {
-            return getDistance(getX(), getY(),
+            return getXYDistance(getX(), getY(),
                                position.getX(), position.getY());
         }
 
@@ -374,7 +374,7 @@ public class Map extends FreeColGameObject implements Location {
      * @param height The height of the map.
      * @return True if the given position is within the bounds of the map.
      */
-    public static boolean isValid(int x, int y, int width, int height) {
+    public static boolean inBox(int x, int y, int width, int height) {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
 
@@ -386,7 +386,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return True if the coordinates are valid.
      */
     public boolean isValid(int x, int y) {
-        return isValid(x, y, getWidth(), getHeight());
+        return Map.inBox(x, y, getWidth(), getHeight());
     }
 
     /**
@@ -769,8 +769,8 @@ public class Map extends FreeColGameObject implements Location {
      * @return The distance between the tiles.
      */
     public int getDistance(Tile t1, Tile t2) {
-        return Position.getDistance(t1.getX(), t1.getY(),
-            t2.getX(), t2.getY());
+        return Position.getXYDistance(t1.getX(), t1.getY(),
+                                      t2.getX(), t2.getY());
     }
 
     /**
@@ -1623,7 +1623,7 @@ public class Map extends FreeColGameObject implements Location {
             }
             this.turns += cd.getNewTurns();
             this.movesLeft = cd.getMovesLeft();
-            this.cost = PathNode.getCost(this.turns, this.movesLeft);
+            this.cost = PathNode.getNodeCost(this.turns, this.movesLeft);
         }
 
         /**
@@ -1644,7 +1644,7 @@ public class Map extends FreeColGameObject implements Location {
             this.unit = unit;
             this.movesLeft = unit.getInitialMovesLeft();
             this.turns++;
-            this.cost = PathNode.getCost(this.turns, this.movesLeft);
+            this.cost = PathNode.getNodeCost(this.turns, this.movesLeft);
         }
 
         /**
@@ -2117,8 +2117,8 @@ ok:     while (!openMap.isEmpty()) {
      * @return A boolean[][] of the same size as boolmap, where "true"
      *      means the fill succeeded at that location.
      */
-    public static boolean[][] floodFill(boolean[][] boolmap, int x, int y) {
-        return floodFill(boolmap, x, y, Integer.MAX_VALUE);
+    public static boolean[][] floodFillBool(boolean[][] boolmap, int x, int y) {
+        return floodFillBool(boolmap, x, y, Integer.MAX_VALUE);
     }
 
     /**
@@ -2132,8 +2132,8 @@ ok:     while (!openMap.isEmpty()) {
      * @return A boolean[][] of the same size as boolmap, where "true"
      *      means the fill succeeded at that location.
      */
-    public static boolean[][] floodFill(boolean[][] boolmap, int x, int y,
-        int limit) {
+    public static boolean[][] floodFillBool(boolean[][] boolmap, int x, int y,
+                                            int limit) {
         final int xmax = boolmap.length, ymax = boolmap[0].length;
         boolean[][] visited = new boolean[xmax][ymax];
         Queue<Position> q = new LinkedList<>();
@@ -2204,7 +2204,7 @@ ok:     while (!openMap.isEmpty()) {
                     Tile tile = getTile(x, y);
                     if (tile.getContiguity() >= 0) continue;
 
-                    boolean[][] found = floodFill(waterMap, x, y);
+                    boolean[][] found = floodFillBool(waterMap, x, y);
                     for (int yy = 0; yy < ymax; yy++) {
                         for (int xx = 0; xx < xmax; xx++) {
                             if (found[xx][yy]) {

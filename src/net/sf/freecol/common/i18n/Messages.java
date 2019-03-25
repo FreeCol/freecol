@@ -504,7 +504,7 @@ public class Messages {
         // the role twice, e.g. "Seasoned Scout Scout".
         StringTemplate type;
         String roleKey;
-        String baseKey = typeId + "." + Role.getRoleSuffix(roleId);
+        String baseKey = typeId + "." + Role.getRoleIdSuffix(roleId);
         if (containsKey(baseKey)) {
             type = StringTemplate.template(baseKey)
                 .addAmount("%number%", number);

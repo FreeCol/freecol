@@ -108,6 +108,6 @@ public class PrivateerMissionTest extends FreeColTestCase {
         privateerAI.setMission(null);
         assertFalse("Privateer has no mission", privateerAI.hasMission());
         assertEquals("PrivateeringMission valid", null,
-            PrivateerMission.invalidReason(privateerAI));
+            PrivateerMission.invalidMissionReason(privateerAI));
     }
 }

@@ -479,7 +479,7 @@ public class ServerIndianSettlement extends IndianSettlement
             || !hasContacted(enemy) || !enemy.hasExplored(getTile())) return;
 
         // Tension has changed, update the enemy
-        cs.add(See.only(null).perhaps(enemy), this);
+        cs.add(See.only(null).perhapsOnly(enemy), this);
 
         // No messages about improving tension
         if (newLevel == null

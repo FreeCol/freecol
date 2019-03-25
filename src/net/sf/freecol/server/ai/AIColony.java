@@ -1141,7 +1141,7 @@ public final class AIColony extends AIObject implements PropertyChangeListener {
             final Predicate<Unit> rolePred = u ->
                 (u.roleIsAvailable(role)
                     && (u.hasDefaultRole()
-                        || Role.isCompatibleWith(role, u.getRole())));
+                        || Role.rolesCompatible(role, u.getRole())));
             if (any(colony.getTile().getUnits(), rolePred)) {
                 for (AbstractGoods ag : role.getRequiredGoodsList()) {
                     required.incrementCount(ag.getType(), ag.getAmount());

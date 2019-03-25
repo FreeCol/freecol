@@ -104,17 +104,17 @@ public class MissionAssignmentTest extends FreeColTestCase {
         //Make tests
 
         assertNotNull("Cannot attack own unit",
-            UnitSeekAndDestroyMission.invalidReason(aiUnit, friendlyColonist));
+            UnitSeekAndDestroyMission.invalidMissionReason(aiUnit, friendlyColonist));
         assertNotNull("Players are not at war",
-            UnitSeekAndDestroyMission.invalidReason(aiUnit, enemyColonist));
+            UnitSeekAndDestroyMission.invalidMissionReason(aiUnit, enemyColonist));
 
         dutch.setStance(french, Stance.WAR);
         french.setStance(dutch, Stance.WAR);
 
         assertEquals("Unit should be able to attack land unit", null,
-            UnitSeekAndDestroyMission.invalidReason(aiUnit, enemyColonist));
+            UnitSeekAndDestroyMission.invalidMissionReason(aiUnit, enemyColonist));
         assertNotNull("Land unit cannot attack naval unit",
-            UnitSeekAndDestroyMission.invalidReason(aiUnit, enemyGalleon));
+            UnitSeekAndDestroyMission.invalidMissionReason(aiUnit, enemyGalleon));
     }
 
     public void testIsTargetValidForSeekAndDestroy() {
@@ -170,9 +170,9 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertTrue(colony.getUnitCount() == 1);
         aiUnit.setMission(null);
         assertEquals("DefendSettlementMission should be possible", null,
-            DefendSettlementMission.invalidReason(aiUnit));
+            DefendSettlementMission.invalidMissionReason(aiUnit));
         assertEquals("DefendSettlementMission should work with colony", null,
-            DefendSettlementMission.invalidReason(aiUnit, colony));
+            DefendSettlementMission.invalidMissionReason(aiUnit, colony));
     }
 
     public void testSecureIndianSettlementMission() {
@@ -217,9 +217,9 @@ public class MissionAssignmentTest extends FreeColTestCase {
             assertTrue("Should be UnitWanderHostileMission", 
                 aiUnit.hasMission(UnitWanderHostileMission.class));
             assertEquals("Unit should be candidate for seek+destroy", null,
-                UnitSeekAndDestroyMission.invalidReason(aiUnit));
+                UnitSeekAndDestroyMission.invalidMissionReason(aiUnit));
             assertEquals("Unit should be candidate for defend", null,
-                DefendSettlementMission.invalidReason(aiUnit));
+                DefendSettlementMission.invalidMissionReason(aiUnit));
         }
 
         inca.setStance(dutch, Stance.WAR);

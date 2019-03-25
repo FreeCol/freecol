@@ -136,7 +136,7 @@ public final class EuropePanel extends PortPanel {
             }
 
             // "ship" is a tag, not a key
-            Utility.localizeBorder(this, Unit.getDestinationLabel("ship",
+            Utility.localizeBorder(this, Unit.getUnitDestinationLabel("ship",
                     destination, getMyPlayer()));
             revalidate();
         }

@@ -291,17 +291,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     @Override
     public String toString() {
-        return AbstractGoods.toString(this);
-    }
-
-    /**
-     * Simple string version of some goods.
-     *
-     * @param ag The {@code AbstractGoods} to make a string from.
-     * @return A string version of the goods.
-     */     
-    public static String toString(AbstractGoods ag) {
-        return toString(ag.getType(), ag.getAmount());
+        return AbstractGoods.toFullString(getType(), getAmount());
     }
 
     /**
@@ -311,7 +301,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @param amount The amount of goods.
      * @return A string version of the goods.
      */     
-    public static String toString(GoodsType goodsType, int amount) {
+    public static String toFullString(GoodsType goodsType, int amount) {
         return amount + " "
             + ((goodsType == null) ? "(null)" : goodsType.getSuffix());
     }

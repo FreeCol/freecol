@@ -672,7 +672,7 @@ public final class REFAIPlayer extends EuropeanAIPlayer {
         // - defend the closest port
         // - go idle in a port
         for (AIUnit aiu : land) {
-            Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
+            Location target = UnitSeekAndDestroyMission.findMissionTarget(aiu, 
                 seekAndDestroyRange, false);
             if (target != null) {
                 Integer count = targetMap.get(target);

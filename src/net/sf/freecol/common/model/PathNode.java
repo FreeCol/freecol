@@ -277,7 +277,7 @@ public class PathNode {
      * @param movesLeft The number of moves left for the moving unit.
      * @return The cost of moving to a {@code PathNode}.
      */
-    public static int getCost(int turns, int movesLeft) {
+    public static int getNodeCost(int turns, int movesLeft) {
         return (turns >= INFINITY / (TURN_FACTOR + 1))
             ? INFINITY
             : TURN_FACTOR * turns + (TURN_FACTOR - movesLeft);
@@ -289,7 +289,7 @@ public class PathNode {
      * @return The cost of moving to this {@code PathNode}.
      */
     public int getCost() {
-        return getCost(turns, movesLeft);
+        return getNodeCost(turns, movesLeft);
     }
 
     /**

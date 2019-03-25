@@ -300,8 +300,8 @@ public class AbstractUnit extends FreeColObject {
      * @param l2 The first <code>AbstractUnit</code>.
      * @return True if the lists match.
      */
-    public static boolean matchAll(List<AbstractUnit> l1,
-                                   List<AbstractUnit> l2) {
+    public static boolean matchUnits(List<AbstractUnit> l1,
+                                     List<AbstractUnit> l2) {
         if (l1.size() != l2.size()) return false;
         for (AbstractUnit au : l1) {
             if (none(l2, a -> a.matchAll(au))) return false;

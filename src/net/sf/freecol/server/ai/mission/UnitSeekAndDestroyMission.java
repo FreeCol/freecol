@@ -110,10 +110,10 @@ public final class UnitSeekAndDestroyMission extends Mission {
         Unit u;
         return (loc == null || aiUnit == null || aiUnit.getUnit() == null) 
             ? null
-            : (invalidReason(aiUnit, loc.getSettlement()) == null)
+            : (invalidSettlementReason(aiUnit, loc.getSettlement()) == null)
             ? loc.getSettlement()
             : ((t = loc.getTile()) != null
-                && invalidReason(aiUnit,
+                && invalidTargetReason(aiUnit,
                     u = t.getDefendingUnit(aiUnit.getUnit())) == null)
             ? u
             : null;
@@ -163,7 +163,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
      */
     private static int scoreUnitPath(AIUnit aiUnit, PathNode path,
                                      Unit defender) {
-        if (invalidUnitReason(aiUnit, defender) != null) {
+        if (invalidMissionReason(aiUnit, defender) != null) {
             return Integer.MIN_VALUE;
         }
         final Unit unit = aiUnit.getUnit();
@@ -268,8 +268,8 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @param deferOK Not implemented in this mission.
      * @return A suitable target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    public static Location findMissionTarget(AIUnit aiUnit, int range,
+                                             boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
             : null;
@@ -282,7 +282,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null)
             ? reason
@@ -323,7 +323,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
-    private static String invalidUnitReason(AIUnit aiUnit, Unit unit) {
+    private static String invalidTargetReason(AIUnit aiUnit, Unit unit) {
         String reason = invalidTargetReason(unit);
         if (reason != null) return reason;
         final Tile tile = unit.getTile();
@@ -344,8 +344,8 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -355,14 +355,14 @@ public final class UnitSeekAndDestroyMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason                
             : (loc instanceof Settlement)
             ? invalidSettlementReason(aiUnit, (Settlement)loc)
             : (loc instanceof Unit)
-            ? invalidUnitReason(aiUnit, (Unit)loc)
+            ? invalidTargetReason(aiUnit, (Unit)loc)
             : Mission.TARGETINVALID;
     }
 
@@ -428,7 +428,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 4, false);
+        return findMissionTarget(getAIUnit(), 4, false);
     }
 
     /**
@@ -436,7 +436,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -466,7 +466,7 @@ public final class UnitSeekAndDestroyMission extends Mission {
         // Is there a target-of-opportunity?
         final Unit unit = getUnit();
         Location nearbyTarget = (unit.isOnCarrier()) ? null
-            : findTarget(aiUnit, 1, false);
+            : findMissionTarget(aiUnit, 1, false);
         if (nearbyTarget != null) {
             if (getTarget() == null) {
                 setTarget(nearbyTarget);

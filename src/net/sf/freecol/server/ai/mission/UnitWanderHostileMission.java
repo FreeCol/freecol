@@ -82,7 +82,9 @@ public class UnitWanderHostileMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
+        String reason = invalidAIUnitReason(aiUnit);
+        if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
         return (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
             : (!unit.hasTile()) ? Mission.UNITNOTONMAP
@@ -95,11 +97,8 @@ public class UnitWanderHostileMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        String reason;
-        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
-            : ((reason = invalidMissionReason(aiUnit)) != null) ? reason
-            : null;
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -109,12 +108,9 @@ public class UnitWanderHostileMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit,
+    public static String invalidMissionReason(AIUnit aiUnit,
         @SuppressWarnings("unused") Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidMissionReason(aiUnit)) != null) ? reason
-            : null;
+        return invalidMissionReason(aiUnit);
     }
 
 
@@ -156,7 +152,7 @@ public class UnitWanderHostileMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), null);
+        return invalidMissionReason(getAIUnit(), null);
     }
 
     /**

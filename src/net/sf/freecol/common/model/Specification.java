@@ -1188,8 +1188,8 @@ public final class Specification implements OptionContainer {
         String gtag = GameOptions.TAG;
         File gof = FreeColDirectories
             .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
-        OptionGroup gog = (gof.exists()) ? OptionGroup.load(gof, gtag, this)
-            : null;
+        OptionGroup gog = (!gof.exists()) ? null
+            : OptionGroup.loadOptionGroup(gof, gtag, this);
         if (gog != null) {
             gog = mergeGroup(gog);
             ret |= fixGameOptions();
@@ -1201,8 +1201,8 @@ public final class Specification implements OptionContainer {
         String mtag = MapGeneratorOptions.TAG;
         File mof = FreeColDirectories
             .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
-        OptionGroup mog = (mof.exists()) ? OptionGroup.load(mof, mtag, this)
-            : null;
+        OptionGroup mog = (!mof.exists()) ? null
+            : OptionGroup.loadOptionGroup(mof, mtag, this);
         if (mog != null) {
             mog = mergeGroup(mog);
             ret |= fixMapGeneratorOptions();

@@ -253,8 +253,8 @@ public class Force extends FreeColSpecObject {
      * @return True if the other force contains the same units.
      */
     public boolean matchAll(Force other) {
-        return AbstractUnit.matchAll(this.landUnits, other.landUnits)
-            && AbstractUnit.matchAll(this.navalUnits, other.navalUnits);
+        return AbstractUnit.matchUnits(this.landUnits, other.landUnits)
+            && AbstractUnit.matchUnits(this.navalUnits, other.navalUnits);
     }
 
 

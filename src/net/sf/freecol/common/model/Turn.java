@@ -151,7 +151,7 @@ public class Turn {
      * @return The calculated year based on the turn number.
      */
     public int getYear() {
-        return getYear(turn);
+        return getTurnYear(turn);
     }
 
     /**
@@ -162,7 +162,7 @@ public class Turn {
      * @param turn The turn number to get the year for.
      * @return The calculated year based on the turn number.
      */
-    public static int getYear(int turn) {
+    public static int getTurnYear(int turn) {
         int year = turn - 1 + getStartingYear(), seasonYear = getSeasonYear();
         return (year < seasonYear) ? year
             : seasonYear + (year - seasonYear) / getSeasonNumber();
@@ -177,7 +177,7 @@ public class Turn {
      * @return The season index corresponding to the turn number or negative
      *     if before the season year.
      */
-    public static int getSeason(int turn) {
+    public static int getTurnSeason(int turn) {
         int year = turn - 1 + getStartingYear();
         return (year < getSeasonYear()) ? -1
             : (year - seasonYear) % getSeasonNumber();
@@ -190,7 +190,7 @@ public class Turn {
      *     number, or negative if before the season year.
      */
     public int getSeason() {
-        return getSeason(turn);
+        return getTurnSeason(turn);
     }
 
     /**
@@ -199,7 +199,7 @@ public class Turn {
      * @return A {@code StringTemplate} describing the turn.
      */
     public StringTemplate getLabel() {
-        return getLabel(turn);
+        return getTurnLabel(turn);
     }
 
     /**
@@ -208,14 +208,14 @@ public class Turn {
      * @param turn The integer value of the turn to describe.
      * @return A {@code StringTemplate} describing the turn.
      */
-    public static StringTemplate getLabel(int turn) {
-        int season = getSeason(turn);
+    public static StringTemplate getTurnLabel(int turn) {
+        int season = getTurnSeason(turn);
         StringTemplate t = StringTemplate.label("");
         if (season >= 0) {
             t.addName(NameCache.getSeasonName(season));
             t.addName(" ");
         }
-        t.addName(Integer.toString(getYear(turn)));
+        t.addName(Integer.toString(getTurnYear(turn)));
         return t;
     }
 

@@ -50,7 +50,7 @@ public class ModifierFormat {
     }
 
     public static final String format(float value) {
-        return Modifier.isKnown(value) ? modifierFormat.format(value)
+        return Modifier.isFloatKnown(value) ? modifierFormat.format(value)
             : getUnknownValue();
     }
 
@@ -61,7 +61,7 @@ public class ModifierFormat {
     private static final String[] getModifierStrings(float value,
                                                      ModifierType type) {
         String bonus = modifierFormat.format(value);
-        if (!Modifier.isKnown(value)) {
+        if (!Modifier.isFloatKnown(value)) {
             return new String[] { " ", bonus, null };
         }
         String[] result = (value < 0)

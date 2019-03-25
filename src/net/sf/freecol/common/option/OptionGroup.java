@@ -367,8 +367,8 @@ public class OptionGroup extends AbstractOption<OptionGroup>
      * @return The {@code OptionGroup} found, or null on error or
      *     not found.
      */
-    public static OptionGroup load(File file, String optionId,
-        Specification spec) {
+    public static OptionGroup loadOptionGroup(File file, String optionId,
+                                              Specification spec) {
         OptionGroup ret = new OptionGroup(spec);
         if (ret.load(file)) {
             if (!optionId.equals(ret.getId())) {

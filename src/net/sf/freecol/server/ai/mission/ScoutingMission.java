@@ -216,8 +216,8 @@ public final class ScoutingMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A {@code PathNode} to the target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    public static Location findMissionTarget(AIUnit aiUnit, int range,
+                                             boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return Location.upLoc((path != null)
             ? extractTarget(aiUnit, path)
@@ -234,7 +234,7 @@ public final class ScoutingMission extends Mission {
      *     if none.
      */
     public static String prepare(AIUnit aiUnit) {
-        String reason = invalidReason(aiUnit);
+        String reason = invalidMissionReason(aiUnit);
         return (reason != null) ? reason
             : (canScoutNatives(aiUnit)
                 || aiUnit.equipForRole(aiUnit.getUnit().getSpecification()
@@ -250,7 +250,7 @@ public final class ScoutingMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null) ? reason
             : (!canScoutNatives(aiUnit)) ? "unit-not-a-SCOUT"
@@ -327,8 +327,8 @@ public final class ScoutingMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
     }
 
     /**
@@ -338,7 +338,7 @@ public final class ScoutingMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -385,7 +385,7 @@ public final class ScoutingMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 20, true);
+        return findMissionTarget(getAIUnit(), 20, true);
     }
 
     /**
@@ -393,7 +393,7 @@ public final class ScoutingMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -471,7 +471,7 @@ public final class ScoutingMission extends Mission {
         // the mission.
         lbAt(lb);
         Location completed = getTarget();
-        Location newTarget = findTarget(aiUnit, 20, false);
+        Location newTarget = findMissionTarget(aiUnit, 20, false);
         if (newTarget == null
             || (completed instanceof Colony && newTarget == completed)) {
             if (completed instanceof Colony && canScoutNatives(aiUnit)) {

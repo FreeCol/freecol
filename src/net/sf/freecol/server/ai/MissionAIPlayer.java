@@ -266,7 +266,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @return A new misison, or null if impossible or not worthwhile.
      */
     public Mission getDefendCurrentSettlementMission(AIUnit aiUnit) {
-        if (DefendSettlementMission.invalidReason(aiUnit) != null) return null;
+        if (DefendSettlementMission.invalidMissionReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location loc = unit.getLocation();
         final Settlement settlement = (loc == null) ? null
@@ -285,7 +285,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      */
     public Mission getDefendSettlementMission(AIUnit aiUnit,
                                               Settlement target) {
-        return (DefendSettlementMission.invalidReason(aiUnit) != null) ? null
+        return (DefendSettlementMission.invalidMissionReason(aiUnit) != null) ? null
             : new DefendSettlementMission(getAIMain(), aiUnit, target);
     }
 
@@ -296,7 +296,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     public Mission getIdleAtSettlementMission(AIUnit aiUnit) {
-        return (IdleAtSettlementMission.invalidReason(aiUnit) != null) ? null
+        return (IdleAtSettlementMission.invalidMissionReason(aiUnit) != null) ? null
             : new IdleAtSettlementMission(getAIMain(), aiUnit);
     }
        
@@ -309,8 +309,8 @@ public abstract class MissionAIPlayer extends AIPlayer {
      */
     public Mission getSeekAndDestroyMission(AIUnit aiUnit, int range) {
         Location loc = null;
-        if (UnitSeekAndDestroyMission.invalidReason(aiUnit) == null) {
-            loc = UnitSeekAndDestroyMission.findTarget(aiUnit, range, false);
+        if (UnitSeekAndDestroyMission.invalidMissionReason(aiUnit) == null) {
+            loc = UnitSeekAndDestroyMission.findMissionTarget(aiUnit, range, false);
         }
         return (loc == null) ? null
             : getSeekAndDestroyMission(aiUnit, loc);
@@ -324,7 +324,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     public Mission getSeekAndDestroyMission(AIUnit aiUnit, Location loc) {
-        return (UnitSeekAndDestroyMission.invalidReason(aiUnit) != null
+        return (UnitSeekAndDestroyMission.invalidMissionReason(aiUnit) != null
             || loc == null) ? null
             : new UnitSeekAndDestroyMission(getAIMain(), aiUnit, loc);
     }
@@ -336,7 +336,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     public Mission getWanderHostileMission(AIUnit aiUnit) {
-        return (UnitWanderHostileMission.invalidReason(aiUnit) != null) ? null
+        return (UnitWanderHostileMission.invalidMissionReason(aiUnit) != null) ? null
             : new UnitWanderHostileMission(getAIMain(), aiUnit);
     }
 

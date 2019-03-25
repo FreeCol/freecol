@@ -404,7 +404,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 AIUnit aiu = aiMain.getAIUnit(u);
                 for (int range = buildingRange; range < maxRange;
                      range += buildingRange) {
-                    target = BuildColonyMission.findTarget(aiu, range, false);
+                    target = BuildColonyMission.findMissionTarget(aiu, range, false);
                     if (target != null) break;
                 }
                 if (target == null) {
@@ -1991,12 +1991,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getBuildColonyMission(AIUnit aiUnit, Location target) {
-        String reason = BuildColonyMission.invalidReason(aiUnit);
+        String reason = BuildColonyMission.invalidMissionReason(aiUnit);
         if (reason != null) return null;
         final Unit unit = aiUnit.getUnit();
         if (target == null) {
-            target = BuildColonyMission.findTarget(aiUnit, buildingRange,
-                                                   unit.isInEurope());
+            target = BuildColonyMission.findMissionTarget(aiUnit,
+                buildingRange, unit.isInEurope());
         }
         return (target == null) ? null
             : new BuildColonyMission(getAIMain(), aiUnit, target);
@@ -2009,10 +2009,10 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getCashInTreasureTrainMission(AIUnit aiUnit) {
-        String reason = CashInTreasureTrainMission.invalidReason(aiUnit);
+        String reason = CashInTreasureTrainMission.invalidMissionReason(aiUnit);
         if (reason != null) return null;
         final Unit unit = aiUnit.getUnit();
-        Location loc = CashInTreasureTrainMission.findTarget(aiUnit,
+        Location loc = CashInTreasureTrainMission.findMissionTarget(aiUnit,
             cashInRange, unit.isInEurope());
         return (loc == null) ? null
             : new CashInTreasureTrainMission(getAIMain(), aiUnit, loc);
@@ -2026,7 +2026,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getDefendSettlementMission(AIUnit aiUnit, boolean relaxed) {
-        if (DefendSettlementMission.invalidReason(aiUnit) != null) return null;
+        if (DefendSettlementMission.invalidMissionReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location loc = unit.getLocation();
         double worstValue = 1000000.0;
@@ -2061,8 +2061,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      */
     public Mission getMissionaryMission(AIUnit aiUnit) {
         if (MissionaryMission.prepare(aiUnit) != null) return null;
-        Location loc = MissionaryMission.findTarget(aiUnit, missionaryRange,
-                                                    true);
+        Location loc = MissionaryMission.findMissionTarget(aiUnit,
+            missionaryRange, true);
         if (loc == null) {
             aiUnit.equipForRole(getSpecification().getDefaultRole());
             return null;
@@ -2082,8 +2082,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     public Mission getPioneeringMission(AIUnit aiUnit, Location target) {
         if (PioneeringMission.prepare(aiUnit) != null) return null;
         if (target == null) {
-            target = PioneeringMission.findTarget(aiUnit, pioneeringRange,
-                                                  true);
+            target = PioneeringMission.findMissionTarget(aiUnit,
+                pioneeringRange, true);
         }
         if (target == null) {
             Unit unit = aiUnit.getUnit();
@@ -2103,9 +2103,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return A new mission, or null if impossible.
      */
     public Mission getPrivateerMission(AIUnit aiUnit, Location target) {
-        if (PrivateerMission.invalidReason(aiUnit) != null) return null;
+        if (PrivateerMission.invalidMissionReason(aiUnit) != null) return null;
         if (target == null) {
-            target = PrivateerMission.findTarget(aiUnit, privateerRange, true);
+            target = PrivateerMission.findMissionTarget(aiUnit, privateerRange, true);
         }
         return (target == null) ? null
             : new PrivateerMission(getAIMain(), aiUnit, target);
@@ -2119,7 +2119,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      */
     public Mission getScoutingMission(AIUnit aiUnit) {
         if (ScoutingMission.prepare(aiUnit) != null) return null;
-        Location loc = ScoutingMission.findTarget(aiUnit, scoutingRange, true);
+        Location loc = ScoutingMission.findMissionTarget(aiUnit,
+            scoutingRange, true);
         if (loc == null) {
             Unit unit = aiUnit.getUnit();
             if (unit.isInEurope() || unit.getSettlement() != null) {
@@ -2137,7 +2138,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return A new mission, or null if impossible.
      */
     public Mission getTransportMission(AIUnit aiUnit) {
-        if (TransportMission.invalidReason(aiUnit) != null) return null;
+        if (TransportMission.invalidMissionReason(aiUnit) != null) return null;
         return new TransportMission(getAIMain(), aiUnit);
     }
 
@@ -2149,7 +2150,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getWishRealizationMission(AIUnit aiUnit, WorkerWish wish) {
-        if (WishRealizationMission.invalidReason(aiUnit) != null) return null;
+        if (WishRealizationMission.invalidMissionReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         if (wish == null) {
             wish = getBestWorkerWish(aiUnit, unit.getType());
@@ -2168,7 +2169,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      */
     public Mission getWorkInsideColonyMission(AIUnit aiUnit,
                                               AIColony aiColony) {
-        if (WorkInsideColonyMission.invalidReason(aiUnit) != null) return null;
+        if (WorkInsideColonyMission.invalidMissionReason(aiUnit) != null) return null;
         if (aiColony == null) {
             aiColony = getAIColony(aiUnit.getUnit().getColony());
         }

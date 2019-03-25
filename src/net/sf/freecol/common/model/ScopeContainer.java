@@ -225,7 +225,7 @@ public class ScopeContainer {
     
     // Useful wrappers that allow us to lazily create scope containers
 
-    public static boolean isEmpty(ScopeContainer sc) {
+    public static boolean isScopeContainerEmpty(ScopeContainer sc) {
         return sc == null || sc.isEmpty();
     }
 
@@ -269,11 +269,13 @@ public class ScopeContainer {
             : sc1.equals(sc2);
     }
     
-    public static boolean appliesTo(ScopeContainer sc, FreeColObject fco) {
+    public static boolean scopeContainerAppliesTo(ScopeContainer sc,
+                                                  FreeColObject fco) {
         return sc == null || sc.appliesTo(fco);
     }
 
-    public static void toXML(ScopeContainer sc, FreeColXMLWriter xw)
+    public static void scopeContainerToXML(ScopeContainer sc,
+                                           FreeColXMLWriter xw)
         throws XMLStreamException {
         if (sc != null) sc.toXML(xw);
     }

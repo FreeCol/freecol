@@ -128,8 +128,8 @@ public final class BuildColonyMission extends Mission {
         final Location loc = path.getLastNode().getLocation();
         Tile tile = loc.getTile();
         Colony colony = loc.getColony();
-        return (invalidReason(aiUnit, tile) == null) ? tile
-            : (invalidReason(aiUnit, colony) == null) ? colony
+        return (invalidMissionReason(aiUnit, tile) == null) ? tile
+            : (invalidMissionReason(aiUnit, colony) == null) ? colony
             : null;
     }
 
@@ -219,8 +219,8 @@ public final class BuildColonyMission extends Mission {
      * @param deferOK Enables deferring to a fallback colony.
      * @return A new target for this mission.
      */
-    public static Location findTarget(AIUnit aiUnit, int range,
-                                      boolean deferOK) {
+    public static Location findMissionTarget(AIUnit aiUnit, int range,
+                                             boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
             : Location.upLoc(findCircleTarget(aiUnit,
@@ -234,7 +234,7 @@ public final class BuildColonyMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null)
             ? reason
@@ -277,13 +277,23 @@ public final class BuildColonyMission extends Mission {
     }
 
     /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The {@code AIUnit} to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        return invalidUnitReason(aiUnit);
+    }
+
+    /**
      * Why would this mission be invalid with the given AI unit and location?
      *
      * @param aiUnit The {@code AIUnit} to check.
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null) ? reason
             : (loc instanceof Colony)
@@ -291,16 +301,6 @@ public final class BuildColonyMission extends Mission {
             : (loc instanceof Tile) 
             ? invalidTileReason(aiUnit, (Tile)loc)
             : Mission.TARGETINVALID;
-    }
-
-    /**
-     * Why would this mission be invalid with the given AI unit?
-     *
-     * @param aiUnit The {@code AIUnit} to check.
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
     }
 
       
@@ -342,7 +342,7 @@ public final class BuildColonyMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 5, true);
+        return findMissionTarget(getAIUnit(), 5, true);
     }
 
     /**
@@ -350,7 +350,7 @@ public final class BuildColonyMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidMissionReason(getAIUnit(), target);
     }
 
     /**
@@ -436,7 +436,7 @@ public final class BuildColonyMission extends Mission {
 
                 // Find a real tile target?
                 Location newTarget;
-                if ((newTarget = findTarget(aiUnit, 5, false)) != null) {
+                if ((newTarget = findMissionTarget(aiUnit, 5, false)) != null) {
                     setTarget(newTarget);
                     return lbRetarget(lb);
                 }

@@ -332,7 +332,7 @@ public class TerrainGenerator {
             for (int x = 0; x < map.getWidth(); x++) {
                 if (landmap[x][y]) { // Found a new region.
                     continents++;
-                    boolean[][] continent = Map.floodFill(landmap, x, y);
+                    boolean[][] continent = Map.floodFillBool(landmap, x, y);
 
                     for (int yy = 0; yy < map.getHeight(); yy++) {
                         for (int xx = 0; xx < map.getWidth(); xx++) {
@@ -381,7 +381,7 @@ public class TerrainGenerator {
                         targetsize = continentsize[c]/2;
                     }
                     continents++; //index of the new region in continentmap[][]
-                    boolean[][] newregion = Map.floodFill(splitcontinent,
+                    boolean[][] newregion = Map.floodFillBool(splitcontinent,
                         splitX, splitY, targetsize);
                     for (int x = 0; x < map.getWidth(); x++) {
                         for (int y = 0; y < map.getHeight(); y++) {

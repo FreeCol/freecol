@@ -158,7 +158,7 @@ public class ChangeSet {
          * @param player The {@code Player} to perhaps see this change.
          * @return A {@code See} with attached player.
          */
-        public See perhaps(Player player) {
+        public See perhapsOnly(Player player) {
             seePerhaps = player;
             return this;
         }

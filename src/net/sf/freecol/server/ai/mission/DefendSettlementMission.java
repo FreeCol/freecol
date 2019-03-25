@@ -108,7 +108,7 @@ public final class DefendSettlementMission extends Mission {
         if (path == null) return null;
         final Location loc = path.getLastNode().getLocation();
         Settlement settlement = loc.getSettlement();
-        return (invalidReason(aiUnit, settlement) == null) ? settlement
+        return (invalidSettlementReason(aiUnit, settlement) == null) ? settlement
             : null;
     }
 
@@ -185,8 +185,8 @@ public final class DefendSettlementMission extends Mission {
      * @param deferOK Enables deferral (not implemented in this mission).
      * @return A suitable target, or null if none found.
      */
-    private static Location findTarget(AIUnit aiUnit, int range,
-                                       boolean deferOK) {
+    private static Location findMissionTarget(AIUnit aiUnit, int range,
+                                              boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path) : null;
     }
@@ -198,7 +198,7 @@ public final class DefendSettlementMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidMissionReason(AIUnit aiUnit) {
+    private static String invalidUnitReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
@@ -225,8 +225,8 @@ public final class DefendSettlementMission extends Mission {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
-        String reason = invalidMissionReason(aiUnit);
+    public static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidUnitReason(aiUnit);
         return (reason != null)
             ? reason
             : (!aiUnit.getUnit().getOwner().hasSettlements())
@@ -241,7 +241,7 @@ public final class DefendSettlementMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -286,7 +286,7 @@ public final class DefendSettlementMission extends Mission {
      */
     @Override
     public Location findTarget() {
-        return findTarget(getAIUnit(), 4, true);
+        return findMissionTarget(getAIUnit(), 4, true);
     }
 
     /**
@@ -294,7 +294,7 @@ public final class DefendSettlementMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**

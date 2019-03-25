@@ -358,7 +358,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
             final ToIntFunction<Unit> score = cacheInt(u ->
                 u.getTile().getDistanceTo(tile));
             final Predicate<Unit> validPred = u ->
-                UnitSeekAndDestroyMission.invalidReason(aiMain.getAIUnit(u),
+                UnitSeekAndDestroyMission.invalidMissionReason(aiMain.getAIUnit(u),
                     tile.getDefendingUnit(u)) == null
                 && score.applyAsInt(u) >= 0;
             final Comparator<Unit> scoreComp = Comparator.comparingInt(score);
@@ -507,7 +507,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
                         getAIRandom(), availableUnits.size()));
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
-                if (IndianBringGiftMission.invalidReason(aiUnit) == null
+                if (IndianBringGiftMission.invalidMissionReason(aiUnit) == null
                     && u.findPath(u.getTile(), home, null, cd, null) != null) {
                     unit = u;
                 }
@@ -526,7 +526,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
                 PathNode path;
                 if (c == null
                     || !is.hasContacted(c.getOwner())
-                    || IndianBringGiftMission.invalidReason(aiUnit, c) != null
+                    || IndianBringGiftMission.invalidMissionReason(aiUnit, c) != null
                     || (path = unit.findPath(home, c.getTile(),
                                              null, cd, null)) == null) continue;
                 int alarm = Math.max(1, is.getAlarm(c.getOwner()).getValue());
@@ -603,7 +603,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
                         getAIRandom(), availableUnits.size()));
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
-                if (IndianDemandMission.invalidReason(aiUnit) == null
+                if (IndianDemandMission.invalidMissionReason(aiUnit) == null
                     && u.findPath(u.getTile(), home, null, cd, null) != null) {
                     unit = u;
                 }
@@ -621,7 +621,7 @@ public final class NativeAIPlayer extends MissionAIPlayer {
                 PathNode path;
                 if (c == null
                     || !is.hasContacted(c.getOwner())
-                    || IndianDemandMission.invalidReason(aiUnit, c) != null
+                    || IndianDemandMission.invalidMissionReason(aiUnit, c) != null
                     || (path = unit.findPath(home, c.getTile(),
                                              null, cd, null)) == null) continue;
                 int alarm = is.getAlarm(c.getOwner()).getValue();

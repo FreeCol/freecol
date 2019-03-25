@@ -144,7 +144,7 @@ public class Unit extends GoodsLocation
 
     /** Compare units by location. */
     public static final Comparator<Unit> locComparator
-        = Comparator.comparingInt(u -> Location.getRank(u));
+        = Comparator.comparingInt(u -> Location.rankOf(u));
 
     /**
      * A comparator to compare units by type, then role index, then
@@ -518,7 +518,7 @@ public class Unit extends GoodsLocation
         String type = (isPerson()) ? "person"
             : (isNaval()) ? "ship"
             : "other";
-        return getDestinationLabel(type, getDestination(), getOwner());
+        return getUnitDestinationLabel(type, getDestination(), getOwner());
     }
 
     /**
@@ -529,7 +529,7 @@ public class Unit extends GoodsLocation
      * @param player The {@code Player} viewpoint.
      * @return A {@code StringTemplate} describing the unit movement.
      */
-    public static StringTemplate getDestinationLabel(String tag,
+    public static StringTemplate getUnitDestinationLabel(String tag,
         Location destination, Player player) {
         return StringTemplate.template("model.unit.goingTo")
             .addTagged("%type%", tag)
@@ -916,7 +916,7 @@ public class Unit extends GoodsLocation
      * @return The role suffix.
      */
     public String getRoleSuffix() {
-        return Role.getRoleSuffix(role.getId());
+        return Role.getRoleIdSuffix(role.getId());
     }
 
     /**
@@ -3718,7 +3718,7 @@ public class Unit extends GoodsLocation
      *     signals a more advanced type of units.
      */
     public int getSkillLevel() {
-        return getSkillLevel(this.type);
+        return getUnitSkillLevel(this.type);
     }
 
     /**
@@ -3728,7 +3728,7 @@ public class Unit extends GoodsLocation
      * @return The level of skill for the given unit.  A higher value
      *     signals a more advanced type of units.
      */
-    public static int getSkillLevel(UnitType unitType) {
+    public static int getUnitSkillLevel(UnitType unitType) {
         return (unitType.hasSkill()) ? unitType.getSkill() : 0;
     }
 
@@ -4274,7 +4274,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public int getRank() {
-        return Location.getRank(getLocation());
+        return Location.rankOf(getLocation());
     }
 
     /**

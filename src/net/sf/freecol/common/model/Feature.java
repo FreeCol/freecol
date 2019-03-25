@@ -246,7 +246,7 @@ public abstract class Feature extends FreeColSpecObject
     // Scope delegation
 
     public final boolean hasScope() {
-        return !ScopeContainer.isEmpty(this.scopeContainer);
+        return !ScopeContainer.isScopeContainerEmpty(this.scopeContainer);
     }
         
     public final List<Scope> getScopeList() {
@@ -270,7 +270,7 @@ public abstract class Feature extends FreeColSpecObject
     //}
 
     public boolean appliesTo(FreeColObject fco) {
-        return ScopeContainer.appliesTo(this.scopeContainer, fco);
+        return ScopeContainer.scopeContainerAppliesTo(this.scopeContainer, fco);
     }
 
 

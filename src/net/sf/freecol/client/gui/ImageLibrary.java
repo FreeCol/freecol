@@ -1392,7 +1392,7 @@ public final class ImageLibrary {
         }
         // Try to get an image matching the key
         String roleQual = (Role.isDefaultRoleId(roleId)) ? ""
-            : "." + Role.getRoleSuffix(roleId);
+            : "." + Role.getRoleIdSuffix(roleId);
         String key = "image.unit." + unitType.getId() + roleQual
             + ((nativeEthnicity) ? ".native" : "");
         if (nativeEthnicity && !ResourceManager.hasImageResource(key)) {

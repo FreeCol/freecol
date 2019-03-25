@@ -355,7 +355,7 @@ public abstract class Mission extends AIObject {
      * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit) {
+    public static String invalidMissionReason(AIUnit aiUnit) {
         return invalidAIUnitReason(aiUnit);
     }
 
@@ -375,7 +375,7 @@ public abstract class Mission extends AIObject {
      * @param loc The target {@code Location} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null) ? reason : invalidTargetReason(loc);
     }
@@ -544,7 +544,7 @@ public abstract class Mission extends AIObject {
             Settlement settlement = tile.getSettlement();
             Location blocker = (settlement != null) ? settlement
                 : tile.getDefendingUnit(unit);
-            if (UnitSeekAndDestroyMission.invalidReason(aiUnit, blocker)
+            if (UnitSeekAndDestroyMission.invalidMissionReason(aiUnit, blocker)
                 == null) return blocker;
         }
         return null;

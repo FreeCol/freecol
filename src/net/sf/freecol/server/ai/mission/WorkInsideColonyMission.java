@@ -100,7 +100,7 @@ public final class WorkInsideColonyMission extends Mission {
      * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
+    public static String invalidMissionReason(AIUnit aiUnit, Location loc) {
         String reason;
         return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
             : (!aiUnit.getUnit().isPerson()) ? Mission.UNITNOTAPERSON
@@ -152,7 +152,7 @@ public final class WorkInsideColonyMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidMissionReason(getAIUnit(), getTarget());
     }
 
     /**

@@ -188,7 +188,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     }
 
     public boolean appliesTo(FreeColObject fco) {
-        return ScopeContainer.appliesTo(this.scopeContainer, fco);
+        return ScopeContainer.scopeContainerAppliesTo(this.scopeContainer, fco);
     }
 
     // Interface Named
@@ -255,7 +255,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
 
         for (Modifier modifier : getSortedModifiers()) modifier.toXML(xw);
 
-        ScopeContainer.toXML(this.scopeContainer, xw);
+        ScopeContainer.scopeContainerToXML(this.scopeContainer, xw);
     }
 
     /**

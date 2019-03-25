@@ -321,7 +321,7 @@ public class Modifier extends Feature {
      * @param value The value to test.
      * @return True if the value is known.
      */
-    public static boolean isKnown(float value) {
+    public static boolean isFloatKnown(float value) {
         return Float.compare(value, UNKNOWN) != 0;
     }
 
@@ -333,7 +333,7 @@ public class Modifier extends Feature {
      * @return True if the value is known.
      */
     public boolean isKnown() {
-        return Modifier.isKnown(this.value);
+        return Modifier.isFloatKnown(this.value);
     }
 
     /**

@@ -528,7 +528,7 @@ public final class AIUnit extends TransportableAIObject {
      */
     public int getBuilderScore() {
         final Unit unit = getUnit();
-        if (unit == null || BuildColonyMission.invalidReason(this) != null)
+        if (unit == null || BuildColonyMission.invalidMissionReason(this) != null)
             return -1000;
         int ret = (!unit.hasDefaultRole()) ? 0
             : (unit.getSkillLevel() > 0) ? 100

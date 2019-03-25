@@ -182,7 +182,7 @@ public class NativeTrade extends FreeColGameObject {
      * @return A suitable key.
      */
     public String getKey() {
-        return getKey(this.unit, this.is);
+        return getNativeTradeKey(this.unit, this.is);
     }
 
     /**
@@ -192,7 +192,7 @@ public class NativeTrade extends FreeColGameObject {
      * @param is The {@code IndianSettlement} that is trading.
      * @return A suitable key.
      */
-    public static String getKey(Unit unit, IndianSettlement is) {
+    public static String getNativeTradeKey(Unit unit, IndianSettlement is) {
         return unit.getId() + "-" + is.getId();
     }
 

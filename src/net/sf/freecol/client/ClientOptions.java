@@ -502,7 +502,7 @@ public class ClientOptions extends OptionGroup {
 
     /** Compare by position on the map. */
     private static final Comparator<Colony> colonyPositionComparator
-        = Comparator.comparingInt(c -> Location.getRank(c));
+        = Comparator.comparingInt(c -> Location.rankOf(c));
 
 
     private class MessageSourceComparator implements Comparator<ModelMessage> {
