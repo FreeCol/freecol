@@ -76,6 +76,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.DefaultParser;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * This class is responsible for handling the command-line arguments
@@ -494,6 +496,7 @@ public final class FreeCol {
      *
      * @param status Exit status.
      */
+    @SuppressFBWarnings(value="DM_EXIT", justification="Deliberate")
     public static void quit(int status) {
         System.exit(status);
     }
@@ -1261,6 +1264,8 @@ public final class FreeCol {
      *     default locale.
      * @return True if the {@code Locale} changed.
      */
+    @SuppressFBWarnings(value="MDM_SETDEFAULTLOCALE",
+                        justification="Locale can be reset by user")
     public static boolean setLocale(String localeArg) {
         Locale newLocale = null;
         if (localeArg == null) {
