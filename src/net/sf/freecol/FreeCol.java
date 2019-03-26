@@ -148,6 +148,7 @@ public final class FreeCol {
     public static final long    TIMEOUT_DEFAULT = 60L; // 1 minute
     public static final long    TIMEOUT_MIN = 10L; // 10s
     public static final long    TIMEOUT_MAX = 3600000L; // 1000hours:-)
+    private static final Dimension WINDOWSIZE_FALLBACK = new Dimension(-1, -1);
 
 
     // Cli values.  Often set to null so the default can be applied in
@@ -226,7 +227,7 @@ public final class FreeCol {
      * The size of window to create, defaults to impossible dimensions
      * to require windowed mode with best determined screen size.
      */
-    private static Dimension windowSize = new Dimension(-1, -1);
+    private static Dimension windowSize = WINDOWSIZE_FALLBACK;
 
     /** How much gui elements get scaled. */
     private static float guiScale = GUI_SCALE_DEFAULT;
@@ -1411,6 +1412,7 @@ public final class FreeCol {
      * @param arg The window size specification.
      */
     private static void setWindowSize(String arg) {
+        windowSize = WINDOWSIZE_FALLBACK; // Set fallback up front
         if (arg != null) {
             String[] xy =arg.split("[^0-9]");
             if (xy.length == 2) {
@@ -1420,7 +1422,6 @@ public final class FreeCol {
                 } catch (NumberFormatException nfe) {}
             }
         }
-        if (windowSize == null) windowSize = new Dimension(-1, -1);
     }
 
 
