@@ -33,6 +33,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * Option for selecting an audio mixer.
@@ -216,6 +218,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     /**
      * {@inheritDoc}
      */
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE")
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         MixerWrapper mw = null;

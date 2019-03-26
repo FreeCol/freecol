@@ -38,6 +38,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * Option for selecting a language.  The possible choices are determined
@@ -267,6 +269,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * {@inheritDoc}
      */
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE")
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         Language l = null;

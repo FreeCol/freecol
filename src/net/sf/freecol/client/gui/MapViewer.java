@@ -74,8 +74,9 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.GameOptions;
-
 import static net.sf.freecol.common.util.StringUtils.*;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -1213,6 +1214,8 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param g The Graphics2D object on which to draw the Map.
      */
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE",
+                        justification="lazy load of extra tiles")
     public void displayMap(Graphics2D g) {
         //final long now = now();
         final ClientOptions options = getClientOptions();

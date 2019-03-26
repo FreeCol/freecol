@@ -37,6 +37,8 @@ import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Turn;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 public class ModifierFormat {
 
@@ -81,6 +83,7 @@ public class ModifierFormat {
         return result;
     }
 
+    @SuppressFBWarnings(value="NP_LOAD_OF_KNOWN_NULL_VALUE")
     private static String getSourceName(FreeColObject source) {
         if (source == null) return getUnknownValue();
 
