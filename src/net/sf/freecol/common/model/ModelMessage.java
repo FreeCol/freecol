@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -98,6 +99,11 @@ public class ModelMessage extends StringTemplate {
             return Messages.nameKey("model." + getKey());
         }
     }
+
+    /** Compare messages by type. */
+    public static final Comparator<ModelMessage> messageTypeComparator
+        = (m1, m2) -> m1.getMessageType().ordinal()
+                    - m2.getMessageType().ordinal();
 
     private String sourceId;
     private String displayId;
@@ -385,6 +391,46 @@ public class ModelMessage extends StringTemplate {
             result = next;
         }
         return result;
+    }
+
+    /**
+     * Get a comparator that sorts on the message source object.
+     *
+     * @param game The {@code Game} to look up source objects in.
+     * @param specialized A map of specialized comparators keyed by class name.
+     * @return The {@code Comparator}.
+     */
+    public static Comparator<ModelMessage> getSourceComparator(final Game game,
+            final java.util.Map<String, Comparator<?>> specialized) {
+
+        return new Comparator<ModelMessage>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public int compare(ModelMessage message1, ModelMessage message2) {
+                String sourceId1 = message1.getSourceId();
+                String sourceId2 = message2.getSourceId();
+                if (Utils.equals(sourceId1, sourceId2)) {
+                    return messageTypeComparator.compare(message1, message2);
+                }
+                FreeColGameObject source1 = game.getMessageSource(message1);
+                FreeColGameObject source2 = game.getMessageSource(message2);
+                int base = FreeColObject.getObjectClassIndex(source1)
+                    - FreeColObject.getObjectClassIndex(source2);
+                if (base == 0 && specialized != null && source1 != null) {
+                    String name = source1.getClass().getName();
+                    @SuppressWarnings("unchecked")
+                    Comparator<FreeColObject> c
+                        = (Comparator<FreeColObject>)specialized.get(name);
+                    if (c != null) {
+                        base = c.compare(source1, source2);
+                    }
+                }
+                return base;
+            }
+        };
     }
 
 

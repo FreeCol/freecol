@@ -252,6 +252,17 @@ public abstract class FreeColObject
         return DEFAULT_CLASS_INDEX;
     }
 
+    /**
+     * Get the class index, handling null and non-FCO objects.
+     *
+     * @param o The object to examine.
+     * @return The class index.
+     */
+    public static int getObjectClassIndex(Object o) {
+        return (o instanceof FreeColObject) ? ((FreeColObject)o).getClassIndex()
+            : DEFAULT_CLASS_INDEX;
+    }
+    
 
     // Specification handling.
     //
