@@ -71,7 +71,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      * {@inheritDoc}
      */
     @Override
-    public ModOption clone() {
+    public ModOption cloneOption() {
         ModOption result = new ModOption(getSpecification());
         result.setId(this.getId());
         result.value = this.value;

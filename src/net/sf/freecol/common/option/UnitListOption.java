@@ -56,7 +56,7 @@ public class UnitListOption extends ListOption<AbstractUnit> {
      * {@inheritDoc}
      */
     @Override
-    public UnitListOption clone() {
+    public UnitListOption cloneOption() {
         UnitListOption ret = new UnitListOption(getId(), getSpecification());
         ret.setValues(this);
         ret.setListValues(this);

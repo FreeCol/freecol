@@ -68,7 +68,7 @@ public class TextOption extends AbstractOption<String> {
      * {@inheritDoc}
      */
     @Override
-    public TextOption clone() {
+    public TextOption cloneOption() {
         TextOption result = new TextOption(getId(), getSpecification());
         result.setValues(this);
         return result;

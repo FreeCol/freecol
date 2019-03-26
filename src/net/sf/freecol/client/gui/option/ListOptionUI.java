@@ -87,7 +87,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         this.model = new DefaultListModel<>();
         for (AbstractOption<T> o : option.getValue()) {
             try {
-                AbstractOption<T> c = o.clone();
+                AbstractOption<T> c = o.cloneOption();
                 this.model.addElement(c);
             } catch (CloneNotSupportedException e) {
                 logger.log(Level.WARNING, "Can not clone " + o.getId(), e);
@@ -115,7 +115,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         
         addButton.addActionListener((ActionEvent ae) -> {
                 try {
-                    AbstractOption<T> ao = option.getTemplate().clone();
+                    AbstractOption<T> ao = option.getTemplate().cloneOption();
                     if (gui.showEditOptionDialog(ao) && option.canAdd(ao)) {
                         this.model.addElement(ao);
                         this.list.setSelectedValue(ao, true);

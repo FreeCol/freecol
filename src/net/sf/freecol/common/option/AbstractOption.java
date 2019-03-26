@@ -138,7 +138,8 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      * {@inheritDoc}
      */
     @Override
-    public abstract AbstractOption<T> clone() throws CloneNotSupportedException;
+    public abstract AbstractOption<T> cloneOption()
+        throws CloneNotSupportedException;
 
     /**
      * {@inheritDoc}

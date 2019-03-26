@@ -121,7 +121,7 @@ public class IntegerOption extends AbstractOption<Integer> {
      * {@inheritDoc}
      */
     @Override
-    public IntegerOption clone() {
+    public IntegerOption cloneOption() {
         IntegerOption result = new IntegerOption(getId(), getSpecification());
         result.setValues(this);
         result.setMinimumValue(this.minimumValue);

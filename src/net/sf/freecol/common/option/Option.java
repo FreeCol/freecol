@@ -38,7 +38,7 @@ public interface Option<T> extends Cloneable, ObjectWithId {
      * @return A clone of this option.
      * @exception CloneNotSupportedException if we can not clone.
      */
-    public Option<T> clone() throws CloneNotSupportedException;
+    public Option<T> cloneOption() throws CloneNotSupportedException;
 
     /**
      * Gets the option group identifier for this option.

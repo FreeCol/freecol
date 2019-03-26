@@ -59,7 +59,7 @@ public class ModListOption extends ListOption<FreeColModFile> {
      * {@inheritDoc}
      */
     @Override
-    public ModListOption clone() {
+    public ModListOption cloneOption() {
         ModListOption ret = new ModListOption(getId(), getSpecification());
         ret.setValues(this);
         ret.setListValues(this);

@@ -184,7 +184,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
      * {@inheritDoc}
      */
     @Override
-    public AudioMixerOption clone() {
+    public AudioMixerOption cloneOption() {
         AudioMixerOption result = new AudioMixerOption(getSpecification());
         result.setValues(this);
         return result;

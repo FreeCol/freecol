@@ -146,7 +146,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     @Override
-    public AbstractUnitOption clone() {
+    public AbstractUnitOption cloneOption() {
         final Specification spec = getSpecification();
         AbstractUnitOption result = new AbstractUnitOption(getId(), spec);
         result.setValues(this);
@@ -155,9 +155,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
                 value.getRoleId(), value.getNumber());
             result.setValue(au);
         }
-        if (unitTypeOption != null) result.unitTypeOption = unitTypeOption.clone();
-        if (roleOption != null) result.roleOption = roleOption.clone();
-        if (numberOption != null) result.numberOption = numberOption.clone();
+        if (unitTypeOption != null) result.unitTypeOption = unitTypeOption.cloneOption();
+        if (roleOption != null) result.roleOption = roleOption.cloneOption();
+        if (numberOption != null) result.numberOption = numberOption.cloneOption();
         result.nationType = nationType;
         return result;
     }

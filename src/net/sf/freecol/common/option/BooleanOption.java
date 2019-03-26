@@ -68,7 +68,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
      * {@inheritDoc}
      */
     @Override
-    public BooleanOption clone() {
+    public BooleanOption cloneOption() {
         BooleanOption result = new BooleanOption(getId(), getSpecification());
         result.setValues(this);
         return result;

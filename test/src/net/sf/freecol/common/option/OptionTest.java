@@ -49,7 +49,7 @@ public class OptionTest extends FreeColTestCase {
     public void testCloneIntegerOption() {
         IntegerOption money = spec().getOption(GameOptions.STARTING_MONEY,
                                                IntegerOption.class);
-        IntegerOption money2 = money.clone();
+        IntegerOption money2 = money.cloneOption();
 
         assertFalse(money == money2);
         assertEquals(money.getId(), money2.getId());

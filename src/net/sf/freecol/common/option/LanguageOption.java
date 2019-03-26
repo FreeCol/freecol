@@ -236,7 +236,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * {@inheritDoc}
      */
     @Override
-    public LanguageOption clone() {
+    public LanguageOption cloneOption() {
         LanguageOption result = new LanguageOption(getSpecification());
         result.setValues(this);
         return result;

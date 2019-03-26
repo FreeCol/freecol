@@ -82,7 +82,7 @@ public class FileOption extends AbstractOption<File> {
      * {@inheritDoc}
      */
     @Override
-    public FileOption clone() {
+    public FileOption cloneOption() {
         FileOption result = new FileOption(getSpecification());
         result.setValues(this);
         result.setType(this.getType());

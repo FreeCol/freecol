@@ -117,7 +117,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * {@inheritDoc}
      */
     @Override
-    public UnitTypeOption clone() {
+    public UnitTypeOption cloneOption() {
         UnitTypeOption ret = new UnitTypeOption(getId(), getSpecification());
         ret.value = this.value;
         ret.addNone = this.addNone;
