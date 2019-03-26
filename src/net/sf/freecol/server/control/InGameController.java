@@ -144,6 +144,8 @@ import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.model.Session;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * The main server controller.
@@ -3045,6 +3047,7 @@ public final class InGameController extends Controller {
      * @param nt The {@code NativeTrade} underway.
      * @return A {@code ChangeSet} encapsulating this action.
      */
+    @SuppressFBWarnings(value="SF_SWITCH_FALLTHROUGH")
     public ChangeSet nativeTrade(ServerPlayer serverPlayer,
                                  NativeTradeAction action, NativeTrade nt) {
         final Unit unit = nt.getUnit();
@@ -3346,6 +3349,7 @@ public final class InGameController extends Controller {
      * @param arrangements A list of {@code Arrangement}s to apply.
      * @return A {@code ChangeSet} encapsulating this action.
      */
+    @SuppressFBWarnings(value="SF_SWITCH_FALLTHROUGH")
     public ChangeSet rearrangeColony(ServerPlayer serverPlayer, Colony colony,
                                      List<Arrangement> arrangements) {
         final Role defaultRole = getGame().getSpecification().getDefaultRole();

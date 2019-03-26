@@ -55,6 +55,8 @@ import net.sf.freecol.server.ai.Cargo;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.TransportableAIObject;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * Mission for transporting units and goods on a carrier.
@@ -830,6 +832,7 @@ public final class TransportMission extends Mission {
      *     TNEXT if it has progressed to the next stage,
      *     TRETRY if a blockage has occurred and it should be retried,
      */
+    @SuppressFBWarnings(value="SF_SWITCH_FALLTHROUGH")
     private CargoResult tryCargo(Cargo cargo, LogBuilder lb) {
         final Unit carrier = getUnit();
         final Location here = carrier.getLocation();

@@ -114,6 +114,8 @@ import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * A {@code Player} with additional (server specific) information, notably
@@ -2116,6 +2118,7 @@ outer:  for (Effect effect : effects) {
      * @param random A pseudo-random number source.
      * @param cs A {@code ChangeSet} to update.
      */
+    @SuppressFBWarnings(value="SF_SWITCH_FALLTHROUGH")
     public void csEmigrate(int slot, MigrationType type, Random random,
                            ChangeSet cs) {
         // Create the recruit, move it to the docks.
