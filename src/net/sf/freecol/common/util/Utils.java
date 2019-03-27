@@ -47,6 +47,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * Collection of small static helper methods.
@@ -357,6 +359,7 @@ public class Utils {
      *
      * Route all gc calls here, so we can disable the findbugs warning.
      */
+    @SuppressFBWarnings(value="DM_GC", justification="Deliberate")
     public static void garbageCollect() {
         System.gc();
     }
