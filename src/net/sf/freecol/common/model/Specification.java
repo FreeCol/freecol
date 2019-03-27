@@ -2068,26 +2068,32 @@ public final class Specification implements OptionContainer {
 
     /**
      * Apply all the special fixes to bring older specifications up to date.
+     *
+     * @return True if a change was made.
      */
-    private void applyFixes() {
-        fixDifficultyOptions();
-        fixGameOptions();
-        fixMapGeneratorOptions();
-        fixOrphanOptions();
+    private boolean applyFixes() {
+        boolean ret = false;
+        ret |= fixDifficultyOptions();
+        ret |= fixGameOptions();
+        ret |= fixMapGeneratorOptions();
+        ret |= fixOrphanOptions();
         // @compat 0.11.0
-        fixRoles();
+        ret |= fixRoles();
         // end @compat 0.11.0
         // @compat 0.11.6
-        fixUnitChanges();
+        ret |= fixUnitChanges();
         // end @compat 0.11.6
-        fixSpec();
+        ret |= fixSpec();
+        return ret;
     }
 
     /**
      * Find and remove orphan options/groups that are not part of the
      * core tree of options.
+     *
+     * @return True if a fix was made.
      */
-    private void fixOrphanOptions() {
+    private boolean fixOrphanOptions() {
         Collection<AbstractOption> allO = new HashSet<>(allOptions.values());
         Collection<AbstractOption> allG = new HashSet<>(allOptionGroups.values());
         for (String id : coreOptionGroups) {
@@ -2104,6 +2110,7 @@ public final class Specification implements OptionContainer {
             allOptionGroups.remove(ao.getId());
             logger.warning("Dropping orphan option group: " + ao);
         }
+        return !allO.isEmpty() || !allG.isEmpty();
     }
 
     /**
@@ -2130,30 +2137,33 @@ public final class Specification implements OptionContainer {
      *
      * Deliberately not part of applyFixes(), this is called from readFromXML
      * which can most accurately determine whether it is needed.
+     *
+     * @return True if a fix was made.
      */
-    private void fixRoles() {
-        if (!roles.isEmpty()) return; // Trust what is there
+    private boolean fixRoles() {
+        if (!roles.isEmpty()) return false; // Trust what is there
 
-        if (compareVersion("0.85") > 0) return;
+        if (compareVersion("0.85") > 0) return false;
 
         File rolf = FreeColDirectories.getCompatibilityFile(ROLES_COMPAT_FILE_NAME);
         try (InputStream fis = Files.newInputStream(rolf.toPath())) {
             load(fis);
         } catch (IOException|XMLStreamException e) {
             logger.log(Level.WARNING, "Failed to load remedial roles.", e);
-            return;
+            return false;
         }
 
         logger.info("Loading role backward compatibility fragment: "
             + ROLES_COMPAT_FILE_NAME + " with roles: "
             + transform(getRoles(), alwaysTrue(), Role::getId,
                         Collectors.joining(" ")));
+        return true;
     }
     // end @compat 0.11.0
 
     // @compat 0.11.6
-    private void fixUnitChanges() {
-        if (compareVersion("0.116") > 0) return;
+    private boolean fixUnitChanges() {
+        if (compareVersion("0.116") > 0) return false;
 
         // Unlike roles, we can not trust what is already there, as the changes
         // are deeper.  However we preserve the ENTER_COLONY change as that
@@ -2165,7 +2175,7 @@ public final class Specification implements OptionContainer {
             load(fis);
         } catch (IOException|XMLStreamException e) {
             logger.log(Level.WARNING, "Failed to load unit changes.", e);
-            return;
+            return false;
         }
         if (enter != null) {
             unitChangeTypeList.add(enter);
@@ -2175,13 +2185,17 @@ public final class Specification implements OptionContainer {
             + UNIT_CHANGE_TYPES_COMPAT_FILE_NAME + " with changes: "
             + transform(getUnitChangeTypeList(), alwaysTrue(),
                 UnitChangeType::getId, Collectors.joining(" ")));
+        return true;
     }
     // end @compat 0.11.6
 
     /**
      * Backward compatibility for the Specification in general.
+     *
+     * @return True if a fix was made.
      */
-    private void fixSpec() {
+    private boolean fixSpec() {
+        boolean ret = false;
         // @compat 0.10.x/0.11.x
         // This section contains a bunch of things that were
         // discovered and fixed post 0.11.0.
@@ -2193,13 +2207,17 @@ public final class Specification implements OptionContainer {
         // player, and the type was poorly established.
         Nation ue = findType(Nation.UNKNOWN_NATION_ID, Nation.class);
         ue.setType(getNationType("model.nationType.default"));
-        if (!nations.contains(ue)) nations.add(ue);
+        if (!nations.contains(ue)) {
+            nations.add(ue);
+            ret = true;
+        }
 
         // Nation colour moved (back) into the spec in 0.11.0, but the fixup
         // code was just a wrapper, and did not modify the underlying spec.
         for (Nation nation : nations) {
             if (nation.getColor() == null) {
                 nation.setColor(defaultColors.get(nation.getId()));
+                ret = true;
             }
         }
 
@@ -2210,6 +2228,7 @@ public final class Specification implements OptionContainer {
             && !coronado.hasAbility(Ability.SEE_ALL_COLONIES)) {
             coronado.addAbility(new Ability(Ability.SEE_ALL_COLONIES,
                                             coronado, true));
+            ret = true;
         }
 
         // Fix REF roles, soldier -> infantry, dragoon -> cavalry
@@ -2220,8 +2239,10 @@ public final class Specification implements OptionContainer {
             Option refSize = ((OptionGroup)((monarch instanceof OptionGroup)
                     ? monarch : level)).getOption(GameOptions.REF_FORCE);
             if (!(refSize instanceof UnitListOption)) continue;
+            boolean changed;
             for (AbstractUnit au
                      : ((UnitListOption)refSize).getOptionValues()) {
+                changed = true;
                 if ("DEFAULT".equals(au.getRoleId())) {
                     au.setRoleId(DEFAULT_ROLE_ID);
                 } else if ("model.role.soldier".equals(au.getRoleId())
@@ -2230,7 +2251,10 @@ public final class Specification implements OptionContainer {
                 } else if ("model.role.dragoon".equals(au.getRoleId())
                     || "DRAGOON".equals(au.getRoleId())) {
                     au.setRoleId("model.role.cavalry");
+                } else {
+                    changed = false;
                 }
+                if (changed) ret = true;
             }
         }
 
@@ -2242,12 +2266,14 @@ public final class Specification implements OptionContainer {
                 List<Option> next = ((OptionGroup)o).getOptions();
                 todo.addAll(new ArrayList<>(next));
             } else if (o instanceof UnitListOption) {
+                boolean changed;
                 for (AbstractUnit au : ((UnitListOption)o).getOptionValues()) {
                     String roleId = au.getRoleId();
+                    changed = true;
                     if (roleId == null) {
                         au.setRoleId(DEFAULT_ROLE_ID);
                     } else if (au.getRoleId().startsWith("model.role.")) {
-                        ; // OK
+                        changed = false; // OK
                     } else if ("DEFAULT".equals(au.getRoleId())) {
                         au.setRoleId(DEFAULT_ROLE_ID);
                     } else if ("DRAGOON".equals(au.getRoleId())) {
@@ -2263,15 +2289,22 @@ public final class Specification implements OptionContainer {
                     } else {
                         au.setRoleId(DEFAULT_ROLE_ID);
                     }
+                    if (changed) ret = true;
                 }
             }
         }
 
         // is-military was added to goods type
         GoodsType goodsType = getGoodsType("model.goods.horses");
-        goodsType.setMilitary();
+        if (!goodsType.getMilitary()) {
+            goodsType.setMilitary();
+            ret = true;
+        }
         goodsType = getGoodsType("model.goods.muskets");
-        goodsType.setMilitary();
+        if (!goodsType.getMilitary()) {
+            goodsType.setMilitary();
+            ret = true;
+        }
         // end @compat 0.10.x/0.11.x
 
         // @compat 0.11.0
@@ -2290,12 +2323,14 @@ public final class Specification implements OptionContainer {
         if (bolivarAdd) {
             bolivar.addModifier(new Modifier(Modifier.SOL, 20,
                     Modifier.ModifierType.ADDITIVE, bolivar, 0));
+            ret = true;
         }
 
         // The COASTAL_ONLY attribute was added to customs house.
         BuildingType customs = getBuildingType("model.building.customHouse");
         if (!customs.hasAbility(Ability.COASTAL_ONLY)) {
             customs.addAbility(new Ability(Ability.COASTAL_ONLY, null, false));
+            ret = true;
         }
         // end @compat 0.11.0
 
@@ -2305,6 +2340,7 @@ public final class Specification implements OptionContainer {
             addModifier(new Modifier(Modifier.CARGO_PENALTY, -12.5f,
                     Modifier.ModifierType.PERCENTAGE, CARGO_PENALTY_SOURCE,
                     Modifier.GENERAL_COMBAT_INDEX));
+            ret = true;
         }
 
         // Backwards compatibility for the fixes to BR#2873.
@@ -2314,6 +2350,7 @@ public final class Specification implements OptionContainer {
             if (limit != null) {
                 limit.setOperator(Limit.Operator.GE);
                 limit.getRightHandSide().setValue(1);
+                ret = true;
             }
         }
         // end @compat 0.11.3
@@ -2328,12 +2365,14 @@ public final class Specification implements OptionContainer {
             scope.setType("model.goods.lumber");
             m.addScope(scope);
             hardyPioneer.addModifier(m);
+            ret = true;
         }
 
         // Added modifier to Coronado
         if (!coronado.hasModifier(Modifier.EXPOSED_TILES_RADIUS)) {
             coronado.addModifier(new Modifier(Modifier.EXPOSED_TILES_RADIUS,
                     3.0f, Modifier.ModifierType.ADDITIVE, coronado, 0));
+            ret = true;
         }
         // end @compat 0.11.5
 
@@ -2350,6 +2389,7 @@ public final class Specification implements OptionContainer {
                             + ((st.isCapital()) ? ".capital" : "")
                             + ((scope == null) ? "" : ".extra");
                         pt.setId(id);
+                        ret = true;
                     }
                 }
             }
@@ -2363,12 +2403,14 @@ public final class Specification implements OptionContainer {
             Ability uc = new Ability(Ability.UPGRADE_CONVERT, casas, true);
             addAbility(uc);
             casas.addAbility(uc);
+            ret = true;
         }
 
         // Added mercenary-price to manOWar
         UnitType mow = getUnitType("model.unit.manOWar");
         if (mow != null && mow.getMercenaryPrice() < 0) {
             mow.setMercenaryPrice(10000);
+            ret = true;
         }
         // Old manOWars required independenceDeclared which was moved to
         // independentNation a while back, but surfaced again in old games
@@ -2376,6 +2418,7 @@ public final class Specification implements OptionContainer {
         if (mow != null && mow.requiresAbility(maidId)) {
             mow.removeRequiredAbility(maidId);
             mow.addRequiredAbility(Ability.INDEPENDENT_NATION, true);
+            ret = true;
         }
 
         // Added canBeSurrendered ability to all the REF units.
@@ -2387,9 +2430,11 @@ public final class Specification implements OptionContainer {
             if (!ut.containsAbilityKey(Ability.CAN_BE_SURRENDERED)) {
                 ut.addAbility(new Ability(Ability.CAN_BE_SURRENDERED, null,
                         "model.unit.artillery".equals(ut.getId())));
+                ret = true;
             }
         }
         // end @compat 0.11.6
+        return ret;
     }
 
     /**
