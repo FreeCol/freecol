@@ -483,16 +483,19 @@ public class Connection implements Closeable {
      */
     protected final void logMessage(Message message, boolean send) {
         if (this.lw == null || message == null) return;
-        synchronized (this.lw) {
-            try {
+        // Catch *all* failures.  Logging must not crash the game.
+        // Only XMLStreamException is visible, but other odd parse
+        // errors have been sighted.
+        try {
+            synchronized (this.lw) {
                 this.lw.writeComment(this.name
                     + ((send) ? SEND_SUFFIX : REPLY_SUFFIX));
                 message.toXML(this.lw);
                 this.lw.writeCharacters(END_OF_STREAM_ARRAY, 0,
                                         END_OF_STREAM_ARRAY.length);
                 this.lw.flush();
-            } catch (XMLStreamException xse) {} // Ignore log failure
-        }
+            }
+        } catch (Exception ex) {}
     }
     
 
