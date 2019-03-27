@@ -69,6 +69,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * This class encapsulates any parts of the "specification" for
@@ -180,6 +182,8 @@ public final class Specification implements OptionContainer {
         /**
          * {@inheritDoc}
          */
+        @SuppressFBWarnings(value="DLC_DUBIOUS_LIST_COLLECTION",
+                            justification="List required externally")
         @Override
         public void readChildren(FreeColXMLReader xr)
             throws XMLStreamException {
