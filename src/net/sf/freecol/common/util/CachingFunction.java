@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 /**
  * Wrapper for a Function that caches its results.
@@ -49,6 +51,8 @@ public class CachingFunction<T, R> implements Function<T, R> {
     /**
      * {@inheritDoc}
      */
+    @SuppressFBWarnings(value="MUI_CONTAINSKEY_BEFORE_GET",
+                        justification="Deliberate to all null values")
     public R apply(T t) {
         R result;
         // Normally we would just use get(), but this is a general routine
