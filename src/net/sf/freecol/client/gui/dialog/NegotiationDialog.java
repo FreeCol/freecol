@@ -1007,7 +1007,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             panel.add(new JLabel("Version = " + agreement.getVersion()));
         }
-        panel.setPreferredSize(panel.getPreferredSize());
 
         String str;
         List<ChoiceItem<DiplomaticTrade>> c = choices();
