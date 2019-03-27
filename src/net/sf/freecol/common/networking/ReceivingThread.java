@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -231,9 +232,12 @@ final class ReceivingThread extends Thread {
      */
     private boolean stopThread() {
         if (!stopRun()) return false;
-        for (NetworkReplyObject o : this.waitingThreads.values()) {
-            o.interrupt();
+        // Explicit extraction from waitingThreads before iterating
+        Collection<NetworkReplyObject> nros;
+        synchronized (this.waitingThreads) {
+            nros = this.waitingThreads.values();
         }
+        for (NetworkReplyObject o : nros) o.interrupt();
         return true;
     }
         
