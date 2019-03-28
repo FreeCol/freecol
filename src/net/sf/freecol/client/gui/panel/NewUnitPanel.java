@@ -80,8 +80,6 @@ public class NewUnitPanel extends FreeColPanel {
             europe.getUnitPrice(ut));
 
         okButton.setText(Messages.message("close"));
-
-        update();
     }
 
     /**

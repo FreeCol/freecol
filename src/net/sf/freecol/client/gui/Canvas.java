@@ -2327,7 +2327,9 @@ public final class Canvas extends JDesktopPane {
     public void showPurchasePanel() {
         PurchasePanel panel = getExistingFreeColPanel(PurchasePanel.class);
         if (panel == null) {
-            showFreeColPanel(new PurchasePanel(freeColClient), null, false);
+            PurchasePanel pp = new PurchasePanel(freeColClient);
+            pp.update();
+            showFreeColPanel(pp, null, false);
         }
     }
 
@@ -2564,7 +2566,9 @@ public final class Canvas extends JDesktopPane {
     public void showTrainPanel() {
         TrainPanel panel = getExistingFreeColPanel(TrainPanel.class);
         if (panel == null) {
-            showFreeColPanel(new TrainPanel(freeColClient), null, false);
+            TrainPanel tp = new TrainPanel(freeColClient);
+            tp.update();
+            showFreeColPanel(tp, null, false);
         }
     }
 
