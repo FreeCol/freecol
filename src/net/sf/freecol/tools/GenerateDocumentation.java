@@ -97,7 +97,7 @@ public class GenerateDocumentation {
                 line = bufferedReader.readLine();
             }
         } catch (IOException ioe) {
-            System.err.println("Error reading resources: " + ioe.toString());
+            System.err.println("Error reading resources: " + ioe);
         }
     }
 
@@ -202,8 +202,7 @@ public class GenerateDocumentation {
                         stylesheet = factory.newTransformer(xsl);
                     } catch (TransformerException tce) {
                         System.err.println("Problem with " + XSL + " at: "
-                            + tce.getLocationAsString()
-                            + "\n" + tce.toString());
+                            + tce.getLocationAsString() + '\n' + tce);
                         continue;
                     }
 
@@ -213,7 +212,7 @@ public class GenerateDocumentation {
                     stylesheet.transform(request, response);
                 }
                 catch (TransformerException e) {
-                    System.err.println("Transformation error: " + e.toString());
+                    System.err.println("Transformation error: " + e);
                 }
             }
         }

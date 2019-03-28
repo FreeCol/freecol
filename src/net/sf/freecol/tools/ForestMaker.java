@@ -151,17 +151,18 @@ public class ForestMaker {
             String baseName = sourceDirectory.getName();
             File destinationDirectory = new File(DESTDIR, baseName);
             if (!destinationDirectory.exists()) {
-                System.out.println("Destination directory " + destinationDirectory.getPath()
-                                           + " does not exist.");
+                System.out.println("Destination directory "
+                    + destinationDirectory.getPath() + " does not exist.");
                 continue;
             }
             File[] imageFiles = sourceDirectory.listFiles();
             if (imageFiles == null) {
-                System.out.println("No images found in source directory " + arg + ".");
+                System.out.println("No images found in source directory "
+                    + arg + ".");
                 continue;
             } else {
-                System.out.println(imageFiles.length + " images found in source directory "
-                                           + arg + ".");
+                System.out.println(imageFiles.length
+                    + " images found in source directory " + arg + ".");
             }
             List<BufferedImage> images = new ArrayList<>(imageFiles.length);
             int maximumHeight = 0;
@@ -173,7 +174,7 @@ public class ForestMaker {
                         maximumHeight = Math.min(image.getHeight(), maximumHeight);
                     } catch(IOException e) {
                         System.err.println("Unable to load image "
-                            + imageFile.getName() + ":\n" + e.toString());
+                            + imageFile.getName() + ":\n" + e);
                     }
                 }
             }

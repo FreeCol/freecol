@@ -67,8 +67,7 @@ public class TranslationReport {
                 }
             });
         if (languageFiles == null) {
-            System.err.println("No language files found in "
-                + directory.toString());
+            System.err.println("No language files found in " + directory);
             System.exit(1);
         }
 

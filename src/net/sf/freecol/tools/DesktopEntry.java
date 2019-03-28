@@ -71,7 +71,7 @@ public class DesktopEntry {
             });
             if (sourceFiles == null) {
                 System.err.println("No messages files found in "
-                    + SOURCE_DIRECTORY.toString());
+                    + SOURCE_DIRECTORY);
                 System.exit(1);
             }
 

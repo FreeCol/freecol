@@ -62,7 +62,7 @@ public class MergeTranslations {
             });
         if (sourceFiles == null) {
             System.err.println("No messages files found in "
-                + sourceDirectory.toString());
+                + sourceDirectory);
             System.exit(1);
         }
         
@@ -127,7 +127,7 @@ public class MergeTranslations {
             }
         } catch (IOException ioe) {
             System.err.println("Error reading file " + file.getName()
-                + ": " + ioe.toString());
+                + ": " + ioe);
         }
         return result;
     }

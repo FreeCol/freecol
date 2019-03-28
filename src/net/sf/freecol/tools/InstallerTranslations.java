@@ -143,8 +143,7 @@ public class InstallerTranslations {
                 }
             });
         if (sourceFiles == null) {
-            System.err.println("No messages files found in "
-                + SOURCE_DIRECTORY.toString());
+            System.err.println("No messages files found in " + SOURCE_DIRECTORY);
             System.exit(1);
         }
 
@@ -219,8 +218,8 @@ public class InstallerTranslations {
                 line = bufferedReader.readLine();
             }
         } catch (IOException ioe) {
-            System.err.println("Error reading file: "
-                + file.getName() + ": " + ioe.toString());
+            System.err.println("Error reading file: " + file.getName()
+                + ": " + ioe);
         }
         return result;
     }
