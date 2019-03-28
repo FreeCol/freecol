@@ -782,9 +782,14 @@ public class ClientOptions extends OptionGroup {
      */
     public Point getPanelPosition(String className) {
         OptionGroup etc = getOptionGroup(ETC);
-        return (etc == null) ? null
-            : new Point(etc.getInteger(className + ".x"),
-                        etc.getInteger(className + ".y"));
+        try {
+            return (etc == null) ? null
+                : new Point(etc.getInteger(className + ".x"),
+                    etc.getInteger(className + ".y"));
+        } catch (Exception ex) {
+            logger.log(Level.FINEST, "Missing position option", ex);
+            return null;
+        }
     }
 
     /**
@@ -796,9 +801,14 @@ public class ClientOptions extends OptionGroup {
      */
     public Dimension getPanelSize(String className) {
         OptionGroup etc = getOptionGroup(ETC);
-        return (etc == null) ? null
-            : new Dimension(etc.getInteger(className + ".w"),
-                            etc.getInteger(className + ".h"));
+        try {
+            return (etc == null) ? null
+                : new Dimension(etc.getInteger(className + ".w"),
+                                etc.getInteger(className + ".h"));
+        } catch (Exception ex) {
+            logger.log(Level.FINEST, "Missing size option", ex);
+            return null;
+        }
     }
 
     /**
