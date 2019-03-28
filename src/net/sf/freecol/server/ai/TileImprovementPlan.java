@@ -119,7 +119,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     /**
      * {@inheritDoc}
      */
-    public void setInitialized() {
+    public final void setInitialized() {
         this.initialized = getType() != null && getTarget() != null;
     }
         

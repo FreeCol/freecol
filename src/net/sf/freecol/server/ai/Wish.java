@@ -122,7 +122,7 @@ public abstract class Wish extends ValuedAIObject {
      *     {@link #getTransportable transportable} assigned to
      *     this {@code Wish} will have to reach.
      */
-    public Location getDestination() {
+    public final Location getDestination() {
         return destination;
     }
 
@@ -131,7 +131,7 @@ public abstract class Wish extends ValuedAIObject {
      *
      * @return The destination {@code AIColony}.
      */
-    public AIColony getDestinationAIColony() {
+    public final AIColony getDestinationAIColony() {
         return (destination instanceof Colony)
             ? getAIMain().getAIColony((Colony)destination)
             : null;

@@ -125,7 +125,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * {@inheritDoc}
      */
-    public void setInitialized() {
+    public final void setInitialized() {
         this.initialized = getPlayer() != null;
     }
 

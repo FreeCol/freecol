@@ -115,7 +115,7 @@ public abstract class Mission extends AIObject {
     /**
      * {@inheritDoc}
      */
-    public void setInitialized() {
+    public final void setInitialized() {
         this.initialized = getAIUnit() != null;
     }
 
