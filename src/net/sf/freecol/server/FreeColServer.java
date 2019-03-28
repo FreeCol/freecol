@@ -1305,7 +1305,7 @@ public final class FreeColServer {
      */
     public ServerPlayer getPlayer(final Connection conn) {
         final Predicate<Player> connPred
-            = matchKeyEquals(conn, p -> p.getConnection());
+            = matchKeyEquals(conn, Player::getConnection);
         return (ServerPlayer)getGame().getPlayer(connPred);
     }
 
