@@ -378,7 +378,7 @@ public class FreeColDebugger {
             }
             debugStream.set(print);
         }
-        print.println(msg);
+        if (print != null) print.println(msg);
     }
 
     /**
