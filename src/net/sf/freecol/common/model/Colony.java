@@ -385,7 +385,7 @@ public class Colony extends Settlement implements TradeLocation {
     /**
      * Set the build queue.
      *
-     * @param newBuildQueue A list of new values for the build queue.
+     * @param buildQueue A list of new values for the build queue.
      */
     public void setBuildQueue(final List<BuildableType> buildQueue) {
         this.buildQueue.setValues(buildQueue);
@@ -403,7 +403,7 @@ public class Colony extends Settlement implements TradeLocation {
     /**
      * Set the population queue.
      *
-     * @param newPopulationQueue A list of new values for the population queue.
+     * @param populationQueue A list of new values for the population queue.
      */
     public void setPopulationQueue(final List<UnitType> populationQueue) {
         this.populationQueue.setValues(populationQueue);

@@ -123,7 +123,7 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Add to the number.
      *
-     * @param add The amount to add.
+     * @param diff The amount to add.
      */
     public final void addToNumber(int diff) {
         this.number += diff;
@@ -263,7 +263,7 @@ public class AbstractUnit extends FreeColObject {
      * Create a predicate to match the type+role of an abstract unit.
      *
      * @param ut The {@code UnitType} to match.
-     * @param ro The role identifier to match.
+     * @param roleId The role identifier to match.
      * @return A suitable {@code Predicate}.
      */
     public static Predicate<AbstractUnit> matcher(UnitType ut, String roleId) {

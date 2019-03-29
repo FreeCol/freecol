@@ -909,8 +909,10 @@ public final class FreeColClient {
      * Log this client out.
      *
      * Called when the ConnectController processes a logout.
+     *
+     * @param inGame Whether the server is in-game.
      */
-    public synchronized void logout(boolean inGame) {
+    public synchronized void logout(@SuppressWarnings("unused") boolean inGame) {
         this.loggedIn = false;
         changeClientState(inGame);
         setGame(null);

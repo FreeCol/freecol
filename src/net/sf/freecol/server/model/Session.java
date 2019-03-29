@@ -77,8 +77,6 @@ public abstract class Session {
 
     /**
      * Register a new session.
-     *
-     * @param session The associated {@code Session}.
      */
     public void register() {
         synchronized (allSessions) {

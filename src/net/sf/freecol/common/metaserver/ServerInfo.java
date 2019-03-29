@@ -150,6 +150,7 @@ public class ServerInfo {
     /**
      * Set the connection information.
      *
+     * @param name The name of the connection.
      * @param address The IP-address of the server.
      * @param port The port number to connect to.
      */

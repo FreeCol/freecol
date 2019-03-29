@@ -614,7 +614,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Get the colony comparator identified by type.
      *
-     * @param The colony comparator option integer value.
+     * @param type The colony comparator option integer value.
      * @return The corresponding colony {@code Comparator}.
      */
     private static Comparator<Colony> getColonyComparatorInternal(int type) {
@@ -750,6 +750,14 @@ public class ClientOptions extends OptionGroup {
         }
     }*/
 
+    /**
+     * Add a new range option.
+     *
+     * @param id The option identifier.
+     * @param gr The group identifier.
+     * @param rank The option rank.
+     * @param entries The options in the range.
+     */
     private void addRangeOption(String id, String gr, int rank,
                                 Map<Integer, String> entries) {
         if (!hasOption(id, RangeOption.class)) {
@@ -764,6 +772,13 @@ public class ClientOptions extends OptionGroup {
         }
     }
 
+    /**
+     * Add a new text option.
+     *
+     * @param id The option identifier.
+     * @param gr The group identifier.
+     * @param val The the text value.
+     */
     private void addTextOption(String id, String gr, String val) {
         if (!hasOption(id, TextOption.class)) {
             TextOption op = new TextOption(id, null);

@@ -101,6 +101,9 @@ public abstract class ServerAPI {
 
     /**
      * Reconnect to the server.
+     *
+     * @return The reestablished {@code Connection}.
+     * @exception IOException on failure to connect.
      */
     public abstract Connection reconnect() throws IOException;
 

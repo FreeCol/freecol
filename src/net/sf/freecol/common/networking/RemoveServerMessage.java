@@ -38,7 +38,7 @@ public class RemoveServerMessage extends ServerInfoMessage {
     /**
      * Create a new {@code RemoveServerMessage}.
      *
-     * @param conn A {@code Connection} to the meta-server.
+     * @param si The {@code ServerInfo} describing the server to remove.
      */
     public RemoveServerMessage(ServerInfo si) {
         super(TAG, si);

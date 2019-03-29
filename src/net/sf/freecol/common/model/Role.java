@@ -247,7 +247,7 @@ public class Role extends BuildableType {
     /**
      * Set the role change list.
      *
-     * @param roleChange The new list of {@code RoleChange}s.
+     * @param roleChanges The new list of {@code RoleChange}s.
      */
     protected final void setRoleChanges(List<RoleChange> roleChanges) {
         if (this.roleChanges == null) {

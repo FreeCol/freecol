@@ -61,8 +61,7 @@ import net.sf.freecol.common.util.Utils;
  * AI-player, which is further subdivided by PlayerType.
  *
  * In addition to storing the name, nation etc of the player, it also
- * stores various defaults for the player.  One example of this is the
- * {@link #getEntryLocation entry location}.
+ * stores various defaults for the player.
  */
 public class Player extends FreeColGameObject implements Nameable {
 
@@ -1415,7 +1414,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the founding fathers in this player's congress.
      *
-     * @param A set of {@code FoundingFather}s in congress.
+     * @param foundingFathers A set of {@code FoundingFather}s in congress.
      */
     protected void setFoundingFathers(Set<FoundingFather> foundingFathers) {
         this.foundingFathers.clear();
@@ -2747,6 +2746,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Clear the history events.
+     *
+     * @param history The new {@code HistoryEvent}s.
      */
     protected void setHistory(List<HistoryEvent> history) {
         synchronized (this.history) {
@@ -2830,7 +2831,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * This method should be used to invalidate the current
      * {@code canSeeTiles} when something significant changes.
-     * The method {@link #resetCanSeeTiles} will be called whenever it
+     * The method {@link #makeCanSeeTiles} will be called whenever it
      * is needed.
      *
      * So what is "significant"?
@@ -2988,7 +2989,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Set the tension map.
      *
-     * @param The new map of tension between players.
+     * @param tension The new map of tension between players.
      */
     protected void setTension(java.util.Map<Player, Tension> tension) {
         this.tension.clear();

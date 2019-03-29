@@ -138,7 +138,6 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Creates a {@code MapGenerator}
      *
-     * @param game The {@code Game} to generate for.
      * @param random The {@code Random} number source to use.
      * @see #generateMap
      */
@@ -150,6 +149,7 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Gets the approximate number of land tiles.
      *
+     * @param game The {@code Game} to look up options in.
      * @return The approximate number of land tiles
      */
     private int getApproximateLandCount(Game game) {

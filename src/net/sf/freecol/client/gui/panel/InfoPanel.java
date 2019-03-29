@@ -77,13 +77,14 @@ public final class InfoPanel extends FreeColPanel {
 
     private static final int SLACK = 5; // Small gap
 
-    /**
-     * Panel for ending the turn.
-     *
-     * @param freeColClient The {@code FreeColClient} for the game.
-     */
+    /** Panel for ending the turn. */
     private static class EndTurnPanel extends FreeColPanel {
 
+        /**
+         * Build a new end panel.
+         *
+         * @param freeColClient The {@code FreeColClient} for the game.
+         */
         public EndTurnPanel(FreeColClient freeColClient) {
             super(freeColClient, null,
                   new MigLayout("wrap 1, center", "[center]", ""));

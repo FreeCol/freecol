@@ -560,9 +560,9 @@ public final class ImageLibrary {
      * @param grayscale If true, return the grayscale version of the image.
      * @return The {@code BufferedImage} found by the {@code ResourceManager}.
      */
-    private static BufferedImage getScaledImageInternal(String id, float scale,
+    private static BufferedImage getScaledImageInternal(String key, float scale,
                                                         boolean grayscale) {
-        return ResourceManager.getImage(id, scale, grayscale);
+        return ResourceManager.getImage(key, scale, grayscale);
     }
 
     /**
@@ -573,10 +573,10 @@ public final class ImageLibrary {
      * @param grayscale If true, return the grayscale version of the image.
      * @return The {@code BufferedImage} found by the {@code ResourceManager}.
      */
-    private static BufferedImage getSizedImageInternal(String id,
+    private static BufferedImage getSizedImageInternal(String key,
                                                        Dimension size,
                                                        boolean grayscale) {
-        return ResourceManager.getImage(id, size, grayscale);
+        return ResourceManager.getImage(key, size, grayscale);
     }
 
     /**

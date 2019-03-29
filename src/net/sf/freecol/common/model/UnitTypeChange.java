@@ -66,6 +66,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
      * Read a unit change from a stream.
      *
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @param spec The {@code Specification} to read within.
      * @exception XMLStreamException if there is a problem reading
      *     the stream.
      */

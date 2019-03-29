@@ -960,8 +960,7 @@ public class ServerPlayer extends Player implements TurnTaker {
      * Given a tile and new radius of visibility, explore unexplored tiles
      * and return those plus the previously invisible tiles.
      *
-     * @param center The center {@code Tile} to explore from.
-     * @param radius A radius to explore to.
+     * @param collection A {@code Collection} of tiles to check.
      * @return A set of newly explored or currently invisible {@code Tile}s.
      */
     public Set<Tile> collectNewTiles(Collection<Tile> collection) {
@@ -4082,6 +4081,7 @@ outer:  for (Effect effect : effects) {
      *
      * @param mercs A list of mercenaries.
      * @param price The price to be charged for them.
+     * @param random A pseudo-random number source.
      * @param cs A {@code ChangeSet} to update.
      */
     public void csAddMercenaries(List<AbstractUnit> mercs, int price,

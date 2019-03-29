@@ -45,10 +45,10 @@ public abstract class MapTransform {
     public abstract void transform(Tile t);
 
     /**
-     * A panel with information about this transformation.
-     * This panel is currently displayed on the
-     * {@link InfoPanel} when selected, but might be
-     * used elsewhere as well.
+     * A panel with information about this transformation.  This panel
+     * is currently displayed on the
+     * {@link net.sf.freecol.client.gui.panel.InfoPanel} when selected,
+     * but might be used elsewhere as well.
      *
      * @return The panel or {@code null} if no panel
      *      has been set.

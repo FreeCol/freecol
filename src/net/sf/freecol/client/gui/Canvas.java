@@ -512,6 +512,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param x The new mouse x position.
      * @param y The new mouse y position.
+     * @return True if the mouse has been dragged.
      */
     public boolean isDrag(int x, int y) {
         final Point drag = getDragPoint();
@@ -1206,7 +1207,9 @@ public final class Canvas extends JDesktopPane {
     /**
      * Tells that a chat message was received.
      *
+     * @param senderName The sender.
      * @param message The chat message.
+     * @param privateChat True if this is a private message.
      */
     public void displayStartChat(String senderName, String message,
                                  boolean privateChat) {
@@ -2539,8 +2542,6 @@ public final class Canvas extends JDesktopPane {
      * Display the trade route input panel for a given trade route.
      *
      * @param newRoute The {@code TradeRoute} to display.
-     * @param callBack The {@code Runnable} that is run when the
-     *     panel closes.
      * @return The {@code TradeRouteInputPanel}.
      */
     public TradeRouteInputPanel showTradeRouteInputPanel(TradeRoute newRoute) {

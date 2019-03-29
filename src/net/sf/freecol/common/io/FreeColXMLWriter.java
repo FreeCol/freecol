@@ -252,6 +252,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * Internal flush, returning what was written.
      *
      * @return The internal buffer containing the flushed data.
+     * @exception XMLStreamException on stream error.
      */
     public StringBuffer flushBuffer() throws XMLStreamException {
         this.xmlStreamWriter.flush();

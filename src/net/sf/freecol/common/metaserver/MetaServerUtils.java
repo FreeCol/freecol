@@ -303,6 +303,7 @@ public class MetaServerUtils {
      * If successful, an update timer will be returned, which will
      * continually send update messages to the meta-server until cancelled.
      *
+     * @param si The {@code ServerInfo} describing the server to register.
      * @return True if the server was registered.
      */
     public static boolean registerServer(ServerInfo si) {
@@ -312,6 +313,7 @@ public class MetaServerUtils {
     /**
      * Remove a public server.
      *
+     * @param si The {@code ServerInfo} describing the server to remove.
      * @return True if the server was removed.
      */
     public static boolean removeServer(ServerInfo si) {
@@ -321,6 +323,7 @@ public class MetaServerUtils {
     /**
      * Update a public server.
      *
+     * @param si The {@code ServerInfo} describing the server to update.
      * @return True if the server was updated.
      */
     public static boolean updateServer(ServerInfo si) {

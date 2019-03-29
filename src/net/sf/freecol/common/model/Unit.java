@@ -1710,7 +1710,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the stop the unit is heading for or at.
      *
-     * @return The target {@code Stop}.
+     * @return The target {@code TradeRouteStop}.
      */
     public TradeRouteStop getStop() {
         return (validateCurrentStop() < 0) ? null
@@ -1720,7 +1720,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the stop the unit is heading for or at.
      *
-     * @return The target {@code Stop}.
+     * @return The target {@code TradeRouteStop}.
      */
     public List<TradeRouteStop> getCurrentStops() {
         if (validateCurrentStop() < 0) return null;
@@ -3884,7 +3884,6 @@ public class Unit extends GoodsLocation
      * doing its job.
      *
      * @param others A list of other {@code Unit}s to test against.
-     * @param colony The {@code Colony} the units are working in.
      * @return The unit that was replaced by this expert, or null if none.
      */
     public Unit trySwapExpert(List<Unit> others) {

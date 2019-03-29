@@ -403,7 +403,8 @@ public class NativeTrade extends FreeColGameObject {
     /**
      * Is another native trade compatible with this one?
      *
-     * @return nt The other {@code NativeTrade}.
+     * @param nt The other {@code NativeTrade}.
+     * @return True if the other trade is compatible.
      */
     public boolean isCompatible(final NativeTrade nt) {
         return this.getKey().equals(nt.getKey());

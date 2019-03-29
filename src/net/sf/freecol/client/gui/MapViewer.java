@@ -781,7 +781,7 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param labelWidth The width of the unit label.
      * @param labelHeight The width of the unit label.
-     * @param tileP The position of the Tile on the screen.
+     * @param tileP The position of the {@code Tile} on the screen.
      * @return The position where to put the label, null if tileP is null.
      */
     public Point calculateUnitLabelPositionInTile(int labelWidth,

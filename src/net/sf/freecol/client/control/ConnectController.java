@@ -54,8 +54,6 @@ import net.sf.freecol.server.FreeColServer.ServerState;
 
 /**
  * The controller responsible for starting a server and connecting to it.
- * {@link PreGameInputHandler} will be set as the input handler when a
- * successful login has been completed,
  */
 public final class ConnectController extends FreeColClientHolder {
 
@@ -238,9 +236,10 @@ public final class ConnectController extends FreeColClientHolder {
      * game should include a map and a full complement of players,
      * including ours.
      *
-     * Otherwise we may still need to select a nation, and
-     * optionally change game or map options (using several
-     * possible messages).  {@link StartGamePanel} does this.
+     * Otherwise we may still need to select a nation, and optionally
+     * change game or map options (using several possible messages).
+     * {@link net.sf.freecol.client.gui.panel.StartGamePanel} does
+     * this.
      *
      * When all the parameters are in place and all players are
      * ready (trivially true in single player, needs checking in
@@ -300,7 +299,7 @@ public final class ConnectController extends FreeColClientHolder {
     // They all ultimately have to establish a connection to the server,
     // and get the game from there, which is done in {@link #login()}.
     // Control then effectively transfers to the handler for the login
-    // message in {@link PreGameInputHandler}.
+    // message.
     //
 
     /**

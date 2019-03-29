@@ -109,6 +109,8 @@ public class DebugUtils {
 
     /**
      * Reconnect utility.
+     *
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     private static void reconnect(FreeColClient freeColClient) {
         freeColClient.getConnectController()

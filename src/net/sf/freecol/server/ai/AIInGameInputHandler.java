@@ -52,8 +52,7 @@ public final class AIInGameInputHandler extends FreeColServerHolder
      * The constructor to use.
      *
      * @param freeColServer The main server.
-     * @param serverPlayer The {@code Player} that is being
-     *     managed by this AIInGameInputHandler.
+     * @param player The {@code Player} to manage.
      * @param aiMain The main AI-object.
      */
     public AIInGameInputHandler(FreeColServer freeColServer,

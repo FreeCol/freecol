@@ -44,6 +44,8 @@ public class SetAvailableMessage extends AttributeMessage {
     /**
      * Create a new {@code SetAvailableMessage}.
      *
+     * @param nation The {@code Nation} to make available.
+     * @param state The {@code NationState} for that nation.
      */
     public SetAvailableMessage(Nation nation, NationState state) {
         super(TAG, NATION_TAG, nation.getId(),

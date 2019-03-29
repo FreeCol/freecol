@@ -71,6 +71,8 @@ public final class PreGameController extends FreeColClientHolder {
 
     /**
      * Handle an addPlayer message.
+     *
+     * @param players The {@code Player}s to add.
      */
     public void addPlayerHandler(List<Player> players) {
         getGame().addPlayers(players);
@@ -102,6 +104,9 @@ public final class PreGameController extends FreeColClientHolder {
 
     /**
      * Handle an error.
+     *
+     * @param template A {@code StringTemplate} describing the error.
+     * @param message A backup string describing the error.
      */
     public void errorHandler(StringTemplate template, String message) {
         getGUI().showErrorMessage(template, message);

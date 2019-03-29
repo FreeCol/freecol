@@ -22,8 +22,9 @@ package net.sf.freecol.common.option;
 
 /**
  * Keeps track of the available game options. New options must be
- * added to the {@link Specification} and each option should be given
- * an unique identifier (defined as a constant in this class).
+ * added to the {@link net.sf.freecol.common.model.Specification} and
+ * each option should be given an unique identifier (defined as a
+ * constant in this class).
  */
 public class GameOptions {
 

@@ -242,6 +242,7 @@ public class ImageResource extends Resource
     /**
      * Load an image from a URI.
      *
+     * @param uri The {@code URI} to load from.
      * @return The loaded {@code BufferedImage}, or null on error.
      */
     private static BufferedImage loadImage(URI uri) {

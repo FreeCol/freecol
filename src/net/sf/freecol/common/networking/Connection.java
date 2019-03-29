@@ -141,7 +141,7 @@ public class Connection implements Closeable {
 
     /**
      * Sets up a new socket with specified host and port and uses
-     * {@link #Connection(Socket, MessageHandler, String)}.
+     * {@link #Connection(Socket, String)}.
      *
      * @param host The host to connect to.
      * @param port The port to connect to.
@@ -540,8 +540,6 @@ public class Connection implements Closeable {
      * Client request.
      *
      * @param message A {@code Message} to process.
-     * @return True if the message was sent, the reply handled, and the
-     *     reply was not an error message.
      * @exception FreeColException on handler failure.
      * @exception IOException if there is a problem sending messages.
      * @exception XMLStreamException if there is a message format problem.

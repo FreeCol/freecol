@@ -48,6 +48,7 @@ public class AddPlayerMessage extends ObjectMessage {
     /**
      * Create a new {@code AddPlayerMessage}.
      *
+     * @param destination An optional {@code Player} that will see this message.
      * @param players A list of {@code Player}s to add.
      */
     public AddPlayerMessage(Player destination, List<Player> players) {

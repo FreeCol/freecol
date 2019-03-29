@@ -111,7 +111,11 @@ public class UserServerAPI extends ServerAPI {
     /**
      * Create a new connection.
      *
+     * @param name The name to associate with the connection.
+     * @param host The name of the host to connect to.
+     * @param port The port to connect to.
      * @return The new <code>Connection</code>.
+     * @exception IOException on failure to connect.
      */
     private static Connection newConnection(String name, String host, int port)
         throws IOException {

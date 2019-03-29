@@ -1147,7 +1147,6 @@ public class Map extends FreeColGameObject implements Location {
      * @param unit An optional {@code Unit} to search for.
      * @param end  The candidate end {@code Location}.
      * @return The actual end location.
-     * @throws IllegalArgumentException If there are any argument problems.
      */
     private Location findRealEnd(Unit unit, Location end) {
         while (true) {
@@ -1319,8 +1318,6 @@ public class Map extends FreeColGameObject implements Location {
      * @param lb An optional {@code LogBuilder} to log to.
      * @return A path starting at the start location and ending at the
      *     end location, or null if none found.
-     * @throws IllegalArgumentException For many reasons, see
-     *     {@link #findRealStart}.
      */
     public PathNode findPath(final Unit unit,
                              final Location start, final Location end,
@@ -1682,7 +1679,7 @@ public class Map extends FreeColGameObject implements Location {
          *
          * @param openMap The list of available nodes.
          * @param openMapQueue The queue of available nodes.
-         * @param cost The provisional cost for the path.
+         * @param f The map of f-values.
          * @param sh A {@code SearchHeuristic} to apply.
          */
         public void add(HashMap<String, PathNode> openMap,

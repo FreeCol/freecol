@@ -91,6 +91,7 @@ public abstract class FreeColObject
     /**
      * Get the FreeColObject class corresponding to a class name.
      *
+     * @param <T> A FreeColObject subclass.
      * @param name The class name.
      * @return The class, or null if none found.
      */
@@ -107,6 +108,7 @@ public abstract class FreeColObject
     /**
      * Get the FreeColObject class for this object.
      *
+     * @param <T> A FreeColObject subclass.
      * @return The class, or null on error.
      */
     @SuppressWarnings("unchecked")
@@ -1080,6 +1082,7 @@ public abstract class FreeColObject
     /**
      * Copy another FreeColObject into this one if it is compatible.
      *
+     * @param <T> The {@code FreeColObject} subclass of the object to copy in.
      * @param other The other object.
      * @return True if the copy in is succesful.
      */
@@ -1096,9 +1099,9 @@ public abstract class FreeColObject
     /**
      * If another object can be copied into this one, 
      *
-     * @param T The {@code FreeColObject} subclass of the object to copy in.
+     * @param <T> The {@code FreeColObject} subclass of the object to copy in.
      * @param other The {@code FreeColObject} to copy in.
-     * @param R The {@code FreeColObject} subclass to copy in to.
+     * @param <R> The {@code FreeColObject} subclass to copy in to.
      * @param returnClass The return class.
      * @return The other object cast to the return class, or null
      *     if incompatible in any way.

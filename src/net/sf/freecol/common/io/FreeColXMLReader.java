@@ -916,8 +916,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
     /**
      * Read a {@code FreeColObject} from a stream.
      *
+     * @param <T> The actual return type.
      * @param game The {@code Game} to look in.
-     * @param returnClass The class to expect.
      * @return The {@code FreeColObject} found.
      * @exception XMLStreamException if there is problem reading the stream.
      */

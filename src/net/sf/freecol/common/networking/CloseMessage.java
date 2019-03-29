@@ -41,6 +41,8 @@ public class CloseMessage extends AttributeMessage {
 
     /**
      * Create a new {@code CloseMessage}.
+     *
+     * @param panel The panel name.
      */
     public CloseMessage(String panel) {
         super(TAG, PANEL_TAG, panel);

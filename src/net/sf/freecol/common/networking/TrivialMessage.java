@@ -90,7 +90,6 @@ public abstract class TrivialMessage extends Message {
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if the stream is corrupt.
-     * @exception FreeColException if the internal message can not be read.
      */
     protected TrivialMessage(String tag, @SuppressWarnings("unused") Game game,
                              FreeColXMLReader xr) throws XMLStreamException {

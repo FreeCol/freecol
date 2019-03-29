@@ -120,6 +120,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Get a stop in the trade route by index.
      *
+     * @param index The index to look up.
      * @return The {@code TradeRouteStop} found, or null if the index
      *     is invalid.
      */

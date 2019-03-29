@@ -106,7 +106,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     /**
      * Sets the maximum number of allowed values.
      *
-     * @param maximumValue The new maximum number of allowed values.
+     * @param maximumNumber The new maximum number of allowed values.
      */
     public void setMaximumNumber(int maximumNumber) {
         this.maximumNumber = maximumNumber;
@@ -161,7 +161,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     /**
      * Set the list option values from another list option.
      *
-     * @param T The list option type.
      * @param lo The other {@code ListOption}.
      */
     protected void setListValues(ListOption<T> lo) {
@@ -304,6 +303,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      *
      * @param xr The {@code FreeColXMLReader} to read from.
      * @return A child typed {@code AbstractOption}.
+     * @exception XMLStreamException if the stream is corrupt.
      */
     @SuppressWarnings("unchecked")
     private AbstractOption<T> readChildOption(FreeColXMLReader xr)

@@ -30,7 +30,7 @@ import net.sf.freecol.common.option.OptionGroup;
 
 
 /**
- * Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
+ * Dialog for changing the {@link net.sf.freecol.common.option.GameOptions}.
  */
 public final class GameOptionsDialog extends OptionsDialog {
 

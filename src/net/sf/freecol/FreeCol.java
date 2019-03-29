@@ -1210,6 +1210,7 @@ public final class FreeCol {
      * Set the meta-server location.
      *
      * @param arg The new meta-server location in HOST:PORT format.
+     * @return True if the location was set.
      */
     private static boolean setMetaServer(String arg) {
         String[] s = arg.split(":");

@@ -117,6 +117,7 @@ public class AnimateAttackMessage extends ObjectMessage {
      * Get a unit by key.
      *
      * @param game The {@code Game} to look up the unit in.
+     * @param key An attribute key to extract the unit identifier with.
      * @return The attacker {@code Unit}.
      */
     private Unit getUnit(Game game, String key) {
@@ -162,6 +163,7 @@ public class AnimateAttackMessage extends ObjectMessage {
     /**
      * Get the attacker tile.
      *
+     * @param game The {@code Game} to look up the tile in.
      * @return The attacker {@code Tile}.
      */
     private Tile getAttackerTile(Game game) {
@@ -172,6 +174,7 @@ public class AnimateAttackMessage extends ObjectMessage {
     /**
      * Get the defender tile.
      *
+     * @param game The {@code Game} to look up the tile in.
      * @return The defender {@code Tile}.
      */
     private Tile getDefenderTile(Game game) {

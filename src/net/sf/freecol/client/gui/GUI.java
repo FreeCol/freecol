@@ -1134,8 +1134,6 @@ public class GUI extends FreeColClientHolder {
      * to a given player.
      *
      * @param tile The {@code Tile} to check for settlements.
-     * @param foriegn If true, use the foreign settlement functionality
-     *     for colonies.
      */
     public final void showTileSettlement(Tile tile) {
         if (tile == null) return;
@@ -1354,6 +1352,9 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the animation position.
      *
+     * @param labelWidth The width of the label.
+     * @param labelHeight The height of the label.
+     * @param tileP The position of the {@code Tile} on the screen.
      * @return A point on the map to place a unit for movement.
      */
     public Point getAnimationPosition(int labelWidth, int labelHeight,
@@ -1562,7 +1563,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Perform an immediate goto to a tile with the active unit.
      *
-     * Called from {@see TilePopup}.
+     * Called from {@link TilePopup}.
      *
      * @param tile The {@code Tile} to go to.
      */
@@ -1571,7 +1572,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Perform an immediate goto to a point on the map.
      *
-     * Called from {@see CanvasMouseListener}.
+     * Called from {@link CanvasMouseListener}.
      *
      * @param x The x coordinate of the goto destination (pixels).
      * @param y The x coordinate of the goto destination (pixels).
@@ -1754,7 +1755,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Change to map transform mode, and select a transform.
      *
-     * @param mt The {@code MapTransform} to select.
+     * @param transform The {@code MapTransform} to select.
      */
     public void changeView(MapTransform transform) {}
     
@@ -2108,8 +2109,12 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Show the high scores panel.
+     *
+     * @param messageId The message identifier.
+     * @param scores The {@code HighScore}s to display.
      */
-    public void showHighScoresPanel(String messageId, List<HighScore> scores) {}
+    public void showHighScoresPanel(String messageId,
+                                    List<HighScore> scores) {}
 
     /**
      * Show a panel for a native settlement.
@@ -2160,7 +2165,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Show the main panel.
      *
-     * @parm userMsg An optional user message to display.
+     * @param userMsg An optional user message to display.
      */
     public void showMainPanel(String userMsg) {}
 
@@ -2379,6 +2384,8 @@ public class GUI extends FreeColClientHolder {
 
     /**
      * Show the Turn Report.
+     *
+     * @param messages The {@code ModelMessage}s that make up the report.
      */
     public void showReportTurnPanel(List<ModelMessage> messages) {}
 

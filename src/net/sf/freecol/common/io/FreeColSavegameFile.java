@@ -89,6 +89,8 @@ public class FreeColSavegameFile extends FreeColDataFile {
      *
      * @param attributes A list of attribute names to peek at.
      * @return A list of corresponding attribute values, or null on error.
+     * @exception IOException if there is a problem reading the attributes.
+     * @exception XMLStreamException on stream error.
      */
     public List<String> peekAttributes(List<String> attributes)
         throws IOException, XMLStreamException {
@@ -116,6 +118,8 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * Gets the save game version from this saved game.
      *
      * @return The saved game version, or negative on error.
+     * @exception IOException if there is a problem reading the attributes.
+     * @exception XMLStreamException on stream error.
      */
     public int getSavegameVersion() throws IOException, XMLStreamException {
         List<String> v = this.peekAttributes(versionList);

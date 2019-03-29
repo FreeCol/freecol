@@ -103,6 +103,7 @@ public class DiplomacyMessage extends ObjectMessage {
      *
      * @param game The {@code Game} this message belongs to.
      * @param xr The {@code FreeColXMLReader} to read from.
+     * @exception XMLStreamException on stream error.
      */
     public DiplomacyMessage(Game game, FreeColXMLReader xr)
         throws XMLStreamException {

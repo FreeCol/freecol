@@ -83,8 +83,8 @@ public class LoginMessage extends ObjectMessage {
     /**
      * Create a new {@code LoginMessage} from a stream.
      *
-     * @param game A {@code Game} (not actually used, the actual game is read
-     *     from the stream).
+     * @param ignoredGame A {@code Game} (not actually used, the
+     *     actual game is read from the stream).
      * @param xr The {@code FreeColXMLReader} to read the message from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
@@ -372,6 +372,7 @@ public class LoginMessage extends ObjectMessage {
      *
      * @param freeColServer The server to connect to.
      * @param connection The incoming {@code Connection}.
+     * @return A {@code ChangeSet} encapsulating the login.
      */
     public ChangeSet loginHandler(FreeColServer freeColServer,
                                   Connection connection) {

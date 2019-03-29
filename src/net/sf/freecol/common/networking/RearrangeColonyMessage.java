@@ -137,6 +137,7 @@ public class RearrangeColonyMessage extends AttributeMessage {
         /**
          * Role comparison for use in rearrangeColony.
          *
+         * @param other The {@code Arrangement} to compare to.
          * @return A comparison value.
          */
         public int roleComparison(Arrangement other) {

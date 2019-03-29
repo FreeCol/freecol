@@ -384,6 +384,7 @@ public class ResourceManager {
      * Gets a color resource with the given name.
      *
      * @param key The name of the resource to query.
+     * @param replacement A fallback color.
      * @return The {@code Color} found, or if not found, the replacement color,
      *     or finally the generic replacement color.
      */

@@ -92,7 +92,6 @@ public class ChangeSet {
          * Check this visibility with respect to a player.
          *
          * @param player The {@code Player} to consider.
-         * @param perhapsResult The result if the visibility is ambiguous.
          * @return If the player satisfies the visibility test return VISIBLE,
          *     or INVISIBLE on failure, or SPECIAL if indeterminate.
          */
@@ -1136,6 +1135,7 @@ public class ChangeSet {
     /**
      * Helper function to add a Message to a ChangeSet.
      *
+     * @param <T> The actual message type.
      * @param see The visibility of this change.
      * @param message The {@code Message} to add.
      * @return The updated {@code ChangeSet}.
@@ -1307,6 +1307,7 @@ public class ChangeSet {
      * Helper function to add a partial update change for an object to
      * a ChangeSet.
      *
+     * @param <T> The actual type of object to add.
      * @param see The visibility of this change.
      * @param fcgo The {@code FreeColGameObject} to update.
      * @param fields The fields to update.
@@ -1432,7 +1433,7 @@ public class ChangeSet {
     /**
      * Merge a change set into this one.
      *
-     * @param cs The other {@code ChangeSet}.
+     * @param other The other {@code ChangeSet}.
      */
     public void merge(ChangeSet other) {
         this.changes.addAll(other.changes);
@@ -1581,6 +1582,7 @@ public class ChangeSet {
      *
      * @param player The {@code Player} to change.
      * @param ai The new AI state.
+     * @return The new {@code ChangeSet}.
      */
     public static ChangeSet aiChange(Player player, boolean ai) {
         return simpleChange(See.all(), new SetAIMessage(player, ai));

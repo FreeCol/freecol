@@ -412,7 +412,7 @@ public class Game extends FreeColGameObject {
      * Gets the {@code FreeColGameObject} with the specified
      * identifier and class.
      *
-     * @param T The actual return type.
+     * @param <T> The actual return type.
      * @param id The object identifier.
      * @param returnClass The expected class of the object.
      * @return The game object, or null if not found.
@@ -432,8 +432,6 @@ public class Game extends FreeColGameObject {
      *
      * @param id The object identifier.
      * @param fcgo The {@code FreeColGameObject} to add to this {@code Game}.
-     * @exception RuntimeArgumentException If the identifier is null or empty,
-     *     or the object is null.
      */
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (id == null || id.isEmpty()) {
@@ -453,9 +451,6 @@ public class Game extends FreeColGameObject {
      *
      * @param id The object identifier.
      * @param fcgo The {@code FreeColGameObject} to add to this {@code Game}.
-     * @exception RuntimeArgumentException If either the identifier or
-     *     object are null, or there is already an object with present with
-     *     the given identifier.
      */
     public void addFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (id == null || id.isEmpty()) {
@@ -507,8 +502,9 @@ public class Game extends FreeColGameObject {
     /**
      * Update a {@code FreeColGameObject} from another.
      *
-     * @param T The type of object to update.
+     * @param <T> The type of object to update.
      * @param other The other object.
+     * @param create If true, create the object if it is missing.
      * @return The resulting object after update.
      */
     public <T extends FreeColGameObject> T update(T other, boolean create) {
@@ -520,7 +516,7 @@ public class Game extends FreeColGameObject {
      * Update a {@code FreeColGameObject} from another, optionally allowing
      * missing objects to be created.
      *
-     * @param T The type of object to update.
+     * @param <T> The type of object to update.
      * @param other The other object.
      * @param returnClass The expected class of the object.
      * @param create If true, create missing objects.
@@ -563,9 +559,8 @@ public class Game extends FreeColGameObject {
     /**
      * Convenience wrapper to update several {@code FreeColGameObject}s.
      *
-     * @param T The type of object to update.
+     * @param <T> The type of object to update.
      * @param other The collection of objects to update.
-     * @param returnClass The expected class of the objects.
      * @param create If true, create missing objects.
      * @return The resulting list of updated objects.
      */
@@ -583,7 +578,7 @@ public class Game extends FreeColGameObject {
     /**
      * Update a {@code FreeColGameObject} from a reference to it in an update.
      *
-     * @param T The type of object to update.
+     * @param <T> The type of object to update.
      * @param other The other object.
      * @return The resulting object after update.
      */
@@ -595,7 +590,7 @@ public class Game extends FreeColGameObject {
     /**
      * Update a {@code FreeColGameObject} from a reference to it in an update.
      *
-     * @param T The type of object to update.
+     * @param <T> The type of object to update.
      * @param other The other object.
      * @param returnClass The expected class of the object.
      * @return The resulting object after update.
@@ -611,7 +606,7 @@ public class Game extends FreeColGameObject {
      * Update several {@code FreeColGameObject}s from a list of
      * references to it in an update.
      *
-     * @param T The type of object to update.
+     * @param <T> The type of object to update.
      * @param other The other object.
      * @return The resulting object after update.
      */

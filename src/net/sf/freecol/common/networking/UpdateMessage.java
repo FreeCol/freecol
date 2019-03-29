@@ -62,7 +62,7 @@ public class UpdateMessage extends ObjectMessage {
      * Create a new {@code UpdateMessage}.
      *
      * @param destination The destination {@code Player}.
-     * @param fco A {@code FreeColGameObject}s to add.
+     * @param fcgo A {@code FreeColGameObject}s to add.
      */
     public UpdateMessage(Player destination,
                          FreeColGameObject fcgo) {

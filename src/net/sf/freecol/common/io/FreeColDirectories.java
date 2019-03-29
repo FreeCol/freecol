@@ -591,7 +591,7 @@ public class FreeColDirectories {
     /**
      * Remove disallowed parts of a user supplied file name.
      *
-     * @param The input file name.
+     * @param fileName The input file name.
      * @return A sanitized file name.
      */
     private static String sanitize(String fileName) {

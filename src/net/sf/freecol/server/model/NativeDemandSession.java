@@ -51,6 +51,7 @@ public class NativeDemandSession extends TimedSession {
      *
      * @param unit The {@code Unit} making the demand.
      * @param colony The {@code Colony} where the demand is made.
+     * @param goodsType The {@code GoodsType} to demand.
      * @param amount The amount of goods.
      * @param timeout The amount of time to wait for a response.
      */

@@ -182,7 +182,7 @@ public abstract class Message {
     /**
      * Append a new child.
      *
-     * @param T The child type.
+     * @param <T> The child type.
      * @param fco The new child object.
      */
     abstract protected <T extends FreeColObject> void appendChild(T fco);
@@ -190,7 +190,7 @@ public abstract class Message {
     /**
      * Append a multiple new children.
      *
-     * @param T The child type.
+     * @param <T> The child type.
      * @param fcos The new child objects.
      */
     abstract protected <T extends FreeColObject> void appendChildren(Collection<T> fcos);
@@ -438,7 +438,7 @@ public abstract class Message {
     /**
      * Get a child object.
      *
-     * @param T The actual class of {@code FreeColObject} to get.
+     * @param <T> The actual class of {@code FreeColObject} to get.
      * @param index The index of the child to get.
      * @param returnClass The expected class of child.
      * @return The child object found, or null if the index is invalid or
@@ -459,7 +459,7 @@ public abstract class Message {
     /**
      * Get the child objects.
      *
-     * @param T The actual class of {@code FreeColObject} to get.
+     * @param <T> The actual class of {@code FreeColObject} to get.
      * @param returnClass The expected class of children.
      * @return The children with the expected class.
      */
@@ -629,6 +629,7 @@ public abstract class Message {
      *
      * @param game The {@code Game} within which to construct the message.
      * @param xr A {@code FreeColXMLReader} to read from.
+     * @return The new {@code Message}.
      * @exception FreeColException if there is problem reading the message.
      */
     public static Message read(Game game, FreeColXMLReader xr)

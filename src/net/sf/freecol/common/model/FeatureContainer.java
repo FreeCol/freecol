@@ -456,6 +456,8 @@ public final class FeatureContainer {
 
     /**
      * Copy anther feature container.
+     *
+     * @param other The other {@code FeatureContainer}.
      */
     public void copy(FeatureContainer other) {
         clear();

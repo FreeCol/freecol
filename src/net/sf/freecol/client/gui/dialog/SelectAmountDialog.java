@@ -127,6 +127,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
     /**
      * Verify the contents of the JComboBox.
      *
+     * @param box The {@code JComboBox} to verify.
      * @return True if all is well.
      */
     private boolean verifyWholeBox(JComboBox<Integer> box) {

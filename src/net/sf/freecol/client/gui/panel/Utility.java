@@ -641,7 +641,6 @@ public final class Utility {
      *
      * @param comp The {@code JComponent} to localize.
      * @param template The {@code StringTemplate} to use.
-     * @return The original {@code JComponent}.
      */
     public static void localizeToolTip(JComponent comp,
                                        StringTemplate template) {

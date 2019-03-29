@@ -224,6 +224,7 @@ public final class FreeColServer {
      *
      * @param name An optional name for the server.
      * @param port The TCP port to use for the public socket.
+     * @exception IOException on failure to open the port.
      */
     private FreeColServer(String name, int port) throws IOException {
         this.name = name;
@@ -1211,7 +1212,6 @@ public final class FreeColServer {
      *
      * Public for the map generator.
      *
-     * @param game The {@code Game} to create the map for.
      * @param width The map width.
      * @param height The map height.
      * @return The new empty {@code Map}.

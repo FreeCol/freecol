@@ -3032,8 +3032,8 @@ public final class Specification implements OptionContainer {
      *
      * FIXME: Handles failure to create a needed option badly.
      *
-     * @param R The underlying type encapsulated by the option.
-     * @param T The option type.
+     * @param <R> The underlying type encapsulated by the option.
+     * @param <T> The option type.
      * @param id The option identifier.
      * @param gr The option group identifier.
      * @param defaultValue The default value of the option.

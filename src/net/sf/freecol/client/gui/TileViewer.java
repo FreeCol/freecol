@@ -148,7 +148,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Gets the contained {@code ImageLibrary}.
      *
-     * Public for {@see GUI.getTileImageLibrary}.
+     * Public for {@link GUI#getTileImageLibrary}.
      * 
      * @return The image library;
      */
@@ -188,7 +188,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
      *
-     * Public for {@see GUI.createTileImageWithOverlayAndForest}.
+     * Public for {@link GUI#createTileImageWithOverlayAndForest}.
      *
      * @param type The type of the terrain-image to return.
      * @param size The maximum size of the terrain image to return.
@@ -238,7 +238,7 @@ public final class TileViewer extends FreeColClientHolder {
      * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      * Draws the terrain and improvements.
      *
-     * Public for {@see GUI.createTileImageWithBeachBorderAndItems}.
+     * Public for {@link GUI#createTileImageWithBeachBorderAndItems}.
      *
      * @param tile The Tile to draw.
      * @return The image.
@@ -266,7 +266,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      *
-     * Public for {@see GUI.createTileImage}.
+     * Public for {@link GUI#createTileImage}.
      *
      * @param tile The {@code Tile} to draw.
      * @param player The {@code Player} to draw for.
@@ -295,7 +295,7 @@ public final class TileViewer extends FreeColClientHolder {
      * from the corresponding {@code ColonyTile} of the given
      * {@code Colony}.
      *
-     * Public for {@see GUI.createColonyTileImage}.
+     * Public for {@link GUI#createColonyTileImage}.
      *
      * @param tile The {@code Tile} to draw.
      * @param colony The {@code Colony} to create the visualization
@@ -324,7 +324,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Displays the 3x3 tiles for the TilesPanel in ColonyPanel.
      * 
-     * Public for {@see GUI.displayColonyTles}.
+     * Public for {@link GUI#displayColonyTiles}.
      *
      * @param g The {@code Graphics2D} object on which to draw
      *      the {@code Tile}.

@@ -2360,6 +2360,8 @@ public final class InGameController extends FreeColClientHolder {
 
     /**
      * Handle an addPlayer message.
+     *
+     * @param players The {@code Player}s to add.
      */
     public void addPlayerHandler(List<Player> players) {
         getGame().addPlayers(players);
@@ -2901,6 +2903,8 @@ public final class InGameController extends FreeColClientHolder {
 
     /**
      * Close any open GUI menus.
+     *
+     * @param panel The identifier for the panel to close.
      */
     public void closeHandler(String panel) {
         getGUI().closePanel(panel);

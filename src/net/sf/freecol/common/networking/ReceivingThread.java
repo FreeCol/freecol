@@ -290,8 +290,7 @@ final class ReceivingThread extends Thread {
      * Listens to the InputStream and calls the message handler for
      * each message received.
      * 
-     * @exception IOException If thrown by the
-     *     {@link FreeColNetworkInputStream}.
+     * @exception IOException on low level IO problems.
      * @exception SAXException if a problem occured during parsing.
      * @exception XMLStreamException if a problem occured during parsing.
      */

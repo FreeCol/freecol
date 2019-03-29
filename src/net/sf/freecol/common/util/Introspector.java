@@ -311,7 +311,7 @@ public class Introspector {
     /**
      * Get a constructor for a given class and arguments.
      *
-     * @param T The type to construct.
+     * @param <T> The type to construct.
      * @param cl The base class.
      * @param types The types of the constructor arguments.
      * @return The constructor found, or null on error.
@@ -329,7 +329,7 @@ public class Introspector {
     /**
      * Construct a new instance.
      *
-     * @param T The type to construct.
+     * @param <T> The type to construct.
      * @param constructor The {@code Constructor} to use.
      * @param params The constructor parameters.
      * @return The instance created, or null on error.

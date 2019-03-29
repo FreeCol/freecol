@@ -83,7 +83,6 @@ public class MonarchSession extends Session {
      * Primitive level to finishing the session with the given result.
      *
      * @param result The result of the session, null means ignored.
-     * @param random A pseudo-random number source.
      * @param cs A {@code ChangeSet} to update.
      */
     private void completeInternal(Boolean result, ChangeSet cs) {
