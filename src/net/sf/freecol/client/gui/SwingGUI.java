@@ -1104,8 +1104,7 @@ public class SwingGUI extends GUI {
             change = true;
             // Bring the selected tile along with the unit.
             Tile tile = (unit == null) ? null : unit.getTile();
-            changeSelectedTile(tile, getClientOptions()
-                .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT));
+            changeSelectedTile(tile, true);
 
             // Switch the blink state.
             if (unit != null) {
@@ -1117,7 +1116,6 @@ public class SwingGUI extends GUI {
 
         if (change) updateMapControls();
         updateMenuBar(); // TODO: check
-        // System.err.println("CV " + unit + " " + change);
     }
 
     /**
