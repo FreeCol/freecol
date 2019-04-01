@@ -76,8 +76,6 @@ public class ChangeSet {
         private static final int ALL = 1;
         private static final int PERHAPS = 0;
         private static final int ONLY = -1;
-        private static final See SEE_ALL = new See(ALL);
-        private static final See SEE_PERHAPS = new See(PERHAPS);
         private Player seeAlways;
         private Player seePerhaps;
         private Player seeNever;
@@ -111,20 +109,20 @@ public class ChangeSet {
         /**
          * Make this change visible to all players.
          *
-         * @return SEE_ALL.
+         * @return See(ALL).
          */
         public static See all() {
-            return SEE_ALL;
+            return new See(ALL);
         }
 
         /**
          * Make this change visible to all players, provided they can
          * see the objects that are being changed.
          *
-         * @return SEE_PERHAPS.
+         * @return See(PERHAPS).
          */
         public static See perhaps() {
-            return SEE_PERHAPS;
+            return new See(PERHAPS);
         }
 
         /**
