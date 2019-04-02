@@ -61,6 +61,12 @@ public abstract class FreeColAction extends AbstractAction
     public static final String TAG = "action";
 
     /**
+     * There are four versions of the order buttons: normal, rollover,
+     * pressed, disabled.
+     */
+    private static final int ORDER_BUTTON_COUNT = 4;
+    
+    /**
      * A class used by Actions which have a mnemonic. Those Actions should
      * assign this listener to the JMenuItem they are a part of. This captures
      * the mnemonic key press and keeps other menus from processing keys meant
@@ -227,7 +233,7 @@ public abstract class FreeColAction extends AbstractAction
      * @return True if all the order button images are present.
      */
     public boolean hasOrderButtons() {
-        return orderButtonImageCount == 4;
+        return orderButtonImageCount == ORDER_BUTTON_COUNT;
     }
 
     /**
@@ -236,29 +242,16 @@ public abstract class FreeColAction extends AbstractAction
      * @param key The identifier of the action.
      */
     protected void addImageIcons(String key) {
-        orderButtonImageCount = 0;
         List<BufferedImage> images = ImageLibrary.getButtonImages(key);
-        BufferedImage im;
-        if ((im = images.remove(0)) != null) {
-            putValue(BUTTON_IMAGE, new ImageIcon(im));
-            orderButtonImageCount++;
-        }
-        if ((im = images.remove(0)) != null) {
-            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(im));
-            orderButtonImageCount++;
-        }
-        if ((im = images.remove(0)) != null) {
-            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(im));
-            orderButtonImageCount++;
-        }
-        if ((im = images.remove(0)) != null) {
-            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(im));
-            orderButtonImageCount++;
-        }
-
-        if (!hasOrderButtons()) {
-            logger.warning("Missing " + (4-orderButtonImageCount)
-                + " order button images for " + getId());
+        orderButtonImageCount = images.size();
+        if (hasOrderButtons()) {
+            putValue(BUTTON_IMAGE, new ImageIcon(images.remove(0)));
+            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(images.remove(0)));
+            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(images.remove(0)));
+            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(images.remove(0)));
+        } else {
+            logger.warning("Found only " + orderButtonImageCount
+                + " order button images for " + getId() + "/" + key);
         }
     }
 

@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -129,6 +130,12 @@ public final class ImageLibrary {
     private static String RIVER_STYLE_PREFIX
         = "image.tile.model.improvement.river.s";
 
+    /** The action button key prefixes. */
+    private static final List<String> buttonKeys
+        = makeUnmodifiableList("image.miscicon.button.normal.",
+                               "image.miscicon.button.highlighted.",
+                               "image.miscicon.button.pressed.",
+                               "image.miscicon.button.disabled.");
 
     /** Helper to distinguish different types of paths. */
     public enum PathType {
@@ -610,20 +617,14 @@ public final class ImageLibrary {
      * @param key The key to look up.
      * @return The list of button images found.
      */
-    public static List<BufferedImage> getButtonImages(String key) {
+    public static List<BufferedImage> getButtonImages(final String key) {
         List<BufferedImage> ret = new ArrayList<>();
-        final String normalKey = "image.miscicon.button.normal." + key;
-        ret.add((!ResourceManager.hasImageResource(normalKey)) ? null
-            : getUnscaledImage(normalKey));
-        final String highlightedKey = "image.miscicon.button.highlighted." + key;
-        ret.add((!ResourceManager.hasImageResource(highlightedKey)) ? null
-            : getUnscaledImage(highlightedKey));
-        final String pressedKey = "image.miscicon.button.pressed." + key;
-        ret.add((!ResourceManager.hasImageResource(pressedKey)) ? null
-            : getUnscaledImage(pressedKey));
-        final String disabledKey = "image.miscicon.button.disabled." + key;
-        ret.add((!ResourceManager.hasImageResource(disabledKey)) ? null
-            : getUnscaledImage(disabledKey));
+        for (String base : buttonKeys) {
+            String k = base + key;
+            if (ResourceManager.hasImageResource(k)) {
+                ret.add(getUnscaledImage(k));
+            }
+        }
         return ret;
     }
         
