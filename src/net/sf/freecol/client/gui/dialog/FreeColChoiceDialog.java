@@ -24,6 +24,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
@@ -65,8 +66,9 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
                                List<ChoiceItem<T>> choices) {
         this(freeColClient, frame);
 
-        initializeChoiceDialog(frame, modal, Utility.localizedTextArea(tmpl),
-                               icon, cancelKey, choices);
+        initializeChoiceDialog(frame, modal,
+            Utility.localizedLabel(tmpl, icon, SwingConstants.LEFT),
+            null, cancelKey, choices);
     }
 
 
