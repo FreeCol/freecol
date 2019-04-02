@@ -793,6 +793,16 @@ public final class ImageLibrary {
     public BufferedImage getObjectImage(FreeColObject display, Dimension size) {
         return getObjectImageInternal(display, size);
     }
+
+    /**
+     * Get the generic placeholder image.
+     *
+     * @return The placeholder {@code BufferedImage}.
+     */     
+    public static BufferedImage getPlaceholderImage() {
+        return getSizedImageInternal("image.unit.placeholder",
+                                     ICON_SIZE, false);
+    }
     
     public static BufferedImage getReplacementImage(Dimension size) {
         return getSizedImageInternal(ResourceManager.REPLACEMENT_IMAGE, size, false);

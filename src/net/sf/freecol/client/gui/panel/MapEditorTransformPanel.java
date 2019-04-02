@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -375,10 +376,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private ResourceType getResourceChoice(List<ResourceType> resources) {
         final Function<ResourceType, ChoiceItem<ResourceType>> mapper
             = rt -> new ChoiceItem<ResourceType>(Messages.getName(rt), rt);
-        return getGUI().getChoice(null, 
-            Messages.message("mapEditorTransformPanel.chooseResource"),
-            "cancel",
-            transform(resources, alwaysTrue(), mapper));
+        StringTemplate tmpl = StringTemplate.template("mapEditorTransformPanel.chooseResource");
+        return getGUI().getChoice(tmpl, "cancel",
+                                  transform(resources, alwaysTrue(), mapper));
     }
 
     public static final class TileTypeTransform extends MapTransform {

@@ -671,17 +671,17 @@ public class GUI extends FreeColClientHolder {
      * General modal choice dialog.
      *
      * @param <T> The choice type.
-     * @param tile An optional {@code Tile} to expose.
-     * @param explain An object explaining the choice.
+     * @param explain A {@code StringTemplate} explaining the choice.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a {@code ChoiceItem}s to choose from.
      * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
-    public final <T> T getChoice(Tile tile, Object explain,
-                                 String cancelKey,
+    public final <T> T getChoice(StringTemplate explain, String cancelKey,
                                  List<ChoiceItem<T>> choices) {
-        return getChoice(tile, explain, (ImageIcon)null, cancelKey, choices);
+        return getChoice(null, explain,
+            new ImageIcon(ImageLibrary.getPlaceholderImage()),
+            cancelKey, choices);
     }
 
     /**

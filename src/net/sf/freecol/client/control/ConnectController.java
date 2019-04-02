@@ -502,12 +502,12 @@ public final class ConnectController extends FreeColClientHolder {
             List<String> names = fcc.getVacantPlayerNames();
             if (names.isEmpty()) return false;
             if (names.contains(name)) break; // Already there, use it
-            String choice = getGUI().getChoice(null,
-                Messages.message("client.choicePlayer"), "cancel",
-                transform(names, alwaysTrue(), n ->
-                    new ChoiceItem<>(Messages.message(StringTemplate
-                            .template("countryName")
-                            .add("%nation%", Messages.nameKey(n))), n)));
+            StringTemplate tmpl = StringTemplate.template("client.choicePlayer");
+            String choice = getGUI().getChoice(tmpl, "cancel",
+                    transform(names, alwaysTrue(), n ->
+                        new ChoiceItem<>(Messages.message(StringTemplate
+                                .template("countryName")
+                                .add("%nation%", Messages.nameKey(n))), n)));
             if (choice == null) return false; // User cancelled
             name = Messages.getRulerName(choice);
             break;
