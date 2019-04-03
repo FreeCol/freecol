@@ -26,8 +26,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.dialog.*;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -45,14 +45,15 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
-     * @param text Text that explains the action to the user.
+     * @param tmpl A {@code StringTemplate} to explain the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okKey A key displayed on the "ok"-button.
      * @param cancelKey A key displayed on the optional "cancel"-button.
      */
     public FreeColStringInputDialog(FreeColClient freeColClient, JFrame frame,
-            boolean modal, String text, String defaultValue,
-            String okKey, String cancelKey) {
+                                    boolean modal, StringTemplate tmpl,
+                                    String defaultValue,
+                                    String okKey, String cancelKey) {
         super(freeColClient, frame);
 
         textField = new JTextField(defaultValue);
@@ -65,7 +66,7 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
             };
         panel.setOpaque(false);
 
-        panel.add(Utility.getDefaultTextArea(text));
+        panel.add(Utility.localizedTextArea(tmpl));
         panel.add(textField, BorderLayout.PAGE_END);
 
         initializeInputDialog(frame, modal, panel, null, okKey, cancelKey);

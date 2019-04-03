@@ -110,17 +110,17 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @param frame The owner frame.
      * @param type The {@code DialogType} to create.
      * @param modal Should this dialog be modal?
-     * @param obj The main object that explains the choice for the user,
-     *     usually just a string, but may be more complex.
+     * @param tmpl A {@code StringTemplate} to explains the choice.
      * @param icon An optional icon to display.
      * @param options A list of options to choose from.
      */
     public FreeColDialog(FreeColClient freeColClient, JFrame frame,
-            DialogType type, boolean modal, Object obj, ImageIcon icon,
-            List<ChoiceItem<T>> options) {
+                         DialogType type, boolean modal, StringTemplate tmpl,
+                         ImageIcon icon, List<ChoiceItem<T>> options) {
         this(freeColClient, frame);
 
-        initializeDialog(frame, type, modal, obj, icon, options);
+        initializeDialog(frame, type, modal,
+                         Utility.localizedTextArea(tmpl), icon, options);
     }
 
 
@@ -159,14 +159,14 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @param frame The owner frame.
      * @param type The {@code DialogType} to create.
      * @param modal Should this dialog be modal?
-     * @param obj The main object that explains the choice for the user,
-     *     usually just a string, but may be more complex.
+     * @param jc The main object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param options A list of options to choose from.
      */
-    protected final void initializeDialog(JFrame frame,
-            DialogType type, boolean modal, Object obj, ImageIcon icon,
-            List<ChoiceItem<T>> options) {
+    protected final void initializeDialog(JFrame frame, DialogType type,
+                                          boolean modal, JComponent jc,
+                                          ImageIcon icon,
+                                          List<ChoiceItem<T>> options) {
         this.modal = modal;
         this.options = options;
         int paneType = JOptionPane.QUESTION_MESSAGE;
@@ -176,12 +176,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         }
         int def = selectDefault(options);
         ChoiceItem<T> ci = (def >= 0) ? options.get(def) : null;
-        if (obj instanceof StringTemplate) {
-            obj = Utility.localizedTextArea((StringTemplate)obj);
-        } else if(obj instanceof String) {
-            obj = Utility.getDefaultTextArea((String)obj);
-        }
-        this.pane = new JOptionPane(obj, paneType, JOptionPane.DEFAULT_OPTION,
+        this.pane = new JOptionPane(jc, paneType, JOptionPane.DEFAULT_OPTION,
                                     icon, selectOptions(), ci);
         this.pane.setBorder(Utility.DIALOG_BORDER);
         this.pane.setOpaque(false);

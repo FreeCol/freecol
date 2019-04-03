@@ -22,11 +22,14 @@ package net.sf.freecol.client.gui.dialog;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -51,17 +54,19 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
      * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
-     * @param obj An object that explains the choice for the user.
+     * @param tmpl A {@code StringTemplate} to explain the choice.
      * @param icon An optional icon to display.
      * @param okKey A key for the text displayed on the "ok"-button.
      * @param cancelKey A key for the text displayed on the "cancel"-button.
      */
-    public FreeColConfirmDialog(final FreeColClient freeColClient, JFrame frame,
-            boolean modal, Object obj, ImageIcon icon,
-            String okKey, String cancelKey) {
+    public FreeColConfirmDialog(FreeColClient freeColClient, JFrame frame,
+                                boolean modal, StringTemplate tmpl,
+                                ImageIcon icon,
+                                String okKey, String cancelKey) {
         this(freeColClient, frame);
 
-        initializeConfirmDialog(frame, modal, obj, icon, okKey, cancelKey);
+        initializeConfirmDialog(frame, modal, Utility.localizedTextArea(tmpl),
+                                icon, okKey, cancelKey);
     }
 
 
@@ -70,18 +75,20 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
      *
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
-     * @param obj The object that explains the choice for the user.
+     * @param jc The object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param okKey The text displayed on the "ok"-button.
      * @param cancelKey The text displayed on the "cancel"-button.
      */
     protected final void initializeConfirmDialog(JFrame frame, boolean modal,
-            Object obj, ImageIcon icon, String okKey, String cancelKey) {
+                                                 JComponent jc, ImageIcon icon,
+                                                 String okKey, String cancelKey) {
         List<ChoiceItem<Boolean>> c = choices();
         c.add(new ChoiceItem<>(Messages.message(okKey), Boolean.TRUE)
             .okOption());
         c.add(new ChoiceItem<>(Messages.message(cancelKey), Boolean.FALSE)
             .cancelOption().defaultOption());
-        initializeDialog(frame, DialogType.QUESTION, modal, obj, icon, c);
+
+        initializeDialog(frame, DialogType.QUESTION, modal, jc, icon, c);
     }
 }

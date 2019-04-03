@@ -644,38 +644,35 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean confirm(String textKey, String okKey, String cancelKey) {
-        return canvas.showConfirmDialog(null, Messages.message(textKey),
-            null, okKey, cancelKey);
+        return canvas.showConfirmDialog(null, StringTemplate.key(textKey),
+                                        null, okKey, cancelKey);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean confirm(Tile tile, StringTemplate template,
-                           ImageIcon icon, String okKey, String cancelKey) {
-        return canvas.showConfirmDialog(tile,
-            Utility.localizedTextArea(template), icon, okKey, cancelKey);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected <T> T getChoice(Tile tile, Object explain, ImageIcon icon,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(tile, explain, icon,
-                                       cancelKey, choices);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getInput(Tile tile, StringTemplate template,
-                           String defaultValue,
+    public boolean confirm(Tile tile, StringTemplate tmpl, ImageIcon icon,
                            String okKey, String cancelKey) {
-        return canvas.showInputDialog(tile, template, defaultValue,
+        return canvas.showConfirmDialog(tile, tmpl, icon, okKey, cancelKey);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected <T> T getChoice(Tile tile, StringTemplate tmpl, ImageIcon icon,
+                              String cancelKey, List<ChoiceItem<T>> choices) {
+        return canvas.showChoiceDialog(tile, tmpl, icon, cancelKey, choices);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getInput(Tile tile, StringTemplate tmpl, String defaultValue,
+                           String okKey, String cancelKey) {
+        return canvas.showInputDialog(tile, tmpl, defaultValue,
                                       okKey, cancelKey);
     }
 

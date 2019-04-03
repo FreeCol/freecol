@@ -1388,9 +1388,8 @@ public final class InGameController extends FreeColClientHolder {
             // units or settlements, it may have a rumour or need
             // other special handling.
             Unit u = getGUI().getChoice(unit.getTile(),
-                                   Messages.message("disembark.text"),
-                                   unit,
-                                   "none", choices);
+                                        StringTemplate.key("disembark.text"),
+                                        unit, "none", choices);
             if (u == null) {
                 // Cancelled, done.
             } else if (u == unit) {
@@ -1431,7 +1430,8 @@ public final class InGameController extends FreeColClientHolder {
             carrier = choices.get(0).getObject();
         } else {
             carrier = getGUI().getChoice(unit.getTile(),
-                Messages.message("embark.text"), unit, "none", choices);
+                                         StringTemplate.key("embark.text"),
+                                         unit, "none", choices);
             if (carrier == null) return false; // User cancelled
         }
 
@@ -1822,7 +1822,7 @@ public final class InGameController extends FreeColClientHolder {
             break;
         case MISSIONARY_INCITE_INDIANS:
             Player enemy = getGUI().getChoice(unit.getTile(),
-                Messages.message("missionarySettlement.inciteQuestion"),
+                StringTemplate.key("missionarySettlement.inciteQuestion"),
                 unit, "missionarySettlement.cancel",
                 transform(getGame().getLiveEuropeanPlayers(player), alwaysTrue(),
                     p -> new ChoiceItem<>(Messages.message(p.getCountryLabel()), p)));
@@ -3974,7 +3974,8 @@ public final class InGameController extends FreeColClientHolder {
                 act = null;
                 if (nti == null) {
                     nti = getGUI().getChoice(unit.getTile(),
-                        Messages.message("buyProposition.text"), is, "nothing",
+                        StringTemplate.key("buyProposition.text"),
+                        is, "nothing",
                         transform(nt.getSettlementToUnit(),
                                   NativeTradeItem::priceIsValid, goodsMapper));
                     if (nti == null) break;
@@ -3995,7 +3996,8 @@ public final class InGameController extends FreeColClientHolder {
                 act = null;
                 if (nti == null) {
                     nti = getGUI().getChoice(unit.getTile(),
-                        Messages.message("sellProposition.text"), is, "nothing",
+                        StringTemplate.key("sellProposition.text"),
+                        is, "nothing",
                         transform(nt.getUnitToSettlement(),
                                   NativeTradeItem::priceIsValid, goodsMapper));
                     if (nti == null) break;
@@ -4015,7 +4017,8 @@ public final class InGameController extends FreeColClientHolder {
             case GIFT:
                 act = null;
                 nti = getGUI().getChoice(unit.getTile(),
-                    Messages.message("gift.text"), is, "cancel",
+                    StringTemplate.key("gift.text"),
+                    is, "cancel",
                     transform(nt.getUnitToSettlement(), alwaysTrue(),
                               goodsMapper));
                 if (nti != null) {

@@ -1578,12 +1578,13 @@ public final class Canvas extends JDesktopPane {
      * @return The corresponding member of the values array to the selected
      *     option, or null if no choices available.
      */
-    public <T> T showChoiceDialog(Tile tile, Object obj, ImageIcon icon,
-                                  String cancelKey, List<ChoiceItem<T>> choices) {
+    public <T> T showChoiceDialog(Tile tile, StringTemplate tmpl,
+                                  ImageIcon icon, String cancelKey,
+                                  List<ChoiceItem<T>> choices) {
         if (choices.isEmpty()) return null;
         FreeColChoiceDialog<T> fcd
-            = new FreeColChoiceDialog<>(freeColClient, frame, true, obj, icon,
-                                         cancelKey, choices);
+            = new FreeColChoiceDialog<>(freeColClient, frame, true, tmpl, icon,
+                                        cancelKey, choices);
         return showFreeColDialog(fcd, tile);
     }
 
@@ -1592,17 +1593,18 @@ public final class Canvas extends JDesktopPane {
      *
      * @param tile An optional {@code Tile} to make visible (not
      *     under the dialog!)
-     * @param obj An object that explains the choice for the user.
+     * @param template A {@code StringTemplate} to explain the choice.
      * @param icon An optional icon to display.
      * @param okKey The text displayed on the "ok"-button.
      * @param cancelKey The text displayed on the "cancel"-button.
      * @return True if the user clicked the "ok"-button.
      */
-    public boolean showConfirmDialog(Tile tile, Object obj, ImageIcon icon,
+    public boolean showConfirmDialog(Tile tile, StringTemplate template,
+                                     ImageIcon icon,
                                      String okKey, String cancelKey) {
         FreeColConfirmDialog fcd
-            = new FreeColConfirmDialog(freeColClient, frame, true, obj, icon,
-                                       okKey, cancelKey);
+            = new FreeColConfirmDialog(freeColClient, frame, true, template,
+                                       icon, okKey, cancelKey);
         return showFreeColDialog(fcd, tile);
     }
 
@@ -1622,8 +1624,8 @@ public final class Canvas extends JDesktopPane {
                                   String okKey, String cancelKey) {
         FreeColStringInputDialog fcd
             = new FreeColStringInputDialog(freeColClient, frame, true,
-                                           Messages.message(template),
-                                           defaultValue, okKey, cancelKey);
+                                           template, defaultValue,
+                                           okKey, cancelKey);
         return showFreeColDialog(fcd, tile);
     }
 
@@ -2241,8 +2243,8 @@ public final class Canvas extends JDesktopPane {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
                 new FreeColStringInputDialog(freeColClient, frame, false,
-                                             Messages.message(template),
-                                             defaultName, "ok", null),
+                                             template, defaultName,
+                                             "ok", null),
                 unit.getTile(), handler));
     }
 
