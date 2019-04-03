@@ -54,6 +54,11 @@ public class AudioResource extends Resource {
 
 
     /**
+     * {@inheritDoc}
+     */
+    public void preload() {}
+
+    /**
      * Gets the file represented by this resource.
      *
      * @return The {@code File} for this resource.

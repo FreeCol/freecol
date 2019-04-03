@@ -31,19 +31,6 @@ import java.net.URI;
 public abstract class Resource {
 
     /**
-     * Implement the Preloadable interface if a Resource has a use for
-     * calls to a preload method.
-     */
-    public interface Preloadable {
-
-        /**
-         * Preload the resource.
-         */
-        public void preload();
-
-    }
-
-    /**
      * Implement the Cleanable interface if a Resource has a use for
      * calls to a clean method.
      */
@@ -53,7 +40,6 @@ public abstract class Resource {
          * Clean the caches inside the resource.
          */
         public void clean();
-
     }
 
 
@@ -63,11 +49,12 @@ public abstract class Resource {
     private final URI resourceLocator;
 
 
+    /**
+     * Trivial constructor.
+     */
     protected Resource() {
-        // empty constructor
-        resourceLocator = null;
+        this.resourceLocator = null;
     }
-
 
     /**
      * Do not use directly.
@@ -85,6 +72,11 @@ public abstract class Resource {
      * @return The {@code URI}.
      */
     public URI getResourceLocator() {
-        return resourceLocator;
+        return this.resourceLocator;
     }
+
+    /**
+     * Preload the resource if possible/meaningful.
+     */
+    public abstract void preload();
 }

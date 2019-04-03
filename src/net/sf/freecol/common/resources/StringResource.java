@@ -51,6 +51,11 @@ public class StringResource extends Resource {
 
 
     /**
+     * {@inheritDoc}
+     */
+    public void preload() {}
+
+    /**
      * Gets the {@code String} represented by this resource.
      *
      * @return The string resource.

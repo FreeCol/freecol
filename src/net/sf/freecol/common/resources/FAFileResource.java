@@ -55,6 +55,11 @@ public class FAFileResource extends Resource {
 
 
     /**
+     * {@inheritDoc}
+     */
+    public void preload() {}
+
+    /**
      * Gets the {@code FAFile} represented by this resource.
      *
      * @return The {@code FAFile} for this resource, or the default

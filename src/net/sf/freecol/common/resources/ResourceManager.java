@@ -190,10 +190,8 @@ public class ResourceManager {
                             return;
                         }
                         // TODO: Filter list before running thread?
-                        if (r instanceof Resource.Preloadable) {
-                            ((Resource.Preloadable)r).preload();
-                            n++;
-                        }
+                        r.preload();
+                        n++;
                     }
                     logger.info("Preload background thread preloaded " + n
                         + " resources.");

@@ -80,6 +80,11 @@ public class FontResource extends Resource {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void preload() {}
+
 
     /**
      * Gets the {@code Font} represented by this resource.  As

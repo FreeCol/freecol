@@ -63,6 +63,11 @@ public class ColorResource extends Resource {
 
 
     /**
+     * {@inheritDoc}
+     */
+    public void preload() {}
+
+    /**
      * Gets the {@code Color} represented by this resource.
      *
      * @return The {@code Color} in it's original size.

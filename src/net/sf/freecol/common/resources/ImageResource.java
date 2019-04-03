@@ -44,8 +44,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * A {@code Resource} wrapping an {@code Image}.
  * @see Resource
  */
-public class ImageResource extends Resource
-                           implements Resource.Preloadable {
+public class ImageResource extends Resource {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
@@ -213,9 +212,6 @@ public class ImageResource extends Resource
             ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         return filter.filter(srcImage, null);
     }
-
-
-    // Interface Preloadable
 
     /**
      * {@inheritDoc}

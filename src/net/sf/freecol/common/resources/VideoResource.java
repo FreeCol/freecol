@@ -49,6 +49,11 @@ public class VideoResource extends Resource {
 
 
     /**
+     * {@inheritDoc}
+     */
+    public void preload() {}
+
+    /**
      * Gets the {@code Video} represented by this resource.
      *
      * @return The {@code Video} in its original size.
