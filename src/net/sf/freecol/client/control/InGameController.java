@@ -2458,7 +2458,7 @@ public final class InGameController extends FreeColClientHolder {
      * Called from CargoPanel, TilePopup.
      *
      * @param unit The {@code Unit} which is to board the carrier.
-     * @param carrier The carrier to board.
+     * @param carrier The location of this Unit.
      * @return True if the unit boards the carrier.
      */
     public boolean boardShip(Unit unit, Unit carrier) {
