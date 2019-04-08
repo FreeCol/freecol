@@ -147,7 +147,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     }
 
     /**
-     * {@inheritDoc}
+     * @param location The Settlement that is located on this Tile
      */
     @Override
     public boolean setLocation(Location location) {
