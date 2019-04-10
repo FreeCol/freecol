@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.awt.FontMetrics;
+import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -61,7 +62,7 @@ public class StringUtils {
      * @return Each of the strings in the given array delimited by the given
      *         string.
      */
-    public static String join(String delimiter, List<String> strings) {
+    public static String join(String delimiter, Collection<String> strings) {
         return join(delimiter, strings.toArray(new String[0]));
     }
 
