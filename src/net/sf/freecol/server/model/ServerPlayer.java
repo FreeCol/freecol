@@ -571,7 +571,7 @@ public class ServerPlayer extends Player implements TurnTaker {
         int land = 0;
         for (Unit u : getUnitSet()) {
             if (u.isNaval()) naval = true; else {
-                if (u.hasAbility(Ability.REF_UNIT)) land++;
+                if (u.hasAbility(Ability.REF_UNIT) && !u.isInEurope()) land++;
             }
         }
         if (naval && land >= landREFUnitsRequired) return false;
