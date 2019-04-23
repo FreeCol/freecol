@@ -523,6 +523,9 @@ public class FreeColDirectories {
         if (!dir.isDirectory()) return "Not a directory: " + path;
         if (!dir.canRead()) return "Can not read directory: " + path;
         dataDirectory = dir;
+        if (!getBaseDirectory().exists()) {
+            return "Base data directory missing from: " + path;
+        }
         return null;
     }
 
