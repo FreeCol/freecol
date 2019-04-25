@@ -89,8 +89,10 @@ public class ResourceManager {
     /**
      * Clean up easily replaced modified copies in caches.
      */
-    public static synchronized void clean() {
-        imageCache.clear();
+    public static void clearImageCache() {
+        synchronized (imageCache) {
+            imageCache.clear();
+        }
     }
 
     /**

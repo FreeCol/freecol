@@ -809,7 +809,7 @@ public final class FreeColClient {
         if (freeColServer != null) {
             freeColServer.getController().shutdown();
             setFreeColServer(null);
-            ResourceManager.clean();
+            ResourceManager.clearImageCache();
         }
     }
 
