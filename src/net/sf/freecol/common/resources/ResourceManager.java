@@ -35,6 +35,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -568,5 +569,27 @@ public class ResourceManager {
     public static Video getVideo(final String key) {
         final VideoResource r = getVideoResource(key);
         return (r != null) ? r.getVideo() : null;
+    }
+
+    /**
+     * Summarize the image resources and image cache contents.
+     *
+     * @param sb A {@code StringBuilder} to summarize to.
+     */
+    public static void summarizeImageResources(StringBuilder sb) {
+        Set<String> keys = mergedContainer.getImageKeySet();
+        sb.append("All keys\n").append(join(" ", keys)).append('\n');
+        Map<Integer,String> decode = new HashMap<>();
+        for (String k : keys) decode.put(k.hashCode(), k);
+        sb.append("Cache\n");
+        synchronized (imageCache) {
+            forEachMapEntry(imageCache, e -> {
+                    Long key = e.getKey();
+                    String rep = ResourceManager.imageUnhash(key);
+                    int i = Integer.parseInt(firstPart(rep, "."));
+                    sb.append(decode.get(i)).append('.')
+                        .append(lastPart(rep, ".")).append('\n');
+                });
+        }
     }
 }

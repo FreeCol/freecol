@@ -273,6 +273,15 @@ public final class ResourceMapping {
     }
 
     /**
+     * Get the complete set of image keys.
+     *
+     * @return A set of image keys.
+     */
+    public Set<String> getImageKeySet() {
+        return imageResources.keySet();
+    }
+    
+    /**
      * Get the image keys in this mapping with a given prefix as a set.
      *
      * @param prefix The prefix to check for.

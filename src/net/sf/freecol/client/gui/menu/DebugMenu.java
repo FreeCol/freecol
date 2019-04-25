@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.Utils.*;
 
@@ -332,7 +333,9 @@ public class DebugMenu extends JMenu {
         //showResourceKeys.setMnemonic(KeyEvent.VK_R);
         this.add(showResourceKeys);
         showResourceKeys.addActionListener((ActionEvent ae) -> {
-                gui.showInformationMessage(ImageLibrary.getImageResourceSummary());
+                StringBuilder sb = new StringBuilder(256);
+                ResourceManager.summarizeImageResources(sb);
+                gui.showInformationMessage(sb.toString());
             });
         showResourceKeys.setEnabled(true);
 

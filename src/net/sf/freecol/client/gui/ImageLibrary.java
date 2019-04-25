@@ -672,34 +672,6 @@ public final class ImageLibrary {
         return getScaledImageInternal(key, NORMAL_SCALE, grayscale);
     }
 
-    /**
-     * Get a summary of the current image resources.
-     *
-     * Called from DebugMenu.
-     *
-     * @return A string summary.
-     */
-    public static String getImageResourceSummary() {
-        StringBuilder sb = new StringBuilder();
-        Map<String, ImageResource> resources
-            = ResourceManager.getImageResources();
-        Map<Integer, String> decode = new HashMap<>();
-        forEach(mapEntriesByKey(resources), e -> {
-                String key = e.getKey();
-                decode.put(key.hashCode(), key);
-                sb.append(key).append('\n');
-            });
-        sb.append("Cache\n");
-        forEachMapEntry(ResourceManager.getImageCache(), e -> {
-                Long key = e.getKey();
-                String rep = ResourceManager.imageUnhash(key);
-                int i = Integer.parseInt(firstPart(rep, "."));
-                sb.append(decode.get(i)).append('.').append(lastPart(rep, "."))
-                    .append('\n');
-            });
-        return sb.toString();
-    }        
-
     public static BufferedImage getInformationPanelSkin(Player player) {
         String key = (player == null) ? "image.skin.InformationPanel"
             : (player.isRebel()) ? "image.skin.InformationPanel.rebel"
