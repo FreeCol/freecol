@@ -57,20 +57,10 @@ public class ResourceManager {
     public static final String REPLACEMENT_STRING = "X";
 
     /**
-     * The following fields are mappings from resource IDs to
-     * resources.  A mapping is defined within a specific context.
-     * See the comment on each field's setter for more information:
+     * All the mappings are merged in order into this single ResourceMapping.
      */
-    private static ResourceMapping baseMapping;
-    private static ResourceMapping tcMapping;
-    private static ResourceMapping scenarioMapping;
-    private static ResourceMapping modMapping;
-
-    /**
-     * All the mappings above merged into this single ResourceMapping
-     * according to precendence.
-     */
-    private static ResourceMapping mergedContainer;
+    private static final ResourceMapping mergedContainer
+        = new ResourceMapping();
 
     /** The thread that handles preloading of resources. */
     private static volatile Thread preloadThread = null;
@@ -83,47 +73,17 @@ public class ResourceManager {
      * Sets the mappings specified in the date/base-directory.
      * Do not access the mapping after the call.
      *
+     * @param name The name of the mapping, for logging purposes.
      * @param mapping The mapping between IDs and files.
      */
-    public static synchronized void setBaseMapping(final ResourceMapping mapping) {
-        baseMapping = mapping;
-        update(mapping != null);
-    }
-
-    /**
-     * Sets the mappings specified for a Total Conversion (TC).
-     * Do not access the mapping after the call.
-     *
-     * @param mapping The mapping between IDs and files.
-     */
-    public static synchronized void setTcMapping(final ResourceMapping mapping) {
-        tcMapping = mapping;
-        update(mapping != null);
-    }
-
-    /**
-     * Sets the mappings specified by mods.
-     * Do not access the mapping after the call.
-     *
-     * @param mapping A list of the mappings between IDs and files.
-     */
-    public static synchronized void setModMapping(final ResourceMapping mapping) {
-        modMapping = mapping;
-        update(mapping != null);
-    }
-
-    /**
-     * Sets the mappings specified in a scenario.
-     * Do not access the mapping after the call.
-     *
-     * @param mapping The mapping between IDs and files.
-     */
-    public static synchronized void setScenarioMapping(final ResourceMapping mapping) {
-        scenarioMapping = mapping;
-        // As this is called when loading a new savegame,
-        // use it as a hint for cleaning up
-        clean();
-        update(mapping != null);
+    public static synchronized void addMapping(String name,
+                                               final ResourceMapping mapping) {
+        logger.info("Resource manager adding mapping " + name);
+        mergedContainer.addAll(mapping);
+        preloadThread = null;
+        // TODO: This should wait for the thread to exit, if one
+        // was running.
+        startBackgroundPreloading();
     }
 
     /**
@@ -131,34 +91,6 @@ public class ResourceManager {
      */
     public static synchronized void clean() {
         imageCache.clear();
-    }
-
-    /**
-     * Updates the resource mappings after making changes.
-     * 
-     * @param newItems If new items have been added.
-     */
-    private static void update(boolean newItems) {
-        logger.finest("update(" + newItems + ")");
-        if (newItems) preloadThread = null;
-        createMergedContainer();
-        if (newItems) {
-            // TODO: This should wait for the thread to exit, if one
-            // was running.
-            startBackgroundPreloading();
-        }
-    }
-
-    /**
-     * Creates a merged container containing all the resources.
-     */
-    private static synchronized void createMergedContainer() {
-        ResourceMapping mc = new ResourceMapping();
-        mc.addAll(baseMapping);
-        mc.addAll(tcMapping);
-        mc.addAll(scenarioMapping);
-        mc.addAll(modMapping);
-        mergedContainer = mc;
     }
 
     /**

@@ -171,7 +171,7 @@ public final class FreeColClient {
                     .addName("%dir%", baseDirectory.getName()))
                 + ((ioeMessage == null) ? "" : "\n" + ioeMessage));
         }
-        ResourceManager.setBaseMapping(baseData.getResourceMapping());
+        ResourceManager.addMapping("base", baseData.getResourceMapping());
 
         // Once the basic resources are in place construct other things.
         this.serverAPI = new UserServerAPI();
@@ -197,7 +197,7 @@ public final class FreeColClient {
         // improvement actions, which depend on the specification.
         // However, this step could probably be delayed.
         FreeColTcFile tcData = FreeColTcFile.getFreeColTcFile("classic");
-        ResourceManager.setTcMapping(tcData.getResourceMapping());
+        ResourceManager.addMapping("tc", tcData.getResourceMapping());
 
         // Swing system and look-and-feel initialization.
         if (!FreeCol.getHeadless()) {
@@ -273,9 +273,9 @@ public final class FreeColClient {
         // Reset the mod resources as a result of the client option update.
         ResourceMapping modMappings = new ResourceMapping();
         for (FreeColModFile f : this.clientOptions.getActiveMods()) {
-            modMappings.addAll(f.getResourceMapping());
+            ResourceManager.addMapping("mod " + f.getId(),
+                                       f.getResourceMapping());
         }
-        ResourceManager.setModMapping(modMappings);
 
         // Initialize Sound (depends on client options)
         this.soundController = new SoundController(this, sound);
@@ -809,7 +809,7 @@ public final class FreeColClient {
         if (freeColServer != null) {
             freeColServer.getController().shutdown();
             setFreeColServer(null);
-            ResourceManager.setScenarioMapping(null);
+            ResourceManager.clean();
         }
     }
 
@@ -874,7 +874,7 @@ public final class FreeColClient {
         setFreeColServer(fcs);
         setSinglePlayer(singlePlayer);
         this.inGameController.setGameConnected();
-        ResourceManager.setScenarioMapping(fsg.getResourceMapping());
+        ResourceManager.addMapping("game", fsg.getResourceMapping());
         return fcs;
     }
     
