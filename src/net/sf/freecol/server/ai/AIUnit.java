@@ -753,7 +753,6 @@ public final class AIUnit extends TransportableAIObject {
             ? (AIMessage.askDisembark(this)
                 && unit.getLocation() == carrier.getLocation())
             : move(direction);
-if (direction == null && !result) net.sf.freecol.FreeCol.trace(logger, "LTFAIL");
         if (result) {
             requestLocalRearrange();
             dropTransport();
