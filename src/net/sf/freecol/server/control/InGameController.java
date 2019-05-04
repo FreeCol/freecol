@@ -3112,7 +3112,7 @@ public final class InGameController extends Controller {
             nt.mergeFrom(session.getNativeTrade());
             if (item == null) {
                 return serverPlayer.clientError("Null sale: " + nt);
-            } else if (!nt.canSell()) {
+            } else if (item.priceIsSet() && !nt.canSell()) {
                 return serverPlayer.clientError("Can not sell: " + nt);
             } else if (find(nt.getUnitToSettlement(),
                             item.goodsMatcher()) == null) {
