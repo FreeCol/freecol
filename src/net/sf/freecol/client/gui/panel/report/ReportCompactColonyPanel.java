@@ -360,7 +360,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
 
     /** Predicate to select the goods to report on. */
     private static final Predicate<GoodsType> reportGoodsPred = gt ->
-        gt.isStorable() && !gt.isTradeGoods();
+            (gt.isStorable() && !gt.isTradeGoods()) || gt.isLibertyType();
     private static final String BUILDQUEUE = "buildQueue.";
     private static final String cAlarmKey = "color.report.colony.alarm";
     private static final String cWarnKey = "color.report.colony.warning";
