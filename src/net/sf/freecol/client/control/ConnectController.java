@@ -19,6 +19,25 @@
 
 package net.sf.freecol.client.control;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.LoadingSavegameInfo;
+import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Game.LogoutReason;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.FreeColServer.ServerState;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,30 +45,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
-
-import net.sf.freecol.FreeCol; 
-import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.FreeColClientHolder;
-import net.sf.freecol.client.gui.ChoiceItem;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.LoadingSavegameInfo;
-import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColModFile;
-import net.sf.freecol.common.io.FreeColSavegameFile;
-import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Game.LogoutReason;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.Connection;
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.FreeColServer.ServerState;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.makeUnmodifiableList;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
 
 
 /**
@@ -351,6 +349,8 @@ public final class ConnectController extends FreeColClientHolder {
         // public server state from the file, and update the client
         // options if possible.
         final ClientOptions options = getClientOptions();
+
+
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
         FreeColSavegameFile fis = null;
@@ -370,6 +370,7 @@ public final class ConnectController extends FreeColClientHolder {
             return false;
         }
         options.merge(fis);
+
         options.fixClientOptions();
         List<String> values = null;
         try {
@@ -414,7 +415,8 @@ public final class ConnectController extends FreeColClientHolder {
             port = -1;
         }
         Messages.loadActiveModMessageBundle(options.getActiveMods(),
-                                            FreeCol.getLocale());
+            FreeCol.getLocale());
+
         if (!fcc.unblockServer(port)) return false;
 
         if (fcc.isLoggedIn()) { // Should not happen, warn and suppress
@@ -425,6 +427,9 @@ public final class ConnectController extends FreeColClientHolder {
         FreeColServer fcs = fcc.startServer(publicServer, singlePlayer, file,
                                             port, serverName);
         if (fcs == null) return false;
+
+        fcs.getGame().getSpecification().loadMods(options.getActiveMods());
+
         fcc.setFreeColServer(fcs);
         fcc.setSinglePlayer(true);
         return requestLogin(FreeCol.getName(), fcs.getHost(), fcs.getPort());
