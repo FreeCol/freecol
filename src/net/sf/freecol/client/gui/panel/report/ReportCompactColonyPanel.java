@@ -22,13 +22,12 @@ package net.sf.freecol.client.gui.panel.report;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -43,10 +42,9 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -108,7 +106,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             /** Binary accumulation operator for goods production. */
             public static final BinaryOperator<GoodsProduction>
                 goodsProductionAccumulator = (g1, g2) -> g1.accumulate(g2);
-            
+
             public int amount;
             public ProductionStatus status;
             public int extra;
@@ -165,9 +163,10 @@ public final class ReportCompactColonyPanel extends ReportPanel {
 
         /** Current production bonus. */
         public final int bonus;
-        
-        /** Preferred size change. */
-        public final int sizeChange;
+
+        public final int unitsToAdd;
+
+        public final int unitsToRemove;
 
         /** Goods production. */
         public final Map<GoodsType, GoodsProduction> production
@@ -183,7 +182,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         public final Map<UnitType, Suggestion> improve = new HashMap<>();
         /** Suggested new unit use. */
         public final Map<UnitType, Suggestion> want = new HashMap<>();
-        
+
         /** Currently building. */
         public final BuildableType build;
         public final int completeTurns;
@@ -215,8 +214,9 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             }
 
             this.bonus = colony.getProductionBonus();
-            
-            this.sizeChange = colony.getPreferredSizeChange();
+
+            this.unitsToAdd = colony.getUnitsToAdd();
+            this.unitsToRemove = colony.getUnitsToRemove();
 
             for (GoodsType gt : goodsTypes) produce(gt);
 
@@ -254,7 +254,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                         spec.getExpertForProducing(e.getValue().goodsType),
                         e.getValue()));
             }
-            
+
             // Make a list of unit types that are not working at their
             // speciality, including the units just standing around.
             final Predicate<Unit> couldWorkPred = u -> {
@@ -389,7 +389,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         this.lib = getImageLibrary();
         final Player player = getMyPlayer();
         this.market = player.getMarket();
-        
+
         // Sort the colonies by continent.
         final Map<Integer, List<Colony>> continents = new HashMap<>();
         for (Colony c : player.getColonyList()) {
@@ -553,22 +553,26 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         reportPanel.add(b, "newline");
 
         // Field: The number of colonists that can be added to a
-        // colony without damaging the production bonus, unless
-        // the colony is inefficient in which case add the number
-        // of colonists to remove to fix the inefficiency.
-        // Colour: Blue if efficient/Red if inefficient.
-        if (s.sizeChange < 0) {
-            c = cAlarm;
-            t = stpld("report.colony.shrinking")
-                    .addName("%colony%", s.colony.getName())
-                    .addAmount("%amount%", -s.sizeChange);
-            b = newButton(cac, Integer.toString(-s.sizeChange), null, c, t);
-        } else if (s.sizeChange > 0) {
+        // colony without damaging the production bonus
+        if (s.unitsToAdd > 0) {
             c = cGood;
             t = stpld("report.colony.growing")
                     .addName("%colony%", s.colony.getName())
-                    .addAmount("%amount%", s.sizeChange);
-            b = newButton(cac, Integer.toString(s.sizeChange), null, c, t);
+                    .addAmount("%amount%", s.unitsToAdd);
+            b = newButton(cac, Integer.toString(s.unitsToAdd), null, c, t);
+        } else {
+            b = null;
+        }
+        reportPanel.add((b == null) ? new JLabel() : b);
+
+        // Field: the number of colonists to remove to fix the inefficiency.
+        // Colour: Blue if efficient/Red if inefficient.
+        if (s.unitsToRemove > 0) {
+            c = s.bonus < 0 ? cAlarm : cGood;
+            t = stpld("report.colony.shrinking")
+                    .addName("%colony%", s.colony.getName())
+                    .addAmount("%amount%", s.unitsToRemove);
+            b = newButton(cac, Integer.toString(s.unitsToRemove), null, c, t);
         } else {
             b = null;
         }
@@ -596,7 +600,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
             if (ti.isNatural()) continue;
             n = 0;
-            boolean center = false; 
+            boolean center = false;
             for (TileImprovementSuggestion tis : s.tileSuggestions) {
                 if (tis.tileImprovementType == ti) {
                     n++;
@@ -839,7 +843,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
 
         // TODO: notWorking?
     }
-    
+
     private List<JButton> unitButtons(final Map<UnitType, Suggestion> suggestions,
                                       List<UnitType> have, Colony colony) {
         final String cac = colony.getId();
@@ -893,11 +897,11 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         // Accumulate all the summaries
         Map<Region, Integer> rRegionMap = new HashMap<>();
         List<TileImprovementSuggestion> rTileSuggestions = new ArrayList<>();
-        int rFamine = 0, rBonus = 0, rSizeChange = 0,
-            teacherLen = 0, improveLen = 0;
+        int rFamine = 0, rBonus = 0, rUnitsToAdd = 0, rUnitsToRemove = 0,
+                teacherLen = 0, improveLen = 0;
         double rNewColonist = 0.0;
         Map<GoodsType, ColonySummary.GoodsProduction> rProduction
-            = new HashMap<>();
+                = new HashMap<>();
         Map<UnitType, Integer> rTeachers = new HashMap<>();
         //List<Unit> rNotWorking = new ArrayList<>();
         //List<UnitType> rCouldWork = new ArrayList<>();
@@ -910,7 +914,10 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             if (s.famine) rFamine++;
             if (s.newColonist > 0) rNewColonist += s.newColonist;
             rBonus += s.bonus;
-            rSizeChange += s.sizeChange;
+            rUnitsToAdd += s.unitsToAdd;
+            if (s.bonus < 0) {
+                rUnitsToRemove += s.unitsToRemove;
+            }
             accumulateMap(rProduction, s.production,
                 ColonySummary.GoodsProduction.goodsProductionAccumulator);
             teacherLen = Math.max(teacherLen, s.teachers.size());
@@ -942,11 +949,14 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                                  stpld("report.colony.name.summary")),
                         "newline");
 
-        // Field: The total of the size change field.
+        // Field: The total units to add.
+        reportPanel.add(newLabel(Integer.toString(rUnitsToAdd), null, cGood, stpld("report.colony.growing.summary")));
+
+        // Field: The total units to remove.
         // Colour: cGood if efficient/cAlarm if inefficient.
-        reportPanel.add(newLabel(Integer.toString(rSizeChange), null,
-                                 (rSizeChange < 0) ? cAlarm : cGood,
-                                 stpld("report.colony.growing.summary")));
+        reportPanel.add(newLabel(Integer.toString(rUnitsToRemove), null,
+                (rUnitsToRemove > 0) ? cAlarm : cGood,
+                stpld("report.colony.shrinking.summary")));
 
         // Field: The number of potential colony tiles that need
         // exploring.
@@ -1010,7 +1020,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         // Field: The required goods rates.
         // Colour: cPlain
         List<JLabel> labels = transform(mapEntriesByValue(rNeeded, descendingDoubleComparator),
-            alwaysTrue(), 
+            alwaysTrue(),
             e -> newLabel(String.format("%4.1f %s", e.getValue(),
                                         Messages.getName(e.getKey())),
                 null, cPlain,
@@ -1042,10 +1052,10 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                                 cPlain, t));
             if (++n >= maxSize) break;
         }
-        
+
         return result;
-    }                
-        
+    }
+
     /**
      * Display the header area for the concise panel.
      *
@@ -1061,7 +1071,10 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                         "newline");
 
         reportPanel.add(newLabel("report.colony.grow.header", null, null,
-                                 stpld("report.colony.grow")));
+                stpld("report.colony.grow")));
+        reportPanel.add(newLabel("report.colony.shrink.header", null, null,
+                stpld("report.colony.shrink")));
+
         reportPanel.add(newLabel("report.colony.explore.header", null, null,
                                  stpld("report.colony.explore")));
         for (TileImprovementType ti : this.spec.getTileImprovementTypeList()) {
