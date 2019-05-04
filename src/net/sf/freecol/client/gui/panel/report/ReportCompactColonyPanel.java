@@ -164,6 +164,8 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         /** Current production bonus. */
         public final int bonus;
 
+        public final int unitCount;
+
         public final int unitsToAdd;
 
         public final int unitsToRemove;
@@ -215,6 +217,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
 
             this.bonus = colony.getProductionBonus();
 
+            this.unitCount = colony.getUnitCount();
             this.unitsToAdd = colony.getUnitsToAdd();
             this.unitsToRemove = colony.getUnitsToRemove();
 
@@ -551,6 +554,11 @@ public final class ReportCompactColonyPanel extends ReportPanel {
                 .add(Messages.message(t)));
         if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
         reportPanel.add(b, "newline");
+
+        // Field: Size
+        c = cGood;
+        t = stpld("report.colony.size");
+        reportPanel.add(newButton(cac, Integer.toString(s.unitCount), null, c, t));
 
         // Field: The number of colonists that can be added to a
         // colony without damaging the production bonus
@@ -897,7 +905,7 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         // Accumulate all the summaries
         Map<Region, Integer> rRegionMap = new HashMap<>();
         List<TileImprovementSuggestion> rTileSuggestions = new ArrayList<>();
-        int rFamine = 0, rBonus = 0, rUnitsToAdd = 0, rUnitsToRemove = 0,
+        int rUnitCount = 0, rUnitsToAdd = 0, rUnitsToRemove = 0,
                 teacherLen = 0, improveLen = 0;
         double rNewColonist = 0.0;
         Map<GoodsType, ColonySummary.GoodsProduction> rProduction
@@ -911,9 +919,8 @@ public final class ReportCompactColonyPanel extends ReportPanel {
             accumulateToMap(rRegionMap, s.colony.getTile().getRegion(), 1,
                             integerAccumulator);
             rTileSuggestions.addAll(s.tileSuggestions);
-            if (s.famine) rFamine++;
             if (s.newColonist > 0) rNewColonist += s.newColonist;
-            rBonus += s.bonus;
+            rUnitCount += s.unitCount;
             rUnitsToAdd += s.unitsToAdd;
             if (s.bonus < 0) {
                 rUnitsToRemove += s.unitsToRemove;
@@ -948,6 +955,9 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         reportPanel.add(newLabel(Messages.message(t), null, cPlain,
                                  stpld("report.colony.name.summary")),
                         "newline");
+
+        // Field: The total units.
+        reportPanel.add(newLabel(Integer.toString(rUnitCount), null, cGood, stpld("report.colony.size.summary")));
 
         // Field: The total units to add.
         reportPanel.add(newLabel(Integer.toString(rUnitsToAdd), null, cGood, stpld("report.colony.growing.summary")));
@@ -1069,6 +1079,9 @@ public final class ReportCompactColonyPanel extends ReportPanel {
         reportPanel.add(newLabel("report.colony.name.header", null, null,
                                  stpld("report.colony.name")),
                         "newline");
+
+        reportPanel.add(newLabel("report.colony.size.header", null, null,
+                stpld("report.colony.size")));
 
         reportPanel.add(newLabel("report.colony.grow.header", null, null,
                 stpld("report.colony.grow")));
