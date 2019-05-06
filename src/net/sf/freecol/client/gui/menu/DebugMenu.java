@@ -32,6 +32,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -39,6 +40,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.debug.FreeColDebugger.DebugMode;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Monarch;
@@ -358,6 +360,23 @@ public class DebugMenu extends JMenu {
                 garbageCollect();
             });
         gc.setEnabled(true);
+
+        // debug modes
+        final String debugBase = Messages.message("menuBar.debug");
+        for (DebugMode dm : DebugMode.values()) {
+            if (dm == DebugMode.MENUS) continue;
+            String name = debugBase + ' ' + dm.toString();
+            JCheckBoxMenuItem cb = new JCheckBoxMenuItem(name,
+                FreeColDebugger.isInDebugMode(dm));
+            cb.addChangeListener((ChangeEvent ev) -> {
+                    JCheckBoxMenuItem src = (JCheckBoxMenuItem)ev.getSource();
+                    FreeColDebugger.setDebugMode(dm, src.isSelected());
+                    gui.refresh();
+                });
+            cb.setOpaque(false);
+            cb.setEnabled(true);
+            this.add(cb);
+        }
 
         this.addSeparator();
     }

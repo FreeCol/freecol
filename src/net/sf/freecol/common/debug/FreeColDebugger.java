@@ -118,12 +118,17 @@ public class FreeColDebugger {
     }
 
     /**
-     * Sets the debug mode
+     * Set a debug mode.
      *
-     * @param mode The new debug mode.
+     * @param mode The {@code DebugMode} to set.
+     * @param val The value to set to.
      */
-    private static void setDebugMode(int mode) {
-        FreeColDebugger.debugMode = mode;
+    public static void setDebugMode(DebugMode mode, boolean val) {
+        if (val) {
+            enableDebugMode(mode);
+        } else {
+            disableDebugMode(mode);
+        }
     }
 
     /**
@@ -133,6 +138,17 @@ public class FreeColDebugger {
      */
     public static void enableDebugMode(DebugMode mode) {
         FreeColDebugger.debugMode |= 1 << mode.ordinal();
+    }
+
+    /**
+     * Disable a particular debug mode.
+     *
+     * @param mode The {@code DebugMode} to disable.
+     */
+    private static void disableDebugMode(DebugMode mode) {
+        if (mode != DebugMode.MENUS) { // Can not leave menus mode!
+            FreeColDebugger.debugMode &= ~(1 << mode.ordinal());
+        }
     }
 
     /**
