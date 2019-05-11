@@ -891,21 +891,22 @@ public final class ColonyPanel extends PortPanel
     }
 
     private void updateNetProductionPanel() {
+        final FreeColClient freeColClient = getFreeColClient();
         final Colony colony = getColony();
         final Specification spec = colony.getSpecification();
         // FIXME: find out why the cache needs to be explicitly invalidated
         colony.invalidateCache();
-        netProductionPanel.removeAll();
 
+        netProductionPanel.removeAll();
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             int amount = colony.getAdjustedNetProductionOf(goodsType);
             if (amount != 0) {
-                netProductionPanel.add(new ProductionLabel(getFreeColClient(),
+                netProductionPanel.add(new ProductionLabel(freeColClient,
                         new AbstractGoods(goodsType, amount)));
             }
         }
-
         netProductionPanel.revalidate();
+        netProductionPanel.repaint();
     }
 
     private void updateOutsideColonyPanel() {
