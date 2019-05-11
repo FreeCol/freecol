@@ -364,13 +364,18 @@ public class DebugMenu extends JMenu {
         // debug modes
         final String debugBase = Messages.message("menuBar.debug");
         for (DebugMode dm : DebugMode.values()) {
-            if (dm == DebugMode.MENUS) continue;
+            if (dm == DebugMode.MENUS) continue; // Must be on already
             String name = debugBase + ' ' + dm.toString();
             JCheckBoxMenuItem cb = new JCheckBoxMenuItem(name,
                 FreeColDebugger.isInDebugMode(dm));
             cb.addChangeListener((ChangeEvent ev) -> {
                     JCheckBoxMenuItem src = (JCheckBoxMenuItem)ev.getSource();
                     FreeColDebugger.setDebugMode(dm, src.isSelected());
+                    // Special processing for COMMS
+                    if (dm == DebugMode.COMMS) {
+                        DebugUtils.setCommsLogging(freeColClient, src.isSelected());
+                    }
+                    // Show result
                     gui.refresh();
                 });
             cb.setOpaque(false);

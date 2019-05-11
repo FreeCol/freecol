@@ -1006,6 +1006,17 @@ public class DebugUtils {
     }
 
     /**
+     * Set COMMS logging.
+     *
+     * @param log If true, enable COMMS logging.
+     */
+    public static void setCommsLogging(final FreeColClient freeColClient,
+                                       boolean log) {
+        final FreeColServer server = freeColClient.getFreeColServer();
+        if (server != null) server.getServer().setLogging(log);
+    }
+    
+    /**
      * Debug action to set the next monarch action.
      *
      * Called from the debug menu.
