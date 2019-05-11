@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -72,6 +73,16 @@ public class HighSeas extends UnitLocation {
         return this.destinations;
     }
 
+    /**
+     * Convenience debug function to collect the destination ids.
+     *
+     * @return A string representation of the destination identifiers.
+     */
+    public final String destinationsToString() {
+        return join(",", transform(this.destinations, alwaysTrue(),
+                                   Location::getId));
+    }
+        
     /**
      * Set the destination list.
      *

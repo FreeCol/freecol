@@ -2850,15 +2850,17 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         HighSeas highSeas = serverPlayer.getHighSeas();
         Location current = unit.getDestination();
+        List<Location> destinations = highSeas.getDestinations();
         boolean others = false; // Notify others?
         boolean invalid = false; // Not a highSeas move?
 
         if (!unit.getType().canMoveToHighSeas()) {
             invalid = true;
         } else if (destination instanceof Europe) {
-            if (!highSeas.getDestinations().contains(destination)) {
+            if (!destinations.contains(destination)) {
                 return serverPlayer.clientError("HighSeas does not connect to: "
-                    + destination.getId());
+                    + destination.getId()
+                    + " in " + highSeas.destinationsToString());
             } else if (unit.getLocation() == highSeas) {
                 if (!(current instanceof Europe)) {
                     // Changed direction
@@ -2882,9 +2884,10 @@ public final class InGameController extends Controller {
                 invalid = true;
             }
         } else if (destination instanceof Map) {
-            if (!highSeas.getDestinations().contains(destination)) {
+            if (!destinations.contains(destination)) {
                 return serverPlayer.clientError("HighSeas does not connect to: "
-                    + destination.getId());
+                    + destination.getId()
+                    + " in " + highSeas.destinationsToString());
             } else if (unit.getLocation() == highSeas) {
                 if (current != destination && (current == null
                         || current.getTile() == null
@@ -2907,9 +2910,10 @@ public final class InGameController extends Controller {
             }
         } else if (destination instanceof Settlement) {
             Tile tile = destination.getTile();
-            if (!highSeas.getDestinations().contains(tile.getMap())) {
+            if (!destinations.contains(tile.getMap())) {
                 return serverPlayer.clientError("HighSeas does not connect to: "
-                    + destination.getId());
+                    + destination.getId() + "/" + tile.getMap().getId()
+                    + " in " + highSeas.destinationsToString());
             } else if (unit.getLocation() == highSeas) {
                 // Direction is somewhat moot, so just reset.
                 unit.setWorkLeft(unit.getSailTurns());
