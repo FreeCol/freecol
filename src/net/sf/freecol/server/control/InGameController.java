@@ -2271,6 +2271,8 @@ public final class InGameController extends Controller {
         Unit undead = new ServerUnit(game, theFlyingDutchman,
                                      serverPlayer, landType);//-vis
         assert undead != null;
+        cs.add(See.only(serverPlayer),
+                        serverPlayer.exploreForUnit(theFlyingDutchman));
         serverPlayer.setDead(false);
         serverPlayer.changePlayerType(PlayerType.UNDEAD);
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)

@@ -3043,6 +3043,11 @@ public final class InGameController extends FreeColClientHolder {
         if (ret) {
             updateGUI(tile, false);
         }
+        // Special case if no units left, might end up undead
+        if (getMyPlayer().getUnitCount() == 0 && setDead()) {
+            updateGUI(null, true);
+        }
+
         return ret;
     }
 
@@ -4757,29 +4762,35 @@ public final class InGameController extends FreeColClientHolder {
 
     /**
      * This player has died.
+     *
+     * @return True if the player has risen as the undead.
      */
-    private void setDead() {
+    private boolean setDead() {
         final FreeColClient fcc = getFreeColClient();
         final Player player = getMyPlayer();
-        FreeColDebugger.finishDebugRun(fcc, true);
+        LogoutReason reason = null;
         if (fcc.getSinglePlayer()) {
             if (player.getPlayerType() == Player.PlayerType.RETIRED) {
-                    ; // Do nothing, retire routine will quit
-            } else if (player.getPlayerType() != Player.PlayerType.UNDEAD) {
-                if (getGUI().confirm("defeatedSinglePlayer.text",
-                                     "defeatedSinglePlayer.yes", "quit")) {
-                    askServer().enterRevengeMode();
-                }
+                ; // Do nothing, retire routine will quit
             } else {
-                fcc.getConnectController()
-                    .requestLogout(LogoutReason.DEFEATED);
+                if (player.getPlayerType() != Player.PlayerType.UNDEAD
+                    && getGUI().confirm("defeatedSinglePlayer.text",
+                                        "defeatedSinglePlayer.yes", "quit")) {
+                    askServer().enterRevengeMode();
+                    return true;
+                }
+                reason = LogoutReason.DEFEATED;
             }
         } else {
             if (!getGUI().confirm("defeated.text", "defeated.yes", "quit")) {
-                fcc.getConnectController()
-                    .requestLogout(LogoutReason.DEFEATED);
+                reason = LogoutReason.DEFEATED;
             }
         }
+        FreeColDebugger.finishDebugRun(fcc, true);
+        if (reason != null) {
+            fcc.getConnectController().requestLogout(reason);
+        }
+        return false;
     }
 
     /**
