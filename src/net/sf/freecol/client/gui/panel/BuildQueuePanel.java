@@ -449,23 +449,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private class DefaultBuildQueueCellRenderer
         implements ListCellRenderer<BuildableType> {
 
-        private final JPanel itemPanel = new MigPanel(new MigLayout());
-        private final JPanel selectedPanel = new MigPanel(new MigLayout());
-        private final JLabel imageLabel = new JLabel(new ImageIcon());
-        private final JLabel nameLabel = new JLabel();
-
-        private final JLabel lockLabel
-            = new JLabel(new ImageIcon(getImageLibrary()
-                .getSmallerImage(ImageLibrary.ICON_LOCK)));
-
         private final Dimension buildingDimension = new Dimension(-1, 48);
 
 
-        public DefaultBuildQueueCellRenderer() {
-            itemPanel.setOpaque(false);
-            selectedPanel.setOpaque(false);
-            selectedPanel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(selectedPanel));
-        }
+        public DefaultBuildQueueCellRenderer() {}
 
 
         /**
@@ -473,27 +460,30 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         @Override
         public Component getListCellRendererComponent(JList<? extends BuildableType> list,
-                        BuildableType value,
-                        int index,
-                        boolean isSelected,
-                        boolean cellHasFocus) {
-            JPanel panel = (isSelected) ? selectedPanel : itemPanel;
-            panel.removeAll();
+                                                      BuildableType value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            final ImageLibrary lib = getImageLibrary();
+            JPanel panel = new MigPanel(new MigLayout());
+            panel.setOpaque(false);
+            if (isSelected) {
+                panel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(panel));
+            }
 
-            ((ImageIcon)imageLabel.getIcon()).setImage(ImageLibrary
-                .getBuildableTypeImage(value, buildingDimension));
-
-            nameLabel.setText(Messages.getName(value));
-            panel.setToolTipText(lockReasons.get(value));
+            JLabel imageLabel = new JLabel(new ImageIcon(ImageLibrary
+                    .getBuildableTypeImage(value, buildingDimension)));
+            JLabel nameLabel = new JLabel(Messages.getName(value));
+            String reason = lockReasons.get(value);
             panel.add(imageLabel, "span 1 2");
-            if (lockReasons.get(value) == null) {
+            if (reason == null) {
                 panel.add(nameLabel, "wrap");
             } else {
                 panel.add(nameLabel, "split 2");
-                panel.add(lockLabel, "wrap");
+                panel.add(lib.getLockLabel(), "wrap");
+                panel.setToolTipText(reason);
             }
 
-            ImageLibrary lib = getImageLibrary();
             List<AbstractGoods> required = value.getRequiredGoodsList();
             int size = required.size();
             for (int i = 0; i < size; i++) {

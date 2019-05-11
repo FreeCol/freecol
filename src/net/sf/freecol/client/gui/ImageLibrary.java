@@ -46,7 +46,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Ability;
@@ -687,6 +689,10 @@ public final class ImageLibrary {
 
     public static BufferedImage getLibertyImage() {
         return getSizedImageInternal(BELLS, ICON_SIZE, false);
+    }
+
+    public JLabel getLockLabel() {
+        return new JLabel(new ImageIcon(getSmallerImage(ICON_LOCK)));
     }
 
     public static BufferedImage getMeetingImage(Player meet) {
