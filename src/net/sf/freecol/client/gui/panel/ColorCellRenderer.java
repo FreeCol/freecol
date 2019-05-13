@@ -54,12 +54,14 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object color,
         boolean isSelected, boolean hasFocus, int row, int column) {
         final Color myColor = (Color)color;
-        setBackground(myColor);
-        Utility.localizeToolTip(this, StringTemplate
-            .template("info.rgb")
-            .addAmount("%red%", myColor.getRed())
-            .addAmount("%green%", myColor.getGreen())
-            .addAmount("%blue%", myColor.getBlue()));
+        if (myColor != null) {
+            setBackground(myColor);
+            Utility.localizeToolTip(this, StringTemplate
+                .template("info.rgb")
+                .addAmount("%red%", myColor.getRed())
+                .addAmount("%green%", myColor.getGreen())
+                .addAmount("%blue%", myColor.getBlue()));
+        }
         return this;
     }
 }
