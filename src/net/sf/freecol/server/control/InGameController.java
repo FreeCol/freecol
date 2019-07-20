@@ -2893,7 +2893,6 @@ public final class InGameController extends Controller {
             if (!hasMap) {
                 Map map = getGame().getMap();
                 destinations.add(map);
-                System.out.println("added map");
             }
         } else if (destination instanceof Map) {
             if (!destinations.contains(destination)) {
